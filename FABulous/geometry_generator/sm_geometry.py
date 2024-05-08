@@ -97,15 +97,15 @@ class SmGeometry:
             for southPort in self.southPorts:
                 if abs(southPort.yOffset) > 1:
                     augmentedPort = Port(
-                        southPort.wireDirection,
-                        southPort.sourceName,
-                        0,
-                        1,
-                        southPort.destinationName,
-                        southPort.wireCount * abs(southPort.yOffset),
-                        southPort.name,
-                        southPort.inOut,
-                        southPort.sideOfTile,
+                        wireDirection=southPort.wireDirection,
+                        sourceName=southPort.sourceName,
+                        xOffset=0,
+                        yOffset=1,
+                        destinationName=southPort.destinationName,
+                        wireCount=southPort.wireCount * abs(southPort.yOffset),
+                        name=southPort.name,
+                        inOut=southPort.inOut,
+                        sideOfTile=southPort.sideOfTile,
                     )
                     augmentedSouthPorts.append(augmentedPort)
                 else:
@@ -116,15 +116,15 @@ class SmGeometry:
             for northPort in self.northPorts:
                 if abs(northPort.yOffset) > 1:
                     augmentedPort = Port(
-                        northPort.wireDirection,
-                        northPort.sourceName,
-                        0,
-                        1,
-                        northPort.destinationName,
-                        northPort.wireCount * abs(northPort.yOffset),
-                        northPort.name,
-                        northPort.inOut,
-                        northPort.sideOfTile,
+                        wireDirection=northPort.wireDirection,
+                        sourceName=northPort.sourceName,
+                        xOffset=0,
+                        yOffset=1,
+                        destinationName=northPort.destinationName,
+                        wireCount=northPort.wireCount * abs(northPort.yOffset),
+                        name=northPort.name,
+                        inOut=northPort.inOut,
+                        sideOfTile=northPort.sideOfTile,
                     )
                     augmentedNorthPorts.append(augmentedPort)
                 else:
@@ -136,15 +136,15 @@ class SmGeometry:
             for eastPort in self.eastPorts:
                 if abs(eastPort.xOffset) > 1:
                     augmentedPort = Port(
-                        eastPort.wireDirection,
-                        eastPort.sourceName,
-                        1,
-                        0,
-                        eastPort.destinationName,
-                        eastPort.wireCount * abs(eastPort.xOffset),
-                        eastPort.name,
-                        eastPort.inOut,
-                        eastPort.sideOfTile,
+                        wireDirection=eastPort.wireDirection,
+                        sourceName=eastPort.sourceName,
+                        xOffset=1,
+                        yOffset=0,
+                        destinationName=eastPort.destinationName,
+                        wireCount=eastPort.wireCount * abs(eastPort.xOffset),
+                        name=eastPort.name,
+                        inOut=eastPort.inOut,
+                        sideOfTile=eastPort.sideOfTile,
                     )
                     augmentedEastPorts.append(augmentedPort)
                 else:
@@ -155,15 +155,15 @@ class SmGeometry:
             for westPort in self.westPorts:
                 if abs(westPort.xOffset) > 1:
                     augmentedPort = Port(
-                        westPort.wireDirection,
-                        westPort.sourceName,
-                        1,
-                        0,
-                        westPort.destinationName,
-                        westPort.wireCount * abs(westPort.xOffset),
-                        westPort.name,
-                        westPort.inOut,
-                        westPort.sideOfTile,
+                        wireDirection=westPort.wireDirection,
+                        sourceName=westPort.sourceName,
+                        xOffset=1,
+                        yOffset=0,
+                        destinationName=westPort.destinationName,
+                        wireCount=westPort.wireCount * abs(westPort.xOffset),
+                        name=westPort.name,
+                        inOut=westPort.inOut,
+                        sideOfTile=westPort.sideOfTile,
                     )
                     augmentedWestPorts.append(augmentedPort)
                 else:
@@ -195,15 +195,15 @@ class SmGeometry:
 
             if partnerName in portNameMap:
                 mergedPort = Port(
-                    Direction.JUMP,
-                    firstPort.sourceName,
-                    0,
-                    0,
-                    firstPort.destinationName,
-                    firstPort.wireCount,
-                    firstPortName,
-                    IO.INOUT,
-                    firstPort.sideOfTile,
+                    wireDirection=Direction.JUMP,
+                    sourceName=firstPort.sourceName,
+                    xOffset=0,
+                    yOffset=0,
+                    destinationName=firstPort.destinationName,
+                    wireCount=firstPort.wireCount,
+                    name=firstPortName,
+                    inOut=IO.INOUT,
+                    sideOfTile=firstPort.sideOfTile,
                 )
                 mergedJumpPorts.append(mergedPort)
                 del portNameMap[firstPortName]
@@ -240,7 +240,6 @@ class SmGeometry:
         eastWires = sum([port.wireCount for port in self.eastPorts])
         westWires = sum([port.wireCount for port in self.westPorts])
         jumpWires = sum([port.wireCount for port in self.jumpPorts])
-
         self.northWiresReservedWidth = sum(
             [abs(port.yOffset) * port.wireCount for port in self.northPorts]
         )

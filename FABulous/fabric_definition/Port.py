@@ -26,12 +26,12 @@ class Port:
     """
 
     wireDirection: Direction
+    name: str
     sourceName: str
     xOffset: int
     yOffset: int
     destinationName: str
     wireCount: int
-    name: str
     inOut: IO
     sideOfTile: Side
 
@@ -137,3 +137,53 @@ class Port:
             if self.destinationName != "NULL":
                 outputs.append(f"{self.destinationName}{openIndex}{str(i)}{closeIndex}")
         return inputs, outputs
+
+
+@dataclass(frozen=True, eq=True)
+class InPort(Port):
+    """
+    The InPort data class is a subclass of the Port
+    """
+
+    def __init__(
+        self,
+        name: str,
+        wireCount: int,
+        sideOfTile: Side = Side.ANY,
+    ):
+        super().__init__(
+            wireDirection=Direction.JUMP,
+            sourceName=name,
+            xOffset=0,
+            yOffset=0,
+            destinationName=name,
+            wireCount=wireCount,
+            name=name,
+            inOut=IO.INPUT,
+            sideOfTile=sideOfTile,
+        )
+
+
+@dataclass(frozen=True, eq=True)
+class OutPort(Port):
+    """
+    The OutPort data class is a subclass of the Port
+    """
+
+    def __init__(
+        self,
+        name,
+        wireCount: int,
+        sideOfTile: Side = Side.ANY,
+    ):
+        super().__init__(
+            wireDirection=Direction.JUMP,
+            sourceName=name,
+            xOffset=0,
+            yOffset=0,
+            destinationName=name,
+            wireCount=wireCount,
+            name=name,
+            inOut=IO.OUTPUT,
+            sideOfTile=sideOfTile,
+        )

@@ -275,29 +275,29 @@ def parseTiles(fileName: str) -> tuple[list[Tile], list[tuple[str, str]]]:
             if temp[0] in ["NORTH", "SOUTH", "EAST", "WEST"]:
                 ports.append(
                     Port(
-                        Direction[temp[0]],
-                        temp[1],
-                        int(temp[2]),
-                        int(temp[3]),
-                        temp[4],
-                        int(temp[5]),
-                        temp[1],
-                        IO.OUTPUT,
-                        Side[temp[0]],
+                        wireDirection=Direction[temp[0]],
+                        sourceName=temp[1],
+                        xOffset=int(temp[2]),
+                        yOffset=int(temp[3]),
+                        destinationName=temp[4],
+                        wireCount=int(temp[5]),
+                        name=temp[1],
+                        inOut=IO.OUTPUT,
+                        sideOfTile=Side[temp[0]],
                     )
                 )
 
                 ports.append(
                     Port(
-                        Direction[temp[0]],
-                        temp[1],
-                        int(temp[2]),
-                        int(temp[3]),
-                        temp[4],
-                        int(temp[5]),
-                        temp[4],
-                        IO.INPUT,
-                        Side[oppositeDic[temp[0]].upper()],
+                        wireDirection=Direction[temp[0]],
+                        sourceName=temp[1],
+                        xOffset=int(temp[2]),
+                        yOffset=int(temp[3]),
+                        destinationName=temp[4],
+                        wireCount=int(temp[5]),
+                        name=temp[4],
+                        inOut=IO.INPUT,
+                        sideOfTile=Side[oppositeDic[temp[0]].upper()],
                     )
                 )
                 # wireCount = (abs(int(temp[2])) +
@@ -308,28 +308,28 @@ def parseTiles(fileName: str) -> tuple[list[Tile], list[tuple[str, str]]]:
             elif temp[0] == "JUMP":
                 ports.append(
                     Port(
-                        Direction.JUMP,
-                        temp[1],
-                        int(temp[2]),
-                        int(temp[3]),
-                        temp[4],
-                        int(temp[5]),
-                        temp[1],
-                        IO.OUTPUT,
-                        Side.ANY,
+                        wireDirection=Direction.JUMP,
+                        sourceName=temp[1],
+                        xOffset=int(temp[2]),
+                        yOffset=int(temp[3]),
+                        destinationName=temp[4],
+                        wireCount=int(temp[5]),
+                        name=temp[1],
+                        inOut=IO.OUTPUT,
+                        sideOfTile=Side.ANY,
                     )
                 )
                 ports.append(
                     Port(
-                        Direction.JUMP,
-                        temp[1],
-                        int(temp[2]),
-                        int(temp[3]),
-                        temp[4],
-                        int(temp[5]),
-                        temp[4],
-                        IO.INPUT,
-                        Side.ANY,
+                        wireDirection=Direction.JUMP,
+                        sourceName=temp[1],
+                        xOffset=int(temp[2]),
+                        yOffset=int(temp[3]),
+                        destinationName=temp[4],
+                        wireCount=int(temp[5]),
+                        name=temp[4],
+                        inOut=IO.INPUT,
+                        sideOfTile=Side.ANY,
                     )
                 )
             elif temp[0] == "BEL":
@@ -345,15 +345,15 @@ def parseTiles(fileName: str) -> tuple[list[Tile], list[tuple[str, str]]]:
                 internal, external, config, shared, configBit, userClk, belMap = result
                 bels.append(
                     Bel(
-                        belFilePath,
-                        temp[2],
-                        internal,
-                        external,
-                        config,
-                        shared,
-                        configBit,
-                        belMap,
-                        userClk,
+                        src=belFilePath,
+                        prefix=temp[2],
+                        internal=internal,
+                        external=external,
+                        configPort=config,
+                        sharedPort=shared,
+                        configBit=configBit,
+                        belMap=belMap,
+                        userCLK=userClk,
                     )
                 )
                 withUserCLK |= userClk

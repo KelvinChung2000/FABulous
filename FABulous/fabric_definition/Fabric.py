@@ -204,6 +204,7 @@ class Fabric:
                                     destinationTile=f"X{x+port.xOffset}Y{y+value}",
                                 )
                             )
+
                 tile.externalWireList = list(dict.fromkeys(tile.externalWireList))
 
     def __repr__(self) -> str:
@@ -235,5 +236,5 @@ class Fabric:
     def getSuperTileByName(self, name: str) -> SuperTile:
         return self.superTileDic[name]
 
-    def addWireToTile(self, name: str, wire: Wire):
+    def addExternalWireToTile(self, name: str, wire: Wire):
         self.tileDic[name].internalWireList.append(wire)

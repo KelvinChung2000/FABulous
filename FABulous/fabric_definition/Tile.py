@@ -9,7 +9,6 @@ from FABulous.fabric_generator.utilities import parseMatrix, parseList
 from typing import Any
 
 
-@dataclass
 class Tile:
     """
     This class is for storing the information about a tile.
@@ -24,19 +23,6 @@ class Tile:
         filePath (str) : The path of the matrix file
     """
 
-    name: str
-    portsInfo: list[Port]
-    bels: list[Bel]
-    matrixDir: str
-    globalConfigBits: int = 0
-    withUserCLK: bool = False
-    externalWireList: list[Wire] = field(default_factory=list)
-    internalWireList: list[Wire] = field(default_factory=list)
-    filePath: str = "."
-    partOfSuperTile = False
-    X: int = 0
-    Y: int = 0
-
     def __init__(
         self,
         name: str,
@@ -46,52 +32,123 @@ class Tile:
         userCLK: bool,
         configBit: int = 0,
     ) -> None:
-        self.name = name
-        self.portsInfo = ports
-        self.bels = bels
-        self.matrixDir = matrixDir
-        self.withUserCLK = userCLK
-        self.globalConfigBits = configBit
-        self.externalWireList = []
-        self.internalWireList = []
-        self.filePath = os.path.split(matrixDir)[0]
+        self._name = name
+        self._portsInfo = ports
+        self._bels = bels
+        self._matrixDir = matrixDir
+        self._withUserCLK = userCLK
+        self._globalConfigBits = configBit
+        self._externalWireList = []
+        self._internalWireList = []
+        self._filePath = os.path.split(matrixDir)[0]
+        self._partOfSuperTile = False
+        self._X = 0
+        self._Y = 0
 
-        for b in self.bels:
-            self.globalConfigBits += b.configBit
+        for b in self._bels:
+            self._globalConfigBits += b.configBit
 
-        if self.matrixDir.endswith(".csv"):
-            connection = parseMatrix(self.matrixDir, self.name)
+        if self._matrixDir.endswith(".csv"):
+            connection = parseMatrix(self._matrixDir, self._name)
             for source, sinkList in connection.items():
                 for sink in sinkList:
-                    self.internalWireList.append(
+                    self._internalWireList.append(
                         Wire(
                             direction=Direction.JUMP,
                             source=sink,
                             xOffset=0,
                             yOffset=0,
                             destination=source,
-                            sourceTile=self.name,
-                            destinationTile=self.name,
+                            sourceTile=sink,
+                            destinationTile=source,
                         )
                     )
-        elif self.matrixDir.endswith(".list"):
-            connection = parseList(self.matrixDir)
+        elif self._matrixDir.endswith(".list"):
+            connection = parseList(self._matrixDir)
             for sink, source in connection:
-                self.internalWireList.append(
+                self._internalWireList.append(
                     Wire(
                         direction=Direction.JUMP,
                         source=source,
                         xOffset=0,
                         yOffset=0,
                         destination=sink,
-                        sourceTile=self.name,
-                        destinationTile=self.name,
+                        sourceTile=source,
+                        destinationTile=sink,
                     )
                 )
         else:
             raise ValueError(
-                f"For model generation {self.matrixDir} need to a csv or list file"
+                f"For model generation {self._matrixDir} need to a csv or list file"
             )
+
+    @property
+    def name(self) -> str:
+        return self._name
+
+    @property
+    def portsInfo(self) -> list[Port]:
+        return self._portsInfo
+
+    @property
+    def bels(self) -> list[Bel]:
+        return self._bels
+
+    @property
+    def matrixDir(self) -> str:
+        return self._matrixDir
+
+    @matrixDir.setter
+    def matrixDir(self, matrixDir: str) -> None:
+        self._matrixDir = matrixDir
+
+    @property
+    def globalConfigBits(self) -> int:
+        return self._globalConfigBits
+
+    @property
+    def withUserCLK(self) -> bool:
+        return self._withUserCLK
+
+    @property
+    def externalWireList(self) -> list[Wire]:
+        return self._externalWireList
+
+    @externalWireList.setter
+    def externalWireList(self, externalWireList: list[Wire]) -> None:
+        self._externalWireList = externalWireList
+
+    @property
+    def internalWireList(self) -> list[Wire]:
+        return self._internalWireList
+
+    @property
+    def filePath(self) -> str:
+        return self._filePath
+
+    @property
+    def partOfSuperTile(self) -> bool:
+        return self._partOfSuperTile
+
+    @partOfSuperTile.setter
+    def partOfSuperTile(self, partOfSuperTile: bool) -> None:
+        self._partOfSuperTile = partOfSuperTile
+
+    @property
+    def X(self) -> int:
+        return self._X
+
+    @property
+    def Y(self) -> int:
+        return self._Y
+
+    @X.setter
+    def X(self, x: int) -> None:
+        self._X = x
+
+    @Y.setter
+    def Y(self, y: int) -> None:
+        self._Y = y
 
     def __eq__(self, __o: Any) -> bool:
         if __o is None or not isinstance(__o, Tile):
@@ -163,3 +220,12 @@ class Tile:
             and p.wireDirection != Direction.JUMP
             and p.inOut == IO.OUTPUT
         ]
+
+    def addInternalWire(self, wire: Wire) -> None:
+        self._internalWireList.append(wire)
+
+    def addBel(self, bel: Bel) -> None:
+        self._bels.append(bel)
+
+    def addPort(self, port: Port) -> None:
+        self._portsInfo.append(port)

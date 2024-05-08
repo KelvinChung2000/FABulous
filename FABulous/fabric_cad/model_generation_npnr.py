@@ -23,26 +23,13 @@ def genNextpnrModel(fabric: Fabric):
             if tile is None:
                 continue
             pipStr.append(f"#Tile-internal pips on tile X{x}Y{y}:")
-            if tile.matrixDir.endswith(".csv"):
-                connection = parseMatrix(tile.matrixDir, tile.name)
-                for source, sinkList in connection.items():
-                    for sink in sinkList:
-                        pipStr.append(
-                            f"X{x}Y{y},{sink},X{x}Y{y},{source},{8},{sink}.{source}"
-                        )
-            elif tile.matrixDir.endswith(".list"):
-                connection = parseList(tile.matrixDir)
-                for sink, source in connection:
-                    pipStr.append(
-                        f"X{x}Y{y},{source},X{x}Y{y},{sink},{8},{source}.{sink}"
-                    )
-            else:
-                raise ValueError(
-                    f"For model generation {tile.matrixDir} need to a csv or list file"
+            for wire in tile.internalWireList:
+                pipStr.append(
+                    f"X{x}Y{y},{wire.source},X{x}Y{y},{wire.destination},{8},{wire.source}.{wire.destination}"
                 )
 
             pipStr.append(f"#Tile-external pips on tile X{x}Y{y}:")
-            for wire in tile.wireList:
+            for wire in tile.externalWireList:
                 pipStr.append(
                     f"X{x}Y{y},{wire.source},X{x+wire.xOffset}Y{y+wire.yOffset},{wire.destination},{8},{wire.source}.{wire.destination}"
                 )

@@ -5,6 +5,7 @@ from FABulous.fabric_definition.define import IO, Direction, Side
 from FABulous.fabric_definition.Bel import Bel
 from FABulous.fabric_definition.Port import Port
 from FABulous.fabric_definition.Wire import Wire
+from FABulous.fabric_generator.utilities import parseMatrix, parseList
 from typing import Any
 
 
@@ -29,9 +30,12 @@ class Tile:
     matrixDir: str
     globalConfigBits: int = 0
     withUserCLK: bool = False
-    wireList: list[Wire] = field(default_factory=list)
+    externalWireList: list[Wire] = field(default_factory=list)
+    internalWireList: list[Wire] = field(default_factory=list)
     filePath: str = "."
     partOfSuperTile = False
+    X: int = 0
+    Y: int = 0
 
     def __init__(
         self,
@@ -48,11 +52,46 @@ class Tile:
         self.matrixDir = matrixDir
         self.withUserCLK = userCLK
         self.globalConfigBits = configBit
-        self.wireList = []
+        self.externalWireList = []
+        self.internalWireList = []
         self.filePath = os.path.split(matrixDir)[0]
 
         for b in self.bels:
             self.globalConfigBits += b.configBit
+
+        if self.matrixDir.endswith(".csv"):
+            connection = parseMatrix(self.matrixDir, self.name)
+            for source, sinkList in connection.items():
+                for sink in sinkList:
+                    self.internalWireList.append(
+                        Wire(
+                            direction=Direction.JUMP,
+                            source=sink,
+                            xOffset=0,
+                            yOffset=0,
+                            destination=source,
+                            sourceTile=self.name,
+                            destinationTile=self.name,
+                        )
+                    )
+        elif self.matrixDir.endswith(".list"):
+            connection = parseList(self.matrixDir)
+            for sink, source in connection:
+                self.internalWireList.append(
+                    Wire(
+                        direction=Direction.JUMP,
+                        source=source,
+                        xOffset=0,
+                        yOffset=0,
+                        destination=sink,
+                        sourceTile=self.name,
+                        destinationTile=self.name,
+                    )
+                )
+        else:
+            raise ValueError(
+                f"For model generation {self.matrixDir} need to a csv or list file"
+            )
 
     def __eq__(self, __o: Any) -> bool:
         if __o is None or not isinstance(__o, Tile):

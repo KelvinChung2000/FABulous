@@ -169,6 +169,7 @@ def parseFabricCSV(fileName: str) -> Fabric:
             raise ValueError(f"The following parameter is not valid: {i}")
 
     # form the fabric data structure
+    x, y = 0, 0
     usedTile = set()
     for f in fabricDescription:
         fabricLineTmp = f.split(",")
@@ -177,14 +178,19 @@ def parseFabricCSV(fileName: str) -> Fabric:
             continue
         fabricLine = []
         for i in fabricLineTmp:
+            x += 1
             if i in tileDic:
-                fabricLine.append(deepcopy(tileDic[i]))
+                t = deepcopy(tileDic[i])
+                fabricLine.append(t)
+                t.X = x
+                t.Y = y
                 usedTile.add(i)
             elif i == "Null" or i == "NULL" or i == "None":
                 fabricLine.append(None)
             else:
                 raise ValueError(f"Unknown tile {i}")
         fabricTiles.append(fabricLine)
+        y += 1
 
     for i in list(tileDic.keys()):
         if i not in usedTile:
@@ -380,9 +386,7 @@ def parseTiles(fileName: str) -> tuple[list[Tile], list[tuple[str, str]]]:
             else:
                 raise ValueError(f"Unknown tile description {temp[0]} in tile {t}")
 
-            new_tiles.append(
-                Tile(tileName, ports, bels, matrixDir, withUserCLK, configBit)
-            )
+        new_tiles.append(Tile(tileName, ports, bels, matrixDir, withUserCLK, configBit))
 
     return (new_tiles, commonWirePair)
 

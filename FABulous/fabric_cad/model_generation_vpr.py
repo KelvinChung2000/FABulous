@@ -549,7 +549,7 @@ def genVPRRoutingResourceGraph(fabric: Fabric) -> (str, int):
 
             nodeType = ""
             doneWire = set()
-            for wire in tile.wireList:
+            for wire in tile.externalWireList:
                 if wire.xOffset != 0 and wire.yOffset != 0:
                     raise ValueError(
                         "Diagonal wires not currently supported for VPR routing resource model"

@@ -91,7 +91,7 @@ class Fabric:
                         and port.destinationName != "NULL"
                     ):
                         for i in range(port.wireCount):
-                            tile.wireList.append(
+                            tile.externalWireList.append(
                                 Wire(
                                     direction=port.wireDirection,
                                     source=f"{port.sourceName}{i}",
@@ -111,7 +111,7 @@ class Fabric:
                                 cascadedI = i + port.wireCount * (abs(port.xOffset) - 1)
                             else:
                                 cascadedI = i - port.wireCount
-                                tile.wireList.append(
+                                tile.externalWireList.append(
                                     Wire(
                                         direction=Direction.JUMP,
                                         source=f"{port.destinationName}{i}",
@@ -122,7 +122,7 @@ class Fabric:
                                         destinationTile=f"X{x}Y{y}",
                                     )
                                 )
-                            tile.wireList.append(
+                            tile.externalWireList.append(
                                 Wire(
                                     direction=port.wireDirection,
                                     source=f"{port.sourceName}{i}",
@@ -142,7 +142,7 @@ class Fabric:
                                 cascadedI = i + port.wireCount * (abs(port.yOffset) - 1)
                             else:
                                 cascadedI = i - port.wireCount
-                                tile.wireList.append(
+                                tile.externalWireList.append(
                                     Wire(
                                         direction=Direction.JUMP,
                                         source=f"{port.destinationName}{i}",
@@ -153,7 +153,7 @@ class Fabric:
                                         destinationTile=f"X{x}Y{y}",
                                     )
                                 )
-                            tile.wireList.append(
+                            tile.externalWireList.append(
                                 Wire(
                                     direction=port.wireDirection,
                                     source=f"{port.sourceName}{i}",
@@ -179,7 +179,7 @@ class Fabric:
 
                         value = min(max(port.xOffset, -1), 1)
                         for i in range(port.wireCount * abs(port.xOffset)):
-                            tile.wireList.append(
+                            tile.externalWireList.append(
                                 Wire(
                                     direction=port.wireDirection,
                                     source=f"{sourceName}{i}",
@@ -193,7 +193,7 @@ class Fabric:
 
                         value = min(max(port.yOffset, -1), 1)
                         for i in range(port.wireCount * abs(port.yOffset)):
-                            tile.wireList.append(
+                            tile.externalWireList.append(
                                 Wire(
                                     direction=port.wireDirection,
                                     source=f"{sourceName}{i}",
@@ -204,7 +204,7 @@ class Fabric:
                                     destinationTile=f"X{x+port.xOffset}Y{y+value}",
                                 )
                             )
-                tile.wireList = list(dict.fromkeys(tile.wireList))
+                tile.externalWireList = list(dict.fromkeys(tile.externalWireList))
 
     def __repr__(self) -> str:
         fabric = ""

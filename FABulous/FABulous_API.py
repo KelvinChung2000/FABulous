@@ -5,9 +5,11 @@ import FABulous.fabric_generator.file_parser as fileParser
 import FABulous.fabric_cad.model_generation_npnr as model_gen_npnr
 import FABulous.fabric_cad.model_generation_vpr as model_gen_vpr
 from FABulous.fabric_generator.code_generation_VHDL import VHDLWriter
-from FABulous.fabric_definition.Fabric import Fabric, Tile
+from FABulous.fabric_definition.Fabric import Fabric
 from FABulous.fabric_generator.fabric_gen import FabricGenerator
 from FABulous.geometry_generator.geometry_gen import GeometryGenerator
+from FABulous.fabric_definition.Wire import Wire
+from FABulous.fabric_definition.define import Direction
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(
@@ -92,3 +94,8 @@ class FABulous:
 
     def genModelVPRConstrains(self):
         return model_gen_vpr.genVPRConstrainsXML(self.fabric)
+
+    def addInternalTileWire(self, tileName: str, source: str, sink: str):
+        tile = self.fabric.getTileByName(tileName)
+        wire = Wire(Direction.JUMP, source, 0, 0, sink, tileName, tileName)
+        self.fabricGenerator.addInternalTileWire(tile, wire)

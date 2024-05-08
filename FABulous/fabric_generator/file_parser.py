@@ -100,11 +100,11 @@ def parseFabricCSV(fileName: str) -> Fabric:
     commonWirePair += new_commonWirePair
     tileDic = dict(zip(tileTypes, tileDefs))
 
-    new_supertiles = parseSupertiles(fileName, tileDic)
-    for new_supertile in new_supertiles:
-        superTileDic[new_supertile.name] = new_supertile
+    newSuperTiles = parseSuperTiles(fileName, tileDic)
+    for newSuperTile in newSuperTiles:
+        superTileDic[newSuperTile.name] = newSuperTile
 
-    if new_tiles or new_supertiles:
+    if new_tiles or newSuperTiles:
         print(f"Deprecation warning: {fileName} should not contain tile descriptions.")
 
     # parse the parameters
@@ -132,11 +132,11 @@ def parseFabricCSV(fileName: str) -> Fabric:
             commonWirePair += new_commonWirePair
             tileDic = dict(zip(tileTypes, tileDefs))
         elif i[0].startswith("Supertile"):
-            new_supertiles = parseSupertiles(
+            newSuperTiles = parseSuperTiles(
                 os.path.abspath(os.path.join(filePath, i[1])), tileDic
             )
-            for new_supertile in new_supertiles:
-                superTileDic[new_supertile.name] = new_supertile
+            for newSuperTile in newSuperTiles:
+                superTileDic[newSuperTile.name] = newSuperTile
         elif i[0].startswith("ConfigBitMode"):
             if i[1] == "frame_based":
                 configBitMode = ConfigBitMode.FRAME_BASED
@@ -391,7 +391,7 @@ def parseTiles(fileName: str) -> tuple[list[Tile], list[tuple[str, str]]]:
     return (new_tiles, commonWirePair)
 
 
-def parseSupertiles(fileName: str, tileDic: dict[str, Tile]) -> list[SuperTile]:
+def parseSuperTiles(fileName: str, tileDic: dict[str, Tile]) -> list[SuperTile]:
     """
     Parses a csv supertile configuration file and returns all SuperTile objects.
 

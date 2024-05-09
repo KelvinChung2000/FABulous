@@ -39,9 +39,8 @@ class Fabric:
 
     """
 
-    tile: list[list[Tile]] = field(default_factory=list)
-
     name: str = "eFPGA"
+    tile: list[list[Tile]] = field(default_factory=list)
     numberOfRows: int = 15
     numberOfColumns: int = 15
     configBitMode: ConfigBitMode = ConfigBitMode.FRAME_BASED
@@ -58,7 +57,6 @@ class Fabric:
 
     tileDic: dict[str, Tile] = field(default_factory=dict)
     superTileDic: dict[str, SuperTile] = field(default_factory=dict)
-    # wires: list[Wire] = field(default_factory=list)
     commonWirePair: list[tuple[str, str]] = field(default_factory=list)
 
     def __post_init__(self) -> None:

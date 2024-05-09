@@ -77,6 +77,8 @@ class Tile:
                         destinationTile=sink,
                     )
                 )
+        elif self._matrixDir == "software":
+            pass
         else:
             raise ValueError(
                 f"For model generation {self._matrixDir} need to a csv or list file"

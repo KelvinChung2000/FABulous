@@ -1,8 +1,7 @@
-from dataclasses import dataclass, field
 from FABulous.fabric_definition.define import IO
+from FABulous.fabric_definition.Port import Port
 
 
-@dataclass
 class Bel:
     """
     Contains all the information about a single BEL. The information is parsed from the directory of the BEL in the CSV
@@ -28,40 +27,31 @@ class Bel:
         withUserCLK (bool) : Whether the BEL has userCLK port. Default is False.
     """
 
-    src: str
-    prefix: str
-    name: str
-    inputs: list[str]
-    outputs: list[str]
-    externalInput: list[str]
-    externalOutput: list[str]
-    configPort: list[str]
-    sharedPort: list[tuple[str, IO]]
-    configBit: int
-    belFeatureMap: dict[str, dict] = field(default_factory=dict)
-    withUserCLK: bool = False
-
     def __init__(
         self,
         src: str,
+        name: str,
         prefix: str,
-        internal,
-        external,
-        configPort,
-        sharedPort,
+        internalPorts: list[Port],
+        externalPorts: list[Port],
+        configPort: list[Port],
+        sharedPort: list[Port],
         configBit: int,
         belMap: dict[str, dict],
         userCLK: bool,
     ) -> None:
         self.src = src
+        self.name = name
         self.prefix = prefix
-        self.name = src.split("/")[-1].split(".")[0]
-        self.inputs = [p for p, io in internal if io == IO.INPUT]
-        self.outputs = [p for p, io in internal if io == IO.OUTPUT]
-        self.externalInput = [p for p, io in external if io == IO.INPUT]
-        self.externalOutput = [p for p, io in external if io == IO.OUTPUT]
+        self.inputs = [p.name for p in internalPorts if p.inOut == IO.INPUT]
+        self.outputs = [p.name for p in internalPorts if p.inOut == IO.OUTPUT]
+        self.externalInput = [p.name for p in externalPorts if p.inOut == IO.INPUT]
+        self.externalOutput = [p.name for p in externalPorts if p.inOut == IO.OUTPUT]
         self.configPort = configPort
         self.sharedPort = sharedPort
         self.configBit = configBit
         self.belFeatureMap = belMap
         self.withUserCLK = userCLK
+
+    def __repr__(self) -> str:
+        return f"{self.name}({self.prefix})[{self.inputs}]"

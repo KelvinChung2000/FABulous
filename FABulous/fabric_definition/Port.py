@@ -151,11 +151,30 @@ class InPort(Port):
         wireCount: int,
         sideOfTile: Side = Side.ANY,
     ):
+        xOffset = 0
+        yOffset = 0
+        match sideOfTile:
+            case Side.NORTH:
+                xOffset = 0
+                yOffset = 1
+            case Side.EAST:
+                xOffset = 1
+                yOffset = 0
+            case Side.SOUTH:
+                xOffset = 0
+                yOffset = -1
+            case Side.WEST:
+                xOffset = -1
+                yOffset = 0
+            case _:
+                xOffset = 0
+                yOffset = 0
+
         super().__init__(
             wireDirection=Direction.JUMP,
             sourceName=name,
-            xOffset=0,
-            yOffset=0,
+            xOffset=xOffset,
+            yOffset=yOffset,
             destinationName=name,
             wireCount=wireCount,
             name=name,
@@ -176,11 +195,29 @@ class OutPort(Port):
         wireCount: int,
         sideOfTile: Side = Side.ANY,
     ):
+        xOffset = 0
+        yOffset = 0
+        match sideOfTile:
+            case Side.NORTH:
+                xOffset = 0
+                yOffset = 1
+            case Side.EAST:
+                xOffset = 1
+                yOffset = 0
+            case Side.SOUTH:
+                xOffset = 0
+                yOffset = -1
+            case Side.WEST:
+                xOffset = -1
+                yOffset = 0
+            case _:
+                xOffset = 0
+                yOffset = 0
         super().__init__(
             wireDirection=Direction.JUMP,
             sourceName=name,
-            xOffset=0,
-            yOffset=0,
+            xOffset=xOffset,
+            yOffset=yOffset,
             destinationName=name,
             wireCount=wireCount,
             name=name,

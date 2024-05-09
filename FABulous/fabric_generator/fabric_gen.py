@@ -1092,7 +1092,7 @@ class FabricGenerator:
 
             # shared port
             for port in bel.sharedPort:
-                portsPairs.append((port[0], port[0]))
+                portsPairs.append((port.name, port.name))
 
             if self.fabric.configBitMode == ConfigBitMode.FRAME_BASED:
                 if bel.configBit > 0:
@@ -1277,9 +1277,9 @@ class FabricGenerator:
                 for p in b.externalOutput:
                     self.writer.addPortScalar(p, IO.INPUT, indentLevel=2)
                 for p in b.sharedPort:
-                    if p[0] == "UserCLK":
+                    if p.name == "UserCLK":
                         continue
-                    self.writer.addPortScalar(p[0], p[1], indentLevel=2)
+                    self.writer.addPortScalar(p.name, p.inOut, indentLevel=2)
 
         # add userCLK port
         # self.writer.addPortScalar("userCLK", IO.INPUT, indentLevel=2)
@@ -1886,8 +1886,8 @@ class FabricGenerator:
                             portsPairs.append((p, f"Tile_X{x+i}Y{y+j}_{p}"))
 
                         for p in b.sharedPort:
-                            if "UserCLK" not in p[0]:
-                                portsPairs.append(("UserCLK", p[0]))
+                            if "UserCLK" not in p.name:
+                                portsPairs.append(("UserCLK", p.name))
 
                 if not superTile:
                     # for userCLK

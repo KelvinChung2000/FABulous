@@ -33,3 +33,22 @@ class Wire:
         if __o is None or not isinstance(__o, Wire):
             return False
         return self.source == __o.source and self.destination == __o.destination
+
+
+@dataclass(frozen=True, eq=True)
+class InternalWire(Wire):
+
+    def __init__(
+        self,
+        source: str,
+        destination: str,
+    ) -> None:
+        super().__init__(
+            Direction.JUMP,
+            source,
+            0,
+            0,
+            destination,
+            "",
+            "",
+        )

@@ -7,6 +7,7 @@ from FABulous.fabric_definition.Bel import Bel
 from FABulous.fabric_definition.Port import Port
 from FABulous.fabric_definition.Wire import Wire
 from FABulous.fabric_definition.Tile import Tile
+from FABulous.fabric_definition.Port import InPort, OutPort
 from FABulous.fabric_definition.SuperTile import SuperTile
 from FABulous.fabric_definition.Fabric import Fabric
 from FABulous.fabric_definition.ConfigMem import ConfigMem
@@ -342,21 +343,8 @@ def parseTiles(fileName: str) -> tuple[list[Tile], list[tuple[str, str]]]:
                     raise ValueError(
                         "Invalid file type, only .vhdl and .v are supported"
                     )
-                internal, external, config, shared, configBit, userClk, belMap = result
-                bels.append(
-                    Bel(
-                        src=belFilePath,
-                        prefix=temp[2],
-                        internal=internal,
-                        external=external,
-                        configPort=config,
-                        sharedPort=shared,
-                        configBit=configBit,
-                        belMap=belMap,
-                        userCLK=userClk,
-                    )
-                )
-                withUserCLK |= userClk
+                bels.append(result)
+                withUserCLK |= result.withUserCLK
             elif temp[0] == "MATRIX":
                 matrixDir = os.path.join(filePath, temp[1])
                 configBit = 0
@@ -442,21 +430,8 @@ def parseSuperTiles(fileName: str, tileDic: dict[str, Tile]) -> list[SuperTile]:
                     result = parseFileVHDL(belFilePath, line[2])
                 else:
                     result = parseFileVerilog(belFilePath, line[2])
-                internal, external, config, shared, configBit, userClk, belMap = result
-                bels.append(
-                    Bel(
-                        belFilePath,
-                        line[2],
-                        internal,
-                        external,
-                        config,
-                        shared,
-                        configBit,
-                        belMap,
-                        userClk,
-                    )
-                )
-                withUserCLK |= userClk
+                bels.append(result)
+                withUserCLK |= result.withUserCLK
                 continue
 
             for j in line:
@@ -480,15 +455,7 @@ def parseSuperTiles(fileName: str, tileDic: dict[str, Tile]) -> list[SuperTile]:
     return new_supertiles
 
 
-def parseFileVHDL(filename: str, belPrefix: str = "") -> tuple[
-    list[tuple[str, IO]],
-    list[tuple[str, IO]],
-    list[tuple[str, IO]],
-    list[tuple[str, IO]],
-    int,
-    bool,
-    dict[str, int],
-]:
+def parseFileVHDL(filename: str, belPrefix: str = "") -> Bel:
     """
     Parse a VHDL bel file and return all the related information of the bel. The tuple returned for relating to ports will
     be a list of (belName, IO) pair.
@@ -529,6 +496,7 @@ def parseFileVHDL(filename: str, belPrefix: str = "") -> tuple[
         exit(-1)
 
     belMapDic = _belMapProcessing(file, filename, "vhdl")
+    moduleName = re.search(r"entity\s+(\w+)\s+is", file, re.IGNORECASE).group(1)
 
     if result := re.search(r"NoConfigBits.*?=.*?(\d+)", file, re.IGNORECASE):
         noConfigBits = int(result.group(1))
@@ -573,33 +541,29 @@ def parseFileVHDL(filename: str, belPrefix: str = "") -> tuple[
 
         if isExternal and not isShared:
             if result.group(2).lower() == "in":
-                external.append((portName, IO.INPUT))
+                external.append(InPort(portName, 1))
             elif result.group(2).lower() == "out":
-                external.append((portName, IO.OUTPUT))
+                external.append(OutPort(portName, 1))
         elif isConfig:
             if result.group(2).lower() == "in":
-                config.append((portName, IO.INPUT))
+                config.append(InPort(portName, 1))
             elif result.group(2).lower() == "out":
-                config.append((portName, IO.OUTPUT))
+                config.append(OutPort(portName, 1))
         elif isShared:
             # shared port do not have a prefix
             if result.group(2).lower() == "in":
-                shared.append((result.group(1), IO.INOUT))
+                shared.append(InPort(portName, 1))
             elif result.group(2).lower() == "out":
-                shared.append((result.group(1), IO.OUTPUT))
-            elif result.group(2).lower() == "inout":
-                shared.append((result.group(1), IO.INOUT))
+                shared.append(OutPort(portName, 1))
             else:
                 raise ValueError(
                     f"Invalid port type {result.group(2)} in file {filename}"
                 )
         else:
             if result.group(2).lower() == "in":
-                internal.append((portName, IO.INPUT))
+                internal.append(InPort(portName, 1))
             elif result.group(2).lower() == "out":
-                internal.append((portName, IO.OUTPUT))
-            elif result.group(2).lower() == "inout":
-                internal.append((portName, IO.INOUT))
+                internal.append(OutPort(portName, 1))
             else:
                 raise ValueError(
                     f"Invalid port type {result.group(2)} in file {filename}"
@@ -627,18 +591,21 @@ def parseFileVHDL(filename: str, belPrefix: str = "") -> tuple[
         print("Assume the number of configBits is 0")
         noConfigBits = 0
 
-    return internal, external, config, shared, noConfigBits, userClk, belMapDic
+    return Bel(
+        src=filename,
+        name=moduleName,
+        prefix=belPrefix,
+        internalPorts=internal,
+        externalPorts=external,
+        configPort=config,
+        sharedPort=shared,
+        configBit=noConfigBits,
+        belMap=belMapDic,
+        userCLK=userClk,
+    )
 
 
-def parseFileVerilog(filename: str, belPrefix: str = "") -> tuple[
-    list[tuple[str, IO]],
-    list[tuple[str, IO]],
-    list[tuple[str, IO]],
-    list[tuple[str, IO]],
-    int,
-    bool,
-    dict[str, dict],
-]:
+def parseFileVerilog(filename: str, belPrefix: str = "") -> Bel:
     """
     Parse a Verilog bel file and return all the related information of the bel. The tuple returned for relating to ports
     will be a list of (belName, IO) pair.
@@ -741,10 +708,14 @@ def parseFileVerilog(filename: str, belPrefix: str = "") -> tuple[
             f"NoConfigBits does not match with the BEL map in file {filename}, length of BelMap is {len(belMapDic)}, but with {noConfigBits} config bits"
         )
 
+    moduleName = re.search(r"module\s+(\w+)\s*\(", file, re.IGNORECASE).group(1)
+
     file = file.split("\n")
 
     for line in file:
-        if result := re.search(r".*(input|output|inout).*?(\w+);", line, re.IGNORECASE):
+        if result := re.search(
+            r".*(input|output|inout)\s*(\[.*\])?\s*(\w+);", line, re.IGNORECASE
+        ):
             cleanedLine = line.replace(" ", "")
             if attribute := re.search(r"\(\*FABulous,(.*)\*\)", cleanedLine):
                 if "EXTERNAL" in attribute.group(1):
@@ -759,17 +730,26 @@ def parseFileVerilog(filename: str, belPrefix: str = "") -> tuple[
                 if "GLOBAL" in attribute.group(1):
                     break
 
-            portName = f"{belPrefix}{result.group(2)}"
+            portName = f"{belPrefix}{result.group(3)}"
+            wireCount = 1
+            if result.group(2):
+                tmp = result.group(2).replace("[", "").replace("]", "")
+                wireCount = int(tmp.split(":")[0]) - int(tmp.split(":")[1]) + 1
+
+            if IO[result.group(1).upper()] == IO.INPUT:
+                portType = InPort
+            else:
+                portType = OutPort
 
             if isExternal and not isShared:
-                external.append((portName, IO[result.group(1).upper()]))
+                external.append(portType(portName, wireCount=wireCount))
             elif isConfig:
-                config.append((portName, IO[result.group(1).upper()]))
+                config.append(portType(portName, 1))
             elif isShared:
                 # shared port do not have a prefix
-                shared.append((result.group(2), IO[result.group(1).upper()]))
+                shared.append(portType(result.group(3), wireCount=wireCount))
             else:
-                internal.append((portName, IO[result.group(1).upper()]))
+                internal.append(portType(portName, wireCount=wireCount))
 
             if "UserCLK" in portName:
                 userClk = True
@@ -778,7 +758,18 @@ def parseFileVerilog(filename: str, belPrefix: str = "") -> tuple[
             isConfig = False
             isShared = False
 
-    return internal, external, config, shared, noConfigBits, userClk, belMapDic
+    return Bel(
+        src=filename,
+        name=moduleName,
+        prefix=belPrefix,
+        internalPorts=internal,
+        externalPorts=external,
+        configPort=config,
+        sharedPort=shared,
+        configBit=noConfigBits,
+        belMap=belMapDic,
+        userCLK=userClk,
+    )
 
 
 def _belMapProcessing(

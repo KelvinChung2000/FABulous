@@ -39,7 +39,7 @@ import docker
 import FABulous.fabric_cad.model_generation_npnr as model_gen_npnr
 from FABulous.fabric_generator.code_generation_Verilog import VerilogWriter
 from FABulous.fabric_generator.code_generation_VHDL import VHDLWriter
-from FABulous.fabric_generator.utilities import GetFabric, genFabricObject
+from FABulous.utilities.utilities import GetFabric, genFabricObject
 from FABulous.FABulous_API import FABulous
 
 readline.set_completer_delims(" \t\n")
@@ -550,25 +550,40 @@ To run the complete FABulous flow with the default project, run the following co
         logger.info("FABulous fabric flow complete")
         return 0
 
-    def do_gen_model_npnr(self, *ignored):
+    def do_gen_model_npnr(self, args):
         "Generate a npnr model of the fabric"
-        logger.info("Generating npnr model")
-        npnrModel = self.fabricGen.genModelNpnr()
-        logger.info(f"output file: {self.projectDir}/{metaDataDir}/pips.txt")
-        with open(f"{self.projectDir}/{metaDataDir}/pips.txt", "w") as f:
-            f.write(npnrModel[0])
+        args = self.parse(args)
 
-        logger.info(f"output file: {self.projectDir}/{metaDataDir}/bel.txt")
-        with open(f"{self.projectDir}/{metaDataDir}/bel.txt", "w") as f:
-            f.write(npnrModel[1])
+        if len(args) == 0 or args[0] == "text":
+            logger.info("Generating npnr model")
+            npnrModel = self.fabricGen.genModelNpnr()
+            logger.info(f"output file: {self.projectDir}/{metaDataDir}/pips.txt")
+            with open(f"{self.projectDir}/{metaDataDir}/pips.txt", "w") as f:
+                f.write(npnrModel[0])
 
-        logger.info(f"output file: {self.projectDir}/{metaDataDir}/bel.v2.txt")
-        with open(f"{self.projectDir}/{metaDataDir}/bel.v2.txt", "w") as f:
-            f.write(npnrModel[2])
+            logger.info(f"output file: {self.projectDir}/{metaDataDir}/bel.txt")
+            with open(f"{self.projectDir}/{metaDataDir}/bel.txt", "w") as f:
+                f.write(npnrModel[1])
 
-        logger.info(f"output file: {self.projectDir}/{metaDataDir}/template.pcf")
-        with open(f"{self.projectDir}/{metaDataDir}/template.pcf", "w") as f:
-            f.write(npnrModel[3])
+            logger.info(f"output file: {self.projectDir}/{metaDataDir}/bel.v2.txt")
+            with open(f"{self.projectDir}/{metaDataDir}/bel.v2.txt", "w") as f:
+                f.write(npnrModel[2])
+
+            logger.info(f"output file: {self.projectDir}/{metaDataDir}/template.pcf")
+            with open(f"{self.projectDir}/{metaDataDir}/template.pcf", "w") as f:
+                f.write(npnrModel[3])
+        elif len(args) == 1 and args[0] == "bba":
+            logger.info("Generating npnr model")
+            chipModel = self.fabricGen.genModelNpnrBBA()
+            logger.info(
+                f"output file: {self.projectDir}/{metaDataDir}/fabricDatabase.bin"
+            )
+            chipModel.write_bba(f"{self.projectDir}/{metaDataDir}/fabricDatabase.bin")
+        else:
+            logger.error("Usage: synthesis_npnr [text|bba]")
+            raise TypeError(
+                f"gen_model_npnr takes zero or one argument ({len(args)} given)"
+            )
 
         logger.info("Generated npnr model")
 

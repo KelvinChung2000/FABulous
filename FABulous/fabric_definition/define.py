@@ -1,4 +1,4 @@
-from enum import Enum
+from enum import Enum, IntEnum
 
 
 class IO(Enum):
@@ -9,19 +9,19 @@ class IO(Enum):
 
 
 class Direction(Enum):
-    NORTH = "NORTH"
-    SOUTH = "SOUTH"
-    EAST = "EAST"
-    WEST = "WEST"
-    JUMP = "JUMP"
+    NORTH = (1, 0)
+    SOUTH = (-1, 0)
+    EAST = (1, 0)
+    WEST = (-1, 0)
+    JUMP = (0, 0)
 
 
 class Side(Enum):
-    NORTH = "NORTH"
-    SOUTH = "SOUTH"
-    EAST = "EAST"
-    WEST = "WEST"
-    ANY = "ANY"
+    NORTH = (1, 0)
+    SOUTH = (-1, 0)
+    EAST = (1, 0)
+    WEST = (-1, 0)
+    ANY = (0, 0)
 
 
 class MultiplexerStyle(Enum):

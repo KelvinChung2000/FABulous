@@ -1,9 +1,72 @@
 import string
 from typing import Tuple
 
-from FABulous.fabric_definition.Fabric import Fabric, Tile
-from FABulous.fabric_generator.utilities import parseMatrix, parseList
-from FABulous.fabric_generator.utilities import *
+from FABulous.fabric_definition.Fabric import Fabric
+from FABulous.fabric_definition.define import Direction
+from FABulous.utilities.utilities import parseMatrix, parseList
+from FABulous.utilities.utilities import *
+from FABulous.fabric_cad.chip import *
+
+
+def genChipDatabaseBBA(fabric: Fabric) -> Chip:
+    ch = Chip("FABulous", fabric.numberOfColumns, fabric.numberOfRows)
+    X = fabric.numberOfColumns
+    Y = fabric.numberOfRows
+
+    # NULL tile
+    tt = ch.create_tile_type("NULL")
+    tt.create_wire(f"CLK", "TILE_CLK")
+    tt.create_wire(f"CLK_PREV", "CLK_ROUTE")
+
+    tt.create_wire(f"GND", "GND", const_value="GND")
+    tt.create_wire(f"VCC", "VCC", const_value="VCC")
+
+    gnd = tt.create_bel(f"GND_DRV", f"GND_DRV", z=0)
+    tt.add_bel_pin(gnd, "GND", "GND", PinType.OUTPUT)
+    vcc = tt.create_bel(f"VCC_DRV", f"VCC_DRV", z=1)
+    tt.add_bel_pin(vcc, "VCC", "VCC", PinType.OUTPUT)
+
+    for tileName, tile in fabric.tileDic.items():
+        tt = ch.create_tile_type(tileName)
+        # create bels
+        for bel in tile.bels:
+            belLogic = tt.create_bel(f"{bel.prefix}{bel.name}", bel.name)
+            for i in bel.inputs + bel.outputs:
+                tt.create_wire(f"{bel.prefix}{i}", f"{bel.name}_{i}")
+            for i in bel.inputs:
+                tt.add_bel_pin(belLogic, i, f"{bel.prefix}{i}", PinType.INPUT)
+            for i in bel.outputs:
+                tt.add_bel_pin(belLogic, i, f"{bel.prefix}{i}", PinType.OUTPUT)
+
+        for i in tile.internalWireList:
+            tt.create_wire(i.name, "SWITCH")
+            tt.create_pip(i.source, i.destination)
+
+    for y, row in enumerate(fabric.tile):
+        for x, tile in enumerate(row):
+            if tile is None:
+                ch.set_tile_type(x, y, "NULL")
+            else:
+                ch.set_tile_type(x, y, tile.name)
+
+            # create nodes
+            localNodes = []
+            for i in tile.internalWireList:
+                localNodes.append(NodeWire(x, y, i.name))
+
+            Wl = 32 * 4 * 4
+            localNodes = [[NodeWire(x, y, f"SWITCH{i}")] for i in range(Wl)]
+            for d, (dx, dy) in {i.name: i.value for i in Direction}.items():
+                x1 = x - dx
+                y1 = y - dy
+                if x1 < 0 or x1 >= X or y1 < 0 or y1 >= Y or tile is None:
+                    continue
+                for i in range(Wl):
+                    localNodes[i].append(NodeWire(x1, y1, f"{d}{i}"))
+            for n in localNodes:
+                ch.add_node(n)
+
+    return ch
 
 
 def genNextpnrModel(fabric: Fabric):

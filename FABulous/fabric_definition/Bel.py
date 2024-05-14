@@ -54,4 +54,4 @@ class Bel:
         self.withUserCLK = userCLK
 
     def __repr__(self) -> str:
-        return f"{self.name}({self.prefix})[{self.inputs}]"
+        return f"[{self.inputs}]{self.prefix}{self.name}[{self.outputs}]"

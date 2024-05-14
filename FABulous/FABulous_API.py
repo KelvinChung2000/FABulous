@@ -11,6 +11,7 @@ from FABulous.geometry_generator.geometry_gen import GeometryGenerator
 from FABulous.fabric_definition.Wire import Wire
 from FABulous.fabric_definition.define import Direction
 from FABulous.fabric_definition.Bel import Bel
+from FABulous.utilities.bba import bbaWriter
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(
@@ -100,3 +101,7 @@ class FABulous:
         tile = self.fabric.getTileByName(tileName)
         wire = Wire(Direction.JUMP, source, 0, 0, sink, tileName, tileName)
         self.fabric.addExternalTileWire(tile, wire)
+
+    def genModelNpnrBBA(self):
+        ch = model_gen_npnr.genChipDatabaseBBA(self.fabric)
+        return ch

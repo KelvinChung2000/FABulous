@@ -8,8 +8,8 @@ from xml.dom import minidom
 
 from FABulous.fabric_definition.Fabric import IO, Bel, Fabric
 from FABulous.fabric_generator.fabric_gen import FabricGenerator
-from FABulous.fabric_generator.utilities import parseList, parseMatrix
-from FABulous.fabric_generator.utilities import *
+from FABulous.utilities.utilities import parseList, parseMatrix
+from FABulous.utilities.utilities import *
 
 logger = logging.getLogger(__name__)
 

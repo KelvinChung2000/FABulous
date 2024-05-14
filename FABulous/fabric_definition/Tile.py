@@ -5,7 +5,7 @@ from FABulous.fabric_definition.define import IO, Direction, Side
 from FABulous.fabric_definition.Bel import Bel
 from FABulous.fabric_definition.Port import Port
 from FABulous.fabric_definition.Wire import Wire
-from FABulous.fabric_generator.utilities import parseMatrix, parseList
+from FABulous.utilities.utilities import parseMatrix, parseList
 from typing import Any
 
 

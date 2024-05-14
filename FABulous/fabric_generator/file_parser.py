@@ -11,7 +11,7 @@ from FABulous.fabric_definition.Port import InPort, OutPort
 from FABulous.fabric_definition.SuperTile import SuperTile
 from FABulous.fabric_definition.Fabric import Fabric
 from FABulous.fabric_definition.ConfigMem import ConfigMem
-from FABulous.fabric_generator.utilities import parseList, parseMatrix
+from FABulous.utilities.utilities import parseList, parseMatrix
 from typing import Literal
 from FABulous.fabric_definition.define import (
     IO,

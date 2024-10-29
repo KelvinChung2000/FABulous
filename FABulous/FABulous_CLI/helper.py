@@ -119,7 +119,10 @@ def setup_project_env_vars(args: argparse.Namespace) -> None:
         logger.warning("No project .env file found")
 
     # Overwrite project language param, if writer is specified as command line argument
-    if args.writer:
+    if args.writer and args.writer != os.getenv("FAB_PROJ_LANG"):
+        logger.warning(
+            f"Overwriting project language for current run, from {os.getenv('FAB_PROJ_LANG')} to {args.writer}, which was specified as command line argument"
+        )
         os.environ["FAB_PROJ_LANG"] = args.writer
 
 
@@ -163,6 +166,10 @@ def create_project(project_dir, type: Literal["verilog", "vhdl"] = "verilog"):
     else:
         os.mkdir(f"{project_dir}")
 
+    # set default type, since "None" overwrites the default value
+    if not type:
+        type = "verilog"
+
     os.mkdir(f"{project_dir}/.FABulous")
     fabulousRoot = os.getenv("FAB_ROOT")
 
@@ -181,6 +188,8 @@ def create_project(project_dir, type: Literal["verilog", "vhdl"] = "verilog"):
         env_file.write(f"FAB_PROJ_LANG={type}\n")
 
     adjust_directory_in_verilog_tb(project_dir)
+
+    logger.info(f"New FABulous project created in {project_dir} with {type} language.")
 
 
 def copy_verilog_files(src: Path, dst: Path):

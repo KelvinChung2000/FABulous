@@ -1064,8 +1064,10 @@ def main():
 
         if os.getenv("FAB_PROJ_LANG") == "vhdl":
             writer = VHDLWriter()
+            logger.debug("VHDL writer selected")
         elif os.getenv("FAB_PROJ_LANG") == "verilog":
             writer = VerilogWriter()
+            logger.debug("Verilog writer selected")
         else:
             logger.error(
                 f"Invalid projct language specified: {os.getenv('FAB_PROJ_LANG')}"

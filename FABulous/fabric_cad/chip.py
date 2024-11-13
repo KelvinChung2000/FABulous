@@ -70,6 +70,14 @@ class StringPool:
                 continue
             bba.str(s)
 
+    def __getitem__(self, id: IdString) -> str:
+        for s, i in self.strs.items():
+            if i == id.index:
+                return s
+        else:
+            raise ValueError(f"Unknown id {id}")
+
+
     def serialise(self, context: str, bba: BBAWriter):
         bba.u32(self.known_id_count)
         bba.slice(f"{context}_strs", len(self.strs) - self.known_id_count)
@@ -848,7 +856,7 @@ class Chip:
         self.extra_data = None
         self.timing = TimingPool(self.strs)
 
-    def create_tile_type(self, name: str):
+    def create_tile_type(self, name: str) -> TileType:
         tt = TileType(self.strs, self.timing, self.strs.id(name))
         self.tile_type_idx[name] = len(self.tile_types)
         self.tile_types.append(tt)
@@ -858,7 +866,7 @@ class Chip:
         self.tiles[y][x].type_idx = self.tile_type_idx[type]
         return self.tiles[y][x]
 
-    def tile_type_at(self, x: int, y: int):
+    def tile_type_at(self, x: int, y: int) -> TileType:
         assert (
             self.tiles[y][x].type_idx is not None
         ), f"tile type at ({x}, {y}) must be set"
@@ -887,6 +895,8 @@ class Chip:
                 wire_index = w.wire
             else:
                 wire_id = w.wire if w.wire is IdString else self.strs.id(w.wire)
+                if wire_id not in self.tile_type_at(w.x, w.y)._wire2idx:
+                    raise ValueError(f"Wire {w.wire} not found in tile {self.strs[self.tile_type_at(w.x, w.y).type_name]}")
                 wire_index = self.tile_type_at(w.x, w.y)._wire2idx[wire_id]
             shape.wires += [w.x - x0, w.y - y0, wire_index]
         # deduplicate node shapes

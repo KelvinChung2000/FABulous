@@ -1,22 +1,34 @@
-import os
-from pathlib import Path
-
 from loguru import logger
 
-from FABulous.fabric_cad.chip import Chip, PinType, TileType
+from FABulous.fabric_cad.chip import Chip, NodeWire, PinType, TileType
 from FABulous.fabric_definition.Bel import Bel
+from FABulous.fabric_definition.define import Direction
 from FABulous.fabric_definition.Fabric import Fabric
 from FABulous.fabric_definition.Tile import Tile
 from FABulous.fabric_generator.code_generation_Verilog import VerilogWriter
+from FABulous.fabric_generator.fabric_gen import FabricGenerator
 from FABulous.fabric_generator.file_parser import parseMatrixAsMux
 from FABulous.FABulous_API import FABulous
 
 
 def genSwitchMatrix(tile: Tile, tileType: TileType):
-    muxDict = parseMatrixAsMux(
-        Path("/home/kelvin/FABulous_fork/demo/Tile/LUT4AB/LUT4AB_switch_matrix.csv"),
-        tile.name,
-    )
+    if tile.matrixDir.suffix == ".csv":
+        muxDict = parseMatrixAsMux(tile.matrixDir, tile.name)
+    elif tile.matrixDir.suffix == ".list":
+        logger.info(f"{tile.name} matrix is a list file")
+        logger.info(f"Bootstrapping {tile.name} to matrix form and adding the list file to the matrix")
+        matrixDir = tile.matrixDir.with_suffix(".csv")
+        FabricGenerator.bootstrapSwitchMatrix(tile, matrixDir)
+        FabricGenerator.list2CSV(tile.matrixDir, matrixDir)
+        logger.info(f"Update matrix directory to {matrixDir} for Fabric Tile Dictionary")
+        tile.matrixDir = matrixDir
+        muxDict = parseMatrixAsMux(tile.matrixDir, tile.name)
+    elif tile.matrixDir.suffix == ".v" or tile.matrixDir.suffix == ".vhdl":
+        logger.info(f"A switch matrix file is provided in {tile.name}, will skip the matrix generation process")
+        return
+    else:
+        logger.error("Invalid matrix file format.")
+        raise ValueError
 
     for mux in muxDict.values():
         for i in mux.inputs:
@@ -35,6 +47,12 @@ def genBel(bels: list[Bel], tile: TileType):
 
         # create the bel itself
         belData = tile.create_bel(f"{bel.prefix}{bel.name}", bel.name, z)
+
+        for i in bel.externalInput:
+            tile.create_wire(i, f"{bel.name}_{i}")
+
+        for i in bel.externalOutput:
+            tile.create_wire(i, f"{bel.name}_{i}")
 
         for i in bel.inputs + bel.externalInput:
             tile.add_bel_pin(
@@ -67,24 +85,51 @@ def genTile(tile: Tile, chip: Chip) -> TileType:
     return tt
 
 
+def genFabric(fabric: Fabric, chip: Chip):
+    for i in range(fabric.numberOfRows):
+        for j in range(fabric.numberOfColumns):
+            if fabric.tile[i][j] is None:
+                continue
+
+            localNode = []
+            print(fabric.tile[i][j].wireList)
+            for port in fabric.tile[i][j].portsInfo:
+                if port.wireDirection != Direction.JUMP and port.sourceName != "NULL" and port.destinationName != "NULL":
+                    for i in range(port.wireCount):
+                        localNode.append(NodeWire(i + port.xOffset, j + port.yOffset, f"{port.sourceName}{i}"))
+                        localNode.append(NodeWire(i, j, f"{port.destinationName}{i}"))
+
+                    chip.add_node(localNode)
+
+
 def genChipDatabase(fabric: Fabric):
     ch = Chip("FABulous", fabric.name, fabric.numberOfRows, fabric.numberOfColumns)
-    
+    for tile in fabric.tileDic.values():
+        genTile(tile, ch)
 
-    if p := os.getenv("FAB_PROJ_DIR"):
-        ch.write_bba(str(Path(p) / f"{fabric.name}.bba"))
-    else:
-        logger.error("FAB_PROJ_DIR not set, cannot write bba file")
-        return
+    ch.create_tile_type("NULL")
+
+    for i in range(fabric.numberOfRows):
+        for j in range(fabric.numberOfColumns):
+            if fabric.tile[i][j] is not None:
+                ch.set_tile_type(i, j, fabric.tile[i][j].name)
+            else:
+                ch.set_tile_type(i, j, "NULL")
+
+    genFabric(fabric, ch)
+    ch.write_bba(str(f"{fabric.name}.bba"))
+    # if p := os.getenv("FAB_PROJ_DIR"):
+    #     ch.write_bba(str(Path(p) / f"{fabric.name}.bba"))
+    # else:
+    #     logger.error("FAB_PROJ_DIR not set, cannot write bba file")
+    #     return
 
 
 if __name__ == "__main__":
-    f = FABulous(VerilogWriter(), "/home/kelvin/FABulous_fork/demo/fabric.csv")
-    f.setWriterOutputFile("/home/kelvin/FABulous_fork/test.v")
-    f.bootstrapSwitchMatrix("LUT4AB", "/home/kelvin/FABulous_fork/tmp.csv")
-    f.loadFabric("/home/kelvin/FABulous_fork/demo/fabric.csv")
+    f = FABulous(VerilogWriter(), "/Users/kelvinchung/Documents/FABulous-1/demo/fabric.csv")
+    f.setWriterOutputFile("/Users/kelvinchung/Documents/FABulous-1/FABulous/test.v")
+    # f.bootstrapSwitchMatrix("LUT4AB", "/home/kelvin/FABulous_fork/tmp.csv")
+    f.loadFabric("/Users/kelvinchung/Documents/FABulous-1/demo/fabric.csv")
     f.genFabric()
-    ch = Chip(
-        "FABulous", f.fabric.name, f.fabric.numberOfRows, f.fabric.numberOfColumns
-    )
-    genTile(f.fabric.tileDic["LUT4AB"], ch)
+    ch = Chip("FABulous", f.fabric.name, f.fabric.numberOfRows, f.fabric.numberOfColumns)
+    genChipDatabase(f.fabric)

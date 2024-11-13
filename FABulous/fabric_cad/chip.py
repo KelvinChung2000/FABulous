@@ -248,6 +248,8 @@ class TileType(BBAStruct):
     def add_bel_pin(self, bel: BelData, pin: str, wire: str, dir: PinType):
         # Add a pin with associated wire to a bel. The wire should exist already.
         pin_id = self.strs.id(pin)
+        if self.strs.id(wire) not in self._wire2idx:
+            raise ValueError(f"Wire {wire} not found")
         wire_idx = self._wire2idx[self.strs.id(wire)]
         bel.pins.append(BelPin(pin_id, wire_idx, dir))
         self.wires[wire_idx].bel_pins.append(BelPinRef(bel.index, pin_id))

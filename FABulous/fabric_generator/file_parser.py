@@ -14,6 +14,7 @@ from FABulous.fabric_definition.Tile import Tile
 from FABulous.fabric_definition.SuperTile import SuperTile
 from FABulous.fabric_definition.Fabric import Fabric
 from FABulous.fabric_definition.ConfigMem import ConfigMem
+from FABulous.fabric_definition.Mux import Mux
 from FABulous.fabric_definition.define import (
     IO,
     Direction,
@@ -278,6 +279,31 @@ def parseMatrix(fileName: Path, tileName: str) -> dict[str, list[str]]:
             continue
         indices = [k for k, v in enumerate(connections) if v == "1"]
         connectionsDic[portName] = [destList[j] for j in indices]
+    return connectionsDic
+
+
+def parseMatrixAsMux(fileName: Path, tileName: str) -> dict[str, Mux]:
+    connectionsDic = {}
+    with open(fileName, "r") as f:
+        file = f.read()
+        file = re.sub(r"#.*", "", file)
+        file = file.split("\n")
+
+    if file[0].split(",")[0] != tileName:
+        logger.error(f"{fileName} {file[0].split(',')} {tileName}")
+        logger.error(
+            "Tile name (top left element) in csv file does not match tile name in tile object"
+        )
+        raise ValueError
+    destList = file[0].split(",")[1:]
+
+    for i in file[1:]:
+        i = i.split(",")
+        portName, connections = i[0], i[1:]
+        if portName == "":
+            continue
+        indices = [k for k, v in enumerate(connections) if v == "1"]
+        connectionsDic[portName] = Mux(f"{tileName}_{portName}", [destList[j] for j in indices], portName, 1)
     return connectionsDic
 
 

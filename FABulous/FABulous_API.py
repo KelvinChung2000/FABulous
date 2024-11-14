@@ -1,14 +1,14 @@
 from loguru import logger
 
 import FABulous.fabric_cad.model_generation_npnr as model_gen_npnr
+import FABulous.fabric_generator.code_generator as codeGen
+import FABulous.fabric_generator.file_parser_csv as fileParser
 
 # Importing Modules from FABulous Framework.
 from FABulous.fabric_definition.Bel import Bel
+from FABulous.fabric_definition.Fabric import Fabric
 from FABulous.fabric_definition.SuperTile import SuperTile
 from FABulous.fabric_definition.Tile import Tile
-import FABulous.fabric_generator.code_generator as codeGen
-import FABulous.fabric_generator.file_parser as fileParser
-from FABulous.fabric_definition.Fabric import Fabric
 from FABulous.fabric_generator.code_generation_VHDL import VHDLWriter
 from FABulous.fabric_generator.fabric_gen import FabricGenerator
 from FABulous.geometry_generator.geometry_gen import GeometryGenerator

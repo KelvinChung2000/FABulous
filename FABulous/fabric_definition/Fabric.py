@@ -233,17 +233,20 @@ class Fabric:
                     fabric += f"{str(self.tile[i][j].name).ljust(15)}\t"
             fabric += "\n"
 
-        fabric += f"\n"
-        fabric += f"numberOfColumns: {self.numberOfColumns}\n"
-        fabric += f"numberOfRows: {self.numberOfRows}\n"
-        fabric += f"configBitMode: {self.configBitMode}\n"
-        fabric += f"frameBitsPerRow: {self.frameBitsPerRow}\n"
-        fabric += f"maxFramesPerCol: {self.maxFramesPerCol}\n"
-        fabric += f"package: {self.package}\n"
-        fabric += f"generateDelayInSwitchMatrix: {self.generateDelayInSwitchMatrix}\n"
-        fabric += f"multiplexerStyle: {self.multiplexerStyle}\n"
-        fabric += f"superTileEnable: {self.superTileEnable}\n"
-        fabric += f"tileDic: {list(self.tileDic.keys())}\n"
+        fabric += (
+            "\n"
+            f"numberOfColumns: {self.numberOfColumns}\n" 
+            f"numberOfRows: {self.numberOfRows}\n"
+            f"configBitMode: {self.configBitMode}\n"
+            f"frameBitsPerRow: {self.frameBitsPerRow}\n"
+            f"maxFramesPerCol: {self.maxFramesPerCol}\n"
+            f"package: {self.package}\n"
+            f"generateDelayInSwitchMatrix: {self.generateDelayInSwitchMatrix}\n"
+            f"multiplexerStyle: {self.multiplexerStyle}\n"
+            f"superTileEnable: {self.superTileEnable}\n"
+            f"tileDic: {list(self.tileDic.keys())}\n"
+        )
+
         return fabric
 
     def getTileByName(self, name: str) -> Tile | None:

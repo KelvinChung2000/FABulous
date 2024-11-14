@@ -331,6 +331,10 @@ class TileType(BBAStruct):
         else:
             bba.u32(0)
 
+    @property
+    def name(self):
+        return self.strs[self.type_name]
+
 
 # Pre deduplication (nodes flattened, absolute coords)
 @dataclass

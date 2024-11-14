@@ -7,7 +7,7 @@ from FABulous.fabric_definition.Fabric import Fabric
 from FABulous.fabric_definition.Tile import Tile
 from FABulous.fabric_generator.code_generation_Verilog import VerilogWriter
 from FABulous.fabric_generator.fabric_gen import FabricGenerator
-from FABulous.fabric_generator.file_parser import parseMatrixAsMux
+from FABulous.fabric_generator.file_parser_yaml import parseMatrixAsMux
 from FABulous.FABulous_API import FABulous
 
 
@@ -16,15 +16,21 @@ def genSwitchMatrix(tile: Tile, tileType: TileType):
         muxDict = parseMatrixAsMux(tile.matrixDir, tile.name)
     elif tile.matrixDir.suffix == ".list":
         logger.info(f"{tile.name} matrix is a list file")
-        logger.info(f"Bootstrapping {tile.name} to matrix form and adding the list file to the matrix")
+        logger.info(
+            f"Bootstrapping {tile.name} to matrix form and adding the list file to the matrix"
+        )
         matrixDir = tile.matrixDir.with_suffix(".csv")
         FabricGenerator.bootstrapSwitchMatrix(tile, matrixDir)
         FabricGenerator.list2CSV(tile.matrixDir, matrixDir)
-        logger.info(f"Update matrix directory to {matrixDir} for Fabric Tile Dictionary")
+        logger.info(
+            f"Update matrix directory to {matrixDir} for Fabric Tile Dictionary"
+        )
         tile.matrixDir = matrixDir
         muxDict = parseMatrixAsMux(tile.matrixDir, tile.name)
     elif tile.matrixDir.suffix == ".v" or tile.matrixDir.suffix == ".vhdl":
-        logger.info(f"A switch matrix file is provided in {tile.name}, will skip the matrix generation process")
+        logger.info(
+            f"A switch matrix file is provided in {tile.name}, will skip the matrix generation process"
+        )
         return
     else:
         logger.error("Invalid matrix file format.")
@@ -92,18 +98,29 @@ def genFabric(fabric: Fabric, chip: Chip):
                 continue
 
             localNode = []
-            print(fabric.tile[i][j].wireList)
             for port in fabric.tile[i][j].portsInfo:
-                if port.wireDirection != Direction.JUMP and port.sourceName != "NULL" and port.destinationName != "NULL":
-                    for i in range(port.wireCount):
-                        localNode.append(NodeWire(i + port.xOffset, j + port.yOffset, f"{port.sourceName}{i}"))
-                        localNode.append(NodeWire(i, j, f"{port.destinationName}{i}"))
+                if (
+                    port.wireDirection != Direction.JUMP
+                    and port.sourceName != "NULL"
+                    and port.destinationName != "NULL"
+                    and chip.tile_type_at(j + port.xOffset, i + port.yOffset).name
+                    != "NULL"
+                ):
+                    for w in range(port.wireCount):
+                        localNode.append(
+                            NodeWire(
+                                j + port.xOffset,
+                                i + port.yOffset,
+                                f"{port.sourceName}{w}",
+                            )
+                        )
+                        localNode.append(NodeWire(j, i, f"{port.destinationName}{w}"))
 
                     chip.add_node(localNode)
 
 
 def genChipDatabase(fabric: Fabric):
-    ch = Chip("FABulous", fabric.name, fabric.numberOfRows, fabric.numberOfColumns)
+    ch = Chip("FABulous", fabric.name, fabric.numberOfColumns, fabric.numberOfRows)
     for tile in fabric.tileDic.values():
         genTile(tile, ch)
 
@@ -112,9 +129,9 @@ def genChipDatabase(fabric: Fabric):
     for i in range(fabric.numberOfRows):
         for j in range(fabric.numberOfColumns):
             if fabric.tile[i][j] is not None:
-                ch.set_tile_type(i, j, fabric.tile[i][j].name)
+                ch.set_tile_type(j, i, fabric.tile[i][j].name)
             else:
-                ch.set_tile_type(i, j, "NULL")
+                ch.set_tile_type(j, i, "NULL")
 
     genFabric(fabric, ch)
     ch.write_bba(str(f"{fabric.name}.bba"))
@@ -126,10 +143,12 @@ def genChipDatabase(fabric: Fabric):
 
 
 if __name__ == "__main__":
-    f = FABulous(VerilogWriter(), "/Users/kelvinchung/Documents/FABulous-1/demo/fabric.csv")
-    f.setWriterOutputFile("/Users/kelvinchung/Documents/FABulous-1/FABulous/test.v")
+    f = FABulous(VerilogWriter(), "/home/kelvin/FABulous_fork/demo/fabric.csv")
+    f.setWriterOutputFile("/home/kelvin/FABulous_fork/test.v")
     # f.bootstrapSwitchMatrix("LUT4AB", "/home/kelvin/FABulous_fork/tmp.csv")
-    f.loadFabric("/Users/kelvinchung/Documents/FABulous-1/demo/fabric.csv")
+    f.loadFabric("/home/kelvin/FABulous_fork/demo/fabric.csv")
     f.genFabric()
-    ch = Chip("FABulous", f.fabric.name, f.fabric.numberOfRows, f.fabric.numberOfColumns)
+    ch = Chip(
+        "FABulous", f.fabric.name, f.fabric.numberOfRows, f.fabric.numberOfColumns
+    )
     genChipDatabase(f.fabric)

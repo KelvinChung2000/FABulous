@@ -3,7 +3,7 @@ import string
 from loguru import logger
 
 from FABulous.fabric_definition.Fabric import Fabric
-from FABulous.fabric_generator.file_parser import parseList, parseMatrix
+from FABulous.fabric_generator.file_parser_csv import parseList, parseMatrix
 
 
 def genNextpnrModel(fabric: Fabric):

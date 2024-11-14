@@ -340,33 +340,45 @@ def parseBelFile(
         json_file = filename.with_suffix(".json")
         runCmd = [
             "yosys",
-            "-qp"
+            "-qp",
             f"read_verilog {filename}; proc -noopt; write_json -compat-int {json_file}",
         ]
         try:
             subprocess.run(runCmd, check=True)
-        except subprocess.CalledProcessError as e:
-            logger.error(f"Failed to run yosys command: {e}")
+        except subprocess.CalledProcessError:
+            logger.error(f"Failed to run yosys command: {' '.join(runCmd)}")
             raise ValueError
 
         with open(f"{json_file}", "r") as f:
             data_dict = json.load(f)
 
         modules = data_dict.get("modules", {})
-        filtered_ports: dict[str, IO] = {}
+        if len(modules) > 1:
+            logger.error(
+                f"Multiple modules found in {filename}. Only one module per file is allowed."
+            )
+            raise ValueError
+        elif len(modules) == 0:
+            logger.error(f"No modules found in {filename}.")
+            raise ValueError
+
+        module: dict = modules[list(modules.keys())[0]]
+
+        filtered_ports: dict[str, tuple[IO, list[int]]] = {}
+
         # Gathers port name and direction, filters out configbits as they show in ports.
-        for module_name, module_info in modules.items():
-            ports = module_info["ports"]
-            for port_name, details in ports.items():
-                if "ConfigBits" in port_name:
-                    continue
-                if "UserCLK" in port_name:
-                    userClk = True
-                if port_name[-1].isdigit():
-                    individually_declared = True
-                direction = IO[details["direction"].upper()]
-                bits = details.get("bits", [])
-                filtered_ports[port_name] = (direction, bits)
+        for port_name, port_info in module["ports"].items():
+            if "ConfigBits" in port_name:
+                continue
+            if "UserCLK" in port_name:
+                userClk = True
+            if port_name[-1].isdigit() and len(port_info["bits"]) == 1:
+                individually_declared = True
+                logger.warning(f"Port {port_name} has been individually declared.")
+            filtered_ports[port_name] = (
+                IO[port_info["direction"].upper()],
+                port_info.get("bits", []),
+            )
 
         if individually_declared:
             logger.warning(
@@ -374,12 +386,13 @@ def parseBelFile(
             )
             logger.warning("Ports will not be concatenated during fabric generation.")
 
-        param_defaults = module_info.get("parameter_default_values")
+        param_defaults = module.get("parameter_default_values")
         if param_defaults and "NoConfigBits" in param_defaults:
             noConfigBits = param_defaults["NoConfigBits"]
+
         # Passed attributes dont show in port list, checks for attributes in netnames.
         # (If passed attributes missing, may need to expand to check other lists e.g "memories".)
-        netnames = module_info.get("netnames", {})
+        netnames = module.get("netnames", {})
         for item, details in netnames.items():
             if item in filtered_ports:
                 direction, bits = filtered_ports[item]
@@ -396,7 +409,7 @@ def parseBelFile(
                         shared.append((new_port_name, direction))
                     else:
                         internal.append((f"{belPrefix}{new_port_name}", direction))
-        belMapDic = verilog_belMapProcessing(module_info)
+        belMapDic = verilog_belMapProcessing(module)
         if len(belMapDic) != noConfigBits:
             raise ValueError(
                 f"NoConfigBits does not match with the BEL map in file {filename}, length of BelMap is {len(belMapDic)}, but with {noConfigBits} config bits"

@@ -1,4 +1,5 @@
 from pathlib import Path
+
 from loguru import logger
 
 import FABulous.fabric_cad.model_generation_npnr as model_gen_npnr
@@ -40,7 +41,7 @@ class FABulous:
     fabric: Fabric
     fileExtension: str = ".v"
 
-    def __init__(self, writer: codeGen.codeGenerator, fabricCSV: str = ""):
+    def __init__(self, writer: codeGen.codeGenerator, fabricPath: str = ""):
         """Initialises FABulous object.
 
         If 'fabricCSV' is provided, parses fabric data and initialises
@@ -56,8 +57,8 @@ class FABulous:
             Path to the CSV file containing fabric data, by default ""
         """
         self.writer = writer
-        if fabricCSV != "":
-            self.fabric = fileParserCSV.parseFabricCSV(fabricCSV)
+        if fabricPath != "":
+            self.loadFabric(fabricPath)
             self.fabricGenerator = FabricGenerator(self.fabric, self.writer)
             self.geometryGenerator = GeometryGenerator(self.fabric)
 

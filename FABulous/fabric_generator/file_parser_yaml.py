@@ -190,7 +190,7 @@ def parseTileYAML(fileName: Path) -> Tile:
                 wireCount=int(portEntry["wires"]),
                 name=portEntry["source_name"],
                 inOut=IO.OUTPUT,
-                sideOfTile=Side[portEntry["SIDE"]],
+                sideOfTile=Side[oppositeDic[portEntry["direction"]].upper()],
             )
         )
         ports.append(

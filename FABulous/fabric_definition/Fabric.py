@@ -235,7 +235,7 @@ class Fabric:
 
         fabric += (
             "\n"
-            f"numberOfColumns: {self.numberOfColumns}\n" 
+            f"numberOfColumns: {self.numberOfColumns}\n"
             f"numberOfRows: {self.numberOfRows}\n"
             f"configBitMode: {self.configBitMode}\n"
             f"frameBitsPerRow: {self.frameBitsPerRow}\n"

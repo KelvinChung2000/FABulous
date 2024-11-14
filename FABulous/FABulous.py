@@ -21,7 +21,6 @@ import cmd
 import csv
 import os
 import pickle
-import platform
 import pprint
 import readline
 import shutil
@@ -31,10 +30,10 @@ import tkinter as tk
 import traceback
 from contextlib import redirect_stdout
 from glob import glob
-from pathlib import PurePath, Path
+from pathlib import Path, PurePath
 from typing import List, Literal
-from dotenv import load_dotenv
 
+from dotenv import load_dotenv
 from loguru import logger
 
 from FABulous.fabric_generator.code_generation_Verilog import VerilogWriter
@@ -141,7 +140,7 @@ def setup_project_env_vars(args: argparse.Namespace) -> None:
         pde = Path(args.projectDotEnv)
         if pde.exists() and pde.is_file():
             load_dotenv(pde)
-            logger.info(f"Loaded global .env file from pde")
+            logger.info("Loaded global .env file from pde")
     elif fabDir.joinpath(".env").exists() and fabDir.joinpath(".env").is_file():
         load_dotenv(fabDir.joinpath(".env"))
         logger.info(f"Loaded project .env file from {fabDir}/.env')")
@@ -993,7 +992,7 @@ To run the complete FABulous flow with the default project, run the following co
             return
 
         logger.info(f"Found FABulator installation at {fabulatorRoot}")
-        logger.info(f"Trying to start FABulator...")
+        logger.info("Trying to start FABulator...")
 
         startupCmd = ["mvn", "-f", f"{fabulatorRoot}/pom.xml", "javafx:run"]
         try:
@@ -1748,7 +1747,9 @@ def main():
             )
 
         fabShell = FABulousShell(
-            FABulous(writer, fabricCSV=args.csv), os.getenv("FAB_PROJ_DIR"), args.script
+            FABulous(writer, fabricPath=args.csv),
+            os.getenv("FAB_PROJ_DIR"),
+            args.script,
         )
         if args.verbose == 2:
             fabShell.verbose = True

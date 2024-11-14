@@ -1,8 +1,10 @@
+from pathlib import Path
 from loguru import logger
 
 import FABulous.fabric_cad.model_generation_npnr as model_gen_npnr
 import FABulous.fabric_generator.code_generator as codeGen
-import FABulous.fabric_generator.file_parser_csv as fileParser
+import FABulous.fabric_generator.file_parser_csv as fileParserCSV
+import FABulous.fabric_generator.file_parser_yaml as fileParserYAML
 
 # Importing Modules from FABulous Framework.
 from FABulous.fabric_definition.Bel import Bel
@@ -55,7 +57,7 @@ class FABulous:
         """
         self.writer = writer
         if fabricCSV != "":
-            self.fabric = fileParser.parseFabricCSV(fabricCSV)
+            self.fabric = fileParserCSV.parseFabricCSV(fabricCSV)
             self.fabricGenerator = FabricGenerator(self.fabric, self.writer)
             self.geometryGenerator = GeometryGenerator(self.fabric)
 
@@ -75,7 +77,8 @@ class FABulous:
         self.writer.outFileName = outputDir
 
     def loadFabric(self, dir: str):
-        """Loads fabric data from 'fabric.csv'.
+        """Loads fabric data from 'fabric.csv' or 'fabric.yaml'.
+        The loading will be depends on the file extension.
 
         Parameters
         ----------
@@ -88,11 +91,14 @@ class FABulous:
             If 'dir' does not end with '.csv'
         """
         if dir.endswith(".csv"):
-            self.fabric = fileParser.parseFabricCSV(dir)
+            self.fabric = fileParserCSV.parseFabricCSV(dir)
             self.fabricGenerator = FabricGenerator(self.fabric, self.writer)
             self.geometryGenerator = GeometryGenerator(self.fabric)
+
+        elif dir.endswith(".yaml"):
+            self.fabric = fileParserYAML.parseFabricYAML(Path(dir))
         else:
-            logger.error("Only .csv files are supported for fabric loading")
+            logger.error("Only .csv and .yaml files are supported for fabric loading")
             raise ValueError
 
     def bootstrapSwitchMatrix(self, tileName: str, outputDir: str):
@@ -106,8 +112,10 @@ class FABulous:
         outputDir : str
             Directory path where the switch matrix will be generated.
         """
-        tile = self.fabric.getTileByName(tileName)
-        self.fabricGenerator.bootstrapSwitchMatrix(tile, outputDir)
+        if tile := self.fabric.getTileByName(tileName):
+            self.fabricGenerator.bootstrapSwitchMatrix(tile, Path(outputDir))
+        else:
+            raise ValueError(f"Tile {tileName} not found in fabric")
 
     def addList2Matrix(self, list: str, matrix: str):
         """Converts list into CSV matrix via 'list2CSV' defined in
@@ -120,7 +128,7 @@ class FABulous:
         matrix : str
             File path where the matrix data will be saved.
         """
-        self.fabricGenerator.list2CSV(list, matrix)
+        self.fabricGenerator.list2CSV(Path(list), Path(matrix))
 
     def genConfigMem(self, tileName: str, configMem: str):
         """Generate configuration memory for specified tile.
@@ -132,8 +140,10 @@ class FABulous:
         configMem : str
             File path where the configuration memory will be saved.
         """
-        tile = self.fabric.getTileByName(tileName)
-        self.fabricGenerator.generateConfigMem(tile, configMem)
+        if tile := self.fabric.getTileByName(tileName):
+            self.fabricGenerator.generateConfigMem(tile, configMem)
+        else:
+            raise ValueError(f"Tile {tileName} not found in fabric")
 
     def genSwitchMatrix(self, tileName: str):
         """Generates switch matrix for specified tile via 'genTileSwitchMatrix'
@@ -144,8 +154,10 @@ class FABulous:
         tileName : str
             Name of the tile for which the switch matrix will be generated.
         """
-        tile = self.fabric.getTileByName(tileName)
-        self.fabricGenerator.genTileSwitchMatrix(tile)
+        if tile := self.fabric.getTileByName(tileName):
+            self.fabricGenerator.genTileSwitchMatrix(tile)
+        else:
+            raise ValueError(f"Tile {tileName} not found in fabric")
 
     def genTile(self, tileName: str):
         """Generates a tile based on its name via 'generateTile'
@@ -156,8 +168,10 @@ class FABulous:
         tileName : str
             Name of the tile generated.
         """
-        tile = self.fabric.getTileByName(tileName)
-        self.fabricGenerator.generateTile(tile)
+        if tile := self.fabric.getTileByName(tileName):
+            self.fabricGenerator.generateTile(tile)
+        else:
+            raise ValueError(f"Tile {tileName} not found in fabric")
 
     def genSuperTile(self, tileName: str):
         """Generates a super tile based on its name via 'generateSuperTile'
@@ -168,8 +182,10 @@ class FABulous:
         tileName : str
             Name of the super tile generated.
         """
-        tile = self.fabric.getSuperTileByName(tileName)
-        self.fabricGenerator.generateSuperTile(tile)
+        if tile := self.fabric.getSuperTileByName(tileName):
+            self.fabricGenerator.generateSuperTile(tile)
+        else:
+            raise ValueError(f"SuperTile {tileName} not found in fabric")
 
     def genFabric(self):
         """Generates the entire fabric layout via 'generatreFabric' defined

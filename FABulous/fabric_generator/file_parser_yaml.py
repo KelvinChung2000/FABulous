@@ -30,19 +30,19 @@ oppositeDic = {
 
 
 def parseFabricYAML(fileName: Path) -> Fabric:
-    fName = Path(fileName)
-    if fName.suffix != ".yaml":
+    fileName = Path(fileName)
+    if fileName.suffix != ".yaml":
         logger.error("File must be a csv file")
         raise ValueError
 
-    if not fName.exists():
-        logger.error(f"File {fName} does not exist.")
+    if not fileName.exists():
+        logger.error(f"File {fileName} does not exist.")
         raise ValueError
 
-    with open(fName, "r") as f:
+    with open(fileName, "r") as f:
         data = yaml.safe_load(f)
 
-    filePath = fName.parent
+    filePath = fileName.parent
 
     tileTypes = []
     tileDefs = []

@@ -7,7 +7,8 @@ from typing import Literal
 from loguru import logger
 
 from FABulous.fabric_definition.Bel import Bel
-from FABulous.fabric_definition.define import IO
+from FABulous.fabric_definition.define import IO, FABulousPortType
+from FABulous.fabric_definition.Port import ConfigPort, Port
 
 
 def verilog_belMapProcessing(module_info):
@@ -157,7 +158,7 @@ def vhdl_belMapProcessing(file: str, filename: str) -> dict:
 def parseBelFile(
     filename: Path,
     belPrefix: str = "",
-    filetype: Literal["verilog", "vhdl"] = "",
+    filetype: Literal["verilog", "vhdl"] = "verilog",
 ) -> Bel:
     """
     Parse a Verilog or VHDL bel file and return all the related information of the bel.
@@ -241,16 +242,12 @@ def parseBelFile(
     ValueError
         No permission to access the file
     """
-    internal: list[tuple[str, IO]] = []
-    external: list[tuple[str, IO]] = []
-    config: list[tuple[str, IO]] = []
-    shared: list[tuple[str, IO]] = []
-    isExternal = False
-    isConfig = False
-    isShared = False
-    userClk = False
-    individually_declared = False
-    noConfigBits = 0
+    externalPort: list[Port] = []
+    configPort: list[Port] = []
+    sharedPort: list[Port] = []
+    internalPort: list[Port] = []
+    belMapDict: dict[str, int] = {}
+    userClk: Port | None = None
 
     try:
         with open(filename, "r") as f:
@@ -262,168 +259,100 @@ def parseBelFile(
         logger.critical(f"Permission denied to file {filename}.")
         exit(-1)
 
-    if filetype == "vhdl":
-        belMapDic = vhdl_belMapProcessing(file, filename)
-        if result := re.search(r"NoConfigBits.*?=.*?(\d+)", file, re.IGNORECASE):
-            noConfigBits = int(result.group(1))
-        else:
-            logger.warning(f"Cannot find NoConfigBits in {filename}")
-            logger.warning("Assume the number of configBits is 0")
-            noConfigBits = 0
-        if len(belMapDic) != noConfigBits:
-            logger.error(
-                f"NoConfigBits does not match with the BEL map in file {filename}, length of BelMap is {len(belMapDic)}, but with {noConfigBits} config bits"
-            )
-            raise ValueError
-        if result := re.search(
-            r"port.*?\((.*?)\);", file, re.MULTILINE | re.DOTALL | re.IGNORECASE
-        ):
-            file, _ = result.group(1).split("-- GLOBAL")
-        else:
-            raise ValueError(f"Could not find port section in file {filename}")
-
-        for line in file.split("\n"):
-            result = line
-            result = re.sub(r"STD_LOGIC.*|;.*|--*", "", result, flags=re.IGNORECASE)
-            result = result.replace(" ", "").replace("\t", "").replace(";", "")
-            portName = ""
-            direction = None
-            if "IMPORTANT" in line:
-                continue
-            if result := re.search(r"(.*):(.*)", result):
-                portName = f"{belPrefix}{result.group(1)}"
-                if result.group(2).upper() == "IN":
-                    direction = IO["INPUT"]
-                elif result.group(2).upper() == "OUT":
-                    direction = IO["OUTPUT"]
-                elif result.group(2).upper() == "INOUT":
-                    direction = IO["INOUT"]
-                else:
-                    logger.error(
-                        f"Invalid or Unknown port direction {result.group(2).upper()} in line {line}."
-                    )
-                    raise ValueError
-            else:
-                continue
-            if line:
-                if "EXTERNAL" in line:
-                    isExternal = True
-                if "CONFIG" in line:
-                    isConfig = True
-                if "SHARED_PORT" in line:
-                    isShared = True
-                if "GLOBAL" in line:
-                    break
-
-            if portName == "" or direction is None:
-                logger.warning(f"Invalid port definition in line {line}.")
-                continue
-            elif isExternal and not isShared:
-                external.append((portName, direction))
-            elif isConfig:
-                config.append((portName, direction))
-            elif isShared:
-                # shared port do not have a prefix
-                shared.append((portName.removeprefix(belPrefix), direction))
-            else:
-                internal.append((portName, direction))
-
-            if "UserCLK" in portName:
-                userClk = True
-
-            isExternal = False
-            isConfig = False
-            isShared = False
-
+    json_file = filename.with_suffix(".json")
     if filetype == "verilog":
         # Runs yosys on verilog file, creates netlist, saves to json in same directory.
-        json_file = filename.with_suffix(".json")
         runCmd = [
             "yosys",
             "-qp",
             f"read_verilog {filename}; proc -noopt; write_json -compat-int {json_file}",
         ]
-        try:
-            subprocess.run(runCmd, check=True)
-        except subprocess.CalledProcessError:
-            logger.error(f"Failed to run yosys command: {' '.join(runCmd)}")
-            raise ValueError
+    elif filetype == "vhdl":
+        runCmd = [
+            "yosys",
+            "-qp",
+            f"ghdl {filename}; proc -noopt; write_json -compat-int {json_file}",
+        ]
 
-        with open(f"{json_file}", "r") as f:
-            data_dict = json.load(f)
+    try:
+        subprocess.run(runCmd, check=True)
+    except subprocess.CalledProcessError:
+        logger.error(f"Failed to run yosys command: {' '.join(runCmd)}")
+        raise ValueError
 
-        modules = data_dict.get("modules", {})
-        if len(modules) > 1:
-            logger.error(
-                f"Multiple modules found in {filename}. Only one module per file is allowed."
+    with open(f"{json_file}", "r") as f:
+        data_dict = json.load(f)
+
+    modules = data_dict.get("modules", {})
+    if len(modules) > 1:
+        logger.error(
+            f"Multiple modules found in {filename}. Only one module per file is allowed."
+        )
+        raise ValueError
+    elif len(modules) == 0:
+        logger.error(f"No modules found in {filename}.")
+        raise ValueError
+
+    module: dict = modules[list(modules.keys())[0]]
+
+    ports: dict[str, IO] = {}
+
+    for port_name, port_info in module["ports"].items():
+        ports[port_name] = IO[port_info["direction"].upper()]
+
+    # Passed attributes dont show in port list, checks for attributes in netnames.
+    netnames = module.get("netnames", {})
+    for net, details in netnames.items():
+        if net not in ports:
+            continue
+
+        netBitWidth = len(details.get("bits", [1]))
+        attributes = set(details.get("attributes", {}).keys())
+        if "FABulous" not in attributes:
+            continue
+
+        port = Port(
+            name=net,
+            inOut=ports[net],
+            wireCount=netBitWidth,
+            isBus=FABulousPortType.BUS in attributes,
+        )
+
+        if FABulousPortType.EXTERNAL in attributes:
+            externalPort.append(port)
+        elif FABulousPortType.CONFIG_BIT in attributes:
+            feature = attributes - set(["CONFIG_BIT", "FABulous", "src"])
+            if len(feature) != 1:
+                raise ValueError(
+                    f"Can only have one feature per CONFIG_BIT port and {net} in file {filename} have more than one"
+                )
+            feature = feature.pop()
+            belMapDict[feature] = netBitWidth
+            configPort.append(
+                ConfigPort(
+                    name=net,
+                    inOut=ports[net],
+                    wireCount=netBitWidth,
+                    isBus=FABulousPortType.BUS in attributes,
+                    feature=feature,
+                )
             )
-            raise ValueError
-        elif len(modules) == 0:
-            logger.error(f"No modules found in {filename}.")
-            raise ValueError
+        elif FABulousPortType.USER_CLK in attributes:
+            userClk = port
+        elif FABulousPortType.SHARED in attributes:
+            sharedPort.append(port)
 
-        module: dict = modules[list(modules.keys())[0]]
-
-        filtered_ports: dict[str, tuple[IO, list[int]]] = {}
-
-        # Gathers port name and direction, filters out configbits as they show in ports.
-        for port_name, port_info in module["ports"].items():
-            if "ConfigBits" in port_name:
-                continue
-            if "UserCLK" in port_name:
-                userClk = True
-            if port_name[-1].isdigit() and len(port_info["bits"]) == 1:
-                individually_declared = True
-                logger.warning(f"Port {port_name} has been individually declared.")
-            filtered_ports[port_name] = (
-                IO[port_info["direction"].upper()],
-                port_info.get("bits", []),
-            )
-
-        if individually_declared:
-            logger.warning(
-                f"Ports in {filename} have been individually declared rather than as a vector."
-            )
-            logger.warning("Ports will not be concatenated during fabric generation.")
-
-        param_defaults = module.get("parameter_default_values")
-        if param_defaults and "NoConfigBits" in param_defaults:
-            noConfigBits = param_defaults["NoConfigBits"]
-
-        # Passed attributes dont show in port list, checks for attributes in netnames.
-        # (If passed attributes missing, may need to expand to check other lists e.g "memories".)
-        netnames = module.get("netnames", {})
-        for item, details in netnames.items():
-            if item in filtered_ports:
-                direction, bits = filtered_ports[item]
-                attributes = details.get("attributes", {})
-                for index in range(len(bits)):
-                    new_port_name = (
-                        f"{item}{index}" if len(bits) > 1 else item
-                    )  # Multi-bit ports get index
-                    if "EXTERNAL" in attributes and "SHARED_PORT" not in attributes:
-                        external.append((f"{belPrefix}{new_port_name}", direction))
-                    elif "CONFIG" in attributes:
-                        config.append((f"{belPrefix}{new_port_name}", direction))
-                    elif "SHARED_PORT" in attributes:
-                        shared.append((new_port_name, direction))
-                    else:
-                        internal.append((f"{belPrefix}{new_port_name}", direction))
-        belMapDic = verilog_belMapProcessing(module)
-        if len(belMapDic) != noConfigBits:
-            raise ValueError(
-                f"NoConfigBits does not match with the BEL map in file {filename}, length of BelMap is {len(belMapDic)}, but with {noConfigBits} config bits"
-            )
+        else:
+            internalPort.append(port)
 
     return Bel(
         src=filename,
         prefix=belPrefix,
-        internal=internal,
-        external=external,
-        configPort=config,
-        sharedPort=shared,
-        configBit=noConfigBits,
-        belMap=belMapDic,
+        internal=internalPort,
+        external=externalPort,
+        configPort=configPort,
+        sharedPort=sharedPort,
+        configBit=sum(belMapDict.values()),
+        belMap=belMapDict,
         userCLK=userClk,
-        individually_declared=individually_declared,
     )

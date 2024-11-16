@@ -560,7 +560,7 @@ def parseTiles(fileName: Path) -> tuple[list[Tile], list[tuple[str, str]]]:
             else:
                 logger.error(f"Unknown tile description {temp[0]} in tile {t}.")
                 raise ValueError
-            withUserCLK = any(bel.withUserCLK for bel in bels)
+            withUserCLK = any(bel.userCLK for bel in bels)
             new_tiles.append(
                 Tile(
                     name=tileName,

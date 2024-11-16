@@ -1,6 +1,8 @@
-from dataclasses import dataclass, field
 import pathlib
+from dataclasses import dataclass
+
 from FABulous.fabric_definition.define import IO
+from FABulous.fabric_definition.Port import Port
 
 
 @dataclass
@@ -22,24 +24,24 @@ class Bel:
         The prefix of the BEL given in the CSV file.
     name : str
         The name of the BEL, extracted from the source directory.
-    inputs : list[str]
+    inputs : list[Port]
         All the normal input ports of the BEL.
-    outputs : list[str]
+    outputs : list[Port]
         All the normal output ports of the BEL.
-    externalInput : list[str]
+    externalInput : list[Port]
         All the external input ports of the BEL.
-    externalOutput : list[str]
+    externalOutput : list[Port]
         All the external output ports of the BEL.
-    configPort : list[str]
+    configPort : list[Port]
         All the config ports of the BEL.
-    sharedPort : list[tuple[str, IO]]
+    sharedPort : list[tuple[Port, IO]]
         All the shared ports of the BEL.
     configBit : int
         The number of config bits of the BEL.
     belFeatureMap : dict[str, dict]
         The feature map of the BEL.
-    withUserCLK : bool
-        Whether the BEL has userCLK port. Default is False.
+    userCLK : Port | None
+        The user clock port of the BEL. Default is None.
     individually_declared : bool
         Indicates if ports are individually declared. Default is False.
     """
@@ -47,40 +49,37 @@ class Bel:
     src: pathlib.Path
     prefix: str
     name: str
-    inputs: list[str]
-    outputs: list[str]
-    externalInput: list[str]
-    externalOutput: list[str]
-    configPort: list[str]
-    sharedPort: list[tuple[str, IO]]
+    inputs: list[Port]
+    outputs: list[Port]
+    externalInput: list[Port]
+    externalOutput: list[Port]
+    configPort: list[Port]
+    sharedPort: list[Port]
     configBit: int
-    belFeatureMap: dict[str, dict] = field(default_factory=dict)
-    withUserCLK: bool = False
-    individually_declared: bool = False
+    belFeatureMap: dict[str, int]
+    userCLK: Port | None
 
     def __init__(
         self,
         src: pathlib.Path,
         prefix: str,
-        internal,
-        external,
-        configPort,
-        sharedPort,
+        internal: list[Port],
+        external: list[Port],
+        configPort: list[Port],
+        sharedPort: list[Port],
         configBit: int,
-        belMap: dict[str, dict],
-        userCLK: bool,
-        individually_declared: bool,
+        belMap: dict[str, int],
+        userCLK: Port | None,
     ) -> None:
         self.src = src
         self.prefix = prefix
         self.name = src.stem
-        self.inputs = [p for p, io in internal if io == IO.INPUT]
-        self.outputs = [p for p, io in internal if io == IO.OUTPUT]
-        self.externalInput = [p for p, io in external if io == IO.INPUT]
-        self.externalOutput = [p for p, io in external if io == IO.OUTPUT]
+        self.inputs = [p for p in internal if p.inOut == IO.INPUT]
+        self.outputs = [p for p in internal if p.inOut == IO.OUTPUT]
+        self.externalInput = [p for p in external if p.inOut == IO.INPUT]
+        self.externalOutput = [p for p in external if p.inOut == IO.OUTPUT]
         self.configPort = configPort
         self.sharedPort = sharedPort
         self.configBit = configBit
         self.belFeatureMap = belMap
-        self.withUserCLK = userCLK
-        self.individually_declared = individually_declared
+        self.userCLK = userCLK

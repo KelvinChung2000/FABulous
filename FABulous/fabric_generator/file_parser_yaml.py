@@ -15,10 +15,11 @@ from FABulous.fabric_definition.define import (
 )
 from FABulous.fabric_definition.Fabric import Fabric
 from FABulous.fabric_definition.Mux import Mux
-from FABulous.fabric_definition.Port import Port
+from FABulous.fabric_definition.Port import Port, TilePort
 from FABulous.fabric_definition.Tile import Tile
 from FABulous.fabric_generator.file_parser_csv import parseList, parseMatrix
 from FABulous.fabric_generator.file_parser_HDL import parseBelFile
+from FABulous.fabric_generator.file_parser_list import parseMux
 
 oppositeDic = {
     "NORTH": "SOUTH",
@@ -181,7 +182,7 @@ def parseTileYAML(fileName: Path) -> Tile:
     commonWirePairs = []
     for portEntry in data["PORTS"]:
         ports.append(
-            Port(
+            TilePort(
                 wireDirection=Direction[portEntry["direction"]],
                 sourceName=portEntry["source_name"],
                 xOffset=portEntry["X-offset"],
@@ -190,11 +191,12 @@ def parseTileYAML(fileName: Path) -> Tile:
                 wireCount=int(portEntry["wires"]),
                 name=portEntry["source_name"],
                 inOut=IO.OUTPUT,
-                sideOfTile=Side[oppositeDic[portEntry["direction"]].upper()],
+                sideOfTile=Side[portEntry["direction"].upper()],
+                isBus=portEntry.get("isBus", False),
             )
         )
         ports.append(
-            Port(
+            TilePort(
                 wireDirection=Direction[portEntry["direction"]],
                 sourceName=portEntry["source_name"],
                 xOffset=portEntry["X-offset"],
@@ -204,6 +206,7 @@ def parseTileYAML(fileName: Path) -> Tile:
                 name=portEntry["destination_name"],
                 inOut=IO.INPUT,
                 sideOfTile=Side[oppositeDic[portEntry["direction"]].upper()],
+                isBus=portEntry.get("isBus", False),
             )
         )
         commonWirePairs.append(
@@ -230,6 +233,12 @@ def parseTileYAML(fileName: Path) -> Tile:
         case ".list":
             for _, v in parseList(matrixDir, "source").items():
                 muxSize = len(v)
+                if muxSize >= 2:
+                    configBit += muxSize.bit_length() - 1
+
+        case ".mux":
+            for i in parseMux(matrixDir):
+                muxSize = len(i.inputs)
                 if muxSize >= 2:
                     configBit += muxSize.bit_length() - 1
         case "_matrix.csv":
@@ -269,7 +278,7 @@ def parseTileYAML(fileName: Path) -> Tile:
             if commonWirePair:
                 commonWirePairs.append(commonWirePair)
 
-    withUserCLK = any(bel.withUserCLK for bel in bels)
+    withUserCLK = any(bel.userCLK for bel in bels)
 
     return Tile(
         name=tileName,

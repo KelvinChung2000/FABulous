@@ -1,14 +1,14 @@
-from enum import Enum
+from enum import StrEnum
 
 
-class IO(Enum):
+class IO(StrEnum):
     INPUT = "INPUT"
     OUTPUT = "OUTPUT"
     INOUT = "INOUT"
     NULL = "NULL"
 
 
-class Direction(Enum):
+class Direction(StrEnum):
     NORTH = "NORTH"
     SOUTH = "SOUTH"
     EAST = "EAST"
@@ -16,7 +16,7 @@ class Direction(Enum):
     JUMP = "JUMP"
 
 
-class Side(Enum):
+class Side(StrEnum):
     NORTH = "NORTH"
     SOUTH = "SOUTH"
     EAST = "EAST"
@@ -24,11 +24,20 @@ class Side(Enum):
     ANY = "ANY"
 
 
-class MultiplexerStyle(Enum):
+class MultiplexerStyle(StrEnum):
     CUSTOM = "CUSTOM"
     GENERIC = "GENERIC"
 
 
-class ConfigBitMode(Enum):
+class ConfigBitMode(StrEnum):
     FRAME_BASED = "FRAME_BASED"
     FLIPFLOP_CHAIN = "FLIPFLOP_CHAIN"
+
+
+class FABulousPortType(StrEnum):
+    EXTERNAL = "EXTERNAL"
+    CONFIG_BIT = "CONFIG_BIT"
+    USER_CLK = "USER_CLK"
+    GLOBAL = "GLOBAL"
+    BUS = "BUS"
+    SHARED = "SHARED"

@@ -121,7 +121,7 @@ def genNextpnrModel(fabric: Fabric):
                     )  # O,<port>,<wire>
                 for feat, cfg in sorted(bel.belFeatureMap.items(), key=lambda x: x[0]):
                     belv2Str.append(f"CFG,{feat}")
-                if bel.withUserCLK:
+                if bel.userCLK:
                     belv2Str.append("GlobalClk")
                 belv2Str.append("BelEnd")
     return (

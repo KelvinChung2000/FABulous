@@ -1,12 +1,11 @@
-import os
-from enum import Enum
-from dataclasses import dataclass, field
-from FABulous.fabric_definition.define import IO, Direction, Side
-from FABulous.fabric_definition.Bel import Bel
-from FABulous.fabric_definition.Port import Port
-from FABulous.fabric_definition.Wire import Wire
-from typing import Any
 import pathlib
+from dataclasses import dataclass, field
+from typing import Any
+
+from FABulous.fabric_definition.Bel import Bel
+from FABulous.fabric_definition.define import IO, Direction, Side
+from FABulous.fabric_definition.Port import TilePort
+from FABulous.fabric_definition.Wire import Wire
 
 
 @dataclass
@@ -32,7 +31,7 @@ class Tile:
     """
 
     name: str
-    portsInfo: list[Port]
+    portsInfo: list[TilePort]
     bels: list[Bel]
     matrixDir: pathlib.Path
     globalConfigBits: int = 0
@@ -44,7 +43,7 @@ class Tile:
     def __init__(
         self,
         name: str,
-        ports: list[Port],
+        ports: list[TilePort],
         bels: list[Bel],
         tileDir: pathlib.Path,
         matrixDir: pathlib.Path,
@@ -68,48 +67,48 @@ class Tile:
             return False
         return self.name == __o.name
 
-    def getWestSidePorts(self) -> list[Port]:
+    def getWestSidePorts(self) -> list[TilePort]:
         return [
             p for p in self.portsInfo if p.sideOfTile == Side.WEST and p.name != "NULL"
         ]
 
-    def getEastSidePorts(self) -> list[Port]:
+    def getEastSidePorts(self) -> list[TilePort]:
         return [
             p for p in self.portsInfo if p.sideOfTile == Side.EAST and p.name != "NULL"
         ]
 
-    def getNorthSidePorts(self) -> list[Port]:
+    def getNorthSidePorts(self) -> list[TilePort]:
         return [
             p for p in self.portsInfo if p.sideOfTile == Side.NORTH and p.name != "NULL"
         ]
 
-    def getSouthSidePorts(self) -> list[Port]:
+    def getSouthSidePorts(self) -> list[TilePort]:
         return [
             p for p in self.portsInfo if p.sideOfTile == Side.SOUTH and p.name != "NULL"
         ]
 
-    def getNorthPorts(self, io: IO) -> list[Port]:
+    def getNorthPorts(self, io: IO) -> list[TilePort]:
         return [
             p
             for p in self.portsInfo
             if p.wireDirection == Direction.NORTH and p.name != "NULL" and p.inOut == io
         ]
 
-    def getSouthPorts(self, io: IO) -> list[Port]:
+    def getSouthPorts(self, io: IO) -> list[TilePort]:
         return [
             p
             for p in self.portsInfo
             if p.wireDirection == Direction.SOUTH and p.name != "NULL" and p.inOut == io
         ]
 
-    def getEastPorts(self, io: IO) -> list[Port]:
+    def getEastPorts(self, io: IO) -> list[TilePort]:
         return [
             p
             for p in self.portsInfo
             if p.wireDirection == Direction.EAST and p.name != "NULL" and p.inOut == io
         ]
 
-    def getWestPorts(self, io: IO) -> list[Port]:
+    def getWestPorts(self, io: IO) -> list[TilePort]:
         return [
             p
             for p in self.portsInfo

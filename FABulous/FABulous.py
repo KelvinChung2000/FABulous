@@ -1116,47 +1116,6 @@ To run the complete FABulous flow with the default project, run the following co
 
         logger.info("Generated npnr model")
 
-    # TODO update once have transition the model gen to object based
-    # def do_gen_model_npnr_pair(self):
-    #     """(Currently not working!)
-
-    #     Generates a pair Nextpnr (npnr) model of
-    #     the fabric by calling 'GetFabric' and 'genFabricObject' then saving
-    #     the npnr components in their respective files.
-
-    #     Also logs the path of the output files.
-
-    #     Usage:
-    #         gen_model_npnr_pair
-
-    #     """
-    #     logger.info("Generating pair npnr model")
-    #     if self.csvFile:
-    #         FabricFile = [i.strip("\n").split(",") for i in open(self.csvFile)]
-    #         fabric = GetFabric(FabricFile)
-    #         fabricObject = genFabricObject(fabric, FabricFile)
-    #         pipFile = open(f"{self.projectDir}/{metaDataDir}/pips.txt", "w")
-    #         belFile = open(f"{self.projectDir}/{metaDataDir}/bel.txt", "w")
-    #         pairFile = open(f"{self.projectDir}/{metaDataDir}/wirePairs.csv", "w")
-    #         constraintFile = open(f"{self.projectDir}/{metaDataDir}/template.pcf", "w")
-
-    #         npnrModel = model_gen_npnr.genNextpnrModelOld(fabricObject, False)
-
-    #         pipFile.write(npnrModel[0])
-    #         belFile.write(npnrModel[1])
-    #         constraintFile.write(npnrModel[2])
-    #         pairFile.write(npnrModel[3])
-
-    #         pipFile.close()
-    #         belFile.close()
-    #         constraintFile.close()
-    #         pairFile.close()
-
-    #     else:
-    #         logger.error(
-    #             "Need to call sec_fabric_csv before running model_gen_npnr_pair"
-    #         )
-    #     logger.info("Generated pair npnr model")
 
     def do_synthesis(self, args):
         """Runs Yosys using Nextpnr JSON backend to synthesise the Verilog design specified

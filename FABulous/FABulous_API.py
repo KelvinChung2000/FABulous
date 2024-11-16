@@ -40,6 +40,7 @@ class FABulous:
     geometryGenerator: GeometryGenerator
     fabric: Fabric
     fileExtension: str = ".v"
+    _projectDirectory: Path
 
     def __init__(self, writer: codeGen.codeGenerator, fabricPath: str = ""):
         """Initialises FABulous object.
@@ -290,3 +291,50 @@ class FABulous:
             SuperTile object based on tile name.
         """
         return self.fabric.superTileDic.values()
+
+    @property
+    def projectDirectory(self) -> Path:
+        """Returns the project directory for the fabric generator.
+
+        Returns
+        -------
+        Path
+            Directory of the current project.
+        """
+        if not self._projectDirectory:
+            logger.error("Project directory not set.")
+            raise ValueError("Project directory not set.")
+        return self._projectDirectory
+
+    @projectDirectory.setter
+    def projectDirectory(self, path: Path):
+        """Sets the project directory for the fabric generator.
+
+        Parameters
+        ----------
+        path : Path
+            Path to the project directory.
+        """
+        if not path.joinpath(".FABulous").is_dir():
+            logger.error(
+                f"Directory '.FABulous' not found in {path}, this is not a valid project directory."
+            )
+            raise ValueError
+
+        self._projectDirectory = path
+
+    @staticmethod
+    def createEmptyProjectDirectory(path: Path):
+        """Creates a new empty project directory for the fabric generator.
+
+        Parameters
+        ----------
+        path : Path
+            Path to the project directory.
+        """
+        if path.is_dir():
+            logger.error(f"Directory {path} already exists.")
+            raise ValueError
+
+        path.mkdir(parents=True)
+        path.joinpath(".FABulous").mkdir()

@@ -1,0 +1,28 @@
+FABRIC: [
+    [None,  N_IO, N_IO, None  ],
+    [W_IO,  PE,   PE,   E_IO  ],
+    [W_IO,  PE,   PE,   E_IO  ],
+    [None,  S_IO, S_IO, None  ]
+  ]
+
+PARAM: {
+  ConfigBitMode: frame_based, # default is FlipFlopChain, frame_based
+  #FrameBitsPerRow: 32 # we configure an entire configuration frame over the full height of the device (like Virtex-II) and we write FrameBitsPerRow bits per, well, tile=CLB height",,,,,,,,,,,,,,,,
+  #MaxFramesPerCol: 20
+  #Package: use work.my_package.all;
+  GenerateDelayInSwitchMatrix: 80,
+  MultiplexerStyle: custom, #custom or generic
+  SuperTileEnable: True #True,False
+}
+
+TILES: {
+  ./Tile/PE/PE.yaml,
+  ./Tile/N_IO/N_IO.yaml,
+  ./Tile/E_IO/E_IO.yaml,
+  ./Tile/S_IO/S_IO.yaml,
+  ./Tile/W_IO/W_IO.yaml,
+}
+
+SUPERTILE: {
+
+} 

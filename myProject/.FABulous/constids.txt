@@ -1,0 +1,4 @@
+X(add)
+X(srcA)
+X(srcB)
+X(out)

@@ -1,0 +1,17 @@
+# BEL descriptions: top left corner Tile_X0Y0, bottom right Tile_X15Y15
+#Tile_X0Y0
+X0Y0,X0,Y0,A,inputCrossBar,in0,in1,in2,in3,out0,out1,out2,out3
+X0Y0,X0,Y0,B,outputCrossBar,in0,in1,in2,out0,out1,out2,out3
+X0Y0,X0,Y0,C,alu,srcA,srcB,out
+#Tile_X1Y0
+X1Y0,X1,Y0,A,inputCrossBar,in0,in1,in2,in3,out0,out1,out2,out3
+X1Y0,X1,Y0,B,outputCrossBar,in0,in1,in2,out0,out1,out2,out3
+X1Y0,X1,Y0,C,alu,srcA,srcB,out
+#Tile_X0Y1
+X0Y1,X0,Y1,A,inputCrossBar,in0,in1,in2,in3,out0,out1,out2,out3
+X0Y1,X0,Y1,B,outputCrossBar,in0,in1,in2,out0,out1,out2,out3
+X0Y1,X0,Y1,C,alu,srcA,srcB,out
+#Tile_X1Y1
+X1Y1,X1,Y1,A,inputCrossBar,in0,in1,in2,in3,out0,out1,out2,out3
+X1Y1,X1,Y1,B,outputCrossBar,in0,in1,in2,out0,out1,out2,out3
+X1Y1,X1,Y1,C,alu,srcA,srcB,out

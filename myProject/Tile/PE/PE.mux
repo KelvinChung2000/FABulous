@@ -1,0 +1,7 @@
+# mux_out: mux_in0 
+data_in1:in{0..3}
+data_in2:in{0..3}
+out0:data_out
+out1:data_out
+out2:data_out
+out3:data_out

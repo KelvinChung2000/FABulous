@@ -1,0 +1,17 @@
+TILE: N_IO
+# {direction: <>, source_name: <>, X-offset: <>, Y-offset: <>, destination_name: <>, wires: <>}
+INCLUDE:
+PORTS: [
+    {direction: NORTH, source_name: in2, X-offset: 0, Y-offset: -1, destination_name: null, wires: 32},
+    # {direction: SOUTH, source_name: in0, X-offset: 0, Y-offset: 1, destination_name: in0, wires: 32},
+  ]
+BELS: [
+    # {BEL: ./ALU.v, prefix: },
+    # {BEL: ./const.v, prefix: },
+    # {BEL: ./buff.v, prefix: N_},
+    # {BEL: ./buff.v, prefix: E_},
+    # {BEL: ./buff.v, prefix: S_},
+    # {BEL: ./buff.v, prefix: W_},
+
+]
+MATRIX: ./N_IO.mux

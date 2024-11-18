@@ -1,0 +1,110 @@
+{
+  "creator": "Yosys 0.47+56 (git sha1 a22ff47d6, g++ 11.4.0-1ubuntu1~22.04 -fPIC -O3)",
+  "modules": {
+    "ALU": {
+      "attributes": {
+        "dynports": 1,
+        "blackbox": 1,
+        "cells_not_processed": 1,
+        "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/ALU.v:1.1-11.10"
+      },
+      "parameter_default_values": {
+        "NoConfigBits": 3
+      },
+      "ports": {
+        "rst": {
+          "direction": "input",
+          "bits": [ 2 ]
+        },
+        "en": {
+          "direction": "input",
+          "bits": [ 3 ]
+        },
+        "clk": {
+          "direction": "input",
+          "bits": [ 4 ]
+        },
+        "data_in1": {
+          "direction": "input",
+          "bits": [ 5, 6, 7, 8, 9, 10, 11, 12 ]
+        },
+        "data_in2": {
+          "direction": "input",
+          "bits": [ 13, 14, 15, 16, 17, 18, 19, 20 ]
+        },
+        "data_out": {
+          "direction": "output",
+          "bits": [ 21, 22, 23, 24, 25, 26, 27, 28 ]
+        },
+        "ConfigBits": {
+          "direction": "input",
+          "bits": [ 29, 30, 31, 32 ]
+        }
+      },
+      "cells": {
+      },
+      "netnames": {
+        "ConfigBits": {
+          "hide_name": 0,
+          "bits": [ 29, 30, 31, 32 ],
+          "attributes": {
+            "ALU": 1,
+            "CONFIG_BIT": 1,
+            "FABulous": 1,
+            "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/ALU.v:8.60-8.70"
+          }
+        },
+        "clk": {
+          "hide_name": 0,
+          "bits": [ 4 ],
+          "attributes": {
+            "FABulous": 1,
+            "USER_CLK": 1,
+            "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/ALU.v:4.40-4.43"
+          }
+        },
+        "data_in1": {
+          "hide_name": 0,
+          "bits": [ 5, 6, 7, 8, 9, 10, 11, 12 ],
+          "attributes": {
+            "BUS": 1,
+            "FABulous": 1,
+            "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/ALU.v:5.41-5.49"
+          }
+        },
+        "data_in2": {
+          "hide_name": 0,
+          "bits": [ 13, 14, 15, 16, 17, 18, 19, 20 ],
+          "attributes": {
+            "BUS": 1,
+            "FABulous": 1,
+            "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/ALU.v:6.41-6.49"
+          }
+        },
+        "data_out": {
+          "hide_name": 0,
+          "bits": [ 21, 22, 23, 24, 25, 26, 27, 28 ],
+          "attributes": {
+            "BUS": 1,
+            "FABulous": 1,
+            "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/ALU.v:7.42-7.50"
+          }
+        },
+        "en": {
+          "hide_name": 0,
+          "bits": [ 3 ],
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/ALU.v:3.16-3.18"
+          }
+        },
+        "rst": {
+          "hide_name": 0,
+          "bits": [ 2 ],
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/ALU.v:2.16-2.19"
+          }
+        }
+      }
+    }
+  }
+}

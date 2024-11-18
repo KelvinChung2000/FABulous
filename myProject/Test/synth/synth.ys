@@ -1,0 +1,19 @@
+read_verilog -lib ./Test/synth/prims.v
+read_verilog ./Test/test_design/adding.v
+read_verilog ./Test/test_design/top_wrapper.v
+hierarchy -check -top top_wrapper
+proc
+flatten
+tribuf -logic
+deminout
+synth -run coarse -noalumacc
+memory_map
+iopadmap -bits -inpad INBUF O:PAD -outpad OUTBUF I:PAD
+techmap -map ./Test/synth/map.v
+opt -fast
+clean
+hierarchy -check
+clean -purge
+stat
+# show -width
+write_json ./Test/test_design/add.json

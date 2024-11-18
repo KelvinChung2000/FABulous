@@ -1,0 +1,94 @@
+{
+  "creator": "Yosys 0.43 (git sha1 ead4718e5, clang++ 15.0.0 -fPIC -Os)",
+  "modules": {
+    "test": {
+      "attributes": {
+        "cells_not_processed": "00000000000000000000000000000001",
+        "src": "./myProject/PnR/test.v:1.1-9.10"
+      },
+      "ports": {
+        "A": {
+          "direction": "input",
+          "bits": [ 2 ]
+        },
+        "B": {
+          "direction": "input",
+          "bits": [ 3 ]
+        },
+        "Y": {
+          "direction": "output",
+          "bits": [ 4 ]
+        }
+      },
+      "cells": {
+        "$add$./myProject/PnR/test.v:7$1": {
+          "hide_name": 1,
+          "type": "ALU",
+          "parameters": {
+            "OPERATION": "00000000000000000000000000000000"
+          },
+          "attributes": {
+            "module_not_derived": "00000000000000000000000000000001",
+            "src": "./myProject/PnR/test.v:7.14-7.19|./myProject/PnR/PE_map.v:27.38-27.77"
+          },
+          "connections": {
+            "A": [ 2 ],
+            "B": [ 3 ],
+            "Y": [ 4 ]
+          }
+        }
+      },
+      "netnames": {
+        "$add$./myProject/PnR/test.v:7$1_Y": {
+          "hide_name": 1,
+          "bits": [ 4 ],
+          "attributes": {
+            "src": "./myProject/PnR/test.v:7.14-7.19"
+          }
+        },
+        "$techmap2$add$./myProject/PnR/test.v:7$1.A": {
+          "hide_name": 1,
+          "bits": [ 5 ],
+          "attributes": {
+            "src": "./myProject/PnR/test.v:7.14-7.19|./myProject/PnR/PE_map.v:11.25-11.26"
+          }
+        },
+        "$techmap2$add$./myProject/PnR/test.v:7$1.B": {
+          "hide_name": 1,
+          "bits": [ 6 ],
+          "attributes": {
+            "src": "./myProject/PnR/test.v:7.14-7.19|./myProject/PnR/PE_map.v:12.25-12.26"
+          }
+        },
+        "$techmap2$add$./myProject/PnR/test.v:7$1.Y": {
+          "hide_name": 1,
+          "bits": [ 7 ],
+          "attributes": {
+            "src": "./myProject/PnR/test.v:7.14-7.19|./myProject/PnR/PE_map.v:13.26-13.27"
+          }
+        },
+        "A": {
+          "hide_name": 0,
+          "bits": [ 2 ],
+          "attributes": {
+            "src": "./myProject/PnR/test.v:3.11-3.12"
+          }
+        },
+        "B": {
+          "hide_name": 0,
+          "bits": [ 3 ],
+          "attributes": {
+            "src": "./myProject/PnR/test.v:3.14-3.15"
+          }
+        },
+        "Y": {
+          "hide_name": 0,
+          "bits": [ 4 ],
+          "attributes": {
+            "src": "./myProject/PnR/test.v:4.12-4.13"
+          }
+        }
+      }
+    }
+  }
+}

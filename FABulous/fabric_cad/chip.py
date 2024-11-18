@@ -83,6 +83,11 @@ class StringPool:
         bba.u32(self.known_id_count)
         bba.slice(f"{context}_strs", len(self.strs) - self.known_id_count)
 
+    def toConstStringId(self, file: str):
+        with open(file, "w") as f:
+            for s in self.strs.keys():
+                f.write(f"X({s})\n")
+
 
 @dataclass
 class PinType(Enum):

@@ -8,13 +8,7 @@ from loguru import logger
 
 from FABulous.fabric_definition.Bel import Bel
 from FABulous.fabric_definition.ConfigMem import ConfigMem
-from FABulous.fabric_definition.define import (
-    IO,
-    ConfigBitMode,
-    Direction,
-    MultiplexerStyle,
-    Side,
-)
+from FABulous.fabric_definition.define import IO, ConfigBitMode, Direction, MultiplexerStyle, Side
 from FABulous.fabric_definition.Fabric import Fabric
 from FABulous.fabric_definition.Port import Port
 from FABulous.fabric_definition.SuperTile import SuperTile
@@ -235,8 +229,8 @@ def parseFabricCSV(fileName: str) -> Fabric:
         multiplexerStyle=multiplexerStyle,
         numberOfBRAMs=int(height / 2),
         superTileEnable=superTileEnable,
-        tileDic=tileDic,
-        superTileDic=superTileDic,
+        tileDict=tileDic,
+        superTileDict=superTileDic,
         commonWirePair=commonWirePair,
     )
 

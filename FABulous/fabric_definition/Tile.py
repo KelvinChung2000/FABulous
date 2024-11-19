@@ -1,11 +1,11 @@
 import pathlib
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Any
 
 from FABulous.fabric_definition.Bel import Bel
 from FABulous.fabric_definition.define import IO, Direction, Side
 from FABulous.fabric_definition.Port import TilePort
-from FABulous.fabric_definition.Wire import Wire
+from FABulous.fabric_definition.Wire import WireType
 
 
 @dataclass
@@ -31,36 +31,14 @@ class Tile:
     """
 
     name: str
-    portsInfo: list[TilePort]
+    ports: list[TilePort]
     bels: list[Bel]
+    wireTypes: list[WireType]
     matrixDir: pathlib.Path
     globalConfigBits: int = 0
     withUserCLK: bool = False
-    wireList: list[Wire] = field(default_factory=list)
     tileDir: pathlib.Path = pathlib.Path(".")
     partOfSuperTile = False
-
-    def __init__(
-        self,
-        name: str,
-        ports: list[TilePort],
-        bels: list[Bel],
-        tileDir: pathlib.Path,
-        matrixDir: pathlib.Path,
-        userCLK: bool,
-        configBit: int = 0,
-    ) -> None:
-        self.name = name
-        self.portsInfo = ports
-        self.bels = bels
-        self.matrixDir = matrixDir
-        self.withUserCLK = userCLK
-        self.globalConfigBits = configBit
-        self.wireList = []
-        self.tileDir = tileDir
-
-        for b in self.bels:
-            self.globalConfigBits += b.configBit
 
     def __eq__(self, __o: Any) -> bool:
         if __o is None or not isinstance(__o, Tile):
@@ -68,67 +46,47 @@ class Tile:
         return self.name == __o.name
 
     def getWestSidePorts(self) -> list[TilePort]:
-        return [
-            p for p in self.portsInfo if p.sideOfTile == Side.WEST and p.name != "NULL"
-        ]
+        return [p for p in self.ports if p.sideOfTile == Side.WEST and not p.terminal]
 
     def getEastSidePorts(self) -> list[TilePort]:
-        return [
-            p for p in self.portsInfo if p.sideOfTile == Side.EAST and p.name != "NULL"
-        ]
+        return [p for p in self.ports if p.sideOfTile == Side.EAST and not p.terminal]
 
     def getNorthSidePorts(self) -> list[TilePort]:
-        return [
-            p for p in self.portsInfo if p.sideOfTile == Side.NORTH and p.name != "NULL"
-        ]
+        return [p for p in self.ports if p.sideOfTile == Side.NORTH and not p.terminal]
 
     def getSouthSidePorts(self) -> list[TilePort]:
-        return [
-            p for p in self.portsInfo if p.sideOfTile == Side.SOUTH and p.name != "NULL"
-        ]
+        return [p for p in self.ports if p.sideOfTile == Side.SOUTH and not p.terminal]
 
     def getNorthPorts(self, io: IO) -> list[TilePort]:
         return [
             p
-            for p in self.portsInfo
+            for p in self.ports
             if p.wireDirection == Direction.NORTH and p.name != "NULL" and p.inOut == io
         ]
 
     def getSouthPorts(self, io: IO) -> list[TilePort]:
         return [
             p
-            for p in self.portsInfo
+            for p in self.ports
             if p.wireDirection == Direction.SOUTH and p.name != "NULL" and p.inOut == io
         ]
 
     def getEastPorts(self, io: IO) -> list[TilePort]:
         return [
             p
-            for p in self.portsInfo
+            for p in self.ports
             if p.wireDirection == Direction.EAST and p.name != "NULL" and p.inOut == io
         ]
 
     def getWestPorts(self, io: IO) -> list[TilePort]:
         return [
             p
-            for p in self.portsInfo
+            for p in self.ports
             if p.wireDirection == Direction.WEST and p.name != "NULL" and p.inOut == io
         ]
 
     def getTileInputNames(self) -> list[str]:
-        return [
-            p.destinationName
-            for p in self.portsInfo
-            if p.destinationName != "NULL"
-            and p.wireDirection != Direction.JUMP
-            and p.inOut == IO.INPUT
-        ]
+        return [p.name for p in self.ports if p.inOut == IO.INPUT]
 
     def getTileOutputNames(self) -> list[str]:
-        return [
-            p.sourceName
-            for p in self.portsInfo
-            if p.sourceName != "NULL"
-            and p.wireDirection != Direction.JUMP
-            and p.inOut == IO.OUTPUT
-        ]
+        return [p.name for p in self.ports if p.inOut == IO.OUTPUT]

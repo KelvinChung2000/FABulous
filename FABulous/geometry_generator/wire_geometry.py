@@ -1,8 +1,9 @@
 from csv import writer as csvWriter
 from typing import List
+
 from loguru import logger
 
-from FABulous.fabric_definition.Fabric import Direction
+from FABulous.fabric_definition.define import Direction
 from FABulous.geometry_generator.geometry_obj import Location
 
 

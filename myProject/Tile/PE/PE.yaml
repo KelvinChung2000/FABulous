@@ -5,7 +5,7 @@ PORTS: [
     {direction: NORTH, name: in0, inOut: input, wires: 32, terminal: false},
     {direction: EAST, name: in1, inOut: input, wires: 32, terminal: false},
     {direction: SOUTH, name: in2, inOut: input, wires: 32, terminal: false},
-    {direction: WEST, name: in4, inOut: input, wires: 32, terminal: false},
+    {direction: WEST, name: in3, inOut: input, wires: 32, terminal: false},
 
     {direction: NORTH, name: out0, inOut: output, wires: 32, terminal: false},
     {direction: EAST, name: out1, inOut: output, wires: 32, terminal: false},

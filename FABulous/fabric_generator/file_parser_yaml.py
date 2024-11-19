@@ -14,8 +14,9 @@ from FABulous.fabric_definition.define import (
 )
 from FABulous.fabric_definition.Fabric import Fabric
 from FABulous.fabric_definition.Mux import Mux
-from FABulous.fabric_definition.Port import Port, TilePort
+from FABulous.fabric_definition.Port import TilePort
 from FABulous.fabric_definition.Tile import Tile
+from FABulous.fabric_definition.Wire import Wire, WireType
 from FABulous.fabric_generator.file_parser_csv import parseList, parseMatrix
 from FABulous.fabric_generator.file_parser_HDL import parseBelFile
 from FABulous.fabric_generator.file_parser_list import parseMux
@@ -73,7 +74,7 @@ def parseFabricYAML(fileName: Path) -> Fabric:
     superTileEnable = param.get("SuperTileEnable", True)
 
     usedTile = set()
-    fabricTiles = []
+    fabricTiles: list[list[Tile]] = []
     for row in data["FABRIC"]:
         fabricLine = []
         for i in row:
@@ -103,6 +104,25 @@ def parseFabricYAML(fileName: Path) -> Fabric:
     height = len(fabricTiles)
     width = len(fabricTiles[0])
 
+    wireDict = {}
+    for y, row in enumerate(fabricTiles):
+        for x, tile in enumerate(row):
+            wires = []
+            if tile is None:
+                continue
+            for wireType in tile.wireTypes:
+                wires.append(
+                    Wire(
+                        source=wireType.sourcePort,
+                        destination=wireType.destinationPort,
+                        xOffset=wireType.offsetX,
+                        yOffset=wireType.offsetY,
+                        sourceTile=f"X{x}Y{y}",
+                        destinationTile=f"X{x+wireType.offsetX}Y{y+wireType.offsetY}",
+                    )
+                )
+            wireDict[(x, y)] = wires
+
     return Fabric(
         tile=fabricTiles,
         numberOfColumns=width,
@@ -115,9 +135,9 @@ def parseFabricYAML(fileName: Path) -> Fabric:
         multiplexerStyle=multiplexerStyle,
         numberOfBRAMs=int(height / 2),
         superTileEnable=superTileEnable,
-        tileDic=tileDic,
-        superTileDic=superTileDic,
-        commonWirePair=[],
+        tileDict=tileDic,
+        superTileDict=superTileDic,
+        wireDict=wireDict,
     )
 
 
@@ -172,28 +192,47 @@ def parseTileYAML(fileName: Path) -> Tile:
         data = yaml.safe_load(f)
 
     tileName = data["TILE"]
-    ports: list[Port] = []
+    portsDict: dict[str, TilePort] = {}
     bels: list[Bel] = []
+    wires: list[WireType] = []
     matrixDir: Path | None = None
     withUserCLK = False
     configBit = 0
 
-    commonWirePairs = []
+    normalPorts = set()
+
     for portEntry in data["PORTS"]:
-        ports.append(
-            TilePort(
-                wireDirection=Direction[portEntry["direction"]],
-                wireCount=int(portEntry["wires"]),
-                name=portEntry["name"],
-                inOut=portEntry["inOut"],
-                sideOfTile=Side[portEntry["direction"].upper()],
-                isBus=portEntry.get("isBus", False),
-                terminal=portEntry.get("terminal", False),
+        portsDict[portEntry["name"]] = TilePort(
+            wireDirection=Direction[portEntry["direction"]],
+            wireCount=int(portEntry["wires"]),
+            name=portEntry["name"],
+            inOut=portEntry["inOut"],
+            sideOfTile=Side[portEntry["direction"].upper()],
+            isBus=portEntry.get("isBus", False),
+            terminal=portEntry.get("terminal", False),
+        )
+        if not portEntry.get("terminal", False):
+            normalPorts.add(portEntry["name"])
+
+    for wireEntry in data.get("WIRES", {}):
+        sourcePort = portsDict[wireEntry["source_name"]]
+        destinationPort = portsDict[wireEntry["destination_name"]]
+        wires.append(
+            WireType(
+                sourcePort=sourcePort,
+                destinationPort=destinationPort,
+                offsetX=wireEntry["X-offset"],
+                offsetY=wireEntry["Y-offset"],
             )
         )
-        commonWirePairs.append(
-            (portEntry["source_name"], portEntry["destination_name"])
+        normalPorts.discard(wireEntry["source_name"])
+        normalPorts.discard(wireEntry["destination_name"])
+
+    if normalPorts:
+        logger.error(
+            f"Port {normalPorts} does not have a connection, when defined as non terminal."
         )
+        raise ValueError
 
     bels = []
     for belEntry in data["BELS"]:
@@ -261,13 +300,16 @@ def parseTileYAML(fileName: Path) -> Tile:
                 commonWirePairs.append(commonWirePair)
 
     withUserCLK = any(bel.userCLK for bel in bels)
+    for b in bels:
+        configBit += b.configBit
 
     return Tile(
         name=tileName,
-        ports=ports,
+        ports=list(portsDict.values()),
         bels=bels,
-        tileDir=fileName,
+        wireTypes=wires,
         matrixDir=matrixDir,
-        userCLK=withUserCLK,
-        configBit=configBit,
+        globalConfigBits=configBit,
+        withUserCLK=withUserCLK,
+        tileDir=fileName,
     )

@@ -2,7 +2,7 @@ import abc
 from loguru import logger
 from typing import List, Tuple
 
-from FABulous.fabric_definition.Fabric import IO, Bel, ConfigBitMode
+from FABulous.fabric_definition.define import IO
 
 
 class codeGenerator(abc.ABC):

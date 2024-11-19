@@ -1,1 +1,2 @@
-out2:in0
+out:out2
+in:in2

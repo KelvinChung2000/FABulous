@@ -16,8 +16,6 @@ class TilePort(Port):
     sideOfTile: Side
     terminal: bool = False
 
-
-
 @dataclass(frozen=True, eq=True)
 class ConfigPort(Port):
     feature: str = ""

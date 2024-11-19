@@ -650,8 +650,8 @@ To run the complete FABulous flow with the default project, run the following co
         tileByPath = [
             f.name for f in os.scandir(f"{self.projectDir}/Tile/") if f.is_dir()
         ]
-        tileByFabric = list(self.fabricGen.fabric.tileDic.keys())
-        superTileByFabric = list(self.fabricGen.fabric.superTileDic.keys())
+        tileByFabric = list(self.fabricGen.fabric.tileDict.keys())
+        superTileByFabric = list(self.fabricGen.fabric.superTileDict.keys())
         self.allTile = list(set(tileByPath) & set(tileByFabric + superTileByFabric))
         logger.info("Complete")
 

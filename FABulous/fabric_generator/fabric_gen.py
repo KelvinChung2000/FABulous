@@ -92,7 +92,7 @@ class FabricGenerator:
             writer = csv.writer(f)
             sourceName, destName = [], []
             # normal wire
-            for i in tile.portsInfo:
+            for i in tile.ports:
                 if i.wireDirection != Direction.JUMP:
                     input, output = i.expandPortInfo("AutoSwitchMatrix")
                     sourceName += input
@@ -105,7 +105,7 @@ class FabricGenerator:
                     destName.append(f"{p}")
 
             # jump wire
-            for i in tile.portsInfo:
+            for i in tile.ports:
                 if i.wireDirection == Direction.JUMP:
                     input, output = i.expandPortInfo("AutoSwitchMatrix")
                     sourceName += input
@@ -486,7 +486,7 @@ class FabricGenerator:
         self.writer.addPortStart(indentLevel=1)
 
         # normal wire input
-        for i in tile.portsInfo:
+        for i in tile.ports:
             if i.wireDirection != Direction.JUMP and i.inOut == IO.INPUT:
                 for p in i.expandPortInfoByName():
                     self.writer.addPortScalar(p, IO.INPUT, indentLevel=2)
@@ -497,13 +497,13 @@ class FabricGenerator:
                 self.writer.addPortScalar(p, IO.INPUT, indentLevel=2)
 
         # jump wire input
-        for i in tile.portsInfo:
+        for i in tile.ports:
             if i.wireDirection == Direction.JUMP and i.inOut == IO.INPUT:
                 for p in i.expandPortInfoByName():
                     self.writer.addPortScalar(p, IO.INPUT, indentLevel=2)
 
         # normal wire output
-        for i in tile.portsInfo:
+        for i in tile.ports:
             if i.wireDirection != Direction.JUMP and i.inOut == IO.OUTPUT:
                 for p in i.expandPortInfoByName():
                     self.writer.addPortScalar(p, IO.OUTPUT, indentLevel=2)
@@ -514,7 +514,7 @@ class FabricGenerator:
                 self.writer.addPortScalar(p, IO.OUTPUT, indentLevel=2)
 
         # jump wire output
-        for i in tile.portsInfo:
+        for i in tile.ports:
             if i.wireDirection == Direction.JUMP and i.inOut == IO.OUTPUT:
                 for p in i.expandPortInfoByName():
                     self.writer.addPortScalar(p, IO.OUTPUT, indentLevel=2)
@@ -895,7 +895,7 @@ class FabricGenerator:
 
         # Jump wires
         self.writer.addComment("Jump wires", onNewLine=True)
-        for p in tile.portsInfo:
+        for p in tile.ports:
             if p.wireDirection == Direction.JUMP:
                 if (
                     p.sourceName != "NULL"
@@ -933,7 +933,7 @@ class FabricGenerator:
         self.writer.addConnectionVector("FrameStrobe_O_i", "MaxFramesPerCol-1", 0)
 
         added = set()
-        for port in tile.portsInfo:
+        for port in tile.ports:
             span = abs(port.xOffset) + abs(port.yOffset)
             if (port.sourceName, port.destinationName) in added:
                 continue
@@ -994,7 +994,7 @@ class FabricGenerator:
             )
 
         added = set()
-        for port in tile.portsInfo:
+        for port in tile.ports:
             span = abs(port.xOffset) + abs(port.yOffset)
             if (port.sourceName, port.destinationName) in added:
                 continue
@@ -1169,7 +1169,7 @@ class FabricGenerator:
 
         portsPairs = []
         # normal input wire
-        for i in tile.portsInfo:
+        for i in tile.ports:
             if i.wireDirection != Direction.JUMP and i.inOut == IO.INPUT:
                 portsPairs += list(
                     zip(i.expandPortInfoByName(), i.expandPortInfoByName(indexed=True))
@@ -1181,7 +1181,7 @@ class FabricGenerator:
 
         # jump input wire
         port, signal = [], []
-        for i in tile.portsInfo:
+        for i in tile.ports:
             if i.wireDirection == Direction.JUMP and i.inOut == IO.INPUT:
                 port += i.expandPortInfoByName()
             if i.wireDirection == Direction.JUMP and i.inOut == IO.OUTPUT:
@@ -1190,7 +1190,7 @@ class FabricGenerator:
         portsPairs += list(zip(port, signal))
 
         # normal output wire
-        for i in tile.portsInfo:
+        for i in tile.ports:
             if i.wireDirection != Direction.JUMP and i.inOut == IO.OUTPUT:
                 portsPairs += list(
                     zip(
@@ -1206,7 +1206,7 @@ class FabricGenerator:
 
         # jump output wire
         port, signal = [], []
-        for i in tile.portsInfo:
+        for i in tile.ports:
             if i.wireDirection == Direction.JUMP and i.inOut == IO.OUTPUT:
                 port += i.expandPortInfoByName()
             if i.wireDirection == Direction.JUMP and i.inOut == IO.OUTPUT:
@@ -1614,11 +1614,11 @@ class FabricGenerator:
 
         if isinstance(self.writer, VHDLWriter):
             added = set()
-            for t in self.fabric.tileDic:
+            for t in self.fabric.tileDict:
                 name = t.split("_")[0]
                 if name in added:
                     continue
-                if name not in self.fabric.superTileDic.keys():
+                if name not in self.fabric.superTileDict.keys():
                     self.writer.addComponentDeclarationForFile(
                         f"{Path(self.writer.outFileName).parent.parent}/Tile/{t}/{t}.vhdl"
                     )
@@ -1680,7 +1680,7 @@ class FabricGenerator:
             for x, tile in enumerate(row):
                 if tile != None:
                     seenPorts = set()
-                    for p in tile.portsInfo:
+                    for p in tile.ports:
                         wireLength = (abs(p.xOffset) + abs(p.yOffset)) * p.wireCount - 1
                         if p.sourceName == "NULL" or p.wireDirection == Direction.JUMP:
                             continue
@@ -1740,9 +1740,9 @@ class FabricGenerator:
                 # tile map and find all the offset of the subtile, and all their related
                 # ports.
                 if tile.partOfSuperTile:
-                    for k, v in self.fabric.superTileDic.items():
+                    for k, v in self.fabric.superTileDict.items():
                         if tile.name in [i.name for i in v.tiles]:
-                            superTile = self.fabric.superTileDic[k]
+                            superTile = self.fabric.superTileDict[k]
                             break
 
                 if superTile:

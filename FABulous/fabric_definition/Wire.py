@@ -1,7 +1,13 @@
 from dataclasses import dataclass
-from FABulous.fabric_definition.define import Direction
+from FABulous.fabric_definition.Port import Port, TilePort
 from typing import Any
 
+@dataclass(frozen=True, eq=True)
+class WireType:
+    sourcePort: Port | TilePort
+    destinationPort: Port | TilePort
+    offsetX: int
+    offsetY: int
 
 @dataclass(frozen=True, eq=True)
 class Wire:
@@ -11,8 +17,6 @@ class Wire:
 
     Attributes
     ----------
-    direction : Direction
-        The direction of the wire
     source : str
         The source name of the wire
     xOffset : int
@@ -27,16 +31,15 @@ class Wire:
         The destination tile name of the wire
     """
 
-    direction: Direction
-    source: str
+    source: Port | TilePort
     xOffset: int
     yOffset: int
-    destination: str
+    destination: Port | TilePort
     sourceTile: str
     destinationTile: str
 
     def __repr__(self) -> str:
-        return f"{self.source}-X{self.xOffset}Y{self.yOffset}>{self.destination}"
+        return f"{self.source.name}-X{self.xOffset}Y{self.yOffset}>{self.destination.name}"
 
     def __eq__(self, __o: Any) -> bool:
         if __o is None or not isinstance(__o, Wire):

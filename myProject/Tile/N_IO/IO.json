@@ -1,0 +1,58 @@
+{
+  "creator": "Yosys 0.43 (git sha1 ead4718e5, clang++ 15.0.0 -fPIC -Os)",
+  "modules": {
+    "IO": {
+      "attributes": {
+        "blackbox": 1,
+        "cells_not_processed": 1,
+        "src": "/Users/kelvinchung/Documents/FABulous-1/myProject/Tile/N_IO/IO.v:1.1-6.10"
+      },
+      "ports": {
+        "in": {
+          "direction": "input",
+          "bits": [ 2 ]
+        },
+        "out": {
+          "direction": "output",
+          "bits": [ 3 ]
+        },
+        "ConfigBits": {
+          "direction": "input",
+          "bits": [ 4 ]
+        }
+      },
+      "cells": {
+      },
+      "netnames": {
+        "ConfigBits": {
+          "hide_name": 0,
+          "bits": [ 4 ],
+          "attributes": {
+            "CONFIG_BIT": 1,
+            "FABulous": 1,
+            "IO": 1,
+            "src": "/Users/kelvinchung/Documents/FABulous-1/myProject/Tile/N_IO/IO.v:4.42-4.52"
+          }
+        },
+        "in": {
+          "hide_name": 0,
+          "bits": [ 2 ],
+          "attributes": {
+            "BUS": 1,
+            "FABulous": 1,
+            "src": "/Users/kelvinchung/Documents/FABulous-1/myProject/Tile/N_IO/IO.v:2.31-2.33"
+          }
+        },
+        "out": {
+          "hide_name": 0,
+          "bits": [ 3 ],
+          "attributes": {
+            "BUS": 1,
+            "FABulous": 1,
+            "src": "/Users/kelvinchung/Documents/FABulous-1/myProject/Tile/N_IO/IO.v:3.32-3.35"
+          }
+        }
+      }
+    }
+  }
+}

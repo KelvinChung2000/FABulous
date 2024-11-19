@@ -266,7 +266,7 @@ class FABulous:
         Tile
             Tile object based on tile name.
         """
-        return self.fabric.tileDic.values()
+        return self.fabric.tileDict.values()
 
     def getSuperTile(self, tileName: str) -> SuperTile | None:
         """Returns SuperTile object based on tile name.
@@ -290,7 +290,7 @@ class FABulous:
         SuperTile
             SuperTile object based on tile name.
         """
-        return self.fabric.superTileDic.values()
+        return self.fabric.superTileDict.values()
 
     @property
     def projectDirectory(self) -> Path:

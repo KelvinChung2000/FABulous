@@ -5,7 +5,7 @@ from loguru import logger
 
 from FABulous.fabric_cad.chip import Chip, NodeWire, PinType, TileType, TimingValue
 from FABulous.fabric_definition.Bel import Bel
-from FABulous.fabric_definition.define import IO, Direction
+from FABulous.fabric_definition.define import Direction
 from FABulous.fabric_definition.Fabric import Fabric
 from FABulous.fabric_definition.Tile import Tile
 from FABulous.fabric_generator.code_generation_Verilog import VerilogWriter
@@ -46,7 +46,7 @@ def genSwitchMatrix(tile: Tile, tileType: TileType):
 
     wires = set()
 
-    for i in tile.portsInfo:
+    for i in tile.ports:
         if i.wireDirection == Direction.JUMP:
             continue
         tileType.create_wire(i.name, f"NEBR_{tile.name}")
@@ -111,22 +111,40 @@ def genTile(tile: Tile, chip: Chip) -> TileType:
 
 
 def genFabric(fabric: Fabric, chip: Chip):
-    for i in range(fabric.numberOfRows):
-        for j in range(fabric.numberOfColumns):
-            if fabric.tile[i][j] is None:
-                continue
+    for (y, x), wires in fabric.wireDict.items():
+        if not wires:
+            continue
+        localNode = []
+        for wire in wires:
+            print(wire)
+            print(fabric.tile[y + wire.yOffset][x + wire.xOffset].name)
+            print(chip.tile_type_at(x + wire.xOffset, y + wire.yOffset).name)
+            localNode.append(
+                NodeWire(
+                    x + wire.xOffset,
+                    y + wire.yOffset,
+                    wire.destination.name,
+                )
+            )
+        chip.add_node(localNode)
 
-            localNode = []
-            for port in fabric.tile[i][j].portsInfo:
-                if port.destinationName is not None and port.inOut == IO.OUTPUT:
-                    localNode.append(
-                        NodeWire(
-                            j + port.xOffset, i + port.yOffset, port.destinationName
-                        )
-                    )
+    # for i in range(fabric.numberOfRows):
+    #     for j in range(fabric.numberOfColumns):
+    #         if fabric.tile[i][j] is None:
+    #             continue
 
-            if localNode:
-                chip.add_node(localNode)
+    #         localNode = []
+
+    #         for port in fabric.tile[i][j].ports:
+    #             if port.destinationName is not None and port.inOut == IO.OUTPUT:
+    #                 localNode.append(
+    #                     NodeWire(
+    #                         j + port.xOffset, i + port.yOffset, port.destinationName
+    #                     )
+    #                 )
+
+    #         if localNode:
+    #             chip.add_node(localNode)
 
     setTiming(chip)
 
@@ -165,7 +183,7 @@ def genChipDatabase(fabric: Fabric, filePath: Path, baseConstIdsPath: Path):
     ch = Chip("FABulous", fabric.name, fabric.numberOfColumns, fabric.numberOfRows)
 
     ch.strs.read_constids(str(baseConstIdsPath))
-    for tile in fabric.tileDic.values():
+    for tile in fabric.tileDict.values():
         genTile(tile, ch)
 
     logger.info("Generating the chip database")

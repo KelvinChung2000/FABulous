@@ -4,17 +4,15 @@ INCLUDE:
 PORTS: [
     {direction: NORTH, name: out0, inOut: output, wires: 32, terminal: true},
     {direction: SOUTH, name: in0, inOut: input, wires: 32, terminal: true},
-  ],
+
+    {direction: NORTH, name: in2, inOut: input, wires: 32, terminal: true},
+    {direction: SOUTH, name: out2, inOut: input, wires: 32, terminal: true},
+  ]
 WIRES: [
   
 ]
 BELS: [
-    # {BEL: ./ALU.v, prefix: },
-    # {BEL: ./const.v, prefix: },
-    # {BEL: ./buff.v, prefix: N_},
-    # {BEL: ./buff.v, prefix: E_},
-    # {BEL: ./buff.v, prefix: S_},
-    # {BEL: ./buff.v, prefix: W_},
+    {BEL: ./IO.v, prefix: "N_"},
 
 ]
 MATRIX: ./N_IO.mux

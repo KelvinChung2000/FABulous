@@ -4,6 +4,9 @@ INCLUDE:
 PORTS: [
     {direction: EAST, name: out1, inOut: output, wires: 32, terminal: true},
     {direction: WEST, name: in1, inOut: input, wires: 32, terminal: true},
+
+    {direction: EAST, name: in3, inOut: input, wires: 32, terminal: true},
+    {direction: WEST, name: out3, inOut: output, wires: 32, terminal: true},
   ]
 WIRES: [
 

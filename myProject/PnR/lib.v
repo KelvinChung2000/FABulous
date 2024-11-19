@@ -1,4 +1,4 @@
-(* blackbox *)
+(* blackbox, keep *)
 module ConstOp #(
     parameter WIDTH = 32,
     parameter CONST = 0
@@ -7,17 +7,17 @@ module ConstOp #(
   );
 endmodule
 
-(* blackbox *)
+(* blackbox, keep *)
 module UnaryOp #(
     parameter WIDTH = 32,
-    parameter OP = 0,
+    parameter OP = 0
   )(
     input [WIDTH-1:0] A,
     output [WIDTH-1:0] Y
   );
 endmodule
 
-(* blackbox *)
+(* blackbox, keep *)
 module BinaryOp #(
     parameter WIDTH = 32,
     parameter OP = 0
@@ -28,8 +28,8 @@ module BinaryOp #(
   );
 endmodule
 
-(* blackbox *)
-module TenaryOp #(
+(* blackbox, keep *)
+module TernaryOp #(
     parameter WIDTH = 32,
     parameter OP = 0
   )(
@@ -40,7 +40,7 @@ module TenaryOp #(
   );
 endmodule
 
-(* blackbox *)
+(* blackbox, keep *)
 module InputOp #(
     parameter WIDTH = 32
   )(
@@ -48,7 +48,7 @@ module InputOp #(
   );
 endmodule
 
-(* blackbox *)
+(* blackbox, keep *)
 module OutputOp #(
     parameter WIDTH = 32
   )(

@@ -1,5 +1,9 @@
 {
-    "[python]": {
+  "[python]": {
     "editor.defaultFormatter": "ms-python.black-formatter"
-  }
+  },
+  "cSpell.words": [
+    "exitcond"
+  ],
+  "esbonio.server.enabled": false
 }

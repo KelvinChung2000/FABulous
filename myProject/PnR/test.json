@@ -1,91 +1,452 @@
 {
-  "creator": "Yosys 0.43 (git sha1 ead4718e5, clang++ 15.0.0 -fPIC -Os)",
+  "creator": "Yosys 0.47+56 (git sha1 a22ff47d6, g++ 11.4.0-1ubuntu1~22.04 -fPIC -O3)",
   "modules": {
-    "test": {
+    "BinaryOp": {
       "attributes": {
-        "cells_not_processed": "00000000000000000000000000000001",
-        "src": "./myProject/PnR/test.v:1.1-9.10"
+        "dynports": "00000000000000000000000000000001",
+        "blackbox": "00000000000000000000000000000001",
+        "keep": "00000000000000000000000000000001",
+        "src": "/home/kelvin/FABulous_fork/myProject/PnR/lib.v:21.1-29.10"
+      },
+      "parameter_default_values": {
+        "OP": "00000000000000000000000000000000",
+        "WIDTH": "00000000000000000000000000100000"
       },
       "ports": {
         "A": {
           "direction": "input",
-          "bits": [ 2 ]
+          "bits": [ 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33 ]
         },
         "B": {
           "direction": "input",
-          "bits": [ 3 ]
+          "bits": [ 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65 ]
         },
         "Y": {
           "direction": "output",
-          "bits": [ 4 ]
+          "bits": [ 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97 ]
         }
       },
       "cells": {
-        "$add$./myProject/PnR/test.v:7$1": {
-          "hide_name": 1,
+      },
+      "netnames": {
+        "A": {
+          "hide_name": 0,
+          "bits": [ 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33 ],
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/PnR/lib.v:25.23-25.24"
+          }
+        },
+        "B": {
+          "hide_name": 0,
+          "bits": [ 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65 ],
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/PnR/lib.v:26.23-26.24"
+          }
+        },
+        "Y": {
+          "hide_name": 0,
+          "bits": [ 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97 ],
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/PnR/lib.v:27.24-27.25"
+          }
+        }
+      }
+    },
+    "ConstOp": {
+      "attributes": {
+        "keep": "00000000000000000000000000000001",
+        "dynports": "00000000000000000000000000000001",
+        "blackbox": "00000000000000000000000000000001",
+        "cells_not_processed": "00000000000000000000000000000001",
+        "src": "/home/kelvin/FABulous_fork/myProject/PnR/lib.v:2.1-8.10"
+      },
+      "parameter_default_values": {
+        "CONST": "00000000000000000000000000000000",
+        "WIDTH": "00000000000000000000000000100000"
+      },
+      "ports": {
+        "Y": {
+          "direction": "output",
+          "bits": [ 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33 ]
+        }
+      },
+      "cells": {
+      },
+      "netnames": {
+        "Y": {
+          "hide_name": 0,
+          "bits": [ 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33 ],
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/PnR/lib.v:6.24-6.25"
+          }
+        }
+      }
+    },
+    "InputOp": {
+      "attributes": {
+        "dynports": "00000000000000000000000000000001",
+        "blackbox": "00000000000000000000000000000001",
+        "keep": "00000000000000000000000000000001",
+        "src": "/home/kelvin/FABulous_fork/myProject/PnR/lib.v:44.1-49.10"
+      },
+      "parameter_default_values": {
+        "WIDTH": "00000000000000000000000000100000"
+      },
+      "ports": {
+        "Y": {
+          "direction": "output",
+          "bits": [ 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33 ]
+        }
+      },
+      "cells": {
+      },
+      "netnames": {
+        "Y": {
+          "hide_name": 0,
+          "bits": [ 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33 ],
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/PnR/lib.v:47.24-47.25"
+          }
+        }
+      }
+    },
+    "OutputOp": {
+      "attributes": {
+        "dynports": "00000000000000000000000000000001",
+        "blackbox": "00000000000000000000000000000001",
+        "keep": "00000000000000000000000000000001",
+        "src": "/home/kelvin/FABulous_fork/myProject/PnR/lib.v:52.1-57.10"
+      },
+      "parameter_default_values": {
+        "WIDTH": "00000000000000000000000000100000"
+      },
+      "ports": {
+        "A": {
+          "direction": "input",
+          "bits": [ 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33 ]
+        }
+      },
+      "cells": {
+      },
+      "netnames": {
+        "A": {
+          "hide_name": 0,
+          "bits": [ 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33 ],
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/PnR/lib.v:55.23-55.24"
+          }
+        }
+      }
+    },
+    "TernaryOp": {
+      "attributes": {
+        "keep": "00000000000000000000000000000001",
+        "dynports": "00000000000000000000000000000001",
+        "blackbox": "00000000000000000000000000000001",
+        "cells_not_processed": "00000000000000000000000000000001",
+        "src": "/home/kelvin/FABulous_fork/myProject/PnR/lib.v:32.1-41.10"
+      },
+      "parameter_default_values": {
+        "OP": "00000000000000000000000000000000",
+        "WIDTH": "00000000000000000000000000100000"
+      },
+      "ports": {
+        "A": {
+          "direction": "input",
+          "bits": [ 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33 ]
+        },
+        "B": {
+          "direction": "input",
+          "bits": [ 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65 ]
+        },
+        "C": {
+          "direction": "input",
+          "bits": [ 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97 ]
+        },
+        "Y": {
+          "direction": "output",
+          "bits": [ 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129 ]
+        }
+      },
+      "cells": {
+      },
+      "netnames": {
+        "A": {
+          "hide_name": 0,
+          "bits": [ 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33 ],
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/PnR/lib.v:36.23-36.24"
+          }
+        },
+        "B": {
+          "hide_name": 0,
+          "bits": [ 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65 ],
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/PnR/lib.v:37.23-37.24"
+          }
+        },
+        "C": {
+          "hide_name": 0,
+          "bits": [ 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97 ],
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/PnR/lib.v:38.23-38.24"
+          }
+        },
+        "Y": {
+          "hide_name": 0,
+          "bits": [ 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129 ],
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/PnR/lib.v:39.24-39.25"
+          }
+        }
+      }
+    },
+    "UnaryOp": {
+      "attributes": {
+        "keep": "00000000000000000000000000000001",
+        "dynports": "00000000000000000000000000000001",
+        "blackbox": "00000000000000000000000000000001",
+        "cells_not_processed": "00000000000000000000000000000001",
+        "src": "/home/kelvin/FABulous_fork/myProject/PnR/lib.v:11.1-18.10"
+      },
+      "parameter_default_values": {
+        "OP": "00000000000000000000000000000000",
+        "WIDTH": "00000000000000000000000000100000"
+      },
+      "ports": {
+        "A": {
+          "direction": "input",
+          "bits": [ 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33 ]
+        },
+        "Y": {
+          "direction": "output",
+          "bits": [ 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65 ]
+        }
+      },
+      "cells": {
+      },
+      "netnames": {
+        "A": {
+          "hide_name": 0,
+          "bits": [ 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33 ],
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/PnR/lib.v:15.23-15.24"
+          }
+        },
+        "Y": {
+          "hide_name": 0,
+          "bits": [ 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65 ],
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/PnR/lib.v:16.24-16.25"
+          }
+        }
+      }
+    },
+    "test": {
+      "attributes": {
+        "dynports": "00000000000000000000000000000001",
+        "top": "00000000000000000000000000000001",
+        "src": "/home/kelvin/FABulous_fork/myProject/PnR/test.v:1.1-17.10"
+      },
+      "parameter_default_values": {
+        "WIDTH": "00000000000000000000000000100000"
+      },
+      "ports": {
+      },
+      "cells": {
+        "inst_a": {
+          "hide_name": 0,
           "type": "ALU",
           "parameters": {
-            "OPERATION": "00000000000000000000000000000000"
+            "OP": "00000000000000000000000000000000",
+            "WIDTH": "00000000000000000000000000100000"
           },
           "attributes": {
             "module_not_derived": "00000000000000000000000000000001",
-            "src": "./myProject/PnR/test.v:7.14-7.19|./myProject/PnR/PE_map.v:27.38-27.77"
+            "src": "/home/kelvin/FABulous_fork/myProject/PnR/test.v:11.40-11.71|/home/kelvin/FABulous_fork/myProject/PnR/PE_map.v:34.43-34.82"
           },
           "connections": {
-            "A": [ 2 ],
-            "B": [ 3 ],
-            "Y": [ 4 ]
+            "A": [ 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33 ],
+            "B": [ 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65 ],
+            "Y": [ 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97 ]
+          }
+        },
+        "inst_b": {
+          "hide_name": 0,
+          "type": "ALU",
+          "parameters": {
+            "OP": "00000000000000000000000000000000",
+            "WIDTH": "00000000000000000000000000100000"
+          },
+          "attributes": {
+            "module_not_derived": "00000000000000000000000000000001",
+            "src": "/home/kelvin/FABulous_fork/myProject/PnR/test.v:12.40-12.69|/home/kelvin/FABulous_fork/myProject/PnR/PE_map.v:34.43-34.82"
+          },
+          "connections": {
+            "A": [ 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97 ],
+            "B": [ 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129 ],
+            "Y": [ 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161 ]
+          }
+        },
+        "inst_inA": {
+          "hide_name": 0,
+          "type": "InputOp",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000100000"
+          },
+          "attributes": {
+            "module_not_derived": "00000000000000000000000000000001",
+            "src": "/home/kelvin/FABulous_fork/myProject/PnR/test.v:13.26-13.43"
+          },
+          "port_directions": {
+            "Y": "output"
+          },
+          "connections": {
+            "Y": [ 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33 ]
+          }
+        },
+        "inst_inB": {
+          "hide_name": 0,
+          "type": "InputOp",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000100000"
+          },
+          "attributes": {
+            "module_not_derived": "00000000000000000000000000000001",
+            "src": "/home/kelvin/FABulous_fork/myProject/PnR/test.v:14.26-14.43"
+          },
+          "port_directions": {
+            "Y": "output"
+          },
+          "connections": {
+            "Y": [ 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65 ]
+          }
+        },
+        "inst_inC": {
+          "hide_name": 0,
+          "type": "InputOp",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000100000"
+          },
+          "attributes": {
+            "module_not_derived": "00000000000000000000000000000001",
+            "src": "/home/kelvin/FABulous_fork/myProject/PnR/test.v:15.26-15.43"
+          },
+          "port_directions": {
+            "Y": "output"
+          },
+          "connections": {
+            "Y": [ 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129 ]
+          }
+        },
+        "out_b": {
+          "hide_name": 0,
+          "type": "OutputOp",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000100000"
+          },
+          "attributes": {
+            "module_not_derived": "00000000000000000000000000000001",
+            "src": "/home/kelvin/FABulous_fork/myProject/PnR/test.v:10.27-10.39"
+          },
+          "port_directions": {
+            "A": "input"
+          },
+          "connections": {
+            "A": [ 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161 ]
           }
         }
       },
       "netnames": {
-        "$add$./myProject/PnR/test.v:7$1_Y": {
+        "$techmap1\\inst_a.A": {
           "hide_name": 1,
-          "bits": [ 4 ],
+          "bits": [ 162, 163, 164, 165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193 ],
           "attributes": {
-            "src": "./myProject/PnR/test.v:7.14-7.19"
+            "src": "/home/kelvin/FABulous_fork/myProject/PnR/test.v:11.40-11.71|/home/kelvin/FABulous_fork/myProject/PnR/PE_map.v:9.23-9.24"
           }
         },
-        "$techmap2$add$./myProject/PnR/test.v:7$1.A": {
+        "$techmap1\\inst_a.B": {
           "hide_name": 1,
-          "bits": [ 5 ],
+          "bits": [ 194, 195, 196, 197, 198, 199, 200, 201, 202, 203, 204, 205, 206, 207, 208, 209, 210, 211, 212, 213, 214, 215, 216, 217, 218, 219, 220, 221, 222, 223, 224, 225 ],
           "attributes": {
-            "src": "./myProject/PnR/test.v:7.14-7.19|./myProject/PnR/PE_map.v:11.25-11.26"
+            "src": "/home/kelvin/FABulous_fork/myProject/PnR/test.v:11.40-11.71|/home/kelvin/FABulous_fork/myProject/PnR/PE_map.v:10.23-10.24"
           }
         },
-        "$techmap2$add$./myProject/PnR/test.v:7$1.B": {
+        "$techmap1\\inst_a.C": {
           "hide_name": 1,
-          "bits": [ 6 ],
+          "bits": [ 226, 227, 228, 229, 230, 231, 232, 233, 234, 235, 236, 237, 238, 239, 240, 241, 242, 243, 244, 245, 246, 247, 248, 249, 250, 251, 252, 253, 254, 255, 256, 257 ],
           "attributes": {
-            "src": "./myProject/PnR/test.v:7.14-7.19|./myProject/PnR/PE_map.v:12.25-12.26"
+            "src": "/home/kelvin/FABulous_fork/myProject/PnR/test.v:11.40-11.71|/home/kelvin/FABulous_fork/myProject/PnR/PE_map.v:11.23-11.24"
           }
         },
-        "$techmap2$add$./myProject/PnR/test.v:7$1.Y": {
+        "$techmap1\\inst_a.Y": {
           "hide_name": 1,
-          "bits": [ 7 ],
+          "bits": [ 258, 259, 260, 261, 262, 263, 264, 265, 266, 267, 268, 269, 270, 271, 272, 273, 274, 275, 276, 277, 278, 279, 280, 281, 282, 283, 284, 285, 286, 287, 288, 289 ],
           "attributes": {
-            "src": "./myProject/PnR/test.v:7.14-7.19|./myProject/PnR/PE_map.v:13.26-13.27"
+            "src": "/home/kelvin/FABulous_fork/myProject/PnR/test.v:11.40-11.71|/home/kelvin/FABulous_fork/myProject/PnR/PE_map.v:12.24-12.25"
           }
         },
-        "A": {
+        "$techmap2\\inst_b.A": {
+          "hide_name": 1,
+          "bits": [ 290, 291, 292, 293, 294, 295, 296, 297, 298, 299, 300, 301, 302, 303, 304, 305, 306, 307, 308, 309, 310, 311, 312, 313, 314, 315, 316, 317, 318, 319, 320, 321 ],
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/PnR/test.v:12.40-12.69|/home/kelvin/FABulous_fork/myProject/PnR/PE_map.v:9.23-9.24"
+          }
+        },
+        "$techmap2\\inst_b.B": {
+          "hide_name": 1,
+          "bits": [ 322, 323, 324, 325, 326, 327, 328, 329, 330, 331, 332, 333, 334, 335, 336, 337, 338, 339, 340, 341, 342, 343, 344, 345, 346, 347, 348, 349, 350, 351, 352, 353 ],
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/PnR/test.v:12.40-12.69|/home/kelvin/FABulous_fork/myProject/PnR/PE_map.v:10.23-10.24"
+          }
+        },
+        "$techmap2\\inst_b.C": {
+          "hide_name": 1,
+          "bits": [ 354, 355, 356, 357, 358, 359, 360, 361, 362, 363, 364, 365, 366, 367, 368, 369, 370, 371, 372, 373, 374, 375, 376, 377, 378, 379, 380, 381, 382, 383, 384, 385 ],
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/PnR/test.v:12.40-12.69|/home/kelvin/FABulous_fork/myProject/PnR/PE_map.v:11.23-11.24"
+          }
+        },
+        "$techmap2\\inst_b.Y": {
+          "hide_name": 1,
+          "bits": [ 386, 387, 388, 389, 390, 391, 392, 393, 394, 395, 396, 397, 398, 399, 400, 401, 402, 403, 404, 405, 406, 407, 408, 409, 410, 411, 412, 413, 414, 415, 416, 417 ],
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/PnR/test.v:12.40-12.69|/home/kelvin/FABulous_fork/myProject/PnR/PE_map.v:12.24-12.25"
+          }
+        },
+        "a": {
           "hide_name": 0,
-          "bits": [ 2 ],
+          "bits": [ 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97 ],
           "attributes": {
-            "src": "./myProject/PnR/test.v:3.11-3.12"
+            "src": "/home/kelvin/FABulous_fork/myProject/PnR/test.v:5.17-5.18"
           }
         },
-        "B": {
+        "b": {
           "hide_name": 0,
-          "bits": [ 3 ],
+          "bits": [ 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161 ],
           "attributes": {
-            "src": "./myProject/PnR/test.v:3.14-3.15"
+            "src": "/home/kelvin/FABulous_fork/myProject/PnR/test.v:9.17-9.18"
           }
         },
-        "Y": {
+        "inA": {
           "hide_name": 0,
-          "bits": [ 4 ],
+          "bits": [ 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33 ],
           "attributes": {
-            "src": "./myProject/PnR/test.v:4.12-4.13"
+            "src": "/home/kelvin/FABulous_fork/myProject/PnR/test.v:6.17-6.20"
+          }
+        },
+        "inB": {
+          "hide_name": 0,
+          "bits": [ 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65 ],
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/PnR/test.v:7.17-7.20"
+          }
+        },
+        "inC": {
+          "hide_name": 0,
+          "bits": [ 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129 ],
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/PnR/test.v:8.17-8.20"
           }
         }
       }

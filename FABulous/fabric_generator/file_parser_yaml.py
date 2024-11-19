@@ -7,7 +7,6 @@ from loguru import logger
 
 from FABulous.fabric_definition.Bel import Bel
 from FABulous.fabric_definition.define import (
-    IO,
     ConfigBitMode,
     Direction,
     MultiplexerStyle,
@@ -184,29 +183,12 @@ def parseTileYAML(fileName: Path) -> Tile:
         ports.append(
             TilePort(
                 wireDirection=Direction[portEntry["direction"]],
-                sourceName=portEntry["source_name"],
-                xOffset=portEntry["X-offset"],
-                yOffset=portEntry["Y-offset"],
-                destinationName=portEntry["destination_name"],
                 wireCount=int(portEntry["wires"]),
-                name=portEntry["source_name"],
-                inOut=IO.OUTPUT,
+                name=portEntry["name"],
+                inOut=portEntry["inOut"],
                 sideOfTile=Side[portEntry["direction"].upper()],
                 isBus=portEntry.get("isBus", False),
-            )
-        )
-        ports.append(
-            TilePort(
-                wireDirection=Direction[portEntry["direction"]],
-                sourceName=portEntry["source_name"],
-                xOffset=portEntry["X-offset"],
-                yOffset=portEntry["Y-offset"],
-                destinationName=portEntry["destination_name"],
-                wireCount=int(portEntry["wires"]),
-                name=portEntry["destination_name"],
-                inOut=IO.INPUT,
-                sideOfTile=Side[oppositeDic[portEntry["direction"]].upper()],
-                isBus=portEntry.get("isBus", False),
+                terminal=portEntry.get("terminal", False),
             )
         )
         commonWirePairs.append(

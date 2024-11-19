@@ -1,0 +1,9 @@
+read_verilog /home/kelvin/FABulous_fork/myProject/PnR/lib.v
+read_verilog /home/kelvin/FABulous_fork/myProject/PnR/test.v
+hierarchy -top test
+flatten
+proc
+opt;;;
+techmap -map /home/kelvin/FABulous_fork/myProject/PnR/PE_map.v -max_iter 1
+stat
+write_json /home/kelvin/FABulous_fork/myProject/PnR/test.json

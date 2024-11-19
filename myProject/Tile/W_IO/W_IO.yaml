@@ -3,8 +3,12 @@ TILE: W_IO
 INCLUDE:
 PORTS: [
     # {direction: EAST, source_name: out1, X-offset: -1, Y-offset: 0, destination_name: in3, wires: 32},
-    {direction: WEST, source_name: in1, X-offset: -1, Y-offset: 0, destination_name: null, wires: 32},
+    {direction: WEST, name: out1, inOut: output, wires: 32, terminal: true},
+    {direction: EAST, name: in1, inOut: input, wires: 32, terminal: true},
   ]
+WIRES: [
+  
+]
 BELS: [
     # {BEL: ./ALU.v, prefix: },
     # {BEL: ./const.v, prefix: },

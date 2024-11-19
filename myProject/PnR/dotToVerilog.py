@@ -2,21 +2,31 @@ from pathlib import Path
 
 import networkx as nx
 
-
-
-module = "module #(WIDTH=32) {name};\n\n{body}\nendmodule"
+module = "module {name} #(parameter WIDTH=32);\n\n{body}\nendmodule\n"
 wireTemplate = "wire[WIDTH-1:0] {source};\n"
 constOp = "ConstOp #(.CONST({CONST}), .WIDTH(WIDTH)) inst_{value}(.Y({Y}));\n"
-unOp = "UnaryOp #(.OP({OP}), .WIDTH(WIDTH)) inst_{value}(.A({A}), .Y({Y});\n"
-binOp = "BinaryOp #(.OP({OP}), .WIDTH(WIDTH)) inst_{value}(.A({A}), .B({B}), .Y({Y}));\n"
+unOp = "UnaryOp #(.OP({OP}), .WIDTH(WIDTH)) inst_{value}(.A({A}), .Y({Y}));\n"
+binOp = (
+    "BinaryOp #(.OP({OP}), .WIDTH(WIDTH)) inst_{value}(.A({A}), .B({B}), .Y({Y}));\n"
+)
 terOp = "TernaryOp #(.OP({OP}), .WIDTH(WIDTH)) inst_{value}(.A({A}), .B({B}), .C({C}), .Y({Y}));\n"
 
 inputOp = "InputOp #(.WIDTH(WIDTH)) {value}(.Y({Y}));\n"
 outputOp = "OutputOp #(.WIDTH(WIDTH)) {value}(.A({A}));\n"
 
+localParam = "localparam {name} = {value};\n"
+
+
 def dotToVerilog(dotFile: Path, verilogFile: Path):
     G = nx.DiGraph(nx.nx_pydot.read_dot(dotFile))
     body = ""
+
+    opSet = set()
+    for node in G.nodes():
+        opSet.add(G.nodes[node]["opcode"])
+
+    for i, op in enumerate(opSet):
+        body += localParam.format(name=f"{op}_op", value=i)
 
     used = set()
     for s, d in G.edges():
@@ -24,19 +34,31 @@ def dotToVerilog(dotFile: Path, verilogFile: Path):
             body += wireTemplate.format(source=s)
             used.add(s)
 
+    for i in G.nodes:
+        if G.out_degree(i) == 0:
+            body += wireTemplate.format(source=i)
+
+    for i in G.nodes:
+        if G.out_degree(i) == 0:
+            body += outputOp.format(value=f"out_{i}", A=i)
+
     for node in G.nodes():
         if G.in_degree(node) == 0:
             if G.nodes[node]["type"] == "external":
-                body += inputOp.format(value=node, Y=node)
+                body += inputOp.format(value=f"inst_{node}", Y=node)
             elif G.nodes[node]["type"] == "constant":
-                body += constOp.format(CONST=G.nodes[node]["constVal"], value=node, Y=node)
-            else:
                 body += constOp.format(
-                    CONST=0, value=node, Y=node
+                    CONST=G.nodes[node]["constVal"], value=f"inst_{node}", Y=node
                 )
+            else:
+                body += constOp.format(CONST=0, value=f"inst_{node}", Y=node)
+
         elif G.in_degree(node) == 1:
             body += unOp.format(
-                OP=G.nodes[node]["opcode"], value=node, A=list(G.predecessors(node))[0], Y=node
+                OP=f"{G.nodes[node]["opcode"]}_op",
+                value=node,
+                A=list(G.predecessors(node))[0],
+                Y=node,
             )
         elif G.in_degree(node) == 2:
             a, b = list(G.predecessors(node))
@@ -53,7 +75,7 @@ def dotToVerilog(dotFile: Path, verilogFile: Path):
                 else list(G.predecessors(node))[0]
             )
             body += binOp.format(
-                OP=G.nodes[node]["opcode"],
+                OP=f"{G.nodes[node]["opcode"]}_op",
                 value=node,
                 A=lhs,
                 B=rhs,
@@ -61,7 +83,7 @@ def dotToVerilog(dotFile: Path, verilogFile: Path):
             )
         elif G.in_degree(node) == 3:
             body += terOp.format(
-                OP=G.nodes[node]["opcode"],
+                OP=f"{G.nodes[node]["opcode"]}_op",
                 value=node,
                 A=list(G.predecessors(node))[0],
                 B=list(G.predecessors(node))[1],
@@ -77,5 +99,6 @@ def dotToVerilog(dotFile: Path, verilogFile: Path):
 
 if __name__ == "__main__":
     dotToVerilog(
-        Path.cwd() / "myProject/PnR/test.dfg.dot", Path.cwd() / "myProject/PnR/test.v"
+        Path.cwd() / "myProject/PnR/test.simple.dot",
+        Path.cwd() / "myProject/PnR/test.v",
     )

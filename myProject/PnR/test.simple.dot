@@ -1,0 +1,11 @@
+digraph{
+    a [opcode=add];
+    b [opcode=add];
+    inA [type=external, opcode=reg];
+    inB [type=external, opcode=reg];
+    inC [type=external, opcode=reg];
+    inA -> a [operand=any2input];
+    inB -> a [operand=any2input];
+    inC -> b [operand=any2input];
+    a -> b [operand=any2input];
+}

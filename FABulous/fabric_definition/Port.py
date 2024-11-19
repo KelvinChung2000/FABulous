@@ -14,10 +14,8 @@ class Port:
 class TilePort(Port):
     wireDirection: Direction
     sideOfTile: Side
-    xOffset: int = 0
-    yOffset: int = 0
-    sourceName: str = ""
-    destinationName: str = ""
+    terminal: bool = False
+
 
 
 @dataclass(frozen=True, eq=True)

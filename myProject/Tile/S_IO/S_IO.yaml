@@ -3,7 +3,8 @@ TILE: S_IO
 INCLUDE:
 PORTS: [
     # {direction: NORTH, source_name: out0, X-offset: 0, Y-offset: -1, destination_name: in2, wires: 32},
-    {direction: SOUTH, source_name: in0, X-offset: 0, Y-offset: 1, destination_name: null, wires: 32},
+    {direction: SOUTH, name: out2, inOut: output, wires: 32, terminal: true},
+    {direction: NORTH, name: in2, inOut: input, wires: 32, terminal: true},
   ]
 BELS: [
     # {BEL: ./ALU.v, prefix: },

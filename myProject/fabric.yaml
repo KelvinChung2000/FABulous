@@ -1,8 +1,10 @@
 FABRIC: [
-    [None,  N_IO, N_IO, None  ],
-    [W_IO,  PE,   PE,   E_IO  ],
-    [W_IO,  PE,   PE,   E_IO  ],
-    [None,  S_IO, S_IO, None  ]
+    [None,  N_IO, N_IO, N_IO, N_IO, None  ],
+    [W_IO,  PE,   PE,   PE,   PE,   E_IO  ],
+    [W_IO,  PE,   PE,   PE,   PE,   E_IO  ],
+    [W_IO,  PE,   PE,   PE,   PE,   E_IO  ],
+    [W_IO,  PE,   PE,   PE,   PE,   E_IO  ],
+    [None,  S_IO, S_IO, S_IO, S_IO, None  ]
   ]
 
 PARAM: {

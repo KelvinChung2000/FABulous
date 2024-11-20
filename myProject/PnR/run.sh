@@ -1,2 +1,2 @@
 
-nextpnr-himbaechel --chipdb /Users/kelvinchung/Documents/FABulous-1/myProject/.FABulous/eFPGA.bit --device "test"
+nextpnr-himbaechel --chipdb ../.FABulous/eFPGA.bit --device "test" --json test.json --write test_routed.json

@@ -2,14 +2,14 @@ TILE: W_IO
 # {direction: <>, source_name: <>, X-offset: <>, Y-offset: <>, destination_name: <>, wires: <>}
 INCLUDE:
 PORTS: [
-    # {direction: EAST, source_name: out1, X-offset: -1, Y-offset: 0, destination_name: in3, wires: 32},
-    {direction: WEST, name: out1, inOut: output, wires: 32, terminal: true},
-    {direction: EAST, name: in1, inOut: input, wires: 32, terminal: true},
-
-    {direction: EAST, name: in3, inOut: input, wires: 32, terminal: true},
     {direction: WEST, name: out3, inOut: output, wires: 32, terminal: true},
+    {direction: EAST, name: in3, inOut: input, wires: 32, terminal: true},
+
+    {direction: EAST, name: in1, inOut: input, wires: 32, terminal: true},
+    {direction: WEST, name: out1, inOut: output, wires: 32, terminal: true},
   ]
 WIRES: [
+  {source_name: out1, X-offset:  1, Y-offset: 0, destination_name: in3},
   
 ]
 BELS: [

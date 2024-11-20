@@ -111,14 +111,18 @@ def genTile(tile: Tile, chip: Chip) -> TileType:
 
 
 def genFabric(fabric: Fabric, chip: Chip):
-    for (y, x), wires in fabric.wireDict.items():
+    for (x, y), wires in fabric.wireDict.items():
         if not wires:
             continue
         localNode = []
         for wire in wires:
-            print(wire)
-            print(fabric.tile[y + wire.yOffset][x + wire.xOffset].name)
-            print(chip.tile_type_at(x + wire.xOffset, y + wire.yOffset).name)
+            localNode.append(
+                NodeWire(
+                    x,
+                    y,
+                    wire.source.name,
+                )
+            )
             localNode.append(
                 NodeWire(
                     x + wire.xOffset,
@@ -126,6 +130,7 @@ def genFabric(fabric: Fabric, chip: Chip):
                     wire.destination.name,
                 )
             )
+
         chip.add_node(localNode)
 
     # for i in range(fabric.numberOfRows):

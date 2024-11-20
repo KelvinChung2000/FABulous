@@ -7,6 +7,7 @@ from loguru import logger
 
 from FABulous.fabric_definition.Bel import Bel
 from FABulous.fabric_definition.define import (
+    IO,
     ConfigBitMode,
     Direction,
     MultiplexerStyle,
@@ -111,6 +112,15 @@ def parseFabricYAML(fileName: Path) -> Fabric:
             if tile is None:
                 continue
             for wireType in tile.wireTypes:
+                if (
+                    wireType.sourcePort.inOut != IO.OUTPUT
+                    and wireType.destinationPort.inOut != IO.INPUT
+                ):
+                    logger.error(
+                        f"Wire {wireType} must be an output port as source_name and input port as destination_name ."
+                    )
+                    raise ValueError
+
                 wires.append(
                     Wire(
                         source=wireType.sourcePort,
@@ -206,7 +216,7 @@ def parseTileYAML(fileName: Path) -> Tile:
             wireDirection=Direction[portEntry["direction"]],
             wireCount=int(portEntry["wires"]),
             name=portEntry["name"],
-            inOut=portEntry["inOut"],
+            inOut=IO[portEntry["inOut"].upper()],
             sideOfTile=Side[portEntry["direction"].upper()],
             isBus=portEntry.get("isBus", False),
             terminal=portEntry.get("terminal", False),

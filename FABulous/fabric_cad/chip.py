@@ -907,7 +907,7 @@ class Chip:
                 wire_id = w.wire if w.wire is IdString else self.strs.id(w.wire)
                 if wire_id not in self.tile_type_at(w.x, w.y)._wire2idx:
                     raise ValueError(
-                        f"Wire {w.wire} not found in tile {self.strs[self.tile_type_at(w.x, w.y).type_name]}"
+                        f"Wire {w.wire} not found in tile {self.strs[self.tile_type_at(w.x, w.y).type_name]} at ({w.x}, {w.y})"
                     )
                 wire_index = self.tile_type_at(w.x, w.y)._wire2idx[wire_id]
             shape.wires += [w.x - x0, w.y - y0, wire_index]

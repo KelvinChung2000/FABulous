@@ -21,17 +21,32 @@ module PE_map(A, B, C, Y);
         if (OP_TYPE == 0)
             ALU #(.WIDTH(WIDTH), .CONST(CONST)) _TECHMAP_REPLACE_ (.Y(Y));
         else if (OP_TYPE == 1)
-      ALU #(
-          .WIDTH(WIDTH),
-          .OP(OP)
-      ) _TECHMAP_REPLACE_ (
-          .data_in1(A),
-          .Y(Y)
-      );
+            ALU #(
+                .WIDTH(WIDTH),
+                .OP(OP)
+            ) _TECHMAP_REPLACE_ (
+                .data_in1(A),
+                .data_out(Y)
+            );
         else if (OP_TYPE == 2)
-            ALU #(.WIDTH(WIDTH), .OP(OP)) _TECHMAP_REPLACE_ (.A(A), .B(B), .Y(Y));
+            ALU #(
+                .WIDTH(WIDTH),
+                .OP(OP)
+            ) _TECHMAP_REPLACE_ (
+                .data_in1(A),
+                .data_in2(B),
+                .data_out(Y)
+            );
         else if (OP_TYPE == 3)
-            ALU #(.WIDTH(WIDTH), .OP(OP)) _TECHMAP_REPLACE_ (.A(A), .B(B), .C(C), .Y(Y));
+            ALU #(
+                .WIDTH(WIDTH),
+                .OP(OP)
+            ) _TECHMAP_REPLACE_ (
+                .data_in1(A),
+                .data_in2(B),
+                .data_in3(C),
+                .data_out(Y)
+            );
         else
             wire  _TECHMAP_FAIL_ = 1;
     endgenerate

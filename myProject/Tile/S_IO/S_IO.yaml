@@ -2,7 +2,6 @@ TILE: S_IO
 # {direction: <>, source_name: <>, X-offset: <>, Y-offset: <>, destination_name: <>, wires: <>}
 INCLUDE:
 PORTS: [
-    # {direction: NORTH, source_name: out0, X-offset: 0, Y-offset: -1, destination_name: in2, wires: 32},
     {direction: SOUTH, name: out2, inOut: output, wires: 32, terminal: true},
     {direction: NORTH, name: in2, inOut: input, wires: 32, terminal: true},
 
@@ -10,6 +9,7 @@ PORTS: [
     {direction: SOUTH, name: out0, inOut: output, wires: 32, terminal: true},
   ]
 WIRES: [
+  {source_name: out0, X-offset:  0, Y-offset: -1, destination_name: in2},
   
 ]
 BELS: [

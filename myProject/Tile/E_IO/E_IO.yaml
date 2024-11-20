@@ -9,7 +9,7 @@ PORTS: [
     {direction: WEST, name: out3, inOut: output, wires: 32, terminal: true},
   ]
 WIRES: [
-
+  {source_name: out3, X-offset:  -1, Y-offset: 0, destination_name: in1},
 ]
 BELS: [
     {BEL: ./IO.v, prefix: "E_"},

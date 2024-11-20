@@ -1,24 +1,32 @@
 {
-  "creator": "Yosys 0.43 (git sha1 ead4718e5, clang++ 15.0.0 -fPIC -Os)",
+  "creator": "Yosys 0.47+56 (git sha1 a22ff47d6, g++ 11.4.0-1ubuntu1~22.04 -fPIC -O3)",
   "modules": {
     "IO": {
       "attributes": {
         "blackbox": 1,
         "cells_not_processed": 1,
-        "src": "/Users/kelvinchung/Documents/FABulous-1/myProject/Tile/N_IO/IO.v:1.1-6.10"
+        "src": "/home/kelvin/FABulous_fork/myProject/Tile/N_IO/IO.v:1.1-9.10"
       },
       "ports": {
-        "in": {
+        "from_fabric": {
           "direction": "input",
           "bits": [ 2 ]
         },
-        "out": {
+        "to_fabric": {
           "direction": "output",
           "bits": [ 3 ]
         },
-        "ConfigBits": {
+        "in": {
           "direction": "input",
           "bits": [ 4 ]
+        },
+        "out": {
+          "direction": "output",
+          "bits": [ 5 ]
+        },
+        "ConfigBits": {
+          "direction": "input",
+          "bits": [ 6 ]
         }
       },
       "cells": {
@@ -26,30 +34,50 @@
       "netnames": {
         "ConfigBits": {
           "hide_name": 0,
-          "bits": [ 4 ],
+          "bits": [ 6 ],
           "attributes": {
             "CONFIG_BIT": 1,
             "FABulous": 1,
             "IO": 1,
-            "src": "/Users/kelvinchung/Documents/FABulous-1/myProject/Tile/N_IO/IO.v:4.42-4.52"
+            "src": "/home/kelvin/FABulous_fork/myProject/Tile/N_IO/IO.v:7.42-7.52"
           }
         },
-        "in": {
+        "from_fabric": {
           "hide_name": 0,
           "bits": [ 2 ],
           "attributes": {
             "BUS": 1,
             "FABulous": 1,
-            "src": "/Users/kelvinchung/Documents/FABulous-1/myProject/Tile/N_IO/IO.v:2.31-2.33"
+            "src": "/home/kelvin/FABulous_fork/myProject/Tile/N_IO/IO.v:3.31-3.42"
+          }
+        },
+        "in": {
+          "hide_name": 0,
+          "bits": [ 4 ],
+          "attributes": {
+            "BUS": 1,
+            "EXTERNAL": 1,
+            "FABulous": 1,
+            "src": "/home/kelvin/FABulous_fork/myProject/Tile/N_IO/IO.v:5.41-5.43"
           }
         },
         "out": {
+          "hide_name": 0,
+          "bits": [ 5 ],
+          "attributes": {
+            "BUS": 1,
+            "EXTERNAL": 1,
+            "FABulous": 1,
+            "src": "/home/kelvin/FABulous_fork/myProject/Tile/N_IO/IO.v:6.42-6.45"
+          }
+        },
+        "to_fabric": {
           "hide_name": 0,
           "bits": [ 3 ],
           "attributes": {
             "BUS": 1,
             "FABulous": 1,
-            "src": "/Users/kelvinchung/Documents/FABulous-1/myProject/Tile/N_IO/IO.v:3.32-3.35"
+            "src": "/home/kelvin/FABulous_fork/myProject/Tile/N_IO/IO.v:4.32-4.41"
           }
         }
       }

@@ -1,4 +1,4 @@
-module test #(parameter WIDTH=32);
+module test #(parameter WIDTH=1);
 
 localparam reg_op = 1;
 localparam add_op = 0;

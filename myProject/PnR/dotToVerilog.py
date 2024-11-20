@@ -99,6 +99,6 @@ def dotToVerilog(dotFile: Path, verilogFile: Path):
 
 if __name__ == "__main__":
     dotToVerilog(
-        Path.cwd() / "myProject/PnR/test.simple.dot",
+        Path.cwd() / "myProject/PnR/test.dfg.dot",
         Path.cwd() / "myProject/PnR/test.v",
     )

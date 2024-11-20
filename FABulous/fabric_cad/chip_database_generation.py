@@ -132,25 +132,6 @@ def genFabric(fabric: Fabric, chip: Chip):
             )
 
         chip.add_node(localNode)
-
-    # for i in range(fabric.numberOfRows):
-    #     for j in range(fabric.numberOfColumns):
-    #         if fabric.tile[i][j] is None:
-    #             continue
-
-    #         localNode = []
-
-    #         for port in fabric.tile[i][j].ports:
-    #             if port.destinationName is not None and port.inOut == IO.OUTPUT:
-    #                 localNode.append(
-    #                     NodeWire(
-    #                         j + port.xOffset, i + port.yOffset, port.destinationName
-    #                     )
-    #                 )
-
-    #         if localNode:
-    #             chip.add_node(localNode)
-
     setTiming(chip)
 
 

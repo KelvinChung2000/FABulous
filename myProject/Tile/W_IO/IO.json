@@ -1,11 +1,11 @@
 {
-  "creator": "Yosys 0.47+56 (git sha1 a22ff47d6, g++ 11.4.0-1ubuntu1~22.04 -fPIC -O3)",
+  "creator": "Yosys 0.43 (git sha1 ead4718e5, clang++ 15.0.0 -fPIC -Os)",
   "modules": {
     "IO": {
       "attributes": {
         "blackbox": 1,
         "cells_not_processed": 1,
-        "src": "/home/kelvin/FABulous_fork/myProject/Tile/W_IO/IO.v:1.1-9.10"
+        "src": "/Users/kelvinchung/Documents/FABulous-1/myProject/Tile/W_IO/IO.v:1.1-9.10"
       },
       "ports": {
         "from_fabric": {
@@ -39,7 +39,7 @@
             "CONFIG_BIT": 1,
             "FABulous": 1,
             "IO": 1,
-            "src": "/home/kelvin/FABulous_fork/myProject/Tile/W_IO/IO.v:7.42-7.52"
+            "src": "/Users/kelvinchung/Documents/FABulous-1/myProject/Tile/W_IO/IO.v:7.42-7.52"
           }
         },
         "from_fabric": {
@@ -48,7 +48,7 @@
           "attributes": {
             "BUS": 1,
             "FABulous": 1,
-            "src": "/home/kelvin/FABulous_fork/myProject/Tile/W_IO/IO.v:3.31-3.42"
+            "src": "/Users/kelvinchung/Documents/FABulous-1/myProject/Tile/W_IO/IO.v:3.31-3.42"
           }
         },
         "in": {
@@ -58,7 +58,7 @@
             "BUS": 1,
             "EXTERNAL": 1,
             "FABulous": 1,
-            "src": "/home/kelvin/FABulous_fork/myProject/Tile/W_IO/IO.v:5.41-5.43"
+            "src": "/Users/kelvinchung/Documents/FABulous-1/myProject/Tile/W_IO/IO.v:5.41-5.43"
           }
         },
         "out": {
@@ -68,7 +68,7 @@
             "BUS": 1,
             "EXTERNAL": 1,
             "FABulous": 1,
-            "src": "/home/kelvin/FABulous_fork/myProject/Tile/W_IO/IO.v:6.42-6.45"
+            "src": "/Users/kelvinchung/Documents/FABulous-1/myProject/Tile/W_IO/IO.v:6.42-6.45"
           }
         },
         "to_fabric": {
@@ -77,7 +77,7 @@
           "attributes": {
             "BUS": 1,
             "FABulous": 1,
-            "src": "/home/kelvin/FABulous_fork/myProject/Tile/W_IO/IO.v:4.32-4.41"
+            "src": "/Users/kelvinchung/Documents/FABulous-1/myProject/Tile/W_IO/IO.v:4.32-4.41"
           }
         }
       }

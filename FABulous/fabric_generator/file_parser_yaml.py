@@ -266,7 +266,6 @@ def parseTileYAML(fileName: Path) -> Tile:
                 muxSize = len(v)
                 if muxSize >= 2:
                     configBit += muxSize.bit_length() - 1
-
         case ".mux":
             for i in parseMux(matrixDir):
                 muxSize = len(i.inputs)
@@ -290,6 +289,8 @@ def parseTileYAML(fileName: Path) -> Tile:
         case _:
             logger.error("Unknown file extension for matrix.")
             raise ValueError("Unknown file extension for matrix.")
+
+    muxList = parseMux(matrixDir)
 
     if p := data["INCLUDE"]:
         p = fileName.parent.joinpath(p)
@@ -318,7 +319,7 @@ def parseTileYAML(fileName: Path) -> Tile:
         ports=list(portsDict.values()),
         bels=bels,
         wireTypes=wires,
-        matrixDir=matrixDir,
+        switchMatrix=muxList,
         globalConfigBits=configBit,
         withUserCLK=withUserCLK,
         tileDir=fileName,

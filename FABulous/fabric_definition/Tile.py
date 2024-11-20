@@ -1,8 +1,9 @@
-import pathlib
+from pathlib import Path
 from dataclasses import dataclass
 from typing import Any
 
 from FABulous.fabric_definition.Bel import Bel
+from FABulous.fabric_definition.Mux import Mux
 from FABulous.fabric_definition.define import IO, Direction, Side
 from FABulous.fabric_definition.Port import TilePort
 from FABulous.fabric_definition.Wire import WireType
@@ -34,10 +35,10 @@ class Tile:
     ports: list[TilePort]
     bels: list[Bel]
     wireTypes: list[WireType]
-    matrixDir: pathlib.Path
+    switchMatrix: list[Mux] | Path
     globalConfigBits: int = 0
     withUserCLK: bool = False
-    tileDir: pathlib.Path = pathlib.Path(".")
+    tileDir: Path = Path(".")
     partOfSuperTile = False
 
     def __eq__(self, __o: Any) -> bool:

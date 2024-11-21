@@ -1,3 +1,4 @@
+from collections import defaultdict
 from dataclasses import dataclass, field
 
 from FABulous.fabric_definition.Bel import Bel
@@ -58,6 +59,7 @@ class Fabric:
     configBitMode: ConfigBitMode = ConfigBitMode.FRAME_BASED
     frameBitsPerRow: int = 32
     maxFramesPerCol: int = 20
+    contextCount: int = 1
     package: str = "use work.my_package.all"
     generateDelayInSwitchMatrix: int = 80
     multiplexerStyle: MultiplexerStyle = MultiplexerStyle.CUSTOM
@@ -254,3 +256,15 @@ class Fabric:
         for tile in self.tileDict.values():
             bels.extend(tile.bels)
         return bels
+
+    def getTotalBelCount(self) -> int:
+        tileCountDict = defaultdict(int)
+        for row in self.tile:
+            for tile in row:
+                if tile is not None:
+                    tileCountDict[tile.name] += 1
+
+        return sum(
+            len(self.getTileByName(tile).bels) * count
+            for tile, count in tileCountDict.items()
+        )

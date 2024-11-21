@@ -69,6 +69,7 @@ def parseFabricYAML(fileName: Path) -> Fabric:
     configBitMode = ConfigBitMode[param.get("ConfigBitMode", "FRAME_BASED").upper()]
     frameBitsPerRow = int(param.get("FrameBitsPerRow", 32))
     maxFramesPerCol = int(param.get("MaxFramesPerCol", 32))
+    contextCount = int(param.get("ContextCount", 1))
     package = param.get("Package", "use work.my_package.all;")
     generateDelayInSwitchMatrix = int(param.get("GenerateDelayInSwitchMatrix", 80))
     multiplexerStyle = MultiplexerStyle[param.get("MultiplexerStyle", "CUSTOM").upper()]
@@ -140,6 +141,7 @@ def parseFabricYAML(fileName: Path) -> Fabric:
         configBitMode=configBitMode,
         frameBitsPerRow=frameBitsPerRow,
         maxFramesPerCol=maxFramesPerCol,
+        contextCount=contextCount,
         package=package,
         generateDelayInSwitchMatrix=generateDelayInSwitchMatrix,
         multiplexerStyle=multiplexerStyle,

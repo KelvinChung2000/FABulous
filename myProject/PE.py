@@ -5,7 +5,7 @@ from FABulous.fabric_definition.Wire import InternalWire
 from FABulous.fabric_definition.Tile import Tile
 from FABulous.fabric_definition.Fabric import Fabric
 from FABulous.fabric_cad.model_generation_npnr import genNextpnrModel
-from FABulous.fabric_cad.chip import *
+from FABulous.fabric_cad.chipdbGen.chip import *
 from subprocess import run
 
 ch = Chip("example", "example", 4, 4)

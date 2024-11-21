@@ -1,5 +1,5 @@
-import pathlib
 from dataclasses import dataclass
+from pathlib import Path
 
 from FABulous.fabric_definition.define import IO
 from FABulous.fabric_definition.Port import Port
@@ -46,7 +46,7 @@ class Bel:
         Indicates if ports are individually declared. Default is False.
     """
 
-    src: pathlib.Path
+    src: Path
     prefix: str
     name: str
     inputs: list[Port]
@@ -61,14 +61,14 @@ class Bel:
 
     def __init__(
         self,
-        src: pathlib.Path,
+        src: Path,
         prefix: str,
         internal: list[Port],
         external: list[Port],
         configPort: list[Port],
         sharedPort: list[Port],
         configBit: int,
-        belMap: dict[str, int],
+        belFeatureMap: dict[str, int],
         userCLK: Port | None,
     ) -> None:
         self.src = src
@@ -81,5 +81,5 @@ class Bel:
         self.configPort = configPort
         self.sharedPort = sharedPort
         self.configBit = configBit
-        self.belFeatureMap = belMap
+        self.belFeatureMap = belFeatureMap
         self.userCLK = userCLK

@@ -7,7 +7,7 @@ from typing import Literal
 from loguru import logger
 
 from FABulous.fabric_definition.Bel import Bel
-from FABulous.fabric_definition.define import IO, FABulousPortType
+from FABulous.fabric_definition.define import IO, FABulousPortType, FeatureType
 from FABulous.fabric_definition.Port import ConfigPort, Port
 
 
@@ -275,7 +275,10 @@ def parseBelFile(
         ]
 
     try:
-        subprocess.run(runCmd, check=True)
+        logger.info(f"Parsing bel file: {filename}")
+        result = subprocess.run(runCmd, check=True, text=True, capture_output=True)
+        if result.stderr:
+            logger.warning(f"Generated from yosys:\n{result.stderr}")
     except subprocess.CalledProcessError:
         logger.error(f"Failed to run yosys command: {' '.join(runCmd)}")
         raise ValueError
@@ -321,13 +324,15 @@ def parseBelFile(
         if FABulousPortType.EXTERNAL in attributes:
             externalPort.append(port)
         elif FABulousPortType.CONFIG_BIT in attributes:
-            feature = attributes - set(["CONFIG_BIT", "FABulous", "src"])
-            if len(feature) != 1:
+            feature = details.get("attributes", {}).get("FEATURE", "")
+            feature = feature.split(" ")
+            featureType = attributes - set(["FABulous", "CONFIG_BIT", "src", "FEATURE"])
+            if len(feature) == 0:
                 raise ValueError(
-                    f"Can only have one feature per CONFIG_BIT port and {net} in file {filename} have more than one"
+                    f"CONFIG_BIT port and {net} in file {filename} must have at least one feature."
                 )
-            feature = feature.pop()
-            belMapDict[feature] = netBitWidth
+            for i in feature:
+                belMapDict[i] = netBitWidth
             configPort.append(
                 ConfigPort(
                     name=net,
@@ -335,6 +340,7 @@ def parseBelFile(
                     wireCount=netBitWidth,
                     isBus=FABulousPortType.BUS in attributes,
                     feature=feature,
+                    featureType=FeatureType[featureType.pop()],
                 )
             )
         elif FABulousPortType.USER_CLK in attributes:
@@ -353,6 +359,6 @@ def parseBelFile(
         configPort=configPort,
         sharedPort=sharedPort,
         configBit=sum(belMapDict.values()),
-        belMap=belMapDict,
+        belFeatureMap=belMapDict,
         userCLK=userClk,
     )

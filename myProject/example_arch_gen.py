@@ -1,7 +1,7 @@
 from os import path
 import sys
 
-from FABulous.fabric_cad.chip import *
+from FABulous.fabric_cad.chipdbGen.chip import *
 from subprocess import run
 from loguru import logger
 

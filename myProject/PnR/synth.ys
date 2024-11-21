@@ -1,7 +1,6 @@
-read_verilog ./lib.v
+read_verilog -lib ./lib.v
 read_verilog ./test.v
-read_verilog -lib ./ALU.v
-read_verilog -lib ./IO.v
+read_verilog -lib ../.FABulous/prims.v
 hierarchy -top test
 flatten
 proc

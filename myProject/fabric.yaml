@@ -14,7 +14,8 @@ PARAM: {
   #Package: use work.my_package.all;
   GenerateDelayInSwitchMatrix: 80,
   MultiplexerStyle: custom, #custom or generic
-  SuperTileEnable: True #True,False
+  SuperTileEnable: True, #True,False
+  ContextCount: 2
 }
 
 TILES: {

@@ -19,7 +19,7 @@ module PE_map(A, B, C, Y);
             _TECHMAP_CELLTYPE_ == "TernaryOp" ? 3 : -1;
 
         if (OP_TYPE == 0)
-            ALU #(.WIDTH(WIDTH), .CONST(CONST)) _TECHMAP_REPLACE_ (.Y(Y));
+            ALU #(.WIDTH(WIDTH), .CONST(CONST)) _TECHMAP_REPLACE_ (.data_out(Y));
         else if (OP_TYPE == 1)
             ALU #(
                 .WIDTH(WIDTH),

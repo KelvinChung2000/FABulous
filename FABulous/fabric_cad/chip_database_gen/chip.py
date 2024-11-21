@@ -1,13 +1,20 @@
-import abc
 import hashlib
 import struct
 from dataclasses import dataclass, field
-from enum import Enum
 from typing import Optional
 
 from loguru import logger
 
 from FABulous.fabric_cad.bba import BBAWriter
+from FABulous.fabric_cad.chip_database_gen.BBAStruct import BBAStruct
+from FABulous.fabric_cad.chip_database_gen.Bel import BelData, BelPin, BelPinRef
+from FABulous.fabric_cad.chip_database_gen.define import (
+    ClockEdge,
+    IdString,
+    NodeWire,
+    PinType,
+)
+from FABulous.fabric_cad.chip_database_gen.StringPool import StringPool
 
 """
 This provides a semi-flattened routing graph that is built into a deduplicated one.
@@ -24,150 +31,8 @@ There are two key elements:
 """
 
 
-class BBAStruct(abc.ABC):
-    def serialise_lists(self, context: str, bba: BBAWriter):
-        pass
-
-    def serialise(self, context: str, bba: BBAWriter):
-        pass
-
-
-@dataclass(eq=True, order=True, frozen=True)
-class IdString:
-    index: int = 0
-
-
-class StringPool:
-    def __init__(self):
-        self.strs = {"": 0}
-        self.known_id_count = 1
-
-    def read_constids(self, file: str):
-        idx = 1
-        with open(file, "r") as f:
-            for line in f:
-                l = line.strip()
-                if not l.startswith("X("):
-                    continue
-                l = l[2:]
-                assert l.endswith(")"), l
-                l = l[:-1].strip()
-                i = self.id(l)
-                assert i.index == idx, (i, idx, l)
-                idx += 1
-        self.known_id_count = idx
-
-    def id(self, val: str):
-        if val in self.strs:
-            return IdString(self.strs[val])
-        else:
-            idx = len(self.strs)
-            self.strs[val] = idx
-            return IdString(idx)
-
-    def serialise_lists(self, context: str, bba: BBAWriter):
-        bba.label(f"{context}_strs")
-        for s, idx in sorted(self.strs.items(), key=lambda x: x[1]):  # sort by index
-            if idx < self.known_id_count:
-                continue
-            bba.str(s)
-
-    def __getitem__(self, id: IdString) -> str:
-        for s, i in self.strs.items():
-            if i == id.index:
-                return s
-        else:
-            raise ValueError(f"Unknown id {id}")
-
-    def serialise(self, context: str, bba: BBAWriter):
-        bba.u32(self.known_id_count)
-        bba.slice(f"{context}_strs", len(self.strs) - self.known_id_count)
-
-    def toConstStringId(self, file: str):
-        with open(file, "w") as f:
-            for s in self.strs.keys():
-                f.write(f"X({s})\n")
-
-
-@dataclass
-class PinType(Enum):
-    INPUT = 0
-    OUTPUT = 1
-    INOUT = 2
-
-
-@dataclass
-class BelPin(BBAStruct):
-    name: IdString
-    wire: int
-    dir: PinType
-
-    def serialise_lists(self, context: str, bba: BBAWriter):
-        pass
-
-    def serialise(self, context: str, bba: BBAWriter):
-        bba.u32(self.name.index)
-        bba.u32(self.wire)
-        bba.u32(self.dir.value)
-
-
 BEL_FLAG_GLOBAL = 0x01
 BEL_FLAG_HIDDEN = 0x02
-
-
-@dataclass
-class BelData(BBAStruct):
-    index: int
-    name: IdString
-    bel_type: IdString
-    z: int
-
-    flags: int = 0
-    site: int = 0
-    checker_idx: int = 0
-
-    pins: list[BelPin] = field(default_factory=list)
-    extra_data: object = None
-
-    def serialise_lists(self, context: str, bba: BBAWriter):
-        # sort pins for fast binary search lookups
-        self.pins.sort(key=lambda p: p.name.index)
-        # write pins array
-        bba.label(f"{context}_pins")
-        for i, pin in enumerate(self.pins):
-            pin.serialise(f"{context}_pin{i}", bba)
-        # extra data (optional)
-        if self.extra_data is not None:
-            self.extra_data.serialise_lists(f"{context}_extra_data", bba)
-            bba.label(f"{context}_extra_data")
-            self.extra_data.serialise(f"{context}_extra_data", bba)
-
-    def serialise(self, context: str, bba: BBAWriter):
-        bba.u32(self.name.index)
-        bba.u32(self.bel_type.index)
-        bba.u16(self.z)
-        bba.u16(0)
-        bba.u32(self.flags)
-        bba.u32(self.site)
-        bba.u32(self.checker_idx)
-        bba.slice(f"{context}_pins", len(self.pins))
-        if self.extra_data is not None:
-            bba.ref(f"{context}_extra_data")
-        else:
-            bba.u32(0)
-
-
-@dataclass
-class BelPinRef(BBAStruct):
-    bel: int
-    pin: IdString
-
-    def serialise_lists(self, context: str, bba: BBAWriter):
-        pass
-
-    def serialise(self, context: str, bba: BBAWriter):
-        bba.u32(self.bel)
-        bba.u32(self.pin.index)
 
 
 @dataclass
@@ -282,6 +147,10 @@ class TileType(BBAStruct):
 
     def create_pip(self, src: str, dst: str, timing_class: str = ""):
         # Create a pip between two tile wires in the tile type. Both wires should exist already.
+        if self.strs.id(src) not in self._wire2idx:
+            raise ValueError(f"Wire {src} not found")
+        if self.strs.id(dst) not in self._wire2idx:
+            raise ValueError(f"Wire {dst} not found")
         src_idx = self._wire2idx[self.strs.id(src)]
         dst_idx = self._wire2idx[self.strs.id(dst)]
         pip = PipData(
@@ -340,14 +209,6 @@ class TileType(BBAStruct):
     @property
     def name(self):
         return self.strs[self.type_name]
-
-
-# Pre deduplication (nodes flattened, absolute coords)
-@dataclass
-class NodeWire:
-    x: int
-    y: int
-    wire: str
 
 
 @dataclass
@@ -580,12 +441,6 @@ class NodeTiming(BBAStruct):
         self.res.serialise(context, bba)
         self.cap.serialise(context, bba)
         self.delay.serialise(context, bba)
-
-
-@dataclass
-class ClockEdge(Enum):
-    RISING = 0
-    FALLING = 1
 
 
 @dataclass
@@ -848,6 +703,19 @@ class TimingPool(BBAStruct):
             sg.finalise()
 
 
+@dataclass(frozen=True)
+class ChipExtraData(BBAStruct):
+    context: int
+    belCount: int
+
+    def serialise_lists(self, context: str, bba: BBAWriter):
+        pass
+
+    def serialise(self, context: str, bba: BBAWriter):
+        bba.u32(self.context)
+        bba.u32(self.belCount)
+
+
 class Chip:
     def __init__(self, uarch: str, name: str, width: int, height: int):
         self.strs = StringPool()
@@ -964,6 +832,9 @@ class Chip:
         pkg = PackageInfo(self.strs, self.strs.id(name))
         self.packages.append(pkg)
         return pkg
+
+    def set_chip_extra_data(self, ChipExtraData):
+        self.extra_data = ChipExtraData
 
     def serialise(self, bba: BBAWriter):
         self.flatten_tile_shapes()

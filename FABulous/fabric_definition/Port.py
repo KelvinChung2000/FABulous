@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from FABulous.fabric_definition.define import IO, Direction, Side
+from FABulous.fabric_definition.define import IO, Direction, Side, FeatureType
 
 
 @dataclass(frozen=True, eq=True)
@@ -19,6 +19,7 @@ class TilePort(Port):
 @dataclass(frozen=True, eq=True)
 class ConfigPort(Port):
     feature: str = ""
+    featureType: FeatureType = FeatureType.INIT
 
 
 # @dataclass(frozen=True, eq=True)

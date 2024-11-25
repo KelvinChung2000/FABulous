@@ -48,13 +48,21 @@ def genSwitchMatrix(tile: Tile, tileType: TileType, context=1):
                 tileType.create_pip(f"{c}_{s}", f"{c}_{mux.output}")
 
         # cross cycle pip
-        for cn in range(c, context):
+        for cn in range(c + 1, context):
+            tileType.create_wire(f"{c}_to_{cn}_NextCycle", "NEXT_CYCLE")
             for mux in muxDict.values():
                 if mux.output in externalWires:
                     for s in mux.inputs:
                         tileType.create_pip(
-                            f"{c}_{s}", f"{cn}_{mux.output}", "NEXT_CYCLE"
+                            f"{c}_{s}", f"{c}_to_{cn}_NextCycle", "NEXT_CYCLE"
                         )
+                        tileType.create_pip(
+                            f"{c}_to_{cn}_NextCycle", f"{cn}_{mux.output}", "NEXT_CYCLE"
+                        )
+        for cn in range(c + 1, context - 1):
+            tileType.create_pip(
+                f"{c}_to_{cn}_NextCycle", f"{c+1}_to_{cn+1}_NextCycle", "NEXT_CYCLE"
+            )
 
 
 def genBel(bels: list[Bel], tile: TileType, context=1):

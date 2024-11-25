@@ -55,4 +55,3 @@ module OutputOp #(
     input [WIDTH-1:0] A
   );
 endmodule
-

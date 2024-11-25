@@ -19,7 +19,7 @@ WIRES: [
   {source_name: out3, X-offset: -1, Y-offset:  0, destination_name: in1},
 ]
 BELS: [
-    {BEL: ./ALU.v, prefix: },
+ {BEL: ./ALU.v, prefix: },   
     # {BEL: ./const_unit.v, prefix: },
     # {BEL: ./buff.v, prefix: N_},
     # {BEL: ./buff.v, prefix: E_},

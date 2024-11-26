@@ -40,6 +40,7 @@ class TileWireData:
     index: int
     name: IdString
     wire_type: IdString
+    gfx_wire_id: int
     const_value: IdString = field(default_factory=list)
     flags: int = 0
     timing_idx: int = -1
@@ -63,6 +64,7 @@ class TileWireData:
     def serialise(self, context: str, bba: BBAWriter):
         bba.u32(self.name.index)
         bba.u32(self.wire_type.index)
+        bba.u32(self.gfx_wire_id)
         bba.u32(self.const_value.index)
         bba.u32(self.flags)
         bba.u32(self.timing_idx)
@@ -103,6 +105,7 @@ class PipData(BBAStruct):
 @dataclass
 class TileType(BBAStruct):
     strs: StringPool
+    gfx_wire_ids: dict
     tmg: "TimingPool"
     type_name: IdString
     bels: list[BelData] = field(default_factory=list)
@@ -135,10 +138,15 @@ class TileType(BBAStruct):
 
     def create_wire(self, name: str, type: str = "", const_value: str = ""):
         # Create a new tile wire of a given name and type (optional) in the tile type
+        gfx_wire_id = 0
+        if name in self.gfx_wire_ids:
+            gfx_wire_id = self.gfx_wire_ids[name]
+
         wire = TileWireData(
             index=len(self.wires),
             name=self.strs.id(name),
             wire_type=self.strs.id(type),
+            gfx_wire_id=gfx_wire_id,
             const_value=self.strs.id(const_value),
         )
         self._wire2idx[wire.name] = wire.index
@@ -573,40 +581,6 @@ class CellTiming(BBAStruct):
         bba.slice(f"{context}_pins", len(self.pins))
 
 
-@dataclass
-class SpeedGrade(BBAStruct):
-    name: int
-    pip_classes: list[Optional[PipTiming]] = field(default_factory=list)
-    node_classes: list[Optional[NodeTiming]] = field(default_factory=list)
-    cell_types: list[CellTiming] = field(
-        default_factory=list
-    )  # sorted by (cell_type, variant) ID tuple
-
-    def finalise(self):
-        self.cell_types.sort(key=lambda ty: ty.type_variant)
-        for ty in self.cell_types:
-            ty.finalise()
-
-    def serialise_lists(self, context: str, bba: BBAWriter):
-        for i, t in enumerate(self.cell_types):
-            t.serialise_lists(f"{context}_cellty{i}", bba)
-        bba.label(f"{context}_pip_classes")
-        for i, p in enumerate(self.pip_classes):
-            p.serialise(f"{context}_pipc{i}", bba)
-        bba.label(f"{context}_node_classes")
-        for i, n in enumerate(self.node_classes):
-            n.serialise(f"{context}_nodec{i}", bba)
-        bba.label(f"{context}_cell_types")
-        for i, t in enumerate(self.cell_types):
-            t.serialise(f"{context}_cellty{i}", bba)
-
-    def serialise(self, context: str, bba: BBAWriter):
-        bba.u32(self.name.index)  # speed grade idstring
-        bba.slice(f"{context}_pip_classes", len(self.pip_classes))
-        bba.slice(f"{context}_node_classes", len(self.node_classes))
-        bba.slice(f"{context}_cell_types", len(self.cell_types))
-
-
 class TimingPool(BBAStruct):
     def __init__(self, strs: StringPool):
         self.strs = strs
@@ -703,6 +677,40 @@ class TimingPool(BBAStruct):
             sg.finalise()
 
 
+@dataclass
+class SpeedGrade(BBAStruct):
+    name: int
+    pip_classes: list[Optional[PipTiming]] = field(default_factory=list)
+    node_classes: list[Optional[NodeTiming]] = field(default_factory=list)
+    cell_types: list[CellTiming] = field(
+        default_factory=list
+    )  # sorted by (cell_type, variant) ID tuple
+
+    def finalise(self):
+        self.cell_types.sort(key=lambda ty: ty.type_variant)
+        for ty in self.cell_types:
+            ty.finalise()
+
+    def serialise_lists(self, context: str, bba: BBAWriter):
+        for i, t in enumerate(self.cell_types):
+            t.serialise_lists(f"{context}_cellty{i}", bba)
+        bba.label(f"{context}_pip_classes")
+        for i, p in enumerate(self.pip_classes):
+            p.serialise(f"{context}_pipc{i}", bba)
+        bba.label(f"{context}_node_classes")
+        for i, n in enumerate(self.node_classes):
+            n.serialise(f"{context}_nodec{i}", bba)
+        bba.label(f"{context}_cell_types")
+        for i, t in enumerate(self.cell_types):
+            t.serialise(f"{context}_cellty{i}", bba)
+
+    def serialise(self, context: str, bba: BBAWriter):
+        bba.u32(self.name.index)  # speed grade idstring
+        bba.slice(f"{context}_pip_classes", len(self.pip_classes))
+        bba.slice(f"{context}_node_classes", len(self.node_classes))
+        bba.slice(f"{context}_cell_types", len(self.cell_types))
+
+
 @dataclass(frozen=True)
 class ChipExtraData(BBAStruct):
     context: int
@@ -733,9 +741,10 @@ class Chip:
         self.packages = []
         self.extra_data = None
         self.timing = TimingPool(self.strs)
+        self.gfx_wire_ids = dict()
 
-    def create_tile_type(self, name: str) -> TileType:
-        tt = TileType(self.strs, self.timing, self.strs.id(name))
+    def create_tile_type(self, name: str):
+        tt = TileType(self.strs, self.gfx_wire_ids, self.timing, self.strs.id(name))
         self.tile_type_idx[name] = len(self.tile_types)
         self.tile_types.append(tt)
         return tt
@@ -744,7 +753,7 @@ class Chip:
         self.tiles[y][x].type_idx = self.tile_type_idx[type]
         return self.tiles[y][x]
 
-    def tile_type_at(self, x: int, y: int) -> TileType:
+    def tile_type_at(self, x: int, y: int):
         assert (
             self.tiles[y][x].type_idx is not None
         ), f"tile type at ({x}, {y}) must be set"
@@ -774,9 +783,7 @@ class Chip:
             else:
                 wire_id = w.wire if w.wire is IdString else self.strs.id(w.wire)
                 if wire_id not in self.tile_type_at(w.x, w.y)._wire2idx:
-                    raise ValueError(
-                        f"Wire {w.wire} not found in tile {self.strs[self.tile_type_at(w.x, w.y).type_name]} at ({w.x}, {w.y})"
-                    )
+                    raise ValueError(f"Wire {w.wire} not found in tile type")
                 wire_index = self.tile_type_at(w.x, w.y)._wire2idx[wire_id]
             shape.wires += [w.x - x0, w.y - y0, wire_index]
         # deduplicate node shapes
@@ -833,9 +840,6 @@ class Chip:
         self.packages.append(pkg)
         return pkg
 
-    def set_chip_extra_data(self, ChipExtraData):
-        self.extra_data = ChipExtraData
-
     def serialise(self, bba: BBAWriter):
         self.flatten_tile_shapes()
         # TODO: preface, etc
@@ -883,7 +887,7 @@ class Chip:
 
         bba.label("chip_info")
         bba.u32(0x00CA7CA7)  # magic
-        bba.u32(4)  # version
+        bba.u32(5)  # version
         bba.u32(self.width)
         bba.u32(self.height)
 
@@ -918,3 +922,19 @@ class Chip:
             bba.ref("chip_info")
             self.serialise(bba)
             bba.pop()
+
+    def read_gfxids(self, filename):
+        idx = 1
+        with open(filename) as f:
+            for line in f:
+                l = line.strip()
+                if not l.startswith("X("):
+                    continue
+                l = l[2:]
+                assert l.endswith(")"), l
+                l = l[:-1].strip()
+                self.gfx_wire_ids[l] = idx
+                idx += 1
+
+    def set_chip_extra_data(self, ChipExtraData):
+        self.extra_data = ChipExtraData

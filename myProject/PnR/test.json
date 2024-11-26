@@ -1,5 +1,5 @@
 {
-  "creator": "Yosys 0.43 (git sha1 ead4718e5, clang++ 15.0.0 -fPIC -Os)",
+  "creator": "Yosys 0.47+56 (git sha1 a22ff47d6, g++ 11.4.0-1ubuntu1~22.04 -fPIC -O3)",
   "modules": {
     "ALU": {
       "attributes": {

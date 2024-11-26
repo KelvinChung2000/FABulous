@@ -24,24 +24,24 @@ def genSwitchMatrix(tile: Tile, tileType: TileType, context=1):
     for c in range(context):
         muxList = tile.switchMatrix
         muxDict = {i.name: i for i in muxList}
-        externalWires = set()
+        createdWire = set()
 
         # cross tile wires
         for i in tile.ports:
             if i.wireDirection == Direction.JUMP:
                 continue
-            tileType.create_wire(f"{c}_{i.name}", f"NEBR_{tile.name}")
+            tileType.create_wire(f"{c}_{i.name}")
+            createdWire.add(f"{c}_{i.name}")
             for cn in range(c, context):
-                tileType.create_wire(f"{cn}_{i.name}", f"NEBR_{tile.name}")
-
-            externalWires.add(i.name)
+                tileType.create_wire(f"{cn}_{i.name}")
+                createdWire.add(f"{cn}_{i.name}")
 
         for mux in muxDict.values():
             for i in mux.inputs:
-                if i not in externalWires:
-                    tileType.create_wire(f"{c}_{i}", f"SWITCH_{tile.name}")
-            if mux.output not in externalWires:
-                tileType.create_wire(f"{c}_{mux.output}", f"SWITCH_{tile.name}")
+                if i not in createdWire:
+                    tileType.create_wire(f"{c}_{i}")
+            if mux.output not in createdWire:
+                tileType.create_wire(f"{c}_{mux.output}")
 
         for mux in muxDict.values():
             for s in mux.inputs:
@@ -49,20 +49,16 @@ def genSwitchMatrix(tile: Tile, tileType: TileType, context=1):
 
         # cross cycle pip
         for cn in range(c + 1, context):
-            tileType.create_wire(f"{c}_to_{cn}_NextCycle", "NEXT_CYCLE")
+            tileType.create_wire(f"{c}_to_{cn}_NextCycle")
             for mux in muxDict.values():
-                if mux.output in externalWires:
+                if mux.output in createdWire:
                     for s in mux.inputs:
+                        tileType.create_pip(f"{c}_{s}", f"{c}_to_{cn}_NextCycle")
                         tileType.create_pip(
-                            f"{c}_{s}", f"{c}_to_{cn}_NextCycle", "NEXT_CYCLE"
-                        )
-                        tileType.create_pip(
-                            f"{c}_to_{cn}_NextCycle", f"{cn}_{mux.output}", "NEXT_CYCLE"
+                            f"{c}_to_{cn}_NextCycle", f"{cn}_{mux.output}"
                         )
         for cn in range(c + 1, context - 1):
-            tileType.create_pip(
-                f"{c}_to_{cn}_NextCycle", f"{c+1}_to_{cn+1}_NextCycle", "NEXT_CYCLE"
-            )
+            tileType.create_pip(f"{c}_to_{cn}_NextCycle", f"{c+1}_to_{cn+1}_NextCycle")
 
 
 def genBel(bels: list[Bel], tile: TileType, context=1):
@@ -133,7 +129,13 @@ def genFabric(fabric: Fabric, chip: Chip, context=1):
                         f"{c}_{wire.destination.name}",
                     )
                 )
-        chip.add_node(localNode)
+        for c in range(context):
+            for cn in range(c + 1, context):
+                localNode.append(NodeWire(x, y, f"{c}_to_{cn}_NextCycle"))
+
+        # print(localNode)
+        # chip.add_node(localNode)
+        # print()
     setTiming(chip)
 
 
@@ -198,13 +200,14 @@ def genChipDatabase(fabric: Fabric, filePath: Path, baseConstIdsPath: Path):
     logger.info(
         f"Total BEL Count: {fabric.getTotalBelCount()}",
     )
+    ch.strs.toConstStringId(str(filePath / f"{fabric.name}_constids.inc"))
+    ch.read_gfxids(str(filePath / f"{fabric.name}_constids.inc"))_PAD
 
     logger.info(f"Writing the chip database to {filePath / f'{fabric.name}.bba'}")
     ch.write_bba(str(filePath / f"{fabric.name}.bba"))
     logger.info(
         f"Writing Constant String IDs to {filePath / f'{fabric.name}_constids.inc'}"
     )
-    ch.strs.toConstStringId(str(filePath / f"{fabric.name}_constids.inc"))
 
     try:
         logger.info("Compiling the bba file to bit file")

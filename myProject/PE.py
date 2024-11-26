@@ -1,15 +1,10 @@
-from FABulous.fabric_definition.define import *
-from FABulous.fabric_definition.Bel import Bel
-from FABulous.fabric_definition.Port import InPort, OutPort, Port
-from FABulous.fabric_definition.Wire import InternalWire
-from FABulous.fabric_definition.Tile import Tile
-from FABulous.fabric_definition.Fabric import Fabric
-from FABulous.fabric_cad.model_generation_npnr import genNextpnrModel
-from FABulous.fabric_cad.chipdbGen.chip import *
 from subprocess import run
 
+from FABulous.fabric_cad.chip_database_gen.chip import Chip, TimingValue
+from FABulous.fabric_cad.chip_database_gen.define import NodeWire, PinType
+
 ch = Chip("example", "example", 4, 4)
-ch.strs.read_constids(".FABulous/constids.txt")
+ch.strs.read_constids(".FABulous/baseConstIds.inc")
 tt = ch.create_tile_type("PE")
 alu = tt.create_bel("ADD", "add", z=0)
 for i in range(32):
@@ -203,7 +198,7 @@ tmg = ch.set_speed_grades([speed])
 tmg.set_pip_class(
     grade=speed,
     name="SWINPUT",
-    delay=TimingValue(80),  # 80ps intrinstic delay
+    delay=TimingValue(80),  # 80ps intrinstic delaychipdb-example
     in_cap=TimingValue(5000),  # 5pF
     out_res=TimingValue(1000),  # 1ohm
 )
@@ -223,9 +218,9 @@ tmg.set_pip_class(
 )
 
 
-ch.write_bba("./.FABulous/chipdb-example.bba")
+ch.write_bba("./.FABulous/eFPGA.bba")
 run(
-    "bbasm --l ./.FABulous/chipdb-example.bba ./.FABulous/chipdb-example.bin",
+    "bbasm --l ./.FABulous/chipdb-example.bba ./.FABulous/eFPGA.bit",
     shell=True,
 )
 

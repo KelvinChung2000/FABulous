@@ -1,0 +1,84 @@
+{
+  "creator": "Yosys 0.47+56 (git sha1 a22ff47d6, g++ 11.4.0-1ubuntu1~22.04 -fPIC -O3)",
+  "modules": {
+    "const_unit": {
+      "attributes": {
+        "dynports": 1,
+        "blackbox": 1,
+        "cells_not_processed": 1,
+        "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/const_unit.v:1.1-11.10"
+      },
+      "parameter_default_values": {
+        "NoConfigBits": 3
+      },
+      "ports": {
+        "rst": {
+          "direction": "input",
+          "bits": [ 2 ]
+        },
+        "en": {
+          "direction": "input",
+          "bits": [ 3 ]
+        },
+        "clk": {
+          "direction": "input",
+          "bits": [ 4 ]
+        },
+        "const_out": {
+          "direction": "output",
+          "bits": [ 5, 6, 7, 8, 9, 10, 11, 12 ]
+        },
+        "ConfigBits": {
+          "direction": "input",
+          "bits": [ 13, 14, 15, 16 ]
+        }
+      },
+      "cells": {
+      },
+      "netnames": {
+        "ConfigBits": {
+          "hide_name": 0,
+          "bits": [ 13, 14, 15, 16 ],
+          "attributes": {
+            "CONFIG_BIT": 1,
+            "FABulous": 1,
+            "INIT": 1,
+            "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/const_unit.v:8.61-8.71"
+          }
+        },
+        "clk": {
+          "hide_name": 0,
+          "bits": [ 4 ],
+          "attributes": {
+            "FABulous": 1,
+            "USER_CLK": 1,
+            "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/const_unit.v:6.41-6.44"
+          }
+        },
+        "const_out": {
+          "hide_name": 0,
+          "bits": [ 5, 6, 7, 8, 9, 10, 11, 12 ],
+          "attributes": {
+            "BUS": 1,
+            "FABulous": 1,
+            "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/const_unit.v:7.43-7.52"
+          }
+        },
+        "en": {
+          "hide_name": 0,
+          "bits": [ 3 ],
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/const_unit.v:5.16-5.18"
+          }
+        },
+        "rst": {
+          "hide_name": 0,
+          "bits": [ 2 ],
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/const_unit.v:4.16-4.19"
+          }
+        }
+      }
+    }
+  }
+}

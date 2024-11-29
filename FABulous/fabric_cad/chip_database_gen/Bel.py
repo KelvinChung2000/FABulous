@@ -32,6 +32,17 @@ class BelExtraData(BBAStruct):
 
 
 @dataclass
+class TileExtraData(BBAStruct):
+    uniqueBelCount: int = 0
+
+    def serialise_lists(self, context: str, bba: BBAWriter):
+        pass
+
+    def serialise(self, uniqueBelCount: str, bba: BBAWriter):
+        bba.u32(self.uniqueBelCount)
+
+
+@dataclass
 class BelData(BBAStruct):
     index: int
     name: IdString

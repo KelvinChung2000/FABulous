@@ -1,0 +1,512 @@
+Info: Using uarch 'FABulous' for device 'FABulous'
+Info: FABulous uarch initialized with 2 contexts and minII=1
+
+Info: Checksum: 0x67d44446
+
+Info: Device utilisation:
+Info: 	                 ALU:       8/     32    25%
+Info: 	          const_unit:       3/     32     9%
+Info: 	            reg_unit:       2/     32     6%
+Info: 	                  IO:       8/     32    25%
+
+Info: Assigning net info:
+Info: Net: i_inc27_const
+Info: Net: i_inc_const
+Info: Net: i_cnt_160_reg2mem28
+Info: Net: i_exitcond_not
+Info: Net: i_inc27
+Info: Net: i_cnt_2_reg2mem26
+Info: Net: i_inc
+Info: Net: i_cmp21
+Info: Net: i_cmp21_const
+Info: Net: i_arrayidx19_1
+Info: Net: i_arrayidx19_0
+Info: Net: i_level
+Info: Net: i_arrayidx18
+Info: Net: i_e_061_reg2mem30
+Info: Net: i_edges
+Info: Net: i_4
+Info: Net: i_0
+Info: Trying placer heap with seed:3549216002486605715 
+Info: Placed 0 cells based on constraints.
+Info: Creating initial analytic placement for 21 cells, random placement wirelen = 67.
+Info:     at initial placer iter 0, wirelen = 0
+Info:     at initial placer iter 1, wirelen = 0
+Info:     at initial placer iter 2, wirelen = 0
+Info:     at initial placer iter 3, wirelen = 0
+Info: Running main analytical placer, max placement attempts per cell = 10000.
+Info:     at iteration #1, type IO: wirelen solved = 0, spread = 14, legal = 14; time = 0.00s
+Info:     at iteration #1, type const_unit: wirelen solved = 14, spread = 21, legal = 22; time = 0.00s
+Info:     at iteration #1, type reg_unit: wirelen solved = 22, spread = 22, legal = 28; time = 0.00s
+Info:     at iteration #1, type ALU: wirelen solved = 25, spread = 36, legal = 39; time = 0.00s
+Info:     at iteration #1, type ALL: wirelen solved = 0, spread = 50, legal = 42; time = 0.00s
+Info:     at iteration #2, type IO: wirelen solved = 25, spread = 30, legal = 38; time = 0.00s
+Info:     at iteration #2, type const_unit: wirelen solved = 37, spread = 37, legal = 36; time = 0.00s
+Info:     at iteration #2, type reg_unit: wirelen solved = 36, spread = 36, legal = 36; time = 0.00s
+Info:     at iteration #2, type ALU: wirelen solved = 19, spread = 25, legal = 25; time = 0.00s
+Info:     at iteration #2, type ALL: wirelen solved = 1, spread = 28, legal = 31; time = 0.00s
+Info:     at iteration #3, type IO: wirelen solved = 24, spread = 25, legal = 31; time = 0.00s
+Info:     at iteration #3, type const_unit: wirelen solved = 30, spread = 30, legal = 28; time = 0.00s
+Info:     at iteration #3, type reg_unit: wirelen solved = 25, spread = 25, legal = 25; time = 0.00s
+Info:     at iteration #3, type ALU: wirelen solved = 25, spread = 26, legal = 34; time = 0.00s
+Info:     at iteration #3, type ALL: wirelen solved = 2, spread = 29, legal = 28; time = 0.00s
+Info:     at iteration #4, type IO: wirelen solved = 20, spread = 21, legal = 28; time = 0.00s
+Info:     at iteration #4, type const_unit: wirelen solved = 28, spread = 28, legal = 28; time = 0.00s
+Info:     at iteration #4, type reg_unit: wirelen solved = 26, spread = 26, legal = 26; time = 0.00s
+Info:     at iteration #4, type ALU: wirelen solved = 24, spread = 23, legal = 23; time = 0.00s
+Info:     at iteration #4, type ALL: wirelen solved = 5, spread = 22, legal = 27; time = 0.00s
+Info:     at iteration #5, type IO: wirelen solved = 18, spread = 20, legal = 25; time = 0.00s
+Info:     at iteration #5, type const_unit: wirelen solved = 25, spread = 25, legal = 24; time = 0.00s
+Info:     at iteration #5, type reg_unit: wirelen solved = 24, spread = 24, legal = 23; time = 0.00s
+Info:     at iteration #5, type ALU: wirelen solved = 25, spread = 27, legal = 31; time = 0.00s
+Info:     at iteration #5, type ALL: wirelen solved = 6, spread = 26, legal = 26; time = 0.00s
+Info:     at iteration #6, type IO: wirelen solved = 19, spread = 20, legal = 25; time = 0.00s
+Info:     at iteration #6, type const_unit: wirelen solved = 24, spread = 24, legal = 24; time = 0.00s
+Info:     at iteration #6, type reg_unit: wirelen solved = 23, spread = 23, legal = 23; time = 0.00s
+Info:     at iteration #6, type ALU: wirelen solved = 22, spread = 29, legal = 42; time = 0.00s
+Info:     at iteration #6, type ALL: wirelen solved = 8, spread = 34, legal = 37; time = 0.00s
+Info:     at iteration #7, type IO: wirelen solved = 27, spread = 30, legal = 34; time = 0.00s
+Info:     at iteration #7, type const_unit: wirelen solved = 33, spread = 33, legal = 30; time = 0.00s
+Info:     at iteration #7, type reg_unit: wirelen solved = 29, spread = 29, legal = 29; time = 0.00s
+Info:     at iteration #7, type ALU: wirelen solved = 19, spread = 28, legal = 31; time = 0.00s
+Info:     at iteration #7, type ALL: wirelen solved = 5, spread = 22, legal = 32; time = 0.00s
+Info:     at iteration #8, type IO: wirelen solved = 25, spread = 28, legal = 31; time = 0.00s
+Info:     at iteration #8, type const_unit: wirelen solved = 31, spread = 31, legal = 31; time = 0.00s
+Info:     at iteration #8, type reg_unit: wirelen solved = 31, spread = 31, legal = 31; time = 0.00s
+Info:     at iteration #8, type ALU: wirelen solved = 19, spread = 28, legal = 28; time = 0.00s
+Info:     at iteration #8, type ALL: wirelen solved = 8, spread = 27, legal = 29; time = 0.00s
+Info:     at iteration #9, type IO: wirelen solved = 22, spread = 25, legal = 27; time = 0.00s
+Info:     at iteration #9, type const_unit: wirelen solved = 27, spread = 27, legal = 27; time = 0.00s
+Info:     at iteration #9, type reg_unit: wirelen solved = 27, spread = 27, legal = 27; time = 0.00s
+Info:     at iteration #9, type ALU: wirelen solved = 15, spread = 34, legal = 34; time = 0.00s
+Info:     at iteration #9, type ALL: wirelen solved = 7, spread = 28, legal = 39; time = 0.00s
+Info:     at iteration #10, type IO: wirelen solved = 31, spread = 33, legal = 38; time = 0.00s
+Info:     at iteration #10, type const_unit: wirelen solved = 36, spread = 36, legal = 34; time = 0.00s
+Info:     at iteration #10, type reg_unit: wirelen solved = 32, spread = 32, legal = 33; time = 0.00s
+Info:     at iteration #10, type ALU: wirelen solved = 24, spread = 25, legal = 31; time = 0.00s
+Info:     at iteration #10, type ALL: wirelen solved = 10, spread = 34, legal = 34; time = 0.00s
+Warning: post-placement validity check failed for Bel 'X2Y1/1_ALU' (cell 'inst_i_arrayidx18')
+Warning: post-placement validity check failed for Bel 'X2Y2/0_const_unit' (cell 'inst_inst_i_inc_const')
+Info: Trying placer heap with seed:5659617124320425130 
+Info: Placed 0 cells based on constraints.
+Info: Creating initial analytic placement for 21 cells, random placement wirelen = 56.
+Info:     at initial placer iter 0, wirelen = 0
+Info:     at initial placer iter 1, wirelen = 0
+Info:     at initial placer iter 2, wirelen = 0
+Info:     at initial placer iter 3, wirelen = 0
+Info: Running main analytical placer, max placement attempts per cell = 10000.
+Info:     at iteration #1, type IO: wirelen solved = 0, spread = 14, legal = 14; time = 0.00s
+Info:     at iteration #1, type const_unit: wirelen solved = 14, spread = 21, legal = 21; time = 0.00s
+Info:     at iteration #1, type reg_unit: wirelen solved = 21, spread = 21, legal = 27; time = 0.00s
+Info:     at iteration #1, type ALU: wirelen solved = 23, spread = 33, legal = 42; time = 0.00s
+Info:     at iteration #1, type ALL: wirelen solved = 0, spread = 50, legal = 44; time = 0.00s
+Info:     at iteration #2, type IO: wirelen solved = 27, spread = 32, legal = 40; time = 0.00s
+Info:     at iteration #2, type const_unit: wirelen solved = 39, spread = 39, legal = 38; time = 0.00s
+Info:     at iteration #2, type reg_unit: wirelen solved = 37, spread = 37, legal = 37; time = 0.00s
+Info:     at iteration #2, type ALU: wirelen solved = 23, spread = 27, legal = 40; time = 0.00s
+Info:     at iteration #2, type ALL: wirelen solved = 0, spread = 33, legal = 30; time = 0.00s
+Info:     at iteration #3, type IO: wirelen solved = 23, spread = 25, legal = 31; time = 0.00s
+Info:     at iteration #3, type const_unit: wirelen solved = 31, spread = 31, legal = 31; time = 0.00s
+Info:     at iteration #3, type reg_unit: wirelen solved = 29, spread = 29, legal = 29; time = 0.00s
+Info:     at iteration #3, type ALU: wirelen solved = 27, spread = 28, legal = 39; time = 0.00s
+Info:     at iteration #3, type ALL: wirelen solved = 3, spread = 35, legal = 37; time = 0.00s
+Info:     at iteration #4, type IO: wirelen solved = 28, spread = 29, legal = 33; time = 0.00s
+Info:     at iteration #4, type const_unit: wirelen solved = 32, spread = 32, legal = 30; time = 0.00s
+Info:     at iteration #4, type reg_unit: wirelen solved = 27, spread = 27, legal = 27; time = 0.00s
+Info:     at iteration #4, type ALU: wirelen solved = 22, spread = 33, legal = 33; time = 0.00s
+Info:     at iteration #4, type ALL: wirelen solved = 2, spread = 28, legal = 28; time = 0.00s
+Info:     at iteration #5, type IO: wirelen solved = 21, spread = 22, legal = 25; time = 0.00s
+Info:     at iteration #5, type const_unit: wirelen solved = 25, spread = 25, legal = 24; time = 0.00s
+Info:     at iteration #5, type reg_unit: wirelen solved = 24, spread = 24, legal = 24; time = 0.00s
+Info:     at iteration #5, type ALU: wirelen solved = 24, spread = 32, legal = 32; time = 0.00s
+Info:     at iteration #5, type ALL: wirelen solved = 8, spread = 37, legal = 34; time = 0.00s
+Info:     at iteration #6, type IO: wirelen solved = 26, spread = 25, legal = 32; time = 0.00s
+Info:     at iteration #6, type const_unit: wirelen solved = 30, spread = 30, legal = 28; time = 0.00s
+Info:     at iteration #6, type reg_unit: wirelen solved = 27, spread = 27, legal = 28; time = 0.00s
+Info:     at iteration #6, type ALU: wirelen solved = 23, spread = 30, legal = 30; time = 0.00s
+Info:     at iteration #6, type ALL: wirelen solved = 7, spread = 29, legal = 29; time = 0.00s
+Info:     at iteration #7, type IO: wirelen solved = 26, spread = 28, legal = 28; time = 0.00s
+Info:     at iteration #7, type const_unit: wirelen solved = 27, spread = 27, legal = 24; time = 0.00s
+Info:     at iteration #7, type reg_unit: wirelen solved = 24, spread = 24, legal = 24; time = 0.00s
+Info:     at iteration #7, type ALU: wirelen solved = 17, spread = 32, legal = 32; time = 0.00s
+Info:     at iteration #7, type ALL: wirelen solved = 7, spread = 37, legal = 34; time = 0.00s
+Info:     at iteration #8, type IO: wirelen solved = 28, spread = 29, legal = 30; time = 0.00s
+Info:     at iteration #8, type const_unit: wirelen solved = 30, spread = 30, legal = 28; time = 0.00s
+Info:     at iteration #8, type reg_unit: wirelen solved = 28, spread = 28, legal = 28; time = 0.00s
+Info:     at iteration #8, type ALU: wirelen solved = 20, spread = 27, legal = 27; time = 0.00s
+Info:     at iteration #8, type ALL: wirelen solved = 10, spread = 30, legal = 32; time = 0.00s
+Info:     at iteration #9, type IO: wirelen solved = 24, spread = 26, legal = 31; time = 0.00s
+Info:     at iteration #9, type const_unit: wirelen solved = 31, spread = 31, legal = 29; time = 0.00s
+Info:     at iteration #9, type reg_unit: wirelen solved = 28, spread = 28, legal = 28; time = 0.00s
+Info:     at iteration #9, type ALU: wirelen solved = 22, spread = 30, legal = 30; time = 0.00s
+Info:     at iteration #9, type ALL: wirelen solved = 10, spread = 31, legal = 31; time = 0.00s
+Warning: post-placement validity check failed for Bel 'X1Y1/0_const_unit' (cell 'inst_inst_i_inc_const')
+Info: Trying placer heap with seed:6176937498645257248 
+Info: Placed 0 cells based on constraints.
+Info: Creating initial analytic placement for 21 cells, random placement wirelen = 52.
+Info:     at initial placer iter 0, wirelen = 0
+Info:     at initial placer iter 1, wirelen = 0
+Info:     at initial placer iter 2, wirelen = 0
+Info:     at initial placer iter 3, wirelen = 0
+Info: Running main analytical placer, max placement attempts per cell = 10000.
+Info:     at iteration #1, type IO: wirelen solved = 0, spread = 14, legal = 14; time = 0.00s
+Info:     at iteration #1, type const_unit: wirelen solved = 14, spread = 21, legal = 22; time = 0.00s
+Info:     at iteration #1, type reg_unit: wirelen solved = 22, spread = 22, legal = 27; time = 0.00s
+Info:     at iteration #1, type ALU: wirelen solved = 23, spread = 33, legal = 43; time = 0.00s
+Info:     at iteration #1, type ALL: wirelen solved = 0, spread = 50, legal = 45; time = 0.00s
+Info:     at iteration #2, type IO: wirelen solved = 26, spread = 31, legal = 36; time = 0.00s
+Info:     at iteration #2, type const_unit: wirelen solved = 35, spread = 35, legal = 34; time = 0.00s
+Info:     at iteration #2, type reg_unit: wirelen solved = 33, spread = 33, legal = 35; time = 0.00s
+Info:     at iteration #2, type ALU: wirelen solved = 21, spread = 25, legal = 29; time = 0.00s
+Info:     at iteration #2, type ALL: wirelen solved = 0, spread = 25, legal = 27; time = 0.00s
+Info:     at iteration #3, type IO: wirelen solved = 22, spread = 23, legal = 28; time = 0.00s
+Info:     at iteration #3, type const_unit: wirelen solved = 28, spread = 28, legal = 27; time = 0.00s
+Info:     at iteration #3, type reg_unit: wirelen solved = 26, spread = 26, legal = 26; time = 0.00s
+Info:     at iteration #3, type ALU: wirelen solved = 23, spread = 32, legal = 32; time = 0.00s
+Info:     at iteration #3, type ALL: wirelen solved = 2, spread = 29, legal = 27; time = 0.00s
+Info:     at iteration #4, type IO: wirelen solved = 21, spread = 23, legal = 27; time = 0.00s
+Info:     at iteration #4, type const_unit: wirelen solved = 27, spread = 27, legal = 25; time = 0.00s
+Info:     at iteration #4, type reg_unit: wirelen solved = 25, spread = 25, legal = 25; time = 0.00s
+Info:     at iteration #4, type ALU: wirelen solved = 18, spread = 31, legal = 31; time = 0.00s
+Info:     at iteration #4, type ALL: wirelen solved = 5, spread = 32, legal = 31; time = 0.00s
+Info:     at iteration #5, type IO: wirelen solved = 23, spread = 25, legal = 33; time = 0.00s
+Info:     at iteration #5, type const_unit: wirelen solved = 33, spread = 33, legal = 31; time = 0.00s
+Info:     at iteration #5, type reg_unit: wirelen solved = 31, spread = 31, legal = 31; time = 0.00s
+Info:     at iteration #5, type ALU: wirelen solved = 27, spread = 29, legal = 44; time = 0.00s
+Info:     at iteration #5, type ALL: wirelen solved = 4, spread = 34, legal = 29; time = 0.00s
+Info:     at iteration #6, type IO: wirelen solved = 24, spread = 25, legal = 31; time = 0.00s
+Info:     at iteration #6, type const_unit: wirelen solved = 30, spread = 30, legal = 30; time = 0.00s
+Info:     at iteration #6, type reg_unit: wirelen solved = 30, spread = 30, legal = 30; time = 0.00s
+Info:     at iteration #6, type ALU: wirelen solved = 28, spread = 26, legal = 40; time = 0.00s
+Info:     at iteration #6, type ALL: wirelen solved = 8, spread = 30, legal = 28; time = 0.00s
+Info:     at iteration #7, type IO: wirelen solved = 25, spread = 25, legal = 28; time = 0.00s
+Info:     at iteration #7, type const_unit: wirelen solved = 28, spread = 28, legal = 25; time = 0.00s
+Info:     at iteration #7, type reg_unit: wirelen solved = 25, spread = 25, legal = 25; time = 0.00s
+Info:     at iteration #7, type ALU: wirelen solved = 23, spread = 22, legal = 22; time = 0.00s
+Info:     at iteration #7, type ALL: wirelen solved = 7, spread = 25, legal = 27; time = 0.00s
+Warning: post-placement validity check failed for Bel 'X2Y0/1_S_IO' (cell 'inst_i_level')
+Warning: post-placement validity check failed for Bel 'X2Y1/0_const_unit' (cell 'inst_inst_i_cmp21_const')
+Info: Trying placer heap with seed:14959890827522091460 
+Info: Placed 0 cells based on constraints.
+Info: Creating initial analytic placement for 21 cells, random placement wirelen = 54.
+Info:     at initial placer iter 0, wirelen = 0
+Info:     at initial placer iter 1, wirelen = 0
+Info:     at initial placer iter 2, wirelen = 0
+Info:     at initial placer iter 3, wirelen = 0
+Info: Running main analytical placer, max placement attempts per cell = 10000.
+Info:     at iteration #1, type IO: wirelen solved = 0, spread = 14, legal = 14; time = 0.00s
+Info:     at iteration #1, type const_unit: wirelen solved = 14, spread = 21, legal = 24; time = 0.00s
+Info:     at iteration #1, type reg_unit: wirelen solved = 24, spread = 24, legal = 31; time = 0.00s
+Info:     at iteration #1, type ALU: wirelen solved = 25, spread = 43, legal = 43; time = 0.00s
+Info:     at iteration #1, type ALL: wirelen solved = 0, spread = 50, legal = 41; time = 0.00s
+Info:     at iteration #2, type IO: wirelen solved = 23, spread = 28, legal = 36; time = 0.00s
+Info:     at iteration #2, type const_unit: wirelen solved = 36, spread = 36, legal = 36; time = 0.00s
+Info:     at iteration #2, type reg_unit: wirelen solved = 36, spread = 36, legal = 36; time = 0.00s
+Info:     at iteration #2, type ALU: wirelen solved = 19, spread = 33, legal = 33; time = 0.00s
+Info:     at iteration #2, type ALL: wirelen solved = 1, spread = 27, legal = 31; time = 0.00s
+Info:     at iteration #3, type IO: wirelen solved = 23, spread = 24, legal = 30; time = 0.00s
+Info:     at iteration #3, type const_unit: wirelen solved = 29, spread = 29, legal = 28; time = 0.00s
+Info:     at iteration #3, type reg_unit: wirelen solved = 26, spread = 26, legal = 26; time = 0.00s
+Info:     at iteration #3, type ALU: wirelen solved = 28, spread = 38, legal = 38; time = 0.00s
+Info:     at iteration #3, type ALL: wirelen solved = 0, spread = 27, legal = 30; time = 0.00s
+Info:     at iteration #4, type IO: wirelen solved = 24, spread = 26, legal = 28; time = 0.00s
+Info:     at iteration #4, type const_unit: wirelen solved = 25, spread = 25, legal = 23; time = 0.00s
+Info:     at iteration #4, type reg_unit: wirelen solved = 22, spread = 22, legal = 22; time = 0.00s
+Info:     at iteration #4, type ALU: wirelen solved = 28, spread = 22, legal = 22; time = 0.00s
+Info:     at iteration #4, type ALL: wirelen solved = 9, spread = 23, legal = 30; time = 0.00s
+Info:     at iteration #5, type IO: wirelen solved = 21, spread = 26, legal = 30; time = 0.00s
+Info:     at iteration #5, type const_unit: wirelen solved = 29, spread = 29, legal = 28; time = 0.00s
+Info:     at iteration #5, type reg_unit: wirelen solved = 28, spread = 28, legal = 28; time = 0.00s
+Info:     at iteration #5, type ALU: wirelen solved = 23, spread = 36, legal = 36; time = 0.00s
+Info:     at iteration #5, type ALL: wirelen solved = 4, spread = 34, legal = 32; time = 0.00s
+Info:     at iteration #6, type IO: wirelen solved = 24, spread = 27, legal = 28; time = 0.00s
+Info:     at iteration #6, type const_unit: wirelen solved = 28, spread = 28, legal = 26; time = 0.00s
+Info:     at iteration #6, type reg_unit: wirelen solved = 26, spread = 26, legal = 26; time = 0.00s
+Info:     at iteration #6, type ALU: wirelen solved = 24, spread = 32, legal = 32; time = 0.00s
+Info:     at iteration #6, type ALL: wirelen solved = 8, spread = 35, legal = 34; time = 0.00s
+Info:     at iteration #7, type IO: wirelen solved = 24, spread = 27, legal = 33; time = 0.00s
+Info:     at iteration #7, type const_unit: wirelen solved = 33, spread = 33, legal = 31; time = 0.00s
+Info:     at iteration #7, type reg_unit: wirelen solved = 31, spread = 31, legal = 31; time = 0.00s
+Info:     at iteration #7, type ALU: wirelen solved = 20, spread = 23, legal = 27; time = 0.00s
+Info:     at iteration #7, type ALL: wirelen solved = 7, spread = 39, legal = 36; time = 0.00s
+Info:     at iteration #8, type IO: wirelen solved = 29, spread = 31, legal = 34; time = 0.00s
+Info:     at iteration #8, type const_unit: wirelen solved = 32, spread = 32, legal = 30; time = 0.00s
+Info:     at iteration #8, type reg_unit: wirelen solved = 30, spread = 30, legal = 30; time = 0.00s
+Info:     at iteration #8, type ALU: wirelen solved = 28, spread = 26, legal = 32; time = 0.00s
+Info:     at iteration #8, type ALL: wirelen solved = 8, spread = 26, legal = 31; time = 0.00s
+Warning: post-placement validity check failed for Bel 'X1Y1/0_const_unit' (cell 'inst_inst_i_cmp21_const')
+Warning: post-placement validity check failed for Bel 'X2Y3/0_const_unit' (cell 'inst_inst_i_inc_const')
+Info: Trying placer heap with seed:521494586791226707 
+Info: Placed 0 cells based on constraints.
+Info: Creating initial analytic placement for 21 cells, random placement wirelen = 57.
+Info:     at initial placer iter 0, wirelen = 0
+Info:     at initial placer iter 1, wirelen = 0
+Info:     at initial placer iter 2, wirelen = 0
+Info:     at initial placer iter 3, wirelen = 0
+Info: Running main analytical placer, max placement attempts per cell = 10000.
+Info:     at iteration #1, type IO: wirelen solved = 0, spread = 14, legal = 14; time = 0.00s
+Info:     at iteration #1, type const_unit: wirelen solved = 14, spread = 21, legal = 22; time = 0.00s
+Info:     at iteration #1, type reg_unit: wirelen solved = 22, spread = 22, legal = 27; time = 0.00s
+Info:     at iteration #1, type ALU: wirelen solved = 22, spread = 36, legal = 45; time = 0.00s
+Info:     at iteration #1, type ALL: wirelen solved = 0, spread = 50, legal = 42; time = 0.00s
+Info:     at iteration #2, type IO: wirelen solved = 26, spread = 30, legal = 40; time = 0.00s
+Info:     at iteration #2, type const_unit: wirelen solved = 39, spread = 39, legal = 39; time = 0.00s
+Info:     at iteration #2, type reg_unit: wirelen solved = 39, spread = 39, legal = 39; time = 0.00s
+Info:     at iteration #2, type ALU: wirelen solved = 26, spread = 31, legal = 31; time = 0.00s
+Info:     at iteration #2, type ALL: wirelen solved = 1, spread = 31, legal = 35; time = 0.00s
+Info:     at iteration #3, type IO: wirelen solved = 27, spread = 28, legal = 35; time = 0.00s
+Info:     at iteration #3, type const_unit: wirelen solved = 34, spread = 34, legal = 30; time = 0.00s
+Info:     at iteration #3, type reg_unit: wirelen solved = 27, spread = 27, legal = 27; time = 0.00s
+Info:     at iteration #3, type ALU: wirelen solved = 25, spread = 29, legal = 29; time = 0.00s
+Info:     at iteration #3, type ALL: wirelen solved = 2, spread = 29, legal = 32; time = 0.00s
+Info:     at iteration #4, type IO: wirelen solved = 26, spread = 28, legal = 34; time = 0.00s
+Info:     at iteration #4, type const_unit: wirelen solved = 32, spread = 32, legal = 29; time = 0.00s
+Info:     at iteration #4, type reg_unit: wirelen solved = 27, spread = 27, legal = 27; time = 0.00s
+Info:     at iteration #4, type ALU: wirelen solved = 27, spread = 31, legal = 33; time = 0.00s
+Info:     at iteration #4, type ALL: wirelen solved = 4, spread = 21, legal = 29; time = 0.00s
+Info:     at iteration #5, type IO: wirelen solved = 26, spread = 28, legal = 31; time = 0.00s
+Info:     at iteration #5, type const_unit: wirelen solved = 28, spread = 28, legal = 26; time = 0.00s
+Info:     at iteration #5, type reg_unit: wirelen solved = 24, spread = 24, legal = 24; time = 0.00s
+Info:     at iteration #5, type ALU: wirelen solved = 20, spread = 22, legal = 30; time = 0.00s
+Info:     at iteration #5, type ALL: wirelen solved = 7, spread = 24, legal = 33; time = 0.00s
+Info:     at iteration #6, type IO: wirelen solved = 23, spread = 27, legal = 28; time = 0.00s
+Info:     at iteration #6, type const_unit: wirelen solved = 28, spread = 28, legal = 28; time = 0.00s
+Info:     at iteration #6, type reg_unit: wirelen solved = 26, spread = 26, legal = 26; time = 0.00s
+Info:     at iteration #6, type ALU: wirelen solved = 22, spread = 35, legal = 35; time = 0.00s
+Info:     at iteration #6, type ALL: wirelen solved = 10, spread = 25, legal = 32; time = 0.00s
+Info:     at iteration #7, type IO: wirelen solved = 27, spread = 29, legal = 29; time = 0.00s
+Info:     at iteration #7, type const_unit: wirelen solved = 28, spread = 28, legal = 28; time = 0.00s
+Info:     at iteration #7, type reg_unit: wirelen solved = 28, spread = 28, legal = 27; time = 0.00s
+Info:     at iteration #7, type ALU: wirelen solved = 22, spread = 26, legal = 38; time = 0.00s
+Info:     at iteration #7, type ALL: wirelen solved = 7, spread = 28, legal = 27; time = 0.00s
+Info:     at iteration #8, type IO: wirelen solved = 22, spread = 25, legal = 25; time = 0.00s
+Info:     at iteration #8, type const_unit: wirelen solved = 24, spread = 24, legal = 24; time = 0.00s
+Info:     at iteration #8, type reg_unit: wirelen solved = 24, spread = 24, legal = 23; time = 0.00s
+Info:     at iteration #8, type ALU: wirelen solved = 22, spread = 23, legal = 29; time = 0.00s
+Info:     at iteration #8, type ALL: wirelen solved = 8, spread = 28, legal = 29; time = 0.00s
+Info:     at iteration #9, type IO: wirelen solved = 28, spread = 29, legal = 31; time = 0.00s
+Info:     at iteration #9, type const_unit: wirelen solved = 29, spread = 29, legal = 27; time = 0.00s
+Info:     at iteration #9, type reg_unit: wirelen solved = 26, spread = 26, legal = 26; time = 0.00s
+Info:     at iteration #9, type ALU: wirelen solved = 22, spread = 25, legal = 36; time = 0.00s
+Info:     at iteration #9, type ALL: wirelen solved = 9, spread = 26, legal = 27; time = 0.00s
+Info:     at iteration #10, type IO: wirelen solved = 23, spread = 25, legal = 29; time = 0.00s
+Info:     at iteration #10, type const_unit: wirelen solved = 29, spread = 29, legal = 29; time = 0.00s
+Info:     at iteration #10, type reg_unit: wirelen solved = 29, spread = 29, legal = 29; time = 0.00s
+Info:     at iteration #10, type ALU: wirelen solved = 23, spread = 29, legal = 29; time = 0.00s
+Info:     at iteration #10, type ALL: wirelen solved = 10, spread = 28, legal = 23; time = 0.00s
+Info:     at iteration #11, type IO: wirelen solved = 21, spread = 22, legal = 22; time = 0.00s
+Info:     at iteration #11, type const_unit: wirelen solved = 22, spread = 22, legal = 22; time = 0.00s
+Info:     at iteration #11, type reg_unit: wirelen solved = 22, spread = 22, legal = 22; time = 0.00s
+Info:     at iteration #11, type ALU: wirelen solved = 18, spread = 31, legal = 31; time = 0.00s
+Info:     at iteration #11, type ALL: wirelen solved = 9, spread = 38, legal = 38; time = 0.00s
+Info:     at iteration #12, type IO: wirelen solved = 34, spread = 34, legal = 35; time = 0.00s
+Info:     at iteration #12, type const_unit: wirelen solved = 34, spread = 34, legal = 29; time = 0.00s
+Info:     at iteration #12, type reg_unit: wirelen solved = 28, spread = 28, legal = 28; time = 0.00s
+Info:     at iteration #12, type ALU: wirelen solved = 25, spread = 27, legal = 27; time = 0.00s
+Info:     at iteration #12, type ALL: wirelen solved = 9, spread = 24, legal = 28; time = 0.00s
+Info:     at iteration #13, type IO: wirelen solved = 27, spread = 29, legal = 29; time = 0.00s
+Info:     at iteration #13, type const_unit: wirelen solved = 29, spread = 29, legal = 27; time = 0.00s
+Info:     at iteration #13, type reg_unit: wirelen solved = 27, spread = 27, legal = 27; time = 0.00s
+Info:     at iteration #13, type ALU: wirelen solved = 21, spread = 32, legal = 32; time = 0.00s
+Info:     at iteration #13, type ALL: wirelen solved = 7, spread = 26, legal = 36; time = 0.00s
+Info:     at iteration #14, type IO: wirelen solved = 34, spread = 34, legal = 38; time = 0.00s
+Info:     at iteration #14, type const_unit: wirelen solved = 37, spread = 37, legal = 33; time = 0.00s
+Info:     at iteration #14, type reg_unit: wirelen solved = 32, spread = 32, legal = 32; time = 0.00s
+Info:     at iteration #14, type ALU: wirelen solved = 28, spread = 34, legal = 34; time = 0.00s
+Info:     at iteration #14, type ALL: wirelen solved = 9, spread = 35, legal = 35; time = 0.00s
+Info:     at iteration #15, type IO: wirelen solved = 30, spread = 31, legal = 35; time = 0.00s
+Info:     at iteration #15, type const_unit: wirelen solved = 35, spread = 35, legal = 31; time = 0.00s
+Info:     at iteration #15, type reg_unit: wirelen solved = 31, spread = 31, legal = 31; time = 0.00s
+Info:     at iteration #15, type ALU: wirelen solved = 27, spread = 31, legal = 31; time = 0.00s
+Info:     at iteration #15, type ALL: wirelen solved = 8, spread = 38, legal = 35; time = 0.00s
+Info: HeAP Placer Time: 0.02s
+Info:   of which solving equations: 0.00s
+Info:   of which spreading cells: 0.00s
+Info:   of which strict legalisation: 0.02s
+
+Info: Running simulated annealing placer for refinement.
+Info:   at iteration #1: temp = 0.000000, timing cost = 0, wirelen = 23
+Info:   at iteration #5: temp = 0.000000, timing cost = 0, wirelen = 16
+Info:   at iteration #9: temp = 0.000000, timing cost = 0, wirelen = 15 
+Info: SA placement time 0.04s
+ERROR: post-placement validity check failed for Bel 'X2Y0/1_S_IO' (cell 'inst_i_0')
+Info: Trying placer heap with seed:16799879965222963250 
+Info: Placed 0 cells based on constraints.
+Info: Creating initial analytic placement for 21 cells, random placement wirelen = 55.
+Info:     at initial placer iter 0, wirelen = 0
+Info:     at initial placer iter 1, wirelen = 0
+Info:     at initial placer iter 2, wirelen = 0
+Info:     at initial placer iter 3, wirelen = 0
+Info: Running main analytical placer, max placement attempts per cell = 10000.
+Info:     at iteration #1, type IO: wirelen solved = 0, spread = 14, legal = 14; time = 0.00s
+Info:     at iteration #1, type const_unit: wirelen solved = 14, spread = 21, legal = 24; time = 0.00s
+Info:     at iteration #1, type reg_unit: wirelen solved = 24, spread = 24, legal = 29; time = 0.00s
+Info:     at iteration #1, type ALU: wirelen solved = 25, spread = 34, legal = 36; time = 0.00s
+Info:     at iteration #1, type ALL: wirelen solved = 0, spread = 50, legal = 42; time = 0.00s
+Info:     at iteration #2, type IO: wirelen solved = 23, spread = 28, legal = 32; time = 0.00s
+Info:     at iteration #2, type const_unit: wirelen solved = 32, spread = 32, legal = 32; time = 0.00s
+Info:     at iteration #2, type reg_unit: wirelen solved = 32, spread = 32, legal = 32; time = 0.00s
+Info:     at iteration #2, type ALU: wirelen solved = 25, spread = 31, legal = 36; time = 0.00s
+Info:     at iteration #2, type ALL: wirelen solved = 1, spread = 29, legal = 27; time = 0.00s
+Info:     at iteration #3, type IO: wirelen solved = 19, spread = 21, legal = 25; time = 0.00s
+Info:     at iteration #3, type const_unit: wirelen solved = 25, spread = 25, legal = 25; time = 0.00s
+Info:     at iteration #3, type reg_unit: wirelen solved = 24, spread = 24, legal = 24; time = 0.00s
+Info:     at iteration #3, type ALU: wirelen solved = 23, spread = 33, legal = 33; time = 0.00s
+Info:     at iteration #3, type ALL: wirelen solved = 1, spread = 22, legal = 37; time = 0.00s
+Info:     at iteration #4, type IO: wirelen solved = 27, spread = 27, legal = 32; time = 0.00s
+Info:     at iteration #4, type const_unit: wirelen solved = 29, spread = 29, legal = 26; time = 0.00s
+Info:     at iteration #4, type reg_unit: wirelen solved = 24, spread = 24, legal = 24; time = 0.00s
+Info:     at iteration #4, type ALU: wirelen solved = 23, spread = 34, legal = 34; time = 0.00s
+Info:     at iteration #4, type ALL: wirelen solved = 5, spread = 23, legal = 32; time = 0.00s
+Info:     at iteration #5, type IO: wirelen solved = 28, spread = 30, legal = 32; time = 0.00s
+Info:     at iteration #5, type const_unit: wirelen solved = 31, spread = 31, legal = 27; time = 0.00s
+Info:     at iteration #5, type reg_unit: wirelen solved = 26, spread = 26, legal = 26; time = 0.00s
+Info:     at iteration #5, type ALU: wirelen solved = 25, spread = 27, legal = 27; time = 0.00s
+Info:     at iteration #5, type ALL: wirelen solved = 5, spread = 21, legal = 32; time = 0.00s
+Info:     at iteration #6, type IO: wirelen solved = 24, spread = 26, legal = 32; time = 0.00s
+Info:     at iteration #6, type const_unit: wirelen solved = 32, spread = 32, legal = 30; time = 0.00s
+Info:     at iteration #6, type reg_unit: wirelen solved = 30, spread = 30, legal = 30; time = 0.00s
+Info:     at iteration #6, type ALU: wirelen solved = 28, spread = 27, legal = 40; time = 0.00s
+Info:     at iteration #6, type ALL: wirelen solved = 5, spread = 25, legal = 31; time = 0.00s
+Info:     at iteration #7, type IO: wirelen solved = 24, spread = 27, legal = 31; time = 0.00s
+Info:     at iteration #7, type const_unit: wirelen solved = 31, spread = 31, legal = 30; time = 0.00s
+Info:     at iteration #7, type reg_unit: wirelen solved = 30, spread = 30, legal = 30; time = 0.00s
+Info:     at iteration #7, type ALU: wirelen solved = 22, spread = 36, legal = 36; time = 0.00s
+Info:     at iteration #7, type ALL: wirelen solved = 5, spread = 31, legal = 26; time = 0.00s
+Info:     at iteration #8, type IO: wirelen solved = 22, spread = 24, legal = 24; time = 0.00s
+Info:     at iteration #8, type const_unit: wirelen solved = 24, spread = 24, legal = 23; time = 0.00s
+Info:     at iteration #8, type reg_unit: wirelen solved = 23, spread = 23, legal = 23; time = 0.00s
+Info:     at iteration #8, type ALU: wirelen solved = 18, spread = 23, legal = 28; time = 0.00s
+Info:     at iteration #8, type ALL: wirelen solved = 7, spread = 30, legal = 26; time = 0.00s
+Info:     at iteration #9, type IO: wirelen solved = 22, spread = 24, legal = 26; time = 0.00s
+Info:     at iteration #9, type const_unit: wirelen solved = 25, spread = 25, legal = 25; time = 0.00s
+Info:     at iteration #9, type reg_unit: wirelen solved = 25, spread = 25, legal = 25; time = 0.00s
+Info:     at iteration #9, type ALU: wirelen solved = 18, spread = 25, legal = 29; time = 0.00s
+Info:     at iteration #9, type ALL: wirelen solved = 8, spread = 26, legal = 40; time = 0.00s
+Info:     at iteration #10, type IO: wirelen solved = 29, spread = 30, legal = 31; time = 0.00s
+Info:     at iteration #10, type const_unit: wirelen solved = 31, spread = 31, legal = 27; time = 0.00s
+Info:     at iteration #10, type reg_unit: wirelen solved = 27, spread = 27, legal = 27; time = 0.00s
+Info:     at iteration #10, type ALU: wirelen solved = 23, spread = 32, legal = 32; time = 0.00s
+Info:     at iteration #10, type ALL: wirelen solved = 8, spread = 28, legal = 29; time = 0.00s
+Info:     at iteration #11, type IO: wirelen solved = 22, spread = 28, legal = 28; time = 0.00s
+Info:     at iteration #11, type const_unit: wirelen solved = 28, spread = 28, legal = 26; time = 0.00s
+Info:     at iteration #11, type reg_unit: wirelen solved = 26, spread = 26, legal = 26; time = 0.00s
+Info:     at iteration #11, type ALU: wirelen solved = 23, spread = 29, legal = 29; time = 0.00s
+Info:     at iteration #11, type ALL: wirelen solved = 9, spread = 33, legal = 29; time = 0.00s
+Info:     at iteration #12, type IO: wirelen solved = 28, spread = 28, legal = 30; time = 0.00s
+Info:     at iteration #12, type const_unit: wirelen solved = 30, spread = 30, legal = 29; time = 0.00s
+Info:     at iteration #12, type reg_unit: wirelen solved = 29, spread = 29, legal = 29; time = 0.00s
+Info:     at iteration #12, type ALU: wirelen solved = 22, spread = 31, legal = 31; time = 0.00s
+Info:     at iteration #12, type ALL: wirelen solved = 10, spread = 26, legal = 33; time = 0.00s
+Warning: post-placement validity check failed for Bel 'X1Y1/0_const_unit' (cell 'inst_inst_i_inc27_const')
+Warning: post-placement validity check failed for Bel 'X0Y2/1_W_IO' (cell 'inst_i_4')
+Info: Trying placer heap with seed:8881959346757288541 
+Info: Placed 0 cells based on constraints.
+Info: Creating initial analytic placement for 21 cells, random placement wirelen = 63.
+Info:     at initial placer iter 0, wirelen = 0
+Info:     at initial placer iter 1, wirelen = 0
+Info:     at initial placer iter 2, wirelen = 0
+Info:     at initial placer iter 3, wirelen = 0
+Info: Running main analytical placer, max placement attempts per cell = 10000.
+Info:     at iteration #1, type IO: wirelen solved = 0, spread = 14, legal = 14; time = 0.00s
+Info:     at iteration #1, type const_unit: wirelen solved = 14, spread = 21, legal = 22; time = 0.00s
+Info:     at iteration #1, type reg_unit: wirelen solved = 22, spread = 22, legal = 30; time = 0.00s
+Info:     at iteration #1, type ALU: wirelen solved = 24, spread = 41, legal = 41; time = 0.00s
+Info:     at iteration #1, type ALL: wirelen solved = 0, spread = 50, legal = 43; time = 0.00s
+Info:     at iteration #2, type IO: wirelen solved = 24, spread = 29, legal = 34; time = 0.00s
+Info:     at iteration #2, type const_unit: wirelen solved = 34, spread = 34, legal = 34; time = 0.00s
+Info:     at iteration #2, type reg_unit: wirelen solved = 33, spread = 33, legal = 33; time = 0.00s
+Info:     at iteration #2, type ALU: wirelen solved = 24, spread = 41, legal = 41; time = 0.00s
+Info:     at iteration #2, type ALL: wirelen solved = 0, spread = 29, legal = 35; time = 0.00s
+Info:     at iteration #3, type IO: wirelen solved = 23, spread = 23, legal = 29; time = 0.00s
+Info:     at iteration #3, type const_unit: wirelen solved = 28, spread = 28, legal = 26; time = 0.00s
+Info:     at iteration #3, type reg_unit: wirelen solved = 24, spread = 24, legal = 24; time = 0.00s
+Info:     at iteration #3, type ALU: wirelen solved = 25, spread = 27, legal = 30; time = 0.00s
+Info:     at iteration #3, type ALL: wirelen solved = 3, spread = 27, legal = 26; time = 0.00s
+Info:     at iteration #4, type IO: wirelen solved = 18, spread = 20, legal = 25; time = 0.00s
+Info:     at iteration #4, type const_unit: wirelen solved = 25, spread = 25, legal = 25; time = 0.00s
+Info:     at iteration #4, type reg_unit: wirelen solved = 25, spread = 25, legal = 25; time = 0.00s
+Info:     at iteration #4, type ALU: wirelen solved = 21, spread = 27, legal = 36; time = 0.00s
+Info:     at iteration #4, type ALL: wirelen solved = 1, spread = 21, legal = 22; time = 0.00s
+Info:     at iteration #5, type IO: wirelen solved = 17, spread = 19, legal = 22; time = 0.00s
+Info:     at iteration #5, type const_unit: wirelen solved = 22, spread = 22, legal = 22; time = 0.00s
+Info:     at iteration #5, type reg_unit: wirelen solved = 22, spread = 22, legal = 22; time = 0.00s
+Info:     at iteration #5, type ALU: wirelen solved = 24, spread = 27, legal = 31; time = 0.00s
+Info:     at iteration #5, type ALL: wirelen solved = 5, spread = 22, legal = 24; time = 0.00s
+Info:     at iteration #6, type IO: wirelen solved = 18, spread = 21, legal = 26; time = 0.00s
+Info:     at iteration #6, type const_unit: wirelen solved = 25, spread = 25, legal = 24; time = 0.00s
+Info:     at iteration #6, type reg_unit: wirelen solved = 24, spread = 24, legal = 24; time = 0.00s
+Info:     at iteration #6, type ALU: wirelen solved = 22, spread = 29, legal = 29; time = 0.00s
+Info:     at iteration #6, type ALL: wirelen solved = 6, spread = 25, legal = 29; time = 0.00s
+Info:     at iteration #7, type IO: wirelen solved = 22, spread = 23, legal = 24; time = 0.00s
+Info:     at iteration #7, type const_unit: wirelen solved = 22, spread = 22, legal = 22; time = 0.00s
+Info:     at iteration #7, type reg_unit: wirelen solved = 21, spread = 21, legal = 21; time = 0.00s
+Info:     at iteration #7, type ALU: wirelen solved = 23, spread = 32, legal = 32; time = 0.00s
+Info:     at iteration #7, type ALL: wirelen solved = 5, spread = 22, legal = 23; time = 0.00s
+Info:     at iteration #8, type IO: wirelen solved = 18, spread = 19, legal = 26; time = 0.00s
+Info:     at iteration #8, type const_unit: wirelen solved = 26, spread = 26, legal = 26; time = 0.00s
+Info:     at iteration #8, type reg_unit: wirelen solved = 26, spread = 26, legal = 26; time = 0.00s
+Info:     at iteration #8, type ALU: wirelen solved = 20, spread = 33, legal = 33; time = 0.00s
+Info:     at iteration #8, type ALL: wirelen solved = 5, spread = 24, legal = 26; time = 0.00s
+Info:     at iteration #9, type IO: wirelen solved = 21, spread = 22, legal = 24; time = 0.00s
+Info:     at iteration #9, type const_unit: wirelen solved = 24, spread = 24, legal = 24; time = 0.00s
+Info:     at iteration #9, type reg_unit: wirelen solved = 23, spread = 23, legal = 23; time = 0.00s
+Info:     at iteration #9, type ALU: wirelen solved = 17, spread = 31, legal = 31; time = 0.00s
+Info:     at iteration #9, type ALL: wirelen solved = 8, spread = 25, legal = 35; time = 0.00s
+Info: HeAP Placer Time: 0.01s
+Info:   of which solving equations: 0.00s
+Info:   of which spreading cells: 0.00s
+Info:   of which strict legalisation: 0.01s
+
+Info: Running simulated annealing placer for refinement.
+Info:   at iteration #1: temp = 0.000000, timing cost = 0, wirelen = 22
+Info:   at iteration #5: temp = 0.000000, timing cost = 0, wirelen = 18
+Info:   at iteration #6: temp = 0.000000, timing cost = 0, wirelen = 18 
+Info: SA placement time 0.03s
+Info: Checksum: 0x74a93ace
+Info: ================== Final Placement ===================
+Info: X1Y0/1_S_IO: out_i_exitcond_not
+Info: X0Y3/1_W_IO: out_i_cnt_2_reg2mem26
+Info: X2Y5/0_N_IO: out_i_cmp21
+Info: X2Y0/1_S_IO: out_i_arrayidx19_1
+Info: X1Y2/0_const_unit: inst_inst_i_inc_const
+Info: X1Y1/0_const_unit: inst_inst_i_inc27_const
+Info: X2Y1/0_reg_unit: inst_inst_i_e_061_reg2mem30
+Info: X1Y2/0_reg_unit: inst_inst_i_cnt_160_reg2mem28
+Info: X2Y3/0_const_unit: inst_inst_i_cmp21_const
+Info: X2Y0/0_S_IO: inst_i_level
+Info: X1Y1/0_ALU: inst_i_inc27
+Info: X1Y2/0_ALU: inst_i_inc
+Info: X1Y1/1_ALU: inst_i_exitcond_not
+Info: X5Y1/0_E_IO: inst_i_edges
+Info: X1Y2/1_ALU: inst_i_cnt_2_reg2mem26
+Info: X2Y3/0_ALU: inst_i_cmp21
+Info: X2Y1/1_ALU: inst_i_arrayidx19_1
+Info: X2Y2/0_ALU: inst_i_arrayidx19_0
+Info: X3Y1/0_ALU: inst_i_arrayidx18
+Info: X1Y0/0_S_IO: inst_i_4
+Info: X3Y0/1_S_IO: inst_i_0
+
+Info: Running router2...
+Info: Setting up routing resources...
+Info: Running main router loop...
+Info:     iter=1 wires=88 overused=1 overuse=1 archfail=NA
+Info:     iter=2 wires=89 overused=0 overuse=0 archfail=0
+Info: Router2 time 0.00s
+Info: Running router1 to check that route is legal...
+
+Info: Routing..
+Info: Setting up routing queue.
+Info: Routing 0 arcs.
+Info:            |   (re-)routed arcs  |   delta    | remaining|       time spent     |
+Info:    IterCnt |  w/ripup   wo/ripup |  w/r  wo/r |      arcs| batch(sec) total(sec)|
+Info:          0 |        0          0 |    0     0 |         0|       0.00       0.00|
+Info: Routing complete.
+Info: Router1 time 0.00s
+Info: Checksum: 0xd3d386c2
+
+Info: No Fmax available; no interior timing paths found in design.
+
+9 warnings, 1 error
+
+Info: Program finished normally.

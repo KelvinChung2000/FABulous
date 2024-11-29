@@ -173,10 +173,9 @@
     },
     "ConstOp": {
       "attributes": {
-        "keep": "00000000000000000000000000000001",
         "dynports": "00000000000000000000000000000001",
         "blackbox": "00000000000000000000000000000001",
-        "cells_not_processed": "00000000000000000000000000000001",
+        "keep": "00000000000000000000000000000001",
         "src": "./lib.v:2.1-8.10"
       },
       "parameter_default_values": {
@@ -205,7 +204,7 @@
       "attributes": {
         "blackbox": "00000000000000000000000000000001",
         "cells_not_processed": "00000000000000000000000000000001",
-        "src": "../.FABulous/prims.v:40.1-48.10"
+        "src": "../.FABulous/prims.v:64.1-72.10"
       },
       "ports": {
         "from_fabric": {
@@ -240,7 +239,7 @@
             "FABulous": "00000000000000000000000000000001",
             "FEATURE": "IO",
             "ONE_HOT": "00000000000000000000000000000001",
-            "src": "../.FABulous/prims.v:46.61-46.71"
+            "src": "../.FABulous/prims.v:70.61-70.71"
           }
         },
         "from_fabric": {
@@ -249,7 +248,7 @@
           "attributes": {
             "BUS": "00000000000000000000000000000001",
             "FABulous": "00000000000000000000000000000001",
-            "src": "../.FABulous/prims.v:42.31-42.42"
+            "src": "../.FABulous/prims.v:66.31-66.42"
           }
         },
         "in": {
@@ -259,7 +258,7 @@
             "BUS": "00000000000000000000000000000001",
             "EXTERNAL": "00000000000000000000000000000001",
             "FABulous": "00000000000000000000000000000001",
-            "src": "../.FABulous/prims.v:44.41-44.43"
+            "src": "../.FABulous/prims.v:68.41-68.43"
           }
         },
         "out": {
@@ -269,7 +268,7 @@
             "BUS": "00000000000000000000000000000001",
             "EXTERNAL": "00000000000000000000000000000001",
             "FABulous": "00000000000000000000000000000001",
-            "src": "../.FABulous/prims.v:45.42-45.45"
+            "src": "../.FABulous/prims.v:69.42-69.45"
           }
         },
         "to_fabric": {
@@ -278,7 +277,7 @@
           "attributes": {
             "BUS": "00000000000000000000000000000001",
             "FABulous": "00000000000000000000000000000001",
-            "src": "../.FABulous/prims.v:43.32-43.41"
+            "src": "../.FABulous/prims.v:67.32-67.41"
           }
         }
       }
@@ -341,10 +340,9 @@
     },
     "TernaryOp": {
       "attributes": {
-        "keep": "00000000000000000000000000000001",
         "dynports": "00000000000000000000000000000001",
         "blackbox": "00000000000000000000000000000001",
-        "cells_not_processed": "00000000000000000000000000000001",
+        "keep": "00000000000000000000000000000001",
         "src": "./lib.v:32.1-41.10"
       },
       "parameter_default_values": {
@@ -404,10 +402,9 @@
     },
     "UnaryOp": {
       "attributes": {
-        "keep": "00000000000000000000000000000001",
         "dynports": "00000000000000000000000000000001",
         "blackbox": "00000000000000000000000000000001",
-        "cells_not_processed": "00000000000000000000000000000001",
+        "keep": "00000000000000000000000000000001",
         "src": "./lib.v:11.1-18.10"
       },
       "parameter_default_values": {
@@ -443,11 +440,169 @@
         }
       }
     },
+    "const_unit": {
+      "attributes": {
+        "dynports": "00000000000000000000000000000001",
+        "blackbox": "00000000000000000000000000000001",
+        "cells_not_processed": "00000000000000000000000000000001",
+        "src": "../.FABulous/prims.v:40.1-50.10"
+      },
+      "parameter_default_values": {
+        "NoConfigBits": "00000000000000000000000000000011"
+      },
+      "ports": {
+        "rst": {
+          "direction": "input",
+          "bits": [ 2 ]
+        },
+        "en": {
+          "direction": "input",
+          "bits": [ 3 ]
+        },
+        "clk": {
+          "direction": "input",
+          "bits": [ 4 ]
+        },
+        "const_out": {
+          "direction": "output",
+          "bits": [ 5, 6, 7, 8, 9, 10, 11, 12 ]
+        },
+        "ConfigBits": {
+          "direction": "input",
+          "bits": [ 13, 14, 15, 16 ]
+        }
+      },
+      "cells": {
+      },
+      "netnames": {
+        "ConfigBits": {
+          "hide_name": 0,
+          "bits": [ 13, 14, 15, 16 ],
+          "attributes": {
+            "CONFIG_BIT": "00000000000000000000000000000001",
+            "FABulous": "00000000000000000000000000000001",
+            "INIT": "00000000000000000000000000000001",
+            "src": "../.FABulous/prims.v:47.61-47.71"
+          }
+        },
+        "clk": {
+          "hide_name": 0,
+          "bits": [ 4 ],
+          "attributes": {
+            "FABulous": "00000000000000000000000000000001",
+            "USER_CLK": "00000000000000000000000000000001",
+            "src": "../.FABulous/prims.v:45.41-45.44"
+          }
+        },
+        "const_out": {
+          "hide_name": 0,
+          "bits": [ 5, 6, 7, 8, 9, 10, 11, 12 ],
+          "attributes": {
+            "BUS": "00000000000000000000000000000001",
+            "FABulous": "00000000000000000000000000000001",
+            "src": "../.FABulous/prims.v:46.43-46.52"
+          }
+        },
+        "en": {
+          "hide_name": 0,
+          "bits": [ 3 ],
+          "attributes": {
+            "src": "../.FABulous/prims.v:44.16-44.18"
+          }
+        },
+        "rst": {
+          "hide_name": 0,
+          "bits": [ 2 ],
+          "attributes": {
+            "src": "../.FABulous/prims.v:43.16-43.19"
+          }
+        }
+      }
+    },
+    "reg_unit": {
+      "attributes": {
+        "dynports": "00000000000000000000000000000001",
+        "blackbox": "00000000000000000000000000000001",
+        "cells_not_processed": "00000000000000000000000000000001",
+        "src": "../.FABulous/prims.v:52.1-62.10"
+      },
+      "parameter_default_values": {
+        "NoConfigBits": "00000000000000000000000000000011"
+      },
+      "ports": {
+        "rst": {
+          "direction": "input",
+          "bits": [ 2 ]
+        },
+        "en": {
+          "direction": "input",
+          "bits": [ 3 ]
+        },
+        "clk": {
+          "direction": "input",
+          "bits": [ 4 ]
+        },
+        "reg_out": {
+          "direction": "output",
+          "bits": [ 5, 6, 7, 8, 9, 10, 11, 12 ]
+        },
+        "ConfigBits": {
+          "direction": "input",
+          "bits": [ 13, 14, 15, 16 ]
+        }
+      },
+      "cells": {
+      },
+      "netnames": {
+        "ConfigBits": {
+          "hide_name": 0,
+          "bits": [ 13, 14, 15, 16 ],
+          "attributes": {
+            "CONFIG_BIT": "00000000000000000000000000000001",
+            "FABulous": "00000000000000000000000000000001",
+            "INIT": "00000000000000000000000000000001",
+            "src": "../.FABulous/prims.v:59.61-59.71"
+          }
+        },
+        "clk": {
+          "hide_name": 0,
+          "bits": [ 4 ],
+          "attributes": {
+            "FABulous": "00000000000000000000000000000001",
+            "USER_CLK": "00000000000000000000000000000001",
+            "src": "../.FABulous/prims.v:57.41-57.44"
+          }
+        },
+        "en": {
+          "hide_name": 0,
+          "bits": [ 3 ],
+          "attributes": {
+            "src": "../.FABulous/prims.v:56.16-56.18"
+          }
+        },
+        "reg_out": {
+          "hide_name": 0,
+          "bits": [ 5, 6, 7, 8, 9, 10, 11, 12 ],
+          "attributes": {
+            "BUS": "00000000000000000000000000000001",
+            "FABulous": "00000000000000000000000000000001",
+            "src": "../.FABulous/prims.v:58.43-58.50"
+          }
+        },
+        "rst": {
+          "hide_name": 0,
+          "bits": [ 2 ],
+          "attributes": {
+            "src": "../.FABulous/prims.v:55.16-55.19"
+          }
+        }
+      }
+    },
     "test": {
       "attributes": {
         "dynports": "00000000000000000000000000000001",
         "top": "00000000000000000000000000000001",
-        "src": "./test.v:1.1-17.10"
+        "src": "./test.v:1.1-48.10"
       },
       "parameter_default_values": {
         "WIDTH": "00000000000000000000000000000001"
@@ -455,38 +610,50 @@
       "ports": {
       },
       "cells": {
-        "inst_a": {
+        "inst_i_0": {
           "hide_name": 0,
-          "type": "ALU",
+          "type": "IO",
           "parameters": {
-            "OP": "00000000000000000000000000000000",
             "WIDTH": "00000000000000000000000000000001"
           },
           "attributes": {
             "module_not_derived": "00000000000000000000000000000001",
-            "src": "./test.v:11.40-11.71|./PE_map.v:35.15-39.14"
+            "src": "./test.v:37.26-37.43|./IO_map.v:20.15-22.14"
           },
           "port_directions": {
-            "data_in1": "input",
-            "data_in2": "input",
-            "data_out": "output"
+            "to_fabric": "output"
           },
           "connections": {
-            "data_in1": [ 2 ],
-            "data_in2": [ 3 ],
-            "data_out": [ 4 ]
+            "to_fabric": [ 2 ]
           }
         },
-        "inst_b": {
+        "inst_i_4": {
           "hide_name": 0,
-          "type": "ALU",
+          "type": "IO",
           "parameters": {
-            "OP": "00000000000000000000000000000000",
             "WIDTH": "00000000000000000000000000000001"
           },
           "attributes": {
             "module_not_derived": "00000000000000000000000000000001",
-            "src": "./test.v:12.40-12.69|./PE_map.v:35.15-39.14"
+            "src": "./test.v:44.26-44.43|./IO_map.v:20.15-22.14"
+          },
+          "port_directions": {
+            "to_fabric": "output"
+          },
+          "connections": {
+            "to_fabric": [ 3 ]
+          }
+        },
+        "inst_i_arrayidx18": {
+          "hide_name": 0,
+          "type": "ALU",
+          "parameters": {
+            "OP": "00000000000000000000000000000001",
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "module_not_derived": "00000000000000000000000000000001",
+            "src": "./test.v:32.44-32.115|./PE_map.v:32.15-36.14"
           },
           "port_directions": {
             "data_in1": "input",
@@ -499,7 +666,95 @@
             "data_out": [ 6 ]
           }
         },
-        "inst_inA": {
+        "inst_i_arrayidx19_0": {
+          "hide_name": 0,
+          "type": "ALU",
+          "parameters": {
+            "OP": "00000000000000000000000000000001",
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "module_not_derived": "00000000000000000000000000000001",
+            "src": "./test.v:45.44-45.114|./PE_map.v:32.15-36.14"
+          },
+          "port_directions": {
+            "data_in1": "input",
+            "data_in2": "input",
+            "data_out": "output"
+          },
+          "connections": {
+            "data_in1": [ 7 ],
+            "data_in2": [ 6 ],
+            "data_out": [ 8 ]
+          }
+        },
+        "inst_i_arrayidx19_1": {
+          "hide_name": 0,
+          "type": "ALU",
+          "parameters": {
+            "OP": "00000000000000000000000000000000",
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "module_not_derived": "00000000000000000000000000000001",
+            "src": "./test.v:46.46-46.125|./PE_map.v:41.15-46.14"
+          },
+          "port_directions": {
+            "data_in1": "input",
+            "data_in2": "input",
+            "data_in3": "input",
+            "data_out": "output"
+          },
+          "connections": {
+            "data_in1": [ 6 ],
+            "data_in2": [ 7 ],
+            "data_in3": [ 2 ],
+            "data_out": [ 9 ]
+          }
+        },
+        "inst_i_cmp21": {
+          "hide_name": 0,
+          "type": "ALU",
+          "parameters": {
+            "OP": "00000000000000000000000000000010",
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "module_not_derived": "00000000000000000000000000000001",
+            "src": "./test.v:35.40-35.104|./PE_map.v:32.15-36.14"
+          },
+          "port_directions": {
+            "data_in1": "input",
+            "data_in2": "input",
+            "data_out": "output"
+          },
+          "connections": {
+            "data_in1": [ 8 ],
+            "data_in2": [ 10 ],
+            "data_out": [ 11 ]
+          }
+        },
+        "inst_i_cnt_2_reg2mem26": {
+          "hide_name": 0,
+          "type": "ALU",
+          "parameters": {
+            "OP": "00000000000000000000000000000100",
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "module_not_derived": "00000000000000000000000000000001",
+            "src": "./test.v:40.39-40.95|./PE_map.v:24.15-27.14"
+          },
+          "port_directions": {
+            "data_in1": "input",
+            "data_out": "output"
+          },
+          "connections": {
+            "data_in1": [ 12 ],
+            "data_out": [ 13 ]
+          }
+        },
+        "inst_i_edges": {
           "hide_name": 0,
           "type": "IO",
           "parameters": {
@@ -507,16 +762,82 @@
           },
           "attributes": {
             "module_not_derived": "00000000000000000000000000000001",
-            "src": "./test.v:13.26-13.43|./IO_map.v:20.15-22.14"
+            "src": "./test.v:33.26-33.51|./IO_map.v:20.15-22.14"
           },
           "port_directions": {
             "to_fabric": "output"
           },
           "connections": {
-            "to_fabric": [ 2 ]
+            "to_fabric": [ 4 ]
           }
         },
-        "inst_inB": {
+        "inst_i_exitcond_not": {
+          "hide_name": 0,
+          "type": "ALU",
+          "parameters": {
+            "OP": "00000000000000000000000000000010",
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "module_not_derived": "00000000000000000000000000000001",
+            "src": "./test.v:43.40-43.101|./PE_map.v:32.15-36.14"
+          },
+          "port_directions": {
+            "data_in1": "input",
+            "data_in2": "input",
+            "data_out": "output"
+          },
+          "connections": {
+            "data_in1": [ 14 ],
+            "data_in2": [ 3 ],
+            "data_out": [ 15 ]
+          }
+        },
+        "inst_i_inc": {
+          "hide_name": 0,
+          "type": "ALU",
+          "parameters": {
+            "OP": "00000000000000000000000000000011",
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "module_not_derived": "00000000000000000000000000000001",
+            "src": "./test.v:38.40-38.103|./PE_map.v:32.15-36.14"
+          },
+          "port_directions": {
+            "data_in1": "input",
+            "data_in2": "input",
+            "data_out": "output"
+          },
+          "connections": {
+            "data_in1": [ 16 ],
+            "data_in2": [ 17 ],
+            "data_out": [ 12 ]
+          }
+        },
+        "inst_i_inc27": {
+          "hide_name": 0,
+          "type": "ALU",
+          "parameters": {
+            "OP": "00000000000000000000000000000011",
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "module_not_derived": "00000000000000000000000000000001",
+            "src": "./test.v:41.40-41.107|./PE_map.v:32.15-36.14"
+          },
+          "port_directions": {
+            "data_in1": "input",
+            "data_in2": "input",
+            "data_out": "output"
+          },
+          "connections": {
+            "data_in1": [ 5 ],
+            "data_in2": [ 18 ],
+            "data_out": [ 14 ]
+          }
+        },
+        "inst_i_level": {
           "hide_name": 0,
           "type": "IO",
           "parameters": {
@@ -524,33 +845,96 @@
           },
           "attributes": {
             "module_not_derived": "00000000000000000000000000000001",
-            "src": "./test.v:14.26-14.43|./IO_map.v:20.15-22.14"
+            "src": "./test.v:34.26-34.51|./IO_map.v:20.15-22.14"
           },
           "port_directions": {
             "to_fabric": "output"
           },
           "connections": {
-            "to_fabric": [ 3 ]
+            "to_fabric": [ 7 ]
           }
         },
-        "inst_inC": {
+        "inst_inst_i_cmp21_const": {
           "hide_name": 0,
-          "type": "IO",
+          "type": "const_unit",
           "parameters": {
-            "WIDTH": "00000000000000000000000000000001"
           },
           "attributes": {
             "module_not_derived": "00000000000000000000000000000001",
-            "src": "./test.v:15.26-15.43|./IO_map.v:20.15-22.14"
+            "src": "./test.v:36.39-36.81|./const_map.v:13.20-13.53"
           },
           "port_directions": {
-            "to_fabric": "output"
+            "const_out": "output"
           },
           "connections": {
-            "to_fabric": [ 5 ]
+            "const_out": [ 10 ]
           }
         },
-        "out_b": {
+        "inst_inst_i_cnt_160_reg2mem28": {
+          "hide_name": 0,
+          "type": "reg_unit",
+          "parameters": {
+          },
+          "attributes": {
+            "module_not_derived": "00000000000000000000000000000001",
+            "src": "./test.v:31.24-31.78|./reg_map.v:12.18-12.49"
+          },
+          "port_directions": {
+            "reg_out": "output"
+          },
+          "connections": {
+            "reg_out": [ 16 ]
+          }
+        },
+        "inst_inst_i_e_061_reg2mem30": {
+          "hide_name": 0,
+          "type": "reg_unit",
+          "parameters": {
+          },
+          "attributes": {
+            "module_not_derived": "00000000000000000000000000000001",
+            "src": "./test.v:30.24-30.74|./reg_map.v:12.18-12.49"
+          },
+          "port_directions": {
+            "reg_out": "output"
+          },
+          "connections": {
+            "reg_out": [ 5 ]
+          }
+        },
+        "inst_inst_i_inc27_const": {
+          "hide_name": 0,
+          "type": "const_unit",
+          "parameters": {
+          },
+          "attributes": {
+            "module_not_derived": "00000000000000000000000000000001",
+            "src": "./test.v:42.37-42.79|./const_map.v:13.20-13.53"
+          },
+          "port_directions": {
+            "const_out": "output"
+          },
+          "connections": {
+            "const_out": [ 18 ]
+          }
+        },
+        "inst_inst_i_inc_const": {
+          "hide_name": 0,
+          "type": "const_unit",
+          "parameters": {
+          },
+          "attributes": {
+            "module_not_derived": "00000000000000000000000000000001",
+            "src": "./test.v:39.37-39.75|./const_map.v:13.20-13.53"
+          },
+          "port_directions": {
+            "const_out": "output"
+          },
+          "connections": {
+            "const_out": [ 17 ]
+          }
+        },
+        "out_i_arrayidx19_1": {
           "hide_name": 0,
           "type": "IO",
           "parameters": {
@@ -558,162 +942,556 @@
           },
           "attributes": {
             "module_not_derived": "00000000000000000000000000000001",
-            "src": "./test.v:10.27-10.39|./IO_map.v:26.15-28.14"
+            "src": "./test.v:29.27-29.65|./IO_map.v:26.15-28.14"
           },
           "port_directions": {
             "from_fabric": "input"
           },
           "connections": {
-            "from_fabric": [ 6 ]
+            "from_fabric": [ 9 ]
+          }
+        },
+        "out_i_cmp21": {
+          "hide_name": 0,
+          "type": "IO",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "module_not_derived": "00000000000000000000000000000001",
+            "src": "./test.v:26.27-26.51|./IO_map.v:26.15-28.14"
+          },
+          "port_directions": {
+            "from_fabric": "input"
+          },
+          "connections": {
+            "from_fabric": [ 11 ]
+          }
+        },
+        "out_i_cnt_2_reg2mem26": {
+          "hide_name": 0,
+          "type": "IO",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "module_not_derived": "00000000000000000000000000000001",
+            "src": "./test.v:27.27-27.71|./IO_map.v:26.15-28.14"
+          },
+          "port_directions": {
+            "from_fabric": "input"
+          },
+          "connections": {
+            "from_fabric": [ 13 ]
+          }
+        },
+        "out_i_exitcond_not": {
+          "hide_name": 0,
+          "type": "IO",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "module_not_derived": "00000000000000000000000000000001",
+            "src": "./test.v:28.27-28.65|./IO_map.v:26.15-28.14"
+          },
+          "port_directions": {
+            "from_fabric": "input"
+          },
+          "connections": {
+            "from_fabric": [ 15 ]
           }
         }
       },
       "netnames": {
-        "$techmap1\\inst_a.A": {
-          "hide_name": 1,
-          "bits": [ 7 ],
-          "attributes": {
-            "src": "./test.v:11.40-11.71|./PE_map.v:9.23-9.24"
-          }
-        },
-        "$techmap1\\inst_a.B": {
-          "hide_name": 1,
-          "bits": [ 8 ],
-          "attributes": {
-            "src": "./test.v:11.40-11.71|./PE_map.v:10.23-10.24"
-          }
-        },
-        "$techmap1\\inst_a.C": {
-          "hide_name": 1,
-          "bits": [ 9 ],
-          "attributes": {
-            "src": "./test.v:11.40-11.71|./PE_map.v:11.23-11.24"
-          }
-        },
-        "$techmap1\\inst_a.Y": {
-          "hide_name": 1,
-          "bits": [ 10 ],
-          "attributes": {
-            "src": "./test.v:11.40-11.71|./PE_map.v:12.24-12.25"
-          }
-        },
-        "$techmap2\\inst_b.A": {
-          "hide_name": 1,
-          "bits": [ 11 ],
-          "attributes": {
-            "src": "./test.v:12.40-12.69|./PE_map.v:9.23-9.24"
-          }
-        },
-        "$techmap2\\inst_b.B": {
-          "hide_name": 1,
-          "bits": [ 12 ],
-          "attributes": {
-            "src": "./test.v:12.40-12.69|./PE_map.v:10.23-10.24"
-          }
-        },
-        "$techmap2\\inst_b.C": {
-          "hide_name": 1,
-          "bits": [ 13 ],
-          "attributes": {
-            "src": "./test.v:12.40-12.69|./PE_map.v:11.23-11.24"
-          }
-        },
-        "$techmap2\\inst_b.Y": {
-          "hide_name": 1,
-          "bits": [ 14 ],
-          "attributes": {
-            "src": "./test.v:12.40-12.69|./PE_map.v:12.24-12.25"
-          }
-        },
-        "$techmap3\\out_b.A": {
-          "hide_name": 1,
-          "bits": [ 15 ],
-          "attributes": {
-            "src": "./test.v:10.27-10.39|./IO_map.v:9.23-9.24"
-          }
-        },
-        "$techmap3\\out_b.Y": {
-          "hide_name": 1,
-          "bits": [ 16 ],
-          "attributes": {
-            "src": "./test.v:10.27-10.39|./IO_map.v:10.24-10.25"
-          }
-        },
-        "$techmap4\\inst_inA.A": {
-          "hide_name": 1,
-          "bits": [ 17 ],
-          "attributes": {
-            "src": "./test.v:13.26-13.43|./IO_map.v:9.23-9.24"
-          }
-        },
-        "$techmap4\\inst_inA.Y": {
-          "hide_name": 1,
-          "bits": [ 18 ],
-          "attributes": {
-            "src": "./test.v:13.26-13.43|./IO_map.v:10.24-10.25"
-          }
-        },
-        "$techmap5\\inst_inB.A": {
+        "$techmap10\\out_i_cnt_2_reg2mem26.A": {
           "hide_name": 1,
           "bits": [ 19 ],
           "attributes": {
-            "src": "./test.v:14.26-14.43|./IO_map.v:9.23-9.24"
+            "src": "./test.v:27.27-27.71|./IO_map.v:9.23-9.24"
           }
         },
-        "$techmap5\\inst_inB.Y": {
+        "$techmap10\\out_i_cnt_2_reg2mem26.Y": {
           "hide_name": 1,
           "bits": [ 20 ],
           "attributes": {
-            "src": "./test.v:14.26-14.43|./IO_map.v:10.24-10.25"
+            "src": "./test.v:27.27-27.71|./IO_map.v:10.24-10.25"
           }
         },
-        "$techmap6\\inst_inC.A": {
+        "$techmap11\\out_i_exitcond_not.A": {
           "hide_name": 1,
           "bits": [ 21 ],
           "attributes": {
-            "src": "./test.v:15.26-15.43|./IO_map.v:9.23-9.24"
+            "src": "./test.v:28.27-28.65|./IO_map.v:9.23-9.24"
           }
         },
-        "$techmap6\\inst_inC.Y": {
+        "$techmap11\\out_i_exitcond_not.Y": {
           "hide_name": 1,
           "bits": [ 22 ],
           "attributes": {
-            "src": "./test.v:15.26-15.43|./IO_map.v:10.24-10.25"
+            "src": "./test.v:28.27-28.65|./IO_map.v:10.24-10.25"
           }
         },
-        "a": {
-          "hide_name": 0,
-          "bits": [ 4 ],
+        "$techmap12\\out_i_arrayidx19_1.A": {
+          "hide_name": 1,
+          "bits": [ 23 ],
           "attributes": {
-            "src": "./test.v:5.17-5.18"
+            "src": "./test.v:29.27-29.65|./IO_map.v:9.23-9.24"
           }
         },
-        "b": {
-          "hide_name": 0,
-          "bits": [ 6 ],
+        "$techmap12\\out_i_arrayidx19_1.Y": {
+          "hide_name": 1,
+          "bits": [ 24 ],
           "attributes": {
-            "src": "./test.v:9.17-9.18"
+            "src": "./test.v:29.27-29.65|./IO_map.v:10.24-10.25"
           }
         },
-        "inA": {
+        "$techmap13\\inst_i_edges.A": {
+          "hide_name": 1,
+          "bits": [ 25 ],
+          "attributes": {
+            "src": "./test.v:33.26-33.51|./IO_map.v:9.23-9.24"
+          }
+        },
+        "$techmap13\\inst_i_edges.Y": {
+          "hide_name": 1,
+          "bits": [ 26 ],
+          "attributes": {
+            "src": "./test.v:33.26-33.51|./IO_map.v:10.24-10.25"
+          }
+        },
+        "$techmap14\\inst_i_level.A": {
+          "hide_name": 1,
+          "bits": [ 27 ],
+          "attributes": {
+            "src": "./test.v:34.26-34.51|./IO_map.v:9.23-9.24"
+          }
+        },
+        "$techmap14\\inst_i_level.Y": {
+          "hide_name": 1,
+          "bits": [ 28 ],
+          "attributes": {
+            "src": "./test.v:34.26-34.51|./IO_map.v:10.24-10.25"
+          }
+        },
+        "$techmap15\\inst_i_0.A": {
+          "hide_name": 1,
+          "bits": [ 29 ],
+          "attributes": {
+            "src": "./test.v:37.26-37.43|./IO_map.v:9.23-9.24"
+          }
+        },
+        "$techmap15\\inst_i_0.Y": {
+          "hide_name": 1,
+          "bits": [ 30 ],
+          "attributes": {
+            "src": "./test.v:37.26-37.43|./IO_map.v:10.24-10.25"
+          }
+        },
+        "$techmap16\\inst_i_4.A": {
+          "hide_name": 1,
+          "bits": [ 31 ],
+          "attributes": {
+            "src": "./test.v:44.26-44.43|./IO_map.v:9.23-9.24"
+          }
+        },
+        "$techmap16\\inst_i_4.Y": {
+          "hide_name": 1,
+          "bits": [ 32 ],
+          "attributes": {
+            "src": "./test.v:44.26-44.43|./IO_map.v:10.24-10.25"
+          }
+        },
+        "$techmap17\\inst_inst_i_cmp21_const.Y": {
+          "hide_name": 1,
+          "bits": [ 33 ],
+          "attributes": {
+            "src": "./test.v:36.39-36.81|./const_map.v:10.22-10.23"
+          }
+        },
+        "$techmap18\\inst_inst_i_inc_const.Y": {
+          "hide_name": 1,
+          "bits": [ 34 ],
+          "attributes": {
+            "src": "./test.v:39.37-39.75|./const_map.v:10.22-10.23"
+          }
+        },
+        "$techmap19\\inst_inst_i_inc27_const.Y": {
+          "hide_name": 1,
+          "bits": [ 35 ],
+          "attributes": {
+            "src": "./test.v:42.37-42.79|./const_map.v:10.22-10.23"
+          }
+        },
+        "$techmap1\\inst_i_arrayidx18.A": {
+          "hide_name": 1,
+          "bits": [ 36 ],
+          "attributes": {
+            "src": "./test.v:32.44-32.115|./PE_map.v:9.23-9.24"
+          }
+        },
+        "$techmap1\\inst_i_arrayidx18.B": {
+          "hide_name": 1,
+          "bits": [ 37 ],
+          "attributes": {
+            "src": "./test.v:32.44-32.115|./PE_map.v:10.23-10.24"
+          }
+        },
+        "$techmap1\\inst_i_arrayidx18.C": {
+          "hide_name": 1,
+          "bits": [ 38 ],
+          "attributes": {
+            "src": "./test.v:32.44-32.115|./PE_map.v:11.23-11.24"
+          }
+        },
+        "$techmap1\\inst_i_arrayidx18.Y": {
+          "hide_name": 1,
+          "bits": [ 39 ],
+          "attributes": {
+            "src": "./test.v:32.44-32.115|./PE_map.v:12.24-12.25"
+          }
+        },
+        "$techmap20\\inst_inst_i_e_061_reg2mem30.Y": {
+          "hide_name": 1,
+          "bits": [ 40 ],
+          "attributes": {
+            "src": "./test.v:30.24-30.74|./reg_map.v:9.22-9.23"
+          }
+        },
+        "$techmap21\\inst_inst_i_cnt_160_reg2mem28.Y": {
+          "hide_name": 1,
+          "bits": [ 41 ],
+          "attributes": {
+            "src": "./test.v:31.24-31.78|./reg_map.v:9.22-9.23"
+          }
+        },
+        "$techmap2\\inst_i_arrayidx19_0.A": {
+          "hide_name": 1,
+          "bits": [ 42 ],
+          "attributes": {
+            "src": "./test.v:45.44-45.114|./PE_map.v:9.23-9.24"
+          }
+        },
+        "$techmap2\\inst_i_arrayidx19_0.B": {
+          "hide_name": 1,
+          "bits": [ 43 ],
+          "attributes": {
+            "src": "./test.v:45.44-45.114|./PE_map.v:10.23-10.24"
+          }
+        },
+        "$techmap2\\inst_i_arrayidx19_0.C": {
+          "hide_name": 1,
+          "bits": [ 44 ],
+          "attributes": {
+            "src": "./test.v:45.44-45.114|./PE_map.v:11.23-11.24"
+          }
+        },
+        "$techmap2\\inst_i_arrayidx19_0.Y": {
+          "hide_name": 1,
+          "bits": [ 45 ],
+          "attributes": {
+            "src": "./test.v:45.44-45.114|./PE_map.v:12.24-12.25"
+          }
+        },
+        "$techmap3\\inst_i_cmp21.A": {
+          "hide_name": 1,
+          "bits": [ 46 ],
+          "attributes": {
+            "src": "./test.v:35.40-35.104|./PE_map.v:9.23-9.24"
+          }
+        },
+        "$techmap3\\inst_i_cmp21.B": {
+          "hide_name": 1,
+          "bits": [ 47 ],
+          "attributes": {
+            "src": "./test.v:35.40-35.104|./PE_map.v:10.23-10.24"
+          }
+        },
+        "$techmap3\\inst_i_cmp21.C": {
+          "hide_name": 1,
+          "bits": [ 48 ],
+          "attributes": {
+            "src": "./test.v:35.40-35.104|./PE_map.v:11.23-11.24"
+          }
+        },
+        "$techmap3\\inst_i_cmp21.Y": {
+          "hide_name": 1,
+          "bits": [ 49 ],
+          "attributes": {
+            "src": "./test.v:35.40-35.104|./PE_map.v:12.24-12.25"
+          }
+        },
+        "$techmap4\\inst_i_inc.A": {
+          "hide_name": 1,
+          "bits": [ 50 ],
+          "attributes": {
+            "src": "./test.v:38.40-38.103|./PE_map.v:9.23-9.24"
+          }
+        },
+        "$techmap4\\inst_i_inc.B": {
+          "hide_name": 1,
+          "bits": [ 51 ],
+          "attributes": {
+            "src": "./test.v:38.40-38.103|./PE_map.v:10.23-10.24"
+          }
+        },
+        "$techmap4\\inst_i_inc.C": {
+          "hide_name": 1,
+          "bits": [ 52 ],
+          "attributes": {
+            "src": "./test.v:38.40-38.103|./PE_map.v:11.23-11.24"
+          }
+        },
+        "$techmap4\\inst_i_inc.Y": {
+          "hide_name": 1,
+          "bits": [ 53 ],
+          "attributes": {
+            "src": "./test.v:38.40-38.103|./PE_map.v:12.24-12.25"
+          }
+        },
+        "$techmap5\\inst_i_cnt_2_reg2mem26.A": {
+          "hide_name": 1,
+          "bits": [ 54 ],
+          "attributes": {
+            "src": "./test.v:40.39-40.95|./PE_map.v:9.23-9.24"
+          }
+        },
+        "$techmap5\\inst_i_cnt_2_reg2mem26.B": {
+          "hide_name": 1,
+          "bits": [ 55 ],
+          "attributes": {
+            "src": "./test.v:40.39-40.95|./PE_map.v:10.23-10.24"
+          }
+        },
+        "$techmap5\\inst_i_cnt_2_reg2mem26.C": {
+          "hide_name": 1,
+          "bits": [ 56 ],
+          "attributes": {
+            "src": "./test.v:40.39-40.95|./PE_map.v:11.23-11.24"
+          }
+        },
+        "$techmap5\\inst_i_cnt_2_reg2mem26.Y": {
+          "hide_name": 1,
+          "bits": [ 57 ],
+          "attributes": {
+            "src": "./test.v:40.39-40.95|./PE_map.v:12.24-12.25"
+          }
+        },
+        "$techmap6\\inst_i_inc27.A": {
+          "hide_name": 1,
+          "bits": [ 58 ],
+          "attributes": {
+            "src": "./test.v:41.40-41.107|./PE_map.v:9.23-9.24"
+          }
+        },
+        "$techmap6\\inst_i_inc27.B": {
+          "hide_name": 1,
+          "bits": [ 59 ],
+          "attributes": {
+            "src": "./test.v:41.40-41.107|./PE_map.v:10.23-10.24"
+          }
+        },
+        "$techmap6\\inst_i_inc27.C": {
+          "hide_name": 1,
+          "bits": [ 60 ],
+          "attributes": {
+            "src": "./test.v:41.40-41.107|./PE_map.v:11.23-11.24"
+          }
+        },
+        "$techmap6\\inst_i_inc27.Y": {
+          "hide_name": 1,
+          "bits": [ 61 ],
+          "attributes": {
+            "src": "./test.v:41.40-41.107|./PE_map.v:12.24-12.25"
+          }
+        },
+        "$techmap7\\inst_i_exitcond_not.A": {
+          "hide_name": 1,
+          "bits": [ 62 ],
+          "attributes": {
+            "src": "./test.v:43.40-43.101|./PE_map.v:9.23-9.24"
+          }
+        },
+        "$techmap7\\inst_i_exitcond_not.B": {
+          "hide_name": 1,
+          "bits": [ 63 ],
+          "attributes": {
+            "src": "./test.v:43.40-43.101|./PE_map.v:10.23-10.24"
+          }
+        },
+        "$techmap7\\inst_i_exitcond_not.C": {
+          "hide_name": 1,
+          "bits": [ 64 ],
+          "attributes": {
+            "src": "./test.v:43.40-43.101|./PE_map.v:11.23-11.24"
+          }
+        },
+        "$techmap7\\inst_i_exitcond_not.Y": {
+          "hide_name": 1,
+          "bits": [ 65 ],
+          "attributes": {
+            "src": "./test.v:43.40-43.101|./PE_map.v:12.24-12.25"
+          }
+        },
+        "$techmap8\\inst_i_arrayidx19_1.A": {
+          "hide_name": 1,
+          "bits": [ 66 ],
+          "attributes": {
+            "src": "./test.v:46.46-46.125|./PE_map.v:9.23-9.24"
+          }
+        },
+        "$techmap8\\inst_i_arrayidx19_1.B": {
+          "hide_name": 1,
+          "bits": [ 67 ],
+          "attributes": {
+            "src": "./test.v:46.46-46.125|./PE_map.v:10.23-10.24"
+          }
+        },
+        "$techmap8\\inst_i_arrayidx19_1.C": {
+          "hide_name": 1,
+          "bits": [ 68 ],
+          "attributes": {
+            "src": "./test.v:46.46-46.125|./PE_map.v:11.23-11.24"
+          }
+        },
+        "$techmap8\\inst_i_arrayidx19_1.Y": {
+          "hide_name": 1,
+          "bits": [ 69 ],
+          "attributes": {
+            "src": "./test.v:46.46-46.125|./PE_map.v:12.24-12.25"
+          }
+        },
+        "$techmap9\\out_i_cmp21.A": {
+          "hide_name": 1,
+          "bits": [ 70 ],
+          "attributes": {
+            "src": "./test.v:26.27-26.51|./IO_map.v:9.23-9.24"
+          }
+        },
+        "$techmap9\\out_i_cmp21.Y": {
+          "hide_name": 1,
+          "bits": [ 71 ],
+          "attributes": {
+            "src": "./test.v:26.27-26.51|./IO_map.v:10.24-10.25"
+          }
+        },
+        "i_0": {
           "hide_name": 0,
           "bits": [ 2 ],
           "attributes": {
-            "src": "./test.v:6.17-6.20"
+            "src": "./test.v:15.17-15.20"
           }
         },
-        "inB": {
+        "i_4": {
           "hide_name": 0,
           "bits": [ 3 ],
           "attributes": {
-            "src": "./test.v:7.17-7.20"
+            "src": "./test.v:20.17-20.20"
           }
         },
-        "inC": {
+        "i_arrayidx18": {
+          "hide_name": 0,
+          "bits": [ 6 ],
+          "attributes": {
+            "src": "./test.v:11.17-11.29"
+          }
+        },
+        "i_arrayidx19_0": {
+          "hide_name": 0,
+          "bits": [ 8 ],
+          "attributes": {
+            "src": "./test.v:21.17-21.31"
+          }
+        },
+        "i_arrayidx19_1": {
+          "hide_name": 0,
+          "bits": [ 9 ],
+          "attributes": {
+            "src": "./test.v:25.17-25.31"
+          }
+        },
+        "i_cmp21": {
+          "hide_name": 0,
+          "bits": [ 11 ],
+          "attributes": {
+            "src": "./test.v:22.17-22.24"
+          }
+        },
+        "i_cmp21_const": {
+          "hide_name": 0,
+          "bits": [ 10 ],
+          "attributes": {
+            "src": "./test.v:14.17-14.30"
+          }
+        },
+        "i_cnt_160_reg2mem28": {
+          "hide_name": 0,
+          "bits": [ 16 ],
+          "attributes": {
+            "src": "./test.v:10.17-10.36"
+          }
+        },
+        "i_cnt_2_reg2mem26": {
+          "hide_name": 0,
+          "bits": [ 13 ],
+          "attributes": {
+            "src": "./test.v:23.17-23.34"
+          }
+        },
+        "i_e_061_reg2mem30": {
           "hide_name": 0,
           "bits": [ 5 ],
           "attributes": {
-            "src": "./test.v:8.17-8.20"
+            "src": "./test.v:9.17-9.34"
+          }
+        },
+        "i_edges": {
+          "hide_name": 0,
+          "bits": [ 4 ],
+          "attributes": {
+            "src": "./test.v:12.17-12.24"
+          }
+        },
+        "i_exitcond_not": {
+          "hide_name": 0,
+          "bits": [ 15 ],
+          "attributes": {
+            "src": "./test.v:24.17-24.31"
+          }
+        },
+        "i_inc": {
+          "hide_name": 0,
+          "bits": [ 12 ],
+          "attributes": {
+            "src": "./test.v:16.17-16.22"
+          }
+        },
+        "i_inc27": {
+          "hide_name": 0,
+          "bits": [ 14 ],
+          "attributes": {
+            "src": "./test.v:18.17-18.24"
+          }
+        },
+        "i_inc27_const": {
+          "hide_name": 0,
+          "bits": [ 18 ],
+          "attributes": {
+            "src": "./test.v:19.17-19.30"
+          }
+        },
+        "i_inc_const": {
+          "hide_name": 0,
+          "bits": [ 17 ],
+          "attributes": {
+            "src": "./test.v:17.17-17.28"
+          }
+        },
+        "i_level": {
+          "hide_name": 0,
+          "bits": [ 7 ],
+          "attributes": {
+            "src": "./test.v:13.17-13.24"
           }
         }
       }

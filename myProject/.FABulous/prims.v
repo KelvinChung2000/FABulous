@@ -37,6 +37,30 @@ module ALU #(
 
 endmodule
 
+module const_unit #(
+    parameter NoConfigBits = 3
+) (
+    input wire rst,
+    input wire en,
+    (* FABulous, USER_CLK *) input wire clk,
+    (* FABulous, BUS *) output wire [7:0] const_out,
+    (* FABulous, CONFIG_BIT, INIT *) input [NoConfigBits:0] ConfigBits
+);
+
+endmodule
+
+module reg_unit #(
+    parameter NoConfigBits = 3
+) (
+    input wire rst,
+    input wire en,
+    (* FABulous, USER_CLK *) input wire clk,
+    (* FABulous, BUS *) output wire [7:0] reg_out,
+    (* FABulous, CONFIG_BIT, INIT *) input [NoConfigBits:0] ConfigBits
+);
+
+endmodule
+
 module IO #(
 ) (
     (* FABulous, BUS *) input from_fabric,

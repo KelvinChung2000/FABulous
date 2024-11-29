@@ -5,6 +5,7 @@ import networkx as nx
 module = "module {name} #(parameter WIDTH=32);\n\n{body}\nendmodule\n"
 wireTemplate = "wire[WIDTH-1:0] {source};\n"
 constOp = "ConstOp #(.CONST({CONST}), .WIDTH(WIDTH)) inst_{value}(.Y({Y}));\n"
+regOp = "RegOp #(.WIDTH(WIDTH)) inst_{value}(.Y({Y}));\n"
 unOp = "UnaryOp #(.OP({OP}), .WIDTH(WIDTH)) inst_{value}(.A({A}), .Y({Y}));\n"
 binOp = (
     "BinaryOp #(.OP({OP}), .WIDTH(WIDTH)) inst_{value}(.A({A}), .B({B}), .Y({Y}));\n"
@@ -50,6 +51,8 @@ def dotToVerilog(dotFile: Path, verilogFile: Path):
                 body += constOp.format(
                     CONST=G.nodes[node]["constVal"], value=f"inst_{node}", Y=node
                 )
+            elif G.nodes[node]["type"] == "reg":
+                body += regOp.format(value=f"inst_{node}", Y=node)
             else:
                 body += constOp.format(CONST=0, value=f"inst_{node}", Y=node)
 
@@ -99,6 +102,6 @@ def dotToVerilog(dotFile: Path, verilogFile: Path):
 
 if __name__ == "__main__":
     dotToVerilog(
-        Path.cwd() / "myProject/PnR/test.simple.dot",
+        Path.cwd() / "myProject/PnR/test.dfg.dot",
         Path.cwd() / "myProject/PnR/test.v",
     )

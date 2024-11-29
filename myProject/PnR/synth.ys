@@ -7,6 +7,8 @@ proc
 opt;;;
 techmap -map ./PE_map.v -max_iter 1
 techmap -map ./IO_map.v -max_iter 1
+techmap -map ./const_map.v -max_iter 1
+techmap -map ./reg_map.v -max_iter 1
 stat
 write_json ./test.json
 write_verilog ./test_synth.v

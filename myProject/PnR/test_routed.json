@@ -1,5 +1,5 @@
 {
-  "creator": "Next Generation Place and Route (Version d30b73ea)",
+  "creator": "Next Generation Place and Route (Version 95f51e39)",
   "modules": {
     "top": {
       "settings": {
@@ -9,17 +9,6 @@
         "router1/fullCleanupReroute": "1 ",
         "router1/cleanupReroute": "1 ",
         "router1/maxIterCnt": "200",
-        "router2/perfProfile": "0 ",
-        "router2/estimateWeight": "1.250000",
-        "router2/currCongWeightMult": "2.000000",
-        "router2/histCongWeight": "1.000000",
-        "router2/initCurrCongWeight": "0.500000",
-        "router2/biasCostFactor": "0.250000",
-        "router2/ipinCostAdder": "0.000000",
-        "router2/bbMargin/y": "3",
-        "router2/bbMargin/x": "3",
-        "router2/glbBwdMaxIter": "200",
-        "router2/bwdMaxIter": "20",
         "place": "00000000000000000000000000000001",
         "placer1/startTemp": "1.000000",
         "placer1/minBelsForGridPick": "64",
@@ -34,25 +23,25 @@
         "placerHeap/criticalityExponent": "2",
         "placerHeap/beta": "0.900000",
         "placerHeap/alpha": "0.100000",
-        "seed": "0011000101000001010110010010011001010011010110001001011110010011",
+        "seed": "0110100001101000110101000000011010111010101011100111000100010001",
         "arch.type": " ",
         "arch.name": "ARCHNAME",
+        "router": "router1",
         "placer": "heap",
         "auto_freq": "00000000000000000000000000000000",
         "slack_redist_iter": "00000000000000000000000000000000",
         "timing_driven": "00000000000000000000000000000001",
-        "target_freq": "12000000.000000",
-        "router": "router2"
+        "target_freq": "12000000.000000"
       },
       "attributes": {
         "top": "00000000000000000000000000000001",
-        "src": "./test.v:1.1-17.10",
+        "src": "./test.v:1.1-48.10",
         "dynports": "00000000000000000000000000000001"
       },
       "ports": {
       },
       "cells": {
-        "out_b": {
+        "out_i_exitcond_not": {
           "hide_name": 0,
           "type": "IO",
           "parameters": {
@@ -60,18 +49,165 @@
           },
           "attributes": {
             "BEL_STRENGTH": "00000000000000000000000000000001",
-            "NEXTPNR_BEL": "X2Y0/0_N_IO",
-            "src": "./test.v:10.27-10.39|./IO_map.v:26.15-28.14",
+            "NEXTPNR_BEL": "X0Y1/3_W_IO",
+            "src": "./test.v:28.27-28.65|./IO_map.v:26.15-28.14",
             "module_not_derived": "00000000000000000000000000000001"
           },
           "port_directions": {
             "from_fabric": "input"
           },
           "connections": {
-            "from_fabric": [ 228 ]
+            "from_fabric": [ 358 ]
           }
         },
-        "inst_inC": {
+        "out_i_cnt_2_reg2mem26": {
+          "hide_name": 0,
+          "type": "IO",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "BEL_STRENGTH": "00000000000000000000000000000001",
+            "NEXTPNR_BEL": "X0Y3/3_W_IO",
+            "src": "./test.v:27.27-27.71|./IO_map.v:26.15-28.14",
+            "module_not_derived": "00000000000000000000000000000001"
+          },
+          "port_directions": {
+            "from_fabric": "input"
+          },
+          "connections": {
+            "from_fabric": [ 354 ]
+          }
+        },
+        "out_i_cmp21": {
+          "hide_name": 0,
+          "type": "IO",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "BEL_STRENGTH": "00000000000000000000000000000001",
+            "NEXTPNR_BEL": "X0Y2/3_W_IO",
+            "src": "./test.v:26.27-26.51|./IO_map.v:26.15-28.14",
+            "module_not_derived": "00000000000000000000000000000001"
+          },
+          "port_directions": {
+            "from_fabric": "input"
+          },
+          "connections": {
+            "from_fabric": [ 351 ]
+          }
+        },
+        "out_i_arrayidx19_1": {
+          "hide_name": 0,
+          "type": "IO",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "BEL_STRENGTH": "00000000000000000000000000000001",
+            "NEXTPNR_BEL": "X2Y0/3_S_IO",
+            "src": "./test.v:29.27-29.65|./IO_map.v:26.15-28.14",
+            "module_not_derived": "00000000000000000000000000000001"
+          },
+          "port_directions": {
+            "from_fabric": "input"
+          },
+          "connections": {
+            "from_fabric": [ 348 ]
+          }
+        },
+        "inst_inst_i_inc_const": {
+          "hide_name": 0,
+          "type": "const_unit",
+          "parameters": {
+          },
+          "attributes": {
+            "BEL_STRENGTH": "00000000000000000000000000000001",
+            "NEXTPNR_BEL": "X1Y1/0_const_unit",
+            "src": "./test.v:39.37-39.75|./const_map.v:13.20-13.53",
+            "module_not_derived": "00000000000000000000000000000001"
+          },
+          "port_directions": {
+            "const_out": "output"
+          },
+          "connections": {
+            "const_out": [ 361 ]
+          }
+        },
+        "inst_inst_i_inc27_const": {
+          "hide_name": 0,
+          "type": "const_unit",
+          "parameters": {
+          },
+          "attributes": {
+            "BEL_STRENGTH": "00000000000000000000000000000001",
+            "NEXTPNR_BEL": "X2Y1/1_const_unit",
+            "src": "./test.v:42.37-42.79|./const_map.v:13.20-13.53",
+            "module_not_derived": "00000000000000000000000000000001"
+          },
+          "port_directions": {
+            "const_out": "output"
+          },
+          "connections": {
+            "const_out": [ 363 ]
+          }
+        },
+        "inst_inst_i_e_061_reg2mem30": {
+          "hide_name": 0,
+          "type": "reg_unit",
+          "parameters": {
+          },
+          "attributes": {
+            "BEL_STRENGTH": "00000000000000000000000000000001",
+            "NEXTPNR_BEL": "X2Y1/0_reg_unit",
+            "src": "./test.v:30.24-30.74|./reg_map.v:12.18-12.49",
+            "module_not_derived": "00000000000000000000000000000001"
+          },
+          "port_directions": {
+            "reg_out": "output"
+          },
+          "connections": {
+            "reg_out": [ 341 ]
+          }
+        },
+        "inst_inst_i_cnt_160_reg2mem28": {
+          "hide_name": 0,
+          "type": "reg_unit",
+          "parameters": {
+          },
+          "attributes": {
+            "BEL_STRENGTH": "00000000000000000000000000000001",
+            "NEXTPNR_BEL": "X1Y1/0_reg_unit",
+            "src": "./test.v:31.24-31.78|./reg_map.v:12.18-12.49",
+            "module_not_derived": "00000000000000000000000000000001"
+          },
+          "port_directions": {
+            "reg_out": "output"
+          },
+          "connections": {
+            "reg_out": [ 360 ]
+          }
+        },
+        "inst_inst_i_cmp21_const": {
+          "hide_name": 0,
+          "type": "const_unit",
+          "parameters": {
+          },
+          "attributes": {
+            "BEL_STRENGTH": "00000000000000000000000000000001",
+            "NEXTPNR_BEL": "X1Y2/1_const_unit",
+            "src": "./test.v:36.39-36.81|./const_map.v:13.20-13.53",
+            "module_not_derived": "00000000000000000000000000000001"
+          },
+          "port_directions": {
+            "const_out": "output"
+          },
+          "connections": {
+            "const_out": [ 350 ]
+          }
+        },
+        "inst_i_level": {
           "hide_name": 0,
           "type": "IO",
           "parameters": {
@@ -80,17 +216,89 @@
           "attributes": {
             "BEL_STRENGTH": "00000000000000000000000000000001",
             "NEXTPNR_BEL": "X0Y2/0_W_IO",
-            "src": "./test.v:15.26-15.43|./IO_map.v:20.15-22.14",
+            "src": "./test.v:34.26-34.51|./IO_map.v:20.15-22.14",
             "module_not_derived": "00000000000000000000000000000001"
           },
           "port_directions": {
             "to_fabric": "output"
           },
           "connections": {
-            "to_fabric": [ 227 ]
+            "to_fabric": [ 345 ]
           }
         },
-        "inst_inB": {
+        "inst_i_inc27": {
+          "hide_name": 0,
+          "type": "ALU",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001",
+            "OP": "00000000000000000000000000000011"
+          },
+          "attributes": {
+            "BEL_STRENGTH": "00000000000000000000000000000001",
+            "NEXTPNR_BEL": "X2Y1/1_ALU",
+            "src": "./test.v:41.40-41.107|./PE_map.v:32.15-36.14",
+            "module_not_derived": "00000000000000000000000000000001"
+          },
+          "port_directions": {
+            "data_out": "output",
+            "data_in2": "input",
+            "data_in1": "input"
+          },
+          "connections": {
+            "data_out": [ 357 ],
+            "data_in2": [ 363 ],
+            "data_in1": [ 341 ]
+          }
+        },
+        "inst_i_inc": {
+          "hide_name": 0,
+          "type": "ALU",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001",
+            "OP": "00000000000000000000000000000011"
+          },
+          "attributes": {
+            "BEL_STRENGTH": "00000000000000000000000000000001",
+            "NEXTPNR_BEL": "X1Y1/0_ALU",
+            "src": "./test.v:38.40-38.103|./PE_map.v:32.15-36.14",
+            "module_not_derived": "00000000000000000000000000000001"
+          },
+          "port_directions": {
+            "data_out": "output",
+            "data_in2": "input",
+            "data_in1": "input"
+          },
+          "connections": {
+            "data_out": [ 353 ],
+            "data_in2": [ 361 ],
+            "data_in1": [ 360 ]
+          }
+        },
+        "inst_i_exitcond_not": {
+          "hide_name": 0,
+          "type": "ALU",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001",
+            "OP": "00000000000000000000000000000010"
+          },
+          "attributes": {
+            "BEL_STRENGTH": "00000000000000000000000000000001",
+            "NEXTPNR_BEL": "X1Y1/1_ALU",
+            "src": "./test.v:43.40-43.101|./PE_map.v:32.15-36.14",
+            "module_not_derived": "00000000000000000000000000000001"
+          },
+          "port_directions": {
+            "data_out": "output",
+            "data_in2": "input",
+            "data_in1": "input"
+          },
+          "connections": {
+            "data_out": [ 358 ],
+            "data_in2": [ 338 ],
+            "data_in1": [ 357 ]
+          }
+        },
+        "inst_i_edges": {
           "hide_name": 0,
           "type": "IO",
           "parameters": {
@@ -98,37 +306,64 @@
           },
           "attributes": {
             "BEL_STRENGTH": "00000000000000000000000000000001",
-            "NEXTPNR_BEL": "X1Y0/0_N_IO",
-            "src": "./test.v:14.26-14.43|./IO_map.v:20.15-22.14",
+            "NEXTPNR_BEL": "X0Y3/0_W_IO",
+            "src": "./test.v:33.26-33.51|./IO_map.v:20.15-22.14",
             "module_not_derived": "00000000000000000000000000000001"
           },
           "port_directions": {
             "to_fabric": "output"
           },
           "connections": {
-            "to_fabric": [ 221 ]
+            "to_fabric": [ 340 ]
           }
         },
-        "inst_inA": {
+        "inst_i_cnt_2_reg2mem26": {
           "hide_name": 0,
-          "type": "IO",
+          "type": "ALU",
           "parameters": {
-            "WIDTH": "00000000000000000000000000000001"
+            "WIDTH": "00000000000000000000000000000001",
+            "OP": "00000000000000000000000000000100"
           },
           "attributes": {
             "BEL_STRENGTH": "00000000000000000000000000000001",
-            "NEXTPNR_BEL": "X0Y1/0_W_IO",
-            "src": "./test.v:13.26-13.43|./IO_map.v:20.15-22.14",
+            "NEXTPNR_BEL": "X1Y3/1_ALU",
+            "src": "./test.v:40.39-40.95|./PE_map.v:24.15-27.14",
             "module_not_derived": "00000000000000000000000000000001"
           },
           "port_directions": {
-            "to_fabric": "output"
+            "data_out": "output",
+            "data_in1": "input"
           },
           "connections": {
-            "to_fabric": [ 220 ]
+            "data_out": [ 354 ],
+            "data_in1": [ 353 ]
           }
         },
-        "inst_b": {
+        "inst_i_cmp21": {
+          "hide_name": 0,
+          "type": "ALU",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001",
+            "OP": "00000000000000000000000000000010"
+          },
+          "attributes": {
+            "BEL_STRENGTH": "00000000000000000000000000000001",
+            "NEXTPNR_BEL": "X1Y2/1_ALU",
+            "src": "./test.v:35.40-35.104|./PE_map.v:32.15-36.14",
+            "module_not_derived": "00000000000000000000000000000001"
+          },
+          "port_directions": {
+            "data_out": "output",
+            "data_in2": "input",
+            "data_in1": "input"
+          },
+          "connections": {
+            "data_out": [ 351 ],
+            "data_in2": [ 350 ],
+            "data_in1": [ 346 ]
+          }
+        },
+        "inst_i_arrayidx19_1": {
           "hide_name": 0,
           "type": "ALU",
           "parameters": {
@@ -138,31 +373,33 @@
           "attributes": {
             "BEL_STRENGTH": "00000000000000000000000000000001",
             "NEXTPNR_BEL": "X2Y1/0_ALU",
-            "src": "./test.v:12.40-12.69|./PE_map.v:35.15-39.14",
+            "src": "./test.v:46.46-46.125|./PE_map.v:41.15-46.14",
             "module_not_derived": "00000000000000000000000000000001"
           },
           "port_directions": {
             "data_out": "output",
+            "data_in3": "input",
             "data_in2": "input",
             "data_in1": "input"
           },
           "connections": {
-            "data_out": [ 228 ],
-            "data_in2": [ 227 ],
-            "data_in1": [ 222 ]
+            "data_out": [ 348 ],
+            "data_in3": [ 334 ],
+            "data_in2": [ 345 ],
+            "data_in1": [ 342 ]
           }
         },
-        "inst_a": {
+        "inst_i_arrayidx19_0": {
           "hide_name": 0,
           "type": "ALU",
           "parameters": {
             "WIDTH": "00000000000000000000000000000001",
-            "OP": "00000000000000000000000000000000"
+            "OP": "00000000000000000000000000000001"
           },
           "attributes": {
             "BEL_STRENGTH": "00000000000000000000000000000001",
-            "NEXTPNR_BEL": "X1Y1/0_ALU",
-            "src": "./test.v:11.40-11.71|./PE_map.v:35.15-39.14",
+            "NEXTPNR_BEL": "X2Y2/1_ALU",
+            "src": "./test.v:45.44-45.114|./PE_map.v:32.15-36.14",
             "module_not_derived": "00000000000000000000000000000001"
           },
           "port_directions": {
@@ -171,51 +408,209 @@
             "data_in1": "input"
           },
           "connections": {
-            "data_out": [ 222 ],
-            "data_in2": [ 221 ],
-            "data_in1": [ 220 ]
+            "data_out": [ 346 ],
+            "data_in2": [ 342 ],
+            "data_in1": [ 345 ]
+          }
+        },
+        "inst_i_arrayidx18": {
+          "hide_name": 0,
+          "type": "ALU",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001",
+            "OP": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "BEL_STRENGTH": "00000000000000000000000000000001",
+            "NEXTPNR_BEL": "X2Y2/0_ALU",
+            "src": "./test.v:32.44-32.115|./PE_map.v:32.15-36.14",
+            "module_not_derived": "00000000000000000000000000000001"
+          },
+          "port_directions": {
+            "data_out": "output",
+            "data_in2": "input",
+            "data_in1": "input"
+          },
+          "connections": {
+            "data_out": [ 342 ],
+            "data_in2": [ 341 ],
+            "data_in1": [ 340 ]
+          }
+        },
+        "inst_i_4": {
+          "hide_name": 0,
+          "type": "IO",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "BEL_STRENGTH": "00000000000000000000000000000001",
+            "NEXTPNR_BEL": "X1Y0/1_S_IO",
+            "src": "./test.v:44.26-44.43|./IO_map.v:20.15-22.14",
+            "module_not_derived": "00000000000000000000000000000001"
+          },
+          "port_directions": {
+            "to_fabric": "output"
+          },
+          "connections": {
+            "to_fabric": [ 338 ]
+          }
+        },
+        "inst_i_0": {
+          "hide_name": 0,
+          "type": "IO",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "BEL_STRENGTH": "00000000000000000000000000000001",
+            "NEXTPNR_BEL": "X2Y0/0_S_IO",
+            "src": "./test.v:37.26-37.43|./IO_map.v:20.15-22.14",
+            "module_not_derived": "00000000000000000000000000000001"
+          },
+          "port_directions": {
+            "to_fabric": "output"
+          },
+          "connections": {
+            "to_fabric": [ 334 ]
           }
         }
       },
       "netnames": {
-        "b": {
+        "i_inc27_const": {
           "hide_name": 0,
-          "bits": [ 228 ] ,
+          "bits": [ 363 ] ,
           "attributes": {
-            "ROUTING": "X2Y1/0_out0;X2Y1/0_out0/0_data_out;1;X2Y0/0_from_fabric;X2Y0/0_from_fabric/0_in2;1;X2Y1/0_data_out;;1",
-            "src": "./test.v:9.17-9.18"
+            "ROUTING": "X2Y1/1_const_out;;1;X2Y1/1_data_in2;X2Y1/1_data_in2/1_const_out;1",
+            "src": "./test.v:19.17-19.30"
           }
         },
-        "inC": {
+        "i_inc_const": {
           "hide_name": 0,
-          "bits": [ 227 ] ,
+          "bits": [ 361 ] ,
           "attributes": {
-            "ROUTING": "X0Y2/0_out1;X0Y2/0_out1/0_to_fabric;1;X1Y2/0_out0;X1Y2/0_out0/0_in3;1;X2Y2/0_out0;X2Y2/0_out0/0_in3;1;X2Y1/0_data_in2;X2Y1/0_data_in2/0_in2;1;X0Y2/0_to_fabric;;1",
-            "src": "./test.v:8.17-8.20"
+            "ROUTING": "X1Y1/0_const_out;;1;X1Y1/0_data_in2;X1Y1/0_data_in2/0_const_out;1",
+            "src": "./test.v:17.17-17.28"
           }
         },
-        "a": {
+        "i_cnt_160_reg2mem28": {
           "hide_name": 0,
-          "bits": [ 222 ] ,
+          "bits": [ 360 ] ,
           "attributes": {
-            "ROUTING": "X1Y1/0_out0;X1Y1/0_out0/0_data_out;1;X2Y1/0_data_in1;X2Y1/0_data_in1/0_in3;1;X1Y1/0_data_out;;1",
-            "src": "./test.v:5.17-5.18"
+            "ROUTING": "X1Y1/0_reg_out;;1;X1Y1/0_data_in1;X1Y1/0_data_in1/0_reg_out;1",
+            "src": "./test.v:10.17-10.36"
           }
         },
-        "inB": {
+        "i_exitcond_not": {
           "hide_name": 0,
-          "bits": [ 221 ] ,
+          "bits": [ 358 ] ,
           "attributes": {
-            "ROUTING": "X1Y0/0_out2;X1Y0/0_out2/0_to_fabric;1;X1Y1/0_data_in2;X1Y1/0_data_in2/0_in0;1;X1Y0/0_to_fabric;;1",
-            "src": "./test.v:7.17-7.20"
+            "ROUTING": "X1Y1/1_data_out;;1;X1Y1/1_out0_internal;X1Y1/1_out0_internal/1_data_out;1;X1Y1/1_to_3_NextCycle;X1Y1/1_to_3_NextCycle/1_out0_internal;1;X1Y1/3_out3;X1Y1/3_out3/1_to_3_NextCycle;1;X0Y1/3_from_fabric;X0Y1/3_from_fabric/3_in1;1",
+            "src": "./test.v:24.17-24.31"
           }
         },
-        "inA": {
+        "i_inc27": {
           "hide_name": 0,
-          "bits": [ 220 ] ,
+          "bits": [ 357 ] ,
           "attributes": {
-            "ROUTING": "X0Y1/0_out1;X0Y1/0_out1/0_to_fabric;1;X1Y1/0_data_in1;X1Y1/0_data_in1/0_in3;1;X0Y1/0_to_fabric;;1",
-            "src": "./test.v:6.17-6.20"
+            "ROUTING": "X2Y1/1_data_out;;1;X2Y1/1_out3_internal;X2Y1/1_out3_internal/1_data_out;1;X2Y1/1_out3;X2Y1/1_out3/1_out3_internal;1;X1Y1/1_data_in1;X1Y1/1_data_in1/1_in1;1",
+            "src": "./test.v:18.17-18.24"
+          }
+        },
+        "i_cnt_2_reg2mem26": {
+          "hide_name": 0,
+          "bits": [ 354 ] ,
+          "attributes": {
+            "ROUTING": "X1Y3/1_data_out;;1;X1Y3/1_out0_internal;X1Y3/1_out0_internal/1_data_out;1;X1Y3/1_to_3_NextCycle;X1Y3/1_to_3_NextCycle/1_out0_internal;1;X1Y3/3_out3;X1Y3/3_out3/1_to_3_NextCycle;1;X0Y3/3_from_fabric;X0Y3/3_from_fabric/3_in1;1",
+            "src": "./test.v:23.17-23.34"
+          }
+        },
+        "i_inc": {
+          "hide_name": 0,
+          "bits": [ 353 ] ,
+          "attributes": {
+            "ROUTING": "X1Y1/0_data_out;;1;X1Y1/0_out0_internal;X1Y1/0_out0_internal/0_data_out;1;X1Y1/0_out0;X1Y1/0_out0/0_out0_internal;1;X1Y2/0_out3_internal;X1Y2/0_out3_internal/0_in2;1;X1Y2/0_to_1_NextCycle;X1Y2/0_to_1_NextCycle/0_out3_internal;1;X1Y2/1_out0;X1Y2/1_out0/0_to_1_NextCycle;1;X1Y3/1_data_in1;X1Y3/1_data_in1/1_in2;1",
+            "src": "./test.v:16.17-16.22"
+          }
+        },
+        "i_cmp21": {
+          "hide_name": 0,
+          "bits": [ 351 ] ,
+          "attributes": {
+            "ROUTING": "X1Y2/1_data_out;;1;X1Y2/1_out3_internal;X1Y2/1_out3_internal/1_data_out;1;X1Y2/1_to_3_NextCycle;X1Y2/1_to_3_NextCycle/1_out3_internal;1;X1Y2/3_out3;X1Y2/3_out3/1_to_3_NextCycle;1;X0Y2/3_from_fabric;X0Y2/3_from_fabric/3_in1;1",
+            "src": "./test.v:22.17-22.24"
+          }
+        },
+        "i_cmp21_const": {
+          "hide_name": 0,
+          "bits": [ 350 ] ,
+          "attributes": {
+            "ROUTING": "X1Y2/1_const_out;;1;X1Y2/1_data_in2;X1Y2/1_data_in2/1_const_out;1",
+            "src": "./test.v:14.17-14.30"
+          }
+        },
+        "i_arrayidx19_1": {
+          "hide_name": 0,
+          "bits": [ 348 ] ,
+          "attributes": {
+            "ROUTING": "X2Y1/0_data_out;;1;X2Y1/0_out2_internal;X2Y1/0_out2_internal/0_data_out;1;X2Y1/0_to_3_NextCycle;X2Y1/0_to_3_NextCycle/0_out2_internal;1;X2Y1/3_out2;X2Y1/3_out2/0_to_3_NextCycle;1;X2Y0/3_from_fabric;X2Y0/3_from_fabric/3_in0;1",
+            "src": "./test.v:25.17-25.31"
+          }
+        },
+        "i_arrayidx19_0": {
+          "hide_name": 0,
+          "bits": [ 346 ] ,
+          "attributes": {
+            "ROUTING": "X2Y2/1_data_out;;1;X2Y2/1_out3_internal;X2Y2/1_out3_internal/1_data_out;1;X2Y2/1_out3;X2Y2/1_out3/1_out3_internal;1;X1Y2/1_data_in1;X1Y2/1_data_in1/1_in1;1",
+            "src": "./test.v:21.17-21.31"
+          }
+        },
+        "i_level": {
+          "hide_name": 0,
+          "bits": [ 345 ] ,
+          "attributes": {
+            "ROUTING": "X1Y1/0_to_1_NextCycle;X1Y1/0_to_1_NextCycle/0_out1_internal;1;X1Y1/1_out0;X1Y1/1_out0/0_to_1_NextCycle;1;X1Y2/1_out1_internal;X1Y2/1_out1_internal/1_in2;1;X1Y2/1_out1;X1Y2/1_out1/1_out1_internal;1;X2Y2/1_data_in1;X2Y2/1_data_in1/1_in3;1;X0Y2/0_to_fabric;;1;X0Y2/0_out1_internal;X0Y2/0_out1_internal/0_to_fabric;1;X0Y2/0_out1;X0Y2/0_out1/0_out1_internal;1;X1Y2/0_out2_internal;X1Y2/0_out2_internal/0_in3;1;X1Y2/0_out2;X1Y2/0_out2/0_out2_internal;1;X1Y1/0_out1_internal;X1Y1/0_out1_internal/0_in0;1;X1Y1/0_out1;X1Y1/0_out1/0_out1_internal;1;X2Y1/0_data_in2;X2Y1/0_data_in2/0_in3;1",
+            "src": "./test.v:13.17-13.24"
+          }
+        },
+        "i_arrayidx18": {
+          "hide_name": 0,
+          "bits": [ 342 ] ,
+          "attributes": {
+            "ROUTING": "X2Y1/0_data_in1;X2Y1/0_data_in1/0_in0;1;X2Y2/0_data_out;;1;X2Y2/0_out2_internal;X2Y2/0_out2_internal/0_data_out;1;X2Y2/0_out2;X2Y2/0_out2/0_out2_internal;1;X2Y1/0_out3_internal;X2Y1/0_out3_internal/0_in0;1;X2Y1/0_to_1_NextCycle;X2Y1/0_to_1_NextCycle/0_out3_internal;1;X2Y1/1_out0;X2Y1/1_out0/0_to_1_NextCycle;1;X2Y2/1_data_in2;X2Y2/1_data_in2/1_in2;1",
+            "src": "./test.v:11.17-11.29"
+          }
+        },
+        "i_e_061_reg2mem30": {
+          "hide_name": 0,
+          "bits": [ 341 ] ,
+          "attributes": {
+            "ROUTING": "X2Y1/0_out0_internal;X2Y1/0_out0_internal/0_reg_out;1;X2Y1/0_out0;X2Y1/0_out0/0_out0_internal;1;X2Y2/0_data_in2;X2Y2/0_data_in2/0_in2;1;X2Y1/0_reg_out;;1;X2Y1/0_out1_internal;X2Y1/0_out1_internal/0_reg_out;1;X2Y1/0_out1;X2Y1/0_out1/0_out1_internal;1;X3Y1/0_out0_internal;X3Y1/0_out0_internal/0_in3;1;X3Y1/0_to_1_NextCycle;X3Y1/0_to_1_NextCycle/0_out0_internal;1;X3Y1/1_out3;X3Y1/1_out3/0_to_1_NextCycle;1;X2Y1/1_data_in1;X2Y1/1_data_in1/1_in1;1",
+            "src": "./test.v:9.17-9.34"
+          }
+        },
+        "i_edges": {
+          "hide_name": 0,
+          "bits": [ 340 ] ,
+          "attributes": {
+            "ROUTING": "X0Y3/0_to_fabric;;1;X0Y3/0_out1_internal;X0Y3/0_out1_internal/0_to_fabric;1;X0Y3/0_out1;X0Y3/0_out1/0_out1_internal;1;X1Y3/0_out2_internal;X1Y3/0_out2_internal/0_in3;1;X1Y3/0_out2;X1Y3/0_out2/0_out2_internal;1;X1Y2/0_out1_internal;X1Y2/0_out1_internal/0_in0;1;X1Y2/0_out1;X1Y2/0_out1/0_out1_internal;1;X2Y2/0_data_in1;X2Y2/0_data_in1/0_in3;1",
+            "src": "./test.v:12.17-12.24"
+          }
+        },
+        "i_4": {
+          "hide_name": 0,
+          "bits": [ 338 ] ,
+          "attributes": {
+            "ROUTING": "X1Y0/1_to_fabric;;1;X1Y0/1_out0_internal;X1Y0/1_out0_internal/1_to_fabric;1;X1Y0/1_out0;X1Y0/1_out0/1_out0_internal;1;X1Y1/1_data_in2;X1Y1/1_data_in2/1_in2;1",
+            "src": "./test.v:20.17-20.20"
+          }
+        },
+        "i_0": {
+          "hide_name": 0,
+          "bits": [ 334 ] ,
+          "attributes": {
+            "ROUTING": "X2Y0/0_to_fabric;;1;X2Y0/0_out0_internal;X2Y0/0_out0_internal/0_to_fabric;1;X2Y0/0_out0;X2Y0/0_out0/0_out0_internal;1;X2Y1/0_data_in3;X2Y1/0_data_in3/0_in2;1",
+            "src": "./test.v:15.17-15.20"
           }
         }
       }

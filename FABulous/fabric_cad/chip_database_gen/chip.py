@@ -7,7 +7,12 @@ from loguru import logger
 
 from FABulous.fabric_cad.bba import BBAWriter
 from FABulous.fabric_cad.chip_database_gen.BBAStruct import BBAStruct
-from FABulous.fabric_cad.chip_database_gen.Bel import BelData, BelPin, BelPinRef
+from FABulous.fabric_cad.chip_database_gen.Bel import (
+    BelData,
+    BelPin,
+    BelPinRef,
+    TileExtraData,
+)
 from FABulous.fabric_cad.chip_database_gen.define import (
     ClockEdge,
     IdString,
@@ -138,6 +143,9 @@ class TileType(BBAStruct):
 
     def create_wire(self, name: str, type: str = "", const_value: str = ""):
         # Create a new tile wire of a given name and type (optional) in the tile type
+        if self.has_wire(name):
+            return self.wires[self._wire2idx[self.strs.id(name)]]
+
         gfx_wire_id = 0
         if name in self.gfx_wire_ids:
             gfx_wire_id = self.gfx_wire_ids[name]
@@ -217,6 +225,9 @@ class TileType(BBAStruct):
     @property
     def name(self):
         return self.strs[self.type_name]
+
+    def add_extraData(self, extra_data: TileExtraData):
+        self.extra_data = extra_data
 
 
 @dataclass

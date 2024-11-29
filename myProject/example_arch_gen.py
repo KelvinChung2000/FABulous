@@ -1,21 +1,19 @@
-from os import path
 import sys
+from os import path
 
-from FABulous.fabric_cad.chipdbGen.chip import *
-from subprocess import run
-from loguru import logger
-
-logger.level("DEBUG")
+sys.path.append(path.join(path.dirname(__file__), "../.."))
+from FABulous.fabric_cad.chip_database_gen.chip import Chip, ClockEdge, NodeWire, PinType, TimingValue
+from himbaechel_dbgen.chip import *
 
 # Grid size including IOBs at edges
-X = 4
-Y = 4
+X = 100
+Y = 100
 # LUT input count
 K = 4
 # SLICEs per tile
 N = 8
 # number of local wires
-Wl = 96
+Wl = N * (K + 1) + 16
 # 1/Fc for bel input wire pips; local wire pips and neighbour pips
 Si = 6
 Sq = 6
@@ -23,9 +21,13 @@ Sl = 1
 
 dirs = [  # name, dx, dy
     ("N", 0, -1),
+    ("NE", 1, -1),
     ("E", 1, 0),
+    ("SE", 1, 1),
     ("S", 0, 1),
+    ("SW", -1, 1),
     ("W", -1, 0),
+    ("NW", -1, -1),
 ]
 
 
@@ -37,35 +39,31 @@ def create_switch_matrix(tt: TileType, inputs: list[str], outputs: list[str]):
     # switch wires
     for i in range(Wl):
         tt.create_wire(f"SWITCH{i}", "SWITCH")
-
     # neighbor wires
-    for i in range(32):
+    for i in range(Wl):
         for d, dx, dy in dirs:
             tt.create_wire(f"{d}{i}", f"NEIGH_{d}")
     # input pips
-    for i, j in zip(inputs, range(64)):
-        logger.info(f"input SWITCH{j} {i}")
-        tt.create_pip(f"SWITCH{j}", i, timing_class="SWINPUT")
+    for i, w in enumerate(inputs):
+        for j in range((i % Si), Wl, Si):
+            tt.create_pip(f"SWITCH{j}", w, timing_class="SWINPUT")
     # output pips
-    for o, j in zip(outputs, range(64, 96)):
-        logger.info(f"output {o} SWITCH{j}")
-        tt.create_pip(o, f"SWITCH{j}", timing_class="SWINPUT")
+    for i, w in enumerate(outputs):
+        for j in range((i % Sq), Wl, Sq):
+            tt.create_pip(w, f"SWITCH{j}", timing_class="SWINPUT")
     # constant pips
     for i in range(Wl):
         tt.create_pip("GND", f"SWITCH{i}")
         tt.create_pip("VCC", f"SWITCH{i}")
-
     # neighbour local pips
     for i in range(Wl):
-        for d, _, _ in dirs:
-            tt.create_pip(f"{d}{i%32}", f"SWITCH{i}", timing_class="SWNEIGH")
-            tt.create_pip(f"SWITCH{i}", f"{d}{i%32}", timing_class="SWNEIGH")
-
+        for j, (d, dx, dy) in enumerate(dirs):
+            tt.create_pip(f"{d}{(i + j) % Wl}", f"SWITCH{i}", timing_class="SWNEIGH")
     # clock "ladder"
     if not tt.has_wire("CLK"):
-        tt.create_wire(f"CLK", "TILE_CLK")
-    tt.create_wire(f"CLK_PREV", "CLK_ROUTE")
-    tt.create_pip(f"CLK_PREV", f"CLK")
+        tt.create_wire("CLK", "TILE_CLK")
+    tt.create_wire("CLK_PREV", "CLK_ROUTE")
+    tt.create_pip("CLK_PREV", "CLK")
 
 
 def create_logic_tiletype(chip: Chip):
@@ -73,33 +71,35 @@ def create_logic_tiletype(chip: Chip):
     # setup wires
     inputs = []
     outputs = []
-    for i in range(Wl):
-        tt.create_wire(f"srcA[{i}]", "ALU_IN")
-        tt.create_wire(f"srcB[{i}]", "ALU_IN")
-        tt.create_wire(f"out[{i}]", "ALU_OUT")
-
-    for i in range(32):
-        inputs.append(f"srcA[{i}]")
-
-    for i in range(32):
-        inputs.append(f"srcB[{i}]")
-
-    for i in range(32):
-        outputs.append(f"out[{i}]")
-
-    tt.create_wire(f"CLK", "TILE_CLK")
-
+    for i in range(N):
+        for j in range(K):
+            inputs.append(f"L{i}_I{j}")
+            tt.create_wire(f"L{i}_I{j}", "LUT_INPUT")
+        tt.create_wire(f"L{i}_D", "FF_DATA")
+        tt.create_wire(f"L{i}_O", "LUT_OUT")
+        tt.create_wire(f"L{i}_Q", "FF_OUT")
+        outputs += [f"L{i}_O", f"L{i}_Q"]
+    tt.create_wire("CLK", "TILE_CLK")
     # create logic cells
-    alu = tt.create_bel("ADD", "add", z=0)
-    for i in range(Wl):
-        tt.add_bel_pin(alu, f"srcA[{i}]", f"srcA[{i}]", PinType.INPUT)
-        tt.add_bel_pin(alu, f"srcB[{i}]", f"srcB[{i}]", PinType.INPUT)
-        tt.add_bel_pin(alu, f"out[{i}]", f"out[{i}]", PinType.OUTPUT)
+    for i in range(N):
+        # LUT
+        lut = tt.create_bel(f"L{i}_LUT", "LUT4", z=(i * 2 + 0))
+        for j in range(K):
+            tt.add_bel_pin(lut, f"I[{j}]", f"L{i}_I{j}", PinType.INPUT)
+        tt.add_bel_pin(lut, "F", f"L{i}_O", PinType.OUTPUT)
+        # FF data can come from LUT output or LUT I3
+        tt.create_pip(f"L{i}_O", f"L{i}_D")
+        tt.create_pip(f"L{i}_I{K-1}", f"L{i}_D")
+        # FF
+        ff = tt.create_bel(f"L{i}_FF", "DFF", z=(i * 2 + 1))
+        tt.add_bel_pin(ff, "D", f"L{i}_D", PinType.INPUT)
+        tt.add_bel_pin(ff, "CLK", "CLK", PinType.INPUT)
+        tt.add_bel_pin(ff, "Q", f"L{i}_Q", PinType.OUTPUT)
     create_switch_matrix(tt, inputs, outputs)
     return tt
 
 
-N_io = 32
+N_io = 2
 
 
 def create_io_tiletype(chip: Chip):
@@ -112,16 +112,13 @@ def create_io_tiletype(chip: Chip):
         tt.create_wire(f"IO{i}_I", "IO_I")
         tt.create_wire(f"IO{i}_O", "IO_O")
         tt.create_wire(f"IO{i}_PAD", "IO_PAD")
-
+        inputs += [f"IO{i}_T", f"IO{i}_I"]
+        outputs += [
+            f"IO{i}_O",
+        ]
+    tt.create_wire("CLK", "TILE_CLK")
     for i in range(N_io):
-        inputs.append(f"IO{i}_I")
-    for i in range(N_io):
-        inputs.append(f"IO{i}_T")
-    for i in range(N_io):
-        outputs.append(f"IO{i}_O")
-    tt.create_wire(f"CLK", "TILE_CLK")
-    for i in range(N_io):
-        io = tt.create_bel(f"IO{i}", "IOB", z=0)
+        io = tt.create_bel(f"IO{i}", "IOB", z=i)
         tt.add_bel_pin(io, "I", f"IO{i}_I", PinType.INPUT)
         tt.add_bel_pin(io, "T", f"IO{i}_T", PinType.INPUT)
         tt.add_bel_pin(io, "O", f"IO{i}_O", PinType.OUTPUT)
@@ -147,9 +144,9 @@ def create_bram_tiletype(chip: Chip):
         tt.create_wire(w, "RAM_IN")
     for w in outputs:
         tt.create_wire(w, "RAM_OUT")
-    tt.create_wire(f"CLK", "TILE_CLK")
-    ram = tt.create_bel(f"RAM", f"BRAM_{2**Aw}X{Dw}", z=0)
-    tt.add_bel_pin(ram, "CLK", f"CLK", PinType.INPUT)
+    tt.create_wire("CLK", "TILE_CLK")
+    ram = tt.create_bel("RAM", f"BRAM_{2**Aw}X{Dw}", z=0)
+    tt.add_bel_pin(ram, "CLK", "CLK", PinType.INPUT)
     for i in range(Aw):
         tt.add_bel_pin(ram, f"WA[{i}]", f"RAM_WA{i}", PinType.INPUT)
         tt.add_bel_pin(ram, f"RA[{i}]", f"RAM_RA{i}", PinType.INPUT)
@@ -164,16 +161,16 @@ def create_bram_tiletype(chip: Chip):
 
 def create_corner_tiletype(ch):
     tt = ch.create_tile_type("NULL")
-    tt.create_wire(f"CLK", "TILE_CLK")
-    tt.create_wire(f"CLK_PREV", "CLK_ROUTE")
-    tt.create_pip(f"CLK_PREV", f"CLK")
+    tt.create_wire("CLK", "TILE_CLK")
+    tt.create_wire("CLK_PREV", "CLK_ROUTE")
+    tt.create_pip("CLK_PREV", "CLK")
 
-    tt.create_wire(f"GND", "GND", const_value="GND")
-    tt.create_wire(f"VCC", "VCC", const_value="VCC")
+    tt.create_wire("GND", "GND", const_value="GND")
+    tt.create_wire("VCC", "VCC", const_value="VCC")
 
-    gnd = tt.create_bel(f"GND_DRV", f"GND_DRV", z=0)
+    gnd = tt.create_bel("GND_DRV", "GND_DRV", z=0)
     tt.add_bel_pin(gnd, "GND", "GND", PinType.OUTPUT)
-    vcc = tt.create_bel(f"VCC_DRV", f"VCC_DRV", z=1)
+    vcc = tt.create_bel("VCC_DRV", "VCC_DRV", z=1)
     tt.add_bel_pin(vcc, "VCC", "VCC", PinType.OUTPUT)
 
     return tt
@@ -183,29 +180,22 @@ def is_corner(x, y):
     return ((x == 0) or (x == (X - 1))) and ((y == 0) or (y == (Y - 1)))
 
 
-opp = {"S": "N", "W": "E"}
-
-
 def create_nodes(ch):
     for y in range(Y):
         # print(f"generating nodes for row {y}")
         for x in range(X):
             if not is_corner(x, y):
                 # connect up actual neighbours
+                local_nodes = [[NodeWire(x, y, f"SWITCH{i}")] for i in range(Wl)]
                 for d, dx, dy in dirs:
-                    if d not in opp:
-                        continue
-                    local_nodes = [[NodeWire(x, y, f"{d}{i}")] for i in range(32)]
-                    x1 = x + dx
-                    y1 = y + dy
+                    x1 = x - dx
+                    y1 = y - dy
                     if x1 < 0 or x1 >= X or y1 < 0 or y1 >= Y or is_corner(x1, y1):
                         continue
-                    for i in range(32):
-                        local_nodes[i].append(NodeWire(x1, y1, f"{opp[d]}{i}"))
-
-                    for n in local_nodes:
-                        # logger.debug(n)
-                        ch.add_node(n)
+                    for i in range(Wl):
+                        local_nodes[i].append(NodeWire(x1, y1, f"{d}{i}"))
+                for n in local_nodes:
+                    ch.add_node(n)
             # connect up clock ladder (not intended to be a sensible clock structure)
             if y != 1:  # special case where the node has 3 wires
                 if y == 0:
@@ -254,19 +244,20 @@ def set_timings(ch):
     )
     # TODO: also support node/wire delays and add an example of them
 
-    # # --- Cell delays ---
-    # lut = ch.timing.add_cell_variant(speed, "LUT4")
-    # for j in range(K):
-    #     lut.add_comb_arc(f"I[{j}]", "F", TimingValue(150 + j * 15))
-    # dff = ch.timing.add_cell_variant(speed, "DFF")
-    # dff.add_setup_hold("CLK", "D", ClockEdge.RISING, TimingValue(150), TimingValue(25))
-    # dff.add_clock_out("CLK", "Q", ClockEdge.RISING, TimingValue(200))
+    # --- Cell delays ---
+    lut = ch.timing.add_cell_variant(speed, "LUT4")
+    for j in range(K):
+        lut.add_comb_arc(f"I[{j}]", "F", TimingValue(150 + j * 15))
+    dff = ch.timing.add_cell_variant(speed, "DFF")
+    dff.add_setup_hold("CLK", "D", ClockEdge.RISING, TimingValue(150), TimingValue(25))
+    dff.add_clock_out("CLK", "Q", ClockEdge.RISING, TimingValue(200))
 
 
 def main():
     ch = Chip("example", "EX1", X, Y)
     # Init constant ids
-    ch.strs.read_constids(f".FABulous/constids.inc")
+    ch.strs.read_constids(path.join(path.dirname(__file__), "constids.inc"))
+    ch.read_gfxids(path.join(path.dirname(__file__), "gfxids.inc"))
     logic = create_logic_tiletype(ch)
     io = create_io_tiletype(ch)
     bram = create_bram_tiletype(ch)
@@ -281,16 +272,14 @@ def main():
                     ch.set_tile_type(x, y, "IO")
             elif y == 0 or y == Y - 1:  # top/bottom side IO
                 ch.set_tile_type(x, y, "IO")
+            elif (y % 15) == 7:  # BRAM
+                ch.set_tile_type(x, y, "BRAM")
             else:
                 ch.set_tile_type(x, y, "LOGIC")
     # Create nodes between tiles
     create_nodes(ch)
     set_timings(ch)
-    ch.write_bba("./.FABulous/example.bba")
-    run(
-        "bbasm --l ./.FABulous/example.bba ./.FABulous/example.bin",
-        shell=True,
-    )
+    ch.write_bba(sys.argv[1])
 
 
 if __name__ == "__main__":

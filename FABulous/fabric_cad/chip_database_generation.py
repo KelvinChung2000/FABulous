@@ -4,7 +4,7 @@ from subprocess import run
 from loguru import logger
 
 from FABulous.fabric_cad import prims_gen
-from FABulous.fabric_cad.chip_database_gen.Bel import BelExtraData
+from FABulous.fabric_cad.chip_database_gen.Bel import BelExtraData, TileExtraData
 from FABulous.fabric_cad.chip_database_gen.chip import (
     Chip,
     ChipExtraData,
@@ -13,7 +13,7 @@ from FABulous.fabric_cad.chip_database_gen.chip import (
 )
 from FABulous.fabric_cad.chip_database_gen.define import NodeWire, PinType
 from FABulous.fabric_definition.Bel import Bel
-from FABulous.fabric_definition.define import Direction
+from FABulous.fabric_definition.define import IO
 from FABulous.fabric_definition.Fabric import Fabric
 from FABulous.fabric_definition.Tile import Tile
 from FABulous.fabric_generator.code_generation_Verilog import VerilogWriter
@@ -21,57 +21,53 @@ from FABulous.FABulous_API import FABulous
 
 
 def genSwitchMatrix(tile: Tile, tileType: TileType, context=1):
+    if not isinstance(tile.switchMatrix, list):
+        raise ValueError("Switch matrix is not a list")
+
+    outportName = set([p.name for p in tile.ports if p.inOut == IO.OUTPUT])
     for c in range(context):
-        muxList = tile.switchMatrix
-        muxDict = {i.name: i for i in muxList}
-        createdWire = set()
-
-        # cross tile wires
         for i in tile.ports:
-            if i.wireDirection == Direction.JUMP:
-                continue
             tileType.create_wire(f"{c}_{i.name}")
-            createdWire.add(f"{c}_{i.name}")
-            for cn in range(c, context):
-                tileType.create_wire(f"{cn}_{i.name}")
-                createdWire.add(f"{cn}_{i.name}")
+            if i.name in outportName:
+                tileType.create_wire(f"{c}_{i.name}_internal")
 
-        for mux in muxDict.values():
-            for i in mux.inputs:
-                if i not in createdWire:
-                    tileType.create_wire(f"{c}_{i}")
-            if mux.output not in createdWire:
-                tileType.create_wire(f"{c}_{mux.output}")
+        for mux in tile.switchMatrix:
+            tileType.create_wire(f"{c}_{mux.output}")
+            if mux.output in outportName:
+                for i in mux.inputs:
+                    tileType.create_pip(f"{c}_{i}", f"{c}_{mux.output}_internal")
+                tileType.create_pip(f"{c}_{mux.output}_internal", f"{c}_{mux.output}")
+            else:
+                for i in mux.inputs:
+                    tileType.create_pip(f"{c}_{i}", f"{c}_{mux.output}")
 
-        for mux in muxDict.values():
-            for s in mux.inputs:
-                tileType.create_pip(f"{c}_{s}", f"{c}_{mux.output}")
-
-        # cross cycle pip
+    for c in range(context):
         for cn in range(c + 1, context):
             tileType.create_wire(f"{c}_to_{cn}_NextCycle")
-            for mux in muxDict.values():
-                if mux.output in createdWire:
-                    for s in mux.inputs:
-                        tileType.create_pip(f"{c}_{s}", f"{c}_to_{cn}_NextCycle")
-                        tileType.create_pip(
-                            f"{c}_to_{cn}_NextCycle", f"{cn}_{mux.output}"
-                        )
+            for mux in tile.switchMatrix:
+                if mux.output in outportName:
+                    tileType.create_pip(
+                        f"{c}_{mux.output}_internal", f"{c}_to_{cn}_NextCycle"
+                    )
+                    tileType.create_pip(f"{c}_to_{cn}_NextCycle", f"{cn}_{mux.output}")
+
+    for c in range(context):
         for cn in range(c + 1, context - 1):
             tileType.create_pip(f"{c}_to_{cn}_NextCycle", f"{c+1}_to_{cn+1}_NextCycle")
 
 
 def genBel(bels: list[Bel], tile: TileType, context=1):
+    count = 0
     for c in range(context):
         for z, bel in enumerate(bels):
             # create the bel itself
-            belData = tile.create_bel(f"{c}_{bel.prefix}{bel.name}", bel.name, c * z)
+            belData = tile.create_bel(f"{c}_{bel.prefix}{bel.name}", bel.name, count)
 
-            for i in bel.externalInput:
-                tile.create_wire(f"{c}_{i.name}", f"{bel.name}_{i}")
+            for i in bel.externalInput + bel.inputs:
+                tile.create_wire(f"{c}_{i.name}", f"{bel.name}_{i.name}")
 
-            for i in bel.externalOutput:
-                tile.create_wire(f"{c}_{i.name}", f"{bel.name}_{i}")
+            for i in bel.externalOutput + bel.outputs:
+                tile.create_wire(f"{c}_{i.name}", f"{bel.name}_{i.name}")
 
             if bel.userCLK:
                 tile.create_wire(f"{c}_{bel.name}_{bel.userCLK.name}")
@@ -99,12 +95,15 @@ def genBel(bels: list[Bel], tile: TileType, context=1):
                     PinType.INPUT,
                 )
             belData.add_extra_data(BelExtraData(context=c))
+            count += 1
+
+    tile.add_extraData(TileExtraData(uniqueBelCount=len(bels)))
 
 
 def genTile(tile: Tile, chip: Chip, context=1) -> TileType:
     tt = chip.create_tile_type(tile.name)
-    genSwitchMatrix(tile, tt, context=context)
     genBel(tile.bels, tt, context=context)
+    genSwitchMatrix(tile, tt, context=context)
     return tt
 
 
@@ -112,30 +111,21 @@ def genFabric(fabric: Fabric, chip: Chip, context=1):
     for (x, y), wires in fabric.wireDict.items():
         if not wires:
             continue
-        localNode = []
-        for wire in wires:
-            for c in range(context):
-                localNode.append(
+        for c in range(context):
+            for wire in wires:
+                node = [
                     NodeWire(
                         x,
-                        y,
+                        fabric.numberOfRows - y - 1,
                         f"{c}_{wire.source.name}",
-                    )
-                )
-                localNode.append(
+                    ),
                     NodeWire(
                         x + wire.xOffset,
-                        y + wire.yOffset,
+                        fabric.numberOfRows - y - 1 - wire.yOffset,
                         f"{c}_{wire.destination.name}",
-                    )
-                )
-        for c in range(context):
-            for cn in range(c + 1, context):
-                localNode.append(NodeWire(x, y, f"{c}_to_{cn}_NextCycle"))
-
-        # print(localNode)
-        # chip.add_node(localNode)
-        # print()
+                    ),
+                ]
+                chip.add_node(node)
     setTiming(chip)
 
 
@@ -189,9 +179,9 @@ def genChipDatabase(fabric: Fabric, filePath: Path, baseConstIdsPath: Path):
     for i in range(fabric.numberOfRows):
         for j in range(fabric.numberOfColumns):
             if fabric.tile[i][j] is not None:
-                ch.set_tile_type(j, i, fabric.tile[i][j].name)
+                ch.set_tile_type(j, fabric.numberOfRows - i - 1, fabric.tile[i][j].name)
             else:
-                ch.set_tile_type(j, i, "NULL")
+                ch.set_tile_type(j, fabric.numberOfRows - i - 1, "NULL")
 
     genFabric(fabric, ch, context=fabric.contextCount)
 
@@ -201,7 +191,7 @@ def genChipDatabase(fabric: Fabric, filePath: Path, baseConstIdsPath: Path):
         f"Total BEL Count: {fabric.getTotalBelCount()}",
     )
     ch.strs.toConstStringId(str(filePath / f"{fabric.name}_constids.inc"))
-    ch.read_gfxids(str(filePath / f"{fabric.name}_constids.inc"))_PAD
+    ch.read_gfxids(str(filePath / f"{fabric.name}_constids.inc"))
 
     logger.info(f"Writing the chip database to {filePath / f'{fabric.name}.bba'}")
     ch.write_bba(str(filePath / f"{fabric.name}.bba"))

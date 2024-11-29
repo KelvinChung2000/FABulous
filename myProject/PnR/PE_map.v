@@ -1,4 +1,4 @@
-(* techmap_celltype = "ConstOp UnaryOp BinaryOp TernaryOp" *)
+(* techmap_celltype = "UnaryOp BinaryOp TernaryOp" *)
 module PE_map(A, B, C, Y);
     parameter WIDTH = 0;
     parameter _TECHMAP_CELLTYPE_ = "";
@@ -13,14 +13,11 @@ module PE_map(A, B, C, Y);
 
     generate
         localparam OP_TYPE =
-            _TECHMAP_CELLTYPE_ == "ConstOp" ? 0 :
             _TECHMAP_CELLTYPE_ == "UnaryOp" ? 1 :
             _TECHMAP_CELLTYPE_ == "BinaryOp" ? 2 :
             _TECHMAP_CELLTYPE_ == "TernaryOp" ? 3 : -1;
 
-        if (OP_TYPE == 0)
-            ALU #(.WIDTH(WIDTH), .CONST(CONST)) _TECHMAP_REPLACE_ (.data_out(Y));
-        else if (OP_TYPE == 1)
+        if (OP_TYPE == 1)
             ALU #(
                 .WIDTH(WIDTH),
                 .OP(OP)

@@ -1,5 +1,12 @@
 # mux_out: mux_in0 
-data_in1:in{0..3}
-data_in2:in{0..3}
-data_in3:in{0..3}
-out{0..3}:data_out, in{0..3}
+data_in1:in{0..3}, const_out
+data_in2:in{0..3}, const_out
+data_in3:in{0..3}, const_out
+data_in1:in{0..3}, reg_out
+data_in2:in{0..3}, reg_out
+data_in3:in{0..3}, reg_out
+out{0..3}:data_out, reg_out
+out0:in1,in3
+out1:in2,in0
+out2:in3,in1
+out3:in0,in2

@@ -2,7 +2,7 @@ from pathlib import Path
 
 import networkx as nx
 
-module = "module {name} #(parameter WIDTH=32);\n\n{body}\nendmodule\n"
+module = "module {name} #(parameter WIDTH=1);\n\n{body}\nendmodule\n"
 wireTemplate = "wire[WIDTH-1:0] {source};\n"
 constOp = "ConstOp #(.CONST({CONST}), .WIDTH(WIDTH)) inst_{value}(.Y({Y}));\n"
 regOp = "RegOp #(.WIDTH(WIDTH)) inst_{value}(.Y({Y}));\n"

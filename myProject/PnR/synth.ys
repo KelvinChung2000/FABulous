@@ -1,14 +1,12 @@
-read_verilog -lib ./lib.v
-read_verilog ./test.v
-read_verilog -lib ../.FABulous/prims.v
+read_verilog -lib /home/kelvin/FABulous_fork/myProject/PnR/lib.v
+
+read_verilog -lib /home/kelvin/FABulous_fork/myProject/.FABulous/prims.v
 hierarchy -top test
 flatten
 proc
 opt;;;
-techmap -map ./PE_map.v -max_iter 1
-techmap -map ./IO_map.v -max_iter 1
-techmap -map ./const_map.v -max_iter 1
-techmap -map ./reg_map.v -max_iter 1
+techmap -map /home/kelvin/FABulous_fork/myProject/PnR/map/PE_map.v -max_iter 1
+techmap -map /home/kelvin/FABulous_fork/myProject/PnR/map/IO_map.v -max_iter 1
+techmap -map /home/kelvin/FABulous_fork/myProject/PnR/map/const_map.v -max_iter 1
+techmap -map /home/kelvin/FABulous_fork/myProject/PnR/map/reg_map.v -max_iter 1
 stat
-write_json ./test.json
-write_verilog ./test_synth.v

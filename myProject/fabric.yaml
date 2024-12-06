@@ -20,7 +20,9 @@ FABRIC: [
 
 PARAM: {
   ConfigBitMode: frame_based, # default is FlipFlopChain, frame_based
-  #FrameBitsPerRow: 32 # we configure an entire configuration frame over the full height of the device (like Virtex-II) and we write FrameBitsPerRow bits per, well, tile=CLB height",,,,,,,,,,,,,,,,
+  # we configure an entire configuration frame over the full height of the device (like Virtex-II) and 
+  # we write FrameBitsPerRow bits per, well, tile=CLB height
+  #FrameBitsPerRow: 32
   #MaxFramesPerCol: 20
   #Package: use work.my_package.all;
   GenerateDelayInSwitchMatrix: 80,

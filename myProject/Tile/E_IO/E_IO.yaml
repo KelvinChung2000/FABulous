@@ -1,12 +1,12 @@
 TILE: E_IO
-# {direction: <>, source_name: <>, X-offset: <>, Y-offset: <>, destination_name: <>, wires: <>}
+# {side: <>, source_name: <>, X-offset: <>, Y-offset: <>, destination_name: <>, wires: <>}
 INCLUDE:
 PORTS: [
-    {direction: EAST, name: out1, inOut: output, wires: 32, terminal: true},
-    {direction: WEST, name: in1, inOut: input, wires: 32, terminal: true},
+    {side: EAST, name: out1, inOut: output, wires: 32, terminal: true},
+    {side: EAST, name: in1, inOut: input, wires: 32, terminal: true},
 
-    {direction: EAST, name: in3, inOut: input, wires: 32, terminal: true},
-    {direction: WEST, name: out3, inOut: output, wires: 32, terminal: true},
+    {side: WEST, name: in3, inOut: input, wires: 32, terminal: true},
+    {side: WEST, name: out3, inOut: output, wires: 32, terminal: false},
   ]
 WIRES: [
   {source_name: out3, X-offset:  -1, Y-offset: 0, destination_name: in1},

@@ -1,5 +1,7 @@
-from dataclasses import dataclass, field
-from FABulous.fabric_definition.define import IO, Direction, Side, FeatureType
+from dataclasses import dataclass
+from typing import Any
+
+from FABulous.fabric_definition.define import IO, FeatureType, Side
 
 
 @dataclass(frozen=True, eq=True)
@@ -12,9 +14,71 @@ class Port:
 
 @dataclass(frozen=True, eq=True)
 class TilePort(Port):
-    wireDirection: Direction
+    """
+    TilePort is a subclass of Port that represents a port on a tile with a specific side and terminal status.
+    It is an immutable and comparable dataclass. When sorting a list of TilePort instances, the order is determined
+    first by the side of the tile in order of [north, east, south, west] then by the IO type in the order of [output, input, inout].
+
+    Attributes:
+        sideOfTile (Side): The side of the tile where the port is located.
+        terminal (bool): Indicates if the port is a terminal port. Defaults to False.
+
+    Class Attributes:
+        __order (dict): A dictionary mapping each Side to an integer for comparison purposes.
+        __io (dict): A dictionary mapping each IO type to an integer for comparison purposes.
+
+    Methods:
+        __lt__(__o: Any) -> bool:
+            Compares if the current TilePort instance is less than another TilePort instance.
+
+        __le__(__o: Any) -> bool:
+            Compares if the current TilePort instance is less than or equal to another TilePort instance.
+
+        __gt__(__o: Any) -> bool:
+            Compares if the current TilePort instance is greater than another TilePort instance.
+
+        __ge__(__o: Any) -> bool:
+            Compares if the current TilePort instance is greater than or equal to another TilePort instance.
+    """
+
     sideOfTile: Side
     terminal: bool = False
+
+    __order = {Side.NORTH: 0, Side.EAST: 1, Side.SOUTH: 2, Side.WEST: 3}
+    __io = {IO.OUTPUT: 0, IO.INPUT: 1, IO.INOUT: 2}
+
+    def __lt__(self, __o: Any) -> bool:
+        if not isinstance(__o, TilePort):
+            return False
+        return (self.__order[self.sideOfTile], self.__io[self.inOut]) < (
+            self.__order[__o.sideOfTile],
+            self.__io[self.inOut],
+        )
+
+    def __le__(self, __o: Any) -> bool:
+        if not isinstance(__o, TilePort):
+            return False
+        return (self.__order[self.sideOfTile], self.__io[self.inOut]) <= (
+            self.__order[__o.sideOfTile],
+            self.__io[self.inOut],
+        )
+
+    def __gt__(self, __o: Any) -> bool:
+        if not isinstance(__o, TilePort):
+            return False
+        return (self.__order[self.sideOfTile], self.__io[self.inOut]) > (
+            self.__order[__o.sideOfTile],
+            self.__io[self.inOut],
+        )
+
+    def __ge__(self, __o: Any) -> bool:
+        if not isinstance(__o, TilePort):
+            return False
+        return (self.__order[self.sideOfTile], self.__io[self.inOut]) >= (
+            self.__order[__o.sideOfTile],
+            self.__io[self.inOut],
+        )
+
 
 @dataclass(frozen=True, eq=True)
 class ConfigPort(Port):
@@ -172,4 +236,5 @@ class ConfigPort(Port):
 
 #             if self.destinationName != "NULL":
 #                 outputs.append(f"{self.destinationName}{openIndex}{str(i)}{closeIndex}")
+#         return inputs, outputs
 #         return inputs, outputs

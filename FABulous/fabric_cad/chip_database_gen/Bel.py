@@ -34,12 +34,20 @@ class BelExtraData(BBAStruct):
 @dataclass
 class TileExtraData(BBAStruct):
     uniqueBelCount: int = 0
+    northPortCount: int = 0
+    eastPortCount: int = 0
+    southPortCount: int = 0
+    westPortCount: int = 0
 
     def serialise_lists(self, context: str, bba: BBAWriter):
         pass
 
     def serialise(self, uniqueBelCount: str, bba: BBAWriter):
         bba.u32(self.uniqueBelCount)
+        bba.u32(self.northPortCount)
+        bba.u32(self.eastPortCount)
+        bba.u32(self.southPortCount)
+        bba.u32(self.westPortCount)
 
 
 @dataclass

@@ -1,10 +1,10 @@
-from pathlib import Path
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Any
 
 from FABulous.fabric_definition.Bel import Bel
+from FABulous.fabric_definition.define import IO, Side
 from FABulous.fabric_definition.Mux import Mux
-from FABulous.fabric_definition.define import IO, Direction, Side
 from FABulous.fabric_definition.Port import TilePort
 from FABulous.fabric_definition.Wire import WireType
 
@@ -46,48 +46,90 @@ class Tile:
             return False
         return self.name == __o.name
 
-    def getWestSidePorts(self) -> list[TilePort]:
-        return [p for p in self.ports if p.sideOfTile == Side.WEST and not p.terminal]
+    def getWestPorts(self, io: IO | None = None) -> list[TilePort]:
+        """
+        Retrieve the list of ports located on the west side of the tile.
 
-    def getEastSidePorts(self) -> list[TilePort]:
-        return [p for p in self.ports if p.sideOfTile == Side.EAST and not p.terminal]
+        Args:
+            io (IO | None, optional): The direction of the port (input/output).
+                                      If None, all ports on the west side are returned.
+                                      Defaults to None.
 
-    def getNorthSidePorts(self) -> list[TilePort]:
-        return [p for p in self.ports if p.sideOfTile == Side.NORTH and not p.terminal]
+        Returns:
+            list[TilePort]: A list of TilePort objects located on the west side of the tile.
+        """
+        if io is None:
+            return [p for p in self.ports if p.sideOfTile == Side.WEST]
+        else:
+            return [
+                p for p in self.ports if p.sideOfTile == Side.WEST and p.inOut == io
+            ]
 
-    def getSouthSidePorts(self) -> list[TilePort]:
-        return [p for p in self.ports if p.sideOfTile == Side.SOUTH and not p.terminal]
+    def getSouthPorts(self, io: IO | None = None) -> list[TilePort]:
+        """
+        Retrieve the list of ports located on the south side of the tile.
 
-    def getNorthPorts(self, io: IO) -> list[TilePort]:
-        return [
-            p
-            for p in self.ports
-            if p.wireDirection == Direction.NORTH and p.name != "NULL" and p.inOut == io
-        ]
+        Args:
+            io (IO | None, optional): The direction of the port (input/output).
+                                      If None, all ports on the south side are returned.
+                                      Defaults to None.
 
-    def getSouthPorts(self, io: IO) -> list[TilePort]:
-        return [
-            p
-            for p in self.ports
-            if p.wireDirection == Direction.SOUTH and p.name != "NULL" and p.inOut == io
-        ]
+        Returns:
+           list[TilePort]: A list of TilePort objects located on the south side of the tile. If `io` is specified, only ports matching the IO type are returned.
+        """
+        if io is None:
+            return [p for p in self.ports if p.sideOfTile == Side.SOUTH]
+        else:
+            return [
+                p for p in self.ports if p.sideOfTile == Side.SOUTH and p.inOut == io
+            ]
 
-    def getEastPorts(self, io: IO) -> list[TilePort]:
-        return [
-            p
-            for p in self.ports
-            if p.wireDirection == Direction.EAST and p.name != "NULL" and p.inOut == io
-        ]
+    def getEastPorts(self, io: IO | None = None) -> list[TilePort]:
+        """
+        Retrieve the list of ports located on the east side of the tile.
 
-    def getWestPorts(self, io: IO) -> list[TilePort]:
-        return [
-            p
-            for p in self.ports
-            if p.wireDirection == Direction.WEST and p.name != "NULL" and p.inOut == io
-        ]
+        Args:
+            io (IO | None, optional): The direction of the port (input/output).
+                                      If None, all ports on the east side are returned.
+                                      Defaults to None.
+
+        Returns:
+           list[TilePort]: A list of TilePort objects located on the south side of the tile. If `io` is specified, only ports matching the IO type are returned.
+        """
+        if io is None:
+            return [p for p in self.ports if p.sideOfTile == Side.EAST]
+        else:
+            return [
+                p for p in self.ports if p.sideOfTile == Side.EAST and p.inOut == io
+            ]
+
+    def getNorthPorts(self, io: IO | None = None) -> list[TilePort]:
+        """
+        Retrieve the list of ports located on the north side of the tile.
+
+        Args:
+            io (IO | None, optional): The direction of the port (input/output).
+                                      If None, all ports on the north side are returned.
+                                      Defaults to None.
+
+        Returns:
+           list[TilePort]: A list of TilePort objects located on the south side of the tile. If `io` is specified, only ports matching the IO type are returned.
+        """
+        if io is None:
+            return [p for p in self.ports if p.sideOfTile == Side.NORTH]
+        else:
+            return [
+                p for p in self.ports if p.sideOfTile == Side.NORTH and p.inOut == io
+            ]
 
     def getTileInputNames(self) -> list[str]:
         return [p.name for p in self.ports if p.inOut == IO.INPUT]
 
     def getTileOutputNames(self) -> list[str]:
         return [p.name for p in self.ports if p.inOut == IO.OUTPUT]
+
+    def getTileInputPorts(self) -> list[TilePort]:
+        return sorted([p for p in self.ports if p.inOut == IO.INPUT])
+
+    def getTileOutputPorts(self) -> list[TilePort]:
+        return sorted([p for p in self.ports if p.inOut == IO.OUTPUT])

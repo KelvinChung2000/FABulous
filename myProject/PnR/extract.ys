@@ -1,0 +1,17 @@
+read_verilog ./gemm_circt.v
+hierarchy -top gemm
+flatten
+proc -noopt
+#opt -keepdc
+clean -purge
+design -push
+read_verilog ./map/buffer_1slot.v 
+hierarchy -top buffer
+flatten
+proc -noopt
+#opt -keepdc
+clean -purge
+design -save buffer
+design -pop
+extract -map %buffer -ignore_parameters
+stat

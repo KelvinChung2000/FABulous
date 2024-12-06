@@ -88,6 +88,16 @@ class PipData(BBAStruct):
     timing_idx: int = -1
     extra_data: object = None
 
+    def __eq__(self, value: object) -> bool:
+        if not isinstance(value, PipData):
+            return False
+        else:
+            return (
+                self.src_wire == value.src_wire
+                and self.dst_wire == value.dst_wire
+                and self.pip_type == value.pip_type
+            )
+
     def serialise_lists(self, context: str, bba: BBAWriter):
         # extra data (optional)
         if self.extra_data is not None:
@@ -141,7 +151,7 @@ class TileType(BBAStruct):
         bel.pins.append(BelPin(pin_id, wire_idx, dir))
         self.wires[wire_idx].bel_pins.append(BelPinRef(bel.index, pin_id))
 
-    def create_wire(self, name: str, type: str = "", const_value: str = ""):
+    def create_wire(self, name: str, type: str = "", const_value: str = "", z: int = 0):
         # Create a new tile wire of a given name and type (optional) in the tile type
         if self.has_wire(name):
             return self.wires[self._wire2idx[self.strs.id(name)]]
@@ -149,6 +159,11 @@ class TileType(BBAStruct):
         gfx_wire_id = 0
         if name in self.gfx_wire_ids:
             gfx_wire_id = self.gfx_wire_ids[name]
+
+            if z == gfx_wire_id:
+                logger.error(f"repeat declare wire z={z}, gfx_wire_id={gfx_wire_id}")
+                raise
+        gfx_wire_id = z
 
         wire = TileWireData(
             index=len(self.wires),
@@ -167,6 +182,7 @@ class TileType(BBAStruct):
             raise ValueError(f"Wire {src} not found")
         if self.strs.id(dst) not in self._wire2idx:
             raise ValueError(f"Wire {dst} not found")
+
         src_idx = self._wire2idx[self.strs.id(src)]
         dst_idx = self._wire2idx[self.strs.id(dst)]
         pip = PipData(
@@ -175,9 +191,11 @@ class TileType(BBAStruct):
             dst_wire=dst_idx,
             timing_idx=self.tmg.pip_class_idx(timing_class),
         )
-        self.wires[src_idx].pips_downhill.append(pip.index)
-        self.wires[dst_idx].pips_uphill.append(pip.index)
-        self.pips.append(pip)
+
+        if pip not in self.pips:
+            self.wires[src_idx].pips_downhill.append(pip.index)
+            self.wires[dst_idx].pips_uphill.append(pip.index)
+            self.pips.append(pip)
         return pip
 
     def has_wire(self, wire: str):

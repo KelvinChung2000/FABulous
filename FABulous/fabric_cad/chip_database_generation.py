@@ -25,35 +25,58 @@ def genSwitchMatrix(tile: Tile, tileType: TileType, context=1):
         raise ValueError("Switch matrix is not a list")
 
     outportName = set([p.name for p in tile.ports if p.inOut == IO.OUTPUT])
+    zIn = 0
+    zOut = 0
     for c in range(context):
-        for i in tile.ports:
-            tileType.create_wire(f"{c}_{i.name}")
-            if i.name in outportName:
-                tileType.create_wire(f"{c}_{i.name}_internal")
+        for i, p in enumerate(sorted(tile.ports)):
+            if p.inOut == IO.INPUT:
+                tileType.create_wire(f"{c}_{p.name}", f"InPort{p.sideOfTile}", z=zIn)
+                zIn += 1
+            elif p.inOut == IO.OUTPUT:
+                tileType.create_wire(f"{c}_{p.name}", f"OutPort{p.sideOfTile}", z=zOut)
+                if p.name in outportName:
+                    tileType.create_wire(
+                        f"{c}_{p.name}_internal",
+                        f"OutPort{p.sideOfTile}_internal",
+                        z=zOut,
+                    )
+                zOut += 1
 
         for mux in tile.switchMatrix:
             tileType.create_wire(f"{c}_{mux.output}")
             if mux.output in outportName:
                 for i in mux.inputs:
                     tileType.create_pip(f"{c}_{i}", f"{c}_{mux.output}_internal")
-                tileType.create_pip(f"{c}_{mux.output}_internal", f"{c}_{mux.output}")
+                    tileType.create_pip(
+                        f"{c}_{mux.output}_internal", f"{c}_{mux.output}"
+                    )
             else:
                 for i in mux.inputs:
                     tileType.create_pip(f"{c}_{i}", f"{c}_{mux.output}")
 
-    for c in range(context):
-        for cn in range(c + 1, context):
-            tileType.create_wire(f"{c}_to_{cn}_NextCycle")
-            for mux in tile.switchMatrix:
-                if mux.output in outportName:
-                    tileType.create_pip(
-                        f"{c}_{mux.output}_internal", f"{c}_to_{cn}_NextCycle"
-                    )
-                    tileType.create_pip(f"{c}_to_{cn}_NextCycle", f"{cn}_{mux.output}")
+    zOut = 0
+    for c in range(context - 1):
+        for i, p in enumerate(sorted(tile.getTileOutputPorts())):
+            tileType.create_wire(
+                f"{p.name}_{c}_to_{c+1}_NextCycle", "NextCycle", z=zOut
+            )
+            zOut += 1
 
-    for c in range(context):
-        for cn in range(c + 1, context - 1):
-            tileType.create_pip(f"{c}_to_{cn}_NextCycle", f"{c+1}_to_{cn+1}_NextCycle")
+    for c in range(context - 1):
+        for mux in tile.switchMatrix:
+            if mux.output in outportName:
+                tileType.create_pip(
+                    f"{c}_{mux.output}_internal", f"{mux.output}_{c}_to_{c+1}_NextCycle"
+                )
+                tileType.create_pip(
+                    f"{mux.output}_{c}_to_{c+1}_NextCycle", f"{c+1}_{mux.output}"
+                )
+
+    for c in range(context - 2):
+        for i, p in enumerate(sorted(tile.getTileOutputPorts())):
+            tileType.create_pip(
+                f"{p.name}_{c}_to_{c+1}_NextCycle", f"{p.name}_{c+1}_to_{c+2}_NextCycle"
+            )
 
 
 def genBel(bels: list[Bel], tile: TileType, context=1):
@@ -97,13 +120,20 @@ def genBel(bels: list[Bel], tile: TileType, context=1):
             belData.add_extra_data(BelExtraData(context=c))
             count += 1
 
-    tile.add_extraData(TileExtraData(uniqueBelCount=len(bels)))
-
 
 def genTile(tile: Tile, chip: Chip, context=1) -> TileType:
     tt = chip.create_tile_type(tile.name)
     genBel(tile.bels, tt, context=context)
     genSwitchMatrix(tile, tt, context=context)
+    tt.add_extraData(
+        TileExtraData(
+            uniqueBelCount=len(tile.bels),
+            northPortCount=len(tile.getNorthPorts()),
+            eastPortCount=len(tile.getEastPorts()),
+            southPortCount=len(tile.getSouthPorts()),
+            westPortCount=len(tile.getWestPorts()),
+        )
+    )
     return tt
 
 

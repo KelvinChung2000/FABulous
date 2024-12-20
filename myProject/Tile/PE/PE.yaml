@@ -21,11 +21,11 @@ WIRES: [
 BELS: [
   {BEL: ./ALU.v, prefix: },   
   {BEL: ./const_unit.v, prefix: },
-  {BEL: ./reg_unit.v, prefix: },
-    # {BEL: ./buff.v, prefix: N_},
-    # {BEL: ./buff.v, prefix: E_},
-    # {BEL: ./buff.v, prefix: S_},
-    # {BEL: ./buff.v, prefix: W_},
+  {BEL: ./reg_unit.v, prefix: RES_},
+  {BEL: ./reg_unit.v, prefix: N_},
+  {BEL: ./reg_unit.v, prefix: E_},
+  {BEL: ./reg_unit.v, prefix: S_},
+  {BEL: ./reg_unit.v, prefix: W_},
 
 ]
 MATRIX: ./PE.mux

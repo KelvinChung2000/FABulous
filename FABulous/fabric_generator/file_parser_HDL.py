@@ -315,7 +315,7 @@ def parseBelFile(
             continue
 
         port = Port(
-            name=net,
+            name=f"{belPrefix}{net}",
             inOut=ports[net],
             wireCount=netBitWidth,
             isBus=FABulousPortType.BUS in attributes,
@@ -335,7 +335,7 @@ def parseBelFile(
                 belMapDict[i] = netBitWidth
             configPort.append(
                 ConfigPort(
-                    name=net,
+                    name=f"{belPrefix}_{net}",
                     inOut=ports[net],
                     wireCount=netBitWidth,
                     isBus=FABulousPortType.BUS in attributes,

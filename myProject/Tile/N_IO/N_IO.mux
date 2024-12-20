@@ -1,4 +1,4 @@
-out0:out
-in0:in
-from_fabric:in2
-out2:to_fabric
+N_out:out0
+N_in:in0
+N_from_fabric:in2
+out2:N_to_fabric

@@ -3,13 +3,10 @@ from copy import deepcopy
 from pathlib import Path
 
 import yaml
+from loguru import logger
+
 from FABulous.fabric_definition.Bel import Bel
-from FABulous.fabric_definition.define import (
-    IO,
-    ConfigBitMode,
-    MultiplexerStyle,
-    Side,
-)
+from FABulous.fabric_definition.define import IO, ConfigBitMode, MultiplexerStyle, Side
 from FABulous.fabric_definition.Fabric import Fabric
 from FABulous.fabric_definition.Mux import Mux
 from FABulous.fabric_definition.Port import TilePort
@@ -18,7 +15,6 @@ from FABulous.fabric_definition.Wire import Wire, WireType
 from FABulous.fabric_generator.file_parser_csv import parseList, parseMatrix
 from FABulous.fabric_generator.file_parser_HDL import parseBelFile
 from FABulous.fabric_generator.file_parser_list import parseMux
-from loguru import logger
 
 oppositeDic = {
     "NORTH": "SOUTH",
@@ -64,6 +60,7 @@ def parseFabricYAML(fileName: Path) -> Fabric:
     param = data["PARAM"]
     height = 0
     width = 0
+    name = param.get("Name", "eFPGA")
     configBitMode = ConfigBitMode[param.get("ConfigBitMode", "FRAME_BASED").upper()]
     frameBitsPerRow = int(param.get("FrameBitsPerRow", 32))
     maxFramesPerCol = int(param.get("MaxFramesPerCol", 32))
@@ -90,11 +87,15 @@ def parseFabricYAML(fileName: Path) -> Fabric:
 
     for i in list(tileDic.keys()):
         if i not in usedTile:
-            logger.info(f"Tile {i} is not used in the fabric. Removing from tile dictionary.")
+            logger.info(
+                f"Tile {i} is not used in the fabric. Removing from tile dictionary."
+            )
             del tileDic[i]
     for i in list(superTileDic.keys()):
         if any(j.name not in usedTile for j in superTileDic[i].tiles):
-            logger.info(f"Supertile {i} is not used in the fabric. Removing from tile dictionary.")
+            logger.info(
+                f"Supertile {i} is not used in the fabric. Removing from tile dictionary."
+            )
             del superTileDic[i]
 
     height = len(fabricTiles)
@@ -107,7 +108,10 @@ def parseFabricYAML(fileName: Path) -> Fabric:
             if tile is None:
                 continue
             for wireType in tile.wireTypes:
-                if wireType.sourcePort.inOut != IO.OUTPUT and wireType.destinationPort.inOut != IO.INPUT:
+                if (
+                    wireType.sourcePort.inOut != IO.OUTPUT
+                    and wireType.destinationPort.inOut != IO.INPUT
+                ):
                     logger.error(
                         f"Wire {wireType} must be an output port as source_name and input port as destination_name ."
                     )
@@ -126,6 +130,7 @@ def parseFabricYAML(fileName: Path) -> Fabric:
             wireDict[(x, y)] = wires
 
     return Fabric(
+        name=name,
         tile=fabricTiles,
         numberOfColumns=width,
         numberOfRows=height,
@@ -153,7 +158,9 @@ def parseMatrixAsMux(fileName: Path, tileName: str) -> dict[str, Mux]:
 
     if file[0].split(",")[0] != tileName:
         logger.error(f"{fileName} {file[0].split(',')} {tileName}")
-        logger.error("Tile name (top left element) in csv file does not match tile name in tile object")
+        logger.error(
+            "Tile name (top left element) in csv file does not match tile name in tile object"
+        )
         raise ValueError
     destList = file[0].split(",")[1:]
 
@@ -163,7 +170,9 @@ def parseMatrixAsMux(fileName: Path, tileName: str) -> dict[str, Mux]:
         if portName == "":
             continue
         indices = [k for k, v in enumerate(connections) if v == "1"]
-        connectionsDic[portName] = Mux(f"{tileName}_{portName}", [destList[j] for j in indices], portName, 1)
+        connectionsDic[portName] = Mux(
+            f"{tileName}_{portName}", [destList[j] for j in indices], portName, 1
+        )
     return connectionsDic
 
 
@@ -228,7 +237,9 @@ def parseTileYAML(fileName: Path) -> Tile:
         normalPorts.discard(wireEntry["destination_name"])
 
     if normalPorts:
-        logger.error(f"Port {normalPorts} does not have a connection, when defined as non terminal.")
+        logger.error(
+            f"Port {normalPorts} does not have a connection, when defined as non terminal."
+        )
         raise ValueError
 
     bels = []
@@ -241,7 +252,9 @@ def parseTileYAML(fileName: Path) -> Tile:
         elif belEntry["BEL"].endswith(".v"):
             bels.append(parseBelFile(belFilePath, belEntry["prefix"], "verilog"))
         else:
-            raise ValueError(f"Invalid file type in {belFilePath} only .vhdl and .v are supported.")
+            raise ValueError(
+                f"Invalid file type in {belFilePath} only .vhdl and .v are supported."
+            )
 
     matrixDir = fileName.parent.joinpath(data["MATRIX"])
     configBit = 0
@@ -268,7 +281,9 @@ def parseTileYAML(fileName: Path) -> Tile:
                     configBit = int(configBit.group(1))
                 else:
                     configBit = 0
-                    logger.warning(f"Cannot find NumberOfConfigBits in {matrixDir} assume 0 config bits.")
+                    logger.warning(
+                        f"Cannot find NumberOfConfigBits in {matrixDir} assume 0 config bits."
+                    )
         case _:
             logger.error("Unknown file extension for matrix.")
             raise ValueError("Unknown file extension for matrix.")

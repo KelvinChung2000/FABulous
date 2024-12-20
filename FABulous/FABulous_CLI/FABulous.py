@@ -17,315 +17,45 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import argparse
-import cmd
 import csv
 import os
 import pickle
-import platform
 import pprint
 import readline
-import shutil
 import subprocess as sp
 import sys
 import tkinter as tk
-import traceback
 from contextlib import redirect_stdout
-from glob import glob
-from pathlib import PurePath, Path
-from typing import List, Literal
-from dotenv import load_dotenv
+from pathlib import PurePath
+from typing import List
 
+from cmd2 import Cmd, Cmd2ArgumentParser, Settable, with_argparser
 from loguru import logger
 
 from FABulous.fabric_generator.code_generation_Verilog import VerilogWriter
 from FABulous.fabric_generator.code_generation_VHDL import VHDLWriter
 from FABulous.FABulous_API import FABulous
+from FABulous.FABulous_CLI.exception import BitstreamGenerationError, PlaceAndRouteError, SynthesisError
+from FABulous.FABulous_CLI.helper import (
+    check_if_application_exists,
+    copy_verilog_files,
+    create_project,
+    make_hex,
+    remove_dir,
+    setup_global_env_vars,
+    setup_logger,
+    setup_project_env_vars,
+)
 
 readline.set_completer_delims(" \t\n")
 histfile = ""
 histfile_size = 1000
-MAX_BITBYTES = 16384
+
 metaDataDir = ".FABulous"
 
 
-def setup_logger(verbosity: int):
-    # Remove the default logger to avoid duplicate logs
-    logger.remove()
-
-    # Define logger format
-    if verbosity >= 1:
-        log_format = (
-            "<level>{level:}</level> | "
-            "<cyan>[{time:DD-MM-YYYY HH:mm:ss]}</cyan> | "
-            "<green>[{name}</green>:<green>{function}</green>:<green>{line}]</green> - "
-            "<level>{message}</level>"
-        )
-    else:
-        log_format = "<level>{level:}</level> | " "<level>{message}</level>"
-
-    # Add logger to write logs to stdout
-    logger.add(sys.stdout, format=log_format, level="DEBUG", colorize=True)
-
-
-def setup_global_env_vars(args: argparse.Namespace) -> None:
-    """
-    Set up global  environment variables
-
-    Parameters
-    ----------
-    args : argparse.Namespace
-        Command line arguments
-    """
-    # Set FAB_ROOT environment variable
-    fabulousRoot = os.getenv("FAB_ROOT")
-    if fabulousRoot is None:
-        os.environ["FAB_ROOT"] = str(Path(__file__).resolve().parent)
-        logger.info("FAB_ROOT environment variable not set!")
-        logger.info(f"Using {fabulousRoot} as FAB_ROOT")
-    else:
-        # If there is the FABulous folder in the FAB_ROOT, then set the FAB_ROOT to the FABulous folder
-        if Path(fabulousRoot).exists():
-            if Path(fabulousRoot).joinpath("FABulous").exists():
-                fabulousRoot = str(Path(fabulousRoot).joinpath("FABulous"))
-            os.environ["FAB_ROOT"] = fabulousRoot
-        else:
-            logger.error(
-                f"FAB_ROOT environment variable set to {fabulousRoot} but the directory does not exist"
-            )
-            sys.exit()
-
-        logger.info(f"FAB_ROOT set to {fabulousRoot}")
-
-    # Load the .env file and make env variables available globally
-    fabDir = Path(os.getenv("FAB_ROOT"))
-    if args.globalDotEnv:
-        gde = Path(args.globalDotEnv)
-        if gde.is_file():
-            load_dotenv(gde)
-            logger.info(f"Load global .env file from {gde}")
-        elif gde.joinpath(".env").exists() and gde.joinpath(".env").is_file():
-            load_dotenv(gde.joinpath(".env"))
-            logger.info(f"Load global .env file from {gde.joinpath('.env')}")
-        else:
-            logger.warning(f"No global .env file found at {gde}")
-    elif fabDir.joinpath(".env").exists() and fabDir.joinpath(".env").is_file():
-        load_dotenv(fabDir.joinpath(".env"))
-        logger.info(f"Loaded global .env file from {fabulousRoot}/.env")
-    elif (
-        fabDir.parent.joinpath(".env").exists()
-        and fabDir.parent.joinpath(".env").is_file()
-    ):
-        load_dotenv(fabDir.parent.joinpath(".env"))
-        logger.info(f"Loaded global .env file from {fabDir.parent.joinpath('.env')}")
-    else:
-        logger.warning("No global .env file found")
-
-    # Set project directory env var, this can not be saved in the .env file,
-    # since it can change if the project folder is moved
-    if not os.getenv("FAB_PROJ_DIR"):
-        os.environ["FAB_PROJ_DIR"] = args.project_dir
-
-
-def setup_project_env_vars(args: argparse.Namespace) -> None:
-    """
-    Set up environment variables for the project
-
-    Parameters
-    ----------
-    args : argparse.Namespace
-        Command line arguments
-    """
-    # Load the .env file and make env variables available globally
-    fabDir = Path(os.getenv("FAB_PROJ_DIR")).joinpath(".FABulous")
-    if args.projectDotEnv:
-        pde = Path(args.projectDotEnv)
-        if pde.exists() and pde.is_file():
-            load_dotenv(pde)
-            logger.info(f"Loaded global .env file from pde")
-    elif fabDir.joinpath(".env").exists() and fabDir.joinpath(".env").is_file():
-        load_dotenv(fabDir.joinpath(".env"))
-        logger.info(f"Loaded project .env file from {fabDir}/.env')")
-    elif (
-        fabDir.parent.joinpath(".env").exists()
-        and fabDir.parent.joinpath(".env").is_file()
-    ):
-        load_dotenv(fabDir.parent.joinpath(".env"))
-        logger.info(f"Loaded project .env file from {fabDir.parent.joinpath('.env')}")
-    else:
-        logger.warning("No project .env file found")
-
-    # Overwrite project language param, if writer is specified as command line argument
-    if args.writer:
-        os.environ["FAB_PROJ_LANG"] = args.writer
-
-
-def create_project(project_dir, type: Literal["verilog", "vhdl"] = "verilog"):
-    """Creates a FABulous project containing all required files by copying
-    the appropriate project template and the synthesis directory.
-
-    File structure as follows:
-        FABulous_project_template --> project_dir/
-        fabic_cad/synth --> project_dir/Test/synth
-
-    Parameters
-    ----------
-    project_dir : str
-        Directory where the project will be created.
-    type : Literal["verilog", "vhdl"], optional
-        The type of project to create ("verilog" or "vhdl"), by default "verilog".
-    """
-    if os.path.exists(project_dir):
-        logger.error("Project directory already exists!")
-        sys.exit()
-    else:
-        os.mkdir(f"{project_dir}")
-
-    os.mkdir(f"{project_dir}/.FABulous")
-    fabulousRoot = os.getenv("FAB_ROOT")
-
-    shutil.copytree(
-        f"{fabulousRoot}/fabric_files/FABulous_project_template_{type}/",
-        f"{project_dir}/",
-        dirs_exist_ok=True,
-    )
-    shutil.copytree(
-        f"{fabulousRoot}/fabric_cad/synth",
-        f"{project_dir}/Test/synth",
-        dirs_exist_ok=True,
-    )
-
-    with open(os.path.join(project_dir, ".FABulous/.env"), "w") as env_file:
-        env_file.write(f"FAB_PROJ_LANG={type}\n")
-
-    adjust_directory_in_verilog_tb(project_dir)
-
-
-def copy_verilog_files(src, dst):
-    """Copies all Verilog files from source directory to the destination directory.
-
-    Parameters
-    ----------
-    src : str
-        Source directory.
-    dst : str
-        Destination directory
-    """
-    for root, _, files in os.walk(src):
-        for file in files:
-            if file.endswith(".v"):
-                source_path = os.path.join(root, file)
-                destination_path = os.path.join(dst, file)
-                shutil.copy(source_path, destination_path)
-
-
-def remove_dir(path):
-    """Removes a directory and all its contents.
-
-    If the directory cannot be removed, logs OS error.
-
-    Parameters
-    ----------
-    path : str
-        Path of the directory to remove.
-    """
-    try:
-        shutil.rmtree(path)
-        pass
-    except OSError as e:
-        logger.error(f"{e}")
-
-
-def make_hex(binfile, outfile):
-    """Converts a binary file into hex file.
-
-    If the binary file exceeds MAX_BITBYTES, logs error.
-
-    Parameters
-    ----------
-    binfile : str
-        Path to binary file.
-    outfile : str
-        Path to ouput hex file.
-    """
-    with open(binfile, "rb") as f:
-        bindata = f.read()
-
-    if len(bindata) > MAX_BITBYTES:
-        logger.error("Binary file too big.")
-        return
-
-    with open(outfile, "w") as f:
-        for i in range(MAX_BITBYTES):
-            if i < len(bindata):
-                print(f"{bindata[i]:02x}", file=f)
-            else:
-                print("0", file=f)
-
-
-def check_if_application_exists(application: str, throw_exception: bool = True) -> Path:
-    """Checks if an application is installed on the system.
-
-    Parameters
-    ----------
-    application : str
-        Name of the application to check.
-    throw_exception : bool, optional
-        If True, throws an exception if the application is not installed, by default True
-
-    Returns
-    -------
-    Path
-        Path to  the application, if installed.
-
-    Raises
-    ------
-    Exception
-        If the application is not installed and throw_exception is True.
-    """
-    path = shutil.which(application)
-    if path is not None:
-        return Path(path)
-    else:
-        logger.error(
-            f"{application} is not installed. Please install it or set FAB_<APPLICATION>_PATH in the .env file."
-        )
-        if throw_exception:
-            raise Exception(f"{application} is not installed.")
-
-
-def adjust_directory_in_verilog_tb(project_dir):
-    """Adjusts directory paths in a Verilog testbench file by replacing
-    the string "PROJECT_DIR" in the project_template with the actual
-    project directory.
-
-    Parameters
-    ----------
-    project_dir : str
-        Projet directory where the testbench file is located.
-    """
-    with open(
-        f"{os.getenv('FAB_ROOT')}/fabric_files/FABulous_project_template_verilog/Test/sequential_16bit_en_tb.v",
-        "rt",
-    ) as fin:
-        with open(f"{project_dir}/Test/sequential_16bit_en_tb.v", "wt") as fout:
-            for line in fin:
-                fout.write(line.replace("PROJECT_DIR", f"{project_dir}"))
-
-
-class PlaceAndRouteError(Exception):
-    """An exception to be thrown when place and route fails."""
-
-
-class SynthesisError(Exception):
-    """An exception to be thrown when synthesis fails."""
-
-
-class BitstreamGenerationError(Exception):
-    """An exception to be thrown when the bitstream generation fails."""
-
-
-class FABulousShell(cmd.Cmd):
-    intro: str = f"""
+class FABulousShell(Cmd):
+    intro: str = rf"""
 
     ______      ____        __
     |  ____/\   |  _ \      | |
@@ -367,6 +97,7 @@ To run the complete FABulous flow with the default project, run the following co
     fabricLoaded: bool = False
     script: str = ""
 
+
     def __init__(self, fab: FABulous, projectDir: str, script: str = ""):
         """Initialises the FABulous shell instance.
 
@@ -385,11 +116,17 @@ To run the complete FABulous flow with the default project, run the following co
         super().__init__()
         self.fabricGen = fab
         self.projectDir = projectDir
+        self.add_settable(Settable("projectDir", str, "The directory of the project", self))
+
         self.tiles = []
         self.superTiles = []
         self.csvFile = ""
+        self.add_settable(Settable("csvFile", str, "The csv ", self, completer=Cmd.path_complete))
+
         self.script = script
         self.verbose = False
+        self.add_settable(Settable("verbose", bool, "verbose output", self))
+
         if isinstance(self.fabricGen.writer, VHDLWriter):
             self.extension = "vhdl"
         else:
@@ -398,228 +135,101 @@ To run the complete FABulous flow with the default project, run the following co
         if hasattr(fab, "fabric"):
             self.fabricLoaded = True
 
-    def preloop(self) -> None:
-        """Execution before entering main command loop.
-        Reads command history in 'histfile' if it exists, sets up exception
-        handling for Tcl commands, executes Tcl scripts and if Tcl script
-        contains 'exit' command, shell exits with code 0.
-        """
-        # File does not exist when the shell is started the first time after creating a new project
-        if os.path.exists(histfile):
-            readline.read_history_file(histfile)
+    # def preloop(self) -> None:
+    #     """Execution before entering main command loop.
+    #     Reads command history in 'histfile' if it exists, sets up exception
+    #     handling for Tcl commands, executes Tcl scripts and if Tcl script
+    #     contains 'exit' command, shell exits with code 0.
+    #     """
+    #     # File does not exist when the shell is started the first time after creating a new project
+    #     if os.path.exists(histfile):
+    #         readline.read_history_file(histfile)
 
-        def wrap_with_except_handling(fun_to_wrap):
-            """Decorator function that wraps 'fun_to_wrap' with exception handling.
+    #     def wrap_with_except_handling(fun_to_wrap):
+    #         """Decorator function that wraps 'fun_to_wrap' with exception handling.
 
-            Parameters
-            ----------
-            fun_to_wrap : callable
-                The function to be wrapped with exception handling.
-            """
+    #         Parameters
+    #         ----------
+    #         fun_to_wrap : callable
+    #             The function to be wrapped with exception handling.
+    #         """
 
-            def inter(*args, **varargs):
-                """Wrapped function that executes 'fun_to_wrap' with arguments
-                and exception handling.
+    #         def inter(*args, **varargs):
+    #             """Wrapped function that executes 'fun_to_wrap' with arguments
+    #             and exception handling.
 
-                Parameters
-                ----------
-                *args : tuple
-                    Positional arguments to pass to 'fun_to_wrap'.
-                **varags : dict
-                    Keyword arguments to pass to 'fun_to_wrap'.
-                """
-                try:
-                    fun_to_wrap(*args, **varargs)
-                except:
-                    import traceback
+    #             Parameters
+    #             ----------
+    #             *args : tuple
+    #                 Positional arguments to pass to 'fun_to_wrap'.
+    #             **varags : dict
+    #                 Keyword arguments to pass to 'fun_to_wrap'.
+    #             """
+    #             try:
+    #                 fun_to_wrap(*args, **varargs)
+    #             except:
+    #                 import traceback
 
-                    traceback.print_exc()
-                    sys.exit(1)
+    #                 traceback.print_exc()
+    #                 sys.exit(1)
 
-            return inter
+    #         return inter
 
-        tcl = tk.Tcl()
-        script = ""
-        if self.script != "":
-            with open(self.script, "r") as f:
-                script = f.read()
-            for fun in dir(self.__class__):
-                if fun.startswith("do_"):
-                    name = fun.strip("do_")
-                    tcl.createcommand(
-                        name, wrap_with_except_handling(getattr(self, fun))
-                    )
+    #     tcl = tk.Tcl()
+    #     script = ""
+    #     if self.script != "":
+    #         with open(self.script, "r") as f:
+    #             script = f.read()
+    #         for fun in dir(self.__class__):
+    #             if fun.startswith("do_"):
+    #                 name = fun.strip("do_")
+    #                 tcl.createcommand(name, wrap_with_except_handling(getattr(self, fun)))
 
-        # os.chdir(os.getenv('FAB_PROJ_DIR'))
-        tcl.eval(script)
+    #     # os.chdir(os.getenv('FAB_PROJ_DIR'))
+    #     tcl.eval(script)
 
-        if "exit" in script:
-            exit(0)
+    #     if "exit" in script:
+    #         exit(0)
 
-    def postloop(self):
-        """Excecution after exiting main command loop.
-        Sets history length for readline using 'histfile_size' and
-        writes command history to '.fabulous_history' file.
-        """
-        readline.set_history_length(histfile_size)
-        histfile = f"{self.projectDir}/.FABulous/.fabulous_history"
-        readline.write_history_file(histfile)
+    # def onecmd(self, line):
+    #     try:
+    #         return super().onecmd(line)
+    #     except:
+    #         print(traceback.format_exc())
+    #         return False
 
-    def precmd(self, line: str) -> str:
-        """Pre-processes command line before execution.
-
-        Checks if fabric is loaded before allowing commands 'gen' or 'run'.
-
-        If fabric is not loaded and command requires it, logs error and prevents
-        execution.
-
-        Parameters
-        ----------
-        line : str
-            Command line input to pre-process
-
-        Returns
-        -------
-        str
-            Processed command line input, modified or empty if execution blocked.
-        """
-        if (
-            ("gen" in line or "run" in line)
-            and not self.fabricLoaded
-            and "help" not in line
-            and "?" not in line
-        ):
-            logger.error("Fabric not loaded")
-            return ""
-        return line
-
-    def onecmd(self, line):
-        try:
-            return super().onecmd(line)
-        except:
-            print(traceback.format_exc())
-            return False
-
-    def emptyline(self):
-        """Overrides the emptyline method, when pressing enter on an empty
-        command line input it will have no effect.
-        """
-        pass
-
-    def parse(self, line: str) -> List[str]:
-        """Parses command line into list of tokens.
-        Splits the input line based on whitespace.
-
-        Parameters
-        ----------
-        line : str
-            Command line input to parse.
-
-        Returns
-        -------
-        List[str]
-            List of tokens extraced from the input line.
-        """
-        return line.split()
-
-    def _complete_path(self, path):
-        """Completes partial or full file path.
-
-        If 'path' is a directory, returns list of files and directories inside.
-
-        If 'path' is a file, reutrns a list containing the file itself.
-
-        Parameters
-        ----------
-        path : str
-            Partial or full path to complete.
-
-        Returns
-        -------
-        List[str]
-            List of possible completions for given 'path'
-        """
-        if os.path.isdir(path):
-            return glob(os.path.join(path, "*"))
-        else:
-            return glob(path + "*")
-
-    def _complete_tileName(self, text):
-        """Completes partial tile name using list of all tiles.
-
-        Finds tile names from 'self.allTile' that start with provided 'text'.
-
-        Parameters
-        ----------
-        text : srt
-            Partial text of tile name to complete.
-
-        Returns
-        -------
-        List[str]
-            List of tile names from 'self.allTile' starting with 'text'
-        """
-        return [t for t in self.allTile if t.startswith(text)]
-
-    def do_shell(self, args):
-        """Runs a shell command, if no command is provided prints prompt,
-        if command execution fails, logs error message.
-
-        Parameters
-        ----------
-        args : str
-            Shell command to be exectued.
-        """
-        if not args:
-            logger.error("Please provide a command to run")
-            return
-
-        try:
-            sp.run(args, shell=True)
-        except sp.CalledProcessError:
-            logger.error("Could not execute the requested command.")
-            return
-
-    def do_exit(self, *ignore):
-        """Exits the FABulous shell and logs info message.
-
-        Parameters
-        ----------
-        *ignore : tuple
-            Arguments passed will be ignored.
-
-        Returns
-        -------
-        bool
-            Always returns True to indicate the shell will exit.
-        """
+    def do_exit(self, _):
+        """Exits the FABulous shell and logs info message."""
         logger.info("Exiting FABulous shell")
         return True
 
-    def do_load_fabric(self, args=""):
+    load_fabric_parser = Cmd2ArgumentParser()
+    load_fabric_parser.add_argument(
+        "--file", type=str, help="Path to the fabric file to load", required=False, completer=Cmd.path_complete
+    )
+
+    tile_list_parser = Cmd2ArgumentParser()
+    tile_list_parser.add_argument(
+        "tiles",
+        type=str,
+        help="A list of tile want to perform action on",
+        nargs="+",
+        completer=lambda self: self.allTile,
+    )
+
+    @with_argparser(load_fabric_parser)
+    def do_load_fabric(self, args):
         """Loads 'fabric.csv' file and generates an internal representation
         of the fabric. Does this by parsing input arguments, sets an internal
         state to indicate that fabric is loaded and determines the available tiles
         by comparing directories in the project with tiles defined by fabric.
 
         Logs error if no CSV file is found.
-
-        Usage:
-            load_fabric /path/to/fabric.csv
-            load_fabric <defaults to path in 'set_fabric_csv'>
-
-        Parameters
-        ----------
-        args : str, optional
-            Path to the CSV file to load. If unavailable will use
-            path set by 'set_fabric_csv' or looks for 'fabric.csv'
-            in project directory, by default ""
         """
-        args = self.parse(args)
         # if no argument is given will use the one set by set_fabric_csv
         # else use the argument
         logger.info("Loading fabric")
-        if len(args) == 0:
+        if not args.file:
             if self.csvFile != "" and os.path.exists(self.csvFile):
                 self.fabricGen.loadFabric(self.csvFile)
             elif os.path.exists(f"{self.projectDir}/fabric.csv"):
@@ -629,26 +239,18 @@ To run the complete FABulous flow with the default project, run the following co
                 self.fabricGen.loadFabric(f"{self.projectDir}/fabric.csv")
                 self.csvFile = f"{self.projectDir}/fabric.csv"
             else:
-                logger.error(
-                    "No argument is given and no csv file is set or the file does not exist"
-                )
-                return
+                logger.error("No argument is given and no csv file is set or the file does not exist")
         else:
-            self.fabricGen.loadFabric(args[0])
-            self.csvFile = args[0]
+            self.fabricGen.loadFabric(args.file)
+            self.csvFile = args.file
 
         self.fabricLoaded = True
         # self.projectDir = os.path.split(self.csvFile)[0]
-        tileByPath = [
-            f.name for f in os.scandir(f"{self.projectDir}/Tile/") if f.is_dir()
-        ]
+        tileByPath = [f.name for f in os.scandir(f"{self.projectDir}/Tile/") if f.is_dir()]
         tileByFabric = list(self.fabricGen.fabric.tileDic.keys())
         superTileByFabric = list(self.fabricGen.fabric.superTileDic.keys())
         self.allTile = list(set(tileByPath) & set(tileByFabric + superTileByFabric))
         logger.info("Complete")
-
-    def complete_load_fabric(self, text, *ignored):
-        return self._complete_path(text)
 
     def do_print_bel(self, args):
         """Prints a Bel object to the console.
@@ -677,9 +279,6 @@ To run the complete FABulous flow with the default project, run the following co
                 return
         logger.error("Bel not found")
 
-    def complete_print_bel(self, text, *ignored):
-        return [i.name for i in self.fabricGen.getBels() if i.name.startswith(text)]
-
     def do_print_tile(self, args):
         """Prints a tile object to the console.
 
@@ -707,55 +306,21 @@ To run the complete FABulous flow with the default project, run the following co
         else:
             logger.error("Tile not found")
 
-    def complete_print_tile(self, text, *ignored):
-        return self._complete_tileName(text)
-
-    def do_set_fabric_csv(self, args):
-        """Sets the CSV file to be used for fabric generation.
-
-        Usage:
-            set_fabric_csv /path/to/fabric.csv
-
-        Parameters
-        ----------
-        args : str
-            Path to CSV file to be set.
-        """
-        args = self.parse(args)
-        self.csvFile = args[0]
-
-    def complete_set_fabric_csv(self, text, *ignored):
-        return self._complete_path(text)
-
+    @with_argparser(tile_list_parser)
     def do_gen_config_mem(self, args):
         """Generates configuration memory of the given tile by
         by parsing input arguments and calling 'genConfigMem'.
 
         Logs generation processes for each specified tile.
-
-        Usage:
-            gen_config_mem
-
-        Parameters
-        ----------
-        args : str
-            Names of tiles which generate the configuration memory.
         """
-        args = self.parse(args)
         logger.info(f"Generating Config Memory for {' '.join(args)}")
-        for i in args:
+        for i in args.tiles:
             logger.info(f"Generating configMem for {i}")
-            self.fabricGen.setWriterOutputFile(
-                f"{self.projectDir}/Tile/{i}/{i}_ConfigMem.{self.extension}"
-            )
-            self.fabricGen.genConfigMem(
-                i, f"{self.projectDir}/Tile/{i}/{i}_ConfigMem.csv"
-            )
+            self.fabricGen.setWriterOutputFile(f"{self.projectDir}/Tile/{i}/{i}_ConfigMem.{self.extension}")
+            self.fabricGen.genConfigMem(i, f"{self.projectDir}/Tile/{i}/{i}_ConfigMem.csv")
         logger.info("Generating configMem complete")
 
-    def complete_gen_config_mem(self, text, *ignored):
-        return self._complete_tileName(text)
-
+    @with_argparser(tile_list_parser)
     def do_gen_switch_matrix(self, args):
         """Generates switch matrix of given tile by parsing input arguments
         and calling 'genSwitchMatrix'.
@@ -770,19 +335,14 @@ To run the complete FABulous flow with the default project, run the following co
         args : str
             Name of tiles which generate the switch matrix.
         """
-        args = self.parse(args)
-        logger.info(f"Generating switch matrix for {' '.join(args)}")
-        for i in args:
+        logger.info(f"Generating switch matrix for {' '.join(args.tiles)}")
+        for i in args.tiles:
             logger.info(f"Generating switch matrix for {i}")
-            self.fabricGen.setWriterOutputFile(
-                f"{self.projectDir}/Tile/{i}/{i}_switch_matrix.{self.extension}"
-            )
+            self.fabricGen.setWriterOutputFile(f"{self.projectDir}/Tile/{i}/{i}_switch_matrix.{self.extension}")
             self.fabricGen.genSwitchMatrix(i)
         logger.info("Switch matrix generation complete")
 
-    def complete_gen_switch_matrix(self, text, *ignored):
-        return self._complete_tileName(text)
-
+    @with_argparser(tile_list_parser)
     def do_gen_tile(self, args):
         """Generates given tile with switch matrix and configuration memory
         by parsing input arguments, calls functions such as 'genSwitchMatrix' and
@@ -798,16 +358,11 @@ To run the complete FABulous flow with the default project, run the following co
         args : str
             Names of tiles to be generated.
         """
-        if not isinstance(args, list):
-            args = self.parse(args)
-        logger.info(f"Generating tile {' '.join(args)}")
-        for t in args:
-            if subTiles := [
-                f.name for f in os.scandir(f"{self.projectDir}/Tile/{t}") if f.is_dir()
-            ]:
-                logger.info(
-                    f"{t} is a super tile, generating {t} with sub tiles {' '.join(subTiles)}"
-                )
+
+        logger.info(f"Generating tile {' '.join(args.tiles)}")
+        for t in args.tiles:
+            if subTiles := [f.name for f in os.scandir(f"{self.projectDir}/Tile/{t}") if f.is_dir()]:
+                logger.info(f"{t} is a super tile, generating {t} with sub tiles {' '.join(subTiles)}")
                 for st in subTiles:
                     # Gen switch matrix
                     logger.info(f"Generating switch matrix for tile {t}")
@@ -824,25 +379,19 @@ To run the complete FABulous flow with the default project, run the following co
                     self.fabricGen.setWriterOutputFile(
                         f"{self.projectDir}/Tile/{t}/{st}/{st}_ConfigMem.{self.extension}"
                     )
-                    self.fabricGen.genConfigMem(
-                        st, f"{self.projectDir}/Tile/{t}/{st}/{st}_ConfigMem.csv"
-                    )
+                    self.fabricGen.genConfigMem(st, f"{self.projectDir}/Tile/{t}/{st}/{st}_ConfigMem.csv")
                     logger.info(f"Generated configMem for {st}")
 
                     # Gen tile
                     logger.info(f"Generating subtile for tile {t}")
                     logger.info(f"Generating subtile {st}")
-                    self.fabricGen.setWriterOutputFile(
-                        f"{self.projectDir}/Tile/{t}/{st}/{st}.{self.extension}"
-                    )
+                    self.fabricGen.setWriterOutputFile(f"{self.projectDir}/Tile/{t}/{st}/{st}.{self.extension}")
                     self.fabricGen.genTile(st)
                     logger.info(f"Generated subtile {st}")
 
                 # Gen super tile
                 logger.info(f"Generating super tile {t}")
-                self.fabricGen.setWriterOutputFile(
-                    f"{self.projectDir}/Tile/{t}/{t}.{self.extension}"
-                )
+                self.fabricGen.setWriterOutputFile(f"{self.projectDir}/Tile/{t}/{t}.{self.extension}")
                 self.fabricGen.genSuperTile(t)
                 logger.info(f"Generated super tile {t}")
                 continue
@@ -855,16 +404,11 @@ To run the complete FABulous flow with the default project, run the following co
 
             logger.info(f"Generating tile {t}")
             # Gen tile
-            self.fabricGen.setWriterOutputFile(
-                f"{self.projectDir}/Tile/{t}/{t}.{self.extension}"
-            )
+            self.fabricGen.setWriterOutputFile(f"{self.projectDir}/Tile/{t}/{t}.{self.extension}")
             self.fabricGen.genTile(t)
             logger.info(f"Generated tile {t}")
 
         logger.info("Tile generation complete")
-
-    def complete_gen_tile(self, text: str, *ignored):
-        return self._complete_tileName(text)
 
     def do_gen_all_tile(self, *ignored):
         """Generates all tiles by calling 'do_gen_tile'.
@@ -878,7 +422,7 @@ To run the complete FABulous flow with the default project, run the following co
             Ignores additional arguments.
         """
         logger.info("Generating all tiles")
-        self.do_gen_tile(self.allTile)
+        self.do_gen_tile(" ".join(self.allTile))
         logger.info("Generated all tiles")
 
     def do_gen_fabric(self, *ignored):
@@ -896,9 +440,7 @@ To run the complete FABulous flow with the default project, run the following co
         """
         logger.info(f"Generating fabric {self.fabricGen.fabric.name}")
         self.do_gen_all_tile()
-        self.fabricGen.setWriterOutputFile(
-            f"{self.projectDir}/Fabric/{self.fabricGen.fabric.name}.{self.extension}"
-        )
+        self.fabricGen.setWriterOutputFile(f"{self.projectDir}/Fabric/{self.fabricGen.fabric.name}.{self.extension}")
         self.fabricGen.genFabric()
         logger.info("Fabric generation complete")
 
@@ -938,9 +480,7 @@ To run the complete FABulous flow with the default project, run the following co
                 padding = int(vargs[0])
                 logger.info(f"Setting padding to {padding}")
             except ValueError:
-                logger.warning(
-                    f"Faulty padding argument, defaulting to {paddingDefault}"
-                )
+                logger.warning(f"Faulty padding argument, defaulting to {paddingDefault}")
                 padding = paddingDefault
         else:
             logger.info(f"No padding specified, defaulting to {paddingDefault}")
@@ -984,7 +524,7 @@ To run the complete FABulous flow with the default project, run the following co
             return
 
         logger.info(f"Found FABulator installation at {fabulatorRoot}")
-        logger.info(f"Trying to start FABulator...")
+        logger.info("Trying to start FABulator...")
 
         startupCmd = ["mvn", "-f", f"{fabulatorRoot}/pom.xml", "javafx:run"]
         try:
@@ -1016,9 +556,7 @@ To run the complete FABulous flow with the default project, run the following co
         specObject = self.fabricGen.genBitStreamSpec()
 
         logger.info(f"output file: {self.projectDir}/{metaDataDir}/bitStreamSpec.bin")
-        with open(
-            f"{self.projectDir}/{metaDataDir}/bitStreamSpec.bin", "wb"
-        ) as outFile:
+        with open(f"{self.projectDir}/{metaDataDir}/bitStreamSpec.bin", "wb") as outFile:
             pickle.dump(specObject, outFile)
 
         logger.info(f"output file: {self.projectDir}/{metaDataDir}/bitStreamSpec.csv")
@@ -1108,48 +646,6 @@ To run the complete FABulous flow with the default project, run the following co
 
         logger.info("Generated npnr model")
 
-    # TODO update once have transition the model gen to object based
-    # def do_gen_model_npnr_pair(self):
-    #     """(Currently not working!)
-
-    #     Generates a pair Nextpnr (npnr) model of
-    #     the fabric by calling 'GetFabric' and 'genFabricObject' then saving
-    #     the npnr components in their respective files.
-
-    #     Also logs the path of the output files.
-
-    #     Usage:
-    #         gen_model_npnr_pair
-
-    #     """
-    #     logger.info("Generating pair npnr model")
-    #     if self.csvFile:
-    #         FabricFile = [i.strip("\n").split(",") for i in open(self.csvFile)]
-    #         fabric = GetFabric(FabricFile)
-    #         fabricObject = genFabricObject(fabric, FabricFile)
-    #         pipFile = open(f"{self.projectDir}/{metaDataDir}/pips.txt", "w")
-    #         belFile = open(f"{self.projectDir}/{metaDataDir}/bel.txt", "w")
-    #         pairFile = open(f"{self.projectDir}/{metaDataDir}/wirePairs.csv", "w")
-    #         constraintFile = open(f"{self.projectDir}/{metaDataDir}/template.pcf", "w")
-
-    #         npnrModel = model_gen_npnr.genNextpnrModelOld(fabricObject, False)
-
-    #         pipFile.write(npnrModel[0])
-    #         belFile.write(npnrModel[1])
-    #         constraintFile.write(npnrModel[2])
-    #         pairFile.write(npnrModel[3])
-
-    #         pipFile.close()
-    #         belFile.close()
-    #         constraintFile.close()
-    #         pairFile.close()
-
-    #     else:
-    #         logger.error(
-    #             "Need to call sec_fabric_csv before running model_gen_npnr_pair"
-    #         )
-    #     logger.info("Generated pair npnr model")
-
     def do_synthesis(self, args):
         """Runs Yosys using Nextpnr JSON backend to synthesise the Verilog design specified
         by <top_module_file> and generates a Nextpnr-compatible JSON file for further place
@@ -1176,9 +672,7 @@ To run the complete FABulous flow with the default project, run the following co
         if len(args) != 1:
             logger.error("Usage: synthesis <top_module_file>")
             print(args)
-            raise TypeError(
-                f"do_synthesis takes exactly one argument ({len(args)} given)"
-            )
+            raise TypeError(f"do_synthesis takes exactly one argument ({len(args)} given)")
         logger.info(f"Running synthesis that targeting Nextpnr with design {args[0]}")
         path = PurePath(args[0])
         parent = path.parent
@@ -1240,9 +734,7 @@ To run the complete FABulous flow with the default project, run the following co
             logger.error(
                 "Usage: place_and_route_ <json_file> (<json_file> is generated by Yosys. Generate it by running `synthesis`.)"
             )
-            raise TypeError(
-                f"do_place_and_route takes exactly one argument ({len(args)} given)"
-            )
+            raise TypeError(f"do_place_and_route takes exactly one argument ({len(args)} given)")
         logger.info(f"Running Placement and Routing with Nextpnr for design {args[0]}")
         path = PurePath(args[0])
         parent = path.parent
@@ -1264,19 +756,15 @@ To run the complete FABulous flow with the default project, run the following co
         if parent == "":
             parent = "."
 
-        if not os.path.exists(
-            f"{self.projectDir}/.FABulous/pips.txt"
-        ) or not os.path.exists(f"{self.projectDir}/.FABulous/bel.txt"):
-            logger.error(
-                "Pips and Bel files are not found, please run model_gen_npnr first"
-            )
+        if not os.path.exists(f"{self.projectDir}/.FABulous/pips.txt") or not os.path.exists(
+            f"{self.projectDir}/.FABulous/bel.txt"
+        ):
+            logger.error("Pips and Bel files are not found, please run model_gen_npnr first")
             raise FileNotFoundError
 
         if os.path.exists(f"{self.projectDir}/{parent}"):
             # TODO rewriting the fab_arch script so no need to copy file for work around
-            npnr = check_if_application_exists(
-                os.getenv("FAB_NEXTPNR_PATH", "nextpnr-generic")
-            )
+            npnr = check_if_application_exists(os.getenv("FAB_NEXTPNR_PATH", "nextpnr-generic"))
             if f"{json_file}" in os.listdir(f"{self.projectDir}/{parent}"):
                 runCmd = [
                     f"FAB_ROOT={self.projectDir}",
@@ -1354,9 +842,7 @@ To run the complete FABulous flow with the default project, run the following co
         bitstream_file = top_module_name + ".bin"
 
         if not os.path.exists(f"{self.projectDir}/.FABulous/bitStreamSpec.bin"):
-            logger.error(
-                "Cannot find bitStreamSpec.bin file, which is generated by running gen_bitStream_spec"
-            )
+            logger.error("Cannot find bitStreamSpec.bin file, which is generated by running gen_bitStream_spec")
             return
 
         if not os.path.exists(f"{self.projectDir}/{parent}/{fasm_file}"):
@@ -1466,13 +952,9 @@ To run the complete FABulous flow with the default project, run the following co
         os.makedirs(f"{self.projectDir}/{path}/tmp", exist_ok=True)
         copy_verilog_files(f"{self.projectDir}/Tile/", tmp_dir)
         copy_verilog_files(f"{self.projectDir}/Fabric/", tmp_dir)
-        file_list = [
-            os.path.join(tmp_dir, filename) for filename in os.listdir(tmp_dir)
-        ]
+        file_list = [os.path.join(tmp_dir, filename) for filename in os.listdir(tmp_dir)]
 
-        iverilog = check_if_application_exists(
-            os.getenv("FAB_IVERILOG_PATH", "iverilog")
-        )
+        iverilog = check_if_application_exists(os.getenv("FAB_IVERILOG_PATH", "iverilog"))
         try:
             runCmd = [
                 f"{iverilog}",
@@ -1639,9 +1121,7 @@ def main():
     -pde, --projectDotEnv : str, optional
         Set project .env file path. Default is $FAB_PROJ_DIR/.env
     """
-    parser = argparse.ArgumentParser(
-        description="The command line interface for FABulous"
-    )
+    parser = argparse.ArgumentParser(description="The command line interface for FABulous")
 
     parser.add_argument("project_dir", help="The directory to the project folder")
 
@@ -1653,13 +1133,9 @@ def main():
         help="Create a new project",
     )
 
-    parser.add_argument(
-        "-csv", default="", nargs=1, help="Log all the output from the terminal"
-    )
+    parser.add_argument("-csv", default="", nargs=1, help="Log all the output from the terminal")
 
-    parser.add_argument(
-        "-s", "--script", default="", help="Run FABulous with a FABulous script"
-    )
+    parser.add_argument("-s", "--script", default="", help="Run FABulous with a FABulous script")
 
     parser.add_argument(
         "-log",
@@ -1718,9 +1194,7 @@ def main():
         exit(0)
 
     if not os.path.exists(f"{os.getenv('FAB_PROJ_DIR')}/.FABulous"):
-        logger.error(
-            "The directory provided is not a FABulous project as it does not have a .FABulous folder"
-        )
+        logger.error("The directory provided is not a FABulous project as it does not have a .FABulous folder")
         exit(-1)
     else:
         setup_project_env_vars(args)
@@ -1730,25 +1204,17 @@ def main():
         elif os.getenv("FAB_PROJ_LANG") == "verilog":
             writer = VerilogWriter()
         else:
-            logger.error(
-                f"Invalid projct language specified: {os.getenv('FAB_PROJ_LANG')}"
-            )
-            raise ValueError(
-                f"Invalid projct language specified: {os.getenv('FAB_PROJ_LANG')}"
-            )
+            logger.error(f"Invalid projct language specified: {os.getenv('FAB_PROJ_LANG')}")
+            raise ValueError(f"Invalid projct language specified: {os.getenv('FAB_PROJ_LANG')}")
 
-        fabShell = FABulousShell(
-            FABulous(writer, fabricCSV=args.csv), os.getenv("FAB_PROJ_DIR"), args.script
-        )
+        fabShell = FABulousShell(FABulous(writer, fabricCSV=args.csv), os.getenv("FAB_PROJ_DIR"), args.script)
         if args.verbose == 2:
             fabShell.verbose = True
 
         if args.metaDataDir:
             metaDataDir = args.metaDataDir
 
-        histfile = os.path.expanduser(
-            f"{os.getenv('FAB_PROJ_DIR')}/{metaDataDir}/.fabulous_history"
-        )
+        histfile = os.path.expanduser(f"{os.getenv('FAB_PROJ_DIR')}/{metaDataDir}/.fabulous_history")
         readline.write_history_file(histfile)
 
         if args.log:

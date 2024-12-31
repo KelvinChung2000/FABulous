@@ -1,4 +1,5 @@
 from loguru import logger
+from pathlib import Path
 
 import FABulous.fabric_cad.model_generation_npnr as model_gen_npnr
 
@@ -74,7 +75,7 @@ class FABulous:
         logger.info(f"Output file: {outputDir}")
         self.writer.outFileName = outputDir
 
-    def loadFabric(self, dir: str):
+    def loadFabric(self, dir: Path):
         """Loads fabric data from 'fabric.csv'.
 
         Parameters
@@ -87,7 +88,7 @@ class FABulous:
         ValueError
             If 'dir' does not end with '.csv'
         """
-        if dir.endswith(".csv"):
+        if dir.suffix == ".csv":
             self.fabric = fileParser.parseFabricCSV(dir)
             self.fabricGenerator = FabricGenerator(self.fabric, self.writer)
             self.geometryGenerator = GeometryGenerator(self.fabric)
@@ -122,7 +123,7 @@ class FABulous:
         """
         self.fabricGenerator.list2CSV(list, matrix)
 
-    def genConfigMem(self, tileName: str, configMem: str):
+    def genConfigMem(self, tileName: str, configMem: Path):
         """Generate configuration memory for specified tile.
 
         Parameters

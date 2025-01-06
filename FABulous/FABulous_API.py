@@ -1,21 +1,22 @@
-from loguru import logger
 from pathlib import Path
 
+from loguru import logger
+
 import FABulous.fabric_cad.model_generation_npnr as model_gen_npnr
+import FABulous.fabric_generator.code_generator as codeGen
+import FABulous.fabric_generator.file_parser as fileParser
 
 # Importing Modules from FABulous Framework.
 from FABulous.fabric_definition.Bel import Bel
+from FABulous.fabric_definition.Fabric import Fabric
 from FABulous.fabric_definition.SuperTile import SuperTile
 from FABulous.fabric_definition.Tile import Tile
-import FABulous.fabric_generator.code_generator as codeGen
-import FABulous.fabric_generator.file_parser as fileParser
-from FABulous.fabric_definition.Fabric import Fabric
 from FABulous.fabric_generator.code_generation_VHDL import VHDLWriter
 from FABulous.fabric_generator.fabric_gen import FabricGenerator
 from FABulous.geometry_generator.geometry_gen import GeometryGenerator
 
 
-class FABulous:
+class FABulous_API:
     """Class for managing fabric and geometry generation.
 
     This class parses fabric data from 'fabric.csv', generates fabric layouts,
@@ -88,6 +89,7 @@ class FABulous:
         ValueError
             If 'dir' does not end with '.csv'
         """
+        print(dir)
         if dir.suffix == ".csv":
             self.fabric = fileParser.parseFabricCSV(dir)
             self.fabricGenerator = FabricGenerator(self.fabric, self.writer)
@@ -133,8 +135,10 @@ class FABulous:
         configMem : str
             File path where the configuration memory will be saved.
         """
-        tile = self.fabric.getTileByName(tileName)
-        self.fabricGenerator.generateConfigMem(tile, configMem)
+        if tile := self.fabric.getTileByName(tileName):
+            self.fabricGenerator.generateConfigMem(tile, configMem)
+        else:
+            raise ValueError(f"Tile {tileName} not found")
 
     def genSwitchMatrix(self, tileName: str):
         """Generates switch matrix for specified tile via 'genTileSwitchMatrix'
@@ -157,8 +161,10 @@ class FABulous:
         tileName : str
             Name of the tile generated.
         """
-        tile = self.fabric.getTileByName(tileName)
-        self.fabricGenerator.generateTile(tile)
+        if tile := self.fabric.getTileByName(tileName):
+            self.fabricGenerator.generateTile(tile)
+        else:
+            raise ValueError(f"Tile {tileName} not found")
 
     def genSuperTile(self, tileName: str):
         """Generates a super tile based on its name via 'generateSuperTile'

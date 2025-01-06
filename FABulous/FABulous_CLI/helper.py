@@ -1,5 +1,6 @@
 import argparse
 import os
+import shutil
 import sys
 from pathlib import Path
 from typing import Literal
@@ -41,7 +42,8 @@ def setup_global_env_vars(args: argparse.Namespace) -> None:
     # Set FAB_ROOT environment variable
     fabulousRoot = os.getenv("FAB_ROOT")
     if fabulousRoot is None:
-        os.environ["FAB_ROOT"] = str(Path(__file__).resolve().parent)
+        fabulousRoot = str(Path(__file__).resolve().parent.parent)
+        os.environ["FAB_ROOT"] = fabulousRoot
         logger.info("FAB_ROOT environment variable not set!")
         logger.info(f"Using {fabulousRoot} as FAB_ROOT")
     else:
@@ -51,7 +53,9 @@ def setup_global_env_vars(args: argparse.Namespace) -> None:
                 fabulousRoot = str(Path(fabulousRoot).joinpath("FABulous"))
             os.environ["FAB_ROOT"] = fabulousRoot
         else:
-            logger.error(f"FAB_ROOT environment variable set to {fabulousRoot} but the directory does not exist")
+            logger.error(
+                f"FAB_ROOT environment variable set to {fabulousRoot} but the directory does not exist"
+            )
             sys.exit()
 
         logger.info(f"FAB_ROOT set to {fabulousRoot}")
@@ -71,7 +75,10 @@ def setup_global_env_vars(args: argparse.Namespace) -> None:
     elif fabDir.joinpath(".env").exists() and fabDir.joinpath(".env").is_file():
         load_dotenv(fabDir.joinpath(".env"))
         logger.info(f"Loaded global .env file from {fabulousRoot}/.env")
-    elif fabDir.parent.joinpath(".env").exists() and fabDir.parent.joinpath(".env").is_file():
+    elif (
+        fabDir.parent.joinpath(".env").exists()
+        and fabDir.parent.joinpath(".env").is_file()
+    ):
         load_dotenv(fabDir.parent.joinpath(".env"))
         logger.info(f"Loaded global .env file from {fabDir.parent.joinpath('.env')}")
     else:
@@ -102,7 +109,10 @@ def setup_project_env_vars(args: argparse.Namespace) -> None:
     elif fabDir.joinpath(".env").exists() and fabDir.joinpath(".env").is_file():
         load_dotenv(fabDir.joinpath(".env"))
         logger.info(f"Loaded project .env file from {fabDir}/.env')")
-    elif fabDir.parent.joinpath(".env").exists() and fabDir.parent.joinpath(".env").is_file():
+    elif (
+        fabDir.parent.joinpath(".env").exists()
+        and fabDir.parent.joinpath(".env").is_file()
+    ):
         load_dotenv(fabDir.parent.joinpath(".env"))
         logger.info(f"Loaded project .env file from {fabDir.parent.joinpath('.env')}")
     else:
@@ -173,7 +183,7 @@ def create_project(project_dir, type: Literal["verilog", "vhdl"] = "verilog"):
     adjust_directory_in_verilog_tb(project_dir)
 
 
-def copy_verilog_files(src, dst):
+def copy_verilog_files(src: Path, dst: Path):
     """Copies all Verilog files from source directory to the destination directory.
 
     Parameters
@@ -183,15 +193,13 @@ def copy_verilog_files(src, dst):
     dst : str
         Destination directory
     """
-    for root, _, files in os.walk(src):
-        for file in files:
-            if file.endswith(".v"):
-                source_path = os.path.join(root, file)
-                destination_path = os.path.join(dst, file)
-                shutil.copy(source_path, destination_path)
+
+    for file_path in src.rglob("*.v"):
+        destination_path = dst / file_path.name
+        shutil.copy(file_path, destination_path)
 
 
-def remove_dir(path):
+def remove_dir(path: Path):
     """Removes a directory and all its contents.
 
     If the directory cannot be removed, logs OS error.
@@ -208,7 +216,7 @@ def remove_dir(path):
         logger.error(f"{e}")
 
 
-def make_hex(binfile, outfile):
+def make_hex(binfile: Path, outfile: Path):
     """Converts a binary file into hex file.
 
     If the binary file exceeds MAX_BITBYTES, logs error.

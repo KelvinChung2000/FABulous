@@ -236,7 +236,7 @@ class FabricGenerator:
                         print(line[0] + "," + inputs[i - 1], file=f)
         return
 
-    def generateConfigMemInit(self, file: str, globalConfigBitsCounter: int) -> None:
+    def generateConfigMemInit(self, file: Path, globalConfigBitsCounter: int) -> None:
         """This function is used to generate the config memory initialization file for a given amount of configuration
         bits. The amount of configuration bits is determined by the `frameBitsPerRow` attribute of the fabric.
         The function will pack the configuration bit from the highest to the lowest bit in the config memory.
@@ -244,7 +244,7 @@ class FabricGenerator:
 
         Parameters
         ----------
-        file : str
+        file : Path
             The output file of the config memory initialization file.
         globalConfigBitsCounter : int
             The number of global config bits of the tile.
@@ -301,14 +301,14 @@ class FabricGenerator:
                 # write the entry to the file
                 writer.writerow(entry)
 
-    def generateConfigMem(self, tile: Tile, configMemCsv: str) -> None:
+    def generateConfigMem(self, tile: Tile, configMemCsv: Path) -> None:
         """This function will generate the RTL code for configuration memory of the given tile. If the given configMemCsv file does not exist, it will be created using `generateConfigMemInit`.
 
         Parameters
         ----------
         tile : Tile
             A tile object.
-        configMemCsv : str
+        configMemCsv : Path
             The directory of the config memory CSV file.
         """
         # we use a file to describe the exact configuration bits to frame mapping

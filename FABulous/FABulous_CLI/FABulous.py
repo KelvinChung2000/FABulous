@@ -21,13 +21,11 @@ import csv
 import os
 import pickle
 import pprint
-import readline
 import subprocess as sp
 import sys
 import tkinter as tk
 from contextlib import redirect_stdout
 from pathlib import Path
-from typing import List
 
 from cmd2 import (
     Cmd,
@@ -52,10 +50,6 @@ from FABulous.FABulous_CLI.helper import (
     setup_logger,
     setup_project_env_vars,
 )
-
-readline.set_completer_delims(" \t\n")
-histfile = ""
-histfile_size = 1000
 
 META_DATA_DIR = ".FABulous"
 
@@ -107,7 +101,7 @@ class FABulousShell(Cmd):
     fabulousAPI: FABulous_API
     projectDir: Path
     top: str
-    allTile: List[str]
+    allTile: list[str]
     csvFile: Path
     extension: str = "v"
     script: str = ""

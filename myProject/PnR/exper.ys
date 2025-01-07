@@ -1,0 +1,14 @@
+read_verilog -sv /home/kelvin/FABulous_fork/myProject/PnR/gemm_calyx_nested.sv
+hierarchy -top gemm
+setattr -mod -set keep_hierarchy 1
+setattr -mod -unset keep_hierarchy $paramod\std_wire\WIDTH=s32'00000000000000000000000000000001 $paramod\std_mult_pipe\WIDTH=s32'00000000000000000000000000100000
+flatten -noscopeinfo
+proc; fsm -nomap; opt -fine;
+clean -purge
+select gemm
+techmap -dont_map $mux -dont_map $lt -dont_map $eq
+extract_reduce
+#opt -fine;;;;
+muxcover
+stat -width
+show -width

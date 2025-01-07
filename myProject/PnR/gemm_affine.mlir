@@ -14,15 +14,15 @@ module attributes {} {
         }
       }
     }
-    affine.for %arg5 = 0 to 20 {
-      affine.for %arg6 = 0 to 20 {
-        %0 = affine.load %arg4[%arg5, %arg6] : memref<30x30xi32>
-        %1 = arith.muli %0, %arg1 : i32
-        %2 = affine.load %alloca[%arg5, %arg6] : memref<30x30xi32>
-        %3 = arith.addi %1, %2 : i32
-        affine.store %3, %arg4[%arg5, %arg6] : memref<30x30xi32>
-      }
-    }
+    // affine.for %arg5 = 0 to 20 {
+    //   affine.for %arg6 = 0 to 20 {
+    //     %0 = affine.load %arg4[%arg5, %arg6] : memref<30x30xi32>
+    //     %1 = arith.muli %0, %arg1 : i32
+    //     %2 = affine.load %alloca[%arg5, %arg6] : memref<30x30xi32>
+    //     %3 = arith.addi %1, %2 : i32
+    //     affine.store %3, %arg4[%arg5, %arg6] : memref<30x30xi32>
+    //   }
+    // }
     return
   }
 }

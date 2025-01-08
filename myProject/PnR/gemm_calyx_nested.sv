@@ -1353,20 +1353,6 @@ module main(
   output logic done
 );
 // COMPONENT START: main
-// string DATA;
-int CODE;
-// initial begin
-//     CODE = $value$plusargs("DATA=%s", DATA);
-//     $display("DATA (path to meminit files): %s", DATA);
-//     $readmemh({DATA, "/mem_2.dat"}, mem_2.mem.mem);
-//     $readmemh({DATA, "/mem_1.dat"}, mem_1.mem.mem);
-//     $readmemh({DATA, "/mem_0.dat"}, mem_0.mem.mem);
-// end
-// final begin
-//     $writememh({DATA, "/mem_2.out"}, mem_2.mem.mem);
-//     $writememh({DATA, "/mem_1.out"}, mem_1.mem.mem);
-//     $writememh({DATA, "/mem_0.out"}, mem_0.mem.mem);
-// end
 logic mem_2_clk;
 logic mem_2_reset;
 logic [4:0] mem_2_addr0;
@@ -1625,14 +1611,6 @@ assign gemm_instance_arg_mem_1_done =
  invoke1_go_out ? mem_1_done : 1'd0;
 assign gemm_instance_in0 =
  invoke1_go_out ? in0 : 32'd0;
-always_comb begin
-    if(~$onehot0({fsm_out == 2'd1 & invoke1_done_out & tdcc_go_out, fsm_out == 2'd2, fsm_out == 2'd0 & invoke0_done_out & tdcc_go_out})) begin
-        //$fatal(2, "Multiple assignment to port `fsm.in'.");
-    end
-    if(~$onehot0({invoke0_go_out, 1'b1})) begin
-        //$fatal(2, "Multiple assignment to port `gemm_instance.reset'.");
-    end
-end
 // COMPONENT END: main
 endmodule
 module gemm(
@@ -2531,55 +2509,5 @@ assign wrapper_early_reset_static_seq0_done_in = signal_reg_out;
 assign bb0_8_go_in = ~bb0_8_done_out & fsm0_out == 5'd8 & tdcc_go_out;
 assign bb0_10_done_in = arg_mem_1_done;
 assign bb0_13_go_in = ~bb0_13_done_out & fsm0_out == 5'd14 & tdcc_go_out;
-always_comb begin
-    if(~$onehot0({beg_spl_bb0_4_go_out, bb0_13_go_out})) begin
-        //$fatal(2, "Multiple assignment to port `_this.arg_mem_2_write_en'.");
-    end
-    if(~$onehot0({fsm_out == 3'd4 & early_reset_static_seq_go_out | fsm_out == 3'd3 & early_reset_static_seq0_go_out | fsm_out == 3'd3 & early_reset_static_seq1_go_out, fsm_out != 3'd3 & early_reset_static_seq0_go_out, fsm_out != 3'd4 & early_reset_static_seq_go_out, fsm_out != 3'd3 & early_reset_static_seq1_go_out})) begin
-        //$fatal(2, "Multiple assignment to port `fsm.in'.");
-    end
-    if(~$onehot0({invoke11_go_out, invoke1_go_out})) begin
-        //$fatal(2, "Multiple assignment to port `while_1_arg0_reg.in'.");
-    end
-    if(~$onehot0({early_reset_bb0_000_go_out, early_reset_bb0_600_go_out, early_reset_bb0_200_go_out})) begin
-        //$fatal(2, "Multiple assignment to port `std_slt_2.left'.");
-    end
-    if(~$onehot0({fsm_out < 3'd3 & early_reset_static_seq_go_out | fsm_out < 3'd3 & early_reset_static_seq1_go_out, fsm_out < 3'd3 & early_reset_static_seq0_go_out})) begin
-        //$fatal(2, "Multiple assignment to port `std_mult_pipe_2.left'.");
-    end
-    if(~$onehot0({fsm_out < 3'd3 & early_reset_static_seq1_go_out, fsm_out < 3'd3 & early_reset_static_seq_go_out, fsm_out < 3'd3 & early_reset_static_seq0_go_out})) begin
-        //$fatal(2, "Multiple assignment to port `std_mult_pipe_2.right'.");
-    end
-    if(~$onehot0({assign_while_0_latch_go_out, fsm_out == 3'd4 & early_reset_static_seq_go_out})) begin
-        //$fatal(2, "Multiple assignment to port `while_0_arg0_reg.in'.");
-    end
-    if(~$onehot0({bb0_8_go_out, beg_spl_bb0_4_go_out | bb0_10_go_out | bb0_13_go_out})) begin
-        //$fatal(2, "Multiple assignment to port `std_slice_6.in'.");
-    end
-    if(~$onehot0({assign_while_0_latch_go_out, invoke12_go_out, invoke11_go_out})) begin
-        //$fatal(2, "Multiple assignment to port `std_add_3.left'.");
-    end
-    if(~$onehot0({invoke11_go_out | invoke12_go_out, assign_while_0_latch_go_out})) begin
-        //$fatal(2, "Multiple assignment to port `std_add_3.right'.");
-    end
-    if(~$onehot0({beg_spl_bb0_4_go_out | bb0_8_go_out | bb0_13_go_out, bb0_10_go_out})) begin
-        //$fatal(2, "Multiple assignment to port `std_slice_7.in'.");
-    end
-    if(~$onehot0({invoke12_go_out, invoke0_go_out})) begin
-        //$fatal(2, "Multiple assignment to port `while_2_arg0_reg.in'.");
-    end
-    if(~$onehot0({fsm0_out == 5'd8 & bb0_8_done_out & tdcc_go_out, fsm0_out == 5'd3 & wrapper_early_reset_bb0_200_done_out & ~comb_reg0_out & tdcc_go_out | fsm0_out == 5'd16 & wrapper_early_reset_bb0_200_done_out & ~comb_reg0_out & tdcc_go_out, fsm0_out == 5'd5 & invoke2_done_out & tdcc_go_out, fsm0_out == 5'd3 & wrapper_early_reset_bb0_200_done_out & comb_reg0_out & tdcc_go_out | fsm0_out == 5'd16 & wrapper_early_reset_bb0_200_done_out & comb_reg0_out & tdcc_go_out, fsm0_out == 5'd1 & wrapper_early_reset_bb0_000_done_out & ~comb_reg_out & tdcc_go_out | fsm0_out == 5'd18 & wrapper_early_reset_bb0_000_done_out & ~comb_reg_out & tdcc_go_out, fsm0_out == 5'd10 & bb0_10_done_out & tdcc_go_out, fsm0_out == 5'd6 & wrapper_early_reset_static_seq_done_out & tdcc_go_out, fsm0_out == 5'd9 & wrapper_early_reset_static_seq0_done_out & tdcc_go_out, fsm0_out == 5'd7 & wrapper_early_reset_bb0_600_done_out & comb_reg1_out & tdcc_go_out | fsm0_out == 5'd13 & wrapper_early_reset_bb0_600_done_out & comb_reg1_out & tdcc_go_out, fsm0_out == 5'd1 & wrapper_early_reset_bb0_000_done_out & comb_reg_out & tdcc_go_out | fsm0_out == 5'd18 & wrapper_early_reset_bb0_000_done_out & comb_reg_out & tdcc_go_out, fsm0_out == 5'd11 & wrapper_early_reset_static_seq1_done_out & tdcc_go_out, fsm0_out == 5'd4 & beg_spl_bb0_4_done_out & tdcc_go_out, fsm0_out == 5'd7 & wrapper_early_reset_bb0_600_done_out & ~comb_reg1_out & tdcc_go_out | fsm0_out == 5'd13 & wrapper_early_reset_bb0_600_done_out & ~comb_reg1_out & tdcc_go_out, fsm0_out == 5'd12 & assign_while_0_latch_done_out & tdcc_go_out, fsm0_out == 5'd2 & invoke1_done_out & tdcc_go_out, fsm0_out == 5'd19, fsm0_out == 5'd15 & invoke11_done_out & tdcc_go_out, fsm0_out == 5'd17 & invoke12_done_out & tdcc_go_out, fsm0_out == 5'd14 & bb0_13_done_out & tdcc_go_out, fsm0_out == 5'd0 & invoke0_done_out & tdcc_go_out})) begin
-        //$fatal(2, "Multiple assignment to port `fsm0.in'.");
-    end
-    if(~$onehot0({fsm_out == 3'd3 & early_reset_static_seq_go_out | fsm_out == 3'd3 & early_reset_static_seq0_go_out | fsm_out == 3'd3 & early_reset_static_seq1_go_out, invoke2_go_out})) begin
-        //$fatal(2, "Multiple assignment to port `muli_2_reg.in'.");
-    end
-    if(~$onehot0({signal_reg_out, 1'b1 & 1'b1 & ~signal_reg_out & wrapper_early_reset_bb0_000_go_out | 1'b1 & 1'b1 & ~signal_reg_out & wrapper_early_reset_bb0_200_go_out | fsm_out == 3'd4 & 1'b1 & ~signal_reg_out & wrapper_early_reset_static_seq_go_out | 1'b1 & 1'b1 & ~signal_reg_out & wrapper_early_reset_bb0_600_go_out | fsm_out == 3'd3 & 1'b1 & ~signal_reg_out & wrapper_early_reset_static_seq0_go_out | fsm_out == 3'd3 & 1'b1 & ~signal_reg_out & wrapper_early_reset_static_seq1_go_out})) begin
-        //$fatal(2, "Multiple assignment to port `signal_reg.in'.");
-    end
-    if(~$onehot0({fsm_out == 3'd4 & early_reset_static_seq_go_out, assign_while_0_latch_go_out})) begin
-        //$fatal(2, "Multiple assignment to port `while_0_arg1_reg.in'.");
-    end
-end
 // COMPONENT END: gemm
 endmodule

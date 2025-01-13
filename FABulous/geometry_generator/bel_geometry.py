@@ -35,7 +35,6 @@ class BelGeometry:
         List of geometries of the internal ports of the bel
     externalPortGeoms : List[PortGeometry]
         List of geometries of the external ports of the bel
-
     """
 
     name: str

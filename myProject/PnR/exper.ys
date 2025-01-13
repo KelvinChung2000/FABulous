@@ -1,3 +1,4 @@
+#read_verilog -sv /home/kelvin/FABulous_fork/myProject/PnR/gemm_fsm_per_seq.sv
 read_verilog -sv /home/kelvin/FABulous_fork/myProject/PnR/gemm_calyx_nested.sv
 hierarchy -top gemm
 flatten -noscopeinfo
@@ -8,8 +9,9 @@ select gemm
 #freduce;
 #connect -set go 1
 opt -nosdff -nodffe -fine -purge;
-fsm -nomap -encoding one-hot;
+fsm -encoding one-hot -nomap;
 #techmap -dont_map $mux -dont_map $lt -dont_map $eq -dont_map $add -dont_map $mul
+#synth_xilinx
 #extract_reduce
 opt -fine;;;;
 stat

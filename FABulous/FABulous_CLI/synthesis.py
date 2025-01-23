@@ -11,7 +11,7 @@ CMD_FABRIC_FLOW = "Fabric Flow"
 HELP = """
 Runs Yosys using Nextpnr JSON backend to synthesise the Verilog design
 specified by <files> and generates a Nextpnr-compatible JSON file for
-further place and route process. By default the name of the JSON file generated 
+further place and route process. By default the name of the JSON file generated
 will be <first_file_provided_stem>.json.
 
 Also logs usage errors or synthesis failures.
@@ -99,12 +99,21 @@ The following commands are executed by when executing the synthesis command:
 
 synthesis_parser = Cmd2ArgumentParser(description=HELP)
 synthesis_parser.add_argument(
-    "files", type=Path, help="Path to the target files", completer=Cmd.path_complete, nargs="+"
+    "files",
+    type=Path,
+    help="Path to the target files",
+    completer=Cmd.path_complete,
+    nargs="+",
 )
 synthesis_parser.add_argument(
-    "-top", type=str, help="use the specified module as top module (default='top_wrapper')", default="top_wrapper"
+    "-top",
+    type=str,
+    help="use the specified module as top module (default='top_wrapper')",
+    default="top_wrapper",
 )
-synthesis_parser.add_argument("-auto-top", help="automatically determine the top of the design hierarchy")
+synthesis_parser.add_argument(
+    "-auto-top", help="automatically determine the top of the design hierarchy"
+)
 synthesis_parser.add_argument(
     "-blif",
     type=Path,
@@ -127,7 +136,10 @@ synthesis_parser.add_argument(
     completer=Cmd.path_complete,
 )
 synthesis_parser.add_argument(
-    "-lut", type=str, default="4", help="perform synthesis for a k-LUT architecture (default 4)."
+    "-lut",
+    type=str,
+    default="4",
+    help="perform synthesis for a k-LUT architecture (default 4).",
 )
 synthesis_parser.add_argument(
     "-plib",
@@ -150,7 +162,10 @@ synthesis_parser.add_argument(
     completer=Cmd.path_complete,
 )
 synthesis_parser.add_argument(
-    "-encfile", type=Path, help="passed to 'fsm_recode' via 'fsm'", completer=Cmd.path_complete
+    "-encfile",
+    type=Path,
+    help="passed to 'fsm_recode' via 'fsm'",
+    completer=Cmd.path_complete,
 )
 synthesis_parser.add_argument("-nofsm", help="do not run FSM optimization")
 synthesis_parser.add_argument(
@@ -175,9 +190,13 @@ synthesis_parser.add_argument(
     "-complex-dff",
     help="enable support for FFs with enable and synchronous SR (must also be supported by the target fabric.)",
 )
-synthesis_parser.add_argument("-noflatten", help="do not flatten design after elaboration")
 synthesis_parser.add_argument(
-    "-nordff", required=False, help="passed to 'memory'. prohibits merging of FFs into memory read ports"
+    "-noflatten", help="do not flatten design after elaboration"
+)
+synthesis_parser.add_argument(
+    "-nordff",
+    required=False,
+    help="passed to 'memory'. prohibits merging of FFs into memory read ports",
 )
 synthesis_parser.add_argument("-noshare", help="do not run SAT-based resource sharing")
 synthesis_parser.add_argument(
@@ -195,7 +214,9 @@ synthesis_parser.add_argument(
 @with_category(CMD_FABRIC_FLOW)
 @with_argparser(synthesis_parser)
 def do_synthesis(self, args):
-    logger.info(f"Running synthesis that targeting Nextpnr with design {[str(i) for i in args.files]}")
+    logger.info(
+        f"Running synthesis that targeting Nextpnr with design {[str(i) for i in args.files]}"
+    )
 
     p: Path
     paths: list[Path] = []
@@ -221,7 +242,11 @@ def do_synthesis(self, args):
         f"-json {args.json}" if args.json else f"-json {json_file}",
         f"-lut {args.lut}" if args.lut else "",
         f"-plib {args.plib}" if args.plib else "",
-        " ".join([f"-extra-plib {i}" for i in args.extra_plib]) if args.extra_plib else "",
+        (
+            " ".join([f"-extra-plib {i}" for i in args.extra_plib])
+            if args.extra_plib
+            else ""
+        ),
         " ".join([f"-extra-map {i}" for i in args.extra_map]) if args.extra_map else "",
         f"-encfile {args.encfile}" if args.encfile else "",
         "-nofsm" if args.nofsm else "",
@@ -238,7 +263,13 @@ def do_synthesis(self, args):
 
     cmd = " ".join([i for i in cmd if i != ""])
 
-    runCmd = [f"{yosys}", "-p", f'{cmd}', f"{self.projectDir}/user_design/top_wrapper.v", *[str(i) for i in paths]]
+    runCmd = [
+        f"{yosys}",
+        "-p",
+        f"{cmd}",
+        f"{self.projectDir}/user_design/top_wrapper.v",
+        *[str(i) for i in paths],
+    ]
     logger.debug(f"{runCmd}")
     try:
         sp.run(runCmd, check=True)

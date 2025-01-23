@@ -1,27 +1,36 @@
-#read_verilog -sv /home/kelvin/FABulous_fork/myProject/PnR/gemm_fsm_per_seq.sv
-#read_verilog -sv /home/kelvin/FABulous_fork/myProject/PnR/gemm_calyx_nested.sv
-read_verilog -sv /home/kelvin/FABulous_fork/myProject/PnR/gemm_new_fsm.sv
-hierarchy -top main
-proc
-check -assert
-flatten
-check -assert
+read_verilog -sv /home/kelvin/FABulous_fork/myProject/PnR/gemm/gemm.sv
+hierarchy -top gemm
+proc;;;
+setattr -unset src
+setattr -mod -set keep_hierarchy 1
+setattr -mod -unset keep_hierarchy fsm_*_* *wire*
+flatten -noscopeinfo;;;
+check
 opt -nosdff -nodffe -fine -purge;
-fsm
-#wreduce;
-clean -purge
-##freduce;
-#connect -set go 1
+fsm -nomap
 share
-###techmap -dont_map $mux -dont_map $lt -dont_map $eq -dont_map $add -dont_map $mul
-synth_xilinx
-##extract_reduce
+wreduce
+opt -mux_undef -undriven -nosdff -nodffe -fine
+fsm -nomap
 clean -purge
 stat
+select gemm
+select -del w:clk
+select -del w:reset
+#select -del w:fsm*
+clean -purge
+dump -o dump
 show -width
+
 
 #read_verilog -sv ./myProject/PnR/fsm.v
 #hierarchy -auto-top
 #proc -noopt;
 #opt -nosdff -nodffe -fine -purge;
 #fsm
+
+#read_verilog -sv /home/kelvin/FABulous_fork/myProject/PnR/gemm_new_fsm.sv
+##read_verilog -sv /home/kelvin/FABulous_fork/myProject/PnR/gemm_calyx_nested.sv
+#flatten
+#synth_xilinx
+#stat

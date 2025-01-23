@@ -1,0 +1,8 @@
+
+ /----------------------------------------------------------------------------\
+ |  yosys -- Yosys Open SYnthesis Suite                                       |
+ |  Copyright (C) 2012 - 2024  Claire Xenia Wolf <claire@yosyshq.com>         |
+ |  Distributed under an ISC-like license, type "license" to see terms        |
+ \----------------------------------------------------------------------------/
+ Yosys 0.48+45 (git sha1 8acc77c1e, g++ 11.4.0-1ubuntu1~22.04 -fPIC -O3)
+ERROR: Can't guess frontend for input file `1' (missing -f option)!

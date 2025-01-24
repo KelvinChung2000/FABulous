@@ -1,26 +1,25 @@
+read_verilog -sv -lib /home/kelvin/FABulous_fork/myProject/PnR/gemm/gemm.sv 
 read_verilog -sv /home/kelvin/FABulous_fork/myProject/PnR/gemm/gemm.sv
 hierarchy -top gemm
 proc;;;
 setattr -unset src
 setattr -mod -set keep_hierarchy 1
-setattr -mod -unset keep_hierarchy fsm_*_* *wire*
+setattr -mod -unset keep_hierarchy fsm_*_* *wire* *std_slice*
 flatten -noscopeinfo;;;
 check
 opt -nosdff -nodffe -fine -purge;
 fsm -nomap
-share
 wreduce
-opt -mux_undef -undriven -nosdff -nodffe -fine
-fsm -nomap
+share
+opt -full
 clean -purge
 stat
 select gemm
-select -del w:clk
-select -del w:reset
-#select -del w:fsm*
+show 
+
 clean -purge
 dump -o dump
-show -width
+#show -width
 
 
 #read_verilog -sv ./myProject/PnR/fsm.v

@@ -28,10 +28,6 @@ component main<"toplevel"=1,>(in0: 32, in1: 32, @clk clk: 1, @reset reset: 1, @g
 }
 component gemm(in0: 32, in1: 32, @clk clk: 1, @reset reset: 1, @go go: 1) -> (@done done: 1) {
   cells {
-    std_slice_3 = std_slice(32, 10);
-    std_slice_2 = std_slice(32, 10);
-    std_slice_1 = std_slice(32, 10);
-    std_slice_0 = std_slice(32, 10);
     std_add_6 = std_add(32);
     load_0_reg = std_reg(32);
     muli_3_reg = std_reg(32);
@@ -51,13 +47,16 @@ component gemm(in0: 32, in1: 32, @clk clk: 1, @reset reset: 1, @go go: 1) -> (@d
     std_mult_pipe_0 = std_mult_pipe(32);
     std_add_0 = std_add(32);
     std_slt_0 = std_slt(32);
-    while_2_arg0_reg = std_reg(32);
-    while_1_arg0_reg = std_reg(32);
-    while_0_arg0_reg = std_reg(32);
-    ref arg_mem_3 = seq_mem_d1(32, 900, 10);
-    ref arg_mem_2 = seq_mem_d1(32, 900, 10);
-    ref arg_mem_1 = seq_mem_d1(32, 900, 10);
-    ref arg_mem_0 = seq_mem_d1(32, 900, 10);
+    @control while_2_arg0_reg = std_reg(32);
+    @control while_1_arg0_reg = std_reg(32);
+    @control while_0_arg0_reg = std_reg(32);
+    std_eq_0 = std_eq(32);
+    std_eq_1 = std_eq(32);
+    std_eq_2 = std_eq(32);
+    ref arg_mem_3 = seq_mem_d1(32, 900, 32);
+    ref arg_mem_2 = seq_mem_d1(32, 900, 32);
+    ref arg_mem_1 = seq_mem_d1(32, 900, 32);
+    ref arg_mem_0 = seq_mem_d1(32, 900, 32);
   }
   wires {
     group assign_while_0_init_0 {
@@ -75,6 +74,22 @@ component gemm(in0: 32, in1: 32, @clk clk: 1, @reset reset: 1, @go go: 1) -> (@d
       while_2_arg0_reg.write_en = 1'd1;
       assign_while_2_init_0[done] = while_2_arg0_reg.done;
     }
+
+    comb group cond_eq_0 {
+      std_eq_0.left = while_0_arg0_reg.out;
+      std_eq_0.right = 32'd20;
+    }
+
+    comb group cond_eq_1 {
+      std_eq_1.left = while_1_arg0_reg.out;
+      std_eq_1.right = 32'd20;
+    }
+
+    comb group cond_eq_2 {
+      std_eq_2.left = while_2_arg0_reg.out;
+      std_eq_2.right = 32'd20;
+    }
+
     comb group bb0_0 {
       std_slt_0.left = while_2_arg0_reg.out;
       std_slt_0.right = 32'd20;
@@ -96,8 +111,7 @@ component gemm(in0: 32, in1: 32, @clk clk: 1, @reset reset: 1, @go go: 1) -> (@d
       std_slt_2.right = 32'd20;
     }
     group bb0_9 {
-      std_slice_3.in = std_add_4.out;
-      arg_mem_0.addr0 = std_slice_3.out;
+      arg_mem_0.addr0 = std_add_4.out;
       arg_mem_0.content_en = 1'd1;
       arg_mem_0.write_en = 1'd0;
       std_add_4.left = muli_0_reg.out;
@@ -121,8 +135,7 @@ component gemm(in0: 32, in1: 32, @clk clk: 1, @reset reset: 1, @go go: 1) -> (@d
       bb0_11[done] = muli_2_reg.done;
     }
     group bb0_13 {
-      std_slice_2.in = std_add_5.out;
-      arg_mem_1.addr0 = std_slice_2.out;
+      arg_mem_1.addr0 = std_add_5.out;
       arg_mem_1.content_en = 1'd1;
       arg_mem_1.write_en = 1'd0;
       std_add_5.left = muli_2_reg.out;
@@ -138,8 +151,7 @@ component gemm(in0: 32, in1: 32, @clk clk: 1, @reset reset: 1, @go go: 1) -> (@d
       bb0_14[done] = muli_3_reg.done;
     }
     group bb0_15 {
-      std_slice_1.in = std_add_2.out;
-      arg_mem_3.addr0 = std_slice_1.out;
+      arg_mem_3.addr0 = std_add_2.out;
       arg_mem_3.content_en = 1'd1;
       arg_mem_3.write_en = 1'd0;
       load_0_reg.in = arg_mem_3.read_data;
@@ -149,8 +161,7 @@ component gemm(in0: 32, in1: 32, @clk clk: 1, @reset reset: 1, @go go: 1) -> (@d
       bb0_15[done] = load_0_reg.done;
     }
     group bb0_17 {
-      std_slice_0.in = std_add_2.out;
-      arg_mem_3.addr0 = std_slice_0.out;
+      arg_mem_3.addr0 = std_add_2.out;
       arg_mem_3.write_data = std_add_6.out;
       arg_mem_3.write_en = 1'd1;
       arg_mem_3.content_en = 1'd1;
@@ -184,19 +195,19 @@ component gemm(in0: 32, in1: 32, @clk clk: 1, @reset reset: 1, @go go: 1) -> (@d
   }
   control {
     seq {
-      par {
+      if std_eq_2.out with cond_eq_2 {
         assign_while_2_init_0;
       }
       while std_slt_0.out with bb0_0 {
         seq {
           seq {
             bb0_2;
-            par {
+            if std_eq_1.out with cond_eq_1 {
               assign_while_1_init_0;
             }
             while std_slt_1.out with bb0_3 {
               seq {
-                par {
+                if std_eq_0.out with cond_eq_0 {
                   assign_while_0_init_0;
                 }
                 while std_slt_2.out with bb0_6 {

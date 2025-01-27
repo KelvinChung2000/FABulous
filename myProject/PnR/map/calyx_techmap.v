@@ -1,4 +1,4 @@
-(* techmap_celltype = "$paramod\\std_add\\WIDTH=s32'00000000000000000000000000100000" *)
+(* techmap_celltype = "std_add" *)
 module simple_techmap(left, right, out);
     parameter WIDTH = 32;
 

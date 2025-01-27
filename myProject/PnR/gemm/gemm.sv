@@ -3416,30 +3416,30 @@ assign while_0_arg0_reg_in =
        fsm_s23_out ? std_add_3_out :
        'dx;
 assign comb_reg1_in = std_slt_2_out;
-assign std_add_4_left = muli_0_reg_out;
 assign std_slice_3_in = std_add_4_out;
 assign arg_mem_0_addr0 = std_slice_3_out;
 assign std_add_4_right = while_0_arg0_reg_out;
-assign std_mult_pipe_1_right = arg_mem_0_read_data;
+assign std_add_4_left = muli_0_reg_out;
 assign std_mult_pipe_1_left = in0;
+assign std_mult_pipe_1_right = arg_mem_0_read_data;
 assign std_mult_pipe_2_left = while_0_arg0_reg_out;
 assign std_mult_pipe_2_right = 32'd30;
-assign muli_2_reg_in = std_mult_pipe_2_out;
 assign muli_1_reg_in = std_mult_pipe_1_out;
-assign std_add_5_left = muli_2_reg_out;
+assign muli_2_reg_in = std_mult_pipe_2_out;
 assign std_add_5_right = while_1_arg0_reg_out;
 assign arg_mem_1_addr0 = std_slice_2_out;
 assign std_slice_2_in = std_add_5_out;
-assign std_mult_pipe_3_left = muli_1_reg_out;
+assign std_add_5_left = muli_2_reg_out;
 assign std_mult_pipe_3_right = arg_mem_1_read_data;
+assign std_mult_pipe_3_left = muli_1_reg_out;
 assign muli_3_reg_in = std_mult_pipe_3_out;
-assign std_add_2_left = muli_0_reg_out;
+assign std_add_2_right = while_1_arg0_reg_out;
 assign arg_mem_3_addr0 =
        fsm_s20_out ? std_slice_1_out :
        fsm_s22_out ? std_slice_0_out :
        'dx;
 assign std_slice_1_in = std_add_2_out;
-assign std_add_2_right = while_1_arg0_reg_out;
+assign std_add_2_left = muli_0_reg_out;
 assign load_0_reg_in = arg_mem_3_read_data;
 assign std_add_6_left = load_0_reg_out;
 assign std_slice_0_in = std_add_2_out;
@@ -3449,8 +3449,8 @@ assign std_add_3_left = while_0_arg0_reg_out;
 assign std_add_3_right = 32'd1;
 assign std_add_1_right = 32'd1;
 assign std_add_1_left = while_1_arg0_reg_out;
-assign std_add_0_left = while_2_arg0_reg_out;
 assign std_add_0_right = 32'd1;
+assign std_add_0_left = while_2_arg0_reg_out;
 assign done = fsm_done_out;
 assign muli_3_reg_clk = clk;
 assign muli_3_reg_reset = reset;

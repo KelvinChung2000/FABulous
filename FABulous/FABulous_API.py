@@ -4,6 +4,7 @@ from loguru import logger
 
 import FABulous.fabric_cad.model_generation_npnr as model_gen_npnr
 import FABulous.fabric_generator.code_generator as codeGen
+import FABulous.fabric_generator.file_parser as fileParser
 
 # Importing Modules from FABulous Framework.
 from FABulous.fabric_definition.Bel import Bel
@@ -12,8 +13,6 @@ from FABulous.fabric_definition.SuperTile import SuperTile
 from FABulous.fabric_definition.Tile import Tile
 from FABulous.fabric_generator.code_generation_VHDL import VHDLWriter
 from FABulous.fabric_generator.fabric_gen import FabricGenerator
-from FABulous.file_parser.file_parser_csv import parseFabricCSV
-from FABulous.file_parser.file_parser_yaml import parseFabricYAML
 from FABulous.geometry_generator.geometry_gen import GeometryGenerator
 
 
@@ -40,9 +39,8 @@ class FABulous_API:
     geometryGenerator: GeometryGenerator
     fabric: Fabric
     fileExtension: str = ".v"
-    _projectDirectory: Path
 
-    def __init__(self, writer: codeGen.codeGenerator, fabricPath: str = ""):
+    def __init__(self, writer: codeGen.codeGenerator, fabricCSV: str = ""):
         """Initialises FABulous object.
 
         If 'fabricCSV' is provided, parses fabric data and initialises
@@ -58,8 +56,8 @@ class FABulous_API:
             Path to the CSV file containing fabric data, by default ""
         """
         self.writer = writer
-        if fabricPath != "":
-            self.loadFabric(fabricPath)
+        if fabricCSV != "":
+            self.fabric = fileParser.parseFabricCSV(fabricCSV)
             self.fabricGenerator = FabricGenerator(self.fabric, self.writer)
             self.geometryGenerator = GeometryGenerator(self.fabric)
 
@@ -92,14 +90,11 @@ class FABulous_API:
             If 'dir' does not end with '.csv'
         """
         if dir.suffix == ".csv":
-            self.fabric = parseFabricCSV(dir)
+            self.fabric = fileParser.parseFabricCSV(dir)
             self.fabricGenerator = FabricGenerator(self.fabric, self.writer)
             self.geometryGenerator = GeometryGenerator(self.fabric)
-
-        elif dir.suffix == ".yaml" or dir.suffix == ".yml":
-            self.fabric = parseFabricYAML(dir)
         else:
-            logger.error("Only .csv and .yaml files are supported for fabric loading")
+            logger.error("Only .csv files are supported for fabric loading")
             raise ValueError
 
     def bootstrapSwitchMatrix(self, tileName: str, outputDir: str):
@@ -113,10 +108,8 @@ class FABulous_API:
         outputDir : str
             Directory path where the switch matrix will be generated.
         """
-        if tile := self.fabric.getTileByName(tileName):
-            self.fabricGenerator.bootstrapSwitchMatrix(tile, Path(outputDir))
-        else:
-            raise ValueError(f"Tile {tileName} not found in fabric")
+        tile = self.fabric.getTileByName(tileName)
+        self.fabricGenerator.bootstrapSwitchMatrix(tile, outputDir)
 
     def addList2Matrix(self, list: str, matrix: str):
         """Converts list into CSV matrix via 'list2CSV' defined in 'fabric_gen.py' and
@@ -129,7 +122,7 @@ class FABulous_API:
         matrix : str
             File path where the matrix data will be saved.
         """
-        self.fabricGenerator.list2CSV(Path(list), Path(matrix))
+        self.fabricGenerator.list2CSV(list, matrix)
 
     def genConfigMem(self, tileName: str, configMem: Path):
         """Generate configuration memory for specified tile.
@@ -155,10 +148,8 @@ class FABulous_API:
         tileName : str
             Name of the tile for which the switch matrix will be generated.
         """
-        if tile := self.fabric.getTileByName(tileName):
-            self.fabricGenerator.genTileSwitchMatrix(tile)
-        else:
-            raise ValueError(f"Tile {tileName} not found in fabric")
+        tile = self.fabric.getTileByName(tileName)
+        self.fabricGenerator.genTileSwitchMatrix(tile)
 
     def genTile(self, tileName: str):
         """Generates a tile based on its name via 'generateTile' defined in
@@ -183,10 +174,8 @@ class FABulous_API:
         tileName : str
             Name of the super tile generated.
         """
-        if tile := self.fabric.getSuperTileByName(tileName):
-            self.fabricGenerator.generateSuperTile(tile)
-        else:
-            raise ValueError(f"SuperTile {tileName} not found in fabric")
+        tile = self.fabric.getSuperTileByName(tileName)
+        self.fabricGenerator.generateSuperTile(tile)
 
     def genFabric(self):
         """Generates the entire fabric layout via 'generatreFabric' defined in
@@ -264,7 +253,7 @@ class FABulous_API:
         Tile
             Tile object based on tile name.
         """
-        return self.fabric.tileDict.values()
+        return self.fabric.tileDic.values()
 
     def getSuperTile(self, tileName: str) -> SuperTile | None:
         """Returns SuperTile object based on tile name.
@@ -290,51 +279,4 @@ class FABulous_API:
         SuperTile
             SuperTile object based on tile name.
         """
-        return self.fabric.superTileDict.values()
-
-    @property
-    def projectDirectory(self) -> Path:
-        """Returns the project directory for the fabric generator.
-
-        Returns
-        -------
-        Path
-            Directory of the current project.
-        """
-        if not self._projectDirectory:
-            logger.error("Project directory not set.")
-            raise ValueError("Project directory not set.")
-        return self._projectDirectory
-
-    @projectDirectory.setter
-    def projectDirectory(self, path: Path):
-        """Sets the project directory for the fabric generator.
-
-        Parameters
-        ----------
-        path : Path
-            Path to the project directory.
-        """
-        if not path.joinpath(".FABulous").is_dir():
-            logger.error(
-                f"Directory '.FABulous' not found in {path}, this is not a valid project directory."
-            )
-            raise ValueError
-
-        self._projectDirectory = path
-
-    @staticmethod
-    def createEmptyProjectDirectory(path: Path):
-        """Creates a new empty project directory for the fabric generator.
-
-        Parameters
-        ----------
-        path : Path
-            Path to the project directory.
-        """
-        if path.is_dir():
-            logger.error(f"Directory {path} already exists.")
-            raise ValueError
-
-        path.mkdir(parents=True)
-        path.joinpath(".FABulous").mkdir()
+        return self.fabric.superTileDic.values()

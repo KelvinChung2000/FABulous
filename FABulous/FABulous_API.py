@@ -1,7 +1,5 @@
 from pathlib import Path
 
-from pathlib import Path
-
 from loguru import logger
 
 import FABulous.fabric_cad.model_generation_npnr as model_gen_npnr
@@ -10,7 +8,6 @@ import FABulous.fabric_generator.file_parser as fileParser
 
 # Importing Modules from FABulous Framework.
 from FABulous.fabric_definition.Bel import Bel
-from FABulous.fabric_definition.Fabric import Fabric
 from FABulous.fabric_definition.Fabric import Fabric
 from FABulous.fabric_definition.SuperTile import SuperTile
 from FABulous.fabric_definition.Tile import Tile

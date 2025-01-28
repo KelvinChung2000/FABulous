@@ -14,10 +14,11 @@ class Port:
 
 @dataclass(frozen=True, eq=True)
 class TilePort(Port):
-    """
-    TilePort is a subclass of Port that represents a port on a tile with a specific side and terminal status.
-    It is an immutable and comparable dataclass. When sorting a list of TilePort instances, the order is determined
-    first by the side of the tile in order of [north, east, south, west] then by the IO type in the order of [output, input, inout].
+    """TilePort is a subclass of Port that represents a port on a tile with a specific
+    side and terminal status. It is an immutable and comparable dataclass. When sorting
+    a list of TilePort instances, the order is determined first by the side of the tile
+    in order of [north, east, south, west] then by the IO type in the order of [output,
+    input, inout].
 
     Attributes:
         sideOfTile (Side): The side of the tile where the port is located.

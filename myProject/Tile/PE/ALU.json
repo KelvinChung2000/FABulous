@@ -1027,10 +1027,10 @@
           "bits": [ 37, 38, 39, 40 ],
           "attributes": {
             "CONFIG_BIT": 1,
-            "ENUMERATE": 1,
             "FABulous": 1,
             "FEATURE": "ALU",
-            "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/ALU.v:11.81-11.91"
+            "FEATURE_MAP": "std_add(left=>data_in1, right=>data_in2, out=>data_out);",
+            "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/ALU.v:11.142-11.152"
           }
         },
         "clk": {

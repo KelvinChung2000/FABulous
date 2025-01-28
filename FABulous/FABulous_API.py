@@ -4,7 +4,6 @@ from loguru import logger
 
 import FABulous.fabric_cad.model_generation_npnr as model_gen_npnr
 import FABulous.fabric_generator.code_generator as codeGen
-import FABulous.fabric_generator.file_parser as fileParser
 
 # Importing Modules from FABulous Framework.
 from FABulous.fabric_definition.Bel import Bel
@@ -13,6 +12,8 @@ from FABulous.fabric_definition.SuperTile import SuperTile
 from FABulous.fabric_definition.Tile import Tile
 from FABulous.fabric_generator.code_generation_VHDL import VHDLWriter
 from FABulous.fabric_generator.fabric_gen import FabricGenerator
+from FABulous.file_parser.file_parser_csv import parseFabricCSV
+from FABulous.file_parser.file_parser_yaml import parseFabricYAML
 from FABulous.geometry_generator.geometry_gen import GeometryGenerator
 
 
@@ -91,12 +92,12 @@ class FABulous_API:
             If 'dir' does not end with '.csv'
         """
         if dir.suffix == ".csv":
-            self.fabric = fileParser.parseFabricCSV(dir)
+            self.fabric = parseFabricCSV(dir)
             self.fabricGenerator = FabricGenerator(self.fabric, self.writer)
             self.geometryGenerator = GeometryGenerator(self.fabric)
 
-        elif dir.endswith(".yaml"):
-            self.fabric = fileParserYAML.parseFabricYAML(Path(dir))
+        elif dir.suffix == ".yaml" or dir.suffix == ".yml":
+            self.fabric = parseFabricYAML(dir)
         else:
             logger.error("Only .csv and .yaml files are supported for fabric loading")
             raise ValueError

@@ -8,13 +8,19 @@ from loguru import logger
 
 from FABulous.fabric_definition.Bel import Bel
 from FABulous.fabric_definition.ConfigMem import ConfigMem
-from FABulous.fabric_definition.define import IO, ConfigBitMode, Direction, MultiplexerStyle, Side
+from FABulous.fabric_definition.define import (
+    IO,
+    ConfigBitMode,
+    Direction,
+    MultiplexerStyle,
+    Side,
+)
 from FABulous.fabric_definition.Fabric import Fabric
 from FABulous.fabric_definition.Port import Port
 from FABulous.fabric_definition.SuperTile import SuperTile
 from FABulous.fabric_definition.Tile import Tile
-from FABulous.fabric_generator.file_parser_HDL import parseBelFile
 from FABulous.fabric_generator.utilities import expandListPorts
+from FABulous.file_parser.file_parser_HDL import parseBelFile
 
 oppositeDic = {
     "NORTH": "SOUTH",
@@ -25,12 +31,12 @@ oppositeDic = {
 }
 
 
-def parseFabricCSV(fileName: str) -> Fabric:
+def parseFabricCSV(fileName: Path) -> Fabric:
     """Parses a CSV file and returns a fabric object.
 
     Parameters
     ----------
-    fileName : str
+    fileName : Path
         Directory of the CSV file.
 
     Raises

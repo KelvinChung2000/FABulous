@@ -2,10 +2,10 @@ from enum import StrEnum
 
 
 class IO(StrEnum):
-    INPUT = "INPUT"
-    OUTPUT = "OUTPUT"
-    INOUT = "INOUT"
-    NULL = "NULL"
+    INPUT = "input"
+    OUTPUT = "output"
+    INOUT = "inout"
+    NULL = "null"
 
 
 class Direction(StrEnum):

@@ -577,6 +577,8 @@ class FABulous_CLI(Cmd):
         """
         logger.info("Running FABulous")
         self.do_gen_fabric()
+        self.do_gen_primitive_library()
+        self.do_gen_chipdb()
         self.do_gen_bitStream_spec()
         self.do_gen_top_wrapper()
         self.do_gen_model_npnr()
@@ -612,6 +614,32 @@ class FABulous_CLI(Cmd):
             f.write(npnrModel[3])
 
         logger.info("Generated npnr model")
+
+    @with_category(CMD_FABRIC_FLOW)
+    def do_gen_chipdb(self, *ignored):
+        """Generates chip database by calling 'genChipDB'."""
+        logger.info("Generating chip database")
+        logger.info(
+            f"Writing to {self.projectDir}/{META_DATA_DIR}/{self.fabulousAPI.fabric.name}.bin"
+        )
+        self.fabulousAPI.genChipDatabase(
+            self.projectDir / META_DATA_DIR,
+            self.projectDir / META_DATA_DIR / "baseConstIds.inc",
+        )
+        logger.info("Generated chip database")
+
+    @with_argparser(filePathOptionalParser)
+    def do_gen_primitive_library(self, args):
+        """Generates primitive library by calling 'genPrimitiveLibrary'."""
+        logger.info("Generating primitive library")
+        if args.file.is_dir():
+            logger.info(f"Writing to {self.projectDir}/{META_DATA_DIR}/prims.v")
+            self.fabulousAPI.genPrimsLib(self.projectDir / META_DATA_DIR / "prims.v")
+        else:
+            logger.info(f"Writing to {args.file}")
+            self.fabulousAPI.genPrimsLib(args.file)
+
+        logger.info("Generated primitive library")
 
     @with_category(CMD_FABRIC_FLOW)
     @with_argparser(filePathRequireParser)

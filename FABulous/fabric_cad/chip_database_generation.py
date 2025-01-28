@@ -17,7 +17,6 @@ from FABulous.fabric_definition.define import IO
 from FABulous.fabric_definition.Fabric import Fabric
 from FABulous.fabric_definition.Tile import Tile
 from FABulous.fabric_generator.code_generation_Verilog import VerilogWriter
-from FABulous.FABulous_API import FABulous
 
 
 def genSwitchMatrix(tile: Tile, tileType: TileType, context=1):
@@ -197,7 +196,7 @@ def setTiming(chip: Chip):
     )
 
 
-def genChipDatabase(fabric: Fabric, filePath: Path, baseConstIdsPath: Path):
+def generateChipDatabase(fabric: Fabric, filePath: Path, baseConstIdsPath: Path):
     ch = Chip("FABulous", fabric.name, fabric.numberOfColumns, fabric.numberOfRows)
 
     ch.strs.read_constids(str(baseConstIdsPath))
@@ -248,15 +247,16 @@ def genChipDatabase(fabric: Fabric, filePath: Path, baseConstIdsPath: Path):
 
 
 if __name__ == "__main__":
-    f = FABulous(VerilogWriter(), str(Path.cwd() / "myProject" / "fabric.yaml"))
+    f = FABulous_API(VerilogWriter(), str(Path.cwd() / "myProject" / "fabric.yaml"))
     f.setWriterOutputFile("/home/kelvin/FABulous_fork/test.v")
     # f.bootstrapSwitchMatrix("LUT4AB", "/home/kelvin/FABulous_fork/tmp.csv")
     ch = Chip(
         "FABulous", f.fabric.name, f.fabric.numberOfRows, f.fabric.numberOfColumns
     )
-    genChipDatabase(
+    generateChipDatabase(
         f.fabric,
         Path(Path.cwd() / "myProject/.FABulous"),
         Path(Path.cwd() / "myProject/.FABulous" / "baseConstIds.inc"),
     )
+    prims_gen.prims_gen(Path(Path.cwd() / "myProject/.FABulous" / "prims.v"), f.fabric)
     prims_gen.prims_gen(Path(Path.cwd() / "myProject/.FABulous" / "prims.v"), f.fabric)

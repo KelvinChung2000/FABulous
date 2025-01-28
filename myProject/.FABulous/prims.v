@@ -8,7 +8,7 @@ module ALU #(
     (* FABulous, BUS *) input wire [7:0] data_in2,
     (* FABulous, BUS *) input wire [7:0] data_in3,
     (* FABulous, BUS *) output reg [7:0] data_out,
-    (* FABulous, CONFIG_BIT, FEATURE="ALU", ENUMERATE *) input [NoConfigBits:0] ConfigBits
+    (* FABulous, CONFIG_BIT, FEATURE="ALU", FEATURE_MAP="std_add(left=>data_in1, right=>data_in2, out=>data_out);" *) input [NoConfigBits:0] ConfigBits
 );
   // Define operation codes
   localparam ADD = 3'b000;

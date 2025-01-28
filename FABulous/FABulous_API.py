@@ -4,6 +4,8 @@ from loguru import logger
 
 import FABulous.fabric_cad.model_generation_npnr as model_gen_npnr
 import FABulous.fabric_generator.code_generator as codeGen
+from FABulous.fabric_cad.chip_database_generation import generateChipDatabase
+from FABulous.fabric_cad.prims_gen import prims_gen
 
 # Importing Modules from FABulous Framework.
 from FABulous.fabric_definition.Bel import Bel
@@ -284,3 +286,28 @@ class FABulous_API:
             SuperTile object based on tile name.
         """
         return self.fabric.superTileDic.values()
+
+    def genChipDatabase(self, resultDir: Path, baseConstids: Path):
+        """
+        Generates a chip database using the provided result directory and base constant IDs.
+
+        Args:
+            resultDir (Path): The directory where the results will be stored.
+            baseConstids (Path): The path to the base constant IDs.
+
+        Returns:
+            None
+        """
+        generateChipDatabase(self.fabric, resultDir, baseConstids)
+
+    def genPrimsLib(self, result: Path):
+        """
+        Generates primitives library using the provided result path.
+
+        Args:
+            result (Path): The path where the generated primitives library will be saved.
+
+        Returns:
+            None
+        """
+        prims_gen(result, self.fabric)

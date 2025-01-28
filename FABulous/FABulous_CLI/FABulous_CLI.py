@@ -279,8 +279,8 @@ class FABulous_CLI(Cmd):
         tileByPath = [
             f.stem for f in (self.projectDir / "Tile/").iterdir() if f.is_dir()
         ]
-        tileByFabric = list(self.fabulousAPI.fabric.tileDic.keys())
-        superTileByFabric = list(self.fabulousAPI.fabric.superTileDic.keys())
+        tileByFabric = list(self.fabulousAPI.fabric.tileDict.keys())
+        superTileByFabric = list(self.fabulousAPI.fabric.superTileDict.keys())
         self.allTile = list(set(tileByPath) & set(tileByFabric + superTileByFabric))
 
         self.enable_category(CMD_FABRIC_FLOW)

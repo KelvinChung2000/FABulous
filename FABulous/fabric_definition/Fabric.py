@@ -73,22 +73,22 @@ class Fabric:
     superTileDict: dict[str, SuperTile] = field(default_factory=dict)
     wireDict: dict[tuple[int, int], list[Wire]] = field(default_factory=dict)
 
-    def __post_init__(self) -> None:
-        """Generate all the wire pairs in the fabric and get all the wires in the
-        fabric.
+    # def __post_init__(self) -> None:
+    #     """Generate all the wire pairs in the fabric and get all the wires in the
+    #     fabric.
 
-        The wire pair are used during model generation when some of the signals have
-        source or destination of "NULL".
+    #     The wire pair are used during model generation when some of the signals have
+    #     source or destination of "NULL".
 
-        The wires are used during model generation to work with wire that going cross
-        tile.
-        """
-        for row in self.tile:
-            for tile in row:
-                if tile == None:
-                    continue
-                for port in tile.portsInfo:
-                    self.commonWirePair.append((port.sourceName, port.destinationName))
+    #     The wires are used during model generation to work with wire that going cross
+    #     tile.
+    #     """
+    #     for row in self.tile:
+    #         for tile in row:
+    #             if tile is None:
+    #                 continue
+    #             for port in tile.portsInfo:
+    #                 self.commonWirePair.append((port.sourceName, port.destinationName))
 
     #     self.commonWirePair = list(dict.fromkeys(self.commonWirePair))
     #     self.commonWirePair = [

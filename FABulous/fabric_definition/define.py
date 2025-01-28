@@ -47,3 +47,4 @@ class FeatureType(StrEnum):
     ENUMERATE = "ENUMERATE"
     INIT = "INIT"
     ONE_HOT = "ONE_HOT"
+    FEATURE_MAP = "FEATURE_MAP"

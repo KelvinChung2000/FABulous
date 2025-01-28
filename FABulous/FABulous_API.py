@@ -13,6 +13,7 @@ from FABulous.fabric_definition.Tile import Tile
 from FABulous.fabric_generator.code_generation_VHDL import VHDLWriter
 from FABulous.fabric_generator.fabric_gen import FabricGenerator
 from FABulous.file_parser.file_parser_csv import parseFabricCSV
+from FABulous.file_parser.file_parser_yaml import parseFabricYAML
 from FABulous.geometry_generator.geometry_gen import GeometryGenerator
 
 
@@ -82,20 +83,23 @@ class FABulous_API:
         Parameters
         ----------
         dir : str
-            Path to CSV file containing fabric data.
+            Path to fabric file containing fabric data.
 
         Raises
         ----------
         ValueError
             If 'dir' does not end with '.csv'
         """
+
         if dir.suffix == ".csv":
             self.fabric = parseFabricCSV(dir)
-            self.fabricGenerator = FabricGenerator(self.fabric, self.writer)
-            self.geometryGenerator = GeometryGenerator(self.fabric)
+        elif dir.suffix == ".yaml":
+            self.fabric = parseFabricYAML(dir)
         else:
-            logger.error("Only .csv files are supported for fabric loading")
+            logger.error("Only .csv and .yaml files are supported for fabric loading")
             raise ValueError
+        self.fabricGenerator = FabricGenerator(self.fabric, self.writer)
+        self.geometryGenerator = GeometryGenerator(self.fabric)
 
     def bootstrapSwitchMatrix(self, tileName: str, outputDir: str):
         """Bootstraps the switch matrix for the specified tile via

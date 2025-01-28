@@ -107,7 +107,7 @@ def setup_project_env_vars(args: argparse.Namespace) -> None:
             logger.info("Loaded global .env file from pde")
     elif fabDir.joinpath(".env").exists() and fabDir.joinpath(".env").is_file():
         load_dotenv(fabDir.joinpath(".env"))
-        logger.info(f"Loaded project .env file from {fabDir}/.env')")
+        logger.info(f"Loaded project .env file from {fabDir}/.env")
     elif (
         fabDir.parent.joinpath(".env").exists()
         and fabDir.parent.joinpath(".env").is_file()

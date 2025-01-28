@@ -12,6 +12,7 @@ from FABulous.fabric_definition.Mux import Mux
 from FABulous.fabric_definition.Port import TilePort
 from FABulous.fabric_definition.Tile import Tile
 from FABulous.fabric_definition.Wire import Wire, WireType
+from FABulous.file_parser.file_parser_HDL import parseBelFile
 from FABulous.file_parser.file_parser_csv import parseList, parseMatrix, parsePortLine
 from FABulous.file_parser.file_parser_list import parseMux
 

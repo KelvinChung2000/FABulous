@@ -5,7 +5,7 @@
       "attributes": {
         "dynports": 1,
         "cells_not_processed": 1,
-        "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/ALU.v:1.1-38.10"
+        "src": "myProject/Tile/PE/ALU.v:1.1-38.10"
       },
       "parameter_default_values": {
         "NoConfigBits": 3
@@ -45,7 +45,7 @@
         }
       },
       "cells": {
-        "$add$/home/kelvin/FABulous_fork/myProject/Tile/PE/ALU.v:26$2": {
+        "$add$myProject/Tile/PE/ALU.v:26$2": {
           "hide_name": 1,
           "type": "$add",
           "parameters": {
@@ -56,7 +56,7 @@
             "Y_WIDTH": 8
           },
           "attributes": {
-            "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/ALU.v:26.25-26.44"
+            "src": "myProject/Tile/PE/ALU.v:26.25-26.44"
           },
           "port_directions": {
             "A": "input",
@@ -69,7 +69,7 @@
             "Y": [ 41, 42, 43, 44, 45, 46, 47, 48 ]
           }
         },
-        "$and$/home/kelvin/FABulous_fork/myProject/Tile/PE/ALU.v:28$4": {
+        "$and$myProject/Tile/PE/ALU.v:28$4": {
           "hide_name": 1,
           "type": "$and",
           "parameters": {
@@ -80,7 +80,7 @@
             "Y_WIDTH": 8
           },
           "attributes": {
-            "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/ALU.v:28.25-28.44"
+            "src": "myProject/Tile/PE/ALU.v:28.25-28.44"
           },
           "port_directions": {
             "A": "input",
@@ -102,7 +102,7 @@
             "Y_WIDTH": 1
           },
           "attributes": {
-            "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/ALU.v:21.3-35.6"
+            "src": "myProject/Tile/PE/ALU.v:21.3-35.6"
           },
           "port_directions": {
             "A": "input",
@@ -122,7 +122,7 @@
             "Y_WIDTH": 1
           },
           "attributes": {
-            "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/ALU.v:21.3-35.6"
+            "src": "myProject/Tile/PE/ALU.v:21.3-35.6"
           },
           "port_directions": {
             "A": "input",
@@ -142,7 +142,7 @@
             "Y_WIDTH": 1
           },
           "attributes": {
-            "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/ALU.v:21.3-35.6"
+            "src": "myProject/Tile/PE/ALU.v:21.3-35.6"
           },
           "port_directions": {
             "A": "input",
@@ -162,7 +162,7 @@
             "Y_WIDTH": 1
           },
           "attributes": {
-            "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/ALU.v:21.3-35.6"
+            "src": "myProject/Tile/PE/ALU.v:21.3-35.6"
           },
           "port_directions": {
             "A": "input",
@@ -182,7 +182,7 @@
             "Y_WIDTH": 1
           },
           "attributes": {
-            "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/ALU.v:21.3-35.6"
+            "src": "myProject/Tile/PE/ALU.v:21.3-35.6"
           },
           "port_directions": {
             "A": "input",
@@ -202,7 +202,7 @@
             "Y_WIDTH": 1
           },
           "attributes": {
-            "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/ALU.v:21.3-35.6"
+            "src": "myProject/Tile/PE/ALU.v:21.3-35.6"
           },
           "port_directions": {
             "A": "input",
@@ -222,7 +222,7 @@
             "Y_WIDTH": 1
           },
           "attributes": {
-            "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/ALU.v:21.3-35.6"
+            "src": "myProject/Tile/PE/ALU.v:21.3-35.6"
           },
           "port_directions": {
             "A": "input",
@@ -242,7 +242,7 @@
             "Y_WIDTH": 1
           },
           "attributes": {
-            "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/ALU.v:21.3-35.6"
+            "src": "myProject/Tile/PE/ALU.v:21.3-35.6"
           },
           "port_directions": {
             "A": "input",
@@ -262,7 +262,7 @@
             "Y_WIDTH": 1
           },
           "attributes": {
-            "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/ALU.v:21.3-35.6"
+            "src": "myProject/Tile/PE/ALU.v:21.3-35.6"
           },
           "port_directions": {
             "A": "input",
@@ -284,7 +284,7 @@
             "Y_WIDTH": 1
           },
           "attributes": {
-            "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/ALU.v:21.3-35.6"
+            "src": "myProject/Tile/PE/ALU.v:21.3-35.6"
           },
           "port_directions": {
             "A": "input",
@@ -308,7 +308,7 @@
             "Y_WIDTH": 1
           },
           "attributes": {
-            "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/ALU.v:21.3-35.6"
+            "src": "myProject/Tile/PE/ALU.v:21.3-35.6"
           },
           "port_directions": {
             "A": "input",
@@ -332,7 +332,7 @@
             "Y_WIDTH": 1
           },
           "attributes": {
-            "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/ALU.v:21.3-35.6"
+            "src": "myProject/Tile/PE/ALU.v:21.3-35.6"
           },
           "port_directions": {
             "A": "input",
@@ -372,7 +372,7 @@
             "WIDTH": 8
           },
           "attributes": {
-            "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/ALU.v:21.3-35.6"
+            "src": "myProject/Tile/PE/ALU.v:21.3-35.6"
           },
           "port_directions": {
             "D": "input",
@@ -385,7 +385,7 @@
             "Q": [ 29, 30, 31, 32, 33, 34, 35, 36 ]
           }
         },
-        "$mul$/home/kelvin/FABulous_fork/myProject/Tile/PE/ALU.v:31$7": {
+        "$mul$myProject/Tile/PE/ALU.v:31$7": {
           "hide_name": 1,
           "type": "$mul",
           "parameters": {
@@ -396,7 +396,7 @@
             "Y_WIDTH": 8
           },
           "attributes": {
-            "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/ALU.v:31.25-31.44"
+            "src": "myProject/Tile/PE/ALU.v:31.25-31.44"
           },
           "port_directions": {
             "A": "input",
@@ -409,7 +409,7 @@
             "Y": [ 78, 79, 80, 81, 82, 83, 84, 85 ]
           }
         },
-        "$or$/home/kelvin/FABulous_fork/myProject/Tile/PE/ALU.v:29$5": {
+        "$or$myProject/Tile/PE/ALU.v:29$5": {
           "hide_name": 1,
           "type": "$or",
           "parameters": {
@@ -420,7 +420,7 @@
             "Y_WIDTH": 8
           },
           "attributes": {
-            "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/ALU.v:29.24-29.43"
+            "src": "myProject/Tile/PE/ALU.v:29.24-29.43"
           },
           "port_directions": {
             "A": "input",
@@ -442,7 +442,7 @@
           },
           "attributes": {
             "full_case": 1,
-            "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/ALU.v:0.0-0.0|/home/kelvin/FABulous_fork/myProject/Tile/PE/ALU.v:25.7-33.14"
+            "src": "myProject/Tile/PE/ALU.v:0.0-0.0|myProject/Tile/PE/ALU.v:25.7-33.14"
           },
           "port_directions": {
             "A": "input",
@@ -469,7 +469,7 @@
           },
           "attributes": {
             "full_case": 1,
-            "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/ALU.v:0.0-0.0|/home/kelvin/FABulous_fork/myProject/Tile/PE/ALU.v:25.7-33.14"
+            "src": "myProject/Tile/PE/ALU.v:0.0-0.0|myProject/Tile/PE/ALU.v:25.7-33.14"
           },
           "port_directions": {
             "A": "input",
@@ -494,7 +494,7 @@
           },
           "attributes": {
             "full_case": 1,
-            "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/ALU.v:0.0-0.0|/home/kelvin/FABulous_fork/myProject/Tile/PE/ALU.v:25.7-33.14"
+            "src": "myProject/Tile/PE/ALU.v:0.0-0.0|myProject/Tile/PE/ALU.v:25.7-33.14"
           },
           "port_directions": {
             "A": "input",
@@ -519,7 +519,7 @@
           },
           "attributes": {
             "full_case": 1,
-            "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/ALU.v:0.0-0.0|/home/kelvin/FABulous_fork/myProject/Tile/PE/ALU.v:25.7-33.14"
+            "src": "myProject/Tile/PE/ALU.v:0.0-0.0|myProject/Tile/PE/ALU.v:25.7-33.14"
           },
           "port_directions": {
             "A": "input",
@@ -544,7 +544,7 @@
           },
           "attributes": {
             "full_case": 1,
-            "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/ALU.v:0.0-0.0|/home/kelvin/FABulous_fork/myProject/Tile/PE/ALU.v:25.7-33.14"
+            "src": "myProject/Tile/PE/ALU.v:0.0-0.0|myProject/Tile/PE/ALU.v:25.7-33.14"
           },
           "port_directions": {
             "A": "input",
@@ -569,7 +569,7 @@
           },
           "attributes": {
             "full_case": 1,
-            "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/ALU.v:0.0-0.0|/home/kelvin/FABulous_fork/myProject/Tile/PE/ALU.v:25.7-33.14"
+            "src": "myProject/Tile/PE/ALU.v:0.0-0.0|myProject/Tile/PE/ALU.v:25.7-33.14"
           },
           "port_directions": {
             "A": "input",
@@ -594,7 +594,7 @@
           },
           "attributes": {
             "full_case": 1,
-            "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/ALU.v:0.0-0.0|/home/kelvin/FABulous_fork/myProject/Tile/PE/ALU.v:25.7-33.14"
+            "src": "myProject/Tile/PE/ALU.v:0.0-0.0|myProject/Tile/PE/ALU.v:25.7-33.14"
           },
           "port_directions": {
             "A": "input",
@@ -615,7 +615,7 @@
           },
           "attributes": {
             "full_case": 1,
-            "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/ALU.v:24.18-24.20|/home/kelvin/FABulous_fork/myProject/Tile/PE/ALU.v:24.14-34.8"
+            "src": "myProject/Tile/PE/ALU.v:24.18-24.20|myProject/Tile/PE/ALU.v:24.14-34.8"
           },
           "port_directions": {
             "A": "input",
@@ -638,7 +638,7 @@
           },
           "attributes": {
             "full_case": 1,
-            "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/ALU.v:22.9-22.12|/home/kelvin/FABulous_fork/myProject/Tile/PE/ALU.v:22.5-34.8"
+            "src": "myProject/Tile/PE/ALU.v:22.9-22.12|myProject/Tile/PE/ALU.v:22.5-34.8"
           },
           "port_directions": {
             "A": "input",
@@ -661,7 +661,7 @@
           },
           "attributes": {
             "full_case": 1,
-            "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/ALU.v:24.18-24.20|/home/kelvin/FABulous_fork/myProject/Tile/PE/ALU.v:24.14-34.8"
+            "src": "myProject/Tile/PE/ALU.v:24.18-24.20|myProject/Tile/PE/ALU.v:24.14-34.8"
           },
           "port_directions": {
             "A": "input",
@@ -684,7 +684,7 @@
           },
           "attributes": {
             "full_case": 1,
-            "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/ALU.v:22.9-22.12|/home/kelvin/FABulous_fork/myProject/Tile/PE/ALU.v:22.5-34.8"
+            "src": "myProject/Tile/PE/ALU.v:22.9-22.12|myProject/Tile/PE/ALU.v:22.5-34.8"
           },
           "port_directions": {
             "A": "input",
@@ -707,7 +707,7 @@
           },
           "attributes": {
             "full_case": 1,
-            "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/ALU.v:22.9-22.12|/home/kelvin/FABulous_fork/myProject/Tile/PE/ALU.v:22.5-34.8"
+            "src": "myProject/Tile/PE/ALU.v:22.9-22.12|myProject/Tile/PE/ALU.v:22.5-34.8"
           },
           "port_directions": {
             "A": "input",
@@ -722,7 +722,7 @@
             "Y": [ 70, 71, 72, 73, 74, 75, 76, 77 ]
           }
         },
-        "$sub$/home/kelvin/FABulous_fork/myProject/Tile/PE/ALU.v:27$3": {
+        "$sub$myProject/Tile/PE/ALU.v:27$3": {
           "hide_name": 1,
           "type": "$sub",
           "parameters": {
@@ -733,7 +733,7 @@
             "Y_WIDTH": 8
           },
           "attributes": {
-            "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/ALU.v:27.25-27.44"
+            "src": "myProject/Tile/PE/ALU.v:27.25-27.44"
           },
           "port_directions": {
             "A": "input",
@@ -746,7 +746,7 @@
             "Y": [ 102, 103, 104, 105, 106, 107, 108, 109 ]
           }
         },
-        "$xor$/home/kelvin/FABulous_fork/myProject/Tile/PE/ALU.v:30$6": {
+        "$xor$myProject/Tile/PE/ALU.v:30$6": {
           "hide_name": 1,
           "type": "$xor",
           "parameters": {
@@ -757,7 +757,7 @@
             "Y_WIDTH": 8
           },
           "attributes": {
-            "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/ALU.v:30.25-30.44"
+            "src": "myProject/Tile/PE/ALU.v:30.25-30.44"
           },
           "port_directions": {
             "A": "input",
@@ -776,42 +776,42 @@
           "hide_name": 1,
           "bits": [ 70, 71, 72, 73, 74, 75, 76, 77 ],
           "attributes": {
-            "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/ALU.v:21.3-35.6"
+            "src": "myProject/Tile/PE/ALU.v:21.3-35.6"
           }
         },
         "$1\\data_out[7:0]": {
           "hide_name": 1,
           "bits": [ 70, 71, 72, 73, 74, 75, 76, 77 ],
           "attributes": {
-            "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/ALU.v:21.3-35.6"
+            "src": "myProject/Tile/PE/ALU.v:21.3-35.6"
           }
         },
         "$2\\data_out[7:0]": {
           "hide_name": 1,
           "bits": [ 148, 149, 150, 151, 152, 153, 154, 155 ],
           "attributes": {
-            "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/ALU.v:21.3-35.6"
+            "src": "myProject/Tile/PE/ALU.v:21.3-35.6"
           }
         },
         "$3\\data_out[7:0]": {
           "hide_name": 1,
           "bits": [ 132, 133, 134, 135, 136, 137, 138, 139 ],
           "attributes": {
-            "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/ALU.v:21.3-35.6"
+            "src": "myProject/Tile/PE/ALU.v:21.3-35.6"
           }
         },
-        "$add$/home/kelvin/FABulous_fork/myProject/Tile/PE/ALU.v:26$2_Y": {
+        "$add$myProject/Tile/PE/ALU.v:26$2_Y": {
           "hide_name": 1,
           "bits": [ 41, 42, 43, 44, 45, 46, 47, 48 ],
           "attributes": {
-            "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/ALU.v:26.25-26.44"
+            "src": "myProject/Tile/PE/ALU.v:26.25-26.44"
           }
         },
-        "$and$/home/kelvin/FABulous_fork/myProject/Tile/PE/ALU.v:28$4_Y": {
+        "$and$myProject/Tile/PE/ALU.v:28$4_Y": {
           "hide_name": 1,
           "bits": [ 49, 50, 51, 52, 53, 54, 55, 56 ],
           "attributes": {
-            "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/ALU.v:28.25-28.44"
+            "src": "myProject/Tile/PE/ALU.v:28.25-28.44"
           }
         },
         "$auto$rtlil.cc:2739:Not$32": {
@@ -892,18 +892,18 @@
           "attributes": {
           }
         },
-        "$mul$/home/kelvin/FABulous_fork/myProject/Tile/PE/ALU.v:31$7_Y": {
+        "$mul$myProject/Tile/PE/ALU.v:31$7_Y": {
           "hide_name": 1,
           "bits": [ 78, 79, 80, 81, 82, 83, 84, 85 ],
           "attributes": {
-            "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/ALU.v:31.25-31.44"
+            "src": "myProject/Tile/PE/ALU.v:31.25-31.44"
           }
         },
-        "$or$/home/kelvin/FABulous_fork/myProject/Tile/PE/ALU.v:29$5_Y": {
+        "$or$myProject/Tile/PE/ALU.v:29$5_Y": {
           "hide_name": 1,
           "bits": [ 86, 87, 88, 89, 90, 91, 92, 93 ],
           "attributes": {
-            "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/ALU.v:29.24-29.43"
+            "src": "myProject/Tile/PE/ALU.v:29.24-29.43"
           }
         },
         "$procmux$10_Y": {
@@ -1008,18 +1008,18 @@
           "attributes": {
           }
         },
-        "$sub$/home/kelvin/FABulous_fork/myProject/Tile/PE/ALU.v:27$3_Y": {
+        "$sub$myProject/Tile/PE/ALU.v:27$3_Y": {
           "hide_name": 1,
           "bits": [ 102, 103, 104, 105, 106, 107, 108, 109 ],
           "attributes": {
-            "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/ALU.v:27.25-27.44"
+            "src": "myProject/Tile/PE/ALU.v:27.25-27.44"
           }
         },
-        "$xor$/home/kelvin/FABulous_fork/myProject/Tile/PE/ALU.v:30$6_Y": {
+        "$xor$myProject/Tile/PE/ALU.v:30$6_Y": {
           "hide_name": 1,
           "bits": [ 94, 95, 96, 97, 98, 99, 100, 101 ],
           "attributes": {
-            "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/ALU.v:30.25-30.44"
+            "src": "myProject/Tile/PE/ALU.v:30.25-30.44"
           }
         },
         "ConfigBits": {
@@ -1030,7 +1030,7 @@
             "FABulous": 1,
             "FEATURE": "ALU",
             "FEATURE_MAP": "std_add(left=>data_in1, right=>data_in2, out=>data_out);",
-            "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/ALU.v:11.142-11.152"
+            "src": "myProject/Tile/PE/ALU.v:11.142-11.152"
           }
         },
         "clk": {
@@ -1039,7 +1039,7 @@
           "attributes": {
             "FABulous": 1,
             "USER_CLK": 1,
-            "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/ALU.v:6.41-6.44"
+            "src": "myProject/Tile/PE/ALU.v:6.41-6.44"
           }
         },
         "data_in1": {
@@ -1048,7 +1048,7 @@
           "attributes": {
             "BUS": 1,
             "FABulous": 1,
-            "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/ALU.v:7.42-7.50"
+            "src": "myProject/Tile/PE/ALU.v:7.42-7.50"
           }
         },
         "data_in2": {
@@ -1057,7 +1057,7 @@
           "attributes": {
             "BUS": 1,
             "FABulous": 1,
-            "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/ALU.v:8.42-8.50"
+            "src": "myProject/Tile/PE/ALU.v:8.42-8.50"
           }
         },
         "data_in3": {
@@ -1066,7 +1066,7 @@
           "attributes": {
             "BUS": 1,
             "FABulous": 1,
-            "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/ALU.v:9.42-9.50"
+            "src": "myProject/Tile/PE/ALU.v:9.42-9.50"
           }
         },
         "data_out": {
@@ -1075,21 +1075,21 @@
           "attributes": {
             "BUS": 1,
             "FABulous": 1,
-            "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/ALU.v:10.42-10.50"
+            "src": "myProject/Tile/PE/ALU.v:10.42-10.50"
           }
         },
         "en": {
           "hide_name": 0,
           "bits": [ 3 ],
           "attributes": {
-            "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/ALU.v:5.16-5.18"
+            "src": "myProject/Tile/PE/ALU.v:5.16-5.18"
           }
         },
         "rst": {
           "hide_name": 0,
           "bits": [ 2 ],
           "attributes": {
-            "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/ALU.v:4.16-4.19"
+            "src": "myProject/Tile/PE/ALU.v:4.16-4.19"
           }
         }
       }

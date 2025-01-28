@@ -98,7 +98,7 @@ class FABulous_CLI(Cmd):
     projectDir: Path
     top: str
     allTile: list[str]
-    csvFile: Path
+    fabricFilePath: Path
     extension: str = "v"
     script: str = ""
 
@@ -146,7 +146,18 @@ class FABulous_CLI(Cmd):
 
         self.tiles = []
         self.superTiles = []
-        self.csvFile = Path(projectDir / "fabric.csv")
+
+        if Path(projectDir / "fabric.csv").exists():
+            logger.info("Found fabric.csv in the project directory")
+            self.fabricFilePath = Path(projectDir / "fabric.csv")
+        elif Path(projectDir / "fabric.yaml").exists():
+            logger.info("Found fabric.yaml in the project directory")
+            self.fabricFilePath = Path(projectDir / "fabric.yaml")
+        else:
+            logger.info(
+                "Cannot find fabric.csv or fabric.yaml in the project directory, will not set default path for load_fabric"
+            )
+
         self.add_settable(
             Settable(
                 "csvFile", Path, "The fabric file ", self, completer=Cmd.path_complete
@@ -260,19 +271,20 @@ class FABulous_CLI(Cmd):
         # if no argument is given will use the one set by set_fabric_csv
         # else use the argument
         logger.info("Loading fabric")
-        if args.file == Path():
-            if self.csvFile.exists():
+        if args.file.is_dir():
+            if self.fabricFilePath.exists():
                 logger.info(
                     "Found fabric.csv in the project directory loading that file as the definition of the fabric"
                 )
-                self.fabulousAPI.loadFabric(self.csvFile)
+                self.fabulousAPI.loadFabric(self.fabricFilePath)
             else:
                 logger.error(
                     "No argument is given and the csv file is set or the file does not exist"
                 )
+            return
         else:
             self.fabulousAPI.loadFabric(args.file)
-            self.csvFile = args.file
+            self.fabricFilePath = args.file
 
         self.fabricLoaded = True
         # self.projectDir = os.path.split(self.csvFile)[0]

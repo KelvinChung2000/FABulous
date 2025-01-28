@@ -331,6 +331,10 @@ def parseBelFile(
                 raise ValueError(
                     f"CONFIG_BIT port and {net} in file {filename} must have at least one feature."
                 )
+            if len(featureType) != 1:
+                raise ValueError(
+                    f"CONFIG_BIT port and {net} in file {filename} must have exactly one feature type."
+                )
             for i in feature:
                 belMapDict[i] = netBitWidth
             configPort.append(

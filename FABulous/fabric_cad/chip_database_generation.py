@@ -89,7 +89,6 @@ def genBel(bels: list[Bel], tile: TileType, context=1):
                 tile.create_wire(f"{c}_{i.name}", f"{bel.name}_{i.name}")
 
             for i in bel.externalOutput + bel.outputs:
-                print(f"{c}_{i.name}")
                 tile.create_wire(f"{c}_{i.name}", f"{bel.name}_{i.name}")
 
             if bel.userCLK:

@@ -35,10 +35,9 @@ from cmd2 import (
 from loguru import logger
 
 from FABulous.fabric_generator.code_generation_Verilog import VerilogWriter
-from FABulous.FABulous_CLI import synthesis
-from FABulous.fabric_generator.code_generation_Verilog import VerilogWriter
 from FABulous.fabric_generator.code_generation_VHDL import VHDLWriter
 from FABulous.FABulous_API import FABulous_API
+from FABulous.FABulous_CLI import synthesis
 from FABulous.FABulous_CLI.helper import (
     allow_blank,
     check_if_application_exists,
@@ -283,7 +282,7 @@ class FABulous_CLI(Cmd):
                 logger.error(
                     "No argument is given and the csv file is set or the file does not exist"
                 )
-            return
+                return
         else:
             self.fabulousAPI.loadFabric(args.file)
             self.fabricFilePath = args.file
@@ -579,7 +578,7 @@ class FABulous_CLI(Cmd):
         """
         logger.info("Running FABulous")
         self.do_gen_fabric()
-        self.do_gen_primitive_library()
+        self.do_gen_primitive_library(self.projectDir / META_DATA_DIR / "prims.v")
         self.do_gen_chipdb()
         self.do_gen_bitStream_spec()
         self.do_gen_top_wrapper()

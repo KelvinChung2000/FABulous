@@ -1,10 +1,10 @@
-(* techmap_celltype = "std_add" *)
+(* techmap_celltype = "$add" *)
 module std_add_techmap #(
     parameter WIDTH = 32
 ) (
-    input [31:0] left,
-    input [31:0] right,
-    output [31:0] out
+    input [31:0] A,
+    input [31:0] B,
+    output [31:0] Y
 );
     generate
         ALU #(
@@ -13,10 +13,10 @@ module std_add_techmap #(
             .rst(),
             .en(),
             .clk(),
-            .data_in1(left),
-            .data_in2(right),
+            .data_in1(A),
+            .data_in2(B),
             .data_in3(),
-            .data_out(out),
+            .data_out(Y),
             .ConfigBits()
         );
     endgenerate

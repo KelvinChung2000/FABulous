@@ -40,7 +40,7 @@ from FABulous.fabric_definition.Tile import Tile
 from FABulous.fabric_generator.code_generation_Verilog import VerilogWriter
 from FABulous.fabric_generator.code_generation_VHDL import VHDLWriter
 from FABulous.fabric_generator.code_generator import codeGenerator
-from FABulous.file_parser.file_parser_csv import parseList
+from FABulous.file_parser.file_parser_csv import parseConfigMem, parseList
 
 
 class FabricGenerator:

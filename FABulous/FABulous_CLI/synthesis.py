@@ -210,6 +210,35 @@ synthesis_parser.add_argument(
     "(same result as setting the no_rw_check attribute on all memories).",
 )
 
+synthesis_parser.add_argument(
+    "-c",
+    "--tcl-scriptfile",
+    type=Path,
+    help="provide a custom tcl based synthesis script. This will not run the default synthesis flow "
+    "and only execute the commands in the script.",
+)
+
+synthesis_parser.add_argument(
+    "-s",
+    "--scriptfile",
+    type=Path,
+    help="provide a custom Yosys synthesis script. This will not run the default synthesis flow "
+    "and only execute the commands in the script.",
+)
+
+synthesis_parser.add_argument(
+    "-q",
+    "--quiet",
+    help="suppresses the output of the synthesis process",
+)
+
+synthesis_parser.add_argument(
+    "-m",
+    "--plugin",
+    type=str,
+    help="load the specified plugin",
+)
+
 
 @with_category(CMD_FABRIC_FLOW)
 @with_argparser(synthesis_parser)
@@ -263,16 +292,27 @@ def do_synthesis(self, args):
 
     cmd = " ".join([i for i in cmd if i != ""])
 
-    runCmd = [
+    yosysCmd = [
         f"{yosys}",
-        "-p",
-        f"{cmd}",
-        f"{self.projectDir}/user_design/top_wrapper.v",
-        *[str(i) for i in paths],
+        "-q" if args.quiet else "",
+        f"-m {args.plugin}" if args.plugin else "",
     ]
-    logger.debug(f"{runCmd}")
+
+    if args.tcl_scriptfile:
+        yosysCmd.append(f"-c {args.tcl_scriptfile}")
+    elif args.scriptfile:
+        yosysCmd.append(f"-s {args.scriptfile}")
+    else:
+        yosysCmd.extend(
+            [
+                f"-p {cmd}" f"{self.projectDir}/user_design/top_wrapper.v",
+                *[str(i) for i in paths],
+            ]
+        )
+
+    logger.debug(f"{yosysCmd}")
     try:
-        sp.run(runCmd, check=True)
+        sp.run(yosysCmd, check=True)
         logger.info("Synthesis completed")
     except sp.CalledProcessError:
         logger.error("Synthesis failed")

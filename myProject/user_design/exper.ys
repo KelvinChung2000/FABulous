@@ -1,0 +1,35 @@
+#read_verilog -sv -lib /home/kelvin/FABulous_fork/myProject/PnR/prims/*.sv 
+read_verilog -sv /home/kelvin/FABulous_fork/myProject/PnR/gemm/gemm.sv
+blackbox std_* seq_mem_*
+setattr -mod -unset blackbox std_wire std_slice
+hierarchy -top gemm
+proc;;;
+setattr -mod -unset src
+#setattr -mod -set keep_hierarchy 1
+#setattr -mod -unset keep_hierarchy fsm_*_* *wire* *std_slice*
+flatten -noscopeinfo;;;
+check
+opt -nosdff -nodffe -fine -purge;
+fsm -nomap
+wreduce
+share
+opt -full
+clean -purge
+stat
+select gemm
+show 
+
+#show -width
+
+
+#read_verilog -sv ./myProject/PnR/fsm.v
+#hierarchy -auto-top
+#proc -noopt;
+#opt -nosdff -nodffe -fine -purge;
+#fsm
+
+#read_verilog -sv /home/kelvin/FABulous_fork/myProject/PnR/gemm_new_fsm.sv
+##read_verilog -sv /home/kelvin/FABulous_fork/myProject/PnR/gemm_calyx_nested.sv
+#flatten
+#synth_xilinx
+#stat

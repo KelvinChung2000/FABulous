@@ -1344,6 +1344,183 @@ always_ff @(posedge clk) begin
   end
 endmodule
 
+
+module fsm_main_def (
+  input logic clk,
+  input logic reset,
+  output logic fsm_done_in,
+  output logic gemm_instance_arg_mem_0_done,
+  output logic gemm_instance_arg_mem_0_read_data,
+  output logic gemm_instance_arg_mem_1_done,
+  output logic gemm_instance_arg_mem_1_read_data,
+  output logic gemm_instance_arg_mem_3_done,
+  output logic gemm_instance_arg_mem_3_read_data,
+  output logic gemm_instance_go,
+  output logic gemm_instance_in0,
+  output logic gemm_instance_in1,
+  output logic gemm_instance_reset,
+  output logic mem_0_content_en,
+  output logic mem_0_write_en,
+  output logic mem_1_content_en,
+  output logic mem_1_write_en,
+  output logic mem_3_content_en,
+  output logic mem_3_write_en,
+  input logic mem_0_done,
+  input logic mem_0_read_data,
+  input logic mem_1_done,
+  input logic mem_1_read_data,
+  input logic mem_3_done,
+  input logic mem_3_read_data,
+  input logic in0,
+  input logic in1,
+  input logic gemm_instance_arg_mem_0_content_en,
+  input logic gemm_instance_arg_mem_0_write_en,
+  input logic gemm_instance_arg_mem_1_content_en,
+  input logic gemm_instance_arg_mem_1_write_en,
+  input logic gemm_instance_arg_mem_3_content_en,
+  input logic gemm_instance_arg_mem_3_write_en,
+  input logic fsm_start_out,
+  input logic gemm_instance_done
+);
+
+  localparam logic[1:0] S0 = 2'd0;
+  localparam logic[1:0] S1 = 2'd1;
+  localparam logic[1:0] S2 = 2'd2;
+  localparam logic[1:0] S3 = 2'd3;
+
+  logic [1:0] current_state;
+  logic [1:0] next_state;
+
+  always @(posedge clk) begin
+    if (reset) begin
+      current_state <= S0;
+    end
+    else begin
+      current_state <= next_state;
+    end
+  end
+
+  always_comb begin
+    case ( current_state )
+        S0: begin
+          fsm_done_in = 'b0;
+          gemm_instance_arg_mem_0_done = 'b0;
+          gemm_instance_arg_mem_0_read_data = 'b0;
+          gemm_instance_arg_mem_1_done = 'b0;
+          gemm_instance_arg_mem_1_read_data = 'b0;
+          gemm_instance_arg_mem_3_done = 'b0;
+          gemm_instance_arg_mem_3_read_data = 'b0;
+          gemm_instance_go = 'b0;
+          gemm_instance_in0 = 'b0;
+          gemm_instance_in1 = 'b0;
+          gemm_instance_reset = 'b0;
+          mem_0_content_en = 'b0;
+          mem_0_write_en = 'b0;
+          mem_1_content_en = 'b0;
+          mem_1_write_en = 'b0;
+          mem_3_content_en = 'b0;
+          mem_3_write_en = 'b0;
+          if (fsm_start_out) begin
+            next_state = S1;
+          end
+          else begin
+            next_state = S0;
+          end
+        end
+        S1: begin
+          fsm_done_in = 'b0;
+          gemm_instance_arg_mem_0_done = 'b0;
+          gemm_instance_arg_mem_0_read_data = 'b0;
+          gemm_instance_arg_mem_1_done = 'b0;
+          gemm_instance_arg_mem_1_read_data = 'b0;
+          gemm_instance_arg_mem_3_done = 'b0;
+          gemm_instance_arg_mem_3_read_data = 'b0;
+          gemm_instance_go = 1'd1;
+          gemm_instance_in0 = 'b0;
+          gemm_instance_in1 = 'b0;
+          gemm_instance_reset = 1'd1;
+          mem_0_content_en = 'b0;
+          mem_0_write_en = 'b0;
+          mem_1_content_en = 'b0;
+          mem_1_write_en = 'b0;
+          mem_3_content_en = 'b0;
+          mem_3_write_en = 'b0;
+          if (gemm_instance_done) begin
+            next_state = S2;
+          end
+          else begin
+            next_state = S1;
+          end
+        end
+        S2: begin
+          fsm_done_in = 'b0;
+          gemm_instance_arg_mem_0_done = mem_0_done;
+          gemm_instance_arg_mem_0_read_data = mem_0_read_data;
+          gemm_instance_arg_mem_1_done = mem_1_done;
+          gemm_instance_arg_mem_1_read_data = mem_1_read_data;
+          gemm_instance_arg_mem_3_done = mem_3_done;
+          gemm_instance_arg_mem_3_read_data = mem_3_read_data;
+          gemm_instance_go = 1'd1;
+          gemm_instance_in0 = in0;
+          gemm_instance_in1 = in1;
+          gemm_instance_reset = 'b0;
+          mem_0_content_en = gemm_instance_arg_mem_0_content_en;
+          mem_0_write_en = gemm_instance_arg_mem_0_write_en;
+          mem_1_content_en = gemm_instance_arg_mem_1_content_en;
+          mem_1_write_en = gemm_instance_arg_mem_1_write_en;
+          mem_3_content_en = gemm_instance_arg_mem_3_content_en;
+          mem_3_write_en = gemm_instance_arg_mem_3_write_en;
+          if (gemm_instance_done) begin
+            next_state = S3;
+          end
+          else begin
+            next_state = S2;
+          end
+        end
+        S3: begin
+          fsm_done_in = 1'd1;
+          gemm_instance_arg_mem_0_done = 'b0;
+          gemm_instance_arg_mem_0_read_data = 'b0;
+          gemm_instance_arg_mem_1_done = 'b0;
+          gemm_instance_arg_mem_1_read_data = 'b0;
+          gemm_instance_arg_mem_3_done = 'b0;
+          gemm_instance_arg_mem_3_read_data = 'b0;
+          gemm_instance_go = 'b0;
+          gemm_instance_in0 = 'b0;
+          gemm_instance_in1 = 'b0;
+          gemm_instance_reset = 'b0;
+          mem_0_content_en = 'b0;
+          mem_0_write_en = 'b0;
+          mem_1_content_en = 'b0;
+          mem_1_write_en = 'b0;
+          mem_3_content_en = 'b0;
+          mem_3_write_en = 'b0;
+          next_state = S0;
+        end
+      default begin
+          fsm_done_in = 'b0;
+          gemm_instance_arg_mem_0_done = 'b0;
+          gemm_instance_arg_mem_0_read_data = 'b0;
+          gemm_instance_arg_mem_1_done = 'b0;
+          gemm_instance_arg_mem_1_read_data = 'b0;
+          gemm_instance_arg_mem_3_done = 'b0;
+          gemm_instance_arg_mem_3_read_data = 'b0;
+          gemm_instance_go = 'b0;
+          gemm_instance_in0 = 'b0;
+          gemm_instance_in1 = 'b0;
+          gemm_instance_reset = 'b0;
+          mem_0_content_en = 'b0;
+          mem_0_write_en = 'b0;
+          mem_1_content_en = 'b0;
+          mem_1_write_en = 'b0;
+          mem_3_content_en = 'b0;
+          mem_3_write_en = 'b0;
+          next_state = S0;
+      end
+    endcase
+  end
+endmodule
+
 module main(
   input logic [31:0] in0,
   input logic [31:0] in1,
@@ -1415,24 +1592,10 @@ logic gemm_instance_arg_mem_2_write_en;
 logic [31:0] gemm_instance_arg_mem_2_write_data;
 logic [9:0] gemm_instance_arg_mem_1_addr0;
 logic gemm_instance_arg_mem_1_content_en;
-logic [1:0] fsm_in;
-logic fsm_write_en;
-logic fsm_clk;
-logic fsm_reset;
-logic [1:0] fsm_out;
-logic fsm_done;
-logic invoke0_go_in;
-logic invoke0_go_out;
-logic invoke0_done_in;
-logic invoke0_done_out;
-logic invoke1_go_in;
-logic invoke1_go_out;
-logic invoke1_done_in;
-logic invoke1_done_out;
-logic tdcc_go_in;
-logic tdcc_go_out;
-logic tdcc_done_in;
-logic tdcc_done_out;
+logic fsm_start_in;
+logic fsm_start_out;
+logic fsm_done_in;
+logic fsm_done_out;
 seq_mem_d1 # (
     .IDX_SIZE(10),
     .SIZE(900),
@@ -1521,115 +1684,1238 @@ gemm gemm_instance (
     .in1(gemm_instance_in1),
     .reset(gemm_instance_reset)
 );
-std_reg # (
-    .WIDTH(2)
-) fsm (
-    .clk(fsm_clk),
-    .done(fsm_done),
-    .in(fsm_in),
-    .out(fsm_out),
-    .reset(fsm_reset),
-    .write_en(fsm_write_en)
+std_wire # (
+    .WIDTH(1)
+) fsm_start (
+    .in(fsm_start_in),
+    .out(fsm_start_out)
 );
 std_wire # (
     .WIDTH(1)
-) invoke0_go (
-    .in(invoke0_go_in),
-    .out(invoke0_go_out)
+) fsm_done (
+    .in(fsm_done_in),
+    .out(fsm_done_out)
 );
-std_wire # (
-    .WIDTH(1)
-) invoke0_done (
-    .in(invoke0_done_in),
-    .out(invoke0_done_out)
+fsm_main_def fsm (
+  .clk(clk),
+  .reset(reset),
+  // dst ports
+  // input ports
+  .fsm_done_in(fsm_done_in),
+  .gemm_instance_arg_mem_0_done(gemm_instance_arg_mem_0_done),
+  .gemm_instance_arg_mem_0_read_data(gemm_instance_arg_mem_0_read_data),
+  .gemm_instance_arg_mem_1_done(gemm_instance_arg_mem_1_done),
+  .gemm_instance_arg_mem_1_read_data(gemm_instance_arg_mem_1_read_data),
+  .gemm_instance_arg_mem_3_done(gemm_instance_arg_mem_3_done),
+  .gemm_instance_arg_mem_3_read_data(gemm_instance_arg_mem_3_read_data),
+  .gemm_instance_go(gemm_instance_go),
+  .gemm_instance_in0(gemm_instance_in0),
+  .gemm_instance_in1(gemm_instance_in1),
+  .gemm_instance_reset(gemm_instance_reset),
+  .mem_0_content_en(mem_0_content_en),
+  .mem_0_write_en(mem_0_write_en),
+  .mem_1_content_en(mem_1_content_en),
+  .mem_1_write_en(mem_1_write_en),
+  .mem_3_content_en(mem_3_content_en),
+  .mem_3_write_en(mem_3_write_en),
+  .mem_0_done(mem_0_done),
+  .mem_0_read_data(mem_0_read_data),
+  .mem_1_done(mem_1_done),
+  .mem_1_read_data(mem_1_read_data),
+  .mem_3_done(mem_3_done),
+  .mem_3_read_data(mem_3_read_data),
+  .in0(in0),
+  .in1(in1),
+  .gemm_instance_arg_mem_0_content_en(gemm_instance_arg_mem_0_content_en),
+  .gemm_instance_arg_mem_0_write_en(gemm_instance_arg_mem_0_write_en),
+  .gemm_instance_arg_mem_1_content_en(gemm_instance_arg_mem_1_content_en),
+  .gemm_instance_arg_mem_1_write_en(gemm_instance_arg_mem_1_write_en),
+  .gemm_instance_arg_mem_3_content_en(gemm_instance_arg_mem_3_content_en),
+  .gemm_instance_arg_mem_3_write_en(gemm_instance_arg_mem_3_write_en),
+  .fsm_start_out(fsm_start_out),
+  .gemm_instance_done(gemm_instance_done)
 );
-std_wire # (
-    .WIDTH(1)
-) invoke1_go (
-    .in(invoke1_go_in),
-    .out(invoke1_go_out)
-);
-std_wire # (
-    .WIDTH(1)
-) invoke1_done (
-    .in(invoke1_done_in),
-    .out(invoke1_done_out)
-);
-std_wire # (
-    .WIDTH(1)
-) tdcc_go (
-    .in(tdcc_go_in),
-    .out(tdcc_go_out)
-);
-std_wire # (
-    .WIDTH(1)
-) tdcc_done (
-    .in(tdcc_done_in),
-    .out(tdcc_done_out)
-);
-assign done = tdcc_done_out;
-assign fsm_write_en = fsm_out == 2'd2 | fsm_out == 2'd1 & invoke1_done_out & tdcc_go_out | fsm_out == 2'd0 & invoke0_done_out & tdcc_go_out;
-assign fsm_clk = clk;
-assign fsm_reset = reset;
-assign fsm_in =
- fsm_out == 2'd0 & invoke0_done_out & tdcc_go_out ? 2'd1 :
- fsm_out == 2'd2 ? 2'd0 :
- fsm_out == 2'd1 & invoke1_done_out & tdcc_go_out ? 2'd2 : 2'd0;
+
+assign mem_1_addr0 = gemm_instance_arg_mem_1_addr0;
+assign mem_0_addr0 = gemm_instance_arg_mem_0_addr0;
+assign mem_3_addr0 = gemm_instance_arg_mem_3_addr0;
+assign mem_3_write_data = gemm_instance_arg_mem_3_write_data;
+assign done = fsm_done_out;
 assign mem_2_write_en = 1'd0;
 assign mem_2_clk = clk;
 assign mem_2_content_en = 1'd0;
 assign mem_2_reset = reset;
-assign invoke0_go_in = ~invoke0_done_out & fsm_out == 2'd0 & tdcc_go_out;
-assign tdcc_go_in = go;
-assign mem_1_write_en =
- invoke1_go_out ? gemm_instance_arg_mem_1_write_en : 1'd0;
 assign mem_1_clk = clk;
-assign mem_1_addr0 = gemm_instance_arg_mem_1_addr0;
-assign mem_1_content_en =
- invoke1_go_out ? gemm_instance_arg_mem_1_content_en : 1'd0;
 assign mem_1_reset = reset;
-assign invoke0_done_in = gemm_instance_done;
-assign invoke1_go_in = ~invoke1_done_out & fsm_out == 2'd1 & tdcc_go_out;
-assign mem_0_write_en =
- invoke1_go_out ? gemm_instance_arg_mem_0_write_en : 1'd0;
 assign mem_0_clk = clk;
-assign mem_0_addr0 = gemm_instance_arg_mem_0_addr0;
-assign mem_0_content_en =
- invoke1_go_out ? gemm_instance_arg_mem_0_content_en : 1'd0;
 assign mem_0_reset = reset;
-assign tdcc_done_in = fsm_out == 2'd2;
-assign mem_3_write_en =
- invoke1_go_out ? gemm_instance_arg_mem_3_write_en : 1'd0;
 assign mem_3_clk = clk;
-assign mem_3_addr0 = gemm_instance_arg_mem_3_addr0;
-assign mem_3_content_en =
- invoke1_go_out ? gemm_instance_arg_mem_3_content_en : 1'd0;
 assign mem_3_reset = reset;
-assign mem_3_write_data = gemm_instance_arg_mem_3_write_data;
-assign invoke1_done_in = gemm_instance_done;
-assign gemm_instance_arg_mem_0_read_data =
- invoke1_go_out ? mem_0_read_data : 32'd0;
-assign gemm_instance_arg_mem_0_done =
- invoke1_go_out ? mem_0_done : 1'd0;
-assign gemm_instance_arg_mem_3_read_data =
- invoke1_go_out ? mem_3_read_data : 32'd0;
-assign gemm_instance_in1 =
- invoke1_go_out ? in1 : 32'd0;
-assign gemm_instance_arg_mem_1_read_data =
- invoke1_go_out ? mem_1_read_data : 32'd0;
+assign fsm_start_in = go;
 assign gemm_instance_clk = clk;
-assign gemm_instance_arg_mem_3_done =
- invoke1_go_out ? mem_3_done : 1'd0;
-assign gemm_instance_reset =
- 1'b1 ? reset :
- invoke0_go_out ? 1'd1 : 1'd0;
-assign gemm_instance_go = invoke0_go_out | invoke1_go_out;
-assign gemm_instance_arg_mem_1_done =
- invoke1_go_out ? mem_1_done : 1'd0;
-assign gemm_instance_in0 =
- invoke1_go_out ? in0 : 32'd0;
 // COMPONENT END: main
 endmodule
+
+module fsm_gemm_def (
+  input logic clk,
+  input logic reset,
+  output logic arg_mem_0_content_en,
+  output logic arg_mem_0_write_en,
+  output logic arg_mem_1_content_en,
+  output logic arg_mem_1_write_en,
+  output logic arg_mem_3_content_en,
+  output logic arg_mem_3_write_en,
+  output logic comb_reg0_write_en,
+  output logic comb_reg1_write_en,
+  output logic comb_reg_write_en,
+  output logic fsm_done_in,
+  output logic load_0_reg_write_en,
+  output logic muli_0_reg_write_en,
+  output logic muli_1_reg_write_en,
+  output logic muli_2_reg_write_en,
+  output logic muli_3_reg_write_en,
+  output logic std_mult_pipe_0_go,
+  output logic std_mult_pipe_1_go,
+  output logic std_mult_pipe_2_go,
+  output logic std_mult_pipe_3_go,
+  output logic std_slt_0_left,
+  output logic std_slt_0_right,
+  output logic std_slt_1_left,
+  output logic std_slt_1_right,
+  output logic std_slt_2_left,
+  output logic std_slt_2_right,
+  output logic while_0_arg0_reg_write_en,
+  output logic while_1_arg0_reg_write_en,
+  output logic while_2_arg0_reg_write_en,
+  input logic while_2_arg0_reg_out,
+  input logic while_1_arg0_reg_out,
+  input logic while_0_arg0_reg_out,
+  input logic fsm_start_out,
+  input logic while_2_arg0_reg_done,
+  input logic comb_reg_out,
+  input logic comb_reg0_out,
+  input logic while_0_arg0_reg_done,
+  input logic comb_reg1_out,
+  input logic arg_mem_0_done,
+  input logic arg_mem_1_done,
+  input logic arg_mem_3_done,
+  input logic load_0_reg_done,
+  input logic while_1_arg0_reg_done
+);
+
+  localparam logic[4:0] S0 = 5'd0;
+  localparam logic[4:0] S1 = 5'd1;
+  localparam logic[4:0] S2 = 5'd2;
+  localparam logic[4:0] S3 = 5'd3;
+  localparam logic[4:0] S4 = 5'd4;
+  localparam logic[4:0] S5 = 5'd5;
+  localparam logic[4:0] S6 = 5'd6;
+  localparam logic[4:0] S7 = 5'd7;
+  localparam logic[4:0] S8 = 5'd8;
+  localparam logic[4:0] S9 = 5'd9;
+  localparam logic[4:0] S10 = 5'd10;
+  localparam logic[4:0] S11 = 5'd11;
+  localparam logic[4:0] S12 = 5'd12;
+  localparam logic[4:0] S13 = 5'd13;
+  localparam logic[4:0] S14 = 5'd14;
+  localparam logic[4:0] S15 = 5'd15;
+  localparam logic[4:0] S16 = 5'd16;
+  localparam logic[4:0] S17 = 5'd17;
+  localparam logic[4:0] S18 = 5'd18;
+  localparam logic[4:0] S19 = 5'd19;
+  localparam logic[4:0] S20 = 5'd20;
+  localparam logic[4:0] S21 = 5'd21;
+  localparam logic[4:0] S22 = 5'd22;
+  localparam logic[4:0] S23 = 5'd23;
+  localparam logic[4:0] S24 = 5'd24;
+  localparam logic[4:0] S25 = 5'd25;
+  localparam logic[4:0] S26 = 5'd26;
+  localparam logic[4:0] S27 = 5'd27;
+  localparam logic[4:0] S28 = 5'd28;
+  localparam logic[4:0] S29 = 5'd29;
+
+  logic [4:0] current_state;
+  logic [4:0] next_state;
+
+  always @(posedge clk) begin
+    if (reset) begin
+      current_state <= S0;
+    end
+    else begin
+      current_state <= next_state;
+    end
+  end
+
+  always_comb begin
+    case ( current_state )
+        S0: begin
+          arg_mem_0_content_en = 'b0;
+          arg_mem_0_write_en = 'b0;
+          arg_mem_1_content_en = 'b0;
+          arg_mem_1_write_en = 'b0;
+          arg_mem_3_content_en = 'b0;
+          arg_mem_3_write_en = 'b0;
+          comb_reg0_write_en = 'b0;
+          comb_reg1_write_en = 'b0;
+          comb_reg_write_en = 'b0;
+          fsm_done_in = 'b0;
+          load_0_reg_write_en = 'b0;
+          muli_0_reg_write_en = 'b0;
+          muli_1_reg_write_en = 'b0;
+          muli_2_reg_write_en = 'b0;
+          muli_3_reg_write_en = 'b0;
+          std_mult_pipe_0_go = 'b0;
+          std_mult_pipe_1_go = 'b0;
+          std_mult_pipe_2_go = 'b0;
+          std_mult_pipe_3_go = 'b0;
+          std_slt_0_left = 'b0;
+          std_slt_0_right = 'b0;
+          std_slt_1_left = 'b0;
+          std_slt_1_right = 'b0;
+          std_slt_2_left = 'b0;
+          std_slt_2_right = 'b0;
+          while_0_arg0_reg_write_en = 'b0;
+          while_1_arg0_reg_write_en = 'b0;
+          while_2_arg0_reg_write_en = 'b0;
+          if (fsm_start_out) begin
+            next_state = S1;
+          end
+          else begin
+            next_state = S0;
+          end
+        end
+        S1: begin
+          arg_mem_0_content_en = 'b0;
+          arg_mem_0_write_en = 'b0;
+          arg_mem_1_content_en = 'b0;
+          arg_mem_1_write_en = 'b0;
+          arg_mem_3_content_en = 'b0;
+          arg_mem_3_write_en = 'b0;
+          comb_reg0_write_en = 'b0;
+          comb_reg1_write_en = 'b0;
+          comb_reg_write_en = 'b0;
+          fsm_done_in = 'b0;
+          load_0_reg_write_en = 'b0;
+          muli_0_reg_write_en = 'b0;
+          muli_1_reg_write_en = 'b0;
+          muli_2_reg_write_en = 'b0;
+          muli_3_reg_write_en = 'b0;
+          std_mult_pipe_0_go = 'b0;
+          std_mult_pipe_1_go = 'b0;
+          std_mult_pipe_2_go = 'b0;
+          std_mult_pipe_3_go = 'b0;
+          std_slt_0_left = 'b0;
+          std_slt_0_right = 'b0;
+          std_slt_1_left = 'b0;
+          std_slt_1_right = 'b0;
+          std_slt_2_left = 'b0;
+          std_slt_2_right = 'b0;
+          while_0_arg0_reg_write_en = 'b0;
+          while_1_arg0_reg_write_en = 'b0;
+          while_2_arg0_reg_write_en = 1'd1;
+          if (while_2_arg0_reg_done) begin
+            next_state = S2;
+          end
+          else begin
+            next_state = S1;
+          end
+        end
+        S2: begin
+          arg_mem_0_content_en = 'b0;
+          arg_mem_0_write_en = 'b0;
+          arg_mem_1_content_en = 'b0;
+          arg_mem_1_write_en = 'b0;
+          arg_mem_3_content_en = 'b0;
+          arg_mem_3_write_en = 'b0;
+          comb_reg0_write_en = 'b0;
+          comb_reg1_write_en = 'b0;
+          comb_reg_write_en = 1'd1;
+          fsm_done_in = 'b0;
+          load_0_reg_write_en = 'b0;
+          muli_0_reg_write_en = 'b0;
+          muli_1_reg_write_en = 'b0;
+          muli_2_reg_write_en = 'b0;
+          muli_3_reg_write_en = 'b0;
+          std_mult_pipe_0_go = 'b0;
+          std_mult_pipe_1_go = 'b0;
+          std_mult_pipe_2_go = 'b0;
+          std_mult_pipe_3_go = 'b0;
+          std_slt_0_left = while_2_arg0_reg_out;
+          std_slt_0_right = 32'd20;
+          std_slt_1_left = 'b0;
+          std_slt_1_right = 'b0;
+          std_slt_2_left = 'b0;
+          std_slt_2_right = 'b0;
+          while_0_arg0_reg_write_en = 'b0;
+          while_1_arg0_reg_write_en = 'b0;
+          while_2_arg0_reg_write_en = 'b0;
+          if (comb_reg_out) begin
+            next_state = S3;
+          end
+          else if (~(comb_reg_out)) begin
+            next_state = S29;
+          end
+          else begin
+            next_state = S2;
+          end
+        end
+        S3: begin
+          arg_mem_0_content_en = 'b0;
+          arg_mem_0_write_en = 'b0;
+          arg_mem_1_content_en = 'b0;
+          arg_mem_1_write_en = 'b0;
+          arg_mem_3_content_en = 'b0;
+          arg_mem_3_write_en = 'b0;
+          comb_reg0_write_en = 'b0;
+          comb_reg1_write_en = 'b0;
+          comb_reg_write_en = 'b0;
+          fsm_done_in = 'b0;
+          load_0_reg_write_en = 'b0;
+          muli_0_reg_write_en = 'b0;
+          muli_1_reg_write_en = 'b0;
+          muli_2_reg_write_en = 'b0;
+          muli_3_reg_write_en = 'b0;
+          std_mult_pipe_0_go = 1'd1;
+          std_mult_pipe_1_go = 'b0;
+          std_mult_pipe_2_go = 'b0;
+          std_mult_pipe_3_go = 'b0;
+          std_slt_0_left = 'b0;
+          std_slt_0_right = 'b0;
+          std_slt_1_left = 'b0;
+          std_slt_1_right = 'b0;
+          std_slt_2_left = 'b0;
+          std_slt_2_right = 'b0;
+          while_0_arg0_reg_write_en = 'b0;
+          while_1_arg0_reg_write_en = 1'd1;
+          while_2_arg0_reg_write_en = 'b0;
+          next_state = S4;
+        end
+        S4: begin
+          arg_mem_0_content_en = 'b0;
+          arg_mem_0_write_en = 'b0;
+          arg_mem_1_content_en = 'b0;
+          arg_mem_1_write_en = 'b0;
+          arg_mem_3_content_en = 'b0;
+          arg_mem_3_write_en = 'b0;
+          comb_reg0_write_en = 'b0;
+          comb_reg1_write_en = 'b0;
+          comb_reg_write_en = 'b0;
+          fsm_done_in = 'b0;
+          load_0_reg_write_en = 'b0;
+          muli_0_reg_write_en = 'b0;
+          muli_1_reg_write_en = 'b0;
+          muli_2_reg_write_en = 'b0;
+          muli_3_reg_write_en = 'b0;
+          std_mult_pipe_0_go = 1'd1;
+          std_mult_pipe_1_go = 'b0;
+          std_mult_pipe_2_go = 'b0;
+          std_mult_pipe_3_go = 'b0;
+          std_slt_0_left = 'b0;
+          std_slt_0_right = 'b0;
+          std_slt_1_left = 'b0;
+          std_slt_1_right = 'b0;
+          std_slt_2_left = 'b0;
+          std_slt_2_right = 'b0;
+          while_0_arg0_reg_write_en = 'b0;
+          while_1_arg0_reg_write_en = 'b0;
+          while_2_arg0_reg_write_en = 'b0;
+          next_state = S5;
+        end
+        S5: begin
+          arg_mem_0_content_en = 'b0;
+          arg_mem_0_write_en = 'b0;
+          arg_mem_1_content_en = 'b0;
+          arg_mem_1_write_en = 'b0;
+          arg_mem_3_content_en = 'b0;
+          arg_mem_3_write_en = 'b0;
+          comb_reg0_write_en = 'b0;
+          comb_reg1_write_en = 'b0;
+          comb_reg_write_en = 'b0;
+          fsm_done_in = 'b0;
+          load_0_reg_write_en = 'b0;
+          muli_0_reg_write_en = 'b0;
+          muli_1_reg_write_en = 'b0;
+          muli_2_reg_write_en = 'b0;
+          muli_3_reg_write_en = 'b0;
+          std_mult_pipe_0_go = 1'd1;
+          std_mult_pipe_1_go = 'b0;
+          std_mult_pipe_2_go = 'b0;
+          std_mult_pipe_3_go = 'b0;
+          std_slt_0_left = 'b0;
+          std_slt_0_right = 'b0;
+          std_slt_1_left = 'b0;
+          std_slt_1_right = 'b0;
+          std_slt_2_left = 'b0;
+          std_slt_2_right = 'b0;
+          while_0_arg0_reg_write_en = 'b0;
+          while_1_arg0_reg_write_en = 'b0;
+          while_2_arg0_reg_write_en = 'b0;
+          next_state = S6;
+        end
+        S6: begin
+          arg_mem_0_content_en = 'b0;
+          arg_mem_0_write_en = 'b0;
+          arg_mem_1_content_en = 'b0;
+          arg_mem_1_write_en = 'b0;
+          arg_mem_3_content_en = 'b0;
+          arg_mem_3_write_en = 'b0;
+          comb_reg0_write_en = 'b0;
+          comb_reg1_write_en = 'b0;
+          comb_reg_write_en = 'b0;
+          fsm_done_in = 'b0;
+          load_0_reg_write_en = 'b0;
+          muli_0_reg_write_en = 1'd1;
+          muli_1_reg_write_en = 'b0;
+          muli_2_reg_write_en = 'b0;
+          muli_3_reg_write_en = 'b0;
+          std_mult_pipe_0_go = 'b0;
+          std_mult_pipe_1_go = 'b0;
+          std_mult_pipe_2_go = 'b0;
+          std_mult_pipe_3_go = 'b0;
+          std_slt_0_left = 'b0;
+          std_slt_0_right = 'b0;
+          std_slt_1_left = 'b0;
+          std_slt_1_right = 'b0;
+          std_slt_2_left = 'b0;
+          std_slt_2_right = 'b0;
+          while_0_arg0_reg_write_en = 'b0;
+          while_1_arg0_reg_write_en = 'b0;
+          while_2_arg0_reg_write_en = 'b0;
+          next_state = S7;
+        end
+        S7: begin
+          arg_mem_0_content_en = 'b0;
+          arg_mem_0_write_en = 'b0;
+          arg_mem_1_content_en = 'b0;
+          arg_mem_1_write_en = 'b0;
+          arg_mem_3_content_en = 'b0;
+          arg_mem_3_write_en = 'b0;
+          comb_reg0_write_en = 1'd1;
+          comb_reg1_write_en = 'b0;
+          comb_reg_write_en = 'b0;
+          fsm_done_in = 'b0;
+          load_0_reg_write_en = 'b0;
+          muli_0_reg_write_en = 'b0;
+          muli_1_reg_write_en = 'b0;
+          muli_2_reg_write_en = 'b0;
+          muli_3_reg_write_en = 'b0;
+          std_mult_pipe_0_go = 'b0;
+          std_mult_pipe_1_go = 'b0;
+          std_mult_pipe_2_go = 'b0;
+          std_mult_pipe_3_go = 'b0;
+          std_slt_0_left = 'b0;
+          std_slt_0_right = 'b0;
+          std_slt_1_left = while_1_arg0_reg_out;
+          std_slt_1_right = 32'd20;
+          std_slt_2_left = 'b0;
+          std_slt_2_right = 'b0;
+          while_0_arg0_reg_write_en = 'b0;
+          while_1_arg0_reg_write_en = 'b0;
+          while_2_arg0_reg_write_en = 'b0;
+          if (comb_reg0_out) begin
+            next_state = S8;
+          end
+          else if (~(comb_reg0_out)) begin
+            next_state = S27;
+          end
+          else begin
+            next_state = S7;
+          end
+        end
+        S8: begin
+          arg_mem_0_content_en = 'b0;
+          arg_mem_0_write_en = 'b0;
+          arg_mem_1_content_en = 'b0;
+          arg_mem_1_write_en = 'b0;
+          arg_mem_3_content_en = 'b0;
+          arg_mem_3_write_en = 'b0;
+          comb_reg0_write_en = 'b0;
+          comb_reg1_write_en = 'b0;
+          comb_reg_write_en = 'b0;
+          fsm_done_in = 'b0;
+          load_0_reg_write_en = 'b0;
+          muli_0_reg_write_en = 'b0;
+          muli_1_reg_write_en = 'b0;
+          muli_2_reg_write_en = 'b0;
+          muli_3_reg_write_en = 'b0;
+          std_mult_pipe_0_go = 'b0;
+          std_mult_pipe_1_go = 'b0;
+          std_mult_pipe_2_go = 'b0;
+          std_mult_pipe_3_go = 'b0;
+          std_slt_0_left = 'b0;
+          std_slt_0_right = 'b0;
+          std_slt_1_left = 'b0;
+          std_slt_1_right = 'b0;
+          std_slt_2_left = 'b0;
+          std_slt_2_right = 'b0;
+          while_0_arg0_reg_write_en = 1'd1;
+          while_1_arg0_reg_write_en = 'b0;
+          while_2_arg0_reg_write_en = 'b0;
+          if (while_0_arg0_reg_done) begin
+            next_state = S9;
+          end
+          else begin
+            next_state = S8;
+          end
+        end
+        S9: begin
+          arg_mem_0_content_en = 'b0;
+          arg_mem_0_write_en = 'b0;
+          arg_mem_1_content_en = 'b0;
+          arg_mem_1_write_en = 'b0;
+          arg_mem_3_content_en = 'b0;
+          arg_mem_3_write_en = 'b0;
+          comb_reg0_write_en = 'b0;
+          comb_reg1_write_en = 1'd1;
+          comb_reg_write_en = 'b0;
+          fsm_done_in = 'b0;
+          load_0_reg_write_en = 'b0;
+          muli_0_reg_write_en = 'b0;
+          muli_1_reg_write_en = 'b0;
+          muli_2_reg_write_en = 'b0;
+          muli_3_reg_write_en = 'b0;
+          std_mult_pipe_0_go = 'b0;
+          std_mult_pipe_1_go = 'b0;
+          std_mult_pipe_2_go = 'b0;
+          std_mult_pipe_3_go = 'b0;
+          std_slt_0_left = 'b0;
+          std_slt_0_right = 'b0;
+          std_slt_1_left = 'b0;
+          std_slt_1_right = 'b0;
+          std_slt_2_left = while_0_arg0_reg_out;
+          std_slt_2_right = 32'd20;
+          while_0_arg0_reg_write_en = 'b0;
+          while_1_arg0_reg_write_en = 'b0;
+          while_2_arg0_reg_write_en = 'b0;
+          if (comb_reg1_out) begin
+            next_state = S10;
+          end
+          else if (~(comb_reg1_out)) begin
+            next_state = S25;
+          end
+          else begin
+            next_state = S9;
+          end
+        end
+        S10: begin
+          arg_mem_0_content_en = 1'd1;
+          arg_mem_0_write_en = 1'd0;
+          arg_mem_1_content_en = 'b0;
+          arg_mem_1_write_en = 'b0;
+          arg_mem_3_content_en = 'b0;
+          arg_mem_3_write_en = 'b0;
+          comb_reg0_write_en = 'b0;
+          comb_reg1_write_en = 'b0;
+          comb_reg_write_en = 'b0;
+          fsm_done_in = 'b0;
+          load_0_reg_write_en = 'b0;
+          muli_0_reg_write_en = 'b0;
+          muli_1_reg_write_en = 'b0;
+          muli_2_reg_write_en = 'b0;
+          muli_3_reg_write_en = 'b0;
+          std_mult_pipe_0_go = 'b0;
+          std_mult_pipe_1_go = 'b0;
+          std_mult_pipe_2_go = 'b0;
+          std_mult_pipe_3_go = 'b0;
+          std_slt_0_left = 'b0;
+          std_slt_0_right = 'b0;
+          std_slt_1_left = 'b0;
+          std_slt_1_right = 'b0;
+          std_slt_2_left = 'b0;
+          std_slt_2_right = 'b0;
+          while_0_arg0_reg_write_en = 'b0;
+          while_1_arg0_reg_write_en = 'b0;
+          while_2_arg0_reg_write_en = 'b0;
+          if (arg_mem_0_done) begin
+            next_state = S11;
+          end
+          else begin
+            next_state = S10;
+          end
+        end
+        S11: begin
+          arg_mem_0_content_en = 'b0;
+          arg_mem_0_write_en = 'b0;
+          arg_mem_1_content_en = 'b0;
+          arg_mem_1_write_en = 'b0;
+          arg_mem_3_content_en = 'b0;
+          arg_mem_3_write_en = 'b0;
+          comb_reg0_write_en = 'b0;
+          comb_reg1_write_en = 'b0;
+          comb_reg_write_en = 'b0;
+          fsm_done_in = 'b0;
+          load_0_reg_write_en = 'b0;
+          muli_0_reg_write_en = 'b0;
+          muli_1_reg_write_en = 'b0;
+          muli_2_reg_write_en = 'b0;
+          muli_3_reg_write_en = 'b0;
+          std_mult_pipe_0_go = 'b0;
+          std_mult_pipe_1_go = 1'd1;
+          std_mult_pipe_2_go = 1'd1;
+          std_mult_pipe_3_go = 'b0;
+          std_slt_0_left = 'b0;
+          std_slt_0_right = 'b0;
+          std_slt_1_left = 'b0;
+          std_slt_1_right = 'b0;
+          std_slt_2_left = 'b0;
+          std_slt_2_right = 'b0;
+          while_0_arg0_reg_write_en = 'b0;
+          while_1_arg0_reg_write_en = 'b0;
+          while_2_arg0_reg_write_en = 'b0;
+          next_state = S12;
+        end
+        S12: begin
+          arg_mem_0_content_en = 'b0;
+          arg_mem_0_write_en = 'b0;
+          arg_mem_1_content_en = 'b0;
+          arg_mem_1_write_en = 'b0;
+          arg_mem_3_content_en = 'b0;
+          arg_mem_3_write_en = 'b0;
+          comb_reg0_write_en = 'b0;
+          comb_reg1_write_en = 'b0;
+          comb_reg_write_en = 'b0;
+          fsm_done_in = 'b0;
+          load_0_reg_write_en = 'b0;
+          muli_0_reg_write_en = 'b0;
+          muli_1_reg_write_en = 'b0;
+          muli_2_reg_write_en = 'b0;
+          muli_3_reg_write_en = 'b0;
+          std_mult_pipe_0_go = 'b0;
+          std_mult_pipe_1_go = 1'd1;
+          std_mult_pipe_2_go = 1'd1;
+          std_mult_pipe_3_go = 'b0;
+          std_slt_0_left = 'b0;
+          std_slt_0_right = 'b0;
+          std_slt_1_left = 'b0;
+          std_slt_1_right = 'b0;
+          std_slt_2_left = 'b0;
+          std_slt_2_right = 'b0;
+          while_0_arg0_reg_write_en = 'b0;
+          while_1_arg0_reg_write_en = 'b0;
+          while_2_arg0_reg_write_en = 'b0;
+          next_state = S13;
+        end
+        S13: begin
+          arg_mem_0_content_en = 'b0;
+          arg_mem_0_write_en = 'b0;
+          arg_mem_1_content_en = 'b0;
+          arg_mem_1_write_en = 'b0;
+          arg_mem_3_content_en = 'b0;
+          arg_mem_3_write_en = 'b0;
+          comb_reg0_write_en = 'b0;
+          comb_reg1_write_en = 'b0;
+          comb_reg_write_en = 'b0;
+          fsm_done_in = 'b0;
+          load_0_reg_write_en = 'b0;
+          muli_0_reg_write_en = 'b0;
+          muli_1_reg_write_en = 'b0;
+          muli_2_reg_write_en = 'b0;
+          muli_3_reg_write_en = 'b0;
+          std_mult_pipe_0_go = 'b0;
+          std_mult_pipe_1_go = 1'd1;
+          std_mult_pipe_2_go = 1'd1;
+          std_mult_pipe_3_go = 'b0;
+          std_slt_0_left = 'b0;
+          std_slt_0_right = 'b0;
+          std_slt_1_left = 'b0;
+          std_slt_1_right = 'b0;
+          std_slt_2_left = 'b0;
+          std_slt_2_right = 'b0;
+          while_0_arg0_reg_write_en = 'b0;
+          while_1_arg0_reg_write_en = 'b0;
+          while_2_arg0_reg_write_en = 'b0;
+          next_state = S14;
+        end
+        S14: begin
+          arg_mem_0_content_en = 'b0;
+          arg_mem_0_write_en = 'b0;
+          arg_mem_1_content_en = 'b0;
+          arg_mem_1_write_en = 'b0;
+          arg_mem_3_content_en = 'b0;
+          arg_mem_3_write_en = 'b0;
+          comb_reg0_write_en = 'b0;
+          comb_reg1_write_en = 'b0;
+          comb_reg_write_en = 'b0;
+          fsm_done_in = 'b0;
+          load_0_reg_write_en = 'b0;
+          muli_0_reg_write_en = 'b0;
+          muli_1_reg_write_en = 1'd1;
+          muli_2_reg_write_en = 1'd1;
+          muli_3_reg_write_en = 'b0;
+          std_mult_pipe_0_go = 'b0;
+          std_mult_pipe_1_go = 'b0;
+          std_mult_pipe_2_go = 'b0;
+          std_mult_pipe_3_go = 'b0;
+          std_slt_0_left = 'b0;
+          std_slt_0_right = 'b0;
+          std_slt_1_left = 'b0;
+          std_slt_1_right = 'b0;
+          std_slt_2_left = 'b0;
+          std_slt_2_right = 'b0;
+          while_0_arg0_reg_write_en = 'b0;
+          while_1_arg0_reg_write_en = 'b0;
+          while_2_arg0_reg_write_en = 'b0;
+          next_state = S15;
+        end
+        S15: begin
+          arg_mem_0_content_en = 'b0;
+          arg_mem_0_write_en = 'b0;
+          arg_mem_1_content_en = 1'd1;
+          arg_mem_1_write_en = 1'd0;
+          arg_mem_3_content_en = 'b0;
+          arg_mem_3_write_en = 'b0;
+          comb_reg0_write_en = 'b0;
+          comb_reg1_write_en = 'b0;
+          comb_reg_write_en = 'b0;
+          fsm_done_in = 'b0;
+          load_0_reg_write_en = 'b0;
+          muli_0_reg_write_en = 'b0;
+          muli_1_reg_write_en = 'b0;
+          muli_2_reg_write_en = 'b0;
+          muli_3_reg_write_en = 'b0;
+          std_mult_pipe_0_go = 'b0;
+          std_mult_pipe_1_go = 'b0;
+          std_mult_pipe_2_go = 'b0;
+          std_mult_pipe_3_go = 'b0;
+          std_slt_0_left = 'b0;
+          std_slt_0_right = 'b0;
+          std_slt_1_left = 'b0;
+          std_slt_1_right = 'b0;
+          std_slt_2_left = 'b0;
+          std_slt_2_right = 'b0;
+          while_0_arg0_reg_write_en = 'b0;
+          while_1_arg0_reg_write_en = 'b0;
+          while_2_arg0_reg_write_en = 'b0;
+          if (arg_mem_1_done) begin
+            next_state = S16;
+          end
+          else begin
+            next_state = S15;
+          end
+        end
+        S16: begin
+          arg_mem_0_content_en = 'b0;
+          arg_mem_0_write_en = 'b0;
+          arg_mem_1_content_en = 'b0;
+          arg_mem_1_write_en = 'b0;
+          arg_mem_3_content_en = 'b0;
+          arg_mem_3_write_en = 'b0;
+          comb_reg0_write_en = 'b0;
+          comb_reg1_write_en = 'b0;
+          comb_reg_write_en = 'b0;
+          fsm_done_in = 'b0;
+          load_0_reg_write_en = 'b0;
+          muli_0_reg_write_en = 'b0;
+          muli_1_reg_write_en = 'b0;
+          muli_2_reg_write_en = 'b0;
+          muli_3_reg_write_en = 'b0;
+          std_mult_pipe_0_go = 'b0;
+          std_mult_pipe_1_go = 'b0;
+          std_mult_pipe_2_go = 'b0;
+          std_mult_pipe_3_go = 1'd1;
+          std_slt_0_left = 'b0;
+          std_slt_0_right = 'b0;
+          std_slt_1_left = 'b0;
+          std_slt_1_right = 'b0;
+          std_slt_2_left = 'b0;
+          std_slt_2_right = 'b0;
+          while_0_arg0_reg_write_en = 'b0;
+          while_1_arg0_reg_write_en = 'b0;
+          while_2_arg0_reg_write_en = 'b0;
+          next_state = S17;
+        end
+        S17: begin
+          arg_mem_0_content_en = 'b0;
+          arg_mem_0_write_en = 'b0;
+          arg_mem_1_content_en = 'b0;
+          arg_mem_1_write_en = 'b0;
+          arg_mem_3_content_en = 'b0;
+          arg_mem_3_write_en = 'b0;
+          comb_reg0_write_en = 'b0;
+          comb_reg1_write_en = 'b0;
+          comb_reg_write_en = 'b0;
+          fsm_done_in = 'b0;
+          load_0_reg_write_en = 'b0;
+          muli_0_reg_write_en = 'b0;
+          muli_1_reg_write_en = 'b0;
+          muli_2_reg_write_en = 'b0;
+          muli_3_reg_write_en = 'b0;
+          std_mult_pipe_0_go = 'b0;
+          std_mult_pipe_1_go = 'b0;
+          std_mult_pipe_2_go = 'b0;
+          std_mult_pipe_3_go = 1'd1;
+          std_slt_0_left = 'b0;
+          std_slt_0_right = 'b0;
+          std_slt_1_left = 'b0;
+          std_slt_1_right = 'b0;
+          std_slt_2_left = 'b0;
+          std_slt_2_right = 'b0;
+          while_0_arg0_reg_write_en = 'b0;
+          while_1_arg0_reg_write_en = 'b0;
+          while_2_arg0_reg_write_en = 'b0;
+          next_state = S18;
+        end
+        S18: begin
+          arg_mem_0_content_en = 'b0;
+          arg_mem_0_write_en = 'b0;
+          arg_mem_1_content_en = 'b0;
+          arg_mem_1_write_en = 'b0;
+          arg_mem_3_content_en = 'b0;
+          arg_mem_3_write_en = 'b0;
+          comb_reg0_write_en = 'b0;
+          comb_reg1_write_en = 'b0;
+          comb_reg_write_en = 'b0;
+          fsm_done_in = 'b0;
+          load_0_reg_write_en = 'b0;
+          muli_0_reg_write_en = 'b0;
+          muli_1_reg_write_en = 'b0;
+          muli_2_reg_write_en = 'b0;
+          muli_3_reg_write_en = 'b0;
+          std_mult_pipe_0_go = 'b0;
+          std_mult_pipe_1_go = 'b0;
+          std_mult_pipe_2_go = 'b0;
+          std_mult_pipe_3_go = 1'd1;
+          std_slt_0_left = 'b0;
+          std_slt_0_right = 'b0;
+          std_slt_1_left = 'b0;
+          std_slt_1_right = 'b0;
+          std_slt_2_left = 'b0;
+          std_slt_2_right = 'b0;
+          while_0_arg0_reg_write_en = 'b0;
+          while_1_arg0_reg_write_en = 'b0;
+          while_2_arg0_reg_write_en = 'b0;
+          next_state = S19;
+        end
+        S19: begin
+          arg_mem_0_content_en = 'b0;
+          arg_mem_0_write_en = 'b0;
+          arg_mem_1_content_en = 'b0;
+          arg_mem_1_write_en = 'b0;
+          arg_mem_3_content_en = 'b0;
+          arg_mem_3_write_en = 'b0;
+          comb_reg0_write_en = 'b0;
+          comb_reg1_write_en = 'b0;
+          comb_reg_write_en = 'b0;
+          fsm_done_in = 'b0;
+          load_0_reg_write_en = 'b0;
+          muli_0_reg_write_en = 'b0;
+          muli_1_reg_write_en = 'b0;
+          muli_2_reg_write_en = 'b0;
+          muli_3_reg_write_en = 1'd1;
+          std_mult_pipe_0_go = 'b0;
+          std_mult_pipe_1_go = 'b0;
+          std_mult_pipe_2_go = 'b0;
+          std_mult_pipe_3_go = 'b0;
+          std_slt_0_left = 'b0;
+          std_slt_0_right = 'b0;
+          std_slt_1_left = 'b0;
+          std_slt_1_right = 'b0;
+          std_slt_2_left = 'b0;
+          std_slt_2_right = 'b0;
+          while_0_arg0_reg_write_en = 'b0;
+          while_1_arg0_reg_write_en = 'b0;
+          while_2_arg0_reg_write_en = 'b0;
+          next_state = S20;
+        end
+        S20: begin
+          arg_mem_0_content_en = 'b0;
+          arg_mem_0_write_en = 'b0;
+          arg_mem_1_content_en = 'b0;
+          arg_mem_1_write_en = 'b0;
+          arg_mem_3_content_en = 1'd1;
+          arg_mem_3_write_en = 1'd0;
+          comb_reg0_write_en = 'b0;
+          comb_reg1_write_en = 'b0;
+          comb_reg_write_en = 'b0;
+          fsm_done_in = 'b0;
+          load_0_reg_write_en = 'b0;
+          muli_0_reg_write_en = 'b0;
+          muli_1_reg_write_en = 'b0;
+          muli_2_reg_write_en = 'b0;
+          muli_3_reg_write_en = 'b0;
+          std_mult_pipe_0_go = 'b0;
+          std_mult_pipe_1_go = 'b0;
+          std_mult_pipe_2_go = 'b0;
+          std_mult_pipe_3_go = 'b0;
+          std_slt_0_left = 'b0;
+          std_slt_0_right = 'b0;
+          std_slt_1_left = 'b0;
+          std_slt_1_right = 'b0;
+          std_slt_2_left = 'b0;
+          std_slt_2_right = 'b0;
+          while_0_arg0_reg_write_en = 'b0;
+          while_1_arg0_reg_write_en = 'b0;
+          while_2_arg0_reg_write_en = 'b0;
+          if (arg_mem_3_done) begin
+            next_state = S21;
+          end
+          else begin
+            next_state = S20;
+          end
+        end
+        S21: begin
+          arg_mem_0_content_en = 'b0;
+          arg_mem_0_write_en = 'b0;
+          arg_mem_1_content_en = 'b0;
+          arg_mem_1_write_en = 'b0;
+          arg_mem_3_content_en = 'b0;
+          arg_mem_3_write_en = 'b0;
+          comb_reg0_write_en = 'b0;
+          comb_reg1_write_en = 'b0;
+          comb_reg_write_en = 'b0;
+          fsm_done_in = 'b0;
+          load_0_reg_write_en = 1'd1;
+          muli_0_reg_write_en = 'b0;
+          muli_1_reg_write_en = 'b0;
+          muli_2_reg_write_en = 'b0;
+          muli_3_reg_write_en = 'b0;
+          std_mult_pipe_0_go = 'b0;
+          std_mult_pipe_1_go = 'b0;
+          std_mult_pipe_2_go = 'b0;
+          std_mult_pipe_3_go = 'b0;
+          std_slt_0_left = 'b0;
+          std_slt_0_right = 'b0;
+          std_slt_1_left = 'b0;
+          std_slt_1_right = 'b0;
+          std_slt_2_left = 'b0;
+          std_slt_2_right = 'b0;
+          while_0_arg0_reg_write_en = 'b0;
+          while_1_arg0_reg_write_en = 'b0;
+          while_2_arg0_reg_write_en = 'b0;
+          if (load_0_reg_done) begin
+            next_state = S22;
+          end
+          else begin
+            next_state = S21;
+          end
+        end
+        S22: begin
+          arg_mem_0_content_en = 'b0;
+          arg_mem_0_write_en = 'b0;
+          arg_mem_1_content_en = 'b0;
+          arg_mem_1_write_en = 'b0;
+          arg_mem_3_content_en = 1'd1;
+          arg_mem_3_write_en = 1'd1;
+          comb_reg0_write_en = 'b0;
+          comb_reg1_write_en = 'b0;
+          comb_reg_write_en = 'b0;
+          fsm_done_in = 'b0;
+          load_0_reg_write_en = 'b0;
+          muli_0_reg_write_en = 'b0;
+          muli_1_reg_write_en = 'b0;
+          muli_2_reg_write_en = 'b0;
+          muli_3_reg_write_en = 'b0;
+          std_mult_pipe_0_go = 'b0;
+          std_mult_pipe_1_go = 'b0;
+          std_mult_pipe_2_go = 'b0;
+          std_mult_pipe_3_go = 'b0;
+          std_slt_0_left = 'b0;
+          std_slt_0_right = 'b0;
+          std_slt_1_left = 'b0;
+          std_slt_1_right = 'b0;
+          std_slt_2_left = 'b0;
+          std_slt_2_right = 'b0;
+          while_0_arg0_reg_write_en = 'b0;
+          while_1_arg0_reg_write_en = 'b0;
+          while_2_arg0_reg_write_en = 'b0;
+          if (arg_mem_3_done) begin
+            next_state = S23;
+          end
+          else begin
+            next_state = S22;
+          end
+        end
+        S23: begin
+          arg_mem_0_content_en = 'b0;
+          arg_mem_0_write_en = 'b0;
+          arg_mem_1_content_en = 'b0;
+          arg_mem_1_write_en = 'b0;
+          arg_mem_3_content_en = 'b0;
+          arg_mem_3_write_en = 'b0;
+          comb_reg0_write_en = 'b0;
+          comb_reg1_write_en = 'b0;
+          comb_reg_write_en = 'b0;
+          fsm_done_in = 'b0;
+          load_0_reg_write_en = 'b0;
+          muli_0_reg_write_en = 'b0;
+          muli_1_reg_write_en = 'b0;
+          muli_2_reg_write_en = 'b0;
+          muli_3_reg_write_en = 'b0;
+          std_mult_pipe_0_go = 'b0;
+          std_mult_pipe_1_go = 'b0;
+          std_mult_pipe_2_go = 'b0;
+          std_mult_pipe_3_go = 'b0;
+          std_slt_0_left = 'b0;
+          std_slt_0_right = 'b0;
+          std_slt_1_left = 'b0;
+          std_slt_1_right = 'b0;
+          std_slt_2_left = 'b0;
+          std_slt_2_right = 'b0;
+          while_0_arg0_reg_write_en = 1'd1;
+          while_1_arg0_reg_write_en = 'b0;
+          while_2_arg0_reg_write_en = 'b0;
+          if (while_0_arg0_reg_done) begin
+            next_state = S24;
+          end
+          else begin
+            next_state = S23;
+          end
+        end
+        S24: begin
+          arg_mem_0_content_en = 'b0;
+          arg_mem_0_write_en = 'b0;
+          arg_mem_1_content_en = 'b0;
+          arg_mem_1_write_en = 'b0;
+          arg_mem_3_content_en = 'b0;
+          arg_mem_3_write_en = 'b0;
+          comb_reg0_write_en = 'b0;
+          comb_reg1_write_en = 1'd1;
+          comb_reg_write_en = 'b0;
+          fsm_done_in = 'b0;
+          load_0_reg_write_en = 'b0;
+          muli_0_reg_write_en = 'b0;
+          muli_1_reg_write_en = 'b0;
+          muli_2_reg_write_en = 'b0;
+          muli_3_reg_write_en = 'b0;
+          std_mult_pipe_0_go = 'b0;
+          std_mult_pipe_1_go = 'b0;
+          std_mult_pipe_2_go = 'b0;
+          std_mult_pipe_3_go = 'b0;
+          std_slt_0_left = 'b0;
+          std_slt_0_right = 'b0;
+          std_slt_1_left = 'b0;
+          std_slt_1_right = 'b0;
+          std_slt_2_left = while_0_arg0_reg_out;
+          std_slt_2_right = 32'd20;
+          while_0_arg0_reg_write_en = 'b0;
+          while_1_arg0_reg_write_en = 'b0;
+          while_2_arg0_reg_write_en = 'b0;
+          if (comb_reg1_out) begin
+            next_state = S10;
+          end
+          else if (~(comb_reg1_out)) begin
+            next_state = S25;
+          end
+          else begin
+            next_state = S24;
+          end
+        end
+        S25: begin
+          arg_mem_0_content_en = 'b0;
+          arg_mem_0_write_en = 'b0;
+          arg_mem_1_content_en = 'b0;
+          arg_mem_1_write_en = 'b0;
+          arg_mem_3_content_en = 'b0;
+          arg_mem_3_write_en = 'b0;
+          comb_reg0_write_en = 'b0;
+          comb_reg1_write_en = 'b0;
+          comb_reg_write_en = 'b0;
+          fsm_done_in = 'b0;
+          load_0_reg_write_en = 'b0;
+          muli_0_reg_write_en = 'b0;
+          muli_1_reg_write_en = 'b0;
+          muli_2_reg_write_en = 'b0;
+          muli_3_reg_write_en = 'b0;
+          std_mult_pipe_0_go = 'b0;
+          std_mult_pipe_1_go = 'b0;
+          std_mult_pipe_2_go = 'b0;
+          std_mult_pipe_3_go = 'b0;
+          std_slt_0_left = 'b0;
+          std_slt_0_right = 'b0;
+          std_slt_1_left = 'b0;
+          std_slt_1_right = 'b0;
+          std_slt_2_left = 'b0;
+          std_slt_2_right = 'b0;
+          while_0_arg0_reg_write_en = 'b0;
+          while_1_arg0_reg_write_en = 1'd1;
+          while_2_arg0_reg_write_en = 'b0;
+          if (while_1_arg0_reg_done) begin
+            next_state = S26;
+          end
+          else begin
+            next_state = S25;
+          end
+        end
+        S26: begin
+          arg_mem_0_content_en = 'b0;
+          arg_mem_0_write_en = 'b0;
+          arg_mem_1_content_en = 'b0;
+          arg_mem_1_write_en = 'b0;
+          arg_mem_3_content_en = 'b0;
+          arg_mem_3_write_en = 'b0;
+          comb_reg0_write_en = 1'd1;
+          comb_reg1_write_en = 'b0;
+          comb_reg_write_en = 'b0;
+          fsm_done_in = 'b0;
+          load_0_reg_write_en = 'b0;
+          muli_0_reg_write_en = 'b0;
+          muli_1_reg_write_en = 'b0;
+          muli_2_reg_write_en = 'b0;
+          muli_3_reg_write_en = 'b0;
+          std_mult_pipe_0_go = 'b0;
+          std_mult_pipe_1_go = 'b0;
+          std_mult_pipe_2_go = 'b0;
+          std_mult_pipe_3_go = 'b0;
+          std_slt_0_left = 'b0;
+          std_slt_0_right = 'b0;
+          std_slt_1_left = while_1_arg0_reg_out;
+          std_slt_1_right = 32'd20;
+          std_slt_2_left = 'b0;
+          std_slt_2_right = 'b0;
+          while_0_arg0_reg_write_en = 'b0;
+          while_1_arg0_reg_write_en = 'b0;
+          while_2_arg0_reg_write_en = 'b0;
+          if (comb_reg0_out) begin
+            next_state = S8;
+          end
+          else if (~(comb_reg0_out)) begin
+            next_state = S27;
+          end
+          else begin
+            next_state = S26;
+          end
+        end
+        S27: begin
+          arg_mem_0_content_en = 'b0;
+          arg_mem_0_write_en = 'b0;
+          arg_mem_1_content_en = 'b0;
+          arg_mem_1_write_en = 'b0;
+          arg_mem_3_content_en = 'b0;
+          arg_mem_3_write_en = 'b0;
+          comb_reg0_write_en = 'b0;
+          comb_reg1_write_en = 'b0;
+          comb_reg_write_en = 'b0;
+          fsm_done_in = 'b0;
+          load_0_reg_write_en = 'b0;
+          muli_0_reg_write_en = 'b0;
+          muli_1_reg_write_en = 'b0;
+          muli_2_reg_write_en = 'b0;
+          muli_3_reg_write_en = 'b0;
+          std_mult_pipe_0_go = 'b0;
+          std_mult_pipe_1_go = 'b0;
+          std_mult_pipe_2_go = 'b0;
+          std_mult_pipe_3_go = 'b0;
+          std_slt_0_left = 'b0;
+          std_slt_0_right = 'b0;
+          std_slt_1_left = 'b0;
+          std_slt_1_right = 'b0;
+          std_slt_2_left = 'b0;
+          std_slt_2_right = 'b0;
+          while_0_arg0_reg_write_en = 'b0;
+          while_1_arg0_reg_write_en = 'b0;
+          while_2_arg0_reg_write_en = 1'd1;
+          if (while_2_arg0_reg_done) begin
+            next_state = S28;
+          end
+          else begin
+            next_state = S27;
+          end
+        end
+        S28: begin
+          arg_mem_0_content_en = 'b0;
+          arg_mem_0_write_en = 'b0;
+          arg_mem_1_content_en = 'b0;
+          arg_mem_1_write_en = 'b0;
+          arg_mem_3_content_en = 'b0;
+          arg_mem_3_write_en = 'b0;
+          comb_reg0_write_en = 'b0;
+          comb_reg1_write_en = 'b0;
+          comb_reg_write_en = 1'd1;
+          fsm_done_in = 'b0;
+          load_0_reg_write_en = 'b0;
+          muli_0_reg_write_en = 'b0;
+          muli_1_reg_write_en = 'b0;
+          muli_2_reg_write_en = 'b0;
+          muli_3_reg_write_en = 'b0;
+          std_mult_pipe_0_go = 'b0;
+          std_mult_pipe_1_go = 'b0;
+          std_mult_pipe_2_go = 'b0;
+          std_mult_pipe_3_go = 'b0;
+          std_slt_0_left = while_2_arg0_reg_out;
+          std_slt_0_right = 32'd20;
+          std_slt_1_left = 'b0;
+          std_slt_1_right = 'b0;
+          std_slt_2_left = 'b0;
+          std_slt_2_right = 'b0;
+          while_0_arg0_reg_write_en = 'b0;
+          while_1_arg0_reg_write_en = 'b0;
+          while_2_arg0_reg_write_en = 'b0;
+          if (comb_reg_out) begin
+            next_state = S3;
+          end
+          else if (~(comb_reg_out)) begin
+            next_state = S29;
+          end
+          else begin
+            next_state = S28;
+          end
+        end
+        S29: begin
+          arg_mem_0_content_en = 'b0;
+          arg_mem_0_write_en = 'b0;
+          arg_mem_1_content_en = 'b0;
+          arg_mem_1_write_en = 'b0;
+          arg_mem_3_content_en = 'b0;
+          arg_mem_3_write_en = 'b0;
+          comb_reg0_write_en = 'b0;
+          comb_reg1_write_en = 'b0;
+          comb_reg_write_en = 'b0;
+          fsm_done_in = 1'd1;
+          load_0_reg_write_en = 'b0;
+          muli_0_reg_write_en = 'b0;
+          muli_1_reg_write_en = 'b0;
+          muli_2_reg_write_en = 'b0;
+          muli_3_reg_write_en = 'b0;
+          std_mult_pipe_0_go = 'b0;
+          std_mult_pipe_1_go = 'b0;
+          std_mult_pipe_2_go = 'b0;
+          std_mult_pipe_3_go = 'b0;
+          std_slt_0_left = 'b0;
+          std_slt_0_right = 'b0;
+          std_slt_1_left = 'b0;
+          std_slt_1_right = 'b0;
+          std_slt_2_left = 'b0;
+          std_slt_2_right = 'b0;
+          while_0_arg0_reg_write_en = 'b0;
+          while_1_arg0_reg_write_en = 'b0;
+          while_2_arg0_reg_write_en = 'b0;
+          next_state = S0;
+        end
+      default begin
+          arg_mem_0_content_en = 'b0;
+          arg_mem_0_write_en = 'b0;
+          arg_mem_1_content_en = 'b0;
+          arg_mem_1_write_en = 'b0;
+          arg_mem_3_content_en = 'b0;
+          arg_mem_3_write_en = 'b0;
+          comb_reg0_write_en = 'b0;
+          comb_reg1_write_en = 'b0;
+          comb_reg_write_en = 'b0;
+          fsm_done_in = 'b0;
+          load_0_reg_write_en = 'b0;
+          muli_0_reg_write_en = 'b0;
+          muli_1_reg_write_en = 'b0;
+          muli_2_reg_write_en = 'b0;
+          muli_3_reg_write_en = 'b0;
+          std_mult_pipe_0_go = 'b0;
+          std_mult_pipe_1_go = 'b0;
+          std_mult_pipe_2_go = 'b0;
+          std_mult_pipe_3_go = 'b0;
+          std_slt_0_left = 'b0;
+          std_slt_0_right = 'b0;
+          std_slt_1_left = 'b0;
+          std_slt_1_right = 'b0;
+          std_slt_2_left = 'b0;
+          std_slt_2_right = 'b0;
+          while_0_arg0_reg_write_en = 'b0;
+          while_1_arg0_reg_write_en = 'b0;
+          while_2_arg0_reg_write_en = 'b0;
+          next_state = S0;
+      end
+    endcase
+  end
+endmodule
+
 module gemm(
   input logic [31:0] in0,
   input logic [31:0] in1,
@@ -1795,131 +3081,10 @@ logic comb_reg1_clk;
 logic comb_reg1_reset;
 logic comb_reg1_out;
 logic comb_reg1_done;
-logic [2:0] fsm_in;
-logic fsm_write_en;
-logic fsm_clk;
-logic fsm_reset;
-logic [2:0] fsm_out;
-logic fsm_done;
-logic [2:0] adder_left;
-logic [2:0] adder_right;
-logic [2:0] adder_out;
-logic ud0_out;
-logic [2:0] adder0_left;
-logic [2:0] adder0_right;
-logic [2:0] adder0_out;
-logic ud3_out;
-logic [2:0] adder1_left;
-logic [2:0] adder1_right;
-logic [2:0] adder1_out;
-logic ud4_out;
-logic ud5_out;
-logic ud6_out;
-logic ud7_out;
-logic signal_reg_in;
-logic signal_reg_write_en;
-logic signal_reg_clk;
-logic signal_reg_reset;
-logic signal_reg_out;
-logic signal_reg_done;
-logic [4:0] fsm0_in;
-logic fsm0_write_en;
-logic fsm0_clk;
-logic fsm0_reset;
-logic [4:0] fsm0_out;
-logic fsm0_done;
-logic beg_spl_bb0_15_go_in;
-logic beg_spl_bb0_15_go_out;
-logic beg_spl_bb0_15_done_in;
-logic beg_spl_bb0_15_done_out;
-logic bb0_9_go_in;
-logic bb0_9_go_out;
-logic bb0_9_done_in;
-logic bb0_9_done_out;
-logic bb0_13_go_in;
-logic bb0_13_go_out;
-logic bb0_13_done_in;
-logic bb0_13_done_out;
-logic bb0_17_go_in;
-logic bb0_17_go_out;
-logic bb0_17_done_in;
-logic bb0_17_done_out;
-logic invoke0_go_in;
-logic invoke0_go_out;
-logic invoke0_done_in;
-logic invoke0_done_out;
-logic invoke4_go_in;
-logic invoke4_go_out;
-logic invoke4_done_in;
-logic invoke4_done_out;
-logic invoke11_go_in;
-logic invoke11_go_out;
-logic invoke11_done_in;
-logic invoke11_done_out;
-logic invoke12_go_in;
-logic invoke12_go_out;
-logic invoke12_done_in;
-logic invoke12_done_out;
-logic invoke13_go_in;
-logic invoke13_go_out;
-logic invoke13_done_in;
-logic invoke13_done_out;
-logic invoke14_go_in;
-logic invoke14_go_out;
-logic invoke14_done_in;
-logic invoke14_done_out;
-logic early_reset_static_par_thread_go_in;
-logic early_reset_static_par_thread_go_out;
-logic early_reset_static_par_thread_done_in;
-logic early_reset_static_par_thread_done_out;
-logic early_reset_static_par_thread0_go_in;
-logic early_reset_static_par_thread0_go_out;
-logic early_reset_static_par_thread0_done_in;
-logic early_reset_static_par_thread0_done_out;
-logic early_reset_static_seq2_go_in;
-logic early_reset_static_seq2_go_out;
-logic early_reset_static_seq2_done_in;
-logic early_reset_static_seq2_done_out;
-logic early_reset_bb0_600_go_in;
-logic early_reset_bb0_600_go_out;
-logic early_reset_bb0_600_done_in;
-logic early_reset_bb0_600_done_out;
-logic early_reset_bb0_300_go_in;
-logic early_reset_bb0_300_go_out;
-logic early_reset_bb0_300_done_in;
-logic early_reset_bb0_300_done_out;
-logic early_reset_bb0_000_go_in;
-logic early_reset_bb0_000_go_out;
-logic early_reset_bb0_000_done_in;
-logic early_reset_bb0_000_done_out;
-logic wrapper_early_reset_bb0_000_go_in;
-logic wrapper_early_reset_bb0_000_go_out;
-logic wrapper_early_reset_bb0_000_done_in;
-logic wrapper_early_reset_bb0_000_done_out;
-logic wrapper_early_reset_static_par_thread_go_in;
-logic wrapper_early_reset_static_par_thread_go_out;
-logic wrapper_early_reset_static_par_thread_done_in;
-logic wrapper_early_reset_static_par_thread_done_out;
-logic wrapper_early_reset_bb0_300_go_in;
-logic wrapper_early_reset_bb0_300_go_out;
-logic wrapper_early_reset_bb0_300_done_in;
-logic wrapper_early_reset_bb0_300_done_out;
-logic wrapper_early_reset_bb0_600_go_in;
-logic wrapper_early_reset_bb0_600_go_out;
-logic wrapper_early_reset_bb0_600_done_in;
-logic wrapper_early_reset_bb0_600_done_out;
-logic wrapper_early_reset_static_par_thread0_go_in;
-logic wrapper_early_reset_static_par_thread0_go_out;
-logic wrapper_early_reset_static_par_thread0_done_in;
-logic wrapper_early_reset_static_par_thread0_done_out;
-logic wrapper_early_reset_static_seq2_go_in;
-logic wrapper_early_reset_static_seq2_go_out;
-logic wrapper_early_reset_static_seq2_done_in;
-logic wrapper_early_reset_static_seq2_done_out;
-logic tdcc_go_in;
-logic tdcc_go_out;
-logic tdcc_done_in;
-logic tdcc_done_out;
+logic fsm_start_in;
+logic fsm_start_out;
+logic fsm_done_in;
+logic fsm_done_out;
 std_slice # (
     .IN_WIDTH(32),
     .OUT_WIDTH(10)
@@ -2172,575 +3337,151 @@ std_reg # (
     .reset(comb_reg1_reset),
     .write_en(comb_reg1_write_en)
 );
-std_reg # (
-    .WIDTH(3)
-) fsm (
-    .clk(fsm_clk),
-    .done(fsm_done),
-    .in(fsm_in),
-    .out(fsm_out),
-    .reset(fsm_reset),
-    .write_en(fsm_write_en)
-);
-std_add # (
-    .WIDTH(3)
-) adder (
-    .left(adder_left),
-    .out(adder_out),
-    .right(adder_right)
-);
-undef # (
+std_wire # (
     .WIDTH(1)
-) ud0 (
-    .out(ud0_out)
-);
-std_add # (
-    .WIDTH(3)
-) adder0 (
-    .left(adder0_left),
-    .out(adder0_out),
-    .right(adder0_right)
-);
-undef # (
-    .WIDTH(1)
-) ud3 (
-    .out(ud3_out)
-);
-std_add # (
-    .WIDTH(3)
-) adder1 (
-    .left(adder1_left),
-    .out(adder1_out),
-    .right(adder1_right)
-);
-undef # (
-    .WIDTH(1)
-) ud4 (
-    .out(ud4_out)
-);
-undef # (
-    .WIDTH(1)
-) ud5 (
-    .out(ud5_out)
-);
-undef # (
-    .WIDTH(1)
-) ud6 (
-    .out(ud6_out)
-);
-undef # (
-    .WIDTH(1)
-) ud7 (
-    .out(ud7_out)
-);
-std_reg # (
-    .WIDTH(1)
-) signal_reg (
-    .clk(signal_reg_clk),
-    .done(signal_reg_done),
-    .in(signal_reg_in),
-    .out(signal_reg_out),
-    .reset(signal_reg_reset),
-    .write_en(signal_reg_write_en)
-);
-std_reg # (
-    .WIDTH(5)
-) fsm0 (
-    .clk(fsm0_clk),
-    .done(fsm0_done),
-    .in(fsm0_in),
-    .out(fsm0_out),
-    .reset(fsm0_reset),
-    .write_en(fsm0_write_en)
+) fsm_start (
+    .in(fsm_start_in),
+    .out(fsm_start_out)
 );
 std_wire # (
     .WIDTH(1)
-) beg_spl_bb0_15_go (
-    .in(beg_spl_bb0_15_go_in),
-    .out(beg_spl_bb0_15_go_out)
+) fsm_done (
+    .in(fsm_done_in),
+    .out(fsm_done_out)
 );
-std_wire # (
-    .WIDTH(1)
-) beg_spl_bb0_15_done (
-    .in(beg_spl_bb0_15_done_in),
-    .out(beg_spl_bb0_15_done_out)
+fsm_gemm_def fsm (
+  .clk(clk),
+  .reset(reset),
+  // dst ports
+  // input ports
+  .arg_mem_0_content_en(arg_mem_0_content_en),
+  .arg_mem_0_write_en(arg_mem_0_write_en),
+  .arg_mem_1_content_en(arg_mem_1_content_en),
+  .arg_mem_1_write_en(arg_mem_1_write_en),
+  .arg_mem_3_content_en(arg_mem_3_content_en),
+  .arg_mem_3_write_en(arg_mem_3_write_en),
+  .comb_reg0_write_en(comb_reg0_write_en),
+  .comb_reg1_write_en(comb_reg1_write_en),
+  .comb_reg_write_en(comb_reg_write_en),
+  .fsm_done_in(fsm_done_in),
+  .load_0_reg_write_en(load_0_reg_write_en),
+  .muli_0_reg_write_en(muli_0_reg_write_en),
+  .muli_1_reg_write_en(muli_1_reg_write_en),
+  .muli_2_reg_write_en(muli_2_reg_write_en),
+  .muli_3_reg_write_en(muli_3_reg_write_en),
+  .std_mult_pipe_0_go(std_mult_pipe_0_go),
+  .std_mult_pipe_1_go(std_mult_pipe_1_go),
+  .std_mult_pipe_2_go(std_mult_pipe_2_go),
+  .std_mult_pipe_3_go(std_mult_pipe_3_go),
+  .std_slt_0_left(std_slt_0_left),
+  .std_slt_0_right(std_slt_0_right),
+  .std_slt_1_left(std_slt_1_left),
+  .std_slt_1_right(std_slt_1_right),
+  .std_slt_2_left(std_slt_2_left),
+  .std_slt_2_right(std_slt_2_right),
+  .while_0_arg0_reg_write_en(while_0_arg0_reg_write_en),
+  .while_1_arg0_reg_write_en(while_1_arg0_reg_write_en),
+  .while_2_arg0_reg_write_en(while_2_arg0_reg_write_en),
+  .while_2_arg0_reg_out(while_2_arg0_reg_out),
+  .while_1_arg0_reg_out(while_1_arg0_reg_out),
+  .while_0_arg0_reg_out(while_0_arg0_reg_out),
+  .fsm_start_out(fsm_start_out),
+  .while_2_arg0_reg_done(while_2_arg0_reg_done),
+  .comb_reg_out(comb_reg_out),
+  .comb_reg0_out(comb_reg0_out),
+  .while_0_arg0_reg_done(while_0_arg0_reg_done),
+  .comb_reg1_out(comb_reg1_out),
+  .arg_mem_0_done(arg_mem_0_done),
+  .arg_mem_1_done(arg_mem_1_done),
+  .arg_mem_3_done(arg_mem_3_done),
+  .load_0_reg_done(load_0_reg_done),
+  .while_1_arg0_reg_done(while_1_arg0_reg_done)
 );
-std_wire # (
-    .WIDTH(1)
-) bb0_9_go (
-    .in(bb0_9_go_in),
-    .out(bb0_9_go_out)
-);
-std_wire # (
-    .WIDTH(1)
-) bb0_9_done (
-    .in(bb0_9_done_in),
-    .out(bb0_9_done_out)
-);
-std_wire # (
-    .WIDTH(1)
-) bb0_13_go (
-    .in(bb0_13_go_in),
-    .out(bb0_13_go_out)
-);
-std_wire # (
-    .WIDTH(1)
-) bb0_13_done (
-    .in(bb0_13_done_in),
-    .out(bb0_13_done_out)
-);
-std_wire # (
-    .WIDTH(1)
-) bb0_17_go (
-    .in(bb0_17_go_in),
-    .out(bb0_17_go_out)
-);
-std_wire # (
-    .WIDTH(1)
-) bb0_17_done (
-    .in(bb0_17_done_in),
-    .out(bb0_17_done_out)
-);
-std_wire # (
-    .WIDTH(1)
-) invoke0_go (
-    .in(invoke0_go_in),
-    .out(invoke0_go_out)
-);
-std_wire # (
-    .WIDTH(1)
-) invoke0_done (
-    .in(invoke0_done_in),
-    .out(invoke0_done_out)
-);
-std_wire # (
-    .WIDTH(1)
-) invoke4_go (
-    .in(invoke4_go_in),
-    .out(invoke4_go_out)
-);
-std_wire # (
-    .WIDTH(1)
-) invoke4_done (
-    .in(invoke4_done_in),
-    .out(invoke4_done_out)
-);
-std_wire # (
-    .WIDTH(1)
-) invoke11_go (
-    .in(invoke11_go_in),
-    .out(invoke11_go_out)
-);
-std_wire # (
-    .WIDTH(1)
-) invoke11_done (
-    .in(invoke11_done_in),
-    .out(invoke11_done_out)
-);
-std_wire # (
-    .WIDTH(1)
-) invoke12_go (
-    .in(invoke12_go_in),
-    .out(invoke12_go_out)
-);
-std_wire # (
-    .WIDTH(1)
-) invoke12_done (
-    .in(invoke12_done_in),
-    .out(invoke12_done_out)
-);
-std_wire # (
-    .WIDTH(1)
-) invoke13_go (
-    .in(invoke13_go_in),
-    .out(invoke13_go_out)
-);
-std_wire # (
-    .WIDTH(1)
-) invoke13_done (
-    .in(invoke13_done_in),
-    .out(invoke13_done_out)
-);
-std_wire # (
-    .WIDTH(1)
-) invoke14_go (
-    .in(invoke14_go_in),
-    .out(invoke14_go_out)
-);
-std_wire # (
-    .WIDTH(1)
-) invoke14_done (
-    .in(invoke14_done_in),
-    .out(invoke14_done_out)
-);
-std_wire # (
-    .WIDTH(1)
-) early_reset_static_par_thread_go (
-    .in(early_reset_static_par_thread_go_in),
-    .out(early_reset_static_par_thread_go_out)
-);
-std_wire # (
-    .WIDTH(1)
-) early_reset_static_par_thread_done (
-    .in(early_reset_static_par_thread_done_in),
-    .out(early_reset_static_par_thread_done_out)
-);
-std_wire # (
-    .WIDTH(1)
-) early_reset_static_par_thread0_go (
-    .in(early_reset_static_par_thread0_go_in),
-    .out(early_reset_static_par_thread0_go_out)
-);
-std_wire # (
-    .WIDTH(1)
-) early_reset_static_par_thread0_done (
-    .in(early_reset_static_par_thread0_done_in),
-    .out(early_reset_static_par_thread0_done_out)
-);
-std_wire # (
-    .WIDTH(1)
-) early_reset_static_seq2_go (
-    .in(early_reset_static_seq2_go_in),
-    .out(early_reset_static_seq2_go_out)
-);
-std_wire # (
-    .WIDTH(1)
-) early_reset_static_seq2_done (
-    .in(early_reset_static_seq2_done_in),
-    .out(early_reset_static_seq2_done_out)
-);
-std_wire # (
-    .WIDTH(1)
-) early_reset_bb0_600_go (
-    .in(early_reset_bb0_600_go_in),
-    .out(early_reset_bb0_600_go_out)
-);
-std_wire # (
-    .WIDTH(1)
-) early_reset_bb0_600_done (
-    .in(early_reset_bb0_600_done_in),
-    .out(early_reset_bb0_600_done_out)
-);
-std_wire # (
-    .WIDTH(1)
-) early_reset_bb0_300_go (
-    .in(early_reset_bb0_300_go_in),
-    .out(early_reset_bb0_300_go_out)
-);
-std_wire # (
-    .WIDTH(1)
-) early_reset_bb0_300_done (
-    .in(early_reset_bb0_300_done_in),
-    .out(early_reset_bb0_300_done_out)
-);
-std_wire # (
-    .WIDTH(1)
-) early_reset_bb0_000_go (
-    .in(early_reset_bb0_000_go_in),
-    .out(early_reset_bb0_000_go_out)
-);
-std_wire # (
-    .WIDTH(1)
-) early_reset_bb0_000_done (
-    .in(early_reset_bb0_000_done_in),
-    .out(early_reset_bb0_000_done_out)
-);
-std_wire # (
-    .WIDTH(1)
-) wrapper_early_reset_bb0_000_go (
-    .in(wrapper_early_reset_bb0_000_go_in),
-    .out(wrapper_early_reset_bb0_000_go_out)
-);
-std_wire # (
-    .WIDTH(1)
-) wrapper_early_reset_bb0_000_done (
-    .in(wrapper_early_reset_bb0_000_done_in),
-    .out(wrapper_early_reset_bb0_000_done_out)
-);
-std_wire # (
-    .WIDTH(1)
-) wrapper_early_reset_static_par_thread_go (
-    .in(wrapper_early_reset_static_par_thread_go_in),
-    .out(wrapper_early_reset_static_par_thread_go_out)
-);
-std_wire # (
-    .WIDTH(1)
-) wrapper_early_reset_static_par_thread_done (
-    .in(wrapper_early_reset_static_par_thread_done_in),
-    .out(wrapper_early_reset_static_par_thread_done_out)
-);
-std_wire # (
-    .WIDTH(1)
-) wrapper_early_reset_bb0_300_go (
-    .in(wrapper_early_reset_bb0_300_go_in),
-    .out(wrapper_early_reset_bb0_300_go_out)
-);
-std_wire # (
-    .WIDTH(1)
-) wrapper_early_reset_bb0_300_done (
-    .in(wrapper_early_reset_bb0_300_done_in),
-    .out(wrapper_early_reset_bb0_300_done_out)
-);
-std_wire # (
-    .WIDTH(1)
-) wrapper_early_reset_bb0_600_go (
-    .in(wrapper_early_reset_bb0_600_go_in),
-    .out(wrapper_early_reset_bb0_600_go_out)
-);
-std_wire # (
-    .WIDTH(1)
-) wrapper_early_reset_bb0_600_done (
-    .in(wrapper_early_reset_bb0_600_done_in),
-    .out(wrapper_early_reset_bb0_600_done_out)
-);
-std_wire # (
-    .WIDTH(1)
-) wrapper_early_reset_static_par_thread0_go (
-    .in(wrapper_early_reset_static_par_thread0_go_in),
-    .out(wrapper_early_reset_static_par_thread0_go_out)
-);
-std_wire # (
-    .WIDTH(1)
-) wrapper_early_reset_static_par_thread0_done (
-    .in(wrapper_early_reset_static_par_thread0_done_in),
-    .out(wrapper_early_reset_static_par_thread0_done_out)
-);
-std_wire # (
-    .WIDTH(1)
-) wrapper_early_reset_static_seq2_go (
-    .in(wrapper_early_reset_static_seq2_go_in),
-    .out(wrapper_early_reset_static_seq2_go_out)
-);
-std_wire # (
-    .WIDTH(1)
-) wrapper_early_reset_static_seq2_done (
-    .in(wrapper_early_reset_static_seq2_done_in),
-    .out(wrapper_early_reset_static_seq2_done_out)
-);
-std_wire # (
-    .WIDTH(1)
-) tdcc_go (
-    .in(tdcc_go_in),
-    .out(tdcc_go_out)
-);
-std_wire # (
-    .WIDTH(1)
-) tdcc_done (
-    .in(tdcc_done_in),
-    .out(tdcc_done_out)
-);
-assign std_add_5_left = muli_2_reg_out;
-assign std_add_5_right = while_1_arg0_reg_out;
-assign adder1_left =
- early_reset_static_seq2_go_out ? fsm_out : 3'd0;
-assign adder1_right =
- early_reset_static_seq2_go_out ? 3'd1 : 3'd0;
-assign wrapper_early_reset_bb0_600_done_in = signal_reg_out;
-assign done = tdcc_done_out;
-assign arg_mem_3_addr0 =
- beg_spl_bb0_15_go_out ? std_slice_1_out :
- bb0_17_go_out ? std_slice_0_out : 'x;
-assign arg_mem_3_write_data = std_add_6_out;
-assign arg_mem_0_content_en = bb0_9_go_out;
-assign arg_mem_0_addr0 = std_slice_3_out;
-assign arg_mem_3_content_en = beg_spl_bb0_15_go_out | bb0_17_go_out;
-assign arg_mem_0_write_en =
- bb0_9_go_out ? 1'd0 : 1'd0;
-assign arg_mem_3_write_en =
- bb0_17_go_out ? 1'd1 :
- beg_spl_bb0_15_go_out ? 1'd0 : 1'd0;
-assign arg_mem_1_write_en =
- bb0_13_go_out ? 1'd0 : 1'd0;
-assign arg_mem_1_addr0 = std_slice_2_out;
-assign arg_mem_1_content_en = bb0_13_go_out;
-assign fsm_write_en = fsm_out == 3'd3 & early_reset_static_par_thread_go_out | fsm_out != 3'd3 & early_reset_static_par_thread_go_out | fsm_out == 3'd3 & early_reset_static_par_thread0_go_out | fsm_out != 3'd3 & early_reset_static_par_thread0_go_out | fsm_out == 3'd3 & early_reset_static_seq2_go_out | fsm_out != 3'd3 & early_reset_static_seq2_go_out;
-assign fsm_clk = clk;
-assign fsm_reset = reset;
-assign fsm_in =
- fsm_out != 3'd3 & early_reset_static_seq2_go_out ? adder1_out :
- fsm_out != 3'd3 & early_reset_static_par_thread_go_out ? adder_out :
- fsm_out != 3'd3 & early_reset_static_par_thread0_go_out ? adder0_out :
- fsm_out == 3'd3 & early_reset_static_par_thread_go_out | fsm_out == 3'd3 & early_reset_static_par_thread0_go_out | fsm_out == 3'd3 & early_reset_static_seq2_go_out ? 3'd0 : 3'd0;
-assign adder_left =
- early_reset_static_par_thread_go_out ? fsm_out : 3'd0;
-assign adder_right =
- early_reset_static_par_thread_go_out ? 3'd1 : 3'd0;
-assign invoke4_go_in = ~invoke4_done_out & fsm0_out == 5'd4 & tdcc_go_out;
-assign invoke11_done_in = load_0_reg_done;
-assign invoke14_done_in = while_2_arg0_reg_done;
-assign muli_3_reg_write_en = fsm_out == 3'd3 & early_reset_static_seq2_go_out;
-assign muli_3_reg_clk = clk;
-assign muli_3_reg_reset = reset;
-assign muli_3_reg_in = std_mult_pipe_3_out;
-assign early_reset_bb0_600_done_in = ud5_out;
-assign wrapper_early_reset_static_par_thread_go_in = ~wrapper_early_reset_static_par_thread_done_out & fsm0_out == 5'd2 & tdcc_go_out;
-assign load_0_reg_write_en = invoke11_go_out;
-assign load_0_reg_clk = clk;
-assign load_0_reg_reset = reset;
-assign load_0_reg_in = arg_mem_3_read_data;
-assign std_slt_0_left =
- early_reset_bb0_000_go_out ? while_2_arg0_reg_out : 32'd0;
-assign std_slt_0_right =
- early_reset_bb0_000_go_out ? 32'd20 : 32'd0;
-assign while_1_arg0_reg_write_en = invoke13_go_out | fsm_out == 3'd0 & early_reset_static_par_thread_go_out;
-assign while_1_arg0_reg_clk = clk;
-assign while_1_arg0_reg_reset = reset;
-assign while_1_arg0_reg_in =
- fsm_out == 3'd0 & early_reset_static_par_thread_go_out ? 32'd0 :
- invoke13_go_out ? std_add_1_out : 'x;
-assign comb_reg_write_en = early_reset_bb0_000_go_out;
-assign comb_reg_clk = clk;
-assign comb_reg_reset = reset;
+
+assign while_2_arg0_reg_in =
+       fsm_s1_out ? 32'd0 :
+       fsm_s27_out ? std_add_0_out :
+       'dx;
 assign comb_reg_in = std_slt_0_out;
-assign early_reset_static_par_thread0_done_in = ud3_out;
-assign early_reset_static_seq2_done_in = ud4_out;
-assign wrapper_early_reset_bb0_300_go_in = ~wrapper_early_reset_bb0_300_done_out & fsm0_out == 5'd3 & tdcc_go_out | ~wrapper_early_reset_bb0_300_done_out & fsm0_out == 5'd16 & tdcc_go_out;
-assign std_slt_2_left =
- early_reset_bb0_600_go_out ? while_0_arg0_reg_out : 32'd0;
-assign std_slt_2_right =
- early_reset_bb0_600_go_out ? 32'd20 : 32'd0;
-assign std_add_2_left = muli_0_reg_out;
-assign std_add_2_right = while_1_arg0_reg_out;
-assign std_slice_3_in = std_add_4_out;
-assign std_mult_pipe_3_clk = clk;
-assign std_mult_pipe_3_left = muli_1_reg_out;
-assign std_mult_pipe_3_reset = reset;
-assign std_mult_pipe_3_go = fsm_out < 3'd3 & early_reset_static_seq2_go_out;
-assign std_mult_pipe_3_right = arg_mem_1_read_data;
-assign std_mult_pipe_2_clk = clk;
-assign std_mult_pipe_2_left = while_0_arg0_reg_out;
-assign std_mult_pipe_2_reset = reset;
-assign std_mult_pipe_2_go = fsm_out < 3'd3 & early_reset_static_par_thread0_go_out;
-assign std_mult_pipe_2_right = 32'd30;
-assign while_0_arg0_reg_write_en = invoke4_go_out | invoke12_go_out;
-assign while_0_arg0_reg_clk = clk;
-assign while_0_arg0_reg_reset = reset;
+assign while_1_arg0_reg_in =
+       fsm_s3_out ? 32'd0 :
+       fsm_s25_out ? std_add_1_out :
+       'dx;
+assign std_mult_pipe_0_left = while_2_arg0_reg_out;
+assign std_mult_pipe_0_right = 32'd30;
+assign muli_0_reg_in = std_mult_pipe_0_out;
+assign comb_reg0_in = std_slt_1_out;
 assign while_0_arg0_reg_in =
- invoke4_go_out ? 32'd0 :
- invoke12_go_out ? std_add_3_out : 'x;
-assign comb_reg1_write_en = early_reset_bb0_600_go_out;
-assign comb_reg1_clk = clk;
-assign comb_reg1_reset = reset;
+       fsm_s8_out ? 32'd0 :
+       fsm_s23_out ? std_add_3_out :
+       'dx;
 assign comb_reg1_in = std_slt_2_out;
-assign bb0_9_go_in = ~bb0_9_done_out & fsm0_out == 5'd6 & tdcc_go_out;
-assign bb0_13_done_in = arg_mem_1_done;
-assign invoke11_go_in = ~invoke11_done_out & fsm0_out == 5'd11 & tdcc_go_out;
-assign early_reset_static_seq2_go_in = wrapper_early_reset_static_seq2_go_out;
-assign muli_1_reg_write_en = fsm_out == 3'd3 & early_reset_static_par_thread0_go_out;
-assign muli_1_reg_clk = clk;
-assign muli_1_reg_reset = reset;
+assign std_add_4_right = while_0_arg0_reg_out;
+assign std_slice_3_in = std_add_4_out;
+assign arg_mem_0_addr0 = std_slice_3_out;
+assign std_add_4_left = muli_0_reg_out;
+assign std_mult_pipe_1_right = arg_mem_0_read_data;
+assign std_mult_pipe_1_left = in0;
+assign std_mult_pipe_2_right = 32'd30;
+assign std_mult_pipe_2_left = while_0_arg0_reg_out;
 assign muli_1_reg_in = std_mult_pipe_1_out;
-assign std_add_3_left = while_0_arg0_reg_out;
+assign muli_2_reg_in = std_mult_pipe_2_out;
+assign std_add_5_left = muli_2_reg_out;
+assign std_slice_2_in = std_add_5_out;
+assign arg_mem_1_addr0 = std_slice_2_out;
+assign std_add_5_right = while_1_arg0_reg_out;
+assign std_mult_pipe_3_left = muli_1_reg_out;
+assign std_mult_pipe_3_right = arg_mem_1_read_data;
+assign muli_3_reg_in = std_mult_pipe_3_out;
+assign std_add_2_right = while_1_arg0_reg_out;
+assign arg_mem_3_addr0 =
+       fsm_s20_out ? std_slice_1_out :
+       fsm_s22_out ? std_slice_0_out :
+       'dx;
+assign std_add_2_left = muli_0_reg_out;
+assign std_slice_1_in = std_add_2_out;
+assign load_0_reg_in = arg_mem_3_read_data;
+assign arg_mem_3_write_data = std_add_6_out;
+assign std_add_6_right = muli_3_reg_out;
+assign std_slice_0_in = std_add_2_out;
+assign std_add_6_left = load_0_reg_out;
 assign std_add_3_right = 32'd1;
+assign std_add_3_left = while_0_arg0_reg_out;
 assign std_add_1_left = while_1_arg0_reg_out;
 assign std_add_1_right = 32'd1;
-assign muli_0_reg_write_en = fsm_out == 3'd3 & early_reset_static_par_thread_go_out;
+assign std_add_0_right = 32'd1;
+assign std_add_0_left = while_2_arg0_reg_out;
+assign done = fsm_done_out;
+assign muli_3_reg_clk = clk;
+assign muli_3_reg_reset = reset;
+assign load_0_reg_clk = clk;
+assign load_0_reg_reset = reset;
+assign while_1_arg0_reg_clk = clk;
+assign while_1_arg0_reg_reset = reset;
+assign comb_reg_clk = clk;
+assign comb_reg_reset = reset;
+assign std_mult_pipe_3_clk = clk;
+assign std_mult_pipe_3_reset = reset;
+assign std_mult_pipe_2_clk = clk;
+assign std_mult_pipe_2_reset = reset;
+assign while_0_arg0_reg_clk = clk;
+assign while_0_arg0_reg_reset = reset;
+assign comb_reg1_clk = clk;
+assign comb_reg1_reset = reset;
+assign muli_1_reg_clk = clk;
+assign muli_1_reg_reset = reset;
 assign muli_0_reg_clk = clk;
 assign muli_0_reg_reset = reset;
-assign muli_0_reg_in = std_mult_pipe_0_out;
-assign comb_reg0_write_en = early_reset_bb0_300_go_out;
 assign comb_reg0_clk = clk;
 assign comb_reg0_reset = reset;
-assign comb_reg0_in = std_slt_1_out;
-assign invoke0_go_in = ~invoke0_done_out & fsm0_out == 5'd0 & tdcc_go_out;
-assign tdcc_go_in = go;
-assign invoke12_go_in = ~invoke12_done_out & fsm0_out == 5'd13 & tdcc_go_out;
-assign std_add_0_left = while_2_arg0_reg_out;
-assign std_add_0_right = 32'd1;
-assign while_2_arg0_reg_write_en = invoke0_go_out | invoke14_go_out;
 assign while_2_arg0_reg_clk = clk;
 assign while_2_arg0_reg_reset = reset;
-assign while_2_arg0_reg_in =
- invoke0_go_out ? 32'd0 :
- invoke14_go_out ? std_add_0_out : 'x;
-assign fsm0_write_en = fsm0_out == 5'd19 | fsm0_out == 5'd18 & wrapper_early_reset_bb0_000_done_out & ~comb_reg_out & tdcc_go_out | fsm0_out == 5'd1 & wrapper_early_reset_bb0_000_done_out & ~comb_reg_out & tdcc_go_out | fsm0_out == 5'd17 & invoke14_done_out & tdcc_go_out | fsm0_out == 5'd16 & wrapper_early_reset_bb0_300_done_out & ~comb_reg0_out & tdcc_go_out | fsm0_out == 5'd3 & wrapper_early_reset_bb0_300_done_out & ~comb_reg0_out & tdcc_go_out | fsm0_out == 5'd15 & invoke13_done_out & tdcc_go_out | fsm0_out == 5'd14 & wrapper_early_reset_bb0_600_done_out & ~comb_reg1_out & tdcc_go_out | fsm0_out == 5'd5 & wrapper_early_reset_bb0_600_done_out & ~comb_reg1_out & tdcc_go_out | fsm0_out == 5'd13 & invoke12_done_out & tdcc_go_out | fsm0_out == 5'd12 & bb0_17_done_out & tdcc_go_out | fsm0_out == 5'd11 & invoke11_done_out & tdcc_go_out | fsm0_out == 5'd10 & beg_spl_bb0_15_done_out & tdcc_go_out | fsm0_out == 5'd9 & wrapper_early_reset_static_seq2_done_out & tdcc_go_out | fsm0_out == 5'd8 & bb0_13_done_out & tdcc_go_out | fsm0_out == 5'd7 & wrapper_early_reset_static_par_thread0_done_out & tdcc_go_out | fsm0_out == 5'd6 & bb0_9_done_out & tdcc_go_out | fsm0_out == 5'd14 & wrapper_early_reset_bb0_600_done_out & comb_reg1_out & tdcc_go_out | fsm0_out == 5'd5 & wrapper_early_reset_bb0_600_done_out & comb_reg1_out & tdcc_go_out | fsm0_out == 5'd4 & invoke4_done_out & tdcc_go_out | fsm0_out == 5'd16 & wrapper_early_reset_bb0_300_done_out & comb_reg0_out & tdcc_go_out | fsm0_out == 5'd3 & wrapper_early_reset_bb0_300_done_out & comb_reg0_out & tdcc_go_out | fsm0_out == 5'd2 & wrapper_early_reset_static_par_thread_done_out & tdcc_go_out | fsm0_out == 5'd18 & wrapper_early_reset_bb0_000_done_out & comb_reg_out & tdcc_go_out | fsm0_out == 5'd1 & wrapper_early_reset_bb0_000_done_out & comb_reg_out & tdcc_go_out | fsm0_out == 5'd0 & invoke0_done_out & tdcc_go_out;
-assign fsm0_clk = clk;
-assign fsm0_reset = reset;
-assign fsm0_in =
- fsm0_out == 5'd0 & invoke0_done_out & tdcc_go_out ? 5'd1 :
- fsm0_out == 5'd14 & wrapper_early_reset_bb0_600_done_out & ~comb_reg1_out & tdcc_go_out | fsm0_out == 5'd5 & wrapper_early_reset_bb0_600_done_out & ~comb_reg1_out & tdcc_go_out ? 5'd15 :
- fsm0_out == 5'd17 & invoke14_done_out & tdcc_go_out ? 5'd18 :
- fsm0_out == 5'd15 & invoke13_done_out & tdcc_go_out ? 5'd16 :
- fsm0_out == 5'd19 ? 5'd0 :
- fsm0_out == 5'd2 & wrapper_early_reset_static_par_thread_done_out & tdcc_go_out ? 5'd3 :
- fsm0_out == 5'd12 & bb0_17_done_out & tdcc_go_out ? 5'd13 :
- fsm0_out == 5'd13 & invoke12_done_out & tdcc_go_out ? 5'd14 :
- fsm0_out == 5'd4 & invoke4_done_out & tdcc_go_out ? 5'd5 :
- fsm0_out == 5'd11 & invoke11_done_out & tdcc_go_out ? 5'd12 :
- fsm0_out == 5'd18 & wrapper_early_reset_bb0_000_done_out & comb_reg_out & tdcc_go_out | fsm0_out == 5'd1 & wrapper_early_reset_bb0_000_done_out & comb_reg_out & tdcc_go_out ? 5'd2 :
- fsm0_out == 5'd7 & wrapper_early_reset_static_par_thread0_done_out & tdcc_go_out ? 5'd8 :
- fsm0_out == 5'd9 & wrapper_early_reset_static_seq2_done_out & tdcc_go_out ? 5'd10 :
- fsm0_out == 5'd6 & bb0_9_done_out & tdcc_go_out ? 5'd7 :
- fsm0_out == 5'd10 & beg_spl_bb0_15_done_out & tdcc_go_out ? 5'd11 :
- fsm0_out == 5'd18 & wrapper_early_reset_bb0_000_done_out & ~comb_reg_out & tdcc_go_out | fsm0_out == 5'd1 & wrapper_early_reset_bb0_000_done_out & ~comb_reg_out & tdcc_go_out ? 5'd19 :
- fsm0_out == 5'd16 & wrapper_early_reset_bb0_300_done_out & comb_reg0_out & tdcc_go_out | fsm0_out == 5'd3 & wrapper_early_reset_bb0_300_done_out & comb_reg0_out & tdcc_go_out ? 5'd4 :
- fsm0_out == 5'd14 & wrapper_early_reset_bb0_600_done_out & comb_reg1_out & tdcc_go_out | fsm0_out == 5'd5 & wrapper_early_reset_bb0_600_done_out & comb_reg1_out & tdcc_go_out ? 5'd6 :
- fsm0_out == 5'd16 & wrapper_early_reset_bb0_300_done_out & ~comb_reg0_out & tdcc_go_out | fsm0_out == 5'd3 & wrapper_early_reset_bb0_300_done_out & ~comb_reg0_out & tdcc_go_out ? 5'd17 :
- fsm0_out == 5'd8 & bb0_13_done_out & tdcc_go_out ? 5'd9 : 5'd0;
-assign invoke13_done_in = while_1_arg0_reg_done;
-assign early_reset_bb0_300_go_in = wrapper_early_reset_bb0_300_go_out;
-assign std_add_6_left = load_0_reg_out;
-assign std_add_6_right = muli_3_reg_out;
-assign bb0_9_done_in = arg_mem_0_done;
-assign bb0_17_go_in = ~bb0_17_done_out & fsm0_out == 5'd12 & tdcc_go_out;
-assign invoke12_done_in = while_0_arg0_reg_done;
-assign early_reset_bb0_300_done_in = ud6_out;
-assign early_reset_bb0_000_go_in = wrapper_early_reset_bb0_000_go_out;
-assign std_slice_2_in = std_add_5_out;
-assign adder0_left =
- early_reset_static_par_thread0_go_out ? fsm_out : 3'd0;
-assign adder0_right =
- early_reset_static_par_thread0_go_out ? 3'd1 : 3'd0;
-assign invoke0_done_in = while_2_arg0_reg_done;
-assign bb0_17_done_in = arg_mem_3_done;
-assign wrapper_early_reset_static_par_thread0_go_in = ~wrapper_early_reset_static_par_thread0_done_out & fsm0_out == 5'd7 & tdcc_go_out;
-assign muli_2_reg_write_en = fsm_out == 3'd3 & early_reset_static_par_thread0_go_out;
 assign muli_2_reg_clk = clk;
 assign muli_2_reg_reset = reset;
-assign muli_2_reg_in = std_mult_pipe_2_out;
-assign std_slt_1_left =
- early_reset_bb0_300_go_out ? while_1_arg0_reg_out : 32'd0;
-assign std_slt_1_right =
- early_reset_bb0_300_go_out ? 32'd20 : 32'd0;
 assign std_mult_pipe_0_clk = clk;
-assign std_mult_pipe_0_left = while_2_arg0_reg_out;
 assign std_mult_pipe_0_reset = reset;
-assign std_mult_pipe_0_go = fsm_out < 3'd3 & early_reset_static_par_thread_go_out;
-assign std_mult_pipe_0_right = 32'd30;
-assign signal_reg_write_en = signal_reg_out | 1'b1 & 1'b1 & ~signal_reg_out & wrapper_early_reset_bb0_000_go_out | fsm_out == 3'd3 & 1'b1 & ~signal_reg_out & wrapper_early_reset_static_par_thread_go_out | 1'b1 & 1'b1 & ~signal_reg_out & wrapper_early_reset_bb0_300_go_out | 1'b1 & 1'b1 & ~signal_reg_out & wrapper_early_reset_bb0_600_go_out | fsm_out == 3'd3 & 1'b1 & ~signal_reg_out & wrapper_early_reset_static_par_thread0_go_out | fsm_out == 3'd3 & 1'b1 & ~signal_reg_out & wrapper_early_reset_static_seq2_go_out;
-assign signal_reg_clk = clk;
-assign signal_reg_reset = reset;
-assign signal_reg_in =
- 1'b1 & 1'b1 & ~signal_reg_out & wrapper_early_reset_bb0_000_go_out | fsm_out == 3'd3 & 1'b1 & ~signal_reg_out & wrapper_early_reset_static_par_thread_go_out | 1'b1 & 1'b1 & ~signal_reg_out & wrapper_early_reset_bb0_300_go_out | 1'b1 & 1'b1 & ~signal_reg_out & wrapper_early_reset_bb0_600_go_out | fsm_out == 3'd3 & 1'b1 & ~signal_reg_out & wrapper_early_reset_static_par_thread0_go_out | fsm_out == 3'd3 & 1'b1 & ~signal_reg_out & wrapper_early_reset_static_seq2_go_out ? 1'd1 :
- signal_reg_out ? 1'd0 : 1'd0;
-assign early_reset_static_par_thread_go_in = wrapper_early_reset_static_par_thread_go_out;
-assign wrapper_early_reset_static_par_thread0_done_in = signal_reg_out;
-assign std_slice_1_in = std_add_2_out;
-assign std_slice_0_in = std_add_2_out;
-assign early_reset_static_par_thread0_go_in = wrapper_early_reset_static_par_thread0_go_out;
-assign wrapper_early_reset_bb0_000_go_in = ~wrapper_early_reset_bb0_000_done_out & fsm0_out == 5'd1 & tdcc_go_out | ~wrapper_early_reset_bb0_000_done_out & fsm0_out == 5'd18 & tdcc_go_out;
-assign wrapper_early_reset_static_par_thread_done_in = signal_reg_out;
-assign wrapper_early_reset_static_seq2_done_in = signal_reg_out;
 assign std_mult_pipe_1_clk = clk;
-assign std_mult_pipe_1_left = in0;
 assign std_mult_pipe_1_reset = reset;
-assign std_mult_pipe_1_go = fsm_out < 3'd3 & early_reset_static_par_thread0_go_out;
-assign std_mult_pipe_1_right = arg_mem_0_read_data;
-assign std_add_4_left = muli_0_reg_out;
-assign std_add_4_right = while_0_arg0_reg_out;
-assign tdcc_done_in = fsm0_out == 5'd19;
-assign beg_spl_bb0_15_go_in = ~beg_spl_bb0_15_done_out & fsm0_out == 5'd10 & tdcc_go_out;
-assign early_reset_bb0_600_go_in = wrapper_early_reset_bb0_600_go_out;
-assign early_reset_bb0_000_done_in = ud7_out;
-assign wrapper_early_reset_bb0_000_done_in = signal_reg_out;
-assign invoke4_done_in = while_0_arg0_reg_done;
-assign wrapper_early_reset_bb0_600_go_in = ~wrapper_early_reset_bb0_600_done_out & fsm0_out == 5'd5 & tdcc_go_out | ~wrapper_early_reset_bb0_600_done_out & fsm0_out == 5'd14 & tdcc_go_out;
-assign wrapper_early_reset_static_seq2_go_in = ~wrapper_early_reset_static_seq2_done_out & fsm0_out == 5'd9 & tdcc_go_out;
-assign beg_spl_bb0_15_done_in = arg_mem_3_done;
-assign early_reset_static_par_thread_done_in = ud0_out;
-assign bb0_13_go_in = ~bb0_13_done_out & fsm0_out == 5'd8 & tdcc_go_out;
-assign invoke13_go_in = ~invoke13_done_out & fsm0_out == 5'd15 & tdcc_go_out;
-assign invoke14_go_in = ~invoke14_done_out & fsm0_out == 5'd17 & tdcc_go_out;
-assign wrapper_early_reset_bb0_300_done_in = signal_reg_out;
+assign fsm_start_in = go;
 // COMPONENT END: gemm
 endmodule

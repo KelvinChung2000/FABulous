@@ -1,0 +1,464 @@
+extern "/home/kelvin/.calyx/primitives/binary_operators.sv" {
+  comb primitive std_fp_add<"share"=1>[WIDTH, INT_WIDTH, FRAC_WIDTH](@data left: WIDTH, @data right: WIDTH) -> (out: WIDTH);
+  comb primitive std_fp_sub<"share"=1>[WIDTH, INT_WIDTH, FRAC_WIDTH](@data left: WIDTH, @data right: WIDTH) -> (out: WIDTH);
+  primitive std_fp_mult_pipe<"state_share"=1>[WIDTH, INT_WIDTH, FRAC_WIDTH](@clk clk: 1, @reset reset: 1, @write_together @interval(3) @go go: 1, @write_together @data left: WIDTH, @write_together @data right: WIDTH) -> (@stable out: WIDTH, @done done: 1);
+  primitive std_fp_div_pipe<"state_share"=1>[WIDTH, INT_WIDTH, FRAC_WIDTH](@clk clk: 1, @reset reset: 1, @write_together @go go: 1, @write_together @data left: WIDTH, @write_together @data right: WIDTH) -> (@stable out_remainder: WIDTH, @stable out_quotient: WIDTH, @done done: 1);
+  comb primitive std_fp_gt<"share"=1>[WIDTH, INT_WIDTH, FRAC_WIDTH](@data left: WIDTH, @data right: WIDTH) -> (out: 1);
+  comb primitive std_fp_sadd<"share"=1>[WIDTH, INT_WIDTH, FRAC_WIDTH](@data left: WIDTH, @data right: WIDTH) -> (out: WIDTH);
+  comb primitive std_fp_ssub<"share"=1>[WIDTH, INT_WIDTH, FRAC_WIDTH](@data left: WIDTH, @data right: WIDTH) -> (out: WIDTH);
+  primitive std_fp_smult_pipe<"state_share"=1>[WIDTH, INT_WIDTH, FRAC_WIDTH](@clk clk: 1, @reset reset: 1, @write_together @interval(3) @go go: 1, @write_together @data left: WIDTH, @write_together @data right: WIDTH) -> (@stable out: WIDTH, @done done: 1);
+  primitive std_fp_sdiv_pipe<"state_share"=1>[WIDTH, INT_WIDTH, FRAC_WIDTH](@clk clk: 1, @reset reset: 1, @write_together @go go: 1, @write_together @data left: WIDTH, @write_together @data right: WIDTH) -> (@stable out_remainder: WIDTH, @stable out_quotient: WIDTH, @done done: 1);
+  comb primitive std_fp_sgt<"share"=1>[WIDTH, INT_WIDTH, FRAC_WIDTH](@data left: WIDTH, @data right: WIDTH) -> (out: 1);
+  comb primitive std_fp_slt<"share"=1>[WIDTH, INT_WIDTH, FRAC_WIDTH](@data left: WIDTH, @data right: WIDTH) -> (out: 1);
+  primitive std_mult_pipe<"state_share"=1>[WIDTH](@clk clk: 1, @reset reset: 1, @write_together @interval(3) @go go: 1, @write_together @data left: WIDTH, @write_together @data right: WIDTH) -> (@stable out: WIDTH, @done done: 1);
+  primitive std_div_pipe<"state_share"=1>[WIDTH](@clk clk: 1, @reset reset: 1, @write_together @go go: 1, @write_together @data left: WIDTH, @write_together @data right: WIDTH) -> (@stable out_quotient: WIDTH, @stable out_remainder: WIDTH, @done done: 1);
+  comb primitive std_sadd<"share"=1>[WIDTH](@data left: WIDTH, @data right: WIDTH) -> (out: WIDTH);
+  comb primitive std_ssub<"share"=1>[WIDTH](@data left: WIDTH, @data right: WIDTH) -> (out: WIDTH);
+  primitive std_smult_pipe<"state_share"=1>[WIDTH](@clk clk: 1, @reset reset: 1, @write_together @interval(3) @go go: 1, @write_together @data left: WIDTH, @write_together @data right: WIDTH) -> (@stable out: WIDTH, @done done: 1);
+  primitive std_sdiv_pipe[WIDTH](@clk clk: 1, @reset reset: 1, @write_together @go go: 1, @write_together @data left: WIDTH, @write_together @data right: WIDTH) -> (out_quotient: WIDTH, out_remainder: WIDTH, @done done: 1);
+  comb primitive std_sgt<"share"=1>[WIDTH](@data left: WIDTH, @data right: WIDTH) -> (out: 1);
+  comb primitive std_slt<"share"=1>[WIDTH](@data left: WIDTH, @data right: WIDTH) -> (out: 1);
+  comb primitive std_seq<"share"=1>[WIDTH](@data left: WIDTH, @data right: WIDTH) -> (out: 1);
+  comb primitive std_sneq<"share"=1>[WIDTH](@data left: WIDTH, @data right: WIDTH) -> (out: 1);
+  comb primitive std_sge<"share"=1>[WIDTH](@data left: WIDTH, @data right: WIDTH) -> (out: 1);
+  comb primitive std_sle<"share"=1>[WIDTH](@data left: WIDTH, @data right: WIDTH) -> (out: 1);
+  comb primitive std_slsh<"share"=1>[WIDTH](@data left: WIDTH, @data right: WIDTH) -> (out: WIDTH);
+  comb primitive std_srsh<"share"=1>[WIDTH](@data left: WIDTH, @data right: WIDTH) -> (out: WIDTH);
+  comb primitive std_signext<"share"=1>[IN_WIDTH, OUT_WIDTH](@data in: IN_WIDTH) -> (out: OUT_WIDTH);
+  comb primitive std_const_mult<"share"=1>[WIDTH, VALUE](@data in: WIDTH) -> (out: WIDTH);
+}
+primitive undef<"share"=1>[WIDTH]() -> (out: WIDTH) {
+  assign out = 'x;
+}
+comb primitive std_const<"share"=1>[WIDTH, VALUE]() -> (out: WIDTH) {
+  assign out = VALUE;
+}
+comb primitive std_wire<"share"=1>[WIDTH](@data in: WIDTH) -> (out: WIDTH) {
+  assign out = in;
+}
+comb primitive std_add<"share"=1>[WIDTH](@data left: WIDTH, @data right: WIDTH) -> (out: WIDTH) {
+  assign out = left + right;
+}
+comb primitive std_lsh<"share"=1>[WIDTH](@data left: WIDTH, @data right: WIDTH) -> (out: WIDTH) {
+  assign out = left << right;
+}
+primitive std_reg<"state_share"=1>[WIDTH](@write_together @data in: WIDTH, @write_together @interval @go write_en: 1, @clk clk: 1, @reset reset: 1) -> (@stable @data out: WIDTH, @done done: 1) {
+  always_ff @(posedge clk) begin
+    if (reset) begin
+       out <= 0;
+       done <= 0;
+    end else if (write_en) begin
+      out <= in;
+      done <= 1'd1;
+    end else done <= 1'd0;
+  end
+}
+primitive init_one_reg<"state_share"=1>[WIDTH](@write_together @data in: WIDTH, @write_together @interval @go write_en: 1, @clk clk: 1, @reset reset: 1) -> (@stable out: WIDTH, @done done: 1) {
+  always_ff @(posedge clk) begin
+    if (reset) begin
+       out <= 1;
+       done <= 0;
+    end else if (write_en) begin
+      out <= in;
+      done <= 1'd1;
+    end else done <= 1'd0;
+  end
+}
+extern "/home/kelvin/.calyx/primitives/core.sv" {
+  comb primitive std_slice<"share"=1>[IN_WIDTH, OUT_WIDTH](@data in: IN_WIDTH) -> (out: OUT_WIDTH);
+  comb primitive std_pad<"share"=1>[IN_WIDTH, OUT_WIDTH](@data in: IN_WIDTH) -> (out: OUT_WIDTH);
+  comb primitive std_cat<"share"=1>[LEFT_WIDTH, RIGHT_WIDTH, OUT_WIDTH](@data left: LEFT_WIDTH, @data right: RIGHT_WIDTH) -> (out: OUT_WIDTH);
+  comb primitive std_bit_slice<"share"=1>[IN_WIDTH, START_IDX, END_IDX, OUT_WIDTH](@data in: IN_WIDTH) -> (out: OUT_WIDTH);
+  comb primitive std_not<"share"=1>[WIDTH](@data in: WIDTH) -> (out: WIDTH);
+  comb primitive std_and<"share"=1>[WIDTH](@data left: WIDTH, @data right: WIDTH) -> (out: WIDTH);
+  comb primitive std_or<"share"=1>[WIDTH](@data left: WIDTH, @data right: WIDTH) -> (out: WIDTH);
+  comb primitive std_xor<"share"=1>[WIDTH](@data left: WIDTH, @data right: WIDTH) -> (out: WIDTH);
+  comb primitive std_sub<"share"=1>[WIDTH](@data left: WIDTH, @data right: WIDTH) -> (out: WIDTH);
+  comb primitive std_gt<"share"=1>[WIDTH](@data left: WIDTH, @data right: WIDTH) -> (out: 1);
+  comb primitive std_lt<"share"=1>[WIDTH](@data left: WIDTH, @data right: WIDTH) -> (out: 1);
+  comb primitive std_eq<"share"=1>[WIDTH](@data left: WIDTH, @data right: WIDTH) -> (out: 1);
+  comb primitive std_neq<"share"=1>[WIDTH](@data left: WIDTH, @data right: WIDTH) -> (out: 1);
+  comb primitive std_ge<"share"=1>[WIDTH](@data left: WIDTH, @data right: WIDTH) -> (out: 1);
+  comb primitive std_le<"share"=1>[WIDTH](@data left: WIDTH, @data right: WIDTH) -> (out: 1);
+  comb primitive std_rsh<"share"=1>[WIDTH](@data left: WIDTH, @data right: WIDTH) -> (out: WIDTH);
+  comb primitive std_mux<"share"=1>[WIDTH](@data cond: 1, @data tru: WIDTH, @data fal: WIDTH) -> (out: WIDTH);
+  primitive std_skid_buffer<"share"=1>[WIDTH](@data in: WIDTH, i_valid: 1, i_ready: 1, @clk clk: 1, @reset reset: 1) -> (@stable out: WIDTH, o_valid: 1, o_ready: 1);
+  primitive std_bypass_reg<"share"=1>[WIDTH](@data in: WIDTH, @go write_en: 1, @clk clk: 1, @reset reset: 1) -> (@stable out: WIDTH, @done done: 1);
+}
+extern "/home/kelvin/.calyx/primitives/memories/seq.sv" {
+  primitive seq_mem_d1[WIDTH, SIZE, IDX_SIZE](@clk clk: 1, @reset reset: 1, @write_together @data addr0: IDX_SIZE, @write_together @interval @go content_en: 1, @write_together(2) write_en: 1, @write_together(2) @data write_data: WIDTH) -> (@stable read_data: WIDTH, @done done: 1);
+  primitive seq_mem_d2[WIDTH, D0_SIZE, D1_SIZE, D0_IDX_SIZE, D1_IDX_SIZE](@clk clk: 1, @reset reset: 1, @write_together @data addr0: D0_IDX_SIZE, @write_together @data addr1: D1_IDX_SIZE, @write_together @interval @go content_en: 1, @write_together(2) write_en: 1, @write_together(2) @data write_data: WIDTH) -> (@stable read_data: WIDTH, @done done: 1);
+  primitive seq_mem_d3[WIDTH, D0_SIZE, D1_SIZE, D2_SIZE, D0_IDX_SIZE, D1_IDX_SIZE, D2_IDX_SIZE](@clk clk: 1, @reset reset: 1, @write_together @data addr0: D0_IDX_SIZE, @write_together @data addr1: D1_IDX_SIZE, @write_together @data addr2: D2_IDX_SIZE, @write_together @interval @go content_en: 1, @write_together(2) write_en: 1, @write_together(2) @data write_data: WIDTH) -> (@stable read_data: WIDTH, @done done: 1);
+  primitive seq_mem_d4[WIDTH, D0_SIZE, D1_SIZE, D2_SIZE, D3_SIZE, D0_IDX_SIZE, D1_IDX_SIZE, D2_IDX_SIZE, D3_IDX_SIZE](@clk clk: 1, @reset reset: 1, @write_together @data addr0: D0_IDX_SIZE, @write_together @data addr1: D1_IDX_SIZE, @write_together @data addr2: D2_IDX_SIZE, @write_together @data addr3: D3_IDX_SIZE, @write_together @interval @go content_en: 1, @write_together(2) write_en: 1, @write_together(2) @data write_data: WIDTH) -> (@stable read_data: WIDTH, @done done: 1);
+}
+component main<"toplevel"=1>(in0: 32, in1: 32, @clk clk: 1, @reset reset: 1, @go go: 1) -> (@done done: 1) {
+  cells {
+    @external @data mem_3 = seq_mem_d1(32, 900, 10);
+    @external @data mem_2 = seq_mem_d1(32, 900, 10);
+    @external @data mem_1 = seq_mem_d1(32, 900, 10);
+    @external @data mem_0 = seq_mem_d1(32, 900, 10);
+    @data @control gemm_instance = gemm();
+    @generated fsm_start = std_wire(1);
+    @generated fsm_done = std_wire(1);
+  }
+  wires {
+    fsm fsm {
+      0 : {} => {
+        fsm_start.out -> 1,
+        default -> 0,
+      },
+      1 : {
+        gemm_instance.reset = 1'd1;
+        gemm_instance.go = 1'd1;
+      } => {
+        gemm_instance.done -> 2,
+        default -> 1,
+      },
+      2 : {
+        mem_1.write_en = gemm_instance.arg_mem_1_write_en;
+        mem_1.addr0 = gemm_instance.arg_mem_1_addr0;
+        mem_1.content_en = gemm_instance.arg_mem_1_content_en;
+        mem_0.write_en = gemm_instance.arg_mem_0_write_en;
+        mem_0.addr0 = gemm_instance.arg_mem_0_addr0;
+        mem_0.content_en = gemm_instance.arg_mem_0_content_en;
+        mem_3.write_en = gemm_instance.arg_mem_3_write_en;
+        mem_3.addr0 = gemm_instance.arg_mem_3_addr0;
+        mem_3.content_en = gemm_instance.arg_mem_3_content_en;
+        mem_3.write_data = gemm_instance.arg_mem_3_write_data;
+        gemm_instance.arg_mem_0_read_data = mem_0.read_data;
+        gemm_instance.arg_mem_0_done = mem_0.done;
+        gemm_instance.arg_mem_3_read_data = mem_3.read_data;
+        gemm_instance.in1 = in1;
+        gemm_instance.arg_mem_1_read_data = mem_1.read_data;
+        gemm_instance.arg_mem_3_done = mem_3.done;
+        gemm_instance.go = 1'd1;
+        gemm_instance.arg_mem_1_done = mem_1.done;
+        gemm_instance.in0 = in0;
+      } => {
+        gemm_instance.done -> 3,
+        default -> 2,
+      },
+      3 : {
+        fsm_done.in = 1'd1;
+      } => 0,
+    }
+    done = fsm_done.out ? 1'd1;
+    mem_2.write_en = 1'd0;
+    mem_2.clk = clk;
+    mem_2.content_en = 1'd0;
+    mem_2.reset = reset;
+    mem_1.clk = clk;
+    mem_1.reset = reset;
+    mem_0.clk = clk;
+    mem_0.reset = reset;
+    mem_3.clk = clk;
+    mem_3.reset = reset;
+    fsm_start.in = go;
+    gemm_instance.clk = clk;
+  }
+  control {}
+}
+component gemm<"state_share"=1>(in0: 32, in1: 32, @clk clk: 1, @reset reset: 1, @go go: 1, arg_mem_3_read_data: 32, arg_mem_3_done: 1, arg_mem_2_read_data: 32, arg_mem_2_done: 1, arg_mem_1_read_data: 32, arg_mem_1_done: 1, arg_mem_0_read_data: 32, arg_mem_0_done: 1) -> (@done done: 1, @data arg_mem_3_addr0: 10, arg_mem_3_content_en: 1, arg_mem_3_write_en: 1, @data arg_mem_3_write_data: 32, @data arg_mem_2_addr0: 10, arg_mem_2_content_en: 1, arg_mem_2_write_en: 1, @data arg_mem_2_write_data: 32, @data arg_mem_1_addr0: 10, arg_mem_1_content_en: 1, arg_mem_1_write_en: 1, @data arg_mem_1_write_data: 32, @data arg_mem_0_addr0: 10, arg_mem_0_content_en: 1, arg_mem_0_write_en: 1, @data arg_mem_0_write_data: 32) {
+  cells {
+    @data std_slice_3 = std_slice(32, 10);
+    @data std_slice_2 = std_slice(32, 10);
+    @data std_slice_1 = std_slice(32, 10);
+    @data std_slice_0 = std_slice(32, 10);
+    @data std_add_6 = std_add(32);
+    @data load_0_reg = std_reg(32);
+    @data muli_3_reg = std_reg(32);
+    @data std_mult_pipe_3 = std_mult_pipe(32);
+    @data std_add_5 = std_add(32);
+    @data muli_2_reg = std_reg(32);
+    @data std_mult_pipe_2 = std_mult_pipe(32);
+    @data muli_1_reg = std_reg(32);
+    @data std_mult_pipe_1 = std_mult_pipe(32);
+    @data std_add_4 = std_add(32);
+    @data @control std_add_3 = std_add(32);
+    @control std_slt_2 = std_slt(32);
+    @data std_add_2 = std_add(32);
+    @data @control std_add_1 = std_add(32);
+    @control std_slt_1 = std_slt(32);
+    @data muli_0_reg = std_reg(32);
+    @data std_mult_pipe_0 = std_mult_pipe(32);
+    @data @control std_add_0 = std_add(32);
+    @control std_slt_0 = std_slt(32);
+    @data while_2_arg0_reg = std_reg(32);
+    @data while_1_arg0_reg = std_reg(32);
+    @data while_0_arg0_reg = std_reg(32);
+    @control @generated comb_reg = std_reg(1);
+    @control @generated comb_reg0 = std_reg(1);
+    @control @generated comb_reg1 = std_reg(1);
+    @generated fsm_start = std_wire(1);
+    @generated fsm_done = std_wire(1);
+  }
+  wires {
+    fsm fsm {
+      0 : {} => {
+        fsm_start.out -> 1,
+        default -> 0,
+      },
+      1 : {
+        while_2_arg0_reg.write_en = 1'd1;
+        while_2_arg0_reg.in = 32'd0;
+      } => {
+        while_2_arg0_reg.done -> 2,
+        default -> 1,
+      },
+      2 : {
+        std_slt_0.left = while_2_arg0_reg.out;
+        std_slt_0.right = 32'd20;
+        comb_reg.write_en = 1'd1;
+        comb_reg.in = std_slt_0.out;
+      } => {
+        comb_reg.out -> 3,
+        !comb_reg.out -> 29,
+        default -> 2,
+      },
+      3 : {
+        while_1_arg0_reg.write_en = 1'd1;
+        while_1_arg0_reg.in = 32'd0;
+        std_mult_pipe_0.left = while_2_arg0_reg.out;
+        std_mult_pipe_0.go = 1'd1;
+        std_mult_pipe_0.right = 32'd30;
+      } => 4,
+      4 : {
+        std_mult_pipe_0.left = while_2_arg0_reg.out;
+        std_mult_pipe_0.go = 1'd1;
+        std_mult_pipe_0.right = 32'd30;
+      } => 5,
+      5 : {
+        std_mult_pipe_0.left = while_2_arg0_reg.out;
+        std_mult_pipe_0.go = 1'd1;
+        std_mult_pipe_0.right = 32'd30;
+      } => 6,
+      6 : {
+        muli_0_reg.write_en = 1'd1;
+        muli_0_reg.in = std_mult_pipe_0.out;
+      } => 7,
+      7 : {
+        comb_reg0.write_en = 1'd1;
+        comb_reg0.in = std_slt_1.out;
+        std_slt_1.left = while_1_arg0_reg.out;
+        std_slt_1.right = 32'd20;
+      } => {
+        comb_reg0.out -> 8,
+        !comb_reg0.out -> 27,
+        default -> 7,
+      },
+      8 : {
+        while_0_arg0_reg.write_en = 1'd1;
+        while_0_arg0_reg.in = 32'd0;
+      } => {
+        while_0_arg0_reg.done -> 9,
+        default -> 8,
+      },
+      9 : {
+        std_slt_2.left = while_0_arg0_reg.out;
+        std_slt_2.right = 32'd20;
+        comb_reg1.write_en = 1'd1;
+        comb_reg1.in = std_slt_2.out;
+      } => {
+        comb_reg1.out -> 10,
+        !comb_reg1.out -> 25,
+        default -> 9,
+      },
+      10 : {
+        arg_mem_0_content_en = 1'd1;
+        arg_mem_0_addr0 = std_slice_3.out;
+        arg_mem_0_write_en = 1'd0;
+        std_slice_3.in = std_add_4.out;
+        std_add_4.left = muli_0_reg.out;
+        std_add_4.right = while_0_arg0_reg.out;
+      } => {
+        arg_mem_0_done -> 11,
+        default -> 10,
+      },
+      11 : {
+        std_mult_pipe_2.left = while_0_arg0_reg.out;
+        std_mult_pipe_2.go = 1'd1;
+        std_mult_pipe_2.right = 32'd30;
+        std_mult_pipe_1.left = in0;
+        std_mult_pipe_1.go = 1'd1;
+        std_mult_pipe_1.right = arg_mem_0_read_data;
+      } => 12,
+      12 : {
+        std_mult_pipe_2.left = while_0_arg0_reg.out;
+        std_mult_pipe_2.go = 1'd1;
+        std_mult_pipe_2.right = 32'd30;
+        std_mult_pipe_1.left = in0;
+        std_mult_pipe_1.go = 1'd1;
+        std_mult_pipe_1.right = arg_mem_0_read_data;
+      } => 13,
+      13 : {
+        std_mult_pipe_2.left = while_0_arg0_reg.out;
+        std_mult_pipe_2.go = 1'd1;
+        std_mult_pipe_2.right = 32'd30;
+        std_mult_pipe_1.left = in0;
+        std_mult_pipe_1.go = 1'd1;
+        std_mult_pipe_1.right = arg_mem_0_read_data;
+      } => 14,
+      14 : {
+        muli_1_reg.write_en = 1'd1;
+        muli_1_reg.in = std_mult_pipe_1.out;
+        muli_2_reg.write_en = 1'd1;
+        muli_2_reg.in = std_mult_pipe_2.out;
+      } => 15,
+      15 : {
+        std_add_5.left = muli_2_reg.out;
+        std_add_5.right = while_1_arg0_reg.out;
+        arg_mem_1_write_en = 1'd0;
+        arg_mem_1_addr0 = std_slice_2.out;
+        arg_mem_1_content_en = 1'd1;
+        std_slice_2.in = std_add_5.out;
+      } => {
+        arg_mem_1_done -> 16,
+        default -> 15,
+      },
+      16 : {
+        std_mult_pipe_3.left = muli_1_reg.out;
+        std_mult_pipe_3.go = 1'd1;
+        std_mult_pipe_3.right = arg_mem_1_read_data;
+      } => 17,
+      17 : {
+        std_mult_pipe_3.left = muli_1_reg.out;
+        std_mult_pipe_3.go = 1'd1;
+        std_mult_pipe_3.right = arg_mem_1_read_data;
+      } => 18,
+      18 : {
+        std_mult_pipe_3.left = muli_1_reg.out;
+        std_mult_pipe_3.go = 1'd1;
+        std_mult_pipe_3.right = arg_mem_1_read_data;
+      } => 19,
+      19 : {
+        muli_3_reg.write_en = 1'd1;
+        muli_3_reg.in = std_mult_pipe_3.out;
+      } => 20,
+      20 : {
+        arg_mem_3_addr0 = std_slice_1.out;
+        arg_mem_3_content_en = 1'd1;
+        arg_mem_3_write_en = 1'd0;
+        std_add_2.left = muli_0_reg.out;
+        std_add_2.right = while_1_arg0_reg.out;
+        std_slice_1.in = std_add_2.out;
+      } => {
+        arg_mem_3_done -> 21,
+        default -> 20,
+      },
+      21 : {
+        load_0_reg.write_en = 1'd1;
+        load_0_reg.in = arg_mem_3_read_data;
+      } => {
+        load_0_reg.done -> 22,
+        default -> 21,
+      },
+      22 : {
+        arg_mem_3_addr0 = std_slice_0.out;
+        arg_mem_3_write_data = std_add_6.out;
+        arg_mem_3_content_en = 1'd1;
+        arg_mem_3_write_en = 1'd1;
+        std_add_2.left = muli_0_reg.out;
+        std_add_2.right = while_1_arg0_reg.out;
+        std_add_6.left = load_0_reg.out;
+        std_add_6.right = muli_3_reg.out;
+        std_slice_0.in = std_add_2.out;
+      } => {
+        arg_mem_3_done -> 23,
+        default -> 22,
+      },
+      23 : {
+        while_0_arg0_reg.write_en = 1'd1;
+        while_0_arg0_reg.in = std_add_3.out;
+        std_add_3.left = while_0_arg0_reg.out;
+        std_add_3.right = 32'd1;
+      } => {
+        while_0_arg0_reg.done -> 24,
+        default -> 23,
+      },
+      24 : {
+        std_slt_2.left = while_0_arg0_reg.out;
+        std_slt_2.right = 32'd20;
+        comb_reg1.write_en = 1'd1;
+        comb_reg1.in = std_slt_2.out;
+      } => {
+        comb_reg1.out -> 10,
+        !comb_reg1.out -> 25,
+        default -> 24,
+      },
+      25 : {
+        while_1_arg0_reg.write_en = 1'd1;
+        while_1_arg0_reg.in = std_add_1.out;
+        std_add_1.left = while_1_arg0_reg.out;
+        std_add_1.right = 32'd1;
+      } => {
+        while_1_arg0_reg.done -> 26,
+        default -> 25,
+      },
+      26 : {
+        comb_reg0.write_en = 1'd1;
+        comb_reg0.in = std_slt_1.out;
+        std_slt_1.left = while_1_arg0_reg.out;
+        std_slt_1.right = 32'd20;
+      } => {
+        comb_reg0.out -> 8,
+        !comb_reg0.out -> 27,
+        default -> 26,
+      },
+      27 : {
+        std_add_0.left = while_2_arg0_reg.out;
+        std_add_0.right = 32'd1;
+        while_2_arg0_reg.write_en = 1'd1;
+        while_2_arg0_reg.in = std_add_0.out;
+      } => {
+        while_2_arg0_reg.done -> 28,
+        default -> 27,
+      },
+      28 : {
+        std_slt_0.left = while_2_arg0_reg.out;
+        std_slt_0.right = 32'd20;
+        comb_reg.write_en = 1'd1;
+        comb_reg.in = std_slt_0.out;
+      } => {
+        comb_reg.out -> 3,
+        !comb_reg.out -> 29,
+        default -> 28,
+      },
+      29 : {
+        fsm_done.in = 1'd1;
+      } => 0,
+    }
+    done = fsm_done.out ? 1'd1;
+    muli_3_reg.clk = clk;
+    muli_3_reg.reset = reset;
+    load_0_reg.clk = clk;
+    load_0_reg.reset = reset;
+    while_1_arg0_reg.clk = clk;
+    while_1_arg0_reg.reset = reset;
+    comb_reg.clk = clk;
+    comb_reg.reset = reset;
+    std_mult_pipe_3.clk = clk;
+    std_mult_pipe_3.reset = reset;
+    std_mult_pipe_2.clk = clk;
+    std_mult_pipe_2.reset = reset;
+    while_0_arg0_reg.clk = clk;
+    while_0_arg0_reg.reset = reset;
+    comb_reg1.clk = clk;
+    comb_reg1.reset = reset;
+    muli_1_reg.clk = clk;
+    muli_1_reg.reset = reset;
+    muli_0_reg.clk = clk;
+    muli_0_reg.reset = reset;
+    comb_reg0.clk = clk;
+    comb_reg0.reset = reset;
+    while_2_arg0_reg.clk = clk;
+    while_2_arg0_reg.reset = reset;
+    muli_2_reg.clk = clk;
+    muli_2_reg.reset = reset;
+    std_mult_pipe_0.clk = clk;
+    std_mult_pipe_0.reset = reset;
+    std_mult_pipe_1.clk = clk;
+    std_mult_pipe_1.reset = reset;
+    fsm_start.in = go;
+  }
+  control {}
+}

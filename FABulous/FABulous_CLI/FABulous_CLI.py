@@ -38,7 +38,6 @@ from FABulous.FABulous_CLI import cmd_synthesis
 from FABulous.fabric_generator.code_generation_Verilog import VerilogWriter
 from FABulous.fabric_generator.code_generation_VHDL import VHDLWriter
 from FABulous.FABulous_API import FABulous_API
-from FABulous.FABulous_CLI import synthesis
 from FABulous.FABulous_CLI.helper import (
     allow_blank,
     check_if_application_exists,

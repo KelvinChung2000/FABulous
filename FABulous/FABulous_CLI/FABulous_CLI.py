@@ -34,7 +34,7 @@ from cmd2 import (
 )
 from loguru import logger
 
-from FABulous.FABulous_CLI import synthesis
+from FABulous.FABulous_CLI import cmd_synthesis
 from FABulous.fabric_generator.code_generation_Verilog import VerilogWriter
 from FABulous.fabric_generator.code_generation_VHDL import VHDLWriter
 from FABulous.FABulous_API import FABulous_API
@@ -596,7 +596,7 @@ class FABulous_CLI(Cmd):
 
         logger.info("Generated npnr model")
 
-    do_synthesis = synthesis.do_synthesis
+    do_synthesis = cmd_synthesis.do_synthesis
 
     @with_category(CMD_FABRIC_FLOW)
     @with_argparser(filePathRequireParser)

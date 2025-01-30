@@ -167,10 +167,13 @@ synthesis_parser.add_argument(
     help="passed to 'fsm_recode' via 'fsm'",
     completer=Cmd.path_complete,
 )
-synthesis_parser.add_argument("-nofsm", help="do not run FSM optimization")
+synthesis_parser.add_argument(
+    "-nofsm", help="do not run FSM optimization", action="store_true"
+)
 synthesis_parser.add_argument(
     "-noalumacc",
     help="do not run 'alumacc' pass. i.e. keep arithmetic operators in their direct form ($add, $sub, etc.).",
+    action="store_true",
 )
 synthesis_parser.add_argument(
     "-carry",
@@ -185,6 +188,7 @@ synthesis_parser.add_argument(
     "-iopad",
     help="enable automatic insertion of IO buffers (otherwise a wrapper with "
     "manually inserted and constrained IO should be used.)",
+    action="store_true",
 )
 synthesis_parser.add_argument(
     "-complex-dff",
@@ -195,12 +199,13 @@ synthesis_parser.add_argument(
 )
 synthesis_parser.add_argument(
     "-nordff",
-    required=False,
     help="passed to 'memory'. prohibits merging of FFs into memory read ports",
+    action="store_true",
 )
 synthesis_parser.add_argument("-noshare", help="do not run SAT-based resource sharing")
 synthesis_parser.add_argument(
     "-run",
+    type=str,
     help="only run the commands between the labels (see below). an empty from label is synonymous to 'begin',"
     " and empty to label is synonymous to the end of the command list.",
 )
@@ -208,6 +213,7 @@ synthesis_parser.add_argument(
     "-no-rw-check",
     help="marks all recognized read ports as 'return don't-care value on read/write collision'"
     "(same result as setting the no_rw_check attribute on all memories).",
+    action="store_true",
 )
 
 synthesis_parser.add_argument(
@@ -250,15 +256,12 @@ def do_synthesis(self, args):
     p: Path
     paths: list[Path] = []
     for p in args.files:
-        if p.is_absolute():
-            paths.append(p)
+        resolvePath: Path = p.absolute()
+        if resolvePath.exists():
+            paths.append(resolvePath)
         else:
-            resolvePath: Path = self.projectDir / p
-            if resolvePath.exists():
-                paths.append(resolvePath)
-            else:
-                logger.error(f"{resolvePath} does not exits")
-                return
+            logger.error(f"{resolvePath} does not exits")
+            return
 
     json_file = paths[0].with_suffix(".json")
     yosys = check_if_application_exists(os.getenv("FAB_YOSYS_PATH", "yosys"))

@@ -111,7 +111,9 @@ synthesis_parser.add_argument(
     help="use the specified module as top module (default='top_wrapper')",
     default="top_wrapper",
 )
-synthesis_parser.add_argument("-auto-top", help="automatically determine the top of the design hierarchy")
+synthesis_parser.add_argument(
+    "-auto-top", help="automatically determine the top of the design hierarchy"
+)
 synthesis_parser.add_argument(
     "-blif",
     type=Path,
@@ -165,7 +167,9 @@ synthesis_parser.add_argument(
     help="passed to 'fsm_recode' via 'fsm'",
     completer=Cmd.path_complete,
 )
-synthesis_parser.add_argument("-nofsm", help="do not run FSM optimization", action="store_true")
+synthesis_parser.add_argument(
+    "-nofsm", help="do not run FSM optimization", action="store_true"
+)
 synthesis_parser.add_argument(
     "-noalumacc",
     help="do not run 'alumacc' pass. i.e. keep arithmetic operators in their direct form ($add, $sub, etc.).",
@@ -190,7 +194,9 @@ synthesis_parser.add_argument(
     "-complex-dff",
     help="enable support for FFs with enable and synchronous SR (must also be supported by the target fabric.)",
 )
-synthesis_parser.add_argument("-noflatten", help="do not flatten design after elaboration")
+synthesis_parser.add_argument(
+    "-noflatten", help="do not flatten design after elaboration"
+)
 synthesis_parser.add_argument(
     "-nordff",
     help="passed to 'memory'. prohibits merging of FFs into memory read ports",
@@ -214,7 +220,9 @@ synthesis_parser.add_argument(
 @with_category(CMD_FABRIC_FLOW)
 @with_argparser(synthesis_parser)
 def do_synthesis(self, args):
-    logger.info(f"Running synthesis that targeting Nextpnr with design {[str(i) for i in args.files]}")
+    logger.info(
+        f"Running synthesis that targeting Nextpnr with design {[str(i) for i in args.files]}"
+    )
 
     p: Path
     paths: list[Path] = []
@@ -237,7 +245,11 @@ def do_synthesis(self, args):
         f"-json {args.json}" if args.json else f"-json {json_file}",
         f"-lut {args.lut}" if args.lut else "",
         f"-plib {args.plib}" if args.plib else "",
-        (" ".join([f"-extra-plib {i}" for i in args.extra_plib]) if args.extra_plib else ""),
+        (
+            " ".join([f"-extra-plib {i}" for i in args.extra_plib])
+            if args.extra_plib
+            else ""
+        ),
         " ".join([f"-extra-map {i}" for i in args.extra_map]) if args.extra_map else "",
         f"-encfile {args.encfile}" if args.encfile else "",
         "-nofsm" if args.nofsm else "",

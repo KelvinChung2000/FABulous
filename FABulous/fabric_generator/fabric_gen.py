@@ -57,7 +57,7 @@ class FabricGenerator:
     """
 
     fabric: Fabric
-    writer: CodeGenerator
+    writer: codeGenerator
 
     def __init__(self, fabric: Fabric, writer: codeGenerator) -> None:
         self.fabric = fabric
@@ -504,7 +504,7 @@ class FabricGenerator:
 
         # normal wire input
         for i in tile.ports:
-            if i.wireDirection != Direction.JUMP and i.inOut == IO.INPUT:
+            if i.wireDirection != Direction.JUMP and i.ioDirection == IO.INPUT:
                 for p in i.expandPortInfoByName():
                     self.writer.addPortScalar(p, IO.INPUT, indentLevel=2)
 
@@ -515,13 +515,13 @@ class FabricGenerator:
 
         # jump wire input
         for i in tile.ports:
-            if i.wireDirection == Direction.JUMP and i.inOut == IO.INPUT:
+            if i.wireDirection == Direction.JUMP and i.ioDirection == IO.INPUT:
                 for p in i.expandPortInfoByName():
                     self.writer.addPortScalar(p, IO.INPUT, indentLevel=2)
 
         # normal wire output
         for i in tile.ports:
-            if i.wireDirection != Direction.JUMP and i.inOut == IO.OUTPUT:
+            if i.wireDirection != Direction.JUMP and i.ioDirection == IO.OUTPUT:
                 for p in i.expandPortInfoByName():
                     self.writer.addPortScalar(p, IO.OUTPUT, indentLevel=2)
 
@@ -532,7 +532,7 @@ class FabricGenerator:
 
         # jump wire output
         for i in tile.ports:
-            if i.wireDirection == Direction.JUMP and i.inOut == IO.OUTPUT:
+            if i.wireDirection == Direction.JUMP and i.ioDirection == IO.OUTPUT:
                 for p in i.expandPortInfoByName():
                     self.writer.addPortScalar(p, IO.OUTPUT, indentLevel=2)
 
@@ -923,7 +923,7 @@ class FabricGenerator:
                 if (
                     p.sourceName != "NULL"
                     and p.destinationName != "NULL"
-                    and p.inOut == IO.OUTPUT
+                    and p.ioDirection == IO.OUTPUT
                 ):
                     self.writer.addConnectionVector(p.name, f"{p.wireCount}-1")
 
@@ -1194,7 +1194,7 @@ class FabricGenerator:
         portsPairs = []
         # normal input wire
         for i in tile.ports:
-            if i.wireDirection != Direction.JUMP and i.inOut == IO.INPUT:
+            if i.wireDirection != Direction.JUMP and i.ioDirection == IO.INPUT:
                 portsPairs += list(
                     zip(i.expandPortInfoByName(), i.expandPortInfoByName(indexed=True))
                 )
@@ -1206,16 +1206,16 @@ class FabricGenerator:
         # jump input wire
         port, signal = [], []
         for i in tile.ports:
-            if i.wireDirection == Direction.JUMP and i.inOut == IO.INPUT:
+            if i.wireDirection == Direction.JUMP and i.ioDirection == IO.INPUT:
                 port += i.expandPortInfoByName()
-            if i.wireDirection == Direction.JUMP and i.inOut == IO.OUTPUT:
+            if i.wireDirection == Direction.JUMP and i.ioDirection == IO.OUTPUT:
                 signal += i.expandPortInfoByName(indexed=True)
 
         portsPairs += list(zip(port, signal))
 
         # normal output wire
         for i in tile.ports:
-            if i.wireDirection != Direction.JUMP and i.inOut == IO.OUTPUT:
+            if i.wireDirection != Direction.JUMP and i.ioDirection == IO.OUTPUT:
                 portsPairs += list(
                     zip(
                         i.expandPortInfoByName(),
@@ -1231,9 +1231,9 @@ class FabricGenerator:
         # jump output wire
         port, signal = [], []
         for i in tile.ports:
-            if i.wireDirection == Direction.JUMP and i.inOut == IO.OUTPUT:
+            if i.wireDirection == Direction.JUMP and i.ioDirection == IO.OUTPUT:
                 port += i.expandPortInfoByName()
-            if i.wireDirection == Direction.JUMP and i.inOut == IO.OUTPUT:
+            if i.wireDirection == Direction.JUMP and i.ioDirection == IO.OUTPUT:
                 signal += i.expandPortInfoByName(indexed=True)
 
         portsPairs += list(zip(port, signal))
@@ -1318,7 +1318,7 @@ class FabricGenerator:
                 for p in pList:
                     wire = (abs(p.xOffset) + abs(p.yOffset)) * p.wireCount - 1
                     self.writer.addPortVector(
-                        f"Tile_X{x}Y{y}_{p.name}", p.inOut, wire, indentLevel=2
+                        f"Tile_X{x}Y{y}_{p.name}", p.ioDirection, wire, indentLevel=2
                     )
                     self.writer.addComment(str(p), onNewLine=False)
 
@@ -1417,7 +1417,7 @@ class FabricGenerator:
                     f"Tile_X{x}Y{y}_{i[0].wireDirection}", onNewLine=True
                 )
                 for p in i:
-                    if p.inOut == IO.OUTPUT:
+                    if p.ioDirection == IO.OUTPUT:
                         wire = (abs(p.xOffset) + abs(p.yOffset)) * p.wireCount - 1
                         self.writer.addConnectionVector(
                             f"Tile_X{x}Y{y}_{p.name}", wire, indentLevel=1
@@ -1489,7 +1489,9 @@ class FabricGenerator:
 
                 # south direction input connection
                 southPort = [
-                    i.name for i in tile.getSouthPorts(IO.INPUT) if i.inOut == IO.INPUT
+                    i.name
+                    for i in tile.getSouthPorts(IO.INPUT)
+                    if i.ioDirection == IO.INPUT
                 ]
                 if (
                     0 <= y - 1 < len(superTile.tileMap)
@@ -1505,7 +1507,9 @@ class FabricGenerator:
 
                 # west direction input connection
                 westPort = [
-                    i.name for i in tile.getWestPorts(IO.INPUT) if i.inOut == IO.INPUT
+                    i.name
+                    for i in tile.getWestPorts(IO.INPUT)
+                    if i.ioDirection == IO.INPUT
                 ]
                 if (
                     0 <= x + 1 < len(superTile.tileMap[0])
@@ -1914,7 +1918,10 @@ class FabricGenerator:
                     for (i, j), around in cord:
                         for ports in around:
                             for port in ports:
-                                if port.inOut == IO.OUTPUT and port.name != "NULL":
+                                if (
+                                    port.ioDirection == IO.OUTPUT
+                                    and port.name != "NULL"
+                                ):
                                     portsPairs.append(
                                         (
                                             f"Tile_X{int(i)}Y{int(j)}_{port.name}",

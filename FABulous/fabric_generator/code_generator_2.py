@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, TextIO
 
@@ -22,17 +22,88 @@ class CodeGenerator:
     def Module(
         self,
         name: str,
-        parameters: list["_Parameter | None"],
-        ports: list["_Port"],
         attributes=None,
     ):
-        return self._Module(self, name, parameters, ports, attributes)
+        return self._Module(self, name, attributes)
 
-    def Parameter(self, name: str, value: str | int):
-        return self._Parameter(name, value)
+    @dataclass
+    class _Module:
+        from FABulous.fabric_generator.Parameter_region import _ParameterRegion
 
-    def Port(self, name: str, direction: IO, bits: int | str):
-        return self._Port(name, direction, bits)
+        outer: "CodeGenerator"
+        name: str
+        attributes: list["CodeGenerator._Attribute"] | None = None
+
+        parameters: list["_ParameterRegion._Parameter"] = field(default_factory=list)
+        ports: list["CodeGenerator._Module._PortRegion._Port"] = field(
+            default_factory=list
+        )
+        attributes: list["CodeGenerator._Attribute"] | None = None
+
+        def ParameterRegion(self):
+            return _ParameterRegion(self)
+
+        def PortRegion(self):
+            return self._PortRegion(self)
+
+        def LogicRegion(self):
+            return self._LogicRegion(self)
+
+        def __exit__(self, exc_type, exc_value, traceback):
+            if self.attributes:
+                self.outer.f.write(
+                    f"(* {', '.join([str(i) for i in self.attributes])} *)\nmodule "
+                    + self.name
+                    + " #(\n"
+                )
+            else:
+                self.outer.f.write("module " + self.name + " #(\n")
+
+            self.outer.indent += self.outer.indentCount
+            self.outer.f.write(
+                ",\n".join(
+                    [
+                        f"{' '* self.outer.indent}{i}"
+                        for i in self.parameters
+                        if i is not None
+                    ]
+                )
+            )
+            self.outer.indent -= self.outer.indentCount
+            self.outer.f.write("\n) (\n")
+            self.outer.indent += self.outer.indentCount
+            self.outer.f.write(
+                ",\n".join([f"{' '* self.outer.indent}{i}" for i in self.ports])
+            )
+            self.outer.f.write("\n);\n")
+
+            self.outer.f.write("endmodule\n")
+            self.outer.indent -= self.outer.indentCount
+
+        @dataclass
+        class _PortRegion:
+            outer: "CodeGenerator._Module"
+
+            @dataclass
+            class _Port:
+                name: str
+                direction: IO
+                bits: int | str
+
+                def __str__(self) -> str:
+                    if isinstance(self.bits, int):
+                        return f"{self.direction} [{self.bits - 1}:0] {self.name}"
+                    else:
+                        return f"{self.direction} [{self.bits}:0] {self.name}"
+
+            def Port(self, name: str, direction: IO, bits: int | str = 1):
+                _o = self._Port(name, direction, bits)
+                self.outer.ports.append(_o)
+                return _o
+
+        @dataclass
+        class _LogicRegion:
+            outer: "CodeGenerator"
 
     def Attribute(self, name: str, value: str | None = None):
         return self._Attribute(name, value)
@@ -55,7 +126,7 @@ class CodeGenerator:
     def Constant(self, name: str, value: int):
         return self._Constant(self, name, value)
 
-    def Signal(self, name: str, bits: int):
+    def Signal(self, name: str, bits: int = 1):
         return self._signal(self, name, bits)
 
     def Concat(self, *items):
@@ -70,26 +141,6 @@ class CodeGenerator:
         attributes: list["_Attribute"] | None = None,
     ):
         return self._InitModule(self, module, initName, parameters, ports, attributes)
-
-    @dataclass
-    class _Parameter:
-        name: str
-        value: str | int
-
-        def __str__(self) -> str:
-            return f"parameter {self.name} = {self.value}"
-
-    @dataclass
-    class _Port:
-        name: str
-        direction: IO
-        bits: int | str
-
-        def __str__(self) -> str:
-            if isinstance(self.bits, int):
-                return f"{self.direction} [{self.bits - 1}:0] {self.name}"
-            else:
-                return f"{self.direction} [{self.bits}:0] {self.name}"
 
     @dataclass
     class _Attribute:
@@ -213,43 +264,3 @@ class CodeGenerator:
             )
             self.outer.indent -= self.outer.indentCount
             self.outer.f.write(f"\n{' '* self.outer.indent});\n")
-
-    @dataclass
-    class _Module:
-        outer: "CodeGenerator"
-        name: str
-        parameters: list["CodeGenerator._Parameter | None"]
-        ports: list["CodeGenerator._Port"]
-        attributes: list["CodeGenerator._Attribute"] | None = None
-
-        def __enter__(self):
-            if self.attributes:
-                self.outer.f.write(
-                    f"(* {', '.join([str(i) for i in self.attributes])} *)\nmodule "
-                    + self.name
-                    + " #(\n"
-                )
-            else:
-                self.outer.f.write("module " + self.name + " #(\n")
-
-            self.outer.indent += self.outer.indentCount
-            self.outer.f.write(
-                ",\n".join(
-                    [
-                        f"{' '* self.outer.indent}{i}"
-                        for i in self.parameters
-                        if i is not None
-                    ]
-                )
-            )
-            self.outer.indent -= self.outer.indentCount
-            self.outer.f.write("\n) (\n")
-            self.outer.indent += self.outer.indentCount
-            self.outer.f.write(
-                ",\n".join([f"{' '* self.outer.indent}{i}" for i in self.ports])
-            )
-            self.outer.f.write("\n);\n")
-
-        def __exit__(self, exc_type, exc_value, traceback):
-            self.outer.f.write("endmodule\n")
-            self.outer.indent -= self.outer.indentCount

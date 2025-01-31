@@ -48,28 +48,25 @@ def generateConfigMem(self, fabric: Fabric, tile: Tile, configMemCSV: Path, dest
 
     cg = CodeGenerator(dest)
 
-    with cg.Module(
-        f"{tile.name}_ConfigMem",
-        parameters=[
-            (
-                cg.Parameter("MaxFramesPerCol", self.fabric.maxFramesPerCol)
-                if self.fabric.maxFramesPerCol > 0
-                else None
-            ),
-            (
-                cg.Parameter("FrameBitsPerRow", self.fabric.frameBitsPerRow)
-                if self.fabric.frameBitsPerRow > 0
-                else None
-            ),
-            cg.Parameter("GlobalConfigBits", tile.globalConfigBits),
-        ],
-        ports=[
-            cg.Port("FrameData", IO.INPUT, f"{self.fabric.frameBitsPerRow} - 1"),
-            cg.Port("FrameStrobe", IO.INPUT, f"{self.fabric.maxFramesPerCol} - 1"),
-            cg.Port("ConfigBits", IO.OUTPUT, "NoConfigBits - 1"),
-            cg.Port("ConfigBits_N", IO.OUTPUT, "NoConfigBits - 1"),
-        ],
-    ):
+    with cg.Module(f"{tile.name}_ConfigMem",) as module:
+        with module.ParameterRegion() as pr:
+            if self.fabric.maxFramesPerCol > 0:
+                pr.Parameter("MaxFramesPerCol", self.fabric.maxFramesPerCol)
+            if self.fabric.frameBitsPerRow > 0:
+                pr.Parameter("FrameBitsPerRow", self.fabric.frameBitsPerRow)
+
+        with module.PortRegion() as pr:
+            pr.Port("FrameData", IO.INPUT, f"{self.fabric.frameBitsPerRow} - 1")
+            pr.Port("FrameStrobe", IO.INPUT, f"{self.fabric.maxFramesPerCol} - 1")
+            pr.Port("ConfigBits", IO.OUTPUT, "NoConfigBits - 1")
+            pr.Port("ConfigBits_N", IO.OUTPUT, "NoConfigBits - 1")
+
+
+        with module.LogicRegion() as lr:
+
+
+
+
         with cg.IfDef("EMULATION"):
             for i in configMemList:
                 counter = 0

@@ -118,7 +118,7 @@ class SmGeometry:
                         southPort.destinationName,
                         southPort.wireCount * abs(southPort.yOffset),
                         southPort.name,
-                        southPort.inOut,
+                        southPort.ioDirection,
                         southPort.sideOfTile,
                     )
                     augmentedSouthPorts.append(augmentedPort)
@@ -137,7 +137,7 @@ class SmGeometry:
                         northPort.destinationName,
                         northPort.wireCount * abs(northPort.yOffset),
                         northPort.name,
-                        northPort.inOut,
+                        northPort.ioDirection,
                         northPort.sideOfTile,
                     )
                     augmentedNorthPorts.append(augmentedPort)
@@ -157,7 +157,7 @@ class SmGeometry:
                         eastPort.destinationName,
                         eastPort.wireCount * abs(eastPort.xOffset),
                         eastPort.name,
-                        eastPort.inOut,
+                        eastPort.ioDirection,
                         eastPort.sideOfTile,
                     )
                     augmentedEastPorts.append(augmentedPort)
@@ -176,7 +176,7 @@ class SmGeometry:
                         westPort.destinationName,
                         westPort.wireCount * abs(westPort.xOffset),
                         westPort.name,
-                        westPort.inOut,
+                        westPort.ioDirection,
                         westPort.sideOfTile,
                     )
                     augmentedWestPorts.append(augmentedPort)
@@ -331,7 +331,7 @@ class SmGeometry:
                     f"{port.sourceName}{i}",
                     f"{port.destinationName}{i}",
                     PortType.JUMP,
-                    port.inOut,
+                    port.ioDirection,
                     jumpPortX,
                     jumpPortY,
                 )
@@ -348,7 +348,7 @@ class SmGeometry:
                     f"{port.sourceName}{i}",
                     f"{port.destinationName}{i}",
                     PortType.SWITCH_MATRIX,
-                    port.inOut,
+                    port.ioDirection,
                     northPortX,
                     northPortY,
                 )
@@ -372,7 +372,7 @@ class SmGeometry:
                     f"{port.sourceName}{i}",
                     f"{port.destinationName}{i}",
                     PortType.SWITCH_MATRIX,
-                    port.inOut,
+                    port.ioDirection,
                     southPortX,
                     southPortY,
                 )
@@ -396,7 +396,7 @@ class SmGeometry:
                     f"{port.sourceName}{i}",
                     f"{port.destinationName}{i}",
                     PortType.SWITCH_MATRIX,
-                    port.inOut,
+                    port.ioDirection,
                     eastPortX,
                     eastPortY,
                 )
@@ -420,7 +420,7 @@ class SmGeometry:
                     f"{port.sourceName}{i}",
                     f"{port.destinationName}{i}",
                     PortType.SWITCH_MATRIX,
-                    port.inOut,
+                    port.ioDirection,
                     westPortX,
                     westPortY,
                 )

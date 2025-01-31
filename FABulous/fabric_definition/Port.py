@@ -7,7 +7,7 @@ from FABulous.fabric_definition.define import IO, FeatureType, Side
 @dataclass(frozen=True, eq=True)
 class Port:
     name: str
-    inOut: IO
+    ioDirection: IO
     wireCount: int
     isBus: bool
 
@@ -51,33 +51,33 @@ class TilePort(Port):
     def __lt__(self, __o: Any) -> bool:
         if not isinstance(__o, TilePort):
             return False
-        return (self.__order[self.sideOfTile], self.__io[self.inOut]) < (
+        return (self.__order[self.sideOfTile], self.__io[self.ioDirection]) < (
             self.__order[__o.sideOfTile],
-            self.__io[self.inOut],
+            self.__io[self.ioDirection],
         )
 
     def __le__(self, __o: Any) -> bool:
         if not isinstance(__o, TilePort):
             return False
-        return (self.__order[self.sideOfTile], self.__io[self.inOut]) <= (
+        return (self.__order[self.sideOfTile], self.__io[self.ioDirection]) <= (
             self.__order[__o.sideOfTile],
-            self.__io[self.inOut],
+            self.__io[self.ioDirection],
         )
 
     def __gt__(self, __o: Any) -> bool:
         if not isinstance(__o, TilePort):
             return False
-        return (self.__order[self.sideOfTile], self.__io[self.inOut]) > (
+        return (self.__order[self.sideOfTile], self.__io[self.ioDirection]) > (
             self.__order[__o.sideOfTile],
-            self.__io[self.inOut],
+            self.__io[self.ioDirection],
         )
 
     def __ge__(self, __o: Any) -> bool:
         if not isinstance(__o, TilePort):
             return False
-        return (self.__order[self.sideOfTile], self.__io[self.inOut]) >= (
+        return (self.__order[self.sideOfTile], self.__io[self.ioDirection]) >= (
             self.__order[__o.sideOfTile],
-            self.__io[self.inOut],
+            self.__io[self.ioDirection],
         )
 
 

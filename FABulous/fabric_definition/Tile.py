@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
+from FABulous.fabric_definition import Port
 from FABulous.fabric_definition.Bel import Bel
 from FABulous.fabric_definition.define import IO, Side
 from FABulous.fabric_definition.Mux import Mux
@@ -47,8 +48,7 @@ class Tile:
         return self.name == __o.name
 
     def getWestPorts(self, io: IO | None = None) -> list[TilePort]:
-        """
-        Retrieve the list of ports located on the west side of the tile.
+        """Retrieve the list of ports located on the west side of the tile.
 
         Args:
             io (IO | None, optional): The direction of the port (input/output).
@@ -62,12 +62,13 @@ class Tile:
             return [p for p in self.ports if p.sideOfTile == Side.WEST]
         else:
             return [
-                p for p in self.ports if p.sideOfTile == Side.WEST and p.inOut == io
+                p
+                for p in self.ports
+                if p.sideOfTile == Side.WEST and p.ioDirection == io
             ]
 
     def getSouthPorts(self, io: IO | None = None) -> list[TilePort]:
-        """
-        Retrieve the list of ports located on the south side of the tile.
+        """Retrieve the list of ports located on the south side of the tile.
 
         Args:
             io (IO | None, optional): The direction of the port (input/output).
@@ -81,12 +82,13 @@ class Tile:
             return [p for p in self.ports if p.sideOfTile == Side.SOUTH]
         else:
             return [
-                p for p in self.ports if p.sideOfTile == Side.SOUTH and p.inOut == io
+                p
+                for p in self.ports
+                if p.sideOfTile == Side.SOUTH and p.ioDirection == io
             ]
 
     def getEastPorts(self, io: IO | None = None) -> list[TilePort]:
-        """
-        Retrieve the list of ports located on the east side of the tile.
+        """Retrieve the list of ports located on the east side of the tile.
 
         Args:
             io (IO | None, optional): The direction of the port (input/output).
@@ -100,12 +102,13 @@ class Tile:
             return [p for p in self.ports if p.sideOfTile == Side.EAST]
         else:
             return [
-                p for p in self.ports if p.sideOfTile == Side.EAST and p.inOut == io
+                p
+                for p in self.ports
+                if p.sideOfTile == Side.EAST and p.ioDirection == io
             ]
 
     def getNorthPorts(self, io: IO | None = None) -> list[TilePort]:
-        """
-        Retrieve the list of ports located on the north side of the tile.
+        """Retrieve the list of ports located on the north side of the tile.
 
         Args:
             io (IO | None, optional): The direction of the port (input/output).
@@ -119,17 +122,28 @@ class Tile:
             return [p for p in self.ports if p.sideOfTile == Side.NORTH]
         else:
             return [
-                p for p in self.ports if p.sideOfTile == Side.NORTH and p.inOut == io
+                p
+                for p in self.ports
+                if p.sideOfTile == Side.NORTH and p.ioDirection == io
             ]
 
     def getTileInputNames(self) -> list[str]:
-        return [p.name for p in self.ports if p.inOut == IO.INPUT]
+        return [p.name for p in self.ports if p.ioDirection == IO.INPUT]
 
     def getTileOutputNames(self) -> list[str]:
-        return [p.name for p in self.ports if p.inOut == IO.OUTPUT]
+        return [p.name for p in self.ports if p.ioDirection == IO.OUTPUT]
 
     def getTileInputPorts(self) -> list[TilePort]:
-        return sorted([p for p in self.ports if p.inOut == IO.INPUT])
+        return sorted([p for p in self.ports if p.ioDirection == IO.INPUT])
 
     def getTileOutputPorts(self) -> list[TilePort]:
-        return sorted([p for p in self.ports if p.inOut == IO.OUTPUT])
+        return sorted([p for p in self.ports if p.ioDirection == IO.OUTPUT])
+
+    def getCascadeWireCount(self, port: TilePort) -> int:
+        for i in self.wireTypes:
+            if i.sourcePort.name == port.name or i.destinationPort == port.name:
+                return port.wireCount * (abs(i.offsetX) + abs(i.offsetY))
+        else:
+            raise ValueError(
+                f"The given port {port} does not exist in tile {self.name}"
+            )

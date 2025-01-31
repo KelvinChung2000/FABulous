@@ -12,8 +12,8 @@ from FABulous.fabric_definition.Mux import Mux
 from FABulous.fabric_definition.Port import TilePort
 from FABulous.fabric_definition.Tile import Tile
 from FABulous.fabric_definition.Wire import Wire, WireType
-from FABulous.file_parser.file_parser_HDL import parseBelFile
 from FABulous.file_parser.file_parser_csv import parseList, parseMatrix, parsePortLine
+from FABulous.file_parser.file_parser_HDL import parseBelFile
 from FABulous.file_parser.file_parser_list import parseMux
 
 oppositeDic = {
@@ -109,8 +109,8 @@ def parseFabricYAML(fileName: Path) -> Fabric:
                 continue
             for wireType in tile.wireTypes:
                 if (
-                    wireType.sourcePort.inOut != IO.OUTPUT
-                    and wireType.destinationPort.inOut != IO.INPUT
+                    wireType.sourcePort.ioDirection != IO.OUTPUT
+                    and wireType.destinationPort.ioDirection != IO.INPUT
                 ):
                     logger.error(
                         f"Wire {wireType} must be an output port as source_name and input port as destination_name ."
@@ -213,7 +213,7 @@ def parseTileYAML(fileName: Path) -> Tile:
         portsDict[portEntry["name"]] = TilePort(
             wireCount=int(portEntry["wires"]),
             name=portEntry["name"],
-            inOut=IO[portEntry["inOut"].upper()],
+            ioDirection=IO[portEntry["inOut"].upper()],
             sideOfTile=Side[portEntry["side"].upper()],
             isBus=portEntry.get("isBus", False),
             terminal=portEntry.get("terminal", False),
@@ -236,6 +236,7 @@ def parseTileYAML(fileName: Path) -> Tile:
         normalPorts.discard(wireEntry["source_name"])
         normalPorts.discard(wireEntry["destination_name"])
 
+    # if the normal port still have things mean some port do not have a connection
     if normalPorts:
         logger.error(
             f"Port {normalPorts} does not have a connection, when defined as non terminal."

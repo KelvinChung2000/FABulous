@@ -75,10 +75,10 @@ class Bel:
         self.src = src
         self.prefix = prefix
         self.name = src.stem
-        self.inputs = [p for p in internal if p.inOut == IO.INPUT]
-        self.outputs = [p for p in internal if p.inOut == IO.OUTPUT]
-        self.externalInput = [p for p in external if p.inOut == IO.INPUT]
-        self.externalOutput = [p for p in external if p.inOut == IO.OUTPUT]
+        self.inputs = [p for p in internal if p.ioDirection == IO.INPUT]
+        self.outputs = [p for p in internal if p.ioDirection == IO.OUTPUT]
+        self.externalInput = [p for p in external if p.ioDirection == IO.INPUT]
+        self.externalOutput = [p for p in external if p.ioDirection == IO.OUTPUT]
         self.configPort = configPort
         self.sharedPort = sharedPort
         self.configBit = configBit

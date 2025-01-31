@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from lark import logger
+from loguru import logger
 
 from FABulous.fabric_definition.define import IO, ConfigBitMode, MultiplexerStyle
 from FABulous.fabric_definition.Fabric import Fabric
@@ -29,10 +29,10 @@ def generateTileSwitchMatrix(fabric: Fabric, tile: Tile, dest: Path):
 
     if noConfigBits > 0:
         if fabric.configBitMode == ConfigBitMode.FLIPFLOP_CHAIN:
-            ports.append(cg.Port("MODE", IO.INPUT, 1))
-            ports.append(cg.Port("CONFin", IO.INPUT, 1))
-            ports.append(cg.Port("CONFout", IO.OUTPUT, 1))
-            ports.append(cg.Port("CLK", IO.INPUT, 1))
+            ports.append(cg.Port("MODE", IO.INPUT))
+            ports.append(cg.Port("CONFin", IO.INPUT))
+            ports.append(cg.Port("CONFout", IO.OUTPUT))
+            ports.append(cg.Port("CLK", IO.INPUT))
         else:
             ports.append(cg.Port("ConfigBits", IO.INPUT, "NoConfigBits-1"))
             ports.append(cg.Port("ConfigBits_N", IO.INPUT, "NoConfigBits-1"))
@@ -127,3 +127,5 @@ def generateTileSwitchMatrix(fabric: Fabric, tile: Tile, dest: Path):
                         mux.output,
                         f"{mux.output}_input[ConfigBits[{configBitstreamPosition-1}:{configBitstreamPosition}]]",
                     )
+
+                configBitstreamPosition += inputCount.bit_length() - 1

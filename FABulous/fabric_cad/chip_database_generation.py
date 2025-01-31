@@ -23,15 +23,15 @@ def genSwitchMatrix(tile: Tile, tileType: TileType, context=1):
     if not isinstance(tile.switchMatrix, list):
         raise ValueError("Switch matrix is not a list")
 
-    outportName = set([p.name for p in tile.ports if p.inOut == IO.OUTPUT])
+    outportName = set([p.name for p in tile.ports if p.ioDirection == IO.OUTPUT])
     zIn = 0
     zOut = 0
     for c in range(context):
         for i, p in enumerate(sorted(tile.ports)):
-            if p.inOut == IO.INPUT:
+            if p.ioDirection == IO.INPUT:
                 tileType.create_wire(f"{c}_{p.name}", f"InPort{p.sideOfTile}", z=zIn)
                 zIn += 1
-            elif p.inOut == IO.OUTPUT:
+            elif p.ioDirection == IO.OUTPUT:
                 tileType.create_wire(f"{c}_{p.name}", f"OutPort{p.sideOfTile}", z=zOut)
                 if p.name in outportName:
                     tileType.create_wire(

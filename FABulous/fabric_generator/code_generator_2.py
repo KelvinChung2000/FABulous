@@ -11,7 +11,7 @@ class CodeGenerator:
     indent: int = 0
     f: TextIO
 
-    def __init__(self, path: str, indentCount: int = 4) -> None:
+    def __init__(self, path: Path | str, indentCount: int = 4) -> None:
         self.filePath = Path(path)
         self.indentCount = indentCount
         self.f = self.filePath.open("w")
@@ -22,16 +22,16 @@ class CodeGenerator:
     def Module(
         self,
         name: str,
+        parameters: list["_Parameter | None"],
         ports: list["_Port"],
-        parameters: list["_Parameter"],
         attributes=None,
     ):
-        return self._Module(self, name, ports, parameters, attributes)
+        return self._Module(self, name, parameters, ports, attributes)
 
-    def Parameter(self, name: str, value: str):
+    def Parameter(self, name: str, value: str | int):
         return self._Parameter(name, value)
 
-    def Port(self, name: str, direction: IO, bits: int):
+    def Port(self, name: str, direction: IO, bits: int | str):
         return self._Port(name, direction, bits)
 
     def Attribute(self, name: str, value: str | None = None):
@@ -42,6 +42,18 @@ class CodeGenerator:
 
     def ConnectPair(self, dst: str, src: Any | None = None):
         return self._ConnectPair(dst, src)
+
+    def IfDef(self, macro: str):
+        return self._IfDef(self, macro)
+
+    def Comment(self, comment: str):
+        return self._Comment(self, comment)
+
+    def Assign(self, dst: str, src: str):
+        return self._Assign(self, dst, src)
+
+    def Constant(self, name: str, value: int):
+        return self._Constant(self, name, value)
 
     def InitModule(
         self,
@@ -56,7 +68,7 @@ class CodeGenerator:
     @dataclass
     class _Parameter:
         name: str
-        value: str
+        value: str | int
 
         def __str__(self) -> str:
             return f"parameter {self.name} = {self.value}"
@@ -65,10 +77,13 @@ class CodeGenerator:
     class _Port:
         name: str
         direction: IO
-        bits: int
+        bits: int | str
 
         def __str__(self) -> str:
-            return f"{self.direction} [{self.bits - 1}:0] {self.name}"
+            if isinstance(self.bits, int):
+                return f"{self.direction} [{self.bits - 1}:0] {self.name}"
+            else:
+                return f"{self.direction} [{self.bits}:0] {self.name}"
 
     @dataclass
     class _Attribute:
@@ -104,6 +119,44 @@ class CodeGenerator:
             else:
                 return f".{self.dst}()"
 
+    @dataclass
+    class _IfDef:
+        outer: "CodeGenerator"
+        macro: str
+
+        def __enter__(self):
+            self.outer.f.write(f" `ifdef {self.macro}\n")
+            self.outer.indent += self.outer.indentCount
+
+        def __exit__(self, exc_type, exc_value, traceback):
+            self.outer.indent -= self.outer.indentCount
+            self.outer.f.write(" `endif\n")
+
+    @dataclass
+    class _Comment:
+        outer: "CodeGenerator"
+        comment: str
+
+        def __init__(self, outer: "CodeGenerator", comment: str):
+            self.outer.f.write(f"// {self.comment}\n")
+
+    @dataclass
+    class _Assign:
+        outer: "CodeGenerator"
+        dst: str
+        src: str
+
+        def __init__(self, outer: "CodeGenerator", dst: str, src: str):
+            self.outer.f.write(f"assign {dst} = {src};\n")
+
+    @dataclass
+    class _Constant:
+        outer: "CodeGenerator"
+        value: int
+
+        def __init__(self, outer: "CodeGenerator", name: str, value: int):
+            self.outer.f.write(f"localparam {name} = {value};\n")
+
     class _InitModule:
         def __init__(
             self,
@@ -135,7 +188,7 @@ class CodeGenerator:
     class _Module:
         outer: "CodeGenerator"
         name: str
-        parameters: list["CodeGenerator._Parameter"]
+        parameters: list["CodeGenerator._Parameter | None"]
         ports: list["CodeGenerator._Port"]
         attributes: list["CodeGenerator._Attribute"] | None = None
 
@@ -151,7 +204,13 @@ class CodeGenerator:
 
             self.outer.indent += self.outer.indentCount
             self.outer.f.write(
-                ",\n".join([f"{' '* self.outer.indent}{i}" for i in self.parameters])
+                ",\n".join(
+                    [
+                        f"{' '* self.outer.indent}{i}"
+                        for i in self.parameters
+                        if i is not None
+                    ]
+                )
             )
             self.outer.indent -= self.outer.indentCount
             self.outer.f.write("\n) (\n")

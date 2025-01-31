@@ -57,7 +57,7 @@ class FabricGenerator:
     """
 
     fabric: Fabric
-    writer: codeGenerator
+    writer: CodeGenerator
 
     def __init__(self, fabric: Fabric, writer: codeGenerator) -> None:
         self.fabric = fabric

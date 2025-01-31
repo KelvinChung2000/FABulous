@@ -49,11 +49,17 @@ class CodeGenerator:
     def Comment(self, comment: str):
         return self._Comment(self, comment)
 
-    def Assign(self, dst: str, src: str):
+    def Assign(self, dst: str, src: "str | _Concat"):
         return self._Assign(self, dst, src)
 
     def Constant(self, name: str, value: int):
         return self._Constant(self, name, value)
+
+    def Signal(self, name: str, bits: int):
+        return self._signal(self, name, bits)
+
+    def Concat(self, *items):
+        return self._Concat(items)
 
     def InitModule(
         self,
@@ -144,9 +150,11 @@ class CodeGenerator:
     class _Assign:
         outer: "CodeGenerator"
         dst: str
-        src: str
+        src: "str | CodeGenerator._Concat"
 
-        def __init__(self, outer: "CodeGenerator", dst: str, src: str):
+        def __init__(
+            self, outer: "CodeGenerator", dst: str, src: "str | CodeGenerator._Concat"
+        ):
             self.outer.f.write(f"assign {dst} = {src};\n")
 
     @dataclass
@@ -156,6 +164,28 @@ class CodeGenerator:
 
         def __init__(self, outer: "CodeGenerator", name: str, value: int):
             self.outer.f.write(f"localparam {name} = {value};\n")
+
+    @dataclass
+    class _signal:
+        outer: "CodeGenerator"
+        name: str
+        bits: int
+
+        def __init__(self, outer: "CodeGenerator", name: str, bits: int):
+            self.outer.f.write(f"wire [{bits - 1}:0] {name};\n")
+
+    @dataclass
+    class _Concat:
+        item: list[str]
+
+        def __init__(self, *args):
+            if len(args) == 1:
+                self.item = args[0]
+            else:
+                self.item = list(args)
+
+        def __str__(self) -> str:
+            return f"{{{', '.join(self.item)}}}"
 
     class _InitModule:
         def __init__(

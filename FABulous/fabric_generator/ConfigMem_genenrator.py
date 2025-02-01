@@ -48,7 +48,9 @@ def generateConfigMem(self, fabric: Fabric, tile: Tile, configMemCSV: Path, dest
 
     cg = CodeGenerator(dest)
 
-    with cg.Module(f"{tile.name}_ConfigMem",) as module:
+    with cg.Module(
+        f"{tile.name}_ConfigMem",
+    ) as module:
         with module.ParameterRegion() as pr:
             if self.fabric.maxFramesPerCol > 0:
                 pr.Parameter("MaxFramesPerCol", self.fabric.maxFramesPerCol)
@@ -61,44 +63,42 @@ def generateConfigMem(self, fabric: Fabric, tile: Tile, configMemCSV: Path, dest
             pr.Port("ConfigBits", IO.OUTPUT, "NoConfigBits - 1")
             pr.Port("ConfigBits_N", IO.OUTPUT, "NoConfigBits - 1")
 
-
         with module.LogicRegion() as lr:
 
+            with lr.IfDef("EMULATION") as lrIfDef:
+                for i in configMemList:
+                    counter = 0
+                    for k in range(self.fabric.frameBitsPerRow):
+                        if i.usedBitMask[k] == "1":
+                            lrIfDef.Assign(
+                                dst=f"ConfigBits[{i.configBitRanges[counter]}]",
+                                src=f"Emulate_Bitstream[{i.frameIndex*self.fabric.frameBitsPerRow + (self.fabric.frameBitsPerRow-1-k)}]",
+                            )
+                        counter += 1
 
+            lr.Comment("instantiate frame latches")
 
-
-        with cg.IfDef("EMULATION"):
             for i in configMemList:
                 counter = 0
                 for k in range(self.fabric.frameBitsPerRow):
                     if i.usedBitMask[k] == "1":
-                        cg.Assign(
-                            dst=f"ConfigBits[{i.configBitRanges[counter]}]",
-                            src=f"Emulate_Bitstream[{i.frameIndex*self.fabric.frameBitsPerRow + (self.fabric.frameBitsPerRow-1-k)}]",
+                        lr.InitModule(
+                            module="LHQD1",
+                            initName=f"Inst_{i.frameName}_bit{self.fabric.frameBitsPerRow-1-k}",
+                            parameters=[],
+                            ports=[
+                                lr.ConnectPair(
+                                    "D", f"FrameData[{self.fabric.frameBitsPerRow-1-k}]"
+                                ),
+                                lr.ConnectPair("E", f"FrameStrobe[{i.frameIndex}]"),
+                                lr.ConnectPair(
+                                    "Q", f"ConfigBits[{i.configBitRanges[counter]}]"
+                                ),
+                                lr.ConnectPair(
+                                    "QN", f"ConfigBits_N[{i.configBitRanges[counter]}]"
+                                ),
+                            ],
                         )
                         counter += 1
 
-        cg.Comment("instantiate frame latches")
-
-        for i in configMemList:
-            counter = 0
-            for k in range(self.fabric.frameBitsPerRow):
-                if i.usedBitMask[k] == "1":
-                    cg.InitModule(
-                        module="LHQD1",
-                        initName=f"Inst_{i.frameName}_bit{self.fabric.frameBitsPerRow-1-k}",
-                        parameters=[],
-                        ports=[
-                            cg.ConnectPair(
-                                "D", f"FrameData[{self.fabric.frameBitsPerRow-1-k}]"
-                            ),
-                            cg.ConnectPair("E", f"FrameStrobe[{i.frameIndex}]"),
-                            cg.ConnectPair(
-                                "Q", f"ConfigBits[{i.configBitRanges[counter]}]"
-                            ),
-                            cg.ConnectPair(
-                                "QN", f"ConfigBits_N[{i.configBitRanges[counter]}]"
-                            ),
-                        ],
-                    )
-                    counter += 1
+            

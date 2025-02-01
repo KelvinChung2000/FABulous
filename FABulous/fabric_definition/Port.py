@@ -44,9 +44,13 @@ class TilePort(Port):
 
     sideOfTile: Side
     terminal: bool = False
+    spanning: bool = False
 
     __order = {Side.NORTH: 0, Side.EAST: 1, Side.SOUTH: 2, Side.WEST: 3}
     __io = {IO.OUTPUT: 0, IO.INPUT: 1, IO.INOUT: 2}
+
+    def __repr__(self) -> str:
+        return f"({self.sideOfTile}) {self.ioDirection.value} {self.name}[{self.wireCount}]"
 
     def __lt__(self, __o: Any) -> bool:
         if not isinstance(__o, TilePort):
@@ -85,6 +89,11 @@ class TilePort(Port):
 class ConfigPort(Port):
     feature: str = ""
     featureType: FeatureType = FeatureType.INIT
+
+
+@dataclass(frozen=True, eq=True)
+class SharedPort(Port):
+    sharedWith: str = ""
 
 
 # @dataclass(frozen=True, eq=True)

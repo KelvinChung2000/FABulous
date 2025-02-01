@@ -6,7 +6,7 @@
         "dynports": 1,
         "blackbox": 1,
         "cells_not_processed": 1,
-        "src": "myProject/Tile/PE/const_unit.v:1.1-11.10"
+        "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/const_unit.v:1.1-11.10"
       },
       "parameter_default_values": {
         "NoConfigBits": 3
@@ -43,7 +43,7 @@
             "CONFIG_BIT": 1,
             "FABulous": 1,
             "INIT": 1,
-            "src": "myProject/Tile/PE/const_unit.v:8.61-8.71"
+            "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/const_unit.v:8.61-8.71"
           }
         },
         "clk": {
@@ -52,7 +52,7 @@
           "attributes": {
             "FABulous": 1,
             "USER_CLK": 1,
-            "src": "myProject/Tile/PE/const_unit.v:6.41-6.44"
+            "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/const_unit.v:6.41-6.44"
           }
         },
         "const_out": {
@@ -61,21 +61,21 @@
           "attributes": {
             "BUS": 1,
             "FABulous": 1,
-            "src": "myProject/Tile/PE/const_unit.v:7.43-7.52"
+            "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/const_unit.v:7.43-7.52"
           }
         },
         "en": {
           "hide_name": 0,
           "bits": [ 3 ],
           "attributes": {
-            "src": "myProject/Tile/PE/const_unit.v:5.16-5.18"
+            "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/const_unit.v:5.16-5.18"
           }
         },
         "rst": {
           "hide_name": 0,
           "bits": [ 2 ],
           "attributes": {
-            "src": "myProject/Tile/PE/const_unit.v:4.16-4.19"
+            "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/const_unit.v:4.16-4.19"
           }
         }
       }

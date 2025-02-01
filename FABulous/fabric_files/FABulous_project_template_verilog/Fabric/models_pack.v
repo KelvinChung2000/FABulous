@@ -147,6 +147,24 @@ module my_buf (A, X);
     assign X = A;
 endmodule
 
+module my_buf_pack #(
+    parameter WIDTH = 16
+) (
+    input [WIDTH-1:0] A,
+    output [WIDTH-1:0] X
+);
+    genvar i;
+    generate
+        for (i = 0; i < WIDTH; i = i + 1) begin : gen_my_buf
+            my_buf buf_inst (
+                .A(A[i]),
+                .X(X[i])
+            );
+        end
+    endgenerate
+
+endmodule
+
 module cus_mux41 (A0, A1, A2, A3, S0, S0N, S1, S1N, X);
     input A0;
     input A1;

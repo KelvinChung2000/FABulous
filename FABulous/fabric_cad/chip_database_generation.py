@@ -85,23 +85,23 @@ def genBel(bels: list[Bel], tile: TileType, context=1):
             # create the bel itself
             belData = tile.create_bel(f"{c}_{bel.prefix}{bel.name}", bel.name, count)
 
-            for i in bel.externalInput + bel.inputs:
+            for i in bel.externalInputs + bel.inputs:
                 tile.create_wire(f"{c}_{i.name}", f"{bel.name}_{i.name}")
 
-            for i in bel.externalOutput + bel.outputs:
+            for i in bel.externalOutputs + bel.outputs:
                 tile.create_wire(f"{c}_{i.name}", f"{bel.name}_{i.name}")
 
             if bel.userCLK:
                 tile.create_wire(f"{c}_{bel.name}_{bel.userCLK.name}")
 
-            for i in bel.inputs + bel.externalInput:
+            for i in bel.inputs + bel.externalInputs:
                 tile.add_bel_pin(
                     belData,
                     f"{i.name}",
                     f"{c}_{i.name}",
                     PinType.INPUT,
                 )
-            for i in bel.outputs + bel.externalOutput:
+            for i in bel.outputs + bel.externalOutputs:
                 tile.add_bel_pin(
                     belData,
                     f"{i.name}",

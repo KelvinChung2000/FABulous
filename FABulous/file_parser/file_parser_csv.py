@@ -8,13 +8,7 @@ from loguru import logger
 
 from FABulous.fabric_definition.Bel import Bel
 from FABulous.fabric_definition.ConfigMem import ConfigMem
-from FABulous.fabric_definition.define import (
-    IO,
-    ConfigBitMode,
-    Direction,
-    MultiplexerStyle,
-    Side,
-)
+from FABulous.fabric_definition.define import IO, ConfigBitMode, MultiplexerStyle
 from FABulous.fabric_definition.Fabric import Fabric
 from FABulous.fabric_definition.Port import Port
 from FABulous.fabric_definition.SuperTile import SuperTile
@@ -385,60 +379,26 @@ def parsePortLine(line: str) -> tuple[list[Port], tuple[str, str] | None]:
     commonWirePair: tuple[str, str] | None
     temp: list[str] = line.split(",")
     if temp[0] in ["NORTH", "SOUTH", "EAST", "WEST"]:
-        ports.append(
-            Port(
-                Direction[temp[0]],
-                temp[1],
-                int(temp[2]),
-                int(temp[3]),
-                temp[4],
-                int(temp[5]),
-                temp[1],
-                IO.OUTPUT,
-                Side[temp[0]],
-            )
-        )
+        ports.append(Port(temp[1], IO.OUTPUT, int(temp[5]), False))
 
-        ports.append(
-            Port(
-                Direction[temp[0]],
-                temp[1],
-                int(temp[2]),
-                int(temp[3]),
-                temp[4],
-                int(temp[5]),
-                temp[4],
-                IO.INPUT,
-                Side[oppositeDic[temp[0]].upper()],
-            )
-        )
+        ports.append(Port(temp[4], IO.INPUT, int(temp[5]), False))
         commonWirePair = (f"{temp[1]}", f"{temp[4]}")
 
     elif temp[0] == "JUMP":
         ports.append(
             Port(
-                Direction.JUMP,
-                temp[1],
-                int(temp[2]),
-                int(temp[3]),
                 temp[4],
-                int(temp[5]),
-                temp[1],
                 IO.OUTPUT,
-                Side.ANY,
+                int(temp[5]),
+                False,
             )
         )
         ports.append(
             Port(
-                Direction.JUMP,
-                temp[1],
-                int(temp[2]),
-                int(temp[3]),
-                temp[4],
-                int(temp[5]),
                 temp[4],
                 IO.INPUT,
-                Side.ANY,
+                int(temp[5]),
+                False,
             )
         )
         commonWirePair = None
@@ -551,7 +511,6 @@ def parseTiles(fileName: Path) -> tuple[list[Tile], list[tuple[str, str]]]:
                     lineItem = line.split(",")
                     if not lineItem[0]:
                         continue
-
                     port, commonWirePair = parsePortLine(line)
                     ports.extend(port)
                     if commonWirePair:
@@ -567,7 +526,7 @@ def parseTiles(fileName: Path) -> tuple[list[Tile], list[tuple[str, str]]]:
                     ports=ports,
                     bels=bels,
                     tileDir=fileName,
-                    matrixDir=matrixDir,
+                    switchMatrix=matrixDir,
                     userCLK=withUserCLK,
                     configBit=configBit,
                 )

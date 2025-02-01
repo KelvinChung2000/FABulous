@@ -30,6 +30,9 @@ class Region(ABC):
         self.container.append(_o)
         return _o
 
+    def NewLine(self):
+        self.container.append("")
+
     @contextmanager
     def IfDef(self, marco: str):
         from FABulous.fabric_generator.HDL_Construct.IfDef_region import IfDefRegion

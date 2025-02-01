@@ -225,6 +225,15 @@ def parseTileYAML(fileName: Path) -> Tile:
     for wireEntry in data.get("WIRES", {}):
         sourcePort = portsDict[wireEntry["source_name"]]
         destinationPort = portsDict[wireEntry["destination_name"]]
+        x = wireEntry["X-offset"]
+        y = wireEntry["Y-offset"]
+        if x != 0 and y != 0 and x != y:
+            logger.error(
+                f"Invalid wire offset detected: source port '{sourcePort.name}' to destination port '{destinationPort.name}' "
+                f"has an offset of X={x}, Y={y}. The offset must be either only in the X direction, only in the Y direction, "
+                "or both X and Y must be the same for diagonal."
+            )
+            raise ValueError
         wires.append(
             WireType(
                 sourcePort=sourcePort,

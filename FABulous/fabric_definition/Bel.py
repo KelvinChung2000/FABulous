@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from FABulous.fabric_definition.define import IO
-from FABulous.fabric_definition.Port import Port
+from FABulous.fabric_definition.Port import ConfigPort, Port, SharedPort
 
 
 @dataclass
@@ -52,10 +52,10 @@ class Bel:
     name: str
     inputs: list[Port]
     outputs: list[Port]
-    externalInput: list[Port]
-    externalOutput: list[Port]
-    configPort: list[Port]
-    sharedPort: list[Port]
+    externalInputs: list[Port]
+    externalOutputs: list[Port]
+    configPort: list[ConfigPort]
+    sharedPort: list[SharedPort]
     configBit: int
     belFeatureMap: dict[str, int]
     userCLK: Port | None
@@ -66,8 +66,8 @@ class Bel:
         prefix: str,
         internal: list[Port],
         external: list[Port],
-        configPort: list[Port],
-        sharedPort: list[Port],
+        configPort: list[ConfigPort],
+        sharedPort: list[SharedPort],
         configBit: int,
         belFeatureMap: dict[str, int],
         userCLK: Port | None,
@@ -77,8 +77,8 @@ class Bel:
         self.name = src.stem
         self.inputs = [p for p in internal if p.ioDirection == IO.INPUT]
         self.outputs = [p for p in internal if p.ioDirection == IO.OUTPUT]
-        self.externalInput = [p for p in external if p.ioDirection == IO.INPUT]
-        self.externalOutput = [p for p in external if p.ioDirection == IO.OUTPUT]
+        self.externalInputs = [p for p in external if p.ioDirection == IO.INPUT]
+        self.externalOutputs = [p for p in external if p.ioDirection == IO.OUTPUT]
         self.configPort = configPort
         self.sharedPort = sharedPort
         self.configBit = configBit

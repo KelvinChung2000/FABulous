@@ -30,7 +30,9 @@ class PortRegion(Region):
         bits: int | str
 
         def __str__(self) -> str:
-            if isinstance(self.bits, int):
+            if self.bits == 1:
+                return f"{self.direction} {self.name}"
+            elif isinstance(self.bits, int):
                 return f"{self.direction} [{self.bits - 1}:0] {self.name}"
             else:
                 return f"{self.direction} [{self.bits}:0] {self.name}"

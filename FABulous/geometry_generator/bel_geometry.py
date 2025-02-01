@@ -1,8 +1,8 @@
 from csv import writer as csvWriter
 from typing import List
 
-from FABulous.fabric_definition.define import IO
 from FABulous.fabric_definition.Bel import Bel
+from FABulous.fabric_definition.define import IO
 from FABulous.geometry_generator.port_geometry import PortGeometry, PortType
 
 
@@ -69,8 +69,8 @@ class BelGeometry:
         self.src = bel.src
         self.internalInputs = bel.inputs
         self.internalOutputs = bel.outputs
-        self.externalInputs = bel.externalInput
-        self.externalOutputs = bel.externalOutput
+        self.externalInputs = bel.externalInputs
+        self.externalOutputs = bel.externalOutputs
 
         internalPortsAmount = len(self.internalInputs) + len(self.internalOutputs)
         externalPortsAmount = len(self.externalInputs) + len(self.externalOutputs)

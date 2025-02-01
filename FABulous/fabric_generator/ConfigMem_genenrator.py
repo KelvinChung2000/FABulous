@@ -85,7 +85,6 @@ def generateConfigMem(self, fabric: Fabric, tile: Tile, configMemCSV: Path, dest
                         lr.InitModule(
                             module="LHQD1",
                             initName=f"Inst_{i.frameName}_bit{self.fabric.frameBitsPerRow-1-k}",
-                            parameters=[],
                             ports=[
                                 lr.ConnectPair(
                                     "D", f"FrameData[{self.fabric.frameBitsPerRow-1-k}]"
@@ -100,5 +99,3 @@ def generateConfigMem(self, fabric: Fabric, tile: Tile, configMemCSV: Path, dest
                             ],
                         )
                         counter += 1
-
-            

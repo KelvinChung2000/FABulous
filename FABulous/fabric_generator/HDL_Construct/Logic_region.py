@@ -26,14 +26,20 @@ class LogicRegion(Region):
     def ConnectPair(self, dst: str, src: Any | None = None):
         return self._ConnectPair(dst, src)
 
-    def Signal(self, name: str, bits: int = 1):
-        return self._signal(name, bits)
+    def Signal(self, name: str, bits: int | Any = 1):
+        _o = self._signal(name, bits)
+        self.container.append(_o)
+        return _o
 
     def Assign(self, dst: str, src: Any):
-        return self._Assign(dst, src)
+        _o = self._Assign(dst, src)
+        self.container.append(_o)
+        return _o
 
     def Constant(self, name: str, value: int):
-        return self._Constant(name, value)
+        _o = self._Constant(name, value)
+        self.container.append(_o)
+        return _o
 
     def Concat(self, *args):
         return self._Concat(*args)
@@ -42,8 +48,8 @@ class LogicRegion(Region):
         self,
         module: str,
         initName: str,
-        parameters: list["LogicRegion._ConnectPair"],
         ports: list["LogicRegion._ConnectPair"],
+        parameters: list["LogicRegion._ConnectPair"] = [],
     ):
         _o = self._InitModule(
             module, initName, parameters, ports, self.indent, self.indentCount
@@ -72,13 +78,20 @@ class LogicRegion(Region):
         indentCount: int
 
         def __str__(self) -> str:
-            r = (
-                f"{" "*self.indent}{self.module} #(\n"
-                f"{" "*(self.indent+self.indentCount)}{",\n".join([f"{i}" for i in self.parameter])}\n"
-                f"{" "*self.indent}) {self.initName} (\n"
-                f"{" "*(self.indent+self.indentCount)}{",\n".join([f"{i}" for i in self.ports])}\n"
-                f"{" "*self.indent});"
-            )
+            if self.parameter:
+                r = (
+                    f"{" "*self.indent}{self.module} #(\n"
+                    f"{",\n".join([f"{" "*(self.indent+self.indentCount)}{i}" for i in self.parameter])}\n"
+                    f"{" "*self.indent}) {self.initName} (\n"
+                    f"{",\n".join([f"{" "*(self.indent+self.indentCount)}{i}" for i in self.ports])}\n"
+                    f"{" "*self.indent});\n"
+                )
+            else:
+                r = (
+                    f"{" "*self.indent}{self.module} #()(\n"
+                    f"{",\n".join([f"{" "*(self.indent+self.indentCount)}{i}" for i in self.ports])}\n"
+                    f"{" "*self.indent});\n"
+                )
 
             return r
 
@@ -88,7 +101,7 @@ class LogicRegion(Region):
         src: str
 
         def __str__(self) -> str:
-            return f"assign {self.dst} = {self.src}"
+            return f"assign {self.dst} = {self.src};"
 
     @dataclass
     class _signal:
@@ -96,7 +109,12 @@ class LogicRegion(Region):
         bits: int = 1
 
         def __str__(self) -> str:
-            return f"wire [{self.bits - 1}:0] {self.name};"
+            if self.bits == 1:
+                return f"wire {self.name};"
+            elif isinstance(self.bits, int):
+                return f"wire [{self.bits - 1}:0] {self.name};"
+            else:
+                return f"wire [{self.bits}:0] {self.name};"
 
     @dataclass
     class _Constant:

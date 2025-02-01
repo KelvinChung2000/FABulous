@@ -1,6 +1,8 @@
 from dataclasses import dataclass
-from FABulous.fabric_definition.Port import Port, TilePort
 from typing import Any
+
+from FABulous.fabric_definition.Port import Port, TilePort
+
 
 @dataclass(frozen=True, eq=True)
 class WireType:
@@ -8,6 +10,10 @@ class WireType:
     destinationPort: Port | TilePort
     offsetX: int
     offsetY: int
+
+    def __repr__(self) -> str:
+        return f"{self.sourcePort.name}-X{self.offsetX}Y{self.offsetY}>{self.destinationPort.name}"
+
 
 @dataclass(frozen=True, eq=True)
 class Wire:
@@ -40,7 +46,9 @@ class Wire:
     destinationTile: str
 
     def __repr__(self) -> str:
-        return f"{self.source.name}-X{self.xOffset}Y{self.yOffset}>{self.destination.name}"
+        return (
+            f"{self.source.name}-X{self.xOffset}Y{self.yOffset}>{self.destination.name}"
+        )
 
     def __eq__(self, __o: Any) -> bool:
         if __o is None or not isinstance(__o, Wire):

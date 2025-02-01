@@ -105,7 +105,7 @@ class FabricGenerator:
             for b in tile.bels:
                 for p in b.inputs:
                     sourceName.append(f"{p}")
-                for p in b.outputs + b.externalOutput:
+                for p in b.outputs + b.externalOutputs:
                     destName.append(f"{p}")
 
             # jump wire
@@ -818,12 +818,12 @@ class FabricGenerator:
         # now we have to scan all BELs if they use external pins, because they have to be exported to the tile entity
         externalPorts = []
         for i in tile.bels:
-            for p in i.externalInput:
+            for p in i.externalInputs:
                 self.writer.addPortScalar(p, IO.INPUT, indentLevel=2)
-            for p in i.externalOutput:
+            for p in i.externalOutputs:
                 self.writer.addPortScalar(p, IO.OUTPUT, indentLevel=2)
-            externalPorts += i.externalInput
-            externalPorts += i.externalOutput
+            externalPorts += i.externalInputs
+            externalPorts += i.externalOutputs
 
         # if we found BELs with top-level IO ports, we just pass them through
         sharedExternalPorts = set()
@@ -1110,7 +1110,7 @@ class FabricGenerator:
                     port_dict[portname].append((port, number))
 
             # External ports
-            for port in bel.externalInput + bel.externalOutput:
+            for port in bel.externalInputs + bel.externalOutputs:
                 port_name = port.removeprefix(bel.prefix)
                 if r := re.match(r"([a-zA-Z_]+)(\d*)", port_name):
                     portname, number = r.groups()
@@ -1326,9 +1326,9 @@ class FabricGenerator:
         self.writer.addComment("Tile IO ports from BELs", onNewLine=True, indentLevel=1)
         for i in superTile.tiles:
             for b in i.bels:
-                for p in b.externalInput:
+                for p in b.externalInputs:
                     self.writer.addPortScalar(p, IO.OUTPUT, indentLevel=2)
-                for p in b.externalOutput:
+                for p in b.externalOutputs:
                     self.writer.addPortScalar(p, IO.INPUT, indentLevel=2)
                 for p in b.sharedPort:
                     if p[0] == "UserCLK":
@@ -1607,12 +1607,12 @@ class FabricGenerator:
             for x, tile in enumerate(row):
                 if tile != None:
                     for bel in tile.bels:
-                        for i in bel.externalInput:
+                        for i in bel.externalInputs:
                             self.writer.addPortScalar(
                                 f"Tile_X{x}Y{y}_{i}", IO.INPUT, indentLevel=2
                             )
                             self.writer.addComment("EXTERNAL", onNewLine=False)
-                        for i in bel.externalOutput:
+                        for i in bel.externalOutputs:
                             self.writer.addPortScalar(
                                 f"Tile_X{x}Y{y}_{i}", IO.OUTPUT, indentLevel=2
                             )
@@ -1940,10 +1940,10 @@ class FabricGenerator:
                 )
                 for i, j in tileLocationOffset:
                     for b in self.fabric.tile[y + j][x + i].bels:
-                        for p in b.externalInput:
+                        for p in b.externalInputs:
                             portsPairs.append((p, f"Tile_X{x+i}Y{y+j}_{p}"))
 
-                        for p in b.externalOutput:
+                        for p in b.externalOutputs:
                             portsPairs.append((p, f"Tile_X{x+i}Y{y+j}_{p}"))
 
                         for p in b.sharedPort:
@@ -2142,9 +2142,9 @@ class FabricGenerator:
             for x, tile in enumerate(row):
                 if tile != None:
                     for bel in tile.bels:
-                        for i in bel.externalInput:
+                        for i in bel.externalInputs:
                             externalPorts.append((IO.INPUT, f"Tile_X{x}Y{y}_{i}"))
-                        for i in bel.externalOutput:
+                        for i in bel.externalOutputs:
                             externalPorts.append((IO.OUTPUT, f"Tile_X{x}Y{y}_{i}"))
         for iodir, name in externalPorts:
             yx, indices, port = split_port(name)

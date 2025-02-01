@@ -1,8 +1,7 @@
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
-from FABulous.fabric_definition import Port
 from FABulous.fabric_definition.Bel import Bel
 from FABulous.fabric_definition.define import IO, Side
 from FABulous.fabric_definition.Mux import Mux
@@ -36,7 +35,7 @@ class Tile:
     ports: list[TilePort]
     bels: list[Bel]
     wireTypes: list[WireType]
-    switchMatrix: list[Mux] | Path
+    switchMatrix: list[Mux]
     globalConfigBits: int = 0
     withUserCLK: bool = False
     tileDir: Path = Path(".")
@@ -141,8 +140,34 @@ class Tile:
 
     def getCascadeWireCount(self, port: TilePort) -> int:
         for i in self.wireTypes:
-            if i.sourcePort.name == port.name or i.destinationPort == port.name:
+            if i.sourcePort.name == port.name or i.destinationPort.name == port.name:
                 return port.wireCount * (abs(i.offsetX) + abs(i.offsetY))
+        else:
+            raise ValueError(
+                f"The given port {port} does not exist in tile {self.name}"
+            )
+
+    def getEndPointPort(self, port: TilePort) -> TilePort:
+        if port.ioDirection == IO.OUTPUT:
+            raise ValueError(
+                "The given port is an output port. Please provide an input port."
+            )
+        for i in self.wireTypes:
+            if i.sourcePort.name == port.name:
+                return cast(TilePort, i.destinationPort)
+        else:
+            raise ValueError(
+                f"The given port {port} does not exist in tile {self.name}"
+            )
+
+    def getStartPointPort(self, port: TilePort) -> TilePort:
+        if port.ioDirection == IO.INPUT:
+            raise ValueError(
+                "The given port is an input port. Please provide an output port."
+            )
+        for i in self.wireTypes:
+            if i.destinationPort.name == port.name:
+                return cast(TilePort, i.sourcePort)
         else:
             raise ValueError(
                 f"The given port {port} does not exist in tile {self.name}"

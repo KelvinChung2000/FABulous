@@ -111,7 +111,6 @@ def generateTileSwitchMatrix(fabric: Fabric, tile: Tile, dest: Path):
                         lr.InitModule(
                             muxComponentName,
                             f"inst_{muxComponentName}_{mux.output}",
-                            [],
                             connection,
                         )
                         if (inputCount & inputCount - 1) != 0:

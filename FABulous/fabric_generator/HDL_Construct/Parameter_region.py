@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 
 from FABulous.fabric_generator.HDL_Construct.Region import Region
+from FABulous.fabric_generator.HDL_Construct.Value import Value
 
 
 @dataclass
@@ -26,12 +27,12 @@ class ParameterRegion(Region):
     @dataclass
     class _Parameter:
         name: str
-        value: str | int
+        value: Value | int
 
         def __str__(self) -> str:
             return f"parameter {self.name} = {self.value}"
 
-    def Parameter(self, name: str, value: str | int):
+    def Parameter(self, name: str, value: Value | int):
         _o = self._Parameter(name, value)
         self.container.append(_o)
-        return _o
+        return Value(name, 1, isSignal=False)

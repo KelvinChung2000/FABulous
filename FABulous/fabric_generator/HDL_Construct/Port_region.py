@@ -2,6 +2,7 @@ from dataclasses import dataclass
 
 from FABulous.fabric_definition.define import IO
 from FABulous.fabric_generator.HDL_Construct.Region import Region
+from FABulous.fabric_generator.HDL_Construct.Value import Value
 
 
 class PortRegion(Region):
@@ -27,7 +28,7 @@ class PortRegion(Region):
     class _Port:
         name: str
         direction: IO
-        bits: int | str
+        bits: int | Value
 
         def __str__(self) -> str:
             if self.bits == 1:
@@ -37,7 +38,7 @@ class PortRegion(Region):
             else:
                 return f"{self.direction} [{self.bits}:0] {self.name}"
 
-    def Port(self, name: str, direction: IO, bits: int | str = 1):
+    def Port(self, name: str, direction: IO, bits: int | Value = 1):
         _o = self._Port(name, direction, bits)
         self.container.append(_o)
-        return _o
+        return Value(name, bits)

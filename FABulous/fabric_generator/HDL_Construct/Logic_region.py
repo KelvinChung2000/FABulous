@@ -1,7 +1,7 @@
 from dataclasses import dataclass
-from typing import Any
 
 from FABulous.fabric_generator.HDL_Construct.Region import Region
+from FABulous.fabric_generator.HDL_Construct.Value import Value
 
 
 class LogicRegion(Region):
@@ -23,15 +23,15 @@ class LogicRegion(Region):
     def indent(self):
         return self._indent
 
-    def ConnectPair(self, dst: str, src: Any | None = None):
+    def ConnectPair(self, dst: str, src: Value | int):
         return self._ConnectPair(dst, src)
 
-    def Signal(self, name: str, bits: int | Any = 1):
+    def Signal(self, name: str, bits: int | Value = 1):
         _o = self._signal(name, bits)
         self.container.append(_o)
-        return _o
+        return Value(name, bits)
 
-    def Assign(self, dst: str, src: Any):
+    def Assign(self, dst: Value, src: Value):
         _o = self._Assign(dst, src)
         self.container.append(_o)
         return _o
@@ -60,7 +60,7 @@ class LogicRegion(Region):
     @dataclass
     class _ConnectPair:
         dst: str
-        src: str | None = None
+        src: Value | int
 
         def __str__(self) -> str:
             if self.src:
@@ -97,8 +97,8 @@ class LogicRegion(Region):
 
     @dataclass
     class _Assign:
-        dst: str
-        src: str
+        dst: Value
+        src: Value
 
         def __str__(self) -> str:
             return f"assign {self.dst} = {self.src};"
@@ -106,7 +106,7 @@ class LogicRegion(Region):
     @dataclass
     class _signal:
         name: str
-        bits: int = 1
+        bits: Value | int = 1
 
         def __str__(self) -> str:
             if self.bits == 1:

@@ -8,7 +8,7 @@ from loguru import logger
 
 from FABulous.fabric_definition.Bel import Bel
 from FABulous.fabric_definition.define import IO, FABulousPortType, FeatureType
-from FABulous.fabric_definition.Port import ConfigPort, Port
+from FABulous.fabric_definition.Port import ConfigPort, Port, SharedPort
 
 
 def verilog_belMapProcessing(module_info):
@@ -243,8 +243,8 @@ def parseBelFile(
         No permission to access the file
     """
     externalPort: list[Port] = []
-    configPort: list[Port] = []
-    sharedPort: list[Port] = []
+    configPort: list[ConfigPort] = []
+    sharedPort: list[SharedPort] = []
     internalPort: list[Port] = []
     belMapDict: dict[str, int] = {}
     userClk: Port | None = None
@@ -315,7 +315,7 @@ def parseBelFile(
             continue
 
         port = Port(
-            name=f"{belPrefix}{net}",
+            name=f"{net}",
             ioDirection=ports[net],
             wireCount=netBitWidth,
             isBus=FABulousPortType.BUS in attributes,
@@ -350,7 +350,15 @@ def parseBelFile(
         elif FABulousPortType.USER_CLK in attributes:
             userClk = port
         elif FABulousPortType.SHARED in attributes:
-            sharedPort.append(port)
+            sharedPort.append(
+                SharedPort(
+                    name=f"{belPrefix}{net}",
+                    ioDirection=ports[net],
+                    wireCount=netBitWidth,
+                    isBus=FABulousPortType.BUS in attributes,
+                    sharedWith=details.get("attributes", {}).get("SHARED_WITH", ""),
+                )
+            )
 
         else:
             internalPort.append(port)

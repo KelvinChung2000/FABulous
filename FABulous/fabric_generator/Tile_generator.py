@@ -1,9 +1,11 @@
 from pathlib import Path
+from typing import Mapping
 
 from FABulous.fabric_definition.define import IO, ConfigBitMode
 from FABulous.fabric_definition.Fabric import Fabric
 from FABulous.fabric_definition.Tile import Tile
 from FABulous.fabric_generator.code_generator_2 import CodeGenerator
+from FABulous.fabric_generator.HDL_Construct.Value import Value
 
 
 def generateTile(fabric: Fabric, tile: Tile, dest: Path):
@@ -11,14 +13,14 @@ def generateTile(fabric: Fabric, tile: Tile, dest: Path):
 
     with cg.Module(tile.name) as module:
         with module.ParameterRegion() as pr:
-            pr.Parameter(
+            maxFramePerCol = pr.Parameter(
                 "MaxFramesPerCol",
                 fabric.maxFramesPerCol,
             )
-            pr.Parameter("FrameBitsPerRow", fabric.frameBitsPerRow)
+            frameBitsPerRow = pr.Parameter("FrameBitsPerRow", fabric.frameBitsPerRow)
 
             if tile.globalConfigBits > 0:
-                pr.Parameter("NoConfigBits", tile.globalConfigBits)
+                NoConfigBitsParam = pr.Parameter("NoConfigBits", tile.globalConfigBits)
 
         with module.PortRegion() as pr:
             for p in tile.getTileOutputPorts():
@@ -32,15 +34,17 @@ def generateTile(fabric: Fabric, tile: Tile, dest: Path):
                 for p in bel.externalOutputs:
                     pr.Port(p.name, p.ioDirection, p.wireCount)
 
-            pr.Port("UserCLK", IO.INPUT)
-            pr.Port("UserCLKo", IO.OUTPUT)
+            userClkIn = pr.Port("UserCLK", IO.INPUT)
+            userClkOut = pr.Port("UserCLKo", IO.OUTPUT)
 
             if fabric.configBitMode == ConfigBitMode.FRAME_BASED:
                 if tile.globalConfigBits > 0:
-                    pr.Port("FrameData", IO.INPUT, "FrameBitsPerRow - 1")
-                    pr.Port("FrameData_O", IO.OUTPUT, "FrameBitsPerRow - 1")
-                pr.Port("FrameStrobe", IO.INPUT, "MaxFramePerCol - 1")
-                pr.Port("FrameStrobe_O", IO.OUTPUT, "MaxFramePerCol - 1")
+                    frameData = pr.Port("FrameData", IO.INPUT, frameBitsPerRow - 1)
+                    frameDataOut = pr.Port(
+                        "FrameData_O", IO.OUTPUT, frameBitsPerRow - 1
+                    )
+                frameStrobe = pr.Port("FrameStrobe", IO.INPUT, maxFramePerCol - 1)
+                frameStrobeOut = pr.Port("FrameStrobe_O", IO.OUTPUT, maxFramePerCol - 1)
 
             else:
                 pr.Port("MODE", IO.INPUT)
@@ -63,73 +67,73 @@ def generateTile(fabric: Fabric, tile: Tile, dest: Path):
                         )
                     lr.Signal(sig)
                     repeatSet.add(sig)
-            sharePortSet = set()
+
+            sharePortDict: Mapping[str, Value] = {}
             for bel in tile.bels:
                 for port in bel.sharedPort:
-                    sharePortSet.add(f"{port.name}_{port.sharedWith}")
-
-            for port in sharePortSet:
-                lr.Signal(port)
+                    sharePortDict[port.sharedWith] = lr.Signal(port.name)
 
             if tile.globalConfigBits > 0:
                 lr.Comment("ConfigBits Wires")
-                lr.Signal("ConfigBits", "NoConfigBits - 1")
-                lr.Signal("ConfigBits_N", "NoConfigBits - 1")
+                configBitsSignal = lr.Signal("ConfigBits", NoConfigBitsParam - 1)
+                configBitsNSignal = lr.Signal("ConfigBits_N", NoConfigBitsParam - 1)
 
             lr.Comment("Buffering incoming and out outgoing wires")
             if tile.globalConfigBits > 0:
-                lr.Signal("FrameData_O_i", "FrameBitsPerRow-1")
-                lr.Signal("FrameData_i", "FrameBitsPerRow-1")
+                inputFrameDataBufferOut = lr.Signal("FrameData_i", frameBitsPerRow - 1)
+                outputFrameDataBufferIn = lr.Signal(
+                    "FrameData_O_i", frameBitsPerRow - 1
+                )
                 lr.Comment("FrameData Buffer")
                 lr.InitModule(
                     "my_buf_pack",
                     "data_inbuf",
                     [
-                        lr.ConnectPair("A", "FrameData"),
-                        lr.ConnectPair("X", "FrameData_i"),
+                        lr.ConnectPair("A", frameData),
+                        lr.ConnectPair("X", inputFrameDataBufferOut),
                     ],
                     [
-                        lr.ConnectPair("WIDTH", "FrameBitsPerRow"),
+                        lr.ConnectPair("WIDTH", frameBitsPerRow),
                     ],
                 )
-                lr.Assign("FrameData_O_i", "FrameData_i")
+                lr.Assign(outputFrameDataBufferIn, inputFrameDataBufferOut)
                 lr.InitModule(
                     "my_buf_pack",
                     "data_outbuf",
                     [
-                        lr.ConnectPair("A", "FrameData_O_i"),
-                        lr.ConnectPair("X", "FrameData_O"),
+                        lr.ConnectPair("A", outputFrameDataBufferIn),
+                        lr.ConnectPair("X", frameDataOut),
                     ],
                     [
-                        lr.ConnectPair("WIDTH", "FrameBitsPerRow"),
+                        lr.ConnectPair("WIDTH", frameBitsPerRow),
                     ],
                 )
 
             lr.Comment("FrameStrobe Buffer")
-            lr.Signal("FrameStrobe_i", "MaxFramesPerCol-1")
-            lr.Signal("FrameStrobe_O_i", "MaxFramesPerCol-1")
+            inputFrameStrobeBufferOut = lr.Signal("FrameStrobe_i", maxFramePerCol - 1)
+            outputFrameStrobeBufferIn = lr.Signal("FrameStrobe_O_i", maxFramePerCol - 1)
             lr.InitModule(
                 "my_buf_pack",
                 "strobe_inbuf",
                 [
-                    lr.ConnectPair("A", "FrameStrobe"),
-                    lr.ConnectPair("X", "FrameStrobe_i"),
+                    lr.ConnectPair("A", frameStrobe),
+                    lr.ConnectPair("X", inputFrameStrobeBufferOut),
                 ],
                 [
-                    lr.ConnectPair("WIDTH", "MaxFramesPerCol"),
+                    lr.ConnectPair("WIDTH", maxFramePerCol),
                 ],
             )
 
-            lr.Assign("FrameStrobe_O_i", "FrameStrobe_i")
+            lr.Assign(outputFrameStrobeBufferIn, inputFrameStrobeBufferOut)
             lr.InitModule(
                 "my_buf_pack",
                 "strobe_outbuf",
                 [
-                    lr.ConnectPair("A", "FrameStrobe_O_i"),
-                    lr.ConnectPair("X", "FrameStrobe_O"),
+                    lr.ConnectPair("A", outputFrameStrobeBufferIn),
+                    lr.ConnectPair("X", frameStrobeOut),
                 ],
                 [
-                    lr.ConnectPair("WIDTH", "MaxFramesPerCol"),
+                    lr.ConnectPair("WIDTH", maxFramePerCol),
                 ],
             )
 
@@ -137,8 +141,8 @@ def generateTile(fabric: Fabric, tile: Tile, dest: Path):
                 "clk_buf",
                 "inst_clk_buf",
                 [
-                    lr.ConnectPair("A", "UserCLK"),
-                    lr.ConnectPair("X", "UserCLKo"),
+                    lr.ConnectPair("A", userClkIn),
+                    lr.ConnectPair("X", userClkOut),
                 ],
             )
 
@@ -146,10 +150,10 @@ def generateTile(fabric: Fabric, tile: Tile, dest: Path):
                 if not inPort.spanning:
                     continue
                 c = tile.getCascadeWireCount(inPort)
-                lr.Signal(f"{inPort.name}_i", c - inPort.wireCount)
+                inPortSignal = lr.Signal(f"{inPort.name}_i", c - inPort.wireCount)
                 lr.Assign(
-                    f"{inPort.name}_i[{c}-1:{inPort.wireCount}]",
-                    f"{inPort.name}[{inPort.wireCount-1}:0]",
+                    inPortSignal[c - 1 : inPort.wireCount],
+                    inPortSignal[inPort.wireCount : 0],
                 )
                 lr.InitModule(
                     "my_buf_pack",
@@ -157,24 +161,24 @@ def generateTile(fabric: Fabric, tile: Tile, dest: Path):
                     [
                         lr.ConnectPair(
                             "A",
-                            f"{inPort.name}[{inPort.wireCount-1}:{inPort.wireCount-1}]",
+                            inPortSignal[c : inPort.wireCount],
                         ),
-                        lr.ConnectPair("X", f"{inPort.name}_i"),
+                        lr.ConnectPair("X", inPortSignal),
                     ],
                     [lr.ConnectPair("WIDTH", c - inPort.wireCount)],
                 )
                 outPort = tile.getEndPointPort(inPort)
-                lr.Signal(f"{outPort.name}_i", c - outPort.wireCount)
+                outPortSignal = lr.Signal(f"{outPort.name}_i", c - outPort.wireCount)
                 lr.Assign(
-                    f"{outPort.name}_i[{c}-1:{outPort.wireCount}]",
-                    f"{inPort.name}_i[{c}-1:{inPort.wireCount}]",
+                    outPortSignal[c - 1 : outPort.wireCount],
+                    inPortSignal[c - 1 : inPort.wireCount],
                 )
                 lr.InitModule(
                     "my_buf_pack",
                     f"{outPort.name}_outbuf",
                     [
-                        lr.ConnectPair("A", f"{outPort.name}_i"),
-                        lr.ConnectPair("X", f"{outPort.name}"),
+                        lr.ConnectPair("A", outPortSignal),
+                        lr.ConnectPair("X", "outPortSignal"),
                     ],
                     [lr.ConnectPair("WIDTH", c - inPort.wireCount)],
                 )
@@ -196,10 +200,10 @@ def generateTile(fabric: Fabric, tile: Tile, dest: Path):
                     f"{tile.name}_ConfigMem",
                     f"Inst_{tile.name}_ConfigMem",
                     [
-                        lr.ConnectPair("FrameData", "FrameData"),
-                        lr.ConnectPair("FrameStrobe", "FrameStrobe"),
-                        lr.ConnectPair("ConfigBits", "ConfigBits"),
-                        lr.ConnectPair("ConfigBits_N", "ConfigBits_N"),
+                        lr.ConnectPair("FrameData", frameData),
+                        lr.ConnectPair("FrameStrobe", frameStrobe),
+                        lr.ConnectPair("ConfigBits", configBitsSignal),
+                        lr.ConnectPair("ConfigBits_N", configBitsNSignal),
                     ],
                 )
 
@@ -220,14 +224,14 @@ def generateTile(fabric: Fabric, tile: Tile, dest: Path):
 
                 # user clock
                 if bel.userCLK:
-                    connectPairs.append(lr.ConnectPair(bel.userCLK.name, "UserCLK"))
+                    connectPairs.append(lr.ConnectPair(bel.userCLK.name, userClkIn))
 
                 # shared ports
                 for port in bel.sharedPort:
                     connectPairs.append(
                         lr.ConnectPair(
                             port.name,
-                            f"{port.name}_{port.sharedWith}",
+                            sharePortDict[port.sharedWith],
                         )
                     )
 
@@ -236,7 +240,11 @@ def generateTile(fabric: Fabric, tile: Tile, dest: Path):
                     connectPairs.append(
                         lr.ConnectPair(
                             port.name,
-                            f"ConfigBits[{belConfigBitCounter+port.wireCount}-1:{belConfigBitCounter}]",
+                            configBitsSignal[
+                                belConfigBitCounter
+                                + port.wireCount
+                                - 1 : belConfigBitCounter
+                            ],
                         )
                     )
                     belConfigBitCounter += port.wireCount

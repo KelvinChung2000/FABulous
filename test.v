@@ -13,10 +13,10 @@ module PE #(
     input [31:0] in3,
     input UserCLK,
     output UserCLKo,
-    input [FrameBitsPerRow - 1:0] FrameData,
-    output [FrameBitsPerRow - 1:0] FrameData_O,
-    input [MaxFramePerCol - 1:0] FrameStrobe,
-    output [MaxFramePerCol - 1:0] FrameStrobe_O
+    input FrameData,
+    output FrameData_O,
+    input FrameStrobe,
+    output FrameStrobe_O
 );
 // Signal Creation
 wire data_in1;
@@ -24,22 +24,22 @@ wire data_in2;
 wire data_in3;
 wire data_out;
 wire const_out;
-wire RES_RES_reg_in;
-wire RES_RES_reg_out;
-wire N_N_reg_in;
-wire N_N_reg_out;
-wire E_E_reg_in;
-wire E_E_reg_out;
-wire S_S_reg_in;
-wire S_S_reg_out;
-wire W_W_reg_in;
-wire W_W_reg_out;
+wire RES_reg_in;
+wire RES_reg_out;
+wire N_reg_in;
+wire N_reg_out;
+wire E_reg_in;
+wire E_reg_out;
+wire S_reg_in;
+wire S_reg_out;
+wire W_reg_in;
+wire W_reg_out;
 // ConfigBits Wires
-wire [NoConfigBits - 1:0] ConfigBits;
-wire [NoConfigBits - 1:0] ConfigBits_N;
+wire ConfigBits;
+wire ConfigBits_N;
 // Buffering incoming and out outgoing wires
-wire [FrameBitsPerRow-1:0] FrameData_O_i;
-wire [FrameBitsPerRow-1:0] FrameData_i;
+wire FrameData_i;
+wire FrameData_O_i;
 // FrameData Buffer
 my_buf_pack #(
     .WIDTH(FrameBitsPerRow)
@@ -57,8 +57,8 @@ my_buf_pack #(
 );
 
 // FrameStrobe Buffer
-wire [MaxFramesPerCol-1:0] FrameStrobe_i;
-wire [MaxFramesPerCol-1:0] FrameStrobe_O_i;
+wire FrameStrobe_i;
+wire FrameStrobe_O_i;
 my_buf_pack #(
     .WIDTH(MaxFramesPerCol)
 ) strobe_inbuf (
@@ -102,32 +102,32 @@ const_unit #()(
 
 // Instantiate BEL reg_unit
 reg_unit #()(
-    .RES_reg_in(RES_RES_reg_in),
-    .RES_reg_out(RES_RES_reg_out)
+    .reg_in(RES_reg_in),
+    .reg_out(RES_reg_out)
 );
 
 // Instantiate BEL reg_unit
 reg_unit #()(
-    .N_reg_in(N_N_reg_in),
-    .N_reg_out(N_N_reg_out)
+    .reg_in(N_reg_in),
+    .reg_out(N_reg_out)
 );
 
 // Instantiate BEL reg_unit
 reg_unit #()(
-    .E_reg_in(E_E_reg_in),
-    .E_reg_out(E_E_reg_out)
+    .reg_in(E_reg_in),
+    .reg_out(E_reg_out)
 );
 
 // Instantiate BEL reg_unit
 reg_unit #()(
-    .S_reg_in(S_S_reg_in),
-    .S_reg_out(S_S_reg_out)
+    .reg_in(S_reg_in),
+    .reg_out(S_reg_out)
 );
 
 // Instantiate BEL reg_unit
 reg_unit #()(
-    .W_reg_in(W_W_reg_in),
-    .W_reg_out(W_W_reg_out)
+    .reg_in(W_reg_in),
+    .reg_out(W_reg_out)
 );
 
 // Init Switch Matrix

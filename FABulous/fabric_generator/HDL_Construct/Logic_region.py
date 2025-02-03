@@ -39,7 +39,7 @@ class LogicRegion(Region):
     def Constant(self, name: str, value: int):
         _o = self._Constant(name, value)
         self.container.append(_o)
-        return _o
+        return Value(name, value)
 
     def Concat(self, *args):
         return self._Concat(*args)
@@ -51,9 +51,7 @@ class LogicRegion(Region):
         ports: list["LogicRegion._ConnectPair"],
         parameters: list["LogicRegion._ConnectPair"] = [],
     ):
-        _o = self._InitModule(
-            module, initName, parameters, ports, self.indent, self.indentCount
-        )
+        _o = self._InitModule(module, initName, parameters, ports, self.indent, self.indentCount)
         self.container.append(_o)
         return _o
 
@@ -80,17 +78,17 @@ class LogicRegion(Region):
         def __str__(self) -> str:
             if self.parameter:
                 r = (
-                    f"{" "*self.indent}{self.module} #(\n"
-                    f"{",\n".join([f"{" "*(self.indent+self.indentCount)}{i}" for i in self.parameter])}\n"
-                    f"{" "*self.indent}) {self.initName} (\n"
-                    f"{",\n".join([f"{" "*(self.indent+self.indentCount)}{i}" for i in self.ports])}\n"
-                    f"{" "*self.indent});\n"
+                    f"{' ' * self.indent}{self.module} #(\n"
+                    f"{',\n'.join([f'{" " * (self.indent + self.indentCount)}{i}' for i in self.parameter])}\n"
+                    f"{' ' * self.indent}) {self.initName} (\n"
+                    f"{',\n'.join([f'{" " * (self.indent + self.indentCount)}{i}' for i in self.ports])}\n"
+                    f"{' ' * self.indent});\n"
                 )
             else:
                 r = (
-                    f"{" "*self.indent}{self.module} #()(\n"
-                    f"{",\n".join([f"{" "*(self.indent+self.indentCount)}{i}" for i in self.ports])}\n"
-                    f"{" "*self.indent});\n"
+                    f"{' ' * self.indent}{self.module} #() {self.initName} (\n"
+                    f"{',\n'.join([f'{" " * (self.indent + self.indentCount)}{i}' for i in self.ports])}\n"
+                    f"{' ' * self.indent});\n"
                 )
 
             return r
@@ -122,10 +120,10 @@ class LogicRegion(Region):
         value: int
 
         def __str__(self) -> str:
-            return f"localparam {self.name} = {self.value};"
+            return f"localparam reg {self.name} = {self.value};"
 
     @dataclass
-    class _Concat:
+    class _Concat(Value):
         item: list[str]
 
         def __init__(self, *args):
@@ -136,3 +134,7 @@ class LogicRegion(Region):
 
         def __str__(self) -> str:
             return f"{{{', '.join(self.item)}}}"
+
+        @property
+        def value(self) -> str:
+            return self.__str__()

@@ -4,6 +4,7 @@ from loguru import logger
 
 from FABulous.fabric_definition.define import IO, ConfigBitMode, MultiplexerStyle
 from FABulous.fabric_definition.Fabric import Fabric
+from FABulous.fabric_definition.SwitchMatrix import SwitchMatrix
 from FABulous.fabric_definition.Tile import Tile
 from FABulous.fabric_generator.code_generator_2 import CodeGenerator
 from FABulous.file_parser.file_parser_yaml import parseMatrixAsMux
@@ -11,23 +12,22 @@ from FABulous.file_parser.file_parser_yaml import parseMatrixAsMux
 
 def generateTileSwitchMatrix(fabric: Fabric, tile: Tile, dest: Path):
     if isinstance(tile.switchMatrix, Path):
-        tile.switchMatrix = list(
-            parseMatrixAsMux(tile.switchMatrix, tile.name).values()
-        )
+        tile.switchMatrix = list(parseMatrixAsMux(tile.switchMatrix, tile.name).values())
 
+    sm = SwitchMatrix(tile.switchMatrix)
     cg = CodeGenerator(dest)
 
     with cg.Module(f"{tile.name}_switch_matrix") as module:
         with module.ParameterRegion() as pr:
-            pr.Parameter("NoConfigBits", sum([i.configBit for i in tile.switchMatrix]))
+            noConfigBitsParam = pr.Parameter("NoConfigBits", sum([i.configBit for i in tile.switchMatrix]))
 
         noConfigBits = sum([i.configBit for i in tile.switchMatrix])
 
         with module.PortRegion() as pr:
-            for mux in tile.switchMatrix:
-                pr.Port(mux.output, IO.OUTPUT, mux.width)
-                for i in mux.inputs:
-                    pr.Port(i, IO.INPUT, mux.width)
+            for output in sm.getOutputs():
+                pr.Port(output, IO.OUTPUT, mux.width)
+            for i in mux.inputs:
+                pr.Port(i, IO.INPUT, mux.width)
 
             if noConfigBits > 0:
                 if fabric.configBitMode == ConfigBitMode.FLIPFLOP_CHAIN:
@@ -36,11 +36,11 @@ def generateTileSwitchMatrix(fabric: Fabric, tile: Tile, dest: Path):
                     pr.Port("CONFout", IO.OUTPUT)
                     pr.Port("CLK", IO.INPUT)
                 else:
-                    pr.Port("ConfigBits", IO.INPUT, "NoConfigBits-1")
-                    pr.Port("ConfigBits_N", IO.INPUT, "NoConfigBits-1")
+                    configBitsPort = pr.Port("ConfigBits", IO.INPUT, noConfigBitsParam - 1)
+                    configBitsNPort = pr.Port("ConfigBits_N", IO.INPUT, noConfigBitsParam - 1)
 
         with module.LogicRegion() as lr:
-            lr.Constant("GND0", 0)
+            gnd = lr.Constant("GND0", 0)
             lr.Constant("GND", 0)
             lr.Constant("VCC0", 1)
             lr.Constant("VCC", 1)
@@ -74,36 +74,23 @@ def generateTileSwitchMatrix(fabric: Fabric, tile: Tile, dest: Path):
                         connection = []
                         start = 0
                         for start in range(inputCount):
-                            connection.append(
-                                lr.ConnectPair(
-                                    f"A{start}", f"{mux.output}_input[{start}]"
-                                )
-                            )
+                            connection.append(lr.ConnectPair(f"A{start}", f"{mux.output}_input[{start}]"))
                         for end in range(start + 1, paddedMuxSize):
-                            connection.append(lr.ConnectPair(f"A{end}", "GND0"))
+                            connection.append(lr.ConnectPair(f"A{end}", gnd))
 
                         if paddedMuxSize == 2:
-                            connection.append(
-                                lr.ConnectPair(
-                                    "S", f"ConfigBits[{configBitstreamPosition}+0]"
-                                )
-                            )
+                            connection.append(lr.ConnectPair("S", configBitsPort[configBitstreamPosition]))
                         else:
                             for i in range(paddedMuxSize.bit_length() - 1):
-                                connection.append(
-                                    lr.ConnectPair(
-                                        f"S{i}",
-                                        f"ConfigBits[{configBitstreamPosition}+{i}]",
-                                    )
-                                )
+                                connection.append(lr.ConnectPair(f"S{i}", configBitsPort[configBitstreamPosition + i]))
                                 connection.append(
                                     lr.ConnectPair(
                                         f"S{i}N",
-                                        f"ConfigBits_N[{configBitstreamPosition}+{i}]",
+                                        configBitsNPort[configBitstreamPosition + i],
                                     )
                                 )
 
-                        connection.append(("X", f"{mux.output}"))
+                        connection.append(lr.ConnectPair("X", f"{mux.output}"))
                         # we add the input signal in reversed order
                         # Changed it such that the left-most entry is located at the end of the concatenated vector for the multiplexing
                         # This was done such that the index from left-to-right in the adjacency matrix corresponds with the multiplexer select input (index)
@@ -121,7 +108,7 @@ def generateTileSwitchMatrix(fabric: Fabric, tile: Tile, dest: Path):
                         # generic multiplexer
                         lr.Assign(
                             mux.output,
-                            f"{mux.output}_input[ConfigBits[{configBitstreamPosition-1}:{configBitstreamPosition}]]",
+                            f"{mux.output}_input[ConfigBits[{configBitstreamPosition - 1}:{configBitstreamPosition}]]",
                         )
 
-                    configBitstreamPosition += inputCount.bit_length() - 1
+                    configBitstreamPosition += paddedMuxSize.bit_length() - 1

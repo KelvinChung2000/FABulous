@@ -1,4 +1,4 @@
-from collections import namedtuple
+from collections import Counter, namedtuple
 from pathlib import Path
 
 from lark import Lark, Transformer, v_args
@@ -31,7 +31,6 @@ Iter = namedtuple("Iter", ["start", "end", "step"])
 
 
 class MuxTransformer(Transformer):
-
     @v_args(inline=True)
     def start(self, *items) -> list[Mux]:
         muxes = []
@@ -40,7 +39,8 @@ class MuxTransformer(Transformer):
                 muxes.extend(item)
             else:
                 muxes.append(item)
-        return [muxes for muxes in muxes if isinstance(muxes, Mux)]
+
+        return mergeMux([muxes for muxes in muxes if isinstance(muxes, Mux)])
 
     @v_args(inline=True)
     def mux(self, dest, *source) -> list[Mux]:
@@ -57,10 +57,7 @@ class MuxTransformer(Transformer):
         elif isinstance(modifier, Slice):
             return [f"{value}[{i}]" for i in range(modifier.end, modifier.start)]
         elif isinstance(modifier, Iter):
-            return [
-                f"{value}{i}"
-                for i in range(modifier.start, modifier.end + 1, modifier.step)
-            ]
+            return [f"{value}{i}" for i in range(modifier.start, modifier.end + 1, modifier.step)]
         else:
             raise ValueError(f"Unknown modifier {modifier}")
 
@@ -84,6 +81,21 @@ def parseMux(fileName: Path) -> list[Mux]:
 
     with open(fileName, "r") as f:
         return parser.parse(f.read())
+
+
+def mergeMux(muxList: list[Mux]) -> list[Mux]:
+    outputDict: dict[str, Mux] = {}
+
+    for mux in muxList:
+        if mux.output in outputDict:
+            outputDict[mux.output].inputs.extend(mux.inputs)
+            c = Counter(outputDict[mux.output].inputs)
+            outputDict[mux.output].inputs = list(c.keys())
+            outputDict[mux.output]._update()
+        else:
+            outputDict[mux.output] = mux
+
+    return list(outputDict.values())
 
 
 if __name__ == "__main__":

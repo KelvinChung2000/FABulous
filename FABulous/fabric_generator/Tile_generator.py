@@ -1,6 +1,7 @@
 from pathlib import Path
 from typing import Mapping
 
+from FABulous.fabric_definition.Bel import Bel
 from FABulous.fabric_definition.define import IO, ConfigBitMode
 from FABulous.fabric_definition.Fabric import Fabric
 from FABulous.fabric_definition.Tile import Tile
@@ -40,9 +41,7 @@ def generateTile(fabric: Fabric, tile: Tile, dest: Path):
             if fabric.configBitMode == ConfigBitMode.FRAME_BASED:
                 if tile.globalConfigBits > 0:
                     frameData = pr.Port("FrameData", IO.INPUT, frameBitsPerRow - 1)
-                    frameDataOut = pr.Port(
-                        "FrameData_O", IO.OUTPUT, frameBitsPerRow - 1
-                    )
+                    frameDataOut = pr.Port("FrameData_O", IO.OUTPUT, frameBitsPerRow - 1)
                 frameStrobe = pr.Port("FrameStrobe", IO.INPUT, maxFramePerCol - 1)
                 frameStrobeOut = pr.Port("FrameStrobe_O", IO.OUTPUT, maxFramePerCol - 1)
 
@@ -55,18 +54,19 @@ def generateTile(fabric: Fabric, tile: Tile, dest: Path):
         with module.LogicRegion() as lr:
             lr.Comment("Signal Creation")
 
+            belPortValueMap: Mapping[Bel, list[Value]] = {}
             repeatSet = set()
             for bel in tile.bels:
-                for port in (
-                    bel.inputs + bel.outputs + bel.externalInputs + bel.externalOutputs
-                ):
+                valueList = []
+                for port in bel.inputs + bel.outputs + bel.externalInputs + bel.externalOutputs:
                     sig = f"{bel.prefix}{port.name}"
                     if sig in repeatSet:
                         raise ValueError(
                             f"Detected repeat naming of port in tile {tile.name} for bel {bel.name} for port {sig}"
                         )
-                    lr.Signal(sig)
+                    valueList.append(lr.Signal(sig))
                     repeatSet.add(sig)
+                belPortValueMap[bel] = valueList
 
             sharePortDict: Mapping[str, Value] = {}
             for bel in tile.bels:
@@ -81,9 +81,7 @@ def generateTile(fabric: Fabric, tile: Tile, dest: Path):
             lr.Comment("Buffering incoming and out outgoing wires")
             if tile.globalConfigBits > 0:
                 inputFrameDataBufferOut = lr.Signal("FrameData_i", frameBitsPerRow - 1)
-                outputFrameDataBufferIn = lr.Signal(
-                    "FrameData_O_i", frameBitsPerRow - 1
-                )
+                outputFrameDataBufferIn = lr.Signal("FrameData_O_i", frameBitsPerRow - 1)
                 lr.Comment("FrameData Buffer")
                 lr.InitModule(
                     "my_buf_pack",
@@ -191,10 +189,7 @@ def generateTile(fabric: Fabric, tile: Tile, dest: Path):
             #     self.writer.addComment("CONFout is from tile entity")
 
             # init config memory
-            if (
-                fabric.configBitMode == ConfigBitMode.FRAME_BASED
-                and tile.globalConfigBits > 0
-            ):
+            if fabric.configBitMode == ConfigBitMode.FRAME_BASED and tile.globalConfigBits > 0:
                 lr.Comment("Init Configuration storage latches")
                 lr.InitModule(
                     f"{tile.name}_ConfigMem",
@@ -215,12 +210,11 @@ def generateTile(fabric: Fabric, tile: Tile, dest: Path):
                 connectPairs = []
 
                 # basic ports
-                for port in (
-                    bel.inputs + bel.outputs + bel.externalInputs + bel.externalOutputs
+
+                for port, value in zip(
+                    bel.inputs + bel.outputs + bel.externalInputs + bel.externalOutputs, belPortValueMap[bel]
                 ):
-                    connectPairs.append(
-                        lr.ConnectPair(port.name, f"{bel.prefix}{port.name}")
-                    )
+                    connectPairs.append(lr.ConnectPair(port.name, value))
 
                 # user clock
                 if bel.userCLK:
@@ -240,11 +234,7 @@ def generateTile(fabric: Fabric, tile: Tile, dest: Path):
                     connectPairs.append(
                         lr.ConnectPair(
                             port.name,
-                            configBitsSignal[
-                                belConfigBitCounter
-                                + port.wireCount
-                                - 1 : belConfigBitCounter
-                            ],
+                            configBitsSignal[belConfigBitCounter + port.wireCount - 1 : belConfigBitCounter],
                         )
                     )
                     belConfigBitCounter += port.wireCount
@@ -252,13 +242,7 @@ def generateTile(fabric: Fabric, tile: Tile, dest: Path):
                 lr.InitModule(
                     bel.name,
                     f"Inst_{bel.prefix}{bel.name}",
-                    [
-                        lr.ConnectPair(p.name, f"{bel.prefix}{p.name}")
-                        for p in bel.inputs
-                        + bel.outputs
-                        + bel.externalInputs
-                        + bel.externalOutputs
-                    ],
+                    connectPairs,
                 )
 
             # init switch matrix

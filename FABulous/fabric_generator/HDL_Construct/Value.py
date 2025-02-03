@@ -25,13 +25,18 @@ class Value:
     def __str__(self):
         return self.value
 
-    def __getitem__(self, key: slice):
-        if key.step is not None:
-            raise ValueError("Cannot slice with step")
-        if self.isSignal:
-            return Value(f"{self.value}[{key.start}:{key.stop}]", self.bitWidth)
+    def __getitem__(self, key: slice | int):
+        if isinstance(key, int):
+            return Value(f"{self.value}[{key}]", 1)
+        elif isinstance(key, slice):
+            if key.step is not None:
+                raise ValueError("Cannot slice with step")
+            if self.isSignal:
+                return Value(f"{self.value}[{key.start}:{key.stop}]", self.bitWidth)
+            else:
+                raise ValueError("Cannot only index port and signal type")
         else:
-            raise ValueError("Cannot only index port and signal type")
+            raise ValueError("Invalid index")
 
     def __add__(self, other):
         if isinstance(other, Value):
@@ -236,3 +241,9 @@ class Value:
             return Value(f"{other.value} | {self.value}", self.bitWidth)
         else:
             return Value(f"{other} | {self.value}", self.bitWidth)
+
+    def case_eq(self, other):
+        if isinstance(other, Value):
+            return Value(f"{self.value} === {other.value}", 1)
+        else:
+            return Value(f"{self.value} === {other}", 1)

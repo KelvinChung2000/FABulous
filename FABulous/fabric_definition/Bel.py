@@ -84,3 +84,6 @@ class Bel:
         self.configBit = configBit
         self.belFeatureMap = belFeatureMap
         self.userCLK = userCLK
+
+    def __hash__(self) -> int:
+        return hash(f"{self.prefix}{self.name}({self.src})")

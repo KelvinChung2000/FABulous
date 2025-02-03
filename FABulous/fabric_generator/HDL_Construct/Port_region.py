@@ -22,7 +22,7 @@ class PortRegion(Region):
         return self._indent
 
     def __str__(self) -> str:
-        return f"(\n{',\n'.join([f'{" "*self.indent}{str(i)}' for i in self.container])}\n);"
+        return f"(\n{',\n'.join([f'{" " * self.indent}{str(i)}' for i in self.container])}\n);\n"
 
     @dataclass
     class _Port:

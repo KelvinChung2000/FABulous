@@ -87,9 +87,7 @@ def vhdl_belMapProcessing(file: str, filename: str) -> dict:
     pre = "--.*?"
 
     belEnumsDic = {}
-    if belEnums := re.findall(
-        pre + r"\(\*.*?FABulous,.*?BelEnum,(.*?)\*\)", file, re.DOTALL | re.MULTILINE
-    ):
+    if belEnums := re.findall(pre + r"\(\*.*?FABulous,.*?BelEnum,(.*?)\*\)", file, re.DOTALL | re.MULTILINE):
         for enums in belEnums:
             enums = enums.replace("\n", "").replace(" ", "").replace("\t", "")
             enums = enums.split(",")
@@ -114,9 +112,7 @@ def vhdl_belMapProcessing(file: str, filename: str) -> dict:
                         belEnumsDic[name][key][j] = bitValue.pop(0)
 
     belMapDic = {}
-    if belMap := re.search(
-        pre + r"\(\*.*FABulous,.*?BelMap,(.*?)\*\)", file, re.DOTALL | re.MULTILINE
-    ):
+    if belMap := re.search(pre + r"\(\*.*FABulous,.*?BelMap,(.*?)\*\)", file, re.DOTALL | re.MULTILINE):
         belMap = belMap.group(1)
         belMap = belMap.replace("\n", "").replace(" ", "").replace("\t", "")
         belMap = belMap.split(",")
@@ -148,7 +144,7 @@ def vhdl_belMapProcessing(file: str, filename: str) -> dict:
                     length = end - start + 1
                     for i in range(0, 2**length):
                         belMapDic[bel[0]][i] = {}
-                        bitMap = list(f"{2**length-i-1:0{length.bit_length()}b}")
+                        bitMap = list(f"{2**length - i - 1:0{length.bit_length()}b}")
                         for v in range(len(bitMap) - 1, -1, -1):
                             belMapDic[bel[0]][i][v] = bitMap.pop(0)
             else:
@@ -288,9 +284,7 @@ def parseBelFile(
 
     modules = data_dict.get("modules", {})
     if len(modules) > 1:
-        logger.error(
-            f"Multiple modules found in {filename}. Only one module per file is allowed."
-        )
+        logger.error(f"Multiple modules found in {filename}. Only one module per file is allowed.")
         raise ValueError
     elif len(modules) == 0:
         logger.error(f"No modules found in {filename}.")
@@ -328,19 +322,19 @@ def parseBelFile(
             feature = feature.split(" ")
             featureType = attributes - set(["FABulous", "CONFIG_BIT", "src", "FEATURE"])
             if len(feature) == 0:
-                raise ValueError(
-                    f"CONFIG_BIT port and {net} in file {filename} must have at least one feature."
-                )
+                raise ValueError(f"CONFIG_BIT port and {net} in file {filename} must have at least one feature.")
             if len(featureType) != 1:
-                raise ValueError(
-                    f"CONFIG_BIT port and {net} in file {filename} must have exactly one feature type."
-                )
+                raise ValueError(f"CONFIG_BIT port and {net} in file {filename} must have exactly one feature type.")
             for i in feature:
                 belMapDict[i] = netBitWidth
+
+            if ports[net] != IO.INPUT:
+                raise ValueError(f"CONFIG_BIT port {net} in file {filename} must be an input port.")
+
             configPort.append(
                 ConfigPort(
-                    name=f"{belPrefix}_{net}",
-                    ioDirection=ports[net],
+                    name=f"{net}",
+                    ioDirection=IO.INPUT,
                     wireCount=netBitWidth,
                     isBus=FABulousPortType.BUS in attributes,
                     feature=feature,

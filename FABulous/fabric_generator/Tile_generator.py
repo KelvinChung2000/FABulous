@@ -4,6 +4,7 @@ from typing import Mapping
 from FABulous.fabric_definition.Bel import Bel
 from FABulous.fabric_definition.define import IO, ConfigBitMode
 from FABulous.fabric_definition.Fabric import Fabric
+from FABulous.fabric_definition.Port import TilePort
 from FABulous.fabric_definition.Tile import Tile
 from FABulous.fabric_generator.code_generator_2 import CodeGenerator
 from FABulous.fabric_generator.HDL_Construct.Value import Value
@@ -23,11 +24,31 @@ def generateTile(fabric: Fabric, tile: Tile, dest: Path):
             if tile.globalConfigBits > 0:
                 NoConfigBitsParam = pr.Parameter("NoConfigBits", tile.globalConfigBits)
 
+        portMapping: Mapping[TilePort, Value] = {}
         with module.PortRegion() as pr:
-            for p in tile.getTileOutputPorts():
-                pr.Port(p.name, IO.OUTPUT, tile.getCascadeWireCount(p))
-            for p in tile.getTileInputPorts():
-                pr.Port(p.name, IO.INPUT, tile.getCascadeWireCount(p))
+            pr.Comment("North")
+            for p in tile.getNorthPorts():
+                portMapping[p] = pr.Port(
+                    p.name, p.ioDirection, tile.getCascadeWireCount(p)
+                )
+
+            pr.Comment("East")
+            for p in tile.getEastPorts():
+                portMapping[p] = pr.Port(
+                    p.name, p.ioDirection, tile.getCascadeWireCount(p)
+                )
+
+            pr.Comment("South")
+            for p in tile.getSouthPorts():
+                portMapping[p] = pr.Port(
+                    p.name, p.ioDirection, tile.getCascadeWireCount(p)
+                )
+
+            pr.Comment("West")
+            for p in tile.getWestPorts():
+                portMapping[p] = pr.Port(
+                    p.name, p.ioDirection, tile.getCascadeWireCount(p)
+                )
 
             for bel in tile.bels:
                 for p in bel.externalInputs:
@@ -41,7 +62,9 @@ def generateTile(fabric: Fabric, tile: Tile, dest: Path):
             if fabric.configBitMode == ConfigBitMode.FRAME_BASED:
                 if tile.globalConfigBits > 0:
                     frameData = pr.Port("FrameData", IO.INPUT, frameBitsPerRow - 1)
-                    frameDataOut = pr.Port("FrameData_O", IO.OUTPUT, frameBitsPerRow - 1)
+                    frameDataOut = pr.Port(
+                        "FrameData_O", IO.OUTPUT, frameBitsPerRow - 1
+                    )
                 frameStrobe = pr.Port("FrameStrobe", IO.INPUT, maxFramePerCol - 1)
                 frameStrobeOut = pr.Port("FrameStrobe_O", IO.OUTPUT, maxFramePerCol - 1)
 
@@ -58,13 +81,15 @@ def generateTile(fabric: Fabric, tile: Tile, dest: Path):
             repeatSet = set()
             for bel in tile.bels:
                 valueList = []
-                for port in bel.inputs + bel.outputs + bel.externalInputs + bel.externalOutputs:
+                for port in (
+                    bel.inputs + bel.outputs + bel.externalInputs + bel.externalOutputs
+                ):
                     sig = f"{bel.prefix}{port.name}"
                     if sig in repeatSet:
                         raise ValueError(
                             f"Detected repeat naming of port in tile {tile.name} for bel {bel.name} for port {sig}"
                         )
-                    valueList.append(lr.Signal(sig))
+                    valueList.append(lr.Signal(sig, port.wireCount))
                     repeatSet.add(sig)
                 belPortValueMap[bel] = valueList
 
@@ -74,14 +99,19 @@ def generateTile(fabric: Fabric, tile: Tile, dest: Path):
                     sharePortDict[port.sharedWith] = lr.Signal(port.name)
 
             if tile.globalConfigBits > 0:
+                lr.NewLine()
                 lr.Comment("ConfigBits Wires")
                 configBitsSignal = lr.Signal("ConfigBits", NoConfigBitsParam - 1)
                 configBitsNSignal = lr.Signal("ConfigBits_N", NoConfigBitsParam - 1)
 
+            lr.NewLine()
             lr.Comment("Buffering incoming and out outgoing wires")
             if tile.globalConfigBits > 0:
                 inputFrameDataBufferOut = lr.Signal("FrameData_i", frameBitsPerRow - 1)
-                outputFrameDataBufferIn = lr.Signal("FrameData_O_i", frameBitsPerRow - 1)
+                outputFrameDataBufferIn = lr.Signal(
+                    "FrameData_O_i", frameBitsPerRow - 1
+                )
+                lr.NewLine()
                 lr.Comment("FrameData Buffer")
                 lr.InitModule(
                     "my_buf_pack",
@@ -110,6 +140,7 @@ def generateTile(fabric: Fabric, tile: Tile, dest: Path):
             lr.Comment("FrameStrobe Buffer")
             inputFrameStrobeBufferOut = lr.Signal("FrameStrobe_i", maxFramePerCol - 1)
             outputFrameStrobeBufferIn = lr.Signal("FrameStrobe_O_i", maxFramePerCol - 1)
+            lr.NewLine()
             lr.InitModule(
                 "my_buf_pack",
                 "strobe_inbuf",
@@ -144,41 +175,45 @@ def generateTile(fabric: Fabric, tile: Tile, dest: Path):
                 ],
             )
 
-            for inPort in tile.getTileInputPorts():
-                if not inPort.spanning:
+            for wire in tile.wireTypes:
+                if not wire.spanning:
                     continue
-                c = tile.getCascadeWireCount(inPort)
-                inPortSignal = lr.Signal(f"{inPort.name}_i", c - inPort.wireCount)
-                lr.Assign(
-                    inPortSignal[c - 1 : inPort.wireCount],
-                    inPortSignal[inPort.wireCount : 0],
+                lr.Comment(
+                    f"Buffer spanning wire: {wire.sourcePort.name}->{wire.destinationPort.name}"
                 )
+                inputBufferOut = lr.Signal(
+                    f"{wire.sourcePort.name}_i", wire.cascadeWireCount - wire.wireCount
+                )
+                outputBufferIn = lr.Signal(
+                    f"{wire.destinationPort.name}_i",
+                    wire.cascadeWireCount - wire.wireCount,
+                )
+
                 lr.InitModule(
                     "my_buf_pack",
-                    f"{inPort.name}_inbuf",
+                    f"{wire.sourcePort.name}_inbuf",
                     [
                         lr.ConnectPair(
-                            "A",
-                            inPortSignal[c : inPort.wireCount],
+                            "A", portMapping[wire.sourcePort][: wire.wireCount]
                         ),
-                        lr.ConnectPair("X", inPortSignal),
+                        lr.ConnectPair("X", inputBufferOut),
                     ],
-                    [lr.ConnectPair("WIDTH", c - inPort.wireCount)],
+                    [lr.ConnectPair("WIDTH", wire.cascadeWireCount - wire.wireCount)],
                 )
-                outPort = tile.getEndPointPort(inPort)
-                outPortSignal = lr.Signal(f"{outPort.name}_i", c - outPort.wireCount)
-                lr.Assign(
-                    outPortSignal[c - 1 : outPort.wireCount],
-                    inPortSignal[c - 1 : inPort.wireCount],
-                )
+                lr.Assign(outputBufferIn, inputBufferOut)
                 lr.InitModule(
                     "my_buf_pack",
-                    f"{outPort.name}_outbuf",
+                    f"{wire.destinationPort.name}_outbuf",
                     [
-                        lr.ConnectPair("A", outPortSignal),
-                        lr.ConnectPair("X", "outPortSignal"),
+                        lr.ConnectPair("A", outputBufferIn),
+                        lr.ConnectPair(
+                            "X",
+                            portMapping[wire.destinationPort][
+                                wire.cascadeWireCount - wire.wireCount :
+                            ],
+                        ),
                     ],
-                    [lr.ConnectPair("WIDTH", c - inPort.wireCount)],
+                    [lr.ConnectPair("WIDTH", wire.cascadeWireCount - wire.wireCount)],
                 )
 
             # if fabric.configBitMode == ConfigBitMode.FLIPFLOP_CHAIN:
@@ -189,7 +224,10 @@ def generateTile(fabric: Fabric, tile: Tile, dest: Path):
             #     self.writer.addComment("CONFout is from tile entity")
 
             # init config memory
-            if fabric.configBitMode == ConfigBitMode.FRAME_BASED and tile.globalConfigBits > 0:
+            if (
+                fabric.configBitMode == ConfigBitMode.FRAME_BASED
+                and tile.globalConfigBits > 0
+            ):
                 lr.Comment("Init Configuration storage latches")
                 lr.InitModule(
                     f"{tile.name}_ConfigMem",
@@ -212,7 +250,8 @@ def generateTile(fabric: Fabric, tile: Tile, dest: Path):
                 # basic ports
 
                 for port, value in zip(
-                    bel.inputs + bel.outputs + bel.externalInputs + bel.externalOutputs, belPortValueMap[bel]
+                    bel.inputs + bel.outputs + bel.externalInputs + bel.externalOutputs,
+                    belPortValueMap[bel],
                 ):
                     connectPairs.append(lr.ConnectPair(port.name, value))
 
@@ -234,7 +273,11 @@ def generateTile(fabric: Fabric, tile: Tile, dest: Path):
                     connectPairs.append(
                         lr.ConnectPair(
                             port.name,
-                            configBitsSignal[belConfigBitCounter + port.wireCount - 1 : belConfigBitCounter],
+                            configBitsSignal[
+                                belConfigBitCounter
+                                + port.wireCount
+                                - 1 : belConfigBitCounter
+                            ],
                         )
                     )
                     belConfigBitCounter += port.wireCount
@@ -247,10 +290,12 @@ def generateTile(fabric: Fabric, tile: Tile, dest: Path):
 
             # init switch matrix
             connectPairs = []
-            for mux in tile.switchMatrix:
-                connectPairs.append(lr.ConnectPair(mux.output, mux.output))
-                for i in mux.inputs:
-                    connectPairs.append(lr.ConnectPair(i, i))
+            for output in tile.switchMatrix.getOutputs():
+                
+                connectPairs.append(lr.ConnectPair(output.value, output))
+
+            for input in tile.switchMatrix.getInputs():
+                connectPairs.append(lr.ConnectPair(input.value, input))
 
             # if fabric.configBitMode == ConfigBitMode.FLIPFLOP_CHAIN:
             #     connectPairs.append(("MODE", "Mode"))
@@ -263,13 +308,17 @@ def generateTile(fabric: Fabric, tile: Tile, dest: Path):
                     connectPairs.append(
                         lr.ConnectPair(
                             "ConfigBits",
-                            f"ConfigBits[{tile.globalConfigBits}-1:{belConfigBitCounter}]",
+                            configBitsSignal[
+                                tile.globalConfigBits - 1 : belConfigBitCounter
+                            ],
                         )
                     )
                     connectPairs.append(
                         lr.ConnectPair(
                             "ConfigBits_N",
-                            f"ConfigBits_N[{tile.globalConfigBits}-1:{belConfigBitCounter}]",
+                            configBitsNSignal[
+                                tile.globalConfigBits - 1 : belConfigBitCounter
+                            ],
                         )
                     )
             lr.Comment("Init Switch Matrix")

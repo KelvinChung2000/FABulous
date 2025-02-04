@@ -1,13 +1,14 @@
 module ALU #(
-    parameter NoConfigBits = 3
+    parameter NoConfigBits = 3,
+    parameter WIDTH = 32
 ) (
     input wire rst,
     input wire en,
     (* FABulous, USER_CLK *) input wire clk,
-    (* FABulous, BUS *) input wire [7:0] data_in1,
-    (* FABulous, BUS *) input wire [7:0] data_in2,
-    (* FABulous, BUS *) input wire [7:0] data_in3,
-    (* FABulous, BUS *) output reg [7:0] data_out,
+    (* FABulous, BUS *) input wire [WIDTH-1:0] data_in1,
+    (* FABulous, BUS *) input wire [WIDTH-1:0] data_in2,
+    (* FABulous, BUS *) input wire [WIDTH-1:0] data_in3,
+    (* FABulous, BUS *) output reg [WIDTH-1:0] data_out,
     (* FABulous, CONFIG_BIT, FEATURE="ALU", FEATURE_MAP="std_add(left=>data_in1, right=>data_in2, out=>data_out);" *) input [NoConfigBits:0] ConfigBits
 );
   // Define operation codes

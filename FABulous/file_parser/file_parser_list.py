@@ -1,9 +1,11 @@
-from collections import Counter, namedtuple
+from collections import namedtuple
 from pathlib import Path
+from typing import cast
 
 from lark import Lark, Transformer, v_args
 
-from FABulous.fabric_definition.SwitchMatrix import Mux
+from FABulous.fabric_definition.SwitchMatrix import Mux, SwitchMatrix
+from FABulous.fabric_generator.HDL_Construct.Value import Value
 
 muxGrammar = r"""
     start: (mux | COMMENT)+
@@ -32,22 +34,31 @@ Iter = namedtuple("Iter", ["start", "end", "step"])
 
 class MuxTransformer(Transformer):
     @v_args(inline=True)
-    def start(self, *items) -> list[Mux]:
+    def start(self, *items) -> SwitchMatrix:
         muxes = []
         for item in items:
             if isinstance(item, list):
                 muxes.extend(item)
             else:
                 muxes.append(item)
+        sm = SwitchMatrix()
 
-        return mergeMux([muxes for muxes in muxes if isinstance(muxes, Mux)])
+        for mux in muxes:
+            if isinstance(mux, Mux):
+                sm.addMux(mux)
+
+        return sm
 
     @v_args(inline=True)
     def mux(self, dest, *source) -> list[Mux]:
-        sourceList = [item for sublist in source for item in sublist]
+        sourceList = [
+            Value(item, 1, isSignal=True) for sublist in source for item in sublist
+        ]
         muxList: list[Mux] = []
         for i in dest:
-            muxList.append(Mux(name=i, inputs=sourceList, output=i))
+            muxList.append(
+                Mux(name=i, inputs=sourceList, output=Value(i, 1, isSignal=True))
+            )
         return muxList
 
     @v_args(inline=True)
@@ -79,11 +90,11 @@ class MuxTransformer(Transformer):
     COMMENT = str
 
 
-def parseMux(fileName: Path) -> list[Mux]:
+def parseMux(fileName: Path) -> SwitchMatrix:
     parser = Lark(muxGrammar, parser="lalr", transformer=MuxTransformer())
 
     with open(fileName, "r") as f:
-        return parser.parse(f.read())
+        return cast(SwitchMatrix, parser.parse(f.read()))
 
 
 def mergeMux(muxList: list[Mux]) -> list[Mux]:
@@ -91,13 +102,9 @@ def mergeMux(muxList: list[Mux]) -> list[Mux]:
 
     for mux in muxList:
         if mux.output in outputDict:
-            outputDict[mux.output].inputs.extend(mux.inputs)
-            c = Counter(outputDict[mux.output].inputs)
-            outputDict[mux.output].inputs = list(c.keys())
-            outputDict[mux.output]._update()
+            outputDict[mux.output.value].extendInputs(mux.inputs)
         else:
-            outputDict[mux.output] = mux
-
+            outputDict[mux.output.value] = mux
     return list(outputDict.values())
 
 

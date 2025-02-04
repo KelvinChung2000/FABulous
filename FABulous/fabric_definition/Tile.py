@@ -4,8 +4,8 @@ from typing import Any, cast
 
 from FABulous.fabric_definition.Bel import Bel
 from FABulous.fabric_definition.define import IO, Side
-from FABulous.fabric_definition.Mux import Mux
 from FABulous.fabric_definition.Port import TilePort
+from FABulous.fabric_definition.SwitchMatrix import SwitchMatrix
 from FABulous.fabric_definition.Wire import WireType
 
 
@@ -35,7 +35,7 @@ class Tile:
     ports: list[TilePort]
     bels: list[Bel]
     wireTypes: list[WireType]
-    switchMatrix: list[Mux]
+    switchMatrix: SwitchMatrix
     globalConfigBits: int = 0
     withUserCLK: bool = False
     tileDir: Path = Path(".")

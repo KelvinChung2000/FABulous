@@ -8,13 +8,12 @@ from loguru import logger
 from FABulous.fabric_definition.Bel import Bel
 from FABulous.fabric_definition.define import IO, ConfigBitMode, MultiplexerStyle, Side
 from FABulous.fabric_definition.Fabric import Fabric
-from FABulous.fabric_definition.Mux import Mux
 from FABulous.fabric_definition.Port import TilePort
+from FABulous.fabric_definition.SwitchMatrix import Mux, SwitchMatrix
 from FABulous.fabric_definition.Tile import Tile
 from FABulous.fabric_definition.Wire import Wire, WireType
 from FABulous.file_parser.file_parser_csv import parseList, parseMatrix, parsePortLine
 from FABulous.file_parser.file_parser_HDL import parseBelFile
-from FABulous.file_parser.file_parser_list import parseMux
 
 oppositeDic = {
     "NORTH": "SOUTH",
@@ -131,6 +130,7 @@ def parseFabricYAML(fileName: Path) -> Fabric:
 
     return Fabric(
         name=name,
+        fabricDir=fileName,
         tile=fabricTiles,
         numberOfColumns=width,
         numberOfRows=height,
@@ -234,14 +234,34 @@ def parseTileYAML(fileName: Path) -> Tile:
                 "or both X and Y must be the same for diagonal."
             )
             raise ValueError
+        if sourcePort.wireCount != destinationPort.wireCount:
+            logger.error(
+                f"Port {sourcePort.name} and {destinationPort.name} must have the same wire count."
+            )
+            raise ValueError
+
+        spanning = False
+        if abs(x) + abs(y) > 1 and x != y:
+            wireCount = sourcePort.wireCount * (abs(x) + abs(y))
+            spanning = True
+        elif x == y:
+            wireCount = sourcePort.wireCount * abs(x)
+            spanning = True
+        else:
+            wireCount = sourcePort.wireCount
+
         wires.append(
             WireType(
                 sourcePort=sourcePort,
                 destinationPort=destinationPort,
                 offsetX=wireEntry["X-offset"],
                 offsetY=wireEntry["Y-offset"],
+                wireCount=sourcePort.wireCount,
+                cascadeWireCount=wireCount,
+                spanning=spanning,
             )
         )
+
         normalPorts.discard(wireEntry["source_name"])
         normalPorts.discard(wireEntry["destination_name"])
 
@@ -275,10 +295,9 @@ def parseTileYAML(fileName: Path) -> Tile:
                 if muxSize >= 2:
                     configBit += muxSize.bit_length() - 1
         case ".mux":
-            for i in parseMux(matrixDir):
-                muxSize = len(i.inputs)
-                if muxSize >= 2:
-                    configBit += muxSize.bit_length() - 1
+            pass
+            # sm = parseMux(matrixDir)
+            # configBit += sm.configBits
         case "_matrix.csv":
             for _, v in parseMatrix(matrixDir, tileName).items():
                 muxSize = len(v)
@@ -298,7 +317,7 @@ def parseTileYAML(fileName: Path) -> Tile:
             logger.error("Unknown file extension for matrix.")
             raise ValueError("Unknown file extension for matrix.")
 
-    muxList = parseMux(matrixDir)
+    # switchMatrix = parseMux(matrixDir)
 
     if p := data["INCLUDE"]:
         p = fileName.parent.joinpath(p)
@@ -327,7 +346,7 @@ def parseTileYAML(fileName: Path) -> Tile:
         ports=list(portsDict.values()),
         bels=bels,
         wireTypes=wires,
-        switchMatrix=muxList,
+        switchMatrix=SwitchMatrix(),
         globalConfigBits=configBit,
         withUserCLK=withUserCLK,
         tileDir=fileName,

@@ -31,7 +31,7 @@ class PortRegion(Region):
         bits: int | Value
 
         def __str__(self) -> str:
-            if self.bits == 1:
+            if isinstance(self.bits, int) and self.bits == 1:
                 return f"{self.direction} {self.name}"
             elif isinstance(self.bits, int):
                 return f"{self.direction} [{self.bits - 1}:0] {self.name}"
@@ -41,4 +41,4 @@ class PortRegion(Region):
     def Port(self, name: str, direction: IO, bits: int | Value = 1):
         _o = self._Port(name, direction, bits)
         self.container.append(_o)
-        return Value(name, bits)
+        return Value(name, bits, isSignal=True)

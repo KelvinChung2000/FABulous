@@ -11,6 +11,12 @@ class Port:
     wireCount: int
     isBus: bool
 
+    def createSelf(self) -> str:
+        return (
+            f"Port(name='{self.name}', ioDirection=IO.{self.ioDirection.upper()}, "
+            f"wireCount={self.wireCount}, isBus={self.isBus})"
+        )
+
 
 @dataclass(frozen=True, eq=True)
 class TilePort(Port):
@@ -51,6 +57,13 @@ class TilePort(Port):
 
     def __repr__(self) -> str:
         return f"({self.sideOfTile}) {self.ioDirection.value} {self.name}[{self.wireCount}]"
+
+    def createSelf(self) -> str:
+        return (
+            f"TilePort(name='{self.name}', ioDirection=IO.{self.ioDirection.upper()}, "
+            f"wireCount={self.wireCount}, isBus={self.isBus}, sideOfTile=Side.{self.sideOfTile}, "
+            f"terminal={self.terminal}, spanning={self.spanning})"
+        )
 
     def __lt__(self, __o: Any) -> bool:
         if not isinstance(__o, TilePort):

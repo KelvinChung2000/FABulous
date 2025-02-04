@@ -11,12 +11,16 @@ PORTS: [
     {side: EAST, name: out1, inOut: output, wires: 32, terminal: false},
     {side: SOUTH, name: out2, inOut: output, wires: 32, terminal: false},
     {side: WEST, name: out3, inOut: output, wires: 32, terminal: false},
+
+    {side: EAST, name: spanIn, inOut: output, wires: 2, terminal: false},
+    {side: WEST, name: spanOut, inOut: output, wires: 2, terminal: false},
   ]
 WIRES: [
   {source_name: out0, X-offset:  0, Y-offset: -1, destination_name: in2},
   {source_name: out1, X-offset:  1, Y-offset:  0, destination_name: in3},
   {source_name: out2, X-offset:  0, Y-offset:  1, destination_name: in0},
   {source_name: out3, X-offset: -1, Y-offset:  0, destination_name: in1},
+  {source_name: spanOut, X-offset: 2, Y-offset:  0, destination_name: spanIn},
 ]
 BELS: [
   {BEL: ./ALU.v, prefix: },   

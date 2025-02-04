@@ -21,3 +21,5 @@ N_reg_in:N_reg_out
 E_reg_in:E_reg_out
 S_reg_in:S_reg_out
 W_reg_in:W_reg_out
+
+spanOut:spanIn

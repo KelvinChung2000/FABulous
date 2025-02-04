@@ -6,10 +6,13 @@ from FABulous.fabric_definition.Port import Port, TilePort
 
 @dataclass(frozen=True, eq=True)
 class WireType:
-    sourcePort: Port | TilePort
-    destinationPort: Port | TilePort
+    sourcePort: TilePort
+    destinationPort: TilePort
     offsetX: int
     offsetY: int
+    wireCount: int
+    cascadeWireCount: int
+    spanning: bool = False
 
     def __repr__(self) -> str:
         return f"{self.sourcePort.name}-X{self.offsetX}Y{self.offsetY}>{self.destinationPort.name}"

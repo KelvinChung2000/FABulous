@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import Iterable
 
 from FABulous.fabric_generator.HDL_Construct.Region import Region
 from FABulous.fabric_generator.HDL_Construct.Value import Value
@@ -29,7 +30,7 @@ class LogicRegion(Region):
     def Signal(self, name: str, bits: int | Value = 1):
         _o = self._signal(name, bits)
         self.container.append(_o)
-        return Value(name, bits)
+        return Value(name, bits, isSignal=True)
 
     def Assign(self, dst: Value, src: Value):
         _o = self._Assign(dst, src)
@@ -39,7 +40,7 @@ class LogicRegion(Region):
     def Constant(self, name: str, value: int):
         _o = self._Constant(name, value)
         self.container.append(_o)
-        return Value(name, value)
+        return Value(name, value, isSignal=False)
 
     def Concat(self, *args):
         return self._Concat(*args)
@@ -51,7 +52,9 @@ class LogicRegion(Region):
         ports: list["LogicRegion._ConnectPair"],
         parameters: list["LogicRegion._ConnectPair"] = [],
     ):
-        _o = self._InitModule(module, initName, parameters, ports, self.indent, self.indentCount)
+        _o = self._InitModule(
+            module, initName, parameters, ports, self.indent, self.indentCount
+        )
         self.container.append(_o)
         return _o
 
@@ -99,7 +102,7 @@ class LogicRegion(Region):
         src: Value
 
         def __str__(self) -> str:
-            return f"assign {self.dst} = {self.src};"
+            return f"assign {self.dst} = {self.src};\n"
 
     @dataclass
     class _signal:
@@ -107,7 +110,7 @@ class LogicRegion(Region):
         bits: Value | int = 1
 
         def __str__(self) -> str:
-            if self.bits == 1:
+            if self.bits == 1 and isinstance(self.bits, int):
                 return f"wire {self.name};"
             elif isinstance(self.bits, int):
                 return f"wire [{self.bits - 1}:0] {self.name};"
@@ -122,18 +125,12 @@ class LogicRegion(Region):
         def __str__(self) -> str:
             return f"localparam reg {self.name} = {self.value};"
 
-    @dataclass
+    @dataclass(frozen=True)
     class _Concat(Value):
-        item: list[str]
-
-        def __init__(self, *args):
-            if len(args) == 1:
-                self.item = args[0]
-            else:
-                self.item = list(args)
+        item: Iterable[Value]
 
         def __str__(self) -> str:
-            return f"{{{', '.join(self.item)}}}"
+            return f"{{{', '.join(str(i) for i in self.item)}}}"
 
         @property
         def value(self) -> str:

@@ -1,0 +1,34 @@
+from FABulous.fabric_definition.SwitchMatrix import MuxPort
+from FABulous.fabric_definition.define import IO, Side
+from FABulous.fabric_definition.Port import TilePort, Port
+
+class {{ tile.name }}_ports:
+    def __init__(self):
+        # tile ports
+    {%- for p in tile.ports %}
+        self.{{ p.name }} = MuxPort({{ p.createSelf() }}, isTilePort=True, isBus={{ p.isBus }}, bitWidth={{ p.wireCount }})
+    {%- endfor %}
+
+        # bel ports
+    {%- for bel in tile.bels -%}
+    {%- for p in bel.inputs %}
+        self.{{ bel.prefix }}{{ p.name }} = MuxPort({{ p.createSelf() }}, isBelPort=True, isBus={{ p.isBus }}, bitWidth={{ p.wireCount }})
+    {%- endfor %}
+
+    {%- for p in bel.outputs %}
+        self.{{ bel.prefix }}{{ p.name }} = MuxPort({{ p.createSelf() }}, isBelPort=True, isBus={{ p.isBus }}, bitWidth={{ p.wireCount }})
+    {%- endfor %}
+
+    {%- endfor %}
+
+    def NewWire(self, name: str, wireCount: int) -> MuxPort:
+        port = MuxPort(Port(name=name, ioDirection=IO.INOUT, wireCount=wireCount, isBus=False), bitWidth=wireCount)
+        setattr(self, name, port)
+        return port
+
+    def __getitem__(self, key: str) -> MuxPort:
+        return getattr(self, key)
+
+    def __setitem__(self, key: str, value: MuxPort):
+        i = self[key]
+        i //= value

@@ -1,15 +1,17 @@
+from dataclasses import dataclass
 from typing import Self
 
 
+@dataclass(frozen=True)
 class Value:
     _value: str
     _bitWidth: int | Self
     isSignal: bool
 
-    def __init__(self, name: str, bitWidth: int | Self, isSignal: bool = True):
-        self._value = name
-        self._bitWidth = bitWidth
-        self.isSignal = isSignal
+    # def __init__(self, name: str, bitWidth: int | Self, isSignal: bool = True):
+    #     self._value = name
+    #     self._bitWidth = bitWidth
+    #     self.isSignal = isSignal
 
     @property
     def value(self):
@@ -19,6 +21,9 @@ class Value:
     def bitWidth(self):
         return self._bitWidth
 
+    def __repr___(self):
+        return f"[{self.isSignal=} {self.bitWidth=}]{self.value}"
+
     def __bool__(self):
         return True
 
@@ -27,12 +32,27 @@ class Value:
 
     def __getitem__(self, key: slice | int):
         if isinstance(key, int):
-            return Value(f"{self.value}[{key}]", 1)
+            return Value(f"{self.value}[{key}]", 1, self.isSignal)
         elif isinstance(key, slice):
             if key.step is not None:
                 raise ValueError("Cannot slice with step")
             if self.isSignal:
-                return Value(f"{self.value}[{key.start}:{key.stop}]", self.bitWidth)
+                if key.start is None:
+                    return Value(
+                        f"{self.value}[{self.bitWidth-1}:{key.stop}]",
+                        self.bitWidth,
+                        self.isSignal,
+                    )
+                if key.stop is None:
+                    return Value(
+                        f"{self.value}[{key.start}:0]", self.bitWidth, self.isSignal
+                    )
+
+                return Value(
+                    f"{self.value}[{key.start}:{key.stop}]",
+                    self.bitWidth,
+                    self.isSignal,
+                )
             else:
                 raise ValueError("Cannot only index port and signal type")
         else:
@@ -40,210 +60,210 @@ class Value:
 
     def __add__(self, other):
         if isinstance(other, Value):
-            return Value(f"{self.value} + {other.value}", self.bitWidth)
+            return Value(f"{self.value} + {other.value}", self.bitWidth, self.isSignal)
         else:
-            return Value(f"{self.value} + {other}", self.bitWidth)
+            return Value(f"{self.value} + {other}", self.bitWidth, self.isSignal)
 
     def __sub__(self, other):
         if isinstance(other, Value):
-            return Value(f"{self.value} - {other.value}", self.bitWidth)
+            return Value(f"{self.value} - {other.value}", self.bitWidth, self.isSignal)
         else:
-            return Value(f"{self.value} - {other}", self.bitWidth)
+            return Value(f"{self.value} - {other}", self.bitWidth, self.isSignal)
 
     def __mul__(self, other):
         if isinstance(other, Value):
-            return Value(f"{self.value} * {other.value}", self.bitWidth)
+            return Value(f"{self.value} * {other.value}", self.bitWidth, self.isSignal)
         else:
-            return Value(f"{self.value} * {other}", self.bitWidth)
+            return Value(f"{self.value} * {other}", self.bitWidth, self.isSignal)
 
     def __truediv__(self, other):
         if isinstance(other, Value):
-            return Value(f"{self.value} / {other.value}", self.bitWidth)
+            return Value(f"{self.value} / {other.value}", self.bitWidth, self.isSignal)
         else:
-            return Value(f"{self.value} / {other}", self.bitWidth)
+            return Value(f"{self.value} / {other}", self.bitWidth, self.isSignal)
 
     def __floordiv__(self, other):
         if isinstance(other, Value):
-            return Value(f"{self.value} // {other.value}", self.bitWidth)
+            return Value(f"{self.value} // {other.value}", self.bitWidth, self.isSignal)
         else:
-            return Value(f"{self.value} // {other}", self.bitWidth)
+            return Value(f"{self.value} // {other}", self.bitWidth, self.isSignal)
 
     def __mod__(self, other):
         if isinstance(other, Value):
-            return Value(f"{self.value} % {other.value}", self.bitWidth)
+            return Value(f"{self.value} % {other.value}", self.bitWidth, self.isSignal)
         else:
-            return Value(f"{self.value} % {other}", self.bitWidth)
+            return Value(f"{self.value} % {other}", self.bitWidth, self.isSignal)
 
     def __pow__(self, other):
         if isinstance(other, Value):
-            return Value(f"{self.value} ** {other.value}", self.bitWidth)
+            return Value(f"{self.value} ** {other.value}", self.bitWidth, self.isSignal)
         else:
-            return Value(f"{self.value} ** {other}", self.bitWidth)
+            return Value(f"{self.value} ** {other}", self.bitWidth, self.isSignal)
 
     def __lshift__(self, other):
         if isinstance(other, Value):
-            return Value(f"{self.value} << {other.value}", self.bitWidth)
+            return Value(f"{self.value} << {other.value}", self.bitWidth, self.isSignal)
         else:
-            return Value(f"{self.value} << {other}", self.bitWidth)
+            return Value(f"{self.value} << {other}", self.bitWidth, self.isSignal)
 
     def __rshift__(self, other):
         if isinstance(other, Value):
-            return Value(f"{self.value} >> {other.value}", self.bitWidth)
+            return Value(f"{self.value} >> {other.value}", self.bitWidth, self.isSignal)
         else:
-            return Value(f"{self.value} >> {other}", self.bitWidth)
+            return Value(f"{self.value} >> {other}", self.bitWidth, self.isSignal)
 
     def __and__(self, other):
         if isinstance(other, Value):
-            return Value(f"{self.value} & {other.value}", self.bitWidth)
+            return Value(f"{self.value} & {other.value}", self.bitWidth, self.isSignal)
         else:
-            return Value(f"{self.value} & {other}", self.bitWidth)
+            return Value(f"{self.value} & {other}", self.bitWidth, self.isSignal)
 
     def __xor__(self, other):
         if isinstance(other, Value):
-            return Value(f"{self.value} ^ {other.value}", self.bitWidth)
+            return Value(f"{self.value} ^ {other.value}", self.bitWidth, self.isSignal)
         else:
-            return Value(f"{self.value} ^ {other}", self.bitWidth)
+            return Value(f"{self.value} ^ {other}", self.bitWidth, self.isSignal)
 
     def __or__(self, other):
         if isinstance(other, Value):
-            return Value(f"{self.value} | {other.value}", self.bitWidth)
+            return Value(f"{self.value} | {other.value}", self.bitWidth, self.isSignal)
         else:
-            return Value(f"{self.value} | {other}", self.bitWidth)
+            return Value(f"{self.value} | {other}", self.bitWidth, self.isSignal)
 
     def __neg__(self):
-        return Value(f"-{self.value}", self.bitWidth)
+        return Value(f"-{self.value}", self.bitWidth, self.isSignal)
 
     def __pos__(self):
-        return Value(f"+{self.value}", self.bitWidth)
+        return Value(f"+{self.value}", self.bitWidth, self.isSignal)
 
     def __abs__(self):
         raise NotImplementedError("Absolute value is not supported")
 
     def __invert__(self):
-        return Value(f"~{self.value}", self.bitWidth)
+        return Value(f"~{self.value}", self.bitWidth, self.isSignal)
 
     def __lt__(self, other):
         if isinstance(other, Value):
-            return Value(f"{self.value} < {other.value}", 1)
+            return Value(f"{self.value} < {other.value}", 1, self.isSignal)
         else:
-            return Value(f"{self.value} < {other}", 1)
+            return Value(f"{self.value} < {other}", 1, self.isSignal)
 
     def __le__(self, other):
         if isinstance(other, Value):
-            return Value(f"{self.value} <= {other.value}", 1)
+            return Value(f"{self.value} <= {other.value}", 1, self.isSignal)
         else:
-            return Value(f"{self.value} <= {other}", 1)
+            return Value(f"{self.value} <= {other}", 1, self.isSignal)
 
     def __eq__(self, other):
         if isinstance(other, Value):
-            return Value(f"{self.value} == {other.value}", 1)
+            return Value(f"{self.value} == {other.value}", 1, self.isSignal)
         else:
-            return Value(f"{self.value} == {other}", 1)
+            return Value(f"{self.value} == {other}", 1, self.isSignal)
 
     def __ne__(self, other):
         if isinstance(other, Value):
-            return Value(f"{self.value} != {other.value}", 1)
+            return Value(f"{self.value} != {other.value}", 1, self.isSignal)
         else:
-            return Value(f"{self.value} != {other}", 1)
+            return Value(f"{self.value} != {other}", 1, self.isSignal)
 
     def __gt__(self, other):
         if isinstance(other, Value):
-            return Value(f"{self.value} > {other.value}", 1)
+            return Value(f"{self.value} > {other.value}", 1, self.isSignal)
         else:
-            return Value(f"{self.value} > {other}", 1)
+            return Value(f"{self.value} > {other}", 1, self.isSignal)
 
     def __ge__(self, other):
         if isinstance(other, Value):
-            return Value(f"{self.value} >= {other.value}", 1)
+            return Value(f"{self.value} >= {other.value}", 1, self.isSignal)
         else:
-            return Value(f"{self.value} >= {other}", 1)
+            return Value(f"{self.value} >= {other}", 1, self.isSignal)
 
     def __len__(self):
         return self.bitWidth
 
     def logical_and(self, other):
         if isinstance(other, Value):
-            return Value(f"{self.value} && {other.value}", 1)
+            return Value(f"{self.value} && {other.value}", 1, self.isSignal)
         else:
-            return Value(f"{self.value} && {other}", 1)
+            return Value(f"{self.value} && {other}", 1, self.isSignal)
 
     def logical_or(self, other):
         if isinstance(other, Value):
-            return Value(f"{self.value} || {other.value}", 1)
+            return Value(f"{self.value} || {other.value}", 1, self.isSignal)
         else:
-            return Value(f"{self.value} || {other}", 1)
+            return Value(f"{self.value} || {other}", 1, self.isSignal)
 
     def logical_not(self):
-        return Value(f"!{self.value}", 1)
+        return Value(f"!{self.value}", 1, self.isSignal)
 
     def __radd__(self, other):
         if isinstance(other, Value):
-            return Value(f"{other.value} + {self.value}", self.bitWidth)
+            return Value(f"{other.value} + {self.value}", self.bitWidth, self.isSignal)
         else:
-            return Value(f"{other} + {self.value}", self.bitWidth)
+            return Value(f"{other} + {self.value}", self.bitWidth, self.isSignal)
 
     def __rsub__(self, other):
         if isinstance(other, Value):
-            return Value(f"{other.value} - {self.value}", self.bitWidth)
+            return Value(f"{other.value} - {self.value}", self.bitWidth, self.isSignal)
         else:
-            return Value(f"{other} - {self.value}", self.bitWidth)
+            return Value(f"{other} - {self.value}", self.bitWidth, self.isSignal)
 
     def __rmul__(self, other):
         if isinstance(other, Value):
-            return Value(f"{other.value} * {self.value}", self.bitWidth)
+            return Value(f"{other.value} * {self.value}", self.bitWidth, self.isSignal)
         else:
-            return Value(f"{other} * {self.value}", self.bitWidth)
+            return Value(f"{other} * {self.value}", self.bitWidth, self.isSignal)
 
     def __rtruediv__(self, other):
         if isinstance(other, Value):
-            return Value(f"{other.value} / {self.value}", self.bitWidth)
+            return Value(f"{other.value} / {self.value}", self.bitWidth, self.isSignal)
         else:
-            return Value(f"{other} / {self.value}", self.bitWidth)
+            return Value(f"{other} / {self.value}", self.bitWidth, self.isSignal)
 
     def __rfloordiv__(self, other):
         if isinstance(other, Value):
-            return Value(f"{other.value} // {self.value}", self.bitWidth)
+            return Value(f"{other.value} // {self.value}", self.bitWidth, self.isSignal)
         else:
-            return Value(f"{other} // {self.value}", self.bitWidth)
+            return Value(f"{other} // {self.value}", self.bitWidth, self.isSignal)
 
     def __rmod__(self, other):
         if isinstance(other, Value):
-            return Value(f"{other.value} % {self.value}", self.bitWidth)
+            return Value(f"{other.value} % {self.value}", self.bitWidth, self.isSignal)
         else:
-            return Value(f"{other} % {self.value}", self.bitWidth)
+            return Value(f"{other} % {self.value}", self.bitWidth, self.isSignal)
 
     def __rlshift__(self, other):
         if isinstance(other, Value):
-            return Value(f"{other.value} << {self.value}", self.bitWidth)
+            return Value(f"{other.value} << {self.value}", self.bitWidth, self.isSignal)
         else:
-            return Value(f"{other} << {self.value}", self.bitWidth)
+            return Value(f"{other} << {self.value}", self.bitWidth, self.isSignal)
 
     def __rrshift__(self, other):
         if isinstance(other, Value):
-            return Value(f"{other.value} >> {self.value}", self.bitWidth)
+            return Value(f"{other.value} >> {self.value}", self.bitWidth, self.isSignal)
         else:
-            return Value(f"{other} >> {self.value}", self.bitWidth)
+            return Value(f"{other} >> {self.value}", self.bitWidth, self.isSignal)
 
     def __rand__(self, other):
         if isinstance(other, Value):
-            return Value(f"{other.value} & {self.value}", self.bitWidth)
+            return Value(f"{other.value} & {self.value}", self.bitWidth, self.isSignal)
         else:
-            return Value(f"{other} & {self.value}", self.bitWidth)
+            return Value(f"{other} & {self.value}", self.bitWidth, self.isSignal)
 
     def __rxor__(self, other):
         if isinstance(other, Value):
-            return Value(f"{other.value} ^ {self.value}", self.bitWidth)
+            return Value(f"{other.value} ^ {self.value}", self.bitWidth, self.isSignal)
         else:
-            return Value(f"{other} ^ {self.value}", self.bitWidth)
+            return Value(f"{other} ^ {self.value}", self.bitWidth, self.isSignal)
 
     def __ror__(self, other):
         if isinstance(other, Value):
-            return Value(f"{other.value} | {self.value}", self.bitWidth)
+            return Value(f"{other.value} | {self.value}", self.bitWidth, self.isSignal)
         else:
-            return Value(f"{other} | {self.value}", self.bitWidth)
+            return Value(f"{other} | {self.value}", self.bitWidth, self.isSignal)
 
     def case_eq(self, other):
         if isinstance(other, Value):
-            return Value(f"{self.value} === {other.value}", 1)
+            return Value(f"{self.value} === {other.value}", 1, self.isSignal)
         else:
-            return Value(f"{self.value} === {other}", 1)
+            return Value(f"{self.value} === {other}", 1, self.isSignal)

@@ -1,5 +1,6 @@
 from collections import defaultdict
 from dataclasses import dataclass, field
+from pathlib import Path
 
 from FABulous.fabric_definition.Bel import Bel
 from FABulous.fabric_definition.define import ConfigBitMode, MultiplexerStyle
@@ -54,6 +55,7 @@ class Fabric:
     tile: list[list[Tile]] = field(default_factory=list)
 
     name: str = "eFPGA"
+    fabricDir: Path = Path()
     numberOfRows: int = 15
     numberOfColumns: int = 15
     configBitMode: ConfigBitMode = ConfigBitMode.FRAME_BASED

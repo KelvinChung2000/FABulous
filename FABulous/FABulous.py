@@ -125,23 +125,30 @@ def main():
 
     setup_global_env_vars(args)
 
-    args.top = os.getenv("FAB_PROJ_DIR").split("/")[-1]
+    projectDir = Path(os.getenv("FAB_PROJ_DIR", args.project_dir))
+
+    args.top = projectDir.stem
 
     if args.createProject:
-        create_project(os.getenv("FAB_PROJ_DIR"), args.writer)
+        create_project(projectDir, args.writer)
         exit(0)
 
-    if not os.path.exists(f"{os.getenv('FAB_PROJ_DIR')}/.FABulous"):
+    if not projectDir.exists():
+        logger.error(f"The directory provided does not exist: {projectDir}")
+        exit(1)
+
+    if not (projectDir / ".FABulous").exists():
         logger.error(
             "The directory provided is not a FABulous project as it does not have a .FABulous folder"
         )
-        exit(-1)
+        exit(1)
     else:
         setup_project_env_vars(args)
 
         fab_CLI = FABulous_CLI(
             os.getenv("FAB_PROJ_LANG"),
-            Path(str(os.getenv("FAB_PROJ_DIR"))),
+            projectDir,
+            Path().cwd(),
             FABulousScript=args.FABulousScript,
             TCLScript=args.TCLScript,
         )
@@ -150,13 +157,19 @@ def main():
         if args.verbose == 2:
             fab_CLI.verbose = True
         if args.metaDataDir:
-            metaDataDir = args.metaDataDir
+            if Path(args.metaDataDir).exists():
+                metaDataDir = args.metaDataDir
 
         if args.log:
             with open(args.log, "w") as log:
                 with redirect_stdout(log):
+                    logger.info("Logging to file: " + args.log)
+                    logger.info(f"Setting current working directory to: {projectDir}")
+                    os.chdir(projectDir)
                     fab_CLI.cmdloop()
         else:
+            logger.info(f"Setting current working directory to: {projectDir}")
+            os.chdir(projectDir)
             fab_CLI.cmdloop()
 
 

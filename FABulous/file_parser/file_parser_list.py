@@ -3,7 +3,7 @@ from pathlib import Path
 
 from lark import Lark, Transformer, v_args
 
-from FABulous.fabric_definition.Mux import Mux
+from FABulous.fabric_definition.SwitchMatrix import Mux
 
 muxGrammar = r"""
     start: (mux | COMMENT)+
@@ -47,7 +47,7 @@ class MuxTransformer(Transformer):
         sourceList = [item for sublist in source for item in sublist]
         muxList: list[Mux] = []
         for i in dest:
-            muxList.append(Mux(name=i, inputs=sourceList, output=i, width=1))
+            muxList.append(Mux(name=i, inputs=sourceList, output=i))
         return muxList
 
     @v_args(inline=True)
@@ -57,7 +57,10 @@ class MuxTransformer(Transformer):
         elif isinstance(modifier, Slice):
             return [f"{value}[{i}]" for i in range(modifier.end, modifier.start)]
         elif isinstance(modifier, Iter):
-            return [f"{value}{i}" for i in range(modifier.start, modifier.end + 1, modifier.step)]
+            return [
+                f"{value}{i}"
+                for i in range(modifier.start, modifier.end + 1, modifier.step)
+            ]
         else:
             raise ValueError(f"Unknown modifier {modifier}")
 

@@ -15,9 +15,9 @@ class S_IO_ports:
         self.S_to_fabric = MuxPort(BelPort(name='S_to_fabric', ioDirection=IO.OUTPUT, wireCount=1, isBus=True, prefix='S_', external=False), isBelPort=True, isBus=True, bitWidth=1)
 
     def NewWire(self, srcName: str, dstName: str, wireCount: int) -> (MuxPort, MuxPort):
-        portSrc = MuxPort(Port(name=srcName, ioDirection=IO.OUTPUT, wireCount=wireCount, isBus=False), bitWidth=wireCount, isCreated=True)
+        portSrc = MuxPort(Port(name=srcName, ioDirection=IO.INPUT, wireCount=wireCount, isBus=False), bitWidth=wireCount, isCreated=True)
         setattr(self, srcName, portSrc)
-        portDst = MuxPort(Port(name=dstName, ioDirection=IO.INPUT, wireCount=wireCount, isBus=False), bitWidth=wireCount, isCreated=True)
+        portDst = MuxPort(Port(name=dstName, ioDirection=IO.OUTPUT, wireCount=wireCount, isBus=False), bitWidth=wireCount, isCreated=True)
         setattr(self, dstName, portDst)
         return portSrc, portDst
 

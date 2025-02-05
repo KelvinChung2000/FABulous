@@ -143,7 +143,7 @@ def genSwitchMatrix(tile: Tile) -> SwitchMatrix:
 
 
 if __name__ == "__main__":
-    fabric = parseFabricYAML(Path("/home/kelvin/FABulous_fork/myProject/fabric.yaml"))
+    fabric = parseFabricYAML(Path("/Users/kelvin/FABulous/myProject/fabric.yaml"))
     for tile in fabric.tileDict.values():
         initPortHinting(fabric, tile)
         # print(f"Generated port hinting for tile {tile.name}")

@@ -63,6 +63,7 @@ def generateTileSwitchMatrix(fabric: Fabric, tile: Tile, dest: Path):
                     logger.warning(f"Multiplexer {mux.output} has no inputs")
                     logger.warning(f"Skipping {mux.output}")
                     lr.Comment(f"WARNING unused multiplexer MUX-{mux.output}")
+                    lr.NewLine()
 
                 elif inputCount == 1:
                     lr.Assign(portMapping[mux.output], portMapping[mux.inputs[0]])

@@ -1,5 +1,5 @@
 module PE_switch_matrix #(
-    parameter NoConfigBits = 68
+    parameter NoConfigBits = 49
 )(
     output [31:0] out0,
     output [31:0] out1,
@@ -13,18 +13,8 @@ module PE_switch_matrix #(
     output [31:0] E_reg_in,
     output [31:0] S_reg_in,
     output [31:0] W_reg_in,
-    output [31:0] testOut_i,
-    output [15:0] test1_i,
-    output [15:0] test1_o,
-    output [15:0] test2_i,
-    output [15:0] test2_o,
-    output [15:0] test3_i,
-    output [15:0] test3_o,
     output spanOut_1_1,
     output spanOut_0_0,
-    output [15:0] testOut_o_31_16,
-    output [15:0] testOut_o_31_16,
-    output [15:0] testOut_o_15_0,
     input [31:0] data_out,
     input [31:0] in0,
     input [31:0] in1,
@@ -43,9 +33,6 @@ module PE_switch_matrix #(
     input [31:0] W_reg_in,
     input spanIn_0_0,
     input spanIn_1_1,
-    input [15:0] test1_o,
-    input [15:0] test3_o,
-    input [15:0] test2_o,
     input [NoConfigBits - 1:0] ConfigBits,
     input [NoConfigBits - 1:0] ConfigBits_N
 );
@@ -132,7 +119,8 @@ cus_mux161_buf_pack #(
 );
 
 // switch matrix multiplexer data_in3 MUX-0
-// WARNING unused multiplexer MUX-BelPort(name='data_in3', ioDirection=<IO.INPUT: 'input'>, wireCount=32, isBus=True, prefix='', external=False)
+// WARNING unused multiplexer MUX-BelPort(input data_in3[31:0])
+
 // switch matrix multiplexer RES_reg_in MUX-1
 assign RES_reg_in = data_out;
 
@@ -176,47 +164,10 @@ cus_mux21_pack #(
     .X(W_reg_in)
 );
 
-// switch matrix multiplexer testOut_i MUX-0
-// WARNING unused multiplexer MUX-Port(output testOut_i[31:0])
-// switch matrix multiplexer test1_i MUX-0
-// WARNING unused multiplexer MUX-Port(output test1_i[15:0])
-// switch matrix multiplexer test1_o MUX-0
-// WARNING unused multiplexer MUX-Port(input test1_o[15:0])
-// switch matrix multiplexer test2_i MUX-0
-// WARNING unused multiplexer MUX-Port(output test2_i[15:0])
-// switch matrix multiplexer test2_o MUX-0
-// WARNING unused multiplexer MUX-Port(input test2_o[15:0])
-// switch matrix multiplexer test3_i MUX-0
-// WARNING unused multiplexer MUX-Port(output test3_i[15:0])
-// switch matrix multiplexer test3_o MUX-0
-// WARNING unused multiplexer MUX-Port(input test3_o[15:0])
 // switch matrix multiplexer spanOut_1_1 MUX-1
 assign spanOut_1_1 = spanIn_0_0;
 
 // switch matrix multiplexer spanOut_0_0 MUX-1
 assign spanOut_0_0 = spanIn_1_1;
-
-// switch matrix multiplexer testOut_o_31_16 MUX-2
-cus_mux21_pack #(
-    .WIDTH(16)
-) inst_cus_mux21_pack_testOut_o_31_16 (
-    .A0(test3_o),
-    .A1(test1_o),
-    .S(ConfigBits[12]),
-    .X(testOut_o_31_16)
-);
-
-// switch matrix multiplexer testOut_o_31_16 MUX-2
-cus_mux21_pack #(
-    .WIDTH(16)
-) inst_cus_mux21_pack_testOut_o_31_16 (
-    .A0(test3_o),
-    .A1(test1_o),
-    .S(ConfigBits[13]),
-    .X(testOut_o_31_16)
-);
-
-// switch matrix multiplexer testOut_o_15_0 MUX-1
-assign testOut_o_15_0 = test2_o;
 
 endmodule

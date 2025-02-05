@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from FABulous.fabric_definition.define import IO
-from FABulous.fabric_definition.Port import ConfigPort, Port, SharedPort
+from FABulous.fabric_definition.Port import BelPort, ConfigPort, Port, SharedPort
 
 
 @dataclass
@@ -50,10 +50,10 @@ class Bel:
     src: Path
     prefix: str
     name: str
-    inputs: list[Port]
-    outputs: list[Port]
-    externalInputs: list[Port]
-    externalOutputs: list[Port]
+    inputs: list[BelPort]
+    outputs: list[BelPort]
+    externalInputs: list[BelPort]
+    externalOutputs: list[BelPort]
     configPort: list[ConfigPort]
     sharedPort: list[SharedPort]
     configBit: int
@@ -64,8 +64,8 @@ class Bel:
         self,
         src: Path,
         prefix: str,
-        internal: list[Port],
-        external: list[Port],
+        internal: list[BelPort],
+        external: list[BelPort],
         configPort: list[ConfigPort],
         sharedPort: list[SharedPort],
         configBit: int,

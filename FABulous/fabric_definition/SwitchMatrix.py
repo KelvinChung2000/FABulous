@@ -1,69 +1,91 @@
-from copy import deepcopy
+from collections import defaultdict, namedtuple
 from dataclasses import dataclass, field
-from typing import Any, Iterable
+from typing import Any, Iterable, Self
 
-from FABulous.fabric_definition.Port import Port, TilePort
+from FABulous.fabric_definition.define import IO
+from FABulous.fabric_definition.Port import Port, SlicedPort, TilePort
+
+SliceRange = namedtuple("SliceRange", ["start", "end"])
+
+
+@dataclass
+class SlicedSignal:
+    port: Port | TilePort
+    sliceRange: SliceRange
 
 
 @dataclass
 class MuxPort:
     port: Port | TilePort
-    inputs: list[Port | TilePort] = field(default_factory=list)
+    inputs: list["MuxPort"] = field(default_factory=list)
     isTilePort: bool = False
     isBelPort: bool = False
     isSliced: bool = False
     isBus: bool = False
+    isCreated: bool = False
     bitWidth: int = 1
-    sliceRange: tuple[int, int] = (0, 0)
+    sliceRange: SliceRange = SliceRange(-1, -1)
+    slicingAssignDict: dict[SliceRange, list[SlicedSignal]] = field(
+        default_factory=lambda: defaultdict(list)
+    )
 
     def __getitem__(self, key: slice | int):
         if isinstance(key, slice):
             if self.isBus:
                 raise ValueError("Cannot slice a bus")
-            if self.isSliced:
-                raise ValueError("Cannot slice a sliced port")
             if key.step is not None:
                 raise ValueError("Cannot slice with step")
             if abs(key.start - key.stop) > self.bitWidth:
                 raise ValueError("Slice width is greater than bit width")
-
-            selfCopy = deepcopy(self)
-            selfCopy.isSliced = True
-            selfCopy.sliceRange = (key.start, key.stop)
-            return selfCopy
+            self.isSliced = True
+            self.sliceRange = SliceRange(key.start, key.stop)
+            return self
         elif isinstance(key, int):
             if self.isBus:
                 raise ValueError("Cannot slice a bus")
-            if self.isSliced:
-                raise ValueError("Cannot slice a sliced port")
             if key >= self.bitWidth:
                 raise ValueError("Index out of range")
-
-            selfCopy = deepcopy(self)
-            selfCopy.isSliced = True
-            selfCopy.sliceRange = (key, key)
-            return selfCopy
+            self.isSliced = True
+            self.sliceRange = SliceRange(key, key)
+            return self
         else:
             raise ValueError("Invalid slicing for MuxPort")
 
-    def __setitem__(self, key: slice | int, value: Any):
-        self.__add(value)
+    def __setitem__(self, key: slice | int, value: Self):
+        pass
+        # raise ValueError("Cannot perform set item, use the //= operator")
 
     def __ifloordiv__(self, other: Any):
-        return self.__add(other)
-
-    def __add(self, other: Any):
-        if isinstance(other, MuxPort):
-            self.inputs.append(other.port)
-        elif isinstance(other, list):
-            for i in other:
-                self.inputs.append(i.port)
+        if self.isSliced:
+            if isinstance(other, list):
+                for i in other:
+                    self.slicingAssignDict[self.sliceRange].append(
+                        SlicedSignal(port=i.port, sliceRange=i.sliceRange)
+                    )
+            else:
+                self.slicingAssignDict[self.sliceRange].append(
+                    SlicedSignal(port=other.port, sliceRange=other.sliceRange)
+                )
+            return self
         else:
-            raise ValueError("Invalid type for MuxPort")
-        return self
+            if isinstance(other, MuxPort):
+                self.inputs.append(other)
+            elif isinstance(other, list):
+                for i in other:
+                    self.inputs.append(i)
+            else:
+                raise ValueError("Invalid type for MuxPort")
+
+            return self
+
+    # def __repr__(self) -> str:
+    #     if self.isSliced:
+    #         return f"MuxPort(port={self.port}, sliceDict={self.slicingAssignDict})"
+    #     else:
+    #         return f"MuxPort(port={self.port})"
 
 
-GenericPort = Port | TilePort
+GenericPort = Port | TilePort | SlicedPort
 
 
 class Mux:
@@ -137,6 +159,10 @@ class SwitchMatrix:
     #         self.addMux(mux.name, list(mux.inputs), mux.output)
 
     def addMux(self, mux: Mux):
+        if len(mux.inputs) == 0:
+            if isinstance(mux.output, TilePort) and mux.output.ioDirection == IO.OUTPUT:
+                raise ValueError(f"A tile output port {mux.output} has no inputs")
+
         if mux.output in self._uniqueOutput:
             self.muxes[mux.output].extendInputs(mux.inputs)
         else:

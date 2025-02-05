@@ -11,6 +11,9 @@ class Port:
     wireCount: int
     isBus: bool
 
+    def __repr__(self) -> str:
+        return f"Port({self.ioDirection.value} {self.name}[{self.wireCount-1}:0])"
+
     def createSelf(self) -> str:
         return (
             f"Port(name='{self.name}', ioDirection=IO.{self.ioDirection.upper()}, "
@@ -56,7 +59,7 @@ class TilePort(Port):
     __io = {IO.OUTPUT: 0, IO.INPUT: 1, IO.INOUT: 2}
 
     def __repr__(self) -> str:
-        return f"({self.sideOfTile}) {self.ioDirection.value} {self.name}[{self.wireCount}]"
+        return f"TilePort({{{self.sideOfTile}}} {self.ioDirection.value} {self.name}[{self.wireCount-1}:0])"
 
     def createSelf(self) -> str:
         return (
@@ -99,6 +102,24 @@ class TilePort(Port):
 
 
 @dataclass(frozen=True, eq=True)
+class SlicedPort(Port):
+    originalPort: Port
+
+
+@dataclass(frozen=True, eq=True)
+class BelPort(Port):
+    prefix: str
+    external: bool
+
+    def createSelf(self) -> str:
+        return (
+            f"BelPort(name='{self.prefix}{self.name}', ioDirection=IO.{self.ioDirection.upper()}, "
+            f"wireCount={self.wireCount}, isBus={self.isBus}, prefix='{self.prefix}', "
+            f"external={self.external})"
+        )
+
+
+@dataclass(frozen=True, eq=True)
 class ConfigPort(Port):
     feature: str = ""
     featureType: FeatureType = FeatureType.INIT
@@ -108,6 +129,8 @@ class ConfigPort(Port):
 class SharedPort(Port):
     sharedWith: str = ""
 
+
+GenericPort = Port | TilePort | SlicedPort | BelPort | ConfigPort | SharedPort
 
 # @dataclass(frozen=True, eq=True)
 # class Port:

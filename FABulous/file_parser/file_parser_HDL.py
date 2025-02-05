@@ -8,7 +8,7 @@ from loguru import logger
 
 from FABulous.fabric_definition.Bel import Bel
 from FABulous.fabric_definition.define import IO, FABulousPortType, FeatureType
-from FABulous.fabric_definition.Port import ConfigPort, Port, SharedPort
+from FABulous.fabric_definition.Port import BelPort, ConfigPort, Port, SharedPort
 
 
 def verilog_belMapProcessing(module_info):
@@ -87,7 +87,9 @@ def vhdl_belMapProcessing(file: str, filename: str) -> dict:
     pre = "--.*?"
 
     belEnumsDic = {}
-    if belEnums := re.findall(pre + r"\(\*.*?FABulous,.*?BelEnum,(.*?)\*\)", file, re.DOTALL | re.MULTILINE):
+    if belEnums := re.findall(
+        pre + r"\(\*.*?FABulous,.*?BelEnum,(.*?)\*\)", file, re.DOTALL | re.MULTILINE
+    ):
         for enums in belEnums:
             enums = enums.replace("\n", "").replace(" ", "").replace("\t", "")
             enums = enums.split(",")
@@ -112,7 +114,9 @@ def vhdl_belMapProcessing(file: str, filename: str) -> dict:
                         belEnumsDic[name][key][j] = bitValue.pop(0)
 
     belMapDic = {}
-    if belMap := re.search(pre + r"\(\*.*FABulous,.*?BelMap,(.*?)\*\)", file, re.DOTALL | re.MULTILINE):
+    if belMap := re.search(
+        pre + r"\(\*.*FABulous,.*?BelMap,(.*?)\*\)", file, re.DOTALL | re.MULTILINE
+    ):
         belMap = belMap.group(1)
         belMap = belMap.replace("\n", "").replace(" ", "").replace("\t", "")
         belMap = belMap.split(",")
@@ -238,10 +242,10 @@ def parseBelFile(
     ValueError
         No permission to access the file
     """
-    externalPort: list[Port] = []
+    externalPort: list[BelPort] = []
     configPort: list[ConfigPort] = []
     sharedPort: list[SharedPort] = []
-    internalPort: list[Port] = []
+    internalPort: list[BelPort] = []
     belMapDict: dict[str, int] = {}
     userClk: Port | None = None
 
@@ -284,7 +288,9 @@ def parseBelFile(
 
     modules = data_dict.get("modules", {})
     if len(modules) > 1:
-        logger.error(f"Multiple modules found in {filename}. Only one module per file is allowed.")
+        logger.error(
+            f"Multiple modules found in {filename}. Only one module per file is allowed."
+        )
         raise ValueError
     elif len(modules) == 0:
         logger.error(f"No modules found in {filename}.")
@@ -308,11 +314,13 @@ def parseBelFile(
         if "FABulous" not in attributes:
             continue
 
-        port = Port(
+        port = BelPort(
             name=f"{net}",
             ioDirection=ports[net],
             wireCount=netBitWidth,
             isBus=FABulousPortType.BUS in attributes,
+            prefix=belPrefix,
+            external=FABulousPortType.EXTERNAL in attributes,
         )
 
         if FABulousPortType.EXTERNAL in attributes:
@@ -322,14 +330,20 @@ def parseBelFile(
             feature = feature.split(" ")
             featureType = attributes - set(["FABulous", "CONFIG_BIT", "src", "FEATURE"])
             if len(feature) == 0:
-                raise ValueError(f"CONFIG_BIT port and {net} in file {filename} must have at least one feature.")
+                raise ValueError(
+                    f"CONFIG_BIT port and {net} in file {filename} must have at least one feature."
+                )
             if len(featureType) != 1:
-                raise ValueError(f"CONFIG_BIT port and {net} in file {filename} must have exactly one feature type.")
+                raise ValueError(
+                    f"CONFIG_BIT port and {net} in file {filename} must have exactly one feature type."
+                )
             for i in feature:
                 belMapDict[i] = netBitWidth
 
             if ports[net] != IO.INPUT:
-                raise ValueError(f"CONFIG_BIT port {net} in file {filename} must be an input port.")
+                raise ValueError(
+                    f"CONFIG_BIT port {net} in file {filename} must be an input port."
+                )
 
             configPort.append(
                 ConfigPort(

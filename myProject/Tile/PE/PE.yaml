@@ -12,7 +12,7 @@ PORTS: [
     {side: SOUTH, name: out2, inOut: output, wires: 32, terminal: false},
     {side: WEST, name: out3, inOut: output, wires: 32, terminal: false},
 
-    {side: EAST, name: spanIn, inOut: output, wires: 2, terminal: false},
+    {side: EAST, name: spanIn, inOut: input, wires: 2, terminal: false},
     {side: WEST, name: spanOut, inOut: output, wires: 2, terminal: false},
   ]
 WIRES: [

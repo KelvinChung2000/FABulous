@@ -1,12 +1,17 @@
 from itertools import zip_longest
 from pathlib import Path
+from typing import Mapping
 
 from loguru import logger
 
 from FABulous.fabric_definition.define import IO, ConfigBitMode, MultiplexerStyle
 from FABulous.fabric_definition.Fabric import Fabric
+from FABulous.fabric_definition.Port import Port, SlicedPort, TilePort
 from FABulous.fabric_definition.Tile import Tile
 from FABulous.fabric_generator.code_generator_2 import CodeGenerator
+from FABulous.fabric_generator.HDL_Construct.Value import Value
+
+GenericPort = Port | TilePort | SlicedPort
 
 
 def generateTileSwitchMatrix(fabric: Fabric, tile: Tile, dest: Path):
@@ -20,11 +25,12 @@ def generateTileSwitchMatrix(fabric: Fabric, tile: Tile, dest: Path):
                 "NoConfigBits", tile.switchMatrix.configBits
             )
 
+        portMapping: Mapping[GenericPort, Value] = {}
         with module.PortRegion() as pr:
             for output in sm.getOutputs():
-                pr.Port(output.value, IO.OUTPUT, output.bitWidth)
+                portMapping[output] = pr.Port(output.name, IO.OUTPUT, output.wireCount)
             for i in sm.getInputs():
-                pr.Port(i.value, IO.INPUT, i.bitWidth)
+                portMapping[i] = pr.Port(i.name, IO.INPUT, i.wireCount)
 
             if tile.switchMatrix.configBits > 0:
                 if fabric.configBitMode == ConfigBitMode.FLIPFLOP_CHAIN:
@@ -52,14 +58,14 @@ def generateTileSwitchMatrix(fabric: Fabric, tile: Tile, dest: Path):
             configBitstreamPosition = 0
             for mux in sm.muxes.values():
                 inputCount = len(mux.inputs)
-                lr.Comment(f"switch matrix multiplexer {mux.output} MUX-{inputCount}")
+                lr.Comment(f"switch matrix multiplexer {mux.name} MUX-{inputCount}")
                 if inputCount == 0:
                     logger.warning(f"Multiplexer {mux.output} has no inputs")
                     logger.warning(f"Skipping {mux.output}")
                     lr.Comment(f"WARNING unused multiplexer MUX-{mux.output}")
 
                 elif inputCount == 1:
-                    lr.Assign(mux.output, mux.inputs[0])
+                    lr.Assign(portMapping[mux.output], portMapping[mux.inputs[0]])
                 else:
                     # this is the case for a configurable switch matrix multiplexer
                     old_ConfigBitstreamPosition = configBitstreamPosition
@@ -96,15 +102,18 @@ def generateTileSwitchMatrix(fabric: Fabric, tile: Tile, dest: Path):
                                     )
                                 )
 
-                        connection.append(lr.ConnectPair("X", mux.output))
+                        connection.append(lr.ConnectPair("X", portMapping[mux.output]))
                         # we add the input signal in reversed order
                         # Changed it such that the left-most entry is located at the end of the concatenated vector for the multiplexing
                         # This was done such that the index from left-to-right in the adjacency matrix corresponds with the multiplexer select input (index)
                         lr.InitModule(
                             muxComponentName,
-                            f"inst_{muxComponentName}_{mux.output}",
+                            f"inst_{muxComponentName}_{mux.name}",
                             [
-                                lr.ConnectPair(f"A{index}", input_signal)
+                                lr.ConnectPair(
+                                    f"A{index}",
+                                    portMapping.get(input_signal, input_signal),
+                                )
                                 for index, input_signal in zip_longest(
                                     range(0, paddedMuxSize),
                                     mux.inputs[::-1],
@@ -121,7 +130,7 @@ def generateTileSwitchMatrix(fabric: Fabric, tile: Tile, dest: Path):
                     else:
                         # generic multiplexer
                         lr.Assign(
-                            mux.output,
+                            portMapping[mux.output],
                             f"{mux.output}_input[ConfigBits[{configBitstreamPosition - 1}:{configBitstreamPosition}]]",
                         )
 

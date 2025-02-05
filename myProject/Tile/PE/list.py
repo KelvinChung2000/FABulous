@@ -38,8 +38,9 @@ class MuxList(PE_ports):
 
         self.spanOut[1] //= self.spanIn[0]
         self.spanOut[0] //= self.spanIn[1]
-        wOut = self.NewWire("testOut", 32)
-        w1 = self.NewWire("test1", 16)
-        w2 = self.NewWire("test2", 16)
-        wOut[31:16] //= w1
+        _, wOut = self.NewWire("testOut_i", "testOut_o", 32)
+        _, w1 = self.NewWire("test1_i", "test1_o", 16)
+        _, w2 = self.NewWire("test2_i", "test2_o", 16)
+        _, w3 = self.NewWire("test3_i", "test3_o", 16)
+        wOut[31:16] //= [w1, w3]
         wOut[15:0] //= w2

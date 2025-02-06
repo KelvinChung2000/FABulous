@@ -1,6 +1,7 @@
 from collections import defaultdict
 from dataclasses import dataclass, field
 from pathlib import Path
+from typing import Any
 
 from FABulous.fabric_definition.Bel import Bel
 from FABulous.fabric_definition.define import ConfigBitMode, MultiplexerStyle
@@ -75,154 +76,16 @@ class Fabric:
     superTileDict: dict[str, SuperTile] = field(default_factory=dict)
     wireDict: dict[tuple[int, int], list[Wire]] = field(default_factory=dict)
 
-    # def __post_init__(self) -> None:
-    #     """Generate all the wire pairs in the fabric and get all the wires in the
-    #     fabric.
-
-    #     The wire pair are used during model generation when some of the signals have
-    #     source or destination of "NULL".
-
-    #     The wires are used during model generation to work with wire that going cross
-    #     tile.
-    #     """
-    #     for row in self.tile:
-    #         for tile in row:
-    #             if tile is None:
-    #                 continue
-    #             for port in tile.portsInfo:
-    #                 self.commonWirePair.append((port.sourceName, port.destinationName))
-
-    #     self.commonWirePair = list(dict.fromkeys(self.commonWirePair))
-    #     self.commonWirePair = [
-    #         (i, j) for i, j in self.commonWirePair if i != "NULL" and j != "NULL"
-    #     ]
-
-    #     for y, row in enumerate(self.tile):
-    #         for x, tile in enumerate(row):
-    #             if tile == None:
-    #                 continue
-    #             for port in tile.ports:
-    #                 if (
-    #                     abs(port.xOffset) <= 1
-    #                     and abs(port.yOffset) <= 1
-    #                     and port.sourceName != "NULL"
-    #                     and port.destinationName != "NULL"
-    #                 ):
-    #                     for i in range(port.wireCount):
-    #                         tile.wireList.append(
-    #                             Wire(
-    #                                 direction=port.wireDirection,
-    #                                 source=f"{port.sourceName}{i}",
-    #                                 xOffset=port.xOffset,
-    #                                 yOffset=port.yOffset,
-    #                                 destination=f"{port.destinationName}{i}",
-    #                                 sourceTile="",
-    #                                 destinationTile="",
-    #                             )
-    #                         )
-    #                 elif port.sourceName != "NULL" and port.destinationName != "NULL":
-    #                     # clamp the xOffset to 1 or -1
-    #                     value = min(max(port.xOffset, -1), 1)
-    #                     cascadedI = 0
-    #                     for i in range(port.wireCount * abs(port.xOffset)):
-    #                         if i < port.wireCount:
-    #                             cascadedI = i + port.wireCount * (abs(port.xOffset) - 1)
-    #                         else:
-    #                             cascadedI = i - port.wireCount
-    #                             tile.wireList.append(
-    #                                 Wire(
-    #                                     direction=Direction.JUMP,
-    #                                     source=f"{port.destinationName}{i}",
-    #                                     xOffset=0,
-    #                                     yOffset=0,
-    #                                     destination=f"{port.sourceName}{i}",
-    #                                     sourceTile=f"X{x}Y{y}",
-    #                                     destinationTile=f"X{x}Y{y}",
-    #                                 )
-    #                             )
-    #                         tile.wireList.append(
-    #                             Wire(
-    #                                 direction=port.wireDirection,
-    #                                 source=f"{port.sourceName}{i}",
-    #                                 xOffset=value,
-    #                                 yOffset=port.yOffset,
-    #                                 destination=f"{port.destinationName}{cascadedI}",
-    #                                 sourceTile=f"X{x}Y{y}",
-    #                                 destinationTile=f"X{x+value}Y{y+port.yOffset}",
-    #                             )
-    #                         )
-
-    #                     # clamp the yOffset to 1 or -1
-    #                     value = min(max(port.yOffset, -1), 1)
-    #                     cascadedI = 0
-    #                     for i in range(port.wireCount * abs(port.yOffset)):
-    #                         if i < port.wireCount:
-    #                             cascadedI = i + port.wireCount * (abs(port.yOffset) - 1)
-    #                         else:
-    #                             cascadedI = i - port.wireCount
-    #                             tile.wireList.append(
-    #                                 Wire(
-    #                                     direction=Direction.JUMP,
-    #                                     source=f"{port.destinationName}{i}",
-    #                                     xOffset=0,
-    #                                     yOffset=0,
-    #                                     destination=f"{port.sourceName}{i}",
-    #                                     sourceTile=f"X{x}Y{y}",
-    #                                     destinationTile=f"X{x}Y{y}",
-    #                                 )
-    #                             )
-    #                         tile.wireList.append(
-    #                             Wire(
-    #                                 direction=port.wireDirection,
-    #                                 source=f"{port.sourceName}{i}",
-    #                                 xOffset=port.xOffset,
-    #                                 yOffset=value,
-    #                                 destination=f"{port.destinationName}{cascadedI}",
-    #                                 sourceTile=f"X{x}Y{y}",
-    #                                 destinationTile=f"X{x+port.xOffset}Y{y+value}",
-    #                             )
-    #                         )
-    #                 elif port.sourceName != "NULL" and port.destinationName == "NULL":
-    #                     sourceName = port.sourceName
-    #                     destName = ""
-    #                     try:
-    #                         index = [i for i, _ in self.commonWirePair].index(
-    #                             port.sourceName
-    #                         )
-    #                         sourceName = self.commonWirePair[index][0]
-    #                         destName = self.commonWirePair[index][1]
-    #                     except:
-    #                         # if is not in a common pair wire we assume the source name is same as destination name
-    #                         destName = sourceName
-
-    #                     value = min(max(port.xOffset, -1), 1)
-    #                     for i in range(port.wireCount * abs(port.xOffset)):
-    #                         tile.wireList.append(
-    #                             Wire(
-    #                                 direction=port.wireDirection,
-    #                                 source=f"{sourceName}{i}",
-    #                                 xOffset=value,
-    #                                 yOffset=port.yOffset,
-    #                                 destination=f"{destName}{i}",
-    #                                 sourceTile=f"X{x}Y{y}",
-    #                                 destinationTile=f"X{x+value}Y{y+port.yOffset}",
-    #                             )
-    #                         )
-
-    #                     value = min(max(port.yOffset, -1), 1)
-    #                     for i in range(port.wireCount * abs(port.yOffset)):
-    #                         tile.wireList.append(
-    #                             Wire(
-    #                                 direction=port.wireDirection,
-    #                                 source=f"{sourceName}{i}",
-    #                                 xOffset=port.xOffset,
-    #                                 yOffset=value,
-    #                                 destination=f"{destName}{i}",
-    #                                 sourceTile=f"X{x}Y{y}",
-    #                                 destinationTile=f"X{x+port.xOffset}Y{y+value}",
-    #                             )
-    #                         )
-    #             tile.wireList = list(dict.fromkeys(tile.wireList))
+    def __getitem__(self, index: Any) -> Tile | SuperTile | None:
+        if isinstance(index, tuple):
+            return self.tile[index[1]][index[0]]
+        if isinstance(index, str):
+            if index in self.tileDict:
+                return self.tileDict[index]
+            elif index in self.superTileDict:
+                return self.superTileDict[index]
+        else:
+            raise ValueError("Invalid index for Fabric")
 
     def __repr__(self) -> str:
         fabric = ""

@@ -137,6 +137,14 @@ class Tile:
 
     def getTileOutputPorts(self) -> list[TilePort]:
         return sorted([p for p in self.ports if p.ioDirection == IO.OUTPUT])
+    
+    def getTilePortGrouped(self, io: IO) -> dict[Side, list[TilePort]]:
+        return {
+            Side.NORTH: self.getNorthPorts(io),
+            Side.EAST: self.getEastPorts(io),
+            Side.SOUTH: self.getSouthPorts(io),
+            Side.WEST: self.getWestPorts(io),
+        }
 
     def getCascadeWireCount(self, port: TilePort) -> int:
         for i in self.wireTypes:

@@ -21,6 +21,11 @@ class Value:
     def bitWidth(self):
         return self._bitWidth
 
+    def customEq(self, a, b):
+        return (
+            a.value == b.value and a.bitWidth == b.bitWidth and a.isSignal == b.isSignal
+        )
+
     def __repr___(self):
         return f"[{self.isSignal=} {self.bitWidth=}]{self.value}"
 
@@ -30,7 +35,7 @@ class Value:
     def __str__(self):
         return self.value
 
-    def __getitem__(self, key: slice | int):
+    def __getitem__(self, key: slice | int | Self):
         if isinstance(key, int):
             return Value(f"{self.value}[{key}]", 1, self.isSignal)
         elif isinstance(key, slice):
@@ -47,16 +52,21 @@ class Value:
                     return Value(
                         f"{self.value}[{key.start}:0]", self.bitWidth, self.isSignal
                     )
-                if key.start == key.stop:
+                if (
+                    key.start == key.stop
+                    and isinstance(key.start, int)
+                    and isinstance(key.stop, int)
+                ):
                     return Value(f"{self.value}[{key.start}]", 1, self.isSignal)
-
                 return Value(
                     f"{self.value}[{key.start}:{key.stop}]",
                     self.bitWidth,
                     self.isSignal,
                 )
             else:
-                raise ValueError("Cannot only index port and signal type")
+                raise ValueError("Can only index port and signal type")
+        elif isinstance(key, Value):
+            return Value(f"{self.value}[{key.value}]", self.bitWidth, self.isSignal)
         else:
             raise ValueError("Invalid index")
 

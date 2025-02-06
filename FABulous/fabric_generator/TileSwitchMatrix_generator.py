@@ -6,7 +6,7 @@ from loguru import logger
 
 from FABulous.fabric_definition.define import IO, ConfigBitMode, MultiplexerStyle
 from FABulous.fabric_definition.Fabric import Fabric
-from FABulous.fabric_definition.Port import Port, SlicedPort, TilePort
+from FABulous.fabric_definition.Port import BelPort, Port, SlicedPort, TilePort
 from FABulous.fabric_definition.Tile import Tile
 from FABulous.fabric_generator.code_generator_2 import CodeGenerator
 from FABulous.fabric_generator.HDL_Construct.Value import Value
@@ -27,10 +27,29 @@ def generateTileSwitchMatrix(fabric: Fabric, tile: Tile, dest: Path):
 
         portMapping: Mapping[GenericPort, Value] = {}
         with module.PortRegion() as pr:
+            uniqueName = set()
+
             for output in sm.getOutputs():
-                portMapping[output] = pr.Port(output.name, IO.OUTPUT, output.wireCount)
+                if isinstance(output, BelPort):
+                    portMapping[output] = pr.Port(
+                        output.prefix + output.name,
+                        IO.OUTPUT,
+                        output.wireCount,
+                    )
+                else:
+                    portMapping[output] = pr.Port(
+                        output.name, IO.OUTPUT, output.wireCount
+                    )
+                uniqueName.add(output.name)
             for i in sm.getInputs():
-                portMapping[i] = pr.Port(i.name, IO.INPUT, i.wireCount)
+                if i.name in uniqueName:
+                    continue
+                if isinstance(i, BelPort):
+                    portMapping[i] = pr.Port(
+                        i.prefix + i.name, IO.INPUT, i.wireCount
+                    )
+                else:
+                    portMapping[i] = pr.Port(i.name, IO.INPUT, i.wireCount)
 
             if tile.switchMatrix.configBits > 0:
                 if fabric.configBitMode == ConfigBitMode.FLIPFLOP_CHAIN:

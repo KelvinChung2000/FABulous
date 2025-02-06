@@ -103,6 +103,7 @@ class TilePort(Port):
 
 @dataclass(frozen=True, eq=True)
 class SlicedPort(Port):
+    sliceRange: tuple[int, int]
     originalPort: Port
 
 
@@ -112,11 +113,11 @@ class BelPort(Port):
     external: bool
 
     def __repr__(self) -> str:
-        return f"BelPort({self.ioDirection.value} {self.name}[{self.wireCount-1}:0])"
+        return f"BelPort({self.ioDirection.value} {self.prefix}{self.name}[{self.wireCount-1}:0])"
 
     def createSelf(self) -> str:
         return (
-            f"BelPort(name='{self.prefix}{self.name}', ioDirection=IO.{self.ioDirection.upper()}, "
+            f"BelPort(name='{self.name}', ioDirection=IO.{self.ioDirection.upper()}, "
             f"wireCount={self.wireCount}, isBus={self.isBus}, prefix='{self.prefix}', "
             f"external={self.external})"
         )

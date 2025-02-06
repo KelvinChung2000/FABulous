@@ -34,10 +34,10 @@ from cmd2 import (
 )
 from loguru import logger
 
-from FABulous.FABulous_CLI import cmd_synthesis
 from FABulous.fabric_generator.code_generation_Verilog import VerilogWriter
 from FABulous.fabric_generator.code_generation_VHDL import VHDLWriter
 from FABulous.FABulous_API import FABulous_API
+from FABulous.FABulous_CLI import cmd_synthesis
 from FABulous.FABulous_CLI.helper import (
     allow_blank,
     check_if_application_exists,
@@ -577,6 +577,7 @@ class FABulous_CLI(Cmd):
         Does this by calling the respective functions 'do_gen_[function]'.
         """
         logger.info("Running FABulous")
+        self.fabulousAPI.gen_port_hinting()
         self.do_gen_fabric()
         self.do_gen_primitive_library(self.projectDir / META_DATA_DIR / "prims.v")
         self.do_gen_chipdb()

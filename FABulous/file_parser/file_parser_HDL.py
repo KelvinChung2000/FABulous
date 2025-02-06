@@ -2,7 +2,6 @@ import json
 import re
 import subprocess
 from pathlib import Path
-from typing import Literal
 
 from loguru import logger
 
@@ -159,7 +158,6 @@ def vhdl_belMapProcessing(file: str, filename: str) -> dict:
 def parseBelFile(
     filename: Path,
     belPrefix: str = "",
-    filetype: Literal["verilog", "vhdl"] = "verilog",
 ) -> Bel:
     """Parse a Verilog or VHDL bel file and return all the related information of the
     bel. The tuple returned for relating to ports will be a list of (belName, IO) pair.
@@ -249,27 +247,23 @@ def parseBelFile(
     belMapDict: dict[str, int] = {}
     userClk: Port | None = None
 
-    try:
-        with open(filename, "r") as f:
-            file = f.read()
-    except FileNotFoundError:
-        logger.critical(f"File {filename} not found.")
-        exit(-1)
-    except PermissionError:
-        logger.critical(f"Permission denied to file {filename}.")
-        exit(-1)
+    if not filename.exists():
+        logger.error(f"File {filename} not found.")
+        raise ValueError
 
-    json_file = filename.with_suffix(".json")
-    if filetype == "verilog":
+    Path(filename.parent / "metadata").mkdir(exist_ok=True)
+    json_file = filename.parent / Path("metadata") / filename.with_suffix(".json").name
+    if filename.suffix == ".v":
         # Runs yosys on verilog file, creates netlist, saves to json in same directory.
         runCmd = [
             "yosys",
             "-qp",
             f"read_verilog {filename}; proc -noopt; write_json -compat-int {json_file}",
         ]
-    elif filetype == "vhdl":
+    elif filename.suffix == ".vhdl":
         runCmd = [
             "yosys",
+            "-m ghdl",
             "-qp",
             f"ghdl {filename}; proc -noopt; write_json -compat-int {json_file}",
         ]

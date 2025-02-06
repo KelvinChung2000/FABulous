@@ -16,6 +16,7 @@ from FABulous.fabric_generator.code_generation_VHDL import VHDLWriter
 from FABulous.fabric_generator.fabric_gen import FabricGenerator
 from FABulous.file_parser.file_parser_csv import parseFabricCSV
 from FABulous.file_parser.file_parser_yaml import parseFabricYAML
+from FABulous.file_parser.parse_py_mux import initPortHinting
 from FABulous.geometry_generator.geometry_gen import GeometryGenerator
 
 
@@ -311,3 +312,7 @@ class FABulous_API:
             None
         """
         prims_gen(result, self.fabric)
+
+    def gen_port_hinting(self):
+        for i in self.fabric.tileDict.values():
+            initPortHinting(self.fabric, i)

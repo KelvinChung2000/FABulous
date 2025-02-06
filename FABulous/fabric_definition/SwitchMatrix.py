@@ -3,20 +3,20 @@ from dataclasses import dataclass, field
 from typing import Any, Iterable, Self
 
 from FABulous.fabric_definition.define import IO
-from FABulous.fabric_definition.Port import Port, SlicedPort, TilePort
+from FABulous.fabric_definition.Port import Port, SlicedPort, TilePort, GenericPort
 
 SliceRange = namedtuple("SliceRange", ["start", "end"])
 
 
 @dataclass
 class SlicedSignal:
-    port: Port | TilePort
+    port: GenericPort
     sliceRange: SliceRange
 
 
 @dataclass
 class MuxPort:
-    port: Port | TilePort
+    port: GenericPort
     inputs: list["MuxPort"] = field(default_factory=list)
     isTilePort: bool = False
     isBelPort: bool = False
@@ -84,8 +84,6 @@ class MuxPort:
     #     else:
     #         return f"MuxPort(port={self.port})"
 
-
-GenericPort = Port | TilePort | SlicedPort
 
 
 class Mux:

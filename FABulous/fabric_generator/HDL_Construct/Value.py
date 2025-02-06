@@ -47,6 +47,8 @@ class Value:
                     return Value(
                         f"{self.value}[{key.start}:0]", self.bitWidth, self.isSignal
                     )
+                if key.start == key.stop:
+                    return Value(f"{self.value}[{key.start}]", 1, self.isSignal)
 
                 return Value(
                     f"{self.value}[{key.start}:{key.stop}]",

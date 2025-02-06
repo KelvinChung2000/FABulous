@@ -14,6 +14,7 @@ from FABulous.fabric_definition.Tile import Tile
 from FABulous.fabric_definition.Wire import Wire, WireType
 from FABulous.file_parser.file_parser_csv import parseList, parseMatrix, parsePortLine
 from FABulous.file_parser.file_parser_HDL import parseBelFile
+from FABulous.file_parser.parse_py_mux import genSwitchMatrix
 
 oppositeDic = {
     "NORTH": "SOUTH",
@@ -277,14 +278,8 @@ def parseTileYAML(fileName: Path) -> Tile:
         belFilePath = filePathParent.joinpath(belEntry["BEL"])
         if belEntry["prefix"] is None:
             belEntry["prefix"] = ""
-        if belEntry["BEL"].endswith(".vhdl"):
-            bels.append(parseBelFile(belFilePath, belEntry["prefix"], "vhdl"))
-        elif belEntry["BEL"].endswith(".v"):
-            bels.append(parseBelFile(belFilePath, belEntry["prefix"], "verilog"))
-        else:
-            raise ValueError(
-                f"Invalid file type in {belFilePath} only .vhdl and .v are supported."
-            )
+
+        bels.append(parseBelFile(belFilePath, belEntry["prefix"]))
 
     matrixDir = fileName.parent.joinpath(data["MATRIX"])
     configBit = 0
@@ -296,8 +291,8 @@ def parseTileYAML(fileName: Path) -> Tile:
                     configBit += muxSize.bit_length() - 1
         case ".mux":
             pass
-            # sm = parseMux(matrixDir)
-            # configBit += sm.configBits
+            sm = genSwitchMatrix(matrixDir)
+            configBit += sm.configBits
         case "_matrix.csv":
             for _, v in parseMatrix(matrixDir, tileName).items():
                 muxSize = len(v)

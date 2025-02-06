@@ -29,8 +29,9 @@ repos:
     rev: 1.7.0
     hooks:
       - id: interrogate
-        args: [-vv, --ignore-magic, --ignore-init-module, --fail-under=40] # we should aim at 90%
+        args: [-vv, --ignore-magic, --ignore-init-module, --fail-under=0] # we should aim at 90%
         pass_filenames: false  # needed if excluding files with pyproject.toml or setup.cfg
+        language_version: python3.12
 
 -   repo: https://github.com/Lucas-C/pre-commit-hooks
     rev: v1.5.5

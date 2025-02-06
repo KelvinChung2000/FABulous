@@ -3,7 +3,6 @@ from pathlib import Path
 from loguru import logger
 
 import FABulous.fabric_cad.model_generation_npnr as model_gen_npnr
-import FABulous.fabric_generator.code_generator as codeGen
 from FABulous.fabric_cad.chip_database_generation import generateChipDatabase
 from FABulous.fabric_cad.prims_gen import prims_gen
 
@@ -12,8 +11,14 @@ from FABulous.fabric_definition.Bel import Bel
 from FABulous.fabric_definition.Fabric import Fabric
 from FABulous.fabric_definition.SuperTile import SuperTile
 from FABulous.fabric_definition.Tile import Tile
-from FABulous.fabric_generator.code_generation_VHDL import VHDLWriter
-from FABulous.fabric_generator.fabric_gen import FabricGenerator
+from FABulous.fabric_generator.code_generator_2 import CodeGenerator
+from FABulous.fabric_generator.ConfigMem_genenrator import generateConfigMem
+from FABulous.fabric_generator.define import WriterType
+from FABulous.fabric_generator.fabric_generator import generateFabric
+from FABulous.fabric_generator.Tile_generator import generateTile
+from FABulous.fabric_generator.TileSwitchMatrix_generator import (
+    generateTileSwitchMatrix,
+)
 from FABulous.file_parser.file_parser_csv import parseFabricCSV
 from FABulous.file_parser.file_parser_yaml import parseFabricYAML
 from FABulous.file_parser.parse_py_mux import initPortHinting
@@ -35,16 +40,15 @@ class FABulous_API:
         Object responsible for generating geometry-related outputs.
     fabric : Fabric
         Represents the parsed fabric data.
-    fileExtension : str
-        Default file extension for generated output files ('.v' or '.vhdl').
     """
 
-    fabricGenerator: FabricGenerator
+    writerType: WriterType
     geometryGenerator: GeometryGenerator
     fabric: Fabric
-    fileExtension: str = ".v"
 
-    def __init__(self, writer: codeGen.codeGenerator, fabricCSV: str = ""):
+    def __init__(
+        self, fabricFile: Path = Path(), writeType: WriterType = WriterType.VERILOG
+    ):
         """Initialises FABulous object.
 
         If 'fabricCSV' is provided, parses fabric data and initialises
@@ -59,26 +63,21 @@ class FABulous_API:
         fabricCSV : str, optional
             Path to the CSV file containing fabric data, by default ""
         """
-        self.writer = writer
-        if fabricCSV != "":
-            self.fabric = parseFabricCSV(fabricCSV)
-            self.fabricGenerator = FabricGenerator(self.fabric, self.writer)
+        if fabricFile != Path():
+            if fabricFile.suffix == ".csv":
+                self.fabric = parseFabricCSV(fabricFile)
+            elif fabricFile.suffix == ".yaml":
+                self.fabric = parseFabricYAML(fabricFile)
+            else:
+                logger.error(
+                    "Only .csv and .yaml files are supported for fabric loading"
+                )
+                raise ValueError
             self.geometryGenerator = GeometryGenerator(self.fabric)
 
-        if isinstance(self.writer, VHDLWriter):
-            self.fileExtension = ".vhdl"
+        self.writerType = writeType
+
         # self.fabricGenerator = FabricGenerator(fabric, writer)
-
-    def setWriterOutputFile(self, outputDir):
-        """Sets the output file directory for the write object.
-
-        Parameters
-        ----------
-        outputDir : str
-            Directory path where output files will be saved.
-        """
-        logger.info(f"Output file: {outputDir}")
-        self.writer.outFileName = outputDir
 
     def loadFabric(self, dir: Path):
         """Loads fabric data from 'fabric.csv'.
@@ -101,7 +100,6 @@ class FABulous_API:
         else:
             logger.error("Only .csv and .yaml files are supported for fabric loading")
             raise ValueError
-        self.fabricGenerator = FabricGenerator(self.fabric, self.writer)
         self.geometryGenerator = GeometryGenerator(self.fabric)
 
     def bootstrapSwitchMatrix(self, tileName: str, outputDir: str):
@@ -131,7 +129,7 @@ class FABulous_API:
         """
         self.fabricGenerator.list2CSV(list, matrix)
 
-    def genConfigMem(self, tileName: str, configMem: Path):
+    def genConfigMem(self, tileName: str, configMem: Path, dest: Path):
         """Generate configuration memory for specified tile.
 
         Parameters
@@ -141,12 +139,13 @@ class FABulous_API:
         configMem : str
             File path where the configuration memory will be saved.
         """
+        cg = CodeGenerator(dest, self.writerType)
         if tile := self.fabric.getTileByName(tileName):
-            self.fabricGenerator.generateConfigMem(tile, configMem)
+            generateConfigMem(cg, self.fabric, tile, configMem)
         else:
             raise ValueError(f"Tile {tileName} not found")
 
-    def genSwitchMatrix(self, tileName: str):
+    def genSwitchMatrix(self, tileName: str, dest: Path):
         """Generates switch matrix for specified tile via 'genTileSwitchMatrix' defined
         in 'fabric_gen.py'.
 
@@ -155,10 +154,13 @@ class FABulous_API:
         tileName : str
             Name of the tile for which the switch matrix will be generated.
         """
-        tile = self.fabric.getTileByName(tileName)
-        self.fabricGenerator.genTileSwitchMatrix(tile)
+        cg = CodeGenerator(dest, self.writerType)
+        if tile := self.fabric.getTileByName(tileName):
+            generateTileSwitchMatrix(cg, self.fabric, tile)
+        else:
+            raise ValueError(f"Tile {tileName} not found")
 
-    def genTile(self, tileName: str):
+    def genTile(self, tileName: str, dest: Path):
         """Generates a tile based on its name via 'generateTile' defined in
         'fabric_gen.py'.
 
@@ -167,12 +169,13 @@ class FABulous_API:
         tileName : str
             Name of the tile generated.
         """
+        cg = CodeGenerator(dest, self.writerType)
         if tile := self.fabric.getTileByName(tileName):
-            self.fabricGenerator.generateTile(tile)
+            generateTile(cg, self.fabric, tile)
         else:
             raise ValueError(f"Tile {tileName} not found")
 
-    def genSuperTile(self, tileName: str):
+    def genSuperTile(self, tileName: str, dest: Path):
         """Generates a super tile based on its name via 'generateSuperTile' defined in
         'fabric_gen.py'.
 
@@ -181,15 +184,20 @@ class FABulous_API:
         tileName : str
             Name of the super tile generated.
         """
-        tile = self.fabric.getSuperTileByName(tileName)
-        self.fabricGenerator.generateSuperTile(tile)
+        logger.warning("NOTE: SuperTile generation is not yet implemented")
+        return
+        if tile := self.fabric.getSuperTileByName(tileName):
+            self.fabricGenerator.generateSuperTile(tile)
+        else:
+            raise ValueError(f"Tile {tileName} not found")
 
-    def genFabric(self):
+    def genFabric(self, dest: Path):
         """Generates the entire fabric layout via 'generatreFabric' defined in
         'fabric_gen.py'."""
-        self.fabricGenerator.generateFabric()
+        cg = CodeGenerator(dest, self.writerType)
+        generateFabric(cg, self.fabric)
 
-    def genGeometry(self, geomPadding: int = 8):
+    def genGeometry(self, path: Path, geomPadding: int = 8):
         """Generates geometry based on the fabric data and saves it to CSV.
 
         Parameters
@@ -198,12 +206,12 @@ class FABulous_API:
             Padding value for geometry generation, by default 8.
         """
         self.geometryGenerator.generateGeometry(geomPadding)
-        self.geometryGenerator.saveToCSV(self.writer.outFileName)
+        self.geometryGenerator.saveToCSV(path)
 
-    def genTopWrapper(self):
-        """Generates the top wrapper for the fabric via 'generateTopWrapper' defined in
-        'fabric_gen.py'."""
-        self.fabricGenerator.generateTopWrapper()
+    # def genTopWrapper(self):
+    #     """Generates the top wrapper for the fabric via 'generateTopWrapper' defined in
+    #     'fabric_gen.py'."""
+    #     self.fabricGenerator.generateTopWrapper()
 
     def genBitStreamSpec(self):
         """Generates the bitsream specification object.
@@ -252,7 +260,7 @@ class FABulous_API:
 
         return self.fabric.getTileByName(tileName)
 
-    def getTiles(self):
+    def getTiles(self) -> list[Tile]:
         """Returns all Tiles within a fabric.
 
         Returns
@@ -260,7 +268,17 @@ class FABulous_API:
         Tile
             Tile object based on tile name.
         """
-        return self.fabric.tileDic.values()
+        return list(self.fabric.tileDict.values())
+
+    def getTilesNames(self) -> list[str]:
+        """Returns all Tiles names within a fabric.
+
+        Returns
+        -------
+        str
+            Tile name.
+        """
+        return list(self.fabric.tileDict.keys())
 
     def getSuperTile(self, tileName: str) -> SuperTile | None:
         """Returns SuperTile object based on tile name.
@@ -286,11 +304,11 @@ class FABulous_API:
         SuperTile
             SuperTile object based on tile name.
         """
-        return self.fabric.superTileDic.values()
+        return self.fabric.superTileDict.values()
 
     def genChipDatabase(self, resultDir: Path, baseConstids: Path):
-        """
-        Generates a chip database using the provided result directory and base constant IDs.
+        """Generates a chip database using the provided result directory and base
+        constant IDs.
 
         Args:
             resultDir (Path): The directory where the results will be stored.
@@ -302,8 +320,7 @@ class FABulous_API:
         generateChipDatabase(self.fabric, resultDir, baseConstids)
 
     def genPrimsLib(self, result: Path):
-        """
-        Generates primitives library using the provided result path.
+        """Generates primitives library using the provided result path.
 
         Args:
             result (Path): The path where the generated primitives library will be saved.

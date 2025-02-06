@@ -14,12 +14,10 @@ from FABulous.fabric_generator.HDL_Construct.Value import Value
 GenericPort = Port | TilePort | SlicedPort
 
 
-def generateTileSwitchMatrix(fabric: Fabric, tile: Tile, dest: Path):
-
+def generateTileSwitchMatrix(codeGen: CodeGenerator, fabric: Fabric, tile: Tile):
     sm = tile.switchMatrix
-    cg = CodeGenerator(dest)
 
-    with cg.Module(f"{tile.name}_switch_matrix") as module:
+    with codeGen.Module(f"{tile.name}_switch_matrix") as module:
         with module.ParameterRegion() as pr:
             noConfigBitsParam = pr.Parameter(
                 "NoConfigBits", tile.switchMatrix.configBits
@@ -45,9 +43,7 @@ def generateTileSwitchMatrix(fabric: Fabric, tile: Tile, dest: Path):
                 if i.name in uniqueName:
                     continue
                 if isinstance(i, BelPort):
-                    portMapping[i] = pr.Port(
-                        i.prefix + i.name, IO.INPUT, i.wireCount
-                    )
+                    portMapping[i] = pr.Port(i.prefix + i.name, IO.INPUT, i.wireCount)
                 else:
                     portMapping[i] = pr.Port(i.name, IO.INPUT, i.wireCount)
 

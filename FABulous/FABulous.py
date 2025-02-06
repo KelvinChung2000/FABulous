@@ -5,6 +5,7 @@ from pathlib import Path
 
 from loguru import logger
 
+from FABulous.fabric_generator.define import WriterType
 from FABulous.FABulous_CLI.FABulous_CLI import FABulous_CLI
 from FABulous.FABulous_CLI.helper import (
     create_project,
@@ -140,7 +141,7 @@ def main():
         setup_project_env_vars(args)
 
         fab_CLI = FABulous_CLI(
-            os.getenv("FAB_PROJ_LANG"),
+            WriterType[os.getenv("FAB_PROJ_LANG", "VERILOG").upper()],
             Path(str(os.getenv("FAB_PROJ_DIR"))),
             FABulousScript=args.FABulousScript,
             TCLScript=args.TCLScript,

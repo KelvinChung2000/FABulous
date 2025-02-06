@@ -33,7 +33,7 @@ class PE_ports:
         self.W_reg_in = MuxPort(BelPort(name='reg_in', ioDirection=IO.INPUT, wireCount=32, isBus=True, prefix='W_', external=False), isBelPort=True, isBus=True, bitWidth=32)
         self.W_reg_out = MuxPort(BelPort(name='reg_out', ioDirection=IO.OUTPUT, wireCount=32, isBus=True, prefix='W_', external=False), isBelPort=True, isBus=True, bitWidth=32)
 
-    def NewWire(self, srcName: str, dstName: str, wireCount: int) -> (MuxPort, MuxPort):
+    def NewWire(self, srcName: str, dstName: str, wireCount: int) -> tuple[MuxPort, MuxPort]:
         portSrc = MuxPort(Port(name=srcName, ioDirection=IO.INPUT, wireCount=wireCount, isBus=False), bitWidth=wireCount, isCreated=True)
         setattr(self, srcName, portSrc)
         portDst = MuxPort(Port(name=dstName, ioDirection=IO.OUTPUT, wireCount=wireCount, isBus=False), bitWidth=wireCount, isCreated=True)

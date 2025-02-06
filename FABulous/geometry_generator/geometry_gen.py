@@ -15,6 +15,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 
+from pathlib import Path
 from FABulous.fabric_definition.Fabric import Fabric
 from FABulous.geometry_generator.fabric_geometry import FabricGeometry
 
@@ -38,7 +39,7 @@ class GeometryGenerator:
         """Starts the geometry generation for the given fabric."""
         self.fabricGeometry = FabricGeometry(self.fabric, padding)
 
-    def saveToCSV(self, fileName: str) -> None:
+    def saveToCSV(self, fileName: Path) -> None:
         """Saves the generated geometry into a file specified by the given file name.
 
         This file can then be imported into FABulator.

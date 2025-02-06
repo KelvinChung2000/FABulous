@@ -14,10 +14,8 @@ from FABulous.file_parser.file_parser_yaml import parseFabricYAML
 from FABulous.file_parser.parse_py_mux import genSwitchMatrix, initPortHinting
 
 
-def generateTile(fabric: Fabric, tile: Tile, dest: Path):
-    cg = CodeGenerator(dest)
-
-    with cg.Module(tile.name) as module:
+def generateTile(codeGen: CodeGenerator, fabric: Fabric, tile: Tile):
+    with codeGen.Module(tile.name) as module:
         with module.ParameterRegion() as pr:
             maxFramePerCol = pr.Parameter(
                 "MaxFramesPerCol",
@@ -341,7 +339,6 @@ def generateTile(fabric: Fabric, tile: Tile, dest: Path):
                             ],
                         )
                     )
-
 
             # for input in tile.switchMatrix.getInputs():
             #     connectPairs.append(lr.ConnectPair(input.value, input))

@@ -34,8 +34,7 @@ from cmd2 import (
 )
 from loguru import logger
 
-from FABulous.fabric_generator.code_generation_Verilog import VerilogWriter
-from FABulous.fabric_generator.code_generation_VHDL import VHDLWriter
+from FABulous.fabric_generator.define import WriterType
 from FABulous.FABulous_API import FABulous_API
 from FABulous.FABulous_CLI import cmd_synthesis
 from FABulous.FABulous_CLI.helper import (
@@ -97,15 +96,13 @@ class FABulous_CLI(Cmd):
     prompt: str = "FABulous> "
     fabulousAPI: FABulous_API
     projectDir: Path
-    top: str
-    allTile: list[str]
     fabricFilePath: Path
     extension: str = "v"
     script: str = ""
 
     def __init__(
         self,
-        writerType: str | None,
+        writerType: WriterType,
         projectDir: Path,
         FABulousScript: Path = Path(),
         TCLScript: Path = Path(),
@@ -130,16 +127,6 @@ class FABulous_CLI(Cmd):
             startup_script=str(FABulousScript) if not FABulousScript.is_dir() else "",
         )
 
-        if writerType == "verilog":
-            self.fabulousAPI = FABulous_API(VerilogWriter())
-        elif writerType == "vhdl":
-            self.fabulousAPI = FABulous_API(VHDLWriter())
-        else:
-            logger.critical(
-                f"Invalid writer type: {writerType}\n Valid options are 'verilog' or 'vhdl'"
-            )
-            sys.exit(1)
-
         self.projectDir = projectDir.absolute()
         self.add_settable(
             Settable("projectDir", Path, "The directory of the project", self)
@@ -151,9 +138,15 @@ class FABulous_CLI(Cmd):
         if Path(projectDir / "fabric.csv").exists():
             logger.info("Found fabric.csv in the project directory")
             self.fabricFilePath = Path(projectDir / "fabric.csv")
+            logger.info(
+                f"Setting environment variable fabricFilePath to {self.fabricFilePath}"
+            )
         elif Path(projectDir / "fabric.yaml").exists():
             logger.info("Found fabric.yaml in the project directory")
             self.fabricFilePath = Path(projectDir / "fabric.yaml")
+            logger.info(
+                f"Setting environment variable fabricFilePath to {self.fabricFilePath}"
+            )
         else:
             logger.info(
                 "Cannot find fabric.csv or fabric.yaml in the project directory, will not set default path for load_fabric"
@@ -161,17 +154,25 @@ class FABulous_CLI(Cmd):
 
         self.add_settable(
             Settable(
-                "csvFile", Path, "The fabric file ", self, completer=Cmd.path_complete
+                "fabricFilePath",
+                Path,
+                "The fabric file ",
+                self,
+                completer=Cmd.path_complete,
             )
         )
+
+        self.fabulousAPI = FABulous_API(writeType=writerType)
 
         self.verbose = False
         self.add_settable(Settable("verbose", bool, "verbose output", self))
 
-        if isinstance(self.fabulousAPI.writer, VHDLWriter):
-            self.extension = "vhdl"
-        else:
-            self.extension = "v"
+        if writerType is WriterType.VERILOG:
+            self.extension = ".v"
+        elif writerType is WriterType.SYSTEM_VERILOG:
+            self.extension = ".sv"
+        elif writerType is WriterType.VHDL:
+            self.extension = ".vhdl"
 
         categorize(self.do_alias, CMD_OTHER)
         categorize(self.do_edit, CMD_OTHER)
@@ -269,6 +270,7 @@ class FABulous_CLI(Cmd):
 
         Logs error if no CSV file is found.
         """
+
         # if no argument is given will use the one set by set_fabric_csv
         # else use the argument
         logger.info("Loading fabric")
@@ -288,13 +290,6 @@ class FABulous_CLI(Cmd):
             self.fabricFilePath = args.file
 
         self.fabricLoaded = True
-        # self.projectDir = os.path.split(self.csvFile)[0]
-        tileByPath = [
-            f.stem for f in (self.projectDir / "Tile/").iterdir() if f.is_dir()
-        ]
-        tileByFabric = list(self.fabulousAPI.fabric.tileDict.keys())
-        superTileByFabric = list(self.fabulousAPI.fabric.superTileDict.keys())
-        self.allTile = list(set(tileByPath) & set(tileByFabric + superTileByFabric))
 
         self.enable_category(CMD_FABRIC_FLOW)
         logger.info("Complete")
@@ -344,11 +339,10 @@ class FABulous_CLI(Cmd):
         logger.info(f"Generating Config Memory for {' '.join(args.tiles)}")
         for i in args.tiles:
             logger.info(f"Generating configMem for {i}")
-            self.fabulousAPI.setWriterOutputFile(
-                self.projectDir / f"Tile/{i}/{i}_ConfigMem.{self.extension}"
-            )
             self.fabulousAPI.genConfigMem(
-                i, self.projectDir / f"Tile/{i}/{i}_ConfigMem.csv"
+                i,
+                self.projectDir / f"Tile/{i}/{i}_ConfigMem.csv",
+                self.projectDir / f"Tile/{i}/{i}_ConfigMem.{self.extension}",
             )
         logger.info("Generating configMem complete")
 
@@ -363,10 +357,9 @@ class FABulous_CLI(Cmd):
         logger.info(f"Generating switch matrix for {' '.join(args.tiles)}")
         for i in args.tiles:
             logger.info(f"Generating switch matrix for {i}")
-            self.fabulousAPI.setWriterOutputFile(
-                self.projectDir / f"Tile/{i}/{i}_switch_matrix.{self.extension}"
+            self.fabulousAPI.genSwitchMatrix(
+                i, self.projectDir / f"Tile/{i}/{i}_switch_matrix.{self.extension}"
             )
-            self.fabulousAPI.genSwitchMatrix(i)
         logger.info("Switch matrix generation complete")
 
     @with_category(CMD_FABRIC_FLOW)
@@ -381,9 +374,9 @@ class FABulous_CLI(Cmd):
 
         logger.info(f"Generating tile {' '.join(args.tiles)}")
         for t in args.tiles:
-            if subTiles := [
-                f.stem for f in (self.projectDir / f"Tile/{t}").iterdir() if f.is_dir()
-            ]:
+            if (self.projectDir / f"Tile/{t}/metadata/superTile").exists():
+                with open((self.projectDir / f"Tile/{t}/metadata/superTile"), "r") as f:
+                    subTiles = f.readlines()
                 logger.info(
                     f"{t} is a super tile, generating {t} with sub tiles {' '.join(subTiles)}"
                 )
@@ -391,38 +384,40 @@ class FABulous_CLI(Cmd):
                     # Gen switch matrix
                     logger.info(f"Generating switch matrix for tile {t}")
                     logger.info(f"Generating switch matrix for {st}")
-                    self.fabulousAPI.setWriterOutputFile(
-                        f"{self.projectDir}/Tile/{t}/{st}/{st}_switch_matrix.{self.extension}"
+                    self.fabulousAPI.genSwitchMatrix(
+                        st,
+                        Path(
+                            f"{self.projectDir}/Tile/{t}/{st}/{st}_switch_matrix.{self.extension}"
+                        ),
                     )
-                    self.fabulousAPI.genSwitchMatrix(st)
                     logger.info(f"Generated switch matrix for {st}")
 
                     # Gen config mem
                     logger.info(f"Generating configMem for tile {t}")
                     logger.info(f"Generating ConfigMem for {st}")
-                    self.fabulousAPI.setWriterOutputFile(
-                        f"{self.projectDir}/Tile/{t}/{st}/{st}_ConfigMem.{self.extension}"
-                    )
                     self.fabulousAPI.genConfigMem(
-                        st, self.projectDir / f"Tile/{t}/{st}/{st}_ConfigMem.csv"
+                        st,
+                        self.projectDir / f"Tile/{t}/{st}/{st}_ConfigMem.csv",
+                        Path(
+                            f"{self.projectDir}/Tile/{t}/{st}/{st}_ConfigMem.{self.extension}"
+                        ),
                     )
                     logger.info(f"Generated configMem for {st}")
 
                     # Gen tile
                     logger.info(f"Generating subtile for tile {t}")
                     logger.info(f"Generating subtile {st}")
-                    self.fabulousAPI.setWriterOutputFile(
-                        f"{self.projectDir}/Tile/{t}/{st}/{st}.{self.extension}"
+                    self.fabulousAPI.genTile(
+                        st,
+                        Path(f"{self.projectDir}/Tile/{t}/{st}/{st}.{self.extension}"),
                     )
-                    self.fabulousAPI.genTile(st)
                     logger.info(f"Generated subtile {st}")
 
                 # Gen super tile
                 logger.info(f"Generating super tile {t}")
-                self.fabulousAPI.setWriterOutputFile(
-                    f"{self.projectDir}/Tile/{t}/{t}.{self.extension}"
+                self.fabulousAPI.genSuperTile(
+                    t, Path(f"{self.projectDir}/Tile/{t}/{t}.{self.extension}")
                 )
-                self.fabulousAPI.genSuperTile(t)
                 logger.info(f"Generated super tile {t}")
                 continue
 
@@ -434,10 +429,9 @@ class FABulous_CLI(Cmd):
 
             logger.info(f"Generating tile {t}")
             # Gen tile
-            self.fabulousAPI.setWriterOutputFile(
-                f"{self.projectDir}/Tile/{t}/{t}.{self.extension}"
+            self.fabulousAPI.genTile(
+                t, Path(f"{self.projectDir}/Tile/{t}/{t}.{self.extension}")
             )
-            self.fabulousAPI.genTile(t)
             logger.info(f"Generated tile {t}")
 
         logger.info("Tile generation complete")
@@ -446,7 +440,7 @@ class FABulous_CLI(Cmd):
     def do_gen_all_tile(self, *ignored):
         """Generates all tiles by calling 'do_gen_tile'."""
         logger.info("Generating all tiles")
-        self.do_gen_tile(" ".join(self.allTile))
+        self.do_gen_tile(" ".join(list(self.fabulousAPI.getTilesNames())))
         logger.info("Generated all tiles")
 
     @with_category(CMD_FABRIC_FLOW)
@@ -458,10 +452,11 @@ class FABulous_CLI(Cmd):
         """
         logger.info(f"Generating fabric {self.fabulousAPI.fabric.name}")
         self.do_gen_all_tile()
-        self.fabulousAPI.setWriterOutputFile(
-            f"{self.projectDir}/Fabric/{self.fabulousAPI.fabric.name}.{self.extension}"
+        self.fabulousAPI.genFabric(
+            Path(
+                f"{self.projectDir}/Fabric/{self.fabulousAPI.fabric.name}.{self.extension}"
+            )
         )
-        self.fabulousAPI.genFabric()
         logger.info("Fabric generation complete")
 
     geometryParser = Cmd2ArgumentParser()

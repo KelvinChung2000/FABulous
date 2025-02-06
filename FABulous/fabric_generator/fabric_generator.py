@@ -13,15 +13,14 @@ from FABulous.file_parser.file_parser_yaml import parseFabricYAML
 Loc = tuple[int, int]
 
 
-def generateFabric(fabric: Fabric, dest: Path):
-    cg = CodeGenerator(dest)
+def generateFabric(codeGen: CodeGenerator, fabric: Fabric):
 
     flattenFabric: list[tuple[Loc, Tile]] = []
     for y, row in enumerate(fabric.tile):
         for x, tile in enumerate(row):
             flattenFabric.append(((x, y), tile))
 
-    with cg.Module(fabric.name) as m:
+    with codeGen.Module(fabric.name) as m:
         with m.ParameterRegion() as pr:
             maxFramePerCol = pr.Parameter("MaxFramePerCol", fabric.maxFramesPerCol)
             frameBitsPerRow = pr.Parameter("FrameBitsPerRow", fabric.frameBitsPerRow)

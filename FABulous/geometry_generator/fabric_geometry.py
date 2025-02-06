@@ -1,3 +1,4 @@
+from pathlib import Path
 from loguru import logger
 from csv import writer as csvWriter
 from typing import Dict, List, Set
@@ -206,7 +207,7 @@ class FabricGeometry:
             tileGeom = self.tileGeomMap[tileName]
             tileGeom.generateWires(self.padding)
 
-    def saveToCSV(self, fileName: str) -> None:
+    def saveToCSV(self, fileName: Path) -> None:
         """Saves the generated geometric information of the given fabric to a .csv file
         that can be imported into the graphical frontend.
 

@@ -3,17 +3,22 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import TextIO
 
+from FABulous.fabric_generator.define import WriterType
 from FABulous.fabric_generator.HDL_Construct.Module import Module
 
 
 class CodeGenerator:
     filePath: Path
+    writerType: WriterType
     indentCount: int
     indent: int = 0
     f: TextIO
 
-    def __init__(self, path: Path | str = Path(), indentCount: int = 4) -> None:
+    def __init__(
+        self, path: Path, writerType: WriterType, indentCount: int = 4
+    ) -> None:
         self.filePath = Path(path)
+        self.writerType = writerType
         self.indentCount = indentCount
         self.f = self.filePath.open("w")
 

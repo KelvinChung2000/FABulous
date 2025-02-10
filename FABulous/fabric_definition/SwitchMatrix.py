@@ -3,7 +3,7 @@ from dataclasses import dataclass, field
 from typing import Any, Iterable, Self
 
 from FABulous.fabric_definition.define import IO
-from FABulous.fabric_definition.Port import Port, SlicedPort, TilePort, GenericPort
+from FABulous.fabric_definition.Port import GenericPort, TilePort
 
 SliceRange = namedtuple("SliceRange", ["start", "end"])
 
@@ -85,7 +85,6 @@ class MuxPort:
     #         return f"MuxPort(port={self.port})"
 
 
-
 class Mux:
     _name: str
     _inputs: list[GenericPort]
@@ -140,7 +139,7 @@ class Mux:
 
 @dataclass
 class SwitchMatrix:
-    muxes: dict[GenericPort, Mux] = field(default_factory=dict)
+    muxesDict: dict[GenericPort, Mux] = field(default_factory=dict)
     _uniqueOutput: set[GenericPort] = field(default_factory=set)
     configBits: int = 0
     # muxTypeDict: dict[int, str] = {
@@ -156,27 +155,37 @@ class SwitchMatrix:
     #     for mux in muxList:
     #         self.addMux(mux.name, list(mux.inputs), mux.output)
 
+    @property
+    def muxes(self) -> list[Mux]:
+        return list(self.muxesDict.values())
+    
+    def __getitem__(self, key: GenericPort):
+        if key in self.muxesDict:
+            return self.muxesDict[key]
+        else:
+            raise KeyError(f"Output port {key} does not exist in the switch matrix")
+
     def addMux(self, mux: Mux):
         if len(mux.inputs) == 0:
             if isinstance(mux.output, TilePort) and mux.output.ioDirection == IO.OUTPUT:
                 raise ValueError(f"A tile output port {mux.output} has no inputs")
 
         if mux.output in self._uniqueOutput:
-            self.muxes[mux.output].extendInputs(mux.inputs)
+            self.muxesDict[mux.output].extendInputs(mux.inputs)
         else:
-            self.muxes[mux.output] = mux
+            self.muxesDict[mux.output] = mux
             self._uniqueOutput.add(mux.output)
 
         self.configBits += mux.configBit
 
     def getOutputs(self) -> list[GenericPort]:
-        return [mux.output for mux in self.muxes.values()]
+        return [mux.output for mux in self.muxesDict.values()]
 
     def getInputs(self) -> list[GenericPort]:
         deduplicatingInput: set[GenericPort] = set()
 
         resultList: list[GenericPort] = []
-        for mux in self.muxes.values():
+        for mux in self.muxesDict.values():
             for i in mux.inputs:
                 if i not in deduplicatingInput:
                     deduplicatingInput.add(i)

@@ -18,6 +18,11 @@ class WireType:
         return f"{self.sourcePort.name}-X{self.offsetX}Y{self.offsetY}>{self.destinationPort.name}"
 
 
+    def __eq__(self, __o: Any) -> bool:
+        if __o is None or not isinstance(__o, WireType):
+            return False
+        return self.sourcePort == __o.sourcePort and self.destinationPort == __o.destinationPort
+
 @dataclass(frozen=True, eq=True)
 class Wire:
     """This class is for wire connections that span across multiple tiles. If working
@@ -53,7 +58,4 @@ class Wire:
             f"{self.source.name}-X{self.xOffset}Y{self.yOffset}>{self.destination.name}"
         )
 
-    def __eq__(self, __o: Any) -> bool:
-        if __o is None or not isinstance(__o, Wire):
-            return False
-        return self.source == __o.source and self.destination == __o.destination
+

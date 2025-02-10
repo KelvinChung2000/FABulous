@@ -760,7 +760,7 @@ class Chip:
         self.name = name
         self.width = width
         self.height = height
-        self.tile_types = []
+        self.tile_types: list[TileType] = []
         self.tiles = [[TileInst(x, y) for x in range(width)] for y in range(height)]
         self.tile_type_idx = dict()
         self.node_shapes = []
@@ -812,7 +812,7 @@ class Chip:
             else:
                 wire_id = w.wire if w.wire is IdString else self.strs.id(w.wire)
                 if wire_id not in self.tile_type_at(w.x, w.y)._wire2idx:
-                    raise ValueError(f"Wire {w.wire} not found in tile type")
+                    raise ValueError(f"Wire {w.wire} not found in tile type {self.tile_type_at(w.x, w.y).name}")
                 wire_index = self.tile_type_at(w.x, w.y)._wire2idx[wire_id]
             shape.wires += [w.x - x0, w.y - y0, wire_index]
         # deduplicate node shapes

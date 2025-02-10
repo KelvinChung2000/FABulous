@@ -138,7 +138,7 @@ class Tile:
     def getTileOutputPorts(self) -> list[TilePort]:
         return sorted([p for p in self.ports if p.ioDirection == IO.OUTPUT])
     
-    def getTilePortGrouped(self, io: IO) -> dict[Side, list[TilePort]]:
+    def getTilePortGrouped(self, io: IO | None = None) -> dict[Side, list[TilePort]]:
         return {
             Side.NORTH: self.getNorthPorts(io),
             Side.EAST: self.getEastPorts(io),

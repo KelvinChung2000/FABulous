@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import Any
 
 from FABulous.fabric_definition.Bel import Bel
-from FABulous.fabric_definition.define import ConfigBitMode, MultiplexerStyle
+from FABulous.fabric_definition.define import ConfigBitMode, Loc, MultiplexerStyle
 from FABulous.fabric_definition.SuperTile import SuperTile
 from FABulous.fabric_definition.Tile import Tile
 from FABulous.fabric_definition.Wire import Wire
@@ -74,7 +74,7 @@ class Fabric:
 
     tileDict: dict[str, Tile] = field(default_factory=dict)
     superTileDict: dict[str, SuperTile] = field(default_factory=dict)
-    wireDict: dict[tuple[int, int], list[Wire]] = field(default_factory=dict)
+    wireDict: dict[Loc, list[Wire]] = field(default_factory=dict)
 
     def __getitem__(self, index: Any) -> Tile | SuperTile | None:
         if isinstance(index, tuple):

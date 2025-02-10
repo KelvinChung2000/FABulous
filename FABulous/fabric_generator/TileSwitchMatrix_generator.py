@@ -1,5 +1,4 @@
 from itertools import zip_longest
-from pathlib import Path
 from typing import Mapping
 
 from loguru import logger
@@ -71,7 +70,7 @@ def generateTileSwitchMatrix(codeGen: CodeGenerator, fabric: Fabric, tile: Tile)
             lr.NewLine()
 
             configBitstreamPosition = 0
-            for mux in sm.muxes.values():
+            for mux in sm.muxesDict.values():
                 inputCount = len(mux.inputs)
                 lr.Comment(f"switch matrix multiplexer {mux.name} MUX-{inputCount}")
                 if inputCount == 0:

@@ -1,16 +1,16 @@
-module N_IO #(
+module W_IO #(
     parameter MaxFramesPerCol = 32,
     parameter FrameBitsPerRow = 32,
     parameter NoConfigBits = 5
 )(
     // NORTH,
-    output [31:0] out0,
-    input [31:0] in0,
     // EAST,
+    input [31:0] in1,
+    output [31:0] out1,
     // SOUTH,
-    input [31:0] in2,
-    output [31:0] out2,
     // WEST,
+    output [31:0] out3,
+    input [31:0] in3,
     input in,
     output out,
     input UserCLK,
@@ -22,10 +22,10 @@ module N_IO #(
 );
 
 // Signal Creation
-wire N_from_fabric;
-wire N_to_fabric;
-wire N_in;
-wire N_out;
+wire W_from_fabric;
+wire W_to_fabric;
+wire W_in;
+wire W_out;
 
 // ConfigBits Wires
 wire [NoConfigBits - 1:0] ConfigBits;
@@ -74,7 +74,7 @@ clk_buf #() inst_clk_buf (
 );
 
 // Init Configuration storage latches
-N_IO_ConfigMem #() Inst_N_IO_ConfigMem (
+W_IO_ConfigMem #() Inst_W_IO_ConfigMem (
     .FrameData(FrameData),
     .FrameStrobe(FrameStrobe),
     .ConfigBits(ConfigBits),
@@ -82,16 +82,16 @@ N_IO_ConfigMem #() Inst_N_IO_ConfigMem (
 );
 
 // Instantiate BEL IO
-IO #() Inst_N_IO (
-    .from_fabric(N_from_fabric),
-    .to_fabric(N_to_fabric),
-    .in(N_in),
-    .out(N_out),
+IO #() Inst_W_IO (
+    .from_fabric(W_from_fabric),
+    .to_fabric(W_to_fabric),
+    .in(W_in),
+    .out(W_out),
     .ConfigBits(ConfigBits[0])
 );
 
 // Init Switch Matrix
-N_IO_SwitchMatrix #() Inst_N_IO_SwitchMatrix (
+W_IO_SwitchMatrix #() Inst_W_IO_SwitchMatrix (
     .ConfigBits(ConfigBits[4:1]),
     .ConfigBits_N(ConfigBits_N[4:1])
 );

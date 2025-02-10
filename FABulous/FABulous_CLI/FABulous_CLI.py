@@ -23,6 +23,7 @@ import subprocess as sp
 import sys
 import tkinter as tk
 from pathlib import Path
+from typing import Literal
 
 from cmd2 import (
     Cmd,
@@ -97,7 +98,7 @@ class FABulous_CLI(Cmd):
     fabulousAPI: FABulous_API
     projectDir: Path
     fabricFilePath: Path
-    extension: str = "v"
+    extension: Literal[".v", ".sv", ".vhdl"] = ".v"
     script: str = ""
 
     def __init__(
@@ -454,7 +455,7 @@ class FABulous_CLI(Cmd):
         self.do_gen_all_tile()
         self.fabulousAPI.genFabric(
             Path(
-                f"{self.projectDir}/Fabric/{self.fabulousAPI.fabric.name}.{self.extension}"
+                f"{self.projectDir}/Fabric/{self.fabulousAPI.fabric.name}{self.extension}"
             )
         )
         logger.info("Fabric generation complete")
@@ -574,7 +575,7 @@ class FABulous_CLI(Cmd):
         logger.info("Running FABulous")
         self.fabulousAPI.gen_port_hinting()
         self.do_gen_fabric()
-        self.do_gen_primitive_library(self.projectDir / META_DATA_DIR / "prims.v")
+        self.do_gen_primitive_library(str(self.projectDir / META_DATA_DIR / "prims.v"))
         self.do_gen_chipdb()
         self.do_gen_bitStream_spec()
         self.do_gen_top_wrapper()

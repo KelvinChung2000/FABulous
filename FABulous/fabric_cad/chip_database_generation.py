@@ -12,6 +12,7 @@ from FABulous.fabric_cad.chip_database_gen.chip import (
     TimingValue,
 )
 from FABulous.fabric_cad.chip_database_gen.define import NodeWire, PinType
+from FABulous.fabric_definition.SwitchMatrix import SwitchMatrix
 from FABulous.fabric_definition.Bel import Bel
 from FABulous.fabric_definition.define import IO
 from FABulous.fabric_definition.Fabric import Fabric
@@ -20,8 +21,8 @@ from FABulous.fabric_generator.code_generation_Verilog import VerilogWriter
 
 
 def genSwitchMatrix(tile: Tile, tileType: TileType, context=1):
-    if not isinstance(tile.switchMatrix, list):
-        raise ValueError("Switch matrix is not a list")
+    if not isinstance(tile.switchMatrix, SwitchMatrix):
+        raise ValueError("Switch matrix is not a SwitchMatrix object")
 
     outportName = set([p.name for p in tile.ports if p.ioDirection == IO.OUTPUT])
     zIn = 0
@@ -41,17 +42,17 @@ def genSwitchMatrix(tile: Tile, tileType: TileType, context=1):
                     )
                 zOut += 1
 
-        for mux in tile.switchMatrix:
-            tileType.create_wire(f"{c}_{mux.output}")
+        for mux in tile.switchMatrix.muxes:
+            tileType.create_wire(f"{c}_{mux.output.name}")
             if mux.output in outportName:
                 for i in mux.inputs:
                     tileType.create_pip(f"{c}_{i}", f"{c}_{mux.output}_internal")
                     tileType.create_pip(
-                        f"{c}_{mux.output}_internal", f"{c}_{mux.output}"
+                        f"{c}_{mux.output.name}_internal", f"{c}_{mux.output.name}"
                     )
             else:
                 for i in mux.inputs:
-                    tileType.create_pip(f"{c}_{i}", f"{c}_{mux.output}")
+                    tileType.create_pip(f"{c}_{i.name}", f"{c}_{mux.output}")
 
     zOut = 0
     for c in range(context - 1):
@@ -62,7 +63,7 @@ def genSwitchMatrix(tile: Tile, tileType: TileType, context=1):
             zOut += 1
 
     for c in range(context - 1):
-        for mux in tile.switchMatrix:
+        for mux in tile.switchMatrix.muxes:
             if mux.output in outportName:
                 tileType.create_pip(
                     f"{c}_{mux.output}_internal", f"{mux.output}_{c}_to_{c+1}_NextCycle"

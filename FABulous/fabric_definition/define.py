@@ -48,3 +48,6 @@ class FeatureType(StrEnum):
     INIT = "INIT"
     ONE_HOT = "ONE_HOT"
     FEATURE_MAP = "FEATURE_MAP"
+
+
+Loc = tuple[int, int]

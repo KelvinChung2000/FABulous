@@ -28,29 +28,15 @@ def generateTile(codeGen: CodeGenerator, fabric: Fabric, tile: Tile):
 
         portMapping: Mapping[TilePort | Port, Value] = {}
         with module.PortRegion() as pr:
-            pr.Comment("North")
-            for p in tile.getNorthPorts():
-                portMapping[p] = pr.Port(
-                    p.name, p.ioDirection, tile.getCascadeWireCount(p)
-                )
-
-            pr.Comment("East")
-            for p in tile.getEastPorts():
-                portMapping[p] = pr.Port(
-                    p.name, p.ioDirection, tile.getCascadeWireCount(p)
-                )
-
-            pr.Comment("South")
-            for p in tile.getSouthPorts():
-                portMapping[p] = pr.Port(
-                    p.name, p.ioDirection, tile.getCascadeWireCount(p)
-                )
-
-            pr.Comment("West")
-            for p in tile.getWestPorts():
-                portMapping[p] = pr.Port(
-                    p.name, p.ioDirection, tile.getCascadeWireCount(p)
-                )
+            for side, ports in tile.getTilePortGrouped().items():
+                pr.Comment(f"{side.name}")
+                for p in ports:
+                    if p.spanning:
+                        portMapping[p] = pr.Port(
+                            p.name, p.ioDirection, tile.getCascadeWireCount(p)
+                        )
+                    else:
+                        portMapping[p] = pr.Port(p.name, p.ioDirection, p.wireCount)
 
             for bel in tile.bels:
                 for p in bel.externalInputs:

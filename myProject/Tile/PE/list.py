@@ -1,4 +1,4 @@
-from myProject.Tile.PE.PE_ports import PE_ports
+from myProject.Tile.PE.metadata.PE_ports import PE_ports
 
 
 class MuxList(PE_ports):
@@ -36,8 +36,8 @@ class MuxList(PE_ports):
         self.S_reg_in //= self.S_reg_out
         self.W_reg_in //= self.W_reg_out
 
-        self.spanOut[1] //= self.spanIn[0]
-        self.spanOut[0] //= self.spanIn[1]
+        # self.spanOut[1] //= self.spanIn[0]
+        # self.spanOut[0] //= self.spanIn[1]
         # testOut_i, testOut_o = self.NewWire("testOut_i", "testOut_o", 32)
         # test1_i, test1_o = self.NewWire("test1_i", "test1_o", 16)
         # test2_i, test2_o = self.NewWire("test2_i", "test2_o", 16)

@@ -3,20 +3,20 @@ module PE #(
     parameter FrameBitsPerRow = 32,
     parameter NoConfigBits = 77
 )(
-    // North,
+    // NORTH,
     input [31:0] in0,
     output [31:0] out0,
-    // East,
+    // EAST,
     input [31:0] in1,
     output [31:0] out1,
-    input [3:0] spanIn,
-    // South,
+    input [1:0] spanIn,
+    // SOUTH,
     input [31:0] in2,
     output [31:0] out2,
-    // West,
+    // WEST,
     input [31:0] in3,
     output [31:0] out3,
-    output [3:0] spanOut,
+    output [1:0] spanOut,
     input UserCLK,
     output UserCLKo,
     input [FrameBitsPerRow - 1:0] FrameData,
@@ -93,7 +93,7 @@ wire [1:0] spanIn_to_spanOut;
 my_buf_pack #(
     .WIDTH(2)
 ) spanIn_inbuf (
-    .A(spanIn[3:2]),
+    .A(spanIn[1:2]),
     .X(spanIn_to_spanOut)
 );
 

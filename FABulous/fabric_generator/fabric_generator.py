@@ -2,15 +2,13 @@ from collections import defaultdict
 from pathlib import Path
 from typing import Mapping
 
-from FABulous.fabric_definition.define import IO, ConfigBitMode, Side
+from FABulous.fabric_definition.define import IO, ConfigBitMode, Loc, Side
 from FABulous.fabric_definition.Fabric import Fabric
 from FABulous.fabric_definition.Port import BelPort
 from FABulous.fabric_definition.Tile import Tile
 from FABulous.fabric_generator.code_generator_2 import CodeGenerator
 from FABulous.fabric_generator.HDL_Construct.Value import Value
 from FABulous.file_parser.file_parser_yaml import parseFabricYAML
-
-Loc = tuple[int, int]
 
 
 def generateFabric(codeGen: CodeGenerator, fabric: Fabric):

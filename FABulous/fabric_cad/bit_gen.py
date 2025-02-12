@@ -178,6 +178,7 @@ def genBitstream(fasmFile: str, specFile: str, bitstreamFile: str):
             frame_select[j] = "1"
             frame_select_temp = ("".join(frame_select))[::-1]
 
+            print(frame_select_temp)
             bitStr += bitstring_to_bytes(frame_select_temp)
             bitStr += bit_array[i][j]
 

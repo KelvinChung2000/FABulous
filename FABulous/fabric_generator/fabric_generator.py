@@ -5,19 +5,13 @@ from typing import Mapping
 from FABulous.fabric_definition.define import IO, ConfigBitMode, Loc, Side
 from FABulous.fabric_definition.Fabric import Fabric
 from FABulous.fabric_definition.Port import BelPort
-from FABulous.fabric_definition.Tile import Tile
 from FABulous.fabric_generator.code_generator_2 import CodeGenerator
 from FABulous.fabric_generator.HDL_Construct.Value import Value
 from FABulous.file_parser.file_parser_yaml import parseFabricYAML
 
 
 def generateFabric(codeGen: CodeGenerator, fabric: Fabric):
-
-    flattenFabric: list[tuple[Loc, Tile]] = []
-    for y, row in enumerate(fabric.tile):
-        for x, tile in enumerate(row):
-            flattenFabric.append(((x, y), tile))
-
+    flattenFabric = fabric.getFlattenFabric()
     with codeGen.Module(fabric.name) as m:
         with m.ParameterRegion() as pr:
             maxFramePerCol = pr.Parameter("MaxFramePerCol", fabric.maxFramesPerCol)
@@ -56,7 +50,6 @@ def generateFabric(codeGen: CodeGenerator, fabric: Fabric):
             userClk = pr.Port("UserCLK", IO.INPUT)
 
         with m.LogicRegion() as lr:
-
             clkWireInMapping: Mapping[Loc, Value] = {}
             clkWireOutMapping: Mapping[Loc, Value] = {}
             lr.Comment("User Clock wire")
@@ -64,7 +57,7 @@ def generateFabric(codeGen: CodeGenerator, fabric: Fabric):
                 if y == fabric.numberOfColumns - 1:
                     clkWireInMapping[(x, y)] = userClk
                 else:
-                    clkWireInMapping[(x, y)] = lr.Signal(f"Tile_X{x}Y{y+1}_UserCLK")
+                    clkWireInMapping[(x, y)] = lr.Signal(f"Tile_X{x}Y{y + 1}_UserCLK")
                 clkWireOutMapping[(x, y)] = lr.Signal(f"Tile_X{x}Y{y}_UserCLK_o")
 
             frameDataInMapping: Mapping[Loc, Value] = {}

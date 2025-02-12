@@ -1,9 +1,13 @@
 from dataclasses import dataclass
+from typing import Mapping
+
+from FABulous.fabric_definition.define import Loc
 
 
 @dataclass(slots=True)
 class FeatureValue:
-    bitPosition: tuple[int, int]
+    tileLoc: Loc
+    bitPosition: list[tuple[int, int] | tuple[None, None]]
     value: int
 
 
@@ -13,3 +17,6 @@ class FASMFeature:
     address: tuple[int, int] | None
     value: int | None
     annotation: dict[str, str] | None
+
+
+FeatureMap = Mapping[str, FeatureValue]

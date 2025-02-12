@@ -1,7 +1,7 @@
 from collections import defaultdict
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any
+from typing import Any, Generator
 
 from FABulous.fabric_definition.Bel import Bel
 from FABulous.fabric_definition.define import ConfigBitMode, Loc, MultiplexerStyle
@@ -136,3 +136,8 @@ class Fabric:
             len(self.getTileByName(tile).bels) * count
             for tile, count in tileCountDict.items()
         )
+
+    def getFlattenFabric(self) -> Generator[tuple[Loc, Tile]]:
+        for y, row in enumerate(self.tile):
+            for x, tile in enumerate(row):
+                yield ((x, y), tile)

@@ -373,6 +373,5 @@ def parseBelFile(
         configPort=configPort,
         sharedPort=sharedPort,
         configBit=sum(belMapDict.values()),
-        belFeatureMap=belMapDict,
         userCLK=userClk,
     )

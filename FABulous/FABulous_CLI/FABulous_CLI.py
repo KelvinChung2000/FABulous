@@ -573,7 +573,7 @@ class FABulous_CLI(Cmd):
         Does this by calling the respective functions 'do_gen_[function]'.
         """
         logger.info("Running FABulous")
-        self.fabulousAPI.gen_port_hinting()
+        self.fabulousAPI.gen_port_data()
         self.do_gen_fabric()
         self.do_gen_primitive_library(str(self.projectDir / META_DATA_DIR / "prims.v"))
         self.do_gen_chipdb()

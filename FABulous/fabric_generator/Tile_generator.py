@@ -11,7 +11,7 @@ from FABulous.fabric_generator.TileSwitchMatrix_generator import (
     generateTileSwitchMatrix,
 )
 from FABulous.file_parser.file_parser_yaml import parseFabricYAML
-from FABulous.file_parser.parse_py_mux import genSwitchMatrix, initPortHinting
+from FABulous.file_parser.parse_py_mux import genSwitchMatrix, setupPortData
 
 
 def generateTile(codeGen: CodeGenerator, fabric: Fabric, tile: Tile):
@@ -364,7 +364,7 @@ def generateTile(codeGen: CodeGenerator, fabric: Fabric, tile: Tile):
 if __name__ == "__main__":
     fabric = parseFabricYAML(Path("/home/kelvin/FABulous_fork/myProject/fabric.yaml"))
     for tile in fabric.tileDict.values():
-        initPortHinting(fabric, tile)
+        setupPortData(fabric, tile)
         # print(f"Generated port hinting for tile {tile.name}")
     sm = genSwitchMatrix(fabric.tileDict["PE"].tileDir)
     fabric.tileDict["PE"].switchMatrix = sm

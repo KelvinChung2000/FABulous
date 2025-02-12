@@ -1,7 +1,7 @@
 module PE #(
     parameter MaxFramesPerCol = 32,
     parameter FrameBitsPerRow = 32,
-    parameter NoConfigBits = 77
+    parameter NoConfigBits = 75
 )(
     // NORTH,
     input [31:0] in0,
@@ -9,14 +9,12 @@ module PE #(
     // EAST,
     input [31:0] in1,
     output [31:0] out1,
-    input [1:0] spanIn,
     // SOUTH,
     input [31:0] in2,
     output [31:0] out2,
     // WEST,
     input [31:0] in3,
     output [31:0] out3,
-    output [1:0] spanOut,
     input UserCLK,
     output UserCLKo,
     input [FrameBitsPerRow - 1:0] FrameData,
@@ -88,22 +86,6 @@ clk_buf #() inst_clk_buf (
     .X(UserCLKo)
 );
 
-// Buffer spanning wire: spanIn->spanOut
-wire [1:0] spanIn_to_spanOut;
-my_buf_pack #(
-    .WIDTH(2)
-) spanIn_inbuf (
-    .A(spanIn[1:2]),
-    .X(spanIn_to_spanOut)
-);
-
-my_buf_pack #(
-    .WIDTH(2)
-) spanOut_outbuf (
-    .A(spanIn_to_spanOut),
-    .X(spanOut[1:0])
-);
-
 // Init Configuration storage latches
 PE_ConfigMem #() Inst_PE_ConfigMem (
     .FrameData(FrameData),
@@ -171,8 +153,31 @@ reg_unit #() Inst_W_reg_unit (
 
 // Init Switch Matrix
 PE_SwitchMatrix #() Inst_PE_SwitchMatrix (
-    .ConfigBits(ConfigBits[76:28]),
-    .ConfigBits_N(ConfigBits_N[76:28])
+    .out0(out0),
+    .out1(out1),
+    .out2(out2),
+    .out3(out3),
+    .data_in1(data_in1),
+    .data_in2(data_in2),
+    .data_in3(data_in3),
+    .RES_reg_in(RES_reg_in),
+    .N_reg_in(N_reg_in),
+    .E_reg_in(E_reg_in),
+    .S_reg_in(S_reg_in),
+    .W_reg_in(W_reg_in),
+    .data_out(data_out),
+    .in0(in0),
+    .in1(in1),
+    .in2(in2),
+    .in3(in3),
+    .RES_reg_out(RES_reg_out),
+    .N_reg_out(N_reg_out),
+    .E_reg_out(E_reg_out),
+    .S_reg_out(S_reg_out),
+    .W_reg_out(W_reg_out),
+    .const_out(const_out),
+    .ConfigBits(ConfigBits[74:28]),
+    .ConfigBits_N(ConfigBits_N[74:28])
 );
 
 endmodule

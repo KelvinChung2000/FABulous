@@ -16,4 +16,5 @@ BELS: [
     {BEL: ./IO.v, prefix: "W_"},
 
 ]
-MATRIX: ./W_IO.mux
+MATRIX: ./list.py
+CONFIG_MEM: ./W_IO_ConfigMem.csv

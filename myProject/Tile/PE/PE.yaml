@@ -32,4 +32,5 @@ BELS: [
   {BEL: ./reg_unit.v, prefix: W_},
 
 ]
-MATRIX: ./PE.mux
+MATRIX: list.py
+CONFIG_MEM: PE_ConfigMem.csv

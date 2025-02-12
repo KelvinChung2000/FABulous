@@ -4,61 +4,40 @@ from pathlib import Path
 
 from jinja2 import Environment, PackageLoader
 
+from FABulous.fabric_definition.Bel import Bel
 from FABulous.fabric_definition.define import IO
-from FABulous.fabric_definition.Fabric import Fabric
 from FABulous.fabric_definition.Port import Port, SlicedPort, TilePort
 from FABulous.fabric_definition.SwitchMatrix import Mux, MuxPort, SwitchMatrix
-from FABulous.fabric_definition.Tile import Tile
 
 GenericPort = Port | TilePort
 
 
-def initPortHinting(fabric: Fabric, tile: Tile):
+def setupPortData(
+    tileName: str, tileDir: Path, tilePorts: list[TilePort], bels: list[Bel]
+):
     environment = Environment(loader=PackageLoader("FABulous"))
-    template = environment.get_template("muxPortHint.py.jinja")
-    content = template.render(tile=tile)
-    with open(tile.tileDir.parent / f"metadata/{tile.name}_ports.py", "w") as f:
+    template = environment.get_template("portData.py.jinja")
+    content = template.render(tileName=tileName, tilePorts=tilePorts, bels=bels)
+    with open(tileDir.parent / f"metadata/{tileName}_ports.py", "w") as f:
         f.write(content)
 
     template = environment.get_template("listFile.py.jinja")
-    dirPath = str(
-        tile.tileDir.relative_to(fabric.fabricDir.parent.parent).parent
-    ).replace("/", ".")
+    dirPath = str(tileDir.relative_to(tileDir.parent.parent).parent).replace("/", ".")
     content = template.render(
-        title=tile.name,
+        title=tileName,
         path=dirPath,
     )
-    if not (tile.tileDir.parent / "list.py").exists():
-        with open(tile.tileDir.parent / "list.py", "w") as f:
+    if not (tileDir.parent / "list.py").exists():
+        with open(tileDir.parent / "list.py", "w") as f:
             f.write(content)
 
 
-def genSwitchMatrix(tileDir: Path) -> SwitchMatrix:
-    # environment = Environment(loader=PackageLoader("FABulous"))
-    # template = environment.get_template("muxPortHint.py.jinja")
-    # content = template.render(tile=tile)
-    # with open(tileDir.parent / f"metadata/{tileDir.parent.name}_ports.py", "w") as f:
-    #     f.write(content)
-
-    # template = environment.get_template("listFile.py.jinja")
-    # dirPath = str(
-    #     tile.tileDir.relative_to(fabric.fabricDir.parent.parent).parent
-    # ).replace("/", ".")
-    # content = template.render(
-    #     title=tile.name,
-    #     path=dirPath,
-    # )
-    # if not (tileDir.parent / "list.py").exists():
-    #     with open(tileDir.parent / "list.py", "w") as f:
-    #         f.write(content)
-        
-
-    # if not (tileDir.parent / "list.py").exists():
-    #     raise FileNotFoundError("list.py not found, please run initPortHinting first")
-
-    if listModuleSpec := spec_from_file_location(tileDir.parent.name, tileDir.parent / "list.py"):
+def genSwitchMatrix(tileName: str, tileDir: Path) -> SwitchMatrix:
+    if listModuleSpec := spec_from_file_location(
+        tileDir.parent.name, tileDir.parent / "list.py"
+    ):
         listModule = module_from_spec(listModuleSpec)
-        sys.modules["PE"] = listModule
+        sys.modules[tileName] = listModule
         if loader := listModuleSpec.loader:
             loader.exec_module(listModule)
         else:

@@ -2,7 +2,7 @@ from FABulous.fabric_definition.SwitchMatrix import MuxPort
 from FABulous.fabric_definition.define import IO, Side
 from FABulous.fabric_definition.Port import TilePort, Port, BelPort
 
-class PE_ports:
+class mux_ports:
     def __init__(self):
         # tile ports
         self.in0 = MuxPort(TilePort(name='in0', ioDirection=IO.INPUT, wireCount=32, isBus=False, sideOfTile=Side.NORTH, terminal=False, spanning=False), isTilePort=True, isBus=False, bitWidth=32)

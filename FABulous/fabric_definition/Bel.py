@@ -69,7 +69,6 @@ class Bel:
         configPort: list[ConfigPort],
         sharedPort: list[SharedPort],
         configBit: int,
-        belFeatureMap: dict[str, int],
         userCLK: Port | None,
     ) -> None:
         self.src = src
@@ -82,7 +81,6 @@ class Bel:
         self.configPort = configPort
         self.sharedPort = sharedPort
         self.configBit = configBit
-        self.belFeatureMap = belFeatureMap
         self.userCLK = userCLK
 
     def __hash__(self) -> int:

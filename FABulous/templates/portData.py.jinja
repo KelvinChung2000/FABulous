@@ -2,15 +2,15 @@ from FABulous.fabric_definition.SwitchMatrix import MuxPort
 from FABulous.fabric_definition.define import IO, Side
 from FABulous.fabric_definition.Port import TilePort, Port, BelPort
 
-class {{ tile.name }}_ports:
+class {{ tileName }}_ports:
     def __init__(self):
         # tile ports
-    {%- for p in tile.ports %}
+    {%- for p in tilePorts %}
         self.{{ p.name }} = MuxPort({{ p.createSelf() }}, isTilePort=True, isBus={{ p.isBus }}, bitWidth={{ p.wireCount }})
     {%- endfor %}
 
         # bel ports
-    {%- for bel in tile.bels -%}
+    {%- for bel in bels -%}
     {%- for p in bel.inputs %}
         self.{{ bel.prefix }}{{ p.name }} = MuxPort({{ p.createSelf() }}, isBelPort=True, isBus={{ p.isBus }}, bitWidth={{ p.wireCount }})
     {%- endfor %}

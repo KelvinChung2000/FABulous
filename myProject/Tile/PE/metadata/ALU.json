@@ -1,5 +1,5 @@
 {
-  "creator": "Yosys 0.48 (git sha1 aaa5347494801e9e3870b31387da59da24233f76, clang++ 16.0.0 -fPIC -O3)",
+  "creator": "Yosys 0.48+45 (git sha1 8acc77c1e, g++ 11.4.0-1ubuntu1~22.04 -fPIC -O3)",
   "modules": {
     "ALU": {
       "attributes": {
@@ -94,7 +94,7 @@
             "Y": [ 169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197, 198, 199, 200 ]
           }
         },
-        "$auto$proc_dlatch.cc:250:make_hold$33": {
+        "$auto$proc_dlatch.cc:249:make_hold$31": {
           "hide_name": 1,
           "type": "$not",
           "parameters": {
@@ -114,7 +114,7 @@
             "Y": [ 201 ]
           }
         },
-        "$auto$proc_dlatch.cc:250:make_hold$35": {
+        "$auto$proc_dlatch.cc:249:make_hold$33": {
           "hide_name": 1,
           "type": "$not",
           "parameters": {
@@ -134,7 +134,7 @@
             "Y": [ 202 ]
           }
         },
-        "$auto$proc_dlatch.cc:250:make_hold$37": {
+        "$auto$proc_dlatch.cc:249:make_hold$35": {
           "hide_name": 1,
           "type": "$not",
           "parameters": {
@@ -154,7 +154,7 @@
             "Y": [ 203 ]
           }
         },
-        "$auto$proc_dlatch.cc:259:make_hold$39": {
+        "$auto$proc_dlatch.cc:258:make_hold$37": {
           "hide_name": 1,
           "type": "$reduce_or",
           "parameters": {
@@ -174,7 +174,7 @@
             "Y": [ 204 ]
           }
         },
-        "$auto$proc_dlatch.cc:259:make_hold$43": {
+        "$auto$proc_dlatch.cc:258:make_hold$41": {
           "hide_name": 1,
           "type": "$reduce_or",
           "parameters": {
@@ -194,7 +194,7 @@
             "Y": [ 206 ]
           }
         },
-        "$auto$proc_dlatch.cc:259:make_hold$45": {
+        "$auto$proc_dlatch.cc:258:make_hold$43": {
           "hide_name": 1,
           "type": "$reduce_or",
           "parameters": {
@@ -214,7 +214,7 @@
             "Y": [ 207 ]
           }
         },
-        "$auto$proc_dlatch.cc:259:make_hold$49": {
+        "$auto$proc_dlatch.cc:258:make_hold$47": {
           "hide_name": 1,
           "type": "$reduce_or",
           "parameters": {
@@ -234,7 +234,7 @@
             "Y": [ 209 ]
           }
         },
-        "$auto$proc_dlatch.cc:259:make_hold$51": {
+        "$auto$proc_dlatch.cc:258:make_hold$49": {
           "hide_name": 1,
           "type": "$reduce_or",
           "parameters": {
@@ -254,7 +254,7 @@
             "Y": [ 210 ]
           }
         },
-        "$auto$proc_dlatch.cc:259:make_hold$55": {
+        "$auto$proc_dlatch.cc:258:make_hold$53": {
           "hide_name": 1,
           "type": "$reduce_or",
           "parameters": {
@@ -274,7 +274,7 @@
             "Y": [ 212 ]
           }
         },
-        "$auto$proc_dlatch.cc:263:make_hold$41": {
+        "$auto$proc_dlatch.cc:262:make_hold$39": {
           "hide_name": 1,
           "type": "$and",
           "parameters": {
@@ -298,7 +298,7 @@
             "Y": [ 205 ]
           }
         },
-        "$auto$proc_dlatch.cc:263:make_hold$47": {
+        "$auto$proc_dlatch.cc:262:make_hold$45": {
           "hide_name": 1,
           "type": "$and",
           "parameters": {
@@ -322,7 +322,7 @@
             "Y": [ 208 ]
           }
         },
-        "$auto$proc_dlatch.cc:263:make_hold$53": {
+        "$auto$proc_dlatch.cc:262:make_hold$51": {
           "hide_name": 1,
           "type": "$and",
           "parameters": {
@@ -346,28 +346,7 @@
             "Y": [ 211 ]
           }
         },
-        "$auto$proc_dlatch.cc:433:proc_dlatch$31": {
-          "hide_name": 1,
-          "type": "$dlatch",
-          "parameters": {
-            "EN_POLARITY": 1,
-            "WIDTH": 32
-          },
-          "attributes": {
-            "src": "myProject/Tile/PE/ALU.v:22.3-36.6"
-          },
-          "port_directions": {
-            "D": "input",
-            "EN": "input",
-            "Q": "output"
-          },
-          "connections": {
-            "D": [ 213, 214, 215, 216, 217, 218, 219, 220, 221, 222, 223, 224, 225, 226, 227, 228, 229, 230, 231, 232, 233, 234, 235, 236, 237, 238, 239, 240, 241, 242, 243, 244 ],
-            "EN": [ 245 ],
-            "Q": [ 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132 ]
-          }
-        },
-        "$auto$proc_dlatch.cc:433:proc_dlatch$32": {
+        "$auto$proc_dlatch.cc:432:proc_dlatch$55": {
           "hide_name": 1,
           "type": "$not",
           "parameters": {
@@ -383,7 +362,28 @@
           },
           "connections": {
             "A": [ 212 ],
-            "Y": [ 245 ]
+            "Y": [ 213 ]
+          }
+        },
+        "$auto$proc_dlatch.cc:432:proc_dlatch$57": {
+          "hide_name": 1,
+          "type": "$dlatch",
+          "parameters": {
+            "EN_POLARITY": 1,
+            "WIDTH": 32
+          },
+          "attributes": {
+            "src": "myProject/Tile/PE/ALU.v:22.3-36.6"
+          },
+          "port_directions": {
+            "D": "input",
+            "EN": "input",
+            "Q": "output"
+          },
+          "connections": {
+            "D": [ 214, 215, 216, 217, 218, 219, 220, 221, 222, 223, 224, 225, 226, 227, 228, 229, 230, 231, 232, 233, 234, 235, 236, 237, 238, 239, 240, 241, 242, 243, 244, 245 ],
+            "EN": [ 213 ],
+            "Q": [ 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132 ]
           }
         },
         "$mul$myProject/Tile/PE/ALU.v:32$7": {
@@ -720,7 +720,7 @@
             "A": [ 508, 509, 510, 511, 512, 513, 514, 515, 516, 517, 518, 519, 520, 521, 522, 523, 524, 525, 526, 527, 528, 529, 530, 531, 532, 533, 534, 535, 536, 537, 538, 539 ],
             "B": [ "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
             "S": [ 2 ],
-            "Y": [ 213, 214, 215, 216, 217, 218, 219, 220, 221, 222, 223, 224, 225, 226, 227, 228, 229, 230, 231, 232, 233, 234, 235, 236, 237, 238, 239, 240, 241, 242, 243, 244 ]
+            "Y": [ 214, 215, 216, 217, 218, 219, 220, 221, 222, 223, 224, 225, 226, 227, 228, 229, 230, 231, 232, 233, 234, 235, 236, 237, 238, 239, 240, 241, 242, 243, 244, 245 ]
           }
         },
         "$sub$myProject/Tile/PE/ALU.v:28$3": {
@@ -775,14 +775,14 @@
       "netnames": {
         "$0\\data_out[31:0]": {
           "hide_name": 1,
-          "bits": [ 213, 214, 215, 216, 217, 218, 219, 220, 221, 222, 223, 224, 225, 226, 227, 228, 229, 230, 231, 232, 233, 234, 235, 236, 237, 238, 239, 240, 241, 242, 243, 244 ],
+          "bits": [ 214, 215, 216, 217, 218, 219, 220, 221, 222, 223, 224, 225, 226, 227, 228, 229, 230, 231, 232, 233, 234, 235, 236, 237, 238, 239, 240, 241, 242, 243, 244, 245 ],
           "attributes": {
             "src": "myProject/Tile/PE/ALU.v:22.3-36.6"
           }
         },
         "$1\\data_out[31:0]": {
           "hide_name": 1,
-          "bits": [ 213, 214, 215, 216, 217, 218, 219, 220, 221, 222, 223, 224, 225, 226, 227, 228, 229, 230, 231, 232, 233, 234, 235, 236, 237, 238, 239, 240, 241, 242, 243, 244 ],
+          "bits": [ 214, 215, 216, 217, 218, 219, 220, 221, 222, 223, 224, 225, 226, 227, 228, 229, 230, 231, 232, 233, 234, 235, 236, 237, 238, 239, 240, 241, 242, 243, 244, 245 ],
           "attributes": {
             "src": "myProject/Tile/PE/ALU.v:22.3-36.6"
           }
@@ -815,79 +815,79 @@
             "src": "myProject/Tile/PE/ALU.v:29.25-29.44"
           }
         },
-        "$auto$rtlil.cc:2739:Not$34": {
+        "$auto$rtlil.cc:2739:Not$32": {
           "hide_name": 1,
           "bits": [ 201 ],
           "attributes": {
           }
         },
-        "$auto$rtlil.cc:2739:Not$36": {
+        "$auto$rtlil.cc:2739:Not$34": {
           "hide_name": 1,
           "bits": [ 202 ],
           "attributes": {
           }
         },
-        "$auto$rtlil.cc:2739:Not$38": {
+        "$auto$rtlil.cc:2739:Not$36": {
           "hide_name": 1,
           "bits": [ 203 ],
           "attributes": {
           }
         },
-        "$auto$rtlil.cc:2739:Not$57": {
+        "$auto$rtlil.cc:2739:Not$56": {
           "hide_name": 1,
-          "bits": [ 245 ],
+          "bits": [ 213 ],
           "attributes": {
           }
         },
-        "$auto$rtlil.cc:2743:ReduceOr$40": {
+        "$auto$rtlil.cc:2743:ReduceOr$38": {
           "hide_name": 1,
           "bits": [ 204 ],
           "attributes": {
           }
         },
-        "$auto$rtlil.cc:2743:ReduceOr$44": {
+        "$auto$rtlil.cc:2743:ReduceOr$42": {
           "hide_name": 1,
           "bits": [ 206 ],
           "attributes": {
           }
         },
-        "$auto$rtlil.cc:2743:ReduceOr$46": {
+        "$auto$rtlil.cc:2743:ReduceOr$44": {
           "hide_name": 1,
           "bits": [ 207 ],
           "attributes": {
           }
         },
-        "$auto$rtlil.cc:2743:ReduceOr$50": {
+        "$auto$rtlil.cc:2743:ReduceOr$48": {
           "hide_name": 1,
           "bits": [ 209 ],
           "attributes": {
           }
         },
-        "$auto$rtlil.cc:2743:ReduceOr$52": {
+        "$auto$rtlil.cc:2743:ReduceOr$50": {
           "hide_name": 1,
           "bits": [ 210 ],
           "attributes": {
           }
         },
-        "$auto$rtlil.cc:2743:ReduceOr$56": {
+        "$auto$rtlil.cc:2743:ReduceOr$54": {
           "hide_name": 1,
           "bits": [ 212 ],
           "attributes": {
           }
         },
-        "$auto$rtlil.cc:2786:And$42": {
+        "$auto$rtlil.cc:2786:And$40": {
           "hide_name": 1,
           "bits": [ 205 ],
           "attributes": {
           }
         },
-        "$auto$rtlil.cc:2786:And$48": {
+        "$auto$rtlil.cc:2786:And$46": {
           "hide_name": 1,
           "bits": [ 208 ],
           "attributes": {
           }
         },
-        "$auto$rtlil.cc:2786:And$54": {
+        "$auto$rtlil.cc:2786:And$52": {
           "hide_name": 1,
           "bits": [ 211 ],
           "attributes": {
@@ -999,7 +999,7 @@
         },
         "$procmux$29_Y": {
           "hide_name": 1,
-          "bits": [ 213, 214, 215, 216, 217, 218, 219, 220, 221, 222, 223, 224, 225, 226, 227, 228, 229, 230, 231, 232, 233, 234, 235, 236, 237, 238, 239, 240, 241, 242, 243, 244 ],
+          "bits": [ 214, 215, 216, 217, 218, 219, 220, 221, 222, 223, 224, 225, 226, 227, 228, 229, 230, 231, 232, 233, 234, 235, 236, 237, 238, 239, 240, 241, 242, 243, 244, 245 ],
           "attributes": {
           }
         },

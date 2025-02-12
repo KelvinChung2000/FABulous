@@ -3,6 +3,7 @@ from pathlib import Path
 from typing import Any, cast
 
 from FABulous.fabric_definition.Bel import Bel
+from FABulous.fabric_definition.ConfigMem import ConfigMem
 from FABulous.fabric_definition.define import IO, Side
 from FABulous.fabric_definition.Port import TilePort
 from FABulous.fabric_definition.SwitchMatrix import SwitchMatrix
@@ -36,6 +37,7 @@ class Tile:
     bels: list[Bel]
     wireTypes: list[WireType]
     switchMatrix: SwitchMatrix
+    configMems: list[ConfigMem]
     globalConfigBits: int = 0
     withUserCLK: bool = False
     tileDir: Path = Path(".")
@@ -137,7 +139,7 @@ class Tile:
 
     def getTileOutputPorts(self) -> list[TilePort]:
         return sorted([p for p in self.ports if p.ioDirection == IO.OUTPUT])
-    
+
     def getTilePortGrouped(self, io: IO | None = None) -> dict[Side, list[TilePort]]:
         return {
             Side.NORTH: self.getNorthPorts(io),

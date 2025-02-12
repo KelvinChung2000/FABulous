@@ -16,4 +16,5 @@ BELS: [
     {BEL: ./IO.v, prefix: "S_"},
 
 ]
-MATRIX: ./S_IO.mux
+MATRIX: ./list.py
+CONFIG_MEM: S_IO_ConfigMem.csv

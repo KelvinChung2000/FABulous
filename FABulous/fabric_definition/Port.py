@@ -126,6 +126,7 @@ class BelPort(Port):
 @dataclass(frozen=True, eq=True)
 class ConfigPort(Port):
     feature: str = ""
+    value: int = 0
     featureType: FeatureType = FeatureType.INIT
 
 

@@ -9,12 +9,16 @@ from FABulous.fabric_definition.Bel import Bel
 from FABulous.fabric_definition.define import IO, ConfigBitMode, MultiplexerStyle, Side
 from FABulous.fabric_definition.Fabric import Fabric
 from FABulous.fabric_definition.Port import TilePort
-from FABulous.fabric_definition.SwitchMatrix import Mux, SwitchMatrix
+from FABulous.fabric_definition.SwitchMatrix import Mux
 from FABulous.fabric_definition.Tile import Tile
 from FABulous.fabric_definition.Wire import Wire, WireType
-from FABulous.file_parser.file_parser_csv import parseList, parseMatrix, parsePortLine
+from FABulous.file_parser.file_parser_csv import (
+    parseList,
+    parseMatrix,
+    parsePortLine,
+)
 from FABulous.file_parser.file_parser_HDL import parseBelFile
-from FABulous.file_parser.parse_py_mux import genSwitchMatrix
+from FABulous.file_parser.parse_py_mux import genSwitchMatrix, setupPortData
 
 oppositeDic = {
     "NORTH": "SOUTH",
@@ -124,7 +128,7 @@ def parseFabricYAML(fileName: Path) -> Fabric:
                         xOffset=wireType.offsetX,
                         yOffset=wireType.offsetY,
                         sourceTile=f"X{x}Y{y}",
-                        destinationTile=f"X{x+wireType.offsetX}Y{y+wireType.offsetY}",
+                        destinationTile=f"X{x + wireType.offsetX}Y{y + wireType.offsetY}",
                     )
                 )
             wireDict[(x, y)] = wires
@@ -289,9 +293,9 @@ def parseTileYAML(fileName: Path) -> Tile:
                 muxSize = len(v)
                 if muxSize >= 2:
                     configBit += muxSize.bit_length() - 1
-        case ".mux":
-            pass
-            sm = genSwitchMatrix(matrixDir)
+        case ".py":
+            setupPortData(tileName, matrixDir, list(portsDict.values()), bels)
+            sm = genSwitchMatrix(tileName, matrixDir)
             configBit += sm.configBits
         case "_matrix.csv":
             for _, v in parseMatrix(matrixDir, tileName).items():
@@ -309,8 +313,12 @@ def parseTileYAML(fileName: Path) -> Tile:
                         f"Cannot find NumberOfConfigBits in {matrixDir} assume 0 config bits."
                     )
         case _:
-            logger.error("Unknown file extension for matrix.")
-            raise ValueError("Unknown file extension for matrix.")
+            logger.error(
+                f"Unknown file extension '{matrixDir.suffix}' for tile {tileName} switch matrix."
+            )
+            raise ValueError(
+                f"Unknown file extension '{matrixDir.suffix}' for tile {tileName} switch matrix."
+            )
 
     # switchMatrix = parseMux(matrixDir)
 
@@ -336,13 +344,30 @@ def parseTileYAML(fileName: Path) -> Tile:
     for b in bels:
         configBit += b.configBit
 
+    configMems = parseConfigMem(
+        fileName.parent.joinpath(data["CONFIG_MEM"]),
+        32,
+        32,
+        configBit,
+    )
+
+    if configMems is None:
+        configMems = []
+
     return Tile(
         name=tileName,
         ports=list(portsDict.values()),
         bels=bels,
         wireTypes=wires,
-        switchMatrix=SwitchMatrix(),
+        switchMatrix=sm,
+        configMems=configMems,
         globalConfigBits=configBit,
         withUserCLK=withUserCLK,
         tileDir=fileName,
     )
+
+
+def parseConfigMem(
+    fileName: Path, maxFramePerCol: int, frameBitPerRow: int, configBitCount: int
+):
+    pass

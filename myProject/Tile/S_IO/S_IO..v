@@ -92,6 +92,11 @@ IO #() Inst_S_IO (
 
 // Init Switch Matrix
 S_IO_SwitchMatrix #() Inst_S_IO_SwitchMatrix (
+    .out2(out2),
+    .out0(out0),
+    .S_from_fabric(S_from_fabric),
+    .in0(in0),
+    .in2(in2),
     .ConfigBits(ConfigBits[4:1]),
     .ConfigBits_N(ConfigBits_N[4:1])
 );

@@ -7,7 +7,11 @@ from typing import Literal, overload
 from loguru import logger
 
 from FABulous.fabric_definition.Bel import Bel
-from FABulous.fabric_definition.ConfigMem import ConfigMem
+from FABulous.fabric_definition.ConfigMem import (
+    ConfigBitMapping,
+    ConfigMem,
+    ConfigurationMemory,
+)
 from FABulous.fabric_definition.define import IO, ConfigBitMode, MultiplexerStyle
 from FABulous.fabric_definition.Fabric import Fabric
 from FABulous.fabric_definition.Port import Port
@@ -1050,7 +1054,7 @@ def parseConfigMem(
     maxFramePerCol: int,
     frameBitPerRow: int,
     globalConfigBits: int,
-) -> list[ConfigMem]:
+) -> ConfigurationMemory:
     """Parse the config memory CSV file into a list of ConfigMem objects.
 
     Parameters
@@ -1092,7 +1096,7 @@ def parseConfigMem(
         # we should have as many lines as we have frames (=framePerCol)
         if len(mappingFile) != maxFramePerCol:
             logger.error(
-                f"The bitstream mapping file has only {len(mappingFile)} entries but MaxFramesPerCol is {maxFramePerCol}."
+                f"The bitstream mapping file {fileName} has {len(mappingFile)} entries which do not match MaxFramesPerCol of {maxFramePerCol}."
             )
             raise ValueError
 
@@ -1153,8 +1157,7 @@ def parseConfigMem(
                     configBitsOrder.append(int(item))
 
             elif "NULL" in entry["ConfigBits_ranges"]:
-                continue
-
+                configBitsOrder = []
             else:
                 logger.error(
                     f"Range {entry['ConfigBits_ranges']} is not a valid format. It should be in the form [int]:[int] or [int]. If there are multiple ranges it should be separated by ';'."
@@ -1163,15 +1166,40 @@ def parseConfigMem(
 
             allConfigBitsOrder += configBitsOrder
 
-            if entry["used_bits_mask"].count("1") > 0:
-                configMemEntry.append(
-                    ConfigMem(
-                        frameName=entry["frame_name"],
-                        frameIndex=int(entry["frame_index"]),
-                        bitsUsedInFrame=entry["used_bits_mask"].count("1"),
-                        usedBitMask=entry["used_bits_mask"],
-                        configBitRanges=configBitsOrder,
-                    )
+            configMemEntry.append(
+                ConfigMem(
+                    frameName=entry["frame_name"],
+                    frameIndex=int(entry["frame_index"]),
+                    bitsUsedInFrame=entry["used_bits_mask"].count("1"),
+                    usedBitMask=entry["used_bits_mask"],
+                    configBitRanges=configBitsOrder,
                 )
+            )
 
-    return configMemEntry
+    configMemMappings: list[ConfigBitMapping] = []
+
+    # mapping config bit to the location in the frame
+    # If we only have 1 frame for example:
+    # bit mask = 1111_1111_1110_0000_0000_0000_0000_0000
+    # ConfigBits_range = 10:0
+    # Then encodeDict[10] = 31, encodeDict[9] = 30
+    # This means the 10th bit in the config memory is the 31st bit in the 1st frame
+    # and 30th bit in the 1nd frame
+    for i in configMemEntry:
+        configBitRangeCopy = deepcopy(i.configBitRanges)
+        for bitIndex in range(31, -1, -1):
+            used_bit_mask_reversed = list(reversed(str(i.usedBitMask)))
+            if used_bit_mask_reversed[bitIndex] == "1":
+                configMemMappings.append(
+                    ConfigBitMapping(configBitRangeCopy.pop(0), i.frameIndex, bitIndex)
+                )
+            else:
+                configMemMappings.append(ConfigBitMapping(None, i.frameIndex, bitIndex))
+
+    return ConfigurationMemory(
+        frameCount=maxFramePerCol,
+        dataBitCount=frameBitPerRow,
+        configBitCount=globalConfigBits,
+        configMappings=configMemMappings,
+        configMemEntries=configMemEntry,
+    )

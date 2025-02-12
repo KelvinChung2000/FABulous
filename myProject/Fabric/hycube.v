@@ -210,22 +210,18 @@ wire [31:0] Tile_X1Y1_out0;
 wire [31:0] Tile_X1Y1_out1;
 wire [31:0] Tile_X1Y1_out2;
 wire [31:0] Tile_X1Y1_out3;
-wire [1:0] Tile_X1Y1_spanOut;
 wire [31:0] Tile_X2Y1_out0;
 wire [31:0] Tile_X2Y1_out1;
 wire [31:0] Tile_X2Y1_out2;
 wire [31:0] Tile_X2Y1_out3;
-wire [1:0] Tile_X2Y1_spanOut;
 wire [31:0] Tile_X3Y1_out0;
 wire [31:0] Tile_X3Y1_out1;
 wire [31:0] Tile_X3Y1_out2;
 wire [31:0] Tile_X3Y1_out3;
-wire [1:0] Tile_X3Y1_spanOut;
 wire [31:0] Tile_X4Y1_out0;
 wire [31:0] Tile_X4Y1_out1;
 wire [31:0] Tile_X4Y1_out2;
 wire [31:0] Tile_X4Y1_out3;
-wire [1:0] Tile_X4Y1_spanOut;
 wire [31:0] Tile_X5Y1_out1;
 wire [31:0] Tile_X5Y1_out3;
 wire [31:0] Tile_X0Y2_out1;
@@ -234,22 +230,18 @@ wire [31:0] Tile_X1Y2_out0;
 wire [31:0] Tile_X1Y2_out1;
 wire [31:0] Tile_X1Y2_out2;
 wire [31:0] Tile_X1Y2_out3;
-wire [1:0] Tile_X1Y2_spanOut;
 wire [31:0] Tile_X2Y2_out0;
 wire [31:0] Tile_X2Y2_out1;
 wire [31:0] Tile_X2Y2_out2;
 wire [31:0] Tile_X2Y2_out3;
-wire [1:0] Tile_X2Y2_spanOut;
 wire [31:0] Tile_X3Y2_out0;
 wire [31:0] Tile_X3Y2_out1;
 wire [31:0] Tile_X3Y2_out2;
 wire [31:0] Tile_X3Y2_out3;
-wire [1:0] Tile_X3Y2_spanOut;
 wire [31:0] Tile_X4Y2_out0;
 wire [31:0] Tile_X4Y2_out1;
 wire [31:0] Tile_X4Y2_out2;
 wire [31:0] Tile_X4Y2_out3;
-wire [1:0] Tile_X4Y2_spanOut;
 wire [31:0] Tile_X5Y2_out1;
 wire [31:0] Tile_X5Y2_out3;
 wire [31:0] Tile_X0Y3_out1;
@@ -258,22 +250,18 @@ wire [31:0] Tile_X1Y3_out0;
 wire [31:0] Tile_X1Y3_out1;
 wire [31:0] Tile_X1Y3_out2;
 wire [31:0] Tile_X1Y3_out3;
-wire [1:0] Tile_X1Y3_spanOut;
 wire [31:0] Tile_X2Y3_out0;
 wire [31:0] Tile_X2Y3_out1;
 wire [31:0] Tile_X2Y3_out2;
 wire [31:0] Tile_X2Y3_out3;
-wire [1:0] Tile_X2Y3_spanOut;
 wire [31:0] Tile_X3Y3_out0;
 wire [31:0] Tile_X3Y3_out1;
 wire [31:0] Tile_X3Y3_out2;
 wire [31:0] Tile_X3Y3_out3;
-wire [1:0] Tile_X3Y3_spanOut;
 wire [31:0] Tile_X4Y3_out0;
 wire [31:0] Tile_X4Y3_out1;
 wire [31:0] Tile_X4Y3_out2;
 wire [31:0] Tile_X4Y3_out3;
-wire [1:0] Tile_X4Y3_spanOut;
 wire [31:0] Tile_X5Y3_out1;
 wire [31:0] Tile_X5Y3_out3;
 wire [31:0] Tile_X0Y4_out1;
@@ -282,22 +270,18 @@ wire [31:0] Tile_X1Y4_out0;
 wire [31:0] Tile_X1Y4_out1;
 wire [31:0] Tile_X1Y4_out2;
 wire [31:0] Tile_X1Y4_out3;
-wire [1:0] Tile_X1Y4_spanOut;
 wire [31:0] Tile_X2Y4_out0;
 wire [31:0] Tile_X2Y4_out1;
 wire [31:0] Tile_X2Y4_out2;
 wire [31:0] Tile_X2Y4_out3;
-wire [1:0] Tile_X2Y4_spanOut;
 wire [31:0] Tile_X3Y4_out0;
 wire [31:0] Tile_X3Y4_out1;
 wire [31:0] Tile_X3Y4_out2;
 wire [31:0] Tile_X3Y4_out3;
-wire [1:0] Tile_X3Y4_spanOut;
 wire [31:0] Tile_X4Y4_out0;
 wire [31:0] Tile_X4Y4_out1;
 wire [31:0] Tile_X4Y4_out2;
 wire [31:0] Tile_X4Y4_out3;
-wire [1:0] Tile_X4Y4_spanOut;
 wire [31:0] Tile_X5Y4_out1;
 wire [31:0] Tile_X5Y4_out3;
 wire [31:0] Tile_X1Y5_out0;
@@ -436,10 +420,8 @@ PE #() PE_Tile_X1Y1 (
     .out1(Tile_X1Y1_out1),
     .out2(Tile_X1Y1_out2),
     .out3(Tile_X1Y1_out3),
-    .spanOut(Tile_X1Y1_spanOut),
     .in0(Tile_X1Y0_out2),
     .in1(Tile_X0Y1_out3),
-    .spanIn(Tile_X0Y1_out3),
     .in2(Tile_X1Y2_out0),
     .in3(Tile_X2Y1_out1),
     .UserCLK(Tile_X1Y2_UserCLK),
@@ -455,10 +437,8 @@ PE #() PE_Tile_X2Y1 (
     .out1(Tile_X2Y1_out1),
     .out2(Tile_X2Y1_out2),
     .out3(Tile_X2Y1_out3),
-    .spanOut(Tile_X2Y1_spanOut),
     .in0(Tile_X2Y0_out2),
     .in1(Tile_X1Y1_out3),
-    .spanIn(Tile_X1Y1_spanOut),
     .in2(Tile_X2Y2_out0),
     .in3(Tile_X3Y1_out1),
     .UserCLK(Tile_X2Y2_UserCLK),
@@ -474,10 +454,8 @@ PE #() PE_Tile_X3Y1 (
     .out1(Tile_X3Y1_out1),
     .out2(Tile_X3Y1_out2),
     .out3(Tile_X3Y1_out3),
-    .spanOut(Tile_X3Y1_spanOut),
     .in0(Tile_X3Y0_out2),
     .in1(Tile_X2Y1_out3),
-    .spanIn(Tile_X2Y1_spanOut),
     .in2(Tile_X3Y2_out0),
     .in3(Tile_X4Y1_out1),
     .UserCLK(Tile_X3Y2_UserCLK),
@@ -493,10 +471,8 @@ PE #() PE_Tile_X4Y1 (
     .out1(Tile_X4Y1_out1),
     .out2(Tile_X4Y1_out2),
     .out3(Tile_X4Y1_out3),
-    .spanOut(Tile_X4Y1_spanOut),
     .in0(Tile_X4Y0_out2),
     .in1(Tile_X3Y1_out3),
-    .spanIn(Tile_X3Y1_spanOut),
     .in2(Tile_X4Y2_out0),
     .in3(Tile_X5Y1_out1),
     .UserCLK(Tile_X4Y2_UserCLK),
@@ -540,10 +516,8 @@ PE #() PE_Tile_X1Y2 (
     .out1(Tile_X1Y2_out1),
     .out2(Tile_X1Y2_out2),
     .out3(Tile_X1Y2_out3),
-    .spanOut(Tile_X1Y2_spanOut),
     .in0(Tile_X1Y1_out2),
     .in1(Tile_X0Y2_out3),
-    .spanIn(Tile_X0Y2_out3),
     .in2(Tile_X1Y3_out0),
     .in3(Tile_X2Y2_out1),
     .UserCLK(Tile_X1Y3_UserCLK),
@@ -559,10 +533,8 @@ PE #() PE_Tile_X2Y2 (
     .out1(Tile_X2Y2_out1),
     .out2(Tile_X2Y2_out2),
     .out3(Tile_X2Y2_out3),
-    .spanOut(Tile_X2Y2_spanOut),
     .in0(Tile_X2Y1_out2),
     .in1(Tile_X1Y2_out3),
-    .spanIn(Tile_X1Y2_spanOut),
     .in2(Tile_X2Y3_out0),
     .in3(Tile_X3Y2_out1),
     .UserCLK(Tile_X2Y3_UserCLK),
@@ -578,10 +550,8 @@ PE #() PE_Tile_X3Y2 (
     .out1(Tile_X3Y2_out1),
     .out2(Tile_X3Y2_out2),
     .out3(Tile_X3Y2_out3),
-    .spanOut(Tile_X3Y2_spanOut),
     .in0(Tile_X3Y1_out2),
     .in1(Tile_X2Y2_out3),
-    .spanIn(Tile_X2Y2_spanOut),
     .in2(Tile_X3Y3_out0),
     .in3(Tile_X4Y2_out1),
     .UserCLK(Tile_X3Y3_UserCLK),
@@ -597,10 +567,8 @@ PE #() PE_Tile_X4Y2 (
     .out1(Tile_X4Y2_out1),
     .out2(Tile_X4Y2_out2),
     .out3(Tile_X4Y2_out3),
-    .spanOut(Tile_X4Y2_spanOut),
     .in0(Tile_X4Y1_out2),
     .in1(Tile_X3Y2_out3),
-    .spanIn(Tile_X3Y2_spanOut),
     .in2(Tile_X4Y3_out0),
     .in3(Tile_X5Y2_out1),
     .UserCLK(Tile_X4Y3_UserCLK),
@@ -644,10 +612,8 @@ PE #() PE_Tile_X1Y3 (
     .out1(Tile_X1Y3_out1),
     .out2(Tile_X1Y3_out2),
     .out3(Tile_X1Y3_out3),
-    .spanOut(Tile_X1Y3_spanOut),
     .in0(Tile_X1Y2_out2),
     .in1(Tile_X0Y3_out3),
-    .spanIn(Tile_X0Y3_out3),
     .in2(Tile_X1Y4_out0),
     .in3(Tile_X2Y3_out1),
     .UserCLK(Tile_X1Y4_UserCLK),
@@ -663,10 +629,8 @@ PE #() PE_Tile_X2Y3 (
     .out1(Tile_X2Y3_out1),
     .out2(Tile_X2Y3_out2),
     .out3(Tile_X2Y3_out3),
-    .spanOut(Tile_X2Y3_spanOut),
     .in0(Tile_X2Y2_out2),
     .in1(Tile_X1Y3_out3),
-    .spanIn(Tile_X1Y3_spanOut),
     .in2(Tile_X2Y4_out0),
     .in3(Tile_X3Y3_out1),
     .UserCLK(Tile_X2Y4_UserCLK),
@@ -682,10 +646,8 @@ PE #() PE_Tile_X3Y3 (
     .out1(Tile_X3Y3_out1),
     .out2(Tile_X3Y3_out2),
     .out3(Tile_X3Y3_out3),
-    .spanOut(Tile_X3Y3_spanOut),
     .in0(Tile_X3Y2_out2),
     .in1(Tile_X2Y3_out3),
-    .spanIn(Tile_X2Y3_spanOut),
     .in2(Tile_X3Y4_out0),
     .in3(Tile_X4Y3_out1),
     .UserCLK(Tile_X3Y4_UserCLK),
@@ -701,10 +663,8 @@ PE #() PE_Tile_X4Y3 (
     .out1(Tile_X4Y3_out1),
     .out2(Tile_X4Y3_out2),
     .out3(Tile_X4Y3_out3),
-    .spanOut(Tile_X4Y3_spanOut),
     .in0(Tile_X4Y2_out2),
     .in1(Tile_X3Y3_out3),
-    .spanIn(Tile_X3Y3_spanOut),
     .in2(Tile_X4Y4_out0),
     .in3(Tile_X5Y3_out1),
     .UserCLK(Tile_X4Y4_UserCLK),
@@ -748,10 +708,8 @@ PE #() PE_Tile_X1Y4 (
     .out1(Tile_X1Y4_out1),
     .out2(Tile_X1Y4_out2),
     .out3(Tile_X1Y4_out3),
-    .spanOut(Tile_X1Y4_spanOut),
     .in0(Tile_X1Y3_out2),
     .in1(Tile_X0Y4_out3),
-    .spanIn(Tile_X0Y4_out3),
     .in2(Tile_X1Y5_out0),
     .in3(Tile_X2Y4_out1),
     .UserCLK(Tile_X1Y5_UserCLK),
@@ -767,10 +725,8 @@ PE #() PE_Tile_X2Y4 (
     .out1(Tile_X2Y4_out1),
     .out2(Tile_X2Y4_out2),
     .out3(Tile_X2Y4_out3),
-    .spanOut(Tile_X2Y4_spanOut),
     .in0(Tile_X2Y3_out2),
     .in1(Tile_X1Y4_out3),
-    .spanIn(Tile_X1Y4_spanOut),
     .in2(Tile_X2Y5_out0),
     .in3(Tile_X3Y4_out1),
     .UserCLK(Tile_X2Y5_UserCLK),
@@ -786,10 +742,8 @@ PE #() PE_Tile_X3Y4 (
     .out1(Tile_X3Y4_out1),
     .out2(Tile_X3Y4_out2),
     .out3(Tile_X3Y4_out3),
-    .spanOut(Tile_X3Y4_spanOut),
     .in0(Tile_X3Y3_out2),
     .in1(Tile_X2Y4_out3),
-    .spanIn(Tile_X2Y4_spanOut),
     .in2(Tile_X3Y5_out0),
     .in3(Tile_X4Y4_out1),
     .UserCLK(Tile_X3Y5_UserCLK),
@@ -805,10 +759,8 @@ PE #() PE_Tile_X4Y4 (
     .out1(Tile_X4Y4_out1),
     .out2(Tile_X4Y4_out2),
     .out3(Tile_X4Y4_out3),
-    .spanOut(Tile_X4Y4_spanOut),
     .in0(Tile_X4Y3_out2),
     .in1(Tile_X3Y4_out3),
-    .spanIn(Tile_X3Y4_spanOut),
     .in2(Tile_X4Y5_out0),
     .in3(Tile_X5Y4_out1),
     .UserCLK(Tile_X4Y5_UserCLK),

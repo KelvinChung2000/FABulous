@@ -55,8 +55,6 @@ def generateFabric(codeGen: CodeGenerator, fabric: Fabric):
 
             userClk = pr.Port("UserCLK", IO.INPUT)
 
-        print(externalSignalMapping)
-
         with m.LogicRegion() as lr:
 
             clkWireInMapping: Mapping[Loc, Value] = {}

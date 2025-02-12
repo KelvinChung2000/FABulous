@@ -46,13 +46,13 @@ def genSwitchMatrix(tile: Tile, tileType: TileType, context=1):
             tileType.create_wire(f"{c}_{mux.output.name}")
             if mux.output in outportName:
                 for i in mux.inputs:
-                    tileType.create_pip(f"{c}_{i}", f"{c}_{mux.output}_internal")
+                    tileType.create_pip(f"{c}_{i}", f"{c}_{mux.output.name}_internal")
                     tileType.create_pip(
                         f"{c}_{mux.output.name}_internal", f"{c}_{mux.output.name}"
                     )
             else:
                 for i in mux.inputs:
-                    tileType.create_pip(f"{c}_{i.name}", f"{c}_{mux.output}")
+                    tileType.create_pip(f"{c}_{i.name}", f"{c}_{mux.output.name}")
 
     zOut = 0
     for c in range(context - 1):

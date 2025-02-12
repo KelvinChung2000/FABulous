@@ -1,7 +1,12 @@
+from collections import namedtuple
 from dataclasses import dataclass, field
 
+ConfigBitMapping = namedtuple(
+    "ConfigBitMapping", ["configBitNumber", "frameIndex", "frameBitIndex"]
+)
 
-@dataclass(frozen=True, eq=True)
+
+@dataclass
 class ConfigMem:
     """Data structure to store the information about a config memory. Each structure
     represents a row of entries in the config memory CSV file.
@@ -25,3 +30,21 @@ class ConfigMem:
     bitsUsedInFrame: int
     usedBitMask: str
     configBitRanges: list[int] = field(default_factory=list)
+
+
+@dataclass
+class ConfigurationMemory:
+    frameCount: int
+    dataBitCount: int
+    configBitCount: int
+    configMappings: list[ConfigBitMapping]
+    configMemEntries: list[ConfigMem]
+
+    def __getitems__(self, key) -> int:
+        if isinstance(key, tuple):
+            for i in self.configMappings:
+                if i.configBitNumber == key[0] and i.frameIndex == key[1]:
+                    return i.frameBitIndex
+            raise KeyError(f"Key {key} does not exist in the configuration memory")
+        else:
+            raise KeyError(f"Key {key} is not a tuple")

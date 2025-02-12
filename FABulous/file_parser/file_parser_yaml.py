@@ -12,11 +12,7 @@ from FABulous.fabric_definition.Port import TilePort
 from FABulous.fabric_definition.SwitchMatrix import Mux
 from FABulous.fabric_definition.Tile import Tile
 from FABulous.fabric_definition.Wire import Wire, WireType
-from FABulous.file_parser.file_parser_csv import (
-    parseList,
-    parseMatrix,
-    parsePortLine,
-)
+from FABulous.file_parser.file_parser_csv import parseList, parseMatrix, parsePortLine
 from FABulous.file_parser.file_parser_HDL import parseBelFile
 from FABulous.file_parser.parse_py_mux import genSwitchMatrix, setupPortData
 
@@ -136,12 +132,14 @@ def parseFabricYAML(fileName: Path) -> Fabric:
     return Fabric(
         name=name,
         fabricDir=fileName,
-        tile=fabricTiles,
+        tiles=fabricTiles,
         numberOfColumns=width,
         numberOfRows=height,
         configBitMode=configBitMode,
         frameBitsPerRow=frameBitsPerRow,
         maxFramesPerCol=maxFramesPerCol,
+        frameSelectWidth=maxFramesPerCol.bit_length(),
+        rowSelectWidth=height.bit_length(),
         contextCount=contextCount,
         package=package,
         generateDelayInSwitchMatrix=generateDelayInSwitchMatrix,

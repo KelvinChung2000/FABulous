@@ -6,7 +6,6 @@ from FABulous.fabric_definition.Fabric import Fabric
 from FABulous.file_parser.file_parser_csv import parseList, parseMatrix
 
 
-
 def genNextpnrModel(fabric: Fabric):
     """Generates Nextpnr model for given fabric.
 
@@ -39,7 +38,7 @@ def genNextpnrModel(fabric: Fabric):
     )
     constrainStr = []
 
-    for y, row in enumerate(fabric.tile):
+    for y, row in enumerate(fabric.tiles):
         for x, tile in enumerate(row):
             if tile is None:
                 continue

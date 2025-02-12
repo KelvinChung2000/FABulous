@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 
+from FABulous.fabric_generator.define import WriterType
 from FABulous.fabric_generator.HDL_Construct.Region import Region
 from FABulous.fabric_generator.HDL_Construct.Value import Value
 
@@ -9,9 +10,10 @@ class ParameterRegion(Region):
     _container: list["_Parameter"]
     _indent: int
 
-    def __init__(self, parameters: list["_Parameter"], indent: int):
+    def __init__(self, parameters: list["_Parameter"], writer: WriterType, indent: int):
         self._container = parameters
         self._indent = indent
+        self._writer = writer
 
     @property
     def container(self):
@@ -22,17 +24,24 @@ class ParameterRegion(Region):
         return self._indent
 
     def __str__(self) -> str:
-        return f"#(\n{",\n".join([f"{' '*self.indent}{str(i)}" for i in self.container])}\n)"
+        if self._writer == WriterType.VERILOG:
+            return f"#(\n{",\n".join([f"{' '*self.indent}{str(i)}" for i in self.container])}\n)"
+        else:
+            return f"generic(\n{";\n".join([f"{' '*self.indent}{str(i)}" for i in self.container])}\n);"
 
     @dataclass
     class _Parameter:
         name: str
         value: Value | int
+        writer: WriterType
 
         def __str__(self) -> str:
-            return f"parameter {self.name} = {self.value}"
+            if self.writer == WriterType.VERILOG:
+                return f"parameter {self.name} = {self.value}"
+            else:
+                return f"{self.name} : integer := {self.value}"
 
-    def Parameter(self, name: str, value: Value | int):
-        _o = self._Parameter(name, value)
+    def add_parameter(self, name: str, value: Value | int):
+        _o = self._Parameter(name, value, writer=self._writer)
         self.container.append(_o)
         return Value(name, 1, isSignal=False)

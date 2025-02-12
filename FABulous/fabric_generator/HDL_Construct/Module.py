@@ -1,5 +1,6 @@
 from contextlib import contextmanager
 
+from FABulous.fabric_generator.define import WriterType
 from FABulous.fabric_generator.HDL_Construct.Logic_region import LogicRegion
 from FABulous.fabric_generator.HDL_Construct.Parameter_region import ParameterRegion
 from FABulous.fabric_generator.HDL_Construct.Port_region import PortRegion
@@ -16,6 +17,7 @@ class Module(Region):
         self,
         name: str,
         container: list[Region],
+        writer: WriterType,
         indent: int,
         attributes=None,
     ):
@@ -23,6 +25,7 @@ class Module(Region):
         self.attributes = attributes
         self._container = container
         self._indent = indent
+        self._writer = writer
         # self._parameters = ParameterRegion([], self.indent)
         # self._ports = PortRegion([], self.indent)
         # self._logics = LogicRegion([], self.indent)
@@ -39,11 +42,18 @@ class Module(Region):
         # self.container.append(self._parameters)
         # self.container.append(self._ports)
         # self.container.append(self._logics)
-        return f"module {self.name} {''.join([str(i) for i in self.container])}\nendmodule\n"
+        if self._writer == WriterType.VERILOG:
+            return f"module {self.name} {''.join([str(i) for i in self.container])}\nendmodule\n"
+        else:
+
+            return (
+                f"entity {self.name} is\n{self.container[0]}\n{self.container[1]}\nend entity {self.name};\n"
+                f"architecture Behavioral of {self.name} is {self.container[2]}\nend architecture Behavioral;\n"
+            )
 
     @contextmanager
     def ParameterRegion(self):
-        pr = ParameterRegion([], self.indent + self.indentCount)
+        pr = ParameterRegion([], self._writer, self.indent + self.indentCount)
         try:
             yield pr
         finally:
@@ -51,7 +61,7 @@ class Module(Region):
 
     @contextmanager
     def PortRegion(self):
-        pr = PortRegion([], self.indent + self.indentCount)
+        pr = PortRegion([], self._writer, self.indent + self.indentCount)
         try:
             yield pr
         finally:
@@ -59,7 +69,7 @@ class Module(Region):
 
     @contextmanager
     def LogicRegion(self):
-        lr = LogicRegion([], self.indent)
+        lr = LogicRegion([], self._writer, self.indent)
         try:
             yield lr
         finally:

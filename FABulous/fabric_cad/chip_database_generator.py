@@ -12,10 +12,10 @@ from FABulous.fabric_cad.chip_database_gen.chip import (
     TimingValue,
 )
 from FABulous.fabric_cad.chip_database_gen.define import NodeWire, PinType
-from FABulous.fabric_definition.SwitchMatrix import SwitchMatrix
 from FABulous.fabric_definition.Bel import Bel
 from FABulous.fabric_definition.define import IO
 from FABulous.fabric_definition.Fabric import Fabric
+from FABulous.fabric_definition.SwitchMatrix import SwitchMatrix
 from FABulous.fabric_definition.Tile import Tile
 from FABulous.fabric_generator.code_generation_Verilog import VerilogWriter
 
@@ -208,8 +208,10 @@ def generateChipDatabase(fabric: Fabric, filePath: Path, baseConstIdsPath: Path)
 
     for i in range(fabric.numberOfRows):
         for j in range(fabric.numberOfColumns):
-            if fabric.tile[i][j] is not None:
-                ch.set_tile_type(j, fabric.numberOfRows - i - 1, fabric.tile[i][j].name)
+            if fabric.tiles[i][j] is not None:
+                ch.set_tile_type(
+                    j, fabric.numberOfRows - i - 1, fabric.tiles[i][j].name
+                )
             else:
                 ch.set_tile_type(j, fabric.numberOfRows - i - 1, "NULL")
 

@@ -98,7 +98,6 @@ def genBitstream(fasmFile: str, specFile: str, bitstreamFile: str):
     outStr = ""
     bitStr = bytes.fromhex("00AAFF01000000010000000000000000FAB0FAB1")
     bit_array = [[b"" for x in range(20)] for y in range(num_columns)]
-
     verilog_str = ""
     vhdl_str = (
         "library IEEE;\nuse IEEE.STD_LOGIC_1164.ALL;\n\npackage emulate_bitstream is\n"
@@ -178,7 +177,6 @@ def genBitstream(fasmFile: str, specFile: str, bitstreamFile: str):
             frame_select[j] = "1"
             frame_select_temp = ("".join(frame_select))[::-1]
 
-            print(frame_select_temp)
             bitStr += bitstring_to_bytes(frame_select_temp)
             bitStr += bit_array[i][j]
 

@@ -222,7 +222,7 @@ def parseFabricCSV(fileName: Path) -> Fabric:
     ]
 
     return Fabric(
-        tile=fabricTiles,
+        tiles=fabricTiles,
         numberOfColumns=width,
         numberOfRows=height,
         configBitMode=configBitMode,

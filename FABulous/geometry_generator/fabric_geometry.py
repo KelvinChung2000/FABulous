@@ -1,7 +1,8 @@
-from pathlib import Path
-from loguru import logger
 from csv import writer as csvWriter
+from pathlib import Path
 from typing import Dict, List, Set
+
+from loguru import logger
 
 from FABulous.fabric_definition.Fabric import Fabric
 from FABulous.geometry_generator.geometry_obj import Border, Location
@@ -60,7 +61,7 @@ class FabricGeometry:
         # wires respectively.
         for i in range(self.fabric.numberOfRows):
             for j in range(self.fabric.numberOfColumns):
-                tile = self.fabric.tile[i][j]
+                tile = self.fabric.tiles[i][j]
 
                 if tile is not None:
                     self.tileNames.add(tile.name)
@@ -92,7 +93,7 @@ class FabricGeometry:
         for i in range(self.fabric.numberOfRows):
             tileGeometries.append([])
             for j in range(self.fabric.numberOfColumns):
-                tile = self.fabric.tile[i][j]
+                tile = self.fabric.tiles[i][j]
 
                 if tile is None:
                     tileGeometries[i].append(TileGeometry())
@@ -129,7 +130,7 @@ class FabricGeometry:
 
         for i in range(self.fabric.numberOfRows):
             for j in range(self.fabric.numberOfColumns):
-                tile = self.fabric.tile[i][j]
+                tile = self.fabric.tiles[i][j]
 
                 if tile is not None:
                     maxWidthInColumn = maxWidths[j]
@@ -148,7 +149,7 @@ class FabricGeometry:
         for i in range(self.fabric.numberOfRows):
             self.tileLocs.append([])
             for j in range(self.fabric.numberOfColumns):
-                tile = self.fabric.tile[i][j]
+                tile = self.fabric.tiles[i][j]
                 if tile is None:
                     self.tileLocs[i].append(None)
                 else:
@@ -165,7 +166,7 @@ class FabricGeometry:
         rightMostX = 0
         bottomMostY = 0
         for i in range(self.fabric.numberOfRows):
-            tile = self.fabric.tile[i][-1]
+            tile = self.fabric.tiles[i][-1]
             if tile is not None:
                 tileGeom = self.tileGeomMap[tile.name]
                 tileLoc = self.tileLocs[i][-1]
@@ -173,7 +174,7 @@ class FabricGeometry:
                 rightMostX = max(rightMostX, tileRightmostX)
 
         for j in range(self.fabric.numberOfColumns):
-            tile = self.fabric.tile[-1][j]
+            tile = self.fabric.tiles[-1][j]
             if tile is not None:
                 tileGeom = self.tileGeomMap[tile.name]
                 tileLoc = self.tileLocs[-1][j]
@@ -190,7 +191,7 @@ class FabricGeometry:
 
         for i in range(self.fabric.numberOfRows):
             for j in range(self.fabric.numberOfColumns):
-                tile = self.fabric.tile[i][j]
+                tile = self.fabric.tiles[i][j]
 
                 if tile is not None and tile.name not in adjustedTileNames:
                     lowestSmYInRow = lowestSmYCoords[i]
@@ -240,7 +241,7 @@ class FabricGeometry:
                 writer.writerow(
                     [
                         tile.name if tile is not None else "Null"
-                        for tile in self.fabric.tile[i]
+                        for tile in self.fabric.tiles[i]
                     ]
                 )
             writer.writerow([])
@@ -260,7 +261,7 @@ class FabricGeometry:
         geometry = "Respective dimensions of tiles: \n"
         for i in range(self.fabric.numberOfRows):
             for j in range(self.fabric.numberOfColumns):
-                tile = self.fabric.tile[i][j]
+                tile = self.fabric.tiles[i][j]
 
                 if tile is None:
                     geometry += "Null".ljust(8) + "\t"

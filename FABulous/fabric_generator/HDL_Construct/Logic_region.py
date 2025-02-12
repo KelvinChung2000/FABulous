@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from typing import Iterable
 
+from FABulous.fabric_generator.define import WriterType
 from FABulous.fabric_generator.HDL_Construct.Region import Region
 from FABulous.fabric_generator.HDL_Construct.Value import Value
 
@@ -8,13 +9,25 @@ from FABulous.fabric_generator.HDL_Construct.Value import Value
 class LogicRegion(Region):
     _container: list
     _indent: int
+    _writer: WriterType
 
-    def __init__(self, container: list, indent: int):
+    def __init__(self, container: list, writer: WriterType, indent: int):
         self._container = container
+        self._writer = writer
         self._indent = indent
 
     def __str__(self) -> str:
-        return f"\n{'\n'.join([str(i) for i in self.container])}"
+        if self._writer == WriterType.VERILOG:
+            return f"\n{''.join([str(i) for i in self.container])}"
+        else:
+            signal = []
+            other = []
+            for i in self.container:
+                if isinstance(i, self._signal):
+                    signal.append(i)
+                else:
+                    other.append(i)
+            return f"{''.join([str(i) for i in signal])}begin\n{''.join([str(i) for i in other])}"
 
     @property
     def container(self):
@@ -25,25 +38,25 @@ class LogicRegion(Region):
         return self._indent
 
     def ConnectPair(self, dst: str, src: Value | int):
-        return self._ConnectPair(dst, src)
+        return self._ConnectPair(dst, src, self._writer)
 
     def Signal(self, name: str, bits: int | Value = 1):
-        _o = self._signal(name, bits)
+        _o = self._signal(name, bits, self._writer)
         self.container.append(_o)
         return Value(name, bits, isSignal=True)
 
     def Assign(self, dst: Value, src: Value):
-        _o = self._Assign(dst, src)
+        _o = self._Assign(dst, src, self._writer)
         self.container.append(_o)
         return _o
 
     def Constant(self, name: str, value: int):
-        _o = self._Constant(name, value)
+        _o = self._Constant(name, value, self._writer)
         self.container.append(_o)
         return Value(name, value, isSignal=False)
 
     def Concat(self, *args):
-        return self._Concat(*args)
+        return self._Concat(*args, writer=self._writer)
 
     def InitModule(
         self,
@@ -53,7 +66,13 @@ class LogicRegion(Region):
         parameters: list["LogicRegion._ConnectPair"] = [],
     ):
         _o = self._InitModule(
-            module, initName, parameters, ports, self.indent, self.indentCount
+            module,
+            initName,
+            parameters,
+            ports,
+            self._writer,
+            self.indent,
+            self.indentCount,
         )
         self.container.append(_o)
         return _o
@@ -62,12 +81,16 @@ class LogicRegion(Region):
     class _ConnectPair:
         dst: str
         src: Value | int
+        writer: WriterType
 
         def __str__(self) -> str:
-            if self.src:
-                return f".{self.dst}({self.src})"
+            if self.writer == WriterType.VERILOG:
+                if self.src:
+                    return f".{self.dst}({self.src})"
+                else:
+                    return f".{self.dst}()"
             else:
-                return f".{self.dst}()"
+                return f"{self.dst} => {self.src}"
 
     @dataclass
     class _InitModule:
@@ -75,24 +98,41 @@ class LogicRegion(Region):
         initName: str
         parameter: list["LogicRegion._ConnectPair"]
         ports: list["LogicRegion._ConnectPair"]
+        writer: WriterType
         indent: int
         indentCount: int
 
         def __str__(self) -> str:
-            if self.parameter:
-                r = (
-                    f"{' ' * self.indent}{self.module} #(\n"
-                    f"{',\n'.join([f'{" " * (self.indent + self.indentCount)}{i}' for i in self.parameter])}\n"
-                    f"{' ' * self.indent}) {self.initName} (\n"
-                    f"{',\n'.join([f'{" " * (self.indent + self.indentCount)}{i}' for i in self.ports])}\n"
-                    f"{' ' * self.indent});\n"
-                )
+            if self.writer == WriterType.VERILOG:
+                if self.parameter:
+                    r = (
+                        f"{' ' * self.indent}{self.module} #(\n"
+                        f"{',\n'.join([f'{" " * (self.indent + self.indentCount)}{i}' for i in self.parameter])}\n"
+                        f"{' ' * self.indent}) {self.initName} (\n"
+                        f"{',\n'.join([f'{" " * (self.indent + self.indentCount)}{i}' for i in self.ports])}\n"
+                        f"{' ' * self.indent});\n"
+                    )
+                else:
+                    r = (
+                        f"{' ' * self.indent}{self.module} #() {self.initName} (\n"
+                        f"{',\n'.join([f'{" " * (self.indent + self.indentCount)}{i}' for i in self.ports])}\n"
+                        f"{' ' * self.indent});\n"
+                    )
             else:
-                r = (
-                    f"{' ' * self.indent}{self.module} #() {self.initName} (\n"
-                    f"{',\n'.join([f'{" " * (self.indent + self.indentCount)}{i}' for i in self.ports])}\n"
-                    f"{' ' * self.indent});\n"
-                )
+                if self.parameter:
+                    r = (
+                        f"{' ' * self.indent} {self.initName} : {self.module} generic map(\n"
+                        f"{',\n'.join([f'{" " * (self.indent + self.indentCount)}{i}' for i in self.parameter])}\n"
+                        f"{' ' * self.indent}) port map(\n"
+                        f"{',\n'.join([f'{" " * (self.indent + self.indentCount)}{i}' for i in self.ports])}\n"
+                        f"{' ' * self.indent});\n"
+                    )
+                else:
+                    r = (
+                        f"{' ' * self.indent} {self.initName} : {self.module} port map(\n"
+                        f"{',\n'.join([f'{" " * (self.indent + self.indentCount)}{i}' for i in self.ports])}\n"
+                        f"{' ' * self.indent});\n"
+                    )
 
             return r
 
@@ -100,37 +140,58 @@ class LogicRegion(Region):
     class _Assign:
         dst: Value
         src: Value
+        writer: WriterType
 
         def __str__(self) -> str:
-            return f"assign {self.dst} = {self.src};\n"
+            if self.writer == WriterType.VERILOG:
+                return f"assign {self.dst} = {self.src};"
+            else:
+                return f"{self.dst} <= {self.src};"
 
     @dataclass
     class _signal:
         name: str
         bits: Value | int = 1
+        writer: WriterType = WriterType.VERILOG
 
         def __str__(self) -> str:
-            if self.bits == 1 and isinstance(self.bits, int):
-                return f"wire {self.name};"
-            elif isinstance(self.bits, int):
-                return f"wire [{self.bits - 1}:0] {self.name};"
+            if self.writer == WriterType.VERILOG:
+                if self.bits == 1 and isinstance(self.bits, int):
+                    return f"reg {self.name};"
+                elif isinstance(self.bits, int):
+                    return f"reg [{self.bits - 1}:0] {self.name};"
+                else:
+                    return f"reg [{self.bits}:0] {self.name};"
             else:
-                return f"wire [{self.bits}:0] {self.name};"
+                if self.bits == 1 and isinstance(self.bits, int):
+                    return f"{self.name} : std_logic;"
+                elif isinstance(self.bits, int):
+                    return f"{self.name} : std_logic_vector({self.bits - 1} downto 0);"
+                else:
+                    return f"{self.name} : std_logic_vector({self.bits} downto 0);"
 
     @dataclass
     class _Constant:
         name: str
         value: int
+        writer: WriterType
 
         def __str__(self) -> str:
-            return f"localparam reg {self.name} = {self.value};"
+            if self.writer == WriterType.VERILOG:
+                return f"localparam reg {self.name} = {self.value};"
+            else:
+                return f"constant {self.name} : integer := {self.value};"
 
     @dataclass(frozen=True)
     class _Concat(Value):
         item: Iterable[Value]
+        writer: WriterType
 
         def __str__(self) -> str:
-            return f"{{{', '.join(str(i) for i in self.item)}}}"
+            if self.writer == WriterType.VERILOG:
+                return f"{{{' ,'.join(str(i) for i in self.item)}}}"
+            else:
+                return f"{'& '.join(str(i) for i in self.item)}"
 
         @property
         def value(self) -> str:

@@ -53,32 +53,31 @@ class Fabric:
         A dictionary of super tiles used in the fabric. The key is the name of the super tile and the value is the super tile.
     """
 
-    tile: list[list[Tile]] = field(default_factory=list)
-
-    name: str = "eFPGA"
-    fabricDir: Path = Path()
-    numberOfRows: int = 15
-    numberOfColumns: int = 15
-    configBitMode: ConfigBitMode = ConfigBitMode.FRAME_BASED
-    frameBitsPerRow: int = 32
-    maxFramesPerCol: int = 20
+    name: str
+    fabricDir: Path
+    numberOfRows: int
+    numberOfColumns: int
+    frameBitsPerRow: int
+    maxFramesPerCol: int
     contextCount: int = 1
+    configBitMode: ConfigBitMode = ConfigBitMode.FRAME_BASED
+    multiplexerStyle: MultiplexerStyle = MultiplexerStyle.CUSTOM
     package: str = "use work.my_package.all"
     generateDelayInSwitchMatrix: int = 80
-    multiplexerStyle: MultiplexerStyle = MultiplexerStyle.CUSTOM
     frameSelectWidth: int = 5
     rowSelectWidth: int = 5
     desync_flag: int = 20
     numberOfBRAMs: int = 10
     superTileEnable: bool = True
 
+    tiles: list[list[Tile]] = field(default_factory=list)
     tileDict: dict[str, Tile] = field(default_factory=dict)
     superTileDict: dict[str, SuperTile] = field(default_factory=dict)
     wireDict: dict[Loc, list[Wire]] = field(default_factory=dict)
 
     def __getitem__(self, index: Any) -> Tile | SuperTile | None:
         if isinstance(index, tuple):
-            return self.tile[index[1]][index[0]]
+            return self.tiles[index[1]][index[0]]
         if isinstance(index, str):
             if index in self.tileDict:
                 return self.tileDict[index]
@@ -91,10 +90,10 @@ class Fabric:
         fabric = ""
         for i in range(self.numberOfRows):
             for j in range(self.numberOfColumns):
-                if self.tile[i][j] is None:
+                if self.tiles[i][j] is None:
                     fabric += "Null".ljust(15) + "\t"
                 else:
-                    fabric += f"{str(self.tile[i][j].name).ljust(15)}\t"
+                    fabric += f"{str(self.tiles[i][j].name).ljust(15)}\t"
             fabric += "\n"
 
         fabric += (
@@ -127,7 +126,7 @@ class Fabric:
 
     def getTotalBelCount(self) -> int:
         tileCountDict = defaultdict(int)
-        for row in self.tile:
+        for row in self.tiles:
             for tile in row:
                 if tile is not None:
                     tileCountDict[tile.name] += 1
@@ -138,6 +137,6 @@ class Fabric:
         )
 
     def getFlattenFabric(self) -> Generator[tuple[Loc, Tile]]:
-        for y, row in enumerate(self.tile):
+        for y, row in enumerate(self.tiles):
             for x, tile in enumerate(row):
                 yield ((x, y), tile)

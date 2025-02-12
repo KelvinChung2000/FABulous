@@ -3,11 +3,14 @@ from typing import Mapping
 
 from FABulous.fabric_definition.define import Loc
 
+FrameIdx = int
+BitIdx = int
+
 
 @dataclass(slots=True)
 class FeatureValue:
     tileLoc: Loc
-    bitPosition: list[tuple[int, int] | tuple[None, None]]
+    bitPosition: list[tuple[FrameIdx, BitIdx] | tuple[None, None]]
     value: int
 
 

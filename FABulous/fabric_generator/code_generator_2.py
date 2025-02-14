@@ -31,7 +31,7 @@ class CodeGenerator:
         name: str,
         attributes=None,
     ):
-        m = Module(name, [], self.indent, attributes)
+        m = Module(name, [], self.writerType, self.indent, attributes)
         try:
             yield m
         finally:

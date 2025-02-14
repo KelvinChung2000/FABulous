@@ -41,7 +41,7 @@ class ParameterRegion(Region):
             else:
                 return f"{self.name} : integer := {self.value}"
 
-    def add_parameter(self, name: str, value: Value | int):
+    def Parameter(self, name: str, value: Value | int):
         _o = self._Parameter(name, value, writer=self._writer)
         self.container.append(_o)
         return Value(name, 1, isSignal=False)

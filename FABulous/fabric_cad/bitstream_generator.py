@@ -1,8 +1,12 @@
+import csv
+import pprint
 from pathlib import Path
 
+from FABulous.fabric_cad.bitstreamSpec_generator import generateBitsStreamSpec
 from FABulous.fabric_cad.define import FASMFeature, FeatureMap
 from FABulous.fabric_definition.define import Loc
 from FABulous.fabric_definition.Fabric import Fabric
+from FABulous.file_parser.file_parser_csv import parseFabricCSV
 from FABulous.file_parser.file_parser_fasm import parseFASM
 
 
@@ -20,14 +24,11 @@ def bitstringToBytes(s):
 
 def genBitstream(fabric: Fabric, fasmFile: Path, featureMap: FeatureMap, dest: Path):
     fasm: list[FASMFeature] = parseFASM(fasmFile)
-
-    bitStr = bytes.fromhex("00AAFF01000000010000000000000000FAB0FAB1")
-
+    print("FASM parsed")
     bitstream: dict[Loc, list] = {}
-
     for (x, y), _ in fabric.getFlattenFabric():
         bitstream[(x, y)] = [
-            b"" for i in range(fabric.maxFramesPerCol * fabric.frameBitsPerRow)
+            b"" for _ in range(fabric.maxFramesPerCol * fabric.frameBitsPerRow)
         ]
 
     for fasmFeature in fasm:
@@ -44,14 +45,16 @@ def genBitstream(fabric: Fabric, fasmFile: Path, featureMap: FeatureMap, dest: P
             strict=True,
         ):
             if frameIdx is not None and bitIdx is not None:
+                # print(fasmFeature.feature)
+                # print(featureValue.tileLoc)
+                # print(frameIdx * fabric.frameBitsPerRow + bitIdx)
+                # print(frameIdx, bitIdx)
                 bitstream[featureValue.tileLoc][
                     frameIdx * fabric.frameBitsPerRow + bitIdx
                 ] = bitValue
-            else:
-                raise ValueError("Invalid bit position")
 
-        bitstream[featureValue.tileLoc]
-
+    # output the bitstream
+    bitStr = bytes.fromhex("00AAFF01000000010000000000000000FAB0FAB1")
     for i in range(fabric.numberOfColumns):
         for j in range(fabric.maxFramesPerCol):
             binTemp = f"{i:0{fabric.frameSelectWidth}b}"[::-1]
@@ -68,3 +71,35 @@ def genBitstream(fabric: Fabric, fasmFile: Path, featureMap: FeatureMap, dest: P
                 bitStr += bitstringToBytes(
                     bits[j * fabric.frameBitsPerRow : (j + 1) * fabric.frameBitsPerRow]
                 )
+
+    with open(dest, "wb") as f:
+        f.write(bitStr)
+
+    sorted_bitstream_keys = sorted(bitstream.keys(), key=lambda loc: (loc[0], -loc[1]))
+    sorted_bitstream = {key: bitstream[key] for key in sorted_bitstream_keys}
+
+    with open(dest.with_suffix(".csv"), "w", newline="") as csvfile:
+        csvWriter = csv.writer(csvfile)
+        for loc, bits in sorted_bitstream.items():
+            csvWriter.writerow([loc[0], loc[1]])
+            partitioned_bits = [
+                "".join(bits[i : i + fabric.frameBitsPerRow])
+                for i in range(0, len(bits), fabric.frameBitsPerRow)
+            ]
+            for index, partition in enumerate(partitioned_bits):
+                csvWriter.writerow([index, partition])
+
+
+if __name__ == "__main__":
+    fabric = parseFabricCSV(Path("/home/kelvin/FABulous_fork/demo/fabric.csv"))
+    spec = generateBitsStreamSpec(fabric)
+    with open(Path("./bitstreamTest/test.txt"), "w") as f:
+        f.write("Generated Specification:\n")
+        pp = pprint.PrettyPrinter(indent=4)
+        f.write(pp.pformat(spec))
+    genBitstream(
+        fabric,
+        Path("/home/kelvin/FABulous_fork/demo/Test/build/sequential_16bit_en.fasm"),
+        spec,
+        Path("./bitstreamTest/test.bin"),
+    )

@@ -86,7 +86,6 @@ class FASMTransformer(Transformer):
     annotation = tuple
     ANNOTATION_NAME = str
     IDENTIFIER = str
-    SH_COMMENT = None
 
     def ESCAPED_STRING(self, items):
         return items[1:-1]
@@ -97,10 +96,12 @@ FASMParser = Lark(
     parser="lalr",
     transformer=FASMTransformer(),
     maybe_placeholders=True,
+    propagate_positions=False,
 )
 
 
 def parseFASM(fasmFile: Path) -> list[FASMFeature]:
     with open(fasmFile, "r") as f:
-        result = FASMParser.parse(f.read())
+        content = f.read().strip() + "\n"
+        result = FASMParser.parse(content)
     return cast(list[FASMFeature], result)

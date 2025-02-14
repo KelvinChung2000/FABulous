@@ -83,9 +83,6 @@ def genBel(bels: list[Bel], tile: TileType, context=1):
     count = 0
     for c in range(context):
         for z, bel in enumerate(bels):
-            # create the bel itself
-            belData = tile.create_bel(f"{c}_{bel.prefix}{bel.name}", bel.name, count)
-
             for i in bel.externalInputs + bel.inputs:
                 tile.create_wire(f"{c}_{i.name}", f"{bel.name}_{i.name}")
 
@@ -94,31 +91,36 @@ def genBel(bels: list[Bel], tile: TileType, context=1):
 
             if bel.userCLK:
                 tile.create_wire(f"{c}_{bel.name}_{bel.userCLK.name}")
-
-            for i in bel.inputs + bel.externalInputs:
-                tile.add_bel_pin(
-                    belData,
-                    f"{i.name}",
-                    f"{c}_{i.name}",
-                    PinType.INPUT,
-                )
-            for i in bel.outputs + bel.externalOutputs:
-                tile.add_bel_pin(
-                    belData,
-                    f"{i.name}",
-                    f"{c}_{i.name}",
-                    PinType.OUTPUT,
+            for feature in bel.belFeatureMap:
+                # create the bel itself
+                belData = tile.create_bel(
+                    f"{c}_{bel.prefix}{bel.name}.{feature}", bel.name, count
                 )
 
-            if bel.userCLK:
-                tile.add_bel_pin(
-                    belData,
-                    bel.userCLK.name,
-                    f"{c}_{bel.name}_{bel.userCLK.name}",
-                    PinType.INPUT,
-                )
-            belData.add_extra_data(BelExtraData(context=c))
-            count += 1
+                for i in bel.inputs + bel.externalInputs:
+                    tile.add_bel_pin(
+                        belData,
+                        f"{i.name}",
+                        f"{c}_{i.name}",
+                        PinType.INPUT,
+                    )
+                for i in bel.outputs + bel.externalOutputs:
+                    tile.add_bel_pin(
+                        belData,
+                        f"{i.name}",
+                        f"{c}_{i.name}",
+                        PinType.OUTPUT,
+                    )
+
+                if bel.userCLK:
+                    tile.add_bel_pin(
+                        belData,
+                        bel.userCLK.name,
+                        f"{c}_{bel.name}_{bel.userCLK.name}",
+                        PinType.INPUT,
+                    )
+                belData.add_extra_data(BelExtraData(context=c))
+                count += 1
 
 
 def genTile(tile: Tile, chip: Chip, context=1) -> TileType:

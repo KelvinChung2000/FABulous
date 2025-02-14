@@ -1,6 +1,7 @@
 import argparse
 import os
 from contextlib import redirect_stdout
+from importlib.metadata import version
 from pathlib import Path
 
 from loguru import logger
@@ -116,6 +117,10 @@ def main():
         "--projectDotEnv",
         nargs=1,
         help="Set the project .env file path. Default is $FAB_PROJ_DIR/.env",
+    )
+
+    parser.add_argument(
+        "--version", action="version", version=f"%(prog)s{version('FABulous-FPGA')}"
     )
 
     parser.add_argument("--debug", action="store_true", help="Enable debug mode")

@@ -1,158 +1,13 @@
 import json
-import re
 import subprocess
 from pathlib import Path
+from pprint import pprint
 
 from loguru import logger
 
 from FABulous.fabric_definition.Bel import Bel
 from FABulous.fabric_definition.define import IO, FABulousPortType, FeatureType
 from FABulous.fabric_definition.Port import BelPort, ConfigPort, Port, SharedPort
-
-
-def verilog_belMapProcessing(module_info):
-    """Extracts and transforms BEL mapping attributes in the JSON created from a Verilog
-    module.
-
-    Parameters
-    ----------
-    module_info : dict
-        A dictionary containing the module's attributes, including
-        potential BEL mapping information.
-
-    Returns
-    -------
-    dic
-        Dictionary containing the parsed bel mapping information.
-    """
-    belMapDic = {}
-    attributes = module_info.get("attributes", {})
-    # if BelMap not present defaults belMapDic to {}
-    if "BelMap" not in attributes:
-        return belMapDic
-    # Passed attributes that dont need appending. (May need refining.)
-    exclude_attributes = {
-        "BelMap",
-        "FABulous",
-        "dynports",
-        "cells_not_processed",
-        "src",
-    }
-    # match case for INIT. (may need modifying for other naming conventions.)
-    for key, value in attributes.items():
-        if key in exclude_attributes:
-            continue
-        match key:
-            case key if key.startswith("INIT_") and key[5:].isdigit():
-                index = key[5:]
-                new_key = f"INIT[{index}]"
-            case "INIT":
-                new_key = "INIT"
-            case key if key.isupper() and "_" not in key:
-                new_key = key
-            case _:
-                new_key = key
-
-        belMapDic[new_key] = {0: {0: "1"}}
-
-    # yosys reverses belmap, reverse back to keep original belmap.
-    belMapDic = dict(reversed(list(belMapDic.items())))
-
-    return belMapDic
-
-
-def vhdl_belMapProcessing(file: str, filename: str) -> dict:
-    """Processes bel mapping information from file contents.
-
-    Parameters
-    ----------
-    file : str
-        Conent of the file as a string
-    filename : str
-        Name of the file being processed
-    syntax : Literal['vhdl']
-        Syntax type of the file.
-
-    Returns
-    -------
-    dict
-        Dictionary containing the parsed bel mapping information.
-
-    Raises
-    ------
-    ValueError
-        If invalid enum is encounted in the file.
-    """
-    pre = "--.*?"
-
-    belEnumsDic = {}
-    if belEnums := re.findall(
-        pre + r"\(\*.*?FABulous,.*?BelEnum,(.*?)\*\)", file, re.DOTALL | re.MULTILINE
-    ):
-        for enums in belEnums:
-            enums = enums.replace("\n", "").replace(" ", "").replace("\t", "")
-            enums = enums.split(",")
-            enums = [i for i in enums if i != "" and i != " "]
-            if enumParse := re.search(r"(.*?)\[(\d+):(\d+)\]", enums[0]):
-                name = enumParse.group(1)
-                start = int(enumParse.group(2))
-                end = int(enumParse.group(3))
-            else:
-                logger.error(f"Invalid enum {enums[0]} in file {filename}")
-                raise ValueError
-            belEnumsDic[name] = {}
-            for i in enums[1:]:
-                key, value = i.split("=")
-                belEnumsDic[name][key] = {}
-                bitValue = list(value)
-                if start > end:
-                    for j in range(start, end - 1, -1):
-                        belEnumsDic[name][key][j] = bitValue.pop(0)
-                else:
-                    for j in range(start, end + 1):
-                        belEnumsDic[name][key][j] = bitValue.pop(0)
-
-    belMapDic = {}
-    if belMap := re.search(
-        pre + r"\(\*.*FABulous,.*?BelMap,(.*?)\*\)", file, re.DOTALL | re.MULTILINE
-    ):
-        belMap = belMap.group(1)
-        belMap = belMap.replace("\n", "").replace(" ", "").replace("\t", "")
-        belMap = belMap.split(",")
-        belMap = [i for i in belMap if i != "" and i != " "]
-        for bel in belMap:
-            bel = bel.split("=")
-            belNameTemp = bel[0].rsplit("_", 1)
-            # process scalar
-            if len(belNameTemp) > 1 and belNameTemp[1].isnumeric():
-                bel[0] = f"{belNameTemp[0]}[{belNameTemp[1]}]"
-            belMapDic[bel[0]] = {}
-            if bel == [""]:
-                continue
-            # process enum data type
-            if bel[0] in list(belEnumsDic.keys()):
-                belMapDic[bel[0]] = belEnumsDic[bel[0]]
-            # process vector input
-            elif ":" in bel[1]:
-                start, end = bel[1].split(":")
-                start, end = int(start), int(end)
-                if start > end:
-                    length = start - end + 1
-                    for i in range(2**length - 1, -1, -1):
-                        belMapDic[bel[0]][i] = {}
-                        bitMap = list(f"{i:0{length.bit_length()}b}")
-                        for v in range(len(bitMap) - 1, -1, -1):
-                            belMapDic[bel[0]][i][v] = bitMap.pop(0)
-                else:
-                    length = end - start + 1
-                    for i in range(0, 2**length):
-                        belMapDic[bel[0]][i] = {}
-                        bitMap = list(f"{2**length - i - 1:0{length.bit_length()}b}")
-                        for v in range(len(bitMap) - 1, -1, -1):
-                            belMapDic[bel[0]][i][v] = bitMap.pop(0)
-            else:
-                belMapDic[bel[0]][0] = {0: "1"}
-    return belMapDic
 
 
 def parseBelFile(
@@ -244,7 +99,7 @@ def parseBelFile(
     configPort: list[ConfigPort] = []
     sharedPort: list[SharedPort] = []
     internalPort: list[BelPort] = []
-    belMapDict: dict[str, int] = {}
+    belFeatureMap: dict[str, int] = {}
     userClk: Port | None = None
 
     if not filename.exists():
@@ -270,11 +125,10 @@ def parseBelFile(
 
     try:
         logger.info(f"Parsing bel file: {filename}")
-        result = subprocess.run(runCmd, check=True, text=True, capture_output=True)
-        if result.stderr:
-            logger.warning(f"Generated from yosys:\n{result.stderr}")
-    except subprocess.CalledProcessError:
+        subprocess.run(runCmd, check=True, text=True, capture_output=True)
+    except subprocess.CalledProcessError as e:
         logger.error(f"Failed to run yosys command: {' '.join(runCmd)}")
+        logger.error(e.stderr)
         raise ValueError
 
     with open(f"{json_file}", "r") as f:
@@ -320,24 +174,24 @@ def parseBelFile(
         if FABulousPortType.EXTERNAL in attributes:
             externalPort.append(port)
         elif FABulousPortType.CONFIG_BIT in attributes:
-            feature = details.get("attributes", {}).get("FEATURE", "")
-            feature = feature.split(" ")
+            features = details.get("attributes", {}).get("FEATURE", "")
+            features = features.split(";")
             featureType = attributes - set(["FABulous", "CONFIG_BIT", "src", "FEATURE"])
-            if len(feature) == 0:
+            if len(features) == 0:
                 raise ValueError(
                     f"CONFIG_BIT port and {net} in file {filename} must have at least one feature."
                 )
-            if len(featureType) != 1:
-                raise ValueError(
-                    f"CONFIG_BIT port and {net} in file {filename} must have exactly one feature type."
-                )
-            for i in feature:
-                belMapDict[i] = netBitWidth
-
+            # if len(featureType) != 1:
+            #     raise ValueError(
+            #         f"CONFIG_BIT port and {net} in file {filename} must have exactly one feature type."
+            #     )
             if ports[net] != IO.INPUT:
                 raise ValueError(
                     f"CONFIG_BIT port {net} in file {filename} must be an input port."
                 )
+
+            for i, feature in enumerate(features):
+                belFeatureMap[feature] = i
 
             configPort.append(
                 ConfigPort(
@@ -345,8 +199,8 @@ def parseBelFile(
                     ioDirection=IO.INPUT,
                     wireCount=netBitWidth,
                     isBus=FABulousPortType.BUS in attributes,
-                    feature=feature,
-                    featureType=FeatureType[featureType.pop()],
+                    features=[(feature, i) for i, feature in enumerate(features)],
+                    featureType=FeatureType.INIT,
                 )
             )
         elif FABulousPortType.USER_CLK in attributes:
@@ -372,6 +226,11 @@ def parseBelFile(
         external=externalPort,
         configPort=configPort,
         sharedPort=sharedPort,
-        configBit=sum(belMapDict.values()),
+        configBit=sum([i.wireCount for i in configPort]),
+        belFeatureMap=belFeatureMap,
         userCLK=userClk,
     )
+
+
+if __name__ == "__main__":
+    pprint(parseBelFile(Path("/home/kelvin/FABulous_fork/myProject/Tile/PE/ALU.v")))

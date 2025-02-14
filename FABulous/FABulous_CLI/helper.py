@@ -3,6 +3,7 @@ import functools
 import os
 import shutil
 import sys
+from importlib.metadata import version
 from pathlib import Path
 from typing import Literal
 
@@ -160,6 +161,7 @@ def create_project(project_dir, type: Literal["verilog", "vhdl"] = "verilog"):
     )
 
     with open(os.path.join(project_dir, ".FABulous/.env"), "w") as env_file:
+        env_file.write(f"version={version('FABulous-FPGA')}\n")
         env_file.write(f"FAB_PROJ_LANG={type}\n")
 
     logger.info(f"New FABulous project created in {project_dir} with {type} language.")

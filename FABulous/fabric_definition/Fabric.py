@@ -136,7 +136,7 @@ class Fabric:
             for tile, count in tileCountDict.items()
         )
 
-    def getFlattenFabric(self) -> Generator[tuple[Loc, Tile]]:
+    def getFlattenFabric(self) -> Generator[tuple[Loc, Tile], None, None]:
         for y, row in enumerate(self.tiles):
             for x, tile in enumerate(row):
                 yield ((x, y), tile)

@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any
 
 from FABulous.fabric_definition.define import IO, FeatureType, Side
@@ -125,8 +125,7 @@ class BelPort(Port):
 
 @dataclass(frozen=True, eq=True)
 class ConfigPort(Port):
-    feature: str = ""
-    value: int = 0
+    features: list[tuple[str, int]] = field(default_factory=list)
     featureType: FeatureType = FeatureType.INIT
 
 

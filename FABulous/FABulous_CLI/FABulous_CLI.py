@@ -37,7 +37,16 @@ from loguru import logger
 
 from FABulous.fabric_generator.define import WriterType
 from FABulous.FABulous_API import FABulous_API
-from FABulous.FABulous_CLI import cmd_synthesis
+from FABulous.FABulous_CLI import cmd_helper, cmd_synthesis
+from FABulous.FABulous_CLI.define import (
+    CMD_FABRIC_FLOW,
+    CMD_GUI,
+    CMD_HELPER,
+    CMD_OTHER,
+    CMD_SCRIPT,
+    CMD_SETUP,
+    META_DATA_DIR,
+)
 from FABulous.FABulous_CLI.helper import (
     allow_blank,
     check_if_application_exists,
@@ -46,17 +55,6 @@ from FABulous.FABulous_CLI.helper import (
     remove_dir,
     wrap_with_except_handling,
 )
-
-META_DATA_DIR = ".FABulous"
-
-CMD_SETUP = "Setup"
-CMD_FABRIC_FLOW = "Fabric Flow"
-CMD_HELPER = "Helper"
-CMD_OTHER = "Other"
-CMD_GUI = "GUI"
-CMD_SCRIPT = "Script"
-CMD_OTHER = "Other"
-
 
 INTO_STRING = rf"""
      ______      ____        __
@@ -227,6 +225,8 @@ class FABulous_CLI(Cmd):
         return True
 
     do_quit = do_exit
+    do_add_tile = cmd_helper.do_add_tile
+    do_add_bel_to_tile = cmd_helper.do_add_bel_to_tile
 
     filePathOptionalParser = Cmd2ArgumentParser()
     filePathOptionalParser.add_argument(

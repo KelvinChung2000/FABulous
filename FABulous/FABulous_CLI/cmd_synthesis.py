@@ -5,9 +5,9 @@ from pathlib import Path
 from cmd2 import Cmd, Cmd2ArgumentParser, with_argparser, with_category
 from loguru import logger
 
+from FABulous.FABulous_CLI.define import CMD_FABRIC_FLOW
 from FABulous.FABulous_CLI.helper import check_if_application_exists
 
-CMD_FABRIC_FLOW = "Fabric Flow"
 HELP = """
 Runs Yosys using the Nextpnr JSON backend to synthesise the Verilog design
 specified by <files> and generates a Nextpnr-compatible JSON file for the

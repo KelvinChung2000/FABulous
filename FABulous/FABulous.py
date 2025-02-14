@@ -134,8 +134,8 @@ def main():
     args.top = os.getenv("FAB_PROJ_DIR").split("/")[-1]
 
     if args.createProject:
-        create_project(os.getenv("FAB_PROJ_DIR"), args.writer)
-        exit(0)
+        create_project(Path(os.getenv("FAB_PROJ_DIR")), args.writer)
+        # exit(0)
 
     if not os.path.exists(f"{os.getenv('FAB_PROJ_DIR')}/.FABulous"):
         logger.error(

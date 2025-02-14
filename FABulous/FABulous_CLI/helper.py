@@ -126,7 +126,7 @@ def setup_project_env_vars(args: argparse.Namespace) -> None:
         os.environ["FAB_PROJ_LANG"] = args.writer
 
 
-def create_project(project_dir, type: Literal["verilog", "vhdl"] = "verilog"):
+def create_project(project_dir: Path, type: Literal["verilog", "vhdl"] = "verilog"):
     """Creates a FABulous project containing all required files by copying the
     appropriate project template and the synthesis directory.
 
@@ -141,30 +141,45 @@ def create_project(project_dir, type: Literal["verilog", "vhdl"] = "verilog"):
     type : Literal["verilog", "vhdl"], optional
         The type of project to create ("verilog" or "vhdl"), by default "verilog".
     """
-    if os.path.exists(project_dir):
-        logger.error("Project directory already exists!")
+    if project_dir.exists():
+        logger.error("Directory already exists!")
         sys.exit()
     else:
-        os.mkdir(f"{project_dir}")
+        project_dir.mkdir()
 
     # set default type, since "None" overwrites the default value
     if not type:
         type = "verilog"
 
-    os.mkdir(f"{project_dir}/.FABulous")
-    fabulousRoot = os.getenv("FAB_ROOT")
+    Path(project_dir / ".FABulous").mkdir()
+    Path(project_dir / "Tile").mkdir()
+    Path(project_dir / "user_design").mkdir()
+    Path(project_dir / "Fabric").mkdir()
+    # fabulousRoot = os.getenv("FAB_ROOT")
 
-    shutil.copytree(
-        f"{fabulousRoot}/fabric_files/FABulous_project_template_{type}/",
-        f"{project_dir}/",
-        dirs_exist_ok=True,
-    )
+    # shutil.copytree(
+    #     f"{fabulousRoot}/fabric_files/FABulous_project_template_{type}/",
+    #     f"{project_dir}/",
+    #     dirs_exist_ok=True,
+    # )
 
-    with open(os.path.join(project_dir, ".FABulous/.env"), "w") as env_file:
+    with open(project_dir / ".FABulous/.env", "w") as env_file:
         env_file.write(f"version={version('FABulous-FPGA')}\n")
         env_file.write(f"FAB_PROJ_LANG={type}\n")
 
-    logger.info(f"New FABulous project created in {project_dir} with {type} language.")
+    with open(project_dir / "fabric.yaml", "w") as f:
+        f.write("FABRIC: [[]] \n")
+        f.write("PARAM: {}")
+        f.write("TILES: {}")
+        f.write("SUPERTILE: {}")
+
+    logger.info(
+        f"New FABulous project created in {project_dir} with {type} language using version {version('FABulous-FPGA')}."
+    )
+
+
+def create_tile():
+    pass
 
 
 def copy_verilog_files(src: Path, dst: Path):

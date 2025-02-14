@@ -1,0 +1,8 @@
+META_DATA_DIR = ".FABulous"
+CMD_SETUP = "Setup"
+CMD_FABRIC_FLOW = "Fabric Flow"
+CMD_HELPER = "Helper"
+CMD_OTHER = "Other"
+CMD_GUI = "GUI"
+CMD_SCRIPT = "Script"
+CMD_OTHER = "Other"

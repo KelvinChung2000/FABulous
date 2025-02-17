@@ -9,7 +9,10 @@ module ALU #(
     (* FABulous, BUS *) input wire [WIDTH-1:0] data_in2,
     (* FABulous, BUS *) input wire [WIDTH-1:0] data_in3,
     (* FABulous, BUS *) output reg [WIDTH-1:0] data_out,
-    (* FABulous, CONFIG_BIT, FEATURE="ALU", FEATURE_MAP="std_add(left=>data_in1, right=>data_in2, out=>data_out);" *) input [NoConfigBits:0] ConfigBits
+    (* FABulous, CONFIG_BIT, FEATURE="ADD;SUB;AND;OR;XOR;MUL",
+    FEATURE_MAP="std_add(left=>data_in1, right=>data_in2, out=>data_out);"*)
+    input [2:0] ALU_func,
+    (* FABulous, CONFIG_BIT, FEATURE="REG"*) input wire reg_en
 );
   // Define operation codes
   localparam ADD = 3'b000;
@@ -23,7 +26,7 @@ module ALU #(
     if (rst) begin
       data_out = 8'b0;
     end else if (en) begin
-      case (ConfigBits)
+      case (ALU_func)
         ADD: data_out = data_in1 + data_in2;
         SUB: data_out = data_in1 - data_in2;
         AND: data_out = data_in1 & data_in2;

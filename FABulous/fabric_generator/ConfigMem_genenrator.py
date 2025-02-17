@@ -3,7 +3,6 @@ from pathlib import Path
 
 from loguru import logger
 
-from FABulous.fabric_definition.ConfigMem import ConfigMem
 from FABulous.fabric_definition.define import IO
 from FABulous.fabric_definition.Fabric import Fabric
 from FABulous.fabric_definition.Tile import Tile
@@ -84,8 +83,6 @@ def generateConfigMemInit(
 def generateConfigMem(
     codeGen: CodeGenerator, fabric: Fabric, tile: Tile, configMemCSV: Path
 ):
-    configMemList: list[ConfigMem] = []
-
     if configMemCSV.exists():
         if tile.globalConfigBits <= 0:
             logger.warning(
@@ -96,23 +93,13 @@ def generateConfigMem(
                 f"Found bitstream mapping file {tile.name}_configMem.csv for tile {tile.name}"
             )
         logger.info(f"Parsing {tile.name}_configMem.csv")
-        configMemList = parseConfigMem(
-            configMemCSV,
-            fabric.maxFramesPerCol,
-            fabric.frameBitsPerRow,
-            tile.globalConfigBits,
-        )
+        configMem = parseConfigMem(configMemCSV)
     elif tile.globalConfigBits > 0:
         logger.info(f"{tile.name}_configMem.csv does not exist")
         logger.info(f"Generating a default configMem for {tile.name}")
         generateConfigMemInit(fabric, configMemCSV, tile.globalConfigBits)
         logger.info(f"Parsing {tile.name}_configMem.csv")
-        configMemList = parseConfigMem(
-            configMemCSV,
-            fabric.maxFramesPerCol,
-            fabric.frameBitsPerRow,
-            tile.globalConfigBits,
-        )
+        configMem = parseConfigMem(configMemCSV)
     else:
         logger.info(
             f"No config bits defined and no bitstream mapping file provided for tile {tile.name}"
@@ -127,8 +114,7 @@ def generateConfigMem(
                 maxFramePerCol = pr.Parameter("MaxFramesPerCol", fabric.maxFramesPerCol)
             if fabric.frameBitsPerRow > 0:
                 framBitPerRow = pr.Parameter("FrameBitsPerRow", fabric.frameBitsPerRow)
-            if tile.globalConfigBits > 0:
-                noConfigBits = pr.Parameter("NoConfigBits", tile.globalConfigBits)
+            noConfigBits = pr.Parameter("NoConfigBits", tile.globalConfigBits)
 
         with module.PortRegion() as pr:
             frameData = pr.Port("FrameData", IO.INPUT, framBitPerRow - 1)
@@ -151,7 +137,7 @@ def generateConfigMem(
 
             lr.Comment("instantiate frame latches")
 
-            for i in configMemList:
+            for i in configMem.configMemEntries:
                 counter = 0
                 for k in range(fabric.frameBitsPerRow):
                     if i.usedBitMask[k] == "1":

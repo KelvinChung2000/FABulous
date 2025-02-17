@@ -15,9 +15,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import argparse
-import csv
 import os
-import pickle
 import pprint
 import subprocess as sp
 import sys
@@ -538,29 +536,24 @@ class FABulous_CLI(Cmd):
         logger.info("Generating bitstream specification")
         specObject = self.fabulousAPI.genBitStreamSpec()
 
-        logger.info(f"output file: {self.projectDir}/{META_DATA_DIR}/bitStreamSpec.bin")
+        logger.info(
+            f"output file: {self.projectDir}/{META_DATA_DIR}/bitStreamSpec.yaml"
+        )
         with open(
-            f"{self.projectDir}/{META_DATA_DIR}/bitStreamSpec.bin", "wb"
+            f"{self.projectDir}/{META_DATA_DIR}/bitStreamSpec.txt", "w"
         ) as outFile:
-            pickle.dump(specObject, outFile)
-
-        logger.info(f"output file: {self.projectDir}/{META_DATA_DIR}/bitStreamSpec.csv")
-        with open(f"{self.projectDir}/{META_DATA_DIR}/bitStreamSpec.csv", "w") as f:
-            w = csv.writer(f)
-            for key1 in specObject["TileSpecs"]:
-                w.writerow([key1])
-                for key2, val in specObject["TileSpecs"][key1].items():
-                    w.writerow([key2, val])
+            outFile.write(pprint.pformat(specObject, width=200))
         logger.info("Generated bitstream specification")
 
     @with_category(CMD_FABRIC_FLOW)
     def do_gen_top_wrapper(self, *ignored):
         """Generates top wrapper of the fabric by calling 'genTopWrapper'."""
         logger.info("Generating top wrapper")
-        self.fabulousAPI.setWriterOutputFile(
-            f"{self.projectDir}/Fabric/{self.fabulousAPI.fabric.name}_top.{self.extension}"
+        self.fabulousAPI.genTopWrapper(
+            Path(
+                f"{self.projectDir}/Fabric/{self.fabulousAPI.fabric.name}_top.{self.extension}"
+            )
         )
-        self.fabulousAPI.genTopWrapper()
         logger.info("Generated top wrapper")
 
     @with_category(CMD_FABRIC_FLOW)
@@ -573,14 +566,14 @@ class FABulous_CLI(Cmd):
         Does this by calling the respective functions 'do_gen_[function]'.
         """
         logger.info("Running FABulous")
-        self.fabulousAPI.gen_port_data()
+        # self.fabulousAPI.gen_port_data()
         self.do_gen_fabric()
         self.do_gen_primitive_library(str(self.projectDir / META_DATA_DIR / "prims.v"))
         self.do_gen_chipdb()
         self.do_gen_bitStream_spec()
         self.do_gen_top_wrapper()
-        self.do_gen_model_npnr()
-        self.do_gen_geometry()
+        # self.do_gen_model_npnr()
+        # self.do_gen_geometry()
         logger.info("FABulous fabric flow complete")
         return
 

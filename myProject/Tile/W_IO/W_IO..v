@@ -21,77 +21,48 @@ module W_IO #(
     output [MaxFramesPerCol - 1:0] FrameStrobe_O
 );
 
-// Signal Creation
-wire W_from_fabric;
-wire W_to_fabric;
-wire W_in;
-wire W_out;
-
-// ConfigBits Wires
-wire [NoConfigBits - 1:0] ConfigBits;
-wire [NoConfigBits - 1:0] ConfigBits_N;
-
-// Buffering incoming and out outgoing wires
-
-// FrameData Buffer
-wire [FrameBitsPerRow - 1:0] FrameData_internal;
-
-my_buf_pack #(
+// Signal Creationreg W_from_fabric;reg W_to_fabric;reg W_in;reg W_out;// ConfigBits Wiresreg [NoConfigBits - 1:0] ConfigBits;reg [NoConfigBits - 1:0] ConfigBits_N;// Buffering incoming and out outgoing wires// FrameData Bufferreg [FrameBitsPerRow - 1:0] FrameData_internal;my_buf_pack #(
     .WIDTH(FrameBitsPerRow)
 ) data_inbuf (
     .A(FrameData),
     .X(FrameData_internal)
 );
-
 my_buf_pack #(
     .WIDTH(FrameBitsPerRow)
 ) data_outbuf (
     .A(FrameData_internal),
     .X(FrameData_O)
 );
-
-// FrameStrobe Buffer
-wire [MaxFramesPerCol - 1:0] FrameStrobe_internal;
-
-my_buf_pack #(
+// FrameStrobe Bufferreg [MaxFramesPerCol - 1:0] FrameStrobe_internal;my_buf_pack #(
     .WIDTH(MaxFramesPerCol)
 ) strobe_inbuf (
     .A(FrameStrobe),
     .X(FrameStrobe_internal)
 );
-
 my_buf_pack #(
     .WIDTH(MaxFramesPerCol)
 ) strobe_outbuf (
     .A(FrameStrobe_internal),
     .X(FrameStrobe_O)
 );
-
-// User Clock Buffer
-clk_buf #() inst_clk_buf (
+// User Clock Bufferclk_buf #() inst_clk_buf (
     .A(UserCLK),
     .X(UserCLKo)
 );
-
-// Init Configuration storage latches
-W_IO_ConfigMem #() Inst_W_IO_ConfigMem (
+// Init Configuration storage latchesW_IO_ConfigMem #() Inst_W_IO_ConfigMem (
     .FrameData(FrameData),
     .FrameStrobe(FrameStrobe),
     .ConfigBits(ConfigBits),
     .ConfigBits_N(ConfigBits_N)
 );
-
-// Instantiate BEL IO
-IO #() Inst_W_IO (
+// Instantiate BEL IOIO #() Inst_W_IO (
     .from_fabric(W_from_fabric),
     .to_fabric(W_to_fabric),
     .in(W_in),
     .out(W_out),
     .ConfigBits(ConfigBits[0])
 );
-
-// Init Switch Matrix
-W_IO_SwitchMatrix #() Inst_W_IO_SwitchMatrix (
+// Init Switch MatrixW_IO_SwitchMatrix #() Inst_W_IO_SwitchMatrix (
     .out3(out3),
     .out1(out1),
     .W_from_fabric(W_from_fabric),

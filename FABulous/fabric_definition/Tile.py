@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import Any, cast
 
 from FABulous.fabric_definition.Bel import Bel
-from FABulous.fabric_definition.ConfigMem import ConfigMem
+from FABulous.fabric_definition.ConfigMem import ConfigurationMemory
 from FABulous.fabric_definition.define import IO, Side
 from FABulous.fabric_definition.Port import TilePort
 from FABulous.fabric_definition.SwitchMatrix import SwitchMatrix
@@ -37,7 +37,7 @@ class Tile:
     bels: list[Bel]
     wireTypes: list[WireType]
     switchMatrix: SwitchMatrix
-    configMems: list[ConfigMem]
+    configMems: ConfigurationMemory
     globalConfigBits: int = 0
     withUserCLK: bool = False
     tileDir: Path = Path(".")

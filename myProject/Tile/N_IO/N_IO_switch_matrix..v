@@ -10,20 +10,5 @@ module N_IO_switch_matrix #(
     input [NoConfigBits - 1:0] ConfigBits_N
 );
 
-localparam reg GND0 = 0;
-localparam reg GND = 0;
-localparam reg VCC0 = 1;
-localparam reg VCC = 1;
-localparam reg VDD0 = 1;
-localparam reg VDD = 1;
-
-// switch matrix multiplexer out0 MUX-1
-assign out0 = in2;
-
-// switch matrix multiplexer out2 MUX-1
-assign out2 = in0;
-
-// switch matrix multiplexer from_fabric MUX-0
-// WARNING unused multiplexer MUX-BelPort(input N_from_fabric[0:0])
-
+localparam reg GND0 = 0;localparam reg GND = 0;localparam reg VCC0 = 1;localparam reg VCC = 1;localparam reg VDD0 = 1;localparam reg VDD = 1;// switch matrix multiplexer out0 MUX-1assign out0 = in2;// switch matrix multiplexer out2 MUX-1assign out2 = in0;// switch matrix multiplexer from_fabric MUX-0// WARNING unused multiplexer MUX-BelPort(input N_from_fabric[0:0])
 endmodule

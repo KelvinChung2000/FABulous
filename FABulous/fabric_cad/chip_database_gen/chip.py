@@ -179,9 +179,9 @@ class TileType(BBAStruct):
     def create_pip(self, src: str, dst: str, timing_class: str = ""):
         # Create a pip between two tile wires in the tile type. Both wires should exist already.
         if self.strs.id(src) not in self._wire2idx:
-            raise ValueError(f"Wire {src} not found")
+            raise ValueError(f"Source wire {src} not found")
         if self.strs.id(dst) not in self._wire2idx:
-            raise ValueError(f"Wire {dst} not found")
+            raise ValueError(f"Destination wire {dst} not found")
 
         src_idx = self._wire2idx[self.strs.id(src)]
         dst_idx = self._wire2idx[self.strs.id(dst)]
@@ -812,7 +812,9 @@ class Chip:
             else:
                 wire_id = w.wire if w.wire is IdString else self.strs.id(w.wire)
                 if wire_id not in self.tile_type_at(w.x, w.y)._wire2idx:
-                    raise ValueError(f"Wire {w.wire} not found in tile type {self.tile_type_at(w.x, w.y).name}")
+                    raise ValueError(
+                        f"Wire {w.wire} not found in tile type {self.tile_type_at(w.x, w.y).name}"
+                    )
                 wire_index = self.tile_type_at(w.x, w.y)._wire2idx[wire_id]
             shape.wires += [w.x - x0, w.y - y0, wire_index]
         # deduplicate node shapes

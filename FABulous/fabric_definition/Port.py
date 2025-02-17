@@ -55,7 +55,7 @@ class TilePort(Port):
     terminal: bool = False
     spanning: bool = False
 
-    __order = {Side.NORTH: 0, Side.EAST: 1, Side.SOUTH: 2, Side.WEST: 3}
+    __order = {Side.NORTH: 0, Side.EAST: 1, Side.SOUTH: 2, Side.WEST: 3, Side.ANY: 4}
     __io = {IO.OUTPUT: 0, IO.INPUT: 1, IO.INOUT: 2}
 
     def __repr__(self) -> str:

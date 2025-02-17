@@ -1,7 +1,5 @@
 from typing import Generator, Mapping
 
-from loguru import logger
-
 from FABulous.fabric_cad.define import FeatureMap, FeatureValue
 from FABulous.fabric_definition.Fabric import Fabric
 
@@ -21,9 +19,6 @@ def generateBitsStreamSpec(fabric: Fabric) -> FeatureMap:
         if tile is None:
             continue
 
-        if tile.globalConfigBits > 0 and len(tile.configMems) == 0:
-            logger.critical(f"No global configuration bits found for tile {tile.name}")
-
         def frameIndexCounter() -> Generator[tuple[int, int], None, None]:
             value: list[int] = [0, 0]
             while True:
@@ -35,7 +30,6 @@ def generateBitsStreamSpec(fabric: Fabric) -> FeatureMap:
 
         indexCounter = frameIndexCounter()
 
-        # TODO: Need to support multi-bit features
         for i, bel in enumerate(tile.bels):
             for config in bel.configPort:
                 if config.wireCount == 1 and len(config.features) == 1:

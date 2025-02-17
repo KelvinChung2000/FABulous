@@ -34,9 +34,6 @@ class ConfigMem:
 
 @dataclass
 class ConfigurationMemory:
-    frameCount: int
-    dataBitCount: int
-    configBitCount: int
     configMappings: list[ConfigBitMapping]
     configMemEntries: list[ConfigMem]
 

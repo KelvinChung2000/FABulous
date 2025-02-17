@@ -125,6 +125,7 @@ def parseFabricYAML(fileName: Path) -> Fabric:
                         yOffset=wireType.offsetY,
                         sourceTile=f"X{x}Y{y}",
                         destinationTile=f"X{x + wireType.offsetX}Y{y + wireType.offsetY}",
+                        wireCount=wireType.wireCount,
                     )
                 )
             wireDict[(x, y)] = wires
@@ -213,14 +214,25 @@ def parseTileYAML(fileName: Path) -> Tile:
     normalPorts = set()
 
     for portEntry in data["PORTS"]:
-        portsDict[portEntry["name"]] = TilePort(
-            wireCount=int(portEntry["wires"]),
-            name=portEntry["name"],
-            ioDirection=IO[portEntry["inOut"].upper()],
-            sideOfTile=Side[portEntry["side"].upper()],
-            isBus=portEntry.get("isBus", False),
-            terminal=portEntry.get("terminal", False),
-        )
+        if portEntry.get("isBus", False):
+            portsDict[portEntry["name"]] = TilePort(
+                wireCount=int(portEntry["wires"]),
+                name=portEntry["name"],
+                ioDirection=IO[portEntry["inOut"].upper()],
+                sideOfTile=Side[portEntry["side"].upper()],
+                isBus=portEntry.get("isBus", False),
+                terminal=portEntry.get("terminal", False),
+            )
+        else:
+            for i in range(int(portEntry["wires"])):
+                portsDict[f"{portEntry["name"]}{i}"] = TilePort(
+                    wireCount=int(portEntry["wires"]),
+                    name=portEntry["name"],
+                    ioDirection=IO[portEntry["inOut"].upper()],
+                    sideOfTile=Side[portEntry["side"].upper()],
+                    isBus=portEntry.get("isBus", False),
+                    terminal=portEntry.get("terminal", False),
+                )
 
         if not portEntry.get("terminal", False):
             normalPorts.add(portEntry["name"])

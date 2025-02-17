@@ -228,6 +228,7 @@ def parseFabricCSV(fileName: Path) -> Fabric:
                         yOffset=wireType.offsetY,
                         sourceTile=f"X{x}Y{y}",
                         destinationTile=f"X{x + wireType.offsetX}Y{y + wireType.offsetY}",
+                        wireCount=wireType.wireCount,
                     )
                 )
             wireDict[(x, y)] = wires
@@ -357,7 +358,14 @@ def parseList(filePath: Path) -> list[Mux]:
             )
         resultList += list(zip(leftList, rightList))
 
-    result = list(dict.fromkeys(resultList))
+    result: list[tuple[str, str]] = list(dict.fromkeys(resultList))
+
+    def wrapDigit(s: str):
+        index = len(s) - 1
+        while index > 0 and s[index].isdigit():
+            index -= 1
+        index += 1
+        return f"{s[:index]}[{s[index:]}]"
 
     resultDic = {}
     for k, v in result:
@@ -373,29 +381,33 @@ def parseList(filePath: Path) -> list[Mux]:
     return muxList
 
 
-def parsePortLine(line: str) -> tuple[dict[str, TilePort], WireType]:
+def parsePortLine(line: str) -> tuple[list[TilePort], WireType]:
     temp: list[str] = line.split(",")
 
     terminal = temp[1] == "NULL" or temp[4] == "NULL"
     sideOfTile = Side[temp[0].upper()] if temp[0] != "JUMP" else Side.ANY
-    tilePortDict: dict[str, TilePort] = {
-        temp[1]: TilePort(
-            wireCount=int(temp[5]),
-            name=temp[1],
-            ioDirection=IO.OUTPUT,
-            sideOfTile=sideOfTile,
-            isBus=False,
-            terminal=terminal,
-        ),
-        temp[4]: TilePort(
-            wireCount=int(temp[5]),
-            name=temp[4],
-            ioDirection=IO.INPUT,
-            sideOfTile=sideOfTile,
-            isBus=False,
-            terminal=terminal,
-        ),
-    }
+    tilePorts: list[TilePort] = []
+    for i in range(int(temp[5])):
+        tilePorts.append(
+            TilePort(
+                wireCount=1,
+                name=f"{temp[1]}{i}",
+                ioDirection=IO.OUTPUT,
+                sideOfTile=sideOfTile,
+                isBus=False,
+                terminal=terminal,
+            )
+        )
+        tilePorts.append(
+            TilePort(
+                wireCount=1,
+                name=f"{temp[4]}{i}",
+                ioDirection=IO.INPUT,
+                sideOfTile=sideOfTile,
+                isBus=False,
+                terminal=terminal,
+            )
+        )
 
     sourcePort = deepcopy(tilePortDict[temp[1]])
     destPort = deepcopy(tilePortDict[temp[4]])
@@ -411,7 +423,6 @@ def parsePortLine(line: str) -> tuple[dict[str, TilePort], WireType]:
         spanning = True
     else:
         wireCount = sourcePort.wireCount
-
     wire = WireType(
         sourcePort=sourcePort,
         destinationPort=destPort,
@@ -421,7 +432,7 @@ def parsePortLine(line: str) -> tuple[dict[str, TilePort], WireType]:
         cascadeWireCount=wireCount,
         spanning=spanning,
     )
-    return (tilePortDict, wire)
+    return (tilePorts, wire)
 
 
 def parseTiles(fileName: Path) -> list[Tile]:
@@ -461,12 +472,12 @@ def parseTiles(fileName: Path) -> list[Tile]:
     for t in tilesData:
         t = t.split("\n")
         tileName = t[0].split(",")[1]
-        portsDict: dict[str, TilePort] = {}
+        ports: list[TilePort] = []
         bels: list[Bel] = []
         matrixDir: Path | None = None
         wires: list[WireType] = []
         withUserCLK = False
-        configMems = []
+        configMems: ConfigurationMemory | None = None
         configBit = 0
         sm = SwitchMatrix()
         for item in t:
@@ -477,7 +488,7 @@ def parseTiles(fileName: Path) -> list[Tile]:
             match temp[0]:
                 case "NORTH" | "SOUTH" | "EAST" | "WEST" | "JUMP":
                     port, wire = parsePortLine(item)
-                    portsDict.update(port)
+                    ports.extend(port)
                     wires.append(wire)
                 case "BEL":
                     belFilePath = filePathParent.joinpath(temp[1])
@@ -499,23 +510,20 @@ def parseTiles(fileName: Path) -> list[Tile]:
                         lineItem = line.split(",")
                         if not lineItem[0]:
                             continue
-                        ports, wire = parsePortLine(line)
-                        portsDict.update(ports)
+                        port, wire = parsePortLine(line)
+                        ports.extend(port)
                         wires.append(wire)
                 case "CONFIG_MEM":
-                    configMems = parseConfigMem(
-                        fileName.parent.joinpath(temp[1]),
-                        32,
-                        32,
-                        configBit,
-                    )
+                    configMems = parseConfigMem(fileName.parent.joinpath(temp[1]))
+                case _:
+                    logger.error(f"Unknown tile description {temp[0]} in CSV file.")
 
-                    if configMems is None:
-                        configMems = []
+        if configMems is None:
+            configMems = ConfigurationMemory([], [])
         new_tiles.append(
             Tile(
                 name=tileName,
-                ports=list(portsDict.values()),
+                ports=ports,
                 bels=bels,
                 wireTypes=wires,
                 switchMatrix=sm,
@@ -1031,12 +1039,7 @@ def vhdl_belMapProcessing(file: str, filename: str) -> dict:
     return belMapDic
 
 
-def parseConfigMem(
-    fileName: Path,
-    maxFramePerCol: int,
-    frameBitPerRow: int,
-    globalConfigBits: int,
-) -> ConfigurationMemory:
+def parseConfigMem(fileName: Path) -> ConfigurationMemory:
     """Parse the config memory CSV file into a list of ConfigMem objects.
 
     Parameters
@@ -1044,7 +1047,7 @@ def parseConfigMem(
     fileName : str
         Directory of the config memory CSV file
     maxFramePerCol : int
-        Maximum number of frames per colum
+        Maximum number of frames per column
     frameBitPerRow : int
         Number of bits per row
     globalConfigBits : int
@@ -1075,33 +1078,33 @@ def parseConfigMem(
                 "_", ""
             )
 
-        # we should have as many lines as we have frames (=framePerCol)
-        if len(mappingFile) != maxFramePerCol:
-            logger.error(
-                f"The bitstream mapping file {fileName} has {len(mappingFile)} entries which do not match MaxFramesPerCol of {maxFramePerCol}."
-            )
-            raise ValueError
+        # # we should have as many lines as we have frames (=framePerCol)
+        # if len(mappingFile) != maxFramePerCol:
+        #     logger.error(
+        #         f"The bitstream mapping file {fileName} has {len(mappingFile)} entries which do not match MaxFramesPerCol of {maxFramePerCol}."
+        #     )
+        #     raise ValueError
 
-        # we also check used_bits_mask (is a vector that is as long as a frame and contains a '1' for a bit used and a '0' if not used (padded)
-        usedBitsCounter = 0
-        for entry in mappingFile:
-            if entry["used_bits_mask"].count("1") > frameBitPerRow:
-                logger.error(
-                    f"bitstream mapping file {fileName} has to many 1-elements in bitmask for frame : {entry['frame_name']}"
-                )
-                raise ValueError
-            if len(entry["used_bits_mask"]) != frameBitPerRow:
-                logger.error(
-                    f"bitstream mapping file {fileName} has has a too long or short bitmask for frame : {entry['frame_name']}"
-                )
-                raise ValueError
-            usedBitsCounter += entry["used_bits_mask"].count("1")
+        # # we also check used_bits_mask (is a vector that is as long as a frame and contains a '1' for a bit used and a '0' if not used (padded)
+        # usedBitsCounter = 0
+        # for entry in mappingFile:
+        #     if entry["used_bits_mask"].count("1") > frameBitPerRow:
+        #         logger.error(
+        #             f"bitstream mapping file {fileName} has to many 1-elements in bitmask for frame : {entry['frame_name']}"
+        #         )
+        #         raise ValueError
+        #     if len(entry["used_bits_mask"]) != frameBitPerRow:
+        #         logger.error(
+        #             f"bitstream mapping file {fileName} has has a too long or short bitmask for frame : {entry['frame_name']}"
+        #         )
+        #         raise ValueError
+        #     usedBitsCounter += entry["used_bits_mask"].count("1")
 
-        if usedBitsCounter != globalConfigBits:
-            logger.error(
-                f"bitstream mapping file {fileName} has a bitmask mismatch; bitmask has in total {usedBitsCounter} 1-values for {globalConfigBits} bits."
-            )
-            raise ValueError
+        # if usedBitsCounter != globalConfigBits:
+        #     logger.error(
+        #         f"bitstream mapping file {fileName} has a bitmask mismatch; bitmask has in total {usedBitsCounter} 1-values for {globalConfigBits} bits."
+        #     )
+        #     raise ValueError
 
         allConfigBitsOrder = []
         configMemEntry = []
@@ -1179,9 +1182,6 @@ def parseConfigMem(
                 configMemMappings.append(ConfigBitMapping(None, i.frameIndex, bitIndex))
 
     return ConfigurationMemory(
-        frameCount=maxFramePerCol,
-        dataBitCount=frameBitPerRow,
-        configBitCount=globalConfigBits,
         configMappings=configMemMappings,
         configMemEntries=configMemEntry,
     )

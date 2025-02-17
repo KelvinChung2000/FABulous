@@ -1,6 +1,7 @@
 from pathlib import Path
 
 from loguru import logger
+from pyparsing import C
 
 from FABulous.fabric_cad.bitstreamSpec_generator import generateBitsStreamSpec
 import FABulous.fabric_cad.model_generation_npnr as model_gen_npnr
@@ -15,6 +16,7 @@ from FABulous.fabric_definition.Tile import Tile
 from FABulous.fabric_generator.code_generator_2 import CodeGenerator
 from FABulous.fabric_generator.ConfigMem_genenrator import generateConfigMem
 from FABulous.fabric_generator.define import WriterType
+from FABulous.fabric_generator.fabricWrapper_generator import generateFabricTopWrapper
 from FABulous.fabric_generator.fabric_generator import generateFabric
 from FABulous.fabric_generator.Tile_generator import generateTile
 from FABulous.fabric_generator.TileSwitchMatrix_generator import (
@@ -209,10 +211,11 @@ class FABulous_API:
         self.geometryGenerator.generateGeometry(geomPadding)
         self.geometryGenerator.saveToCSV(path)
 
-    # def genTopWrapper(self):
-    #     """Generates the top wrapper for the fabric via 'generateTopWrapper' defined in
-    #     'fabric_gen.py'."""
-    #     self.fabricGenerator.generateTopWrapper()
+    def genTopWrapper(self, dest: Path):
+        """Generates the top wrapper for the fabric via 'generateTopWrapper' defined in
+        'fabric_gen.py'."""
+        cg = CodeGenerator(dest, self.writerType)
+        generateFabricTopWrapper(cg, self.fabric)
 
     def genBitStreamSpec(self):
         """Generates the bitsream specification object.

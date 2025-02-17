@@ -23,136 +23,85 @@ module PE #(
     output [MaxFramesPerCol - 1:0] FrameStrobe_O
 );
 
-// Signal Creation
-wire [31:0] data_in1;
-wire [31:0] data_in2;
-wire [31:0] data_in3;
-wire [31:0] data_out;
-wire [31:0] const_out;
-wire [31:0] RES_reg_in;
-wire [31:0] RES_reg_out;
-wire [31:0] N_reg_in;
-wire [31:0] N_reg_out;
-wire [31:0] E_reg_in;
-wire [31:0] E_reg_out;
-wire [31:0] S_reg_in;
-wire [31:0] S_reg_out;
-wire [31:0] W_reg_in;
-wire [31:0] W_reg_out;
-
-// ConfigBits Wires
-wire [NoConfigBits - 1:0] ConfigBits;
-wire [NoConfigBits - 1:0] ConfigBits_N;
-
-// Buffering incoming and out outgoing wires
-
-// FrameData Buffer
-wire [FrameBitsPerRow - 1:0] FrameData_internal;
-
-my_buf_pack #(
+// Signal Creationreg [31:0] data_in1;reg [31:0] data_in2;reg [31:0] data_in3;reg [31:0] data_out;reg [31:0] const_out;reg [31:0] RES_reg_in;reg [31:0] RES_reg_out;reg [31:0] N_reg_in;reg [31:0] N_reg_out;reg [31:0] E_reg_in;reg [31:0] E_reg_out;reg [31:0] S_reg_in;reg [31:0] S_reg_out;reg [31:0] W_reg_in;reg [31:0] W_reg_out;// ConfigBits Wiresreg [NoConfigBits - 1:0] ConfigBits;reg [NoConfigBits - 1:0] ConfigBits_N;// Buffering incoming and out outgoing wires// FrameData Bufferreg [FrameBitsPerRow - 1:0] FrameData_internal;my_buf_pack #(
     .WIDTH(FrameBitsPerRow)
 ) data_inbuf (
     .A(FrameData),
     .X(FrameData_internal)
 );
-
 my_buf_pack #(
     .WIDTH(FrameBitsPerRow)
 ) data_outbuf (
     .A(FrameData_internal),
     .X(FrameData_O)
 );
-
-// FrameStrobe Buffer
-wire [MaxFramesPerCol - 1:0] FrameStrobe_internal;
-
-my_buf_pack #(
+// FrameStrobe Bufferreg [MaxFramesPerCol - 1:0] FrameStrobe_internal;my_buf_pack #(
     .WIDTH(MaxFramesPerCol)
 ) strobe_inbuf (
     .A(FrameStrobe),
     .X(FrameStrobe_internal)
 );
-
 my_buf_pack #(
     .WIDTH(MaxFramesPerCol)
 ) strobe_outbuf (
     .A(FrameStrobe_internal),
     .X(FrameStrobe_O)
 );
-
-// User Clock Buffer
-clk_buf #() inst_clk_buf (
+// User Clock Bufferclk_buf #() inst_clk_buf (
     .A(UserCLK),
     .X(UserCLKo)
 );
-
-// Init Configuration storage latches
-PE_ConfigMem #() Inst_PE_ConfigMem (
+// Init Configuration storage latchesPE_ConfigMem #() Inst_PE_ConfigMem (
     .FrameData(FrameData),
     .FrameStrobe(FrameStrobe),
     .ConfigBits(ConfigBits),
     .ConfigBits_N(ConfigBits_N)
 );
-
-// Instantiate BEL ALU
-ALU #() Inst_ALU (
+// Instantiate BEL ALUALU #() Inst_ALU (
     .data_in1(data_in1),
     .data_in2(data_in2),
     .data_in3(data_in3),
     .data_out(data_out),
     .clk(UserCLK),
-    .ConfigBits(ConfigBits[3:0])
+    .ALU_func(ConfigBits[2:0]),
+    .reg_en(ConfigBits[3])
 );
-
-// Instantiate BEL const_unit
-const_unit #() Inst_const_unit (
+// Instantiate BEL const_unitconst_unit #() Inst_const_unit (
     .const_out(const_out),
     .clk(UserCLK),
     .ConfigBits(ConfigBits[7:4])
 );
-
-// Instantiate BEL reg_unit
-reg_unit #() Inst_RES_reg_unit (
+// Instantiate BEL reg_unitreg_unit #() Inst_RES_reg_unit (
     .reg_in(RES_reg_in),
     .reg_out(RES_reg_out),
     .clk(UserCLK),
     .ConfigBits(ConfigBits[11:8])
 );
-
-// Instantiate BEL reg_unit
-reg_unit #() Inst_N_reg_unit (
+// Instantiate BEL reg_unitreg_unit #() Inst_N_reg_unit (
     .reg_in(N_reg_in),
     .reg_out(N_reg_out),
     .clk(UserCLK),
     .ConfigBits(ConfigBits[15:12])
 );
-
-// Instantiate BEL reg_unit
-reg_unit #() Inst_E_reg_unit (
+// Instantiate BEL reg_unitreg_unit #() Inst_E_reg_unit (
     .reg_in(E_reg_in),
     .reg_out(E_reg_out),
     .clk(UserCLK),
     .ConfigBits(ConfigBits[19:16])
 );
-
-// Instantiate BEL reg_unit
-reg_unit #() Inst_S_reg_unit (
+// Instantiate BEL reg_unitreg_unit #() Inst_S_reg_unit (
     .reg_in(S_reg_in),
     .reg_out(S_reg_out),
     .clk(UserCLK),
     .ConfigBits(ConfigBits[23:20])
 );
-
-// Instantiate BEL reg_unit
-reg_unit #() Inst_W_reg_unit (
+// Instantiate BEL reg_unitreg_unit #() Inst_W_reg_unit (
     .reg_in(W_reg_in),
     .reg_out(W_reg_out),
     .clk(UserCLK),
     .ConfigBits(ConfigBits[27:24])
 );
-
-// Init Switch Matrix
-PE_SwitchMatrix #() Inst_PE_SwitchMatrix (
+// Init Switch MatrixPE_SwitchMatrix #() Inst_PE_SwitchMatrix (
     .out0(out0),
     .out1(out1),
     .out2(out2),

@@ -24,27 +24,25 @@ def genSwitchMatrix(tile: Tile, tileType: TileType, context=1):
     if not isinstance(tile.switchMatrix, SwitchMatrix):
         raise ValueError("Switch matrix is not a SwitchMatrix object")
 
-    outportName = set([p.name for p in tile.ports if p.ioDirection == IO.OUTPUT])
+    outportName = set([p for p in tile.ports if p.ioDirection == IO.OUTPUT])
     zIn = 0
     zOut = 0
     for c in range(context):
-        for i, p in enumerate(sorted(tile.ports)):
-            if p.ioDirection == IO.INPUT:
-                tileType.create_wire(f"{c}_{p.name}", f"InPort{p.sideOfTile}", z=zIn)
-                zIn += 1
-            elif p.ioDirection == IO.OUTPUT:
-                tileType.create_wire(f"{c}_{p.name}", f"OutPort{p.sideOfTile}", z=zOut)
-                if p.name in outportName:
+        for i, w in enumerate(tile.wireTypes):
+            for wc in range(w.sourcePort.wireCount):
+                tileType.create_wire(f"{c}_{w.sourcePort.name}[{wc}]", "src", z=i)
+            for wc in range(w.destinationPort.wireCount):
+                tileType.create_wire(f"{c}_{w.destinationPort.name}[{wc}]", "dst", z=i)
+            if w.destinationPort in outportName:
+                for wc in range(w.sourcePort.wireCount):
                     tileType.create_wire(
-                        f"{c}_{p.name}_internal",
-                        f"OutPort{p.sideOfTile}_internal",
-                        z=zOut,
+                        f"{c}_{w.destinationPort.name}_internal[{wc}]",
+                        "dst_internal",
+                        z=i,
                     )
-                zOut += 1
 
         for mux in tile.switchMatrix.muxes:
-            for i in range(mux.output.wireCount):
-                tileType.create_wire(f"{c}_{mux.output.name}[{i}]")
+            tileType.create_wire(f"{c}_{mux.output.name}")
             if mux.output.name in outportName:
                 for i in mux.inputs:
                     tileType.create_pip(
@@ -55,6 +53,7 @@ def genSwitchMatrix(tile: Tile, tileType: TileType, context=1):
                         f"{c}_{mux.output.name}",
                     )
             else:
+                print(mux)
                 for i in mux.inputs:
                     tileType.create_pip(f"{c}_{i.name}", f"{c}_{mux.output.name}")
 
@@ -91,13 +90,15 @@ def genBel(bels: list[Bel], tile: TileType, context=1):
     for c in range(context):
         for z, bel in enumerate(bels):
             for i in bel.externalInputs + bel.inputs:
-                tile.create_wire(f"{c}_{i.name}", f"{bel.name}_{i.name}")
+                for wc in range(i.wireCount):
+                    tile.create_wire(f"{c}_{i.prefix}{i.name}[{wc}]", f"{bel.name}_{i.name}")
 
             for i in bel.externalOutputs + bel.outputs:
-                tile.create_wire(f"{c}_{i.name}", f"{bel.name}_{i.name}")
+                for wc in range(i.wireCount):
+                    tile.create_wire(f"{c}_{i.prefix}{i.name}[{wc}]", f"{bel.name}_{i.name}")
 
             if bel.userCLK:
-                tile.create_wire(f"{c}_{bel.name}_{bel.userCLK.name}")
+                tile.create_wire(f"{c}_{bel.prefix}{bel.name}_{bel.userCLK.name}")
             for feature in bel.belFeatureMap:
                 # create the bel itself
                 belData = tile.create_bel(
@@ -105,25 +106,27 @@ def genBel(bels: list[Bel], tile: TileType, context=1):
                 )
 
                 for i in bel.inputs + bel.externalInputs:
-                    tile.add_bel_pin(
-                        belData,
-                        f"{i.name}",
-                        f"{c}_{i.name}",
-                        PinType.INPUT,
-                    )
+                    for wc in range(i.wireCount):
+                        tile.add_bel_pin(
+                            belData,
+                            f"{bel.prefix}{i.name}[{wc}]",
+                            f"{c}_{bel.prefix}{i.name}[{wc}]",
+                            PinType.INPUT,
+                        )
                 for i in bel.outputs + bel.externalOutputs:
-                    tile.add_bel_pin(
-                        belData,
-                        f"{i.name}",
-                        f"{c}_{i.name}",
-                        PinType.OUTPUT,
-                    )
+                    for wc in range(i.wireCount):
+                        tile.add_bel_pin(
+                            belData,
+                            f"{bel.prefix}{i.name}[{wc}]",
+                            f"{c}_{bel.prefix}{i.name}[{wc}]",
+                            PinType.OUTPUT,
+                        )
 
                 if bel.userCLK:
                     tile.add_bel_pin(
                         belData,
                         bel.userCLK.name,
-                        f"{c}_{bel.name}_{bel.userCLK.name}",
+                        f"{c}_{bel.prefix}{bel.name}_{bel.userCLK.name}",
                         PinType.INPUT,
                     )
                 belData.add_extra_data(BelExtraData(context=c))

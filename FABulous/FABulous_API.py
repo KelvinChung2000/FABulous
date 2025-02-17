@@ -1,7 +1,6 @@
 from pathlib import Path
 
 from loguru import logger
-from pyparsing import C
 
 from FABulous.fabric_cad.bitstreamSpec_generator import generateBitsStreamSpec
 import FABulous.fabric_cad.model_generation_npnr as model_gen_npnr

@@ -93,18 +93,18 @@ class Mux:
     _configBit: int = 0
 
     def __init__(self, name: str, inputs: list[GenericPort], output: GenericPort):
+        for p in inputs:
+            if p.wireCount != output.wireCount:
+                raise ValueError("All inputs and output must have the same width")
+
         self._name = name
         self._inputs = inputs
         self._output = output
         self._configBit = 2 ** (len(self.inputs) - 1).bit_length()
+        self._width = output.wireCount
 
-        uniqueSet = set()
-        for i in inputs:
-            uniqueSet.add(i.wireCount)
-        uniqueSet.add(output.wireCount)
-        if len(uniqueSet) != 1:
-            raise ValueError("All inputs and output must have the same width")
-        self._width = uniqueSet.pop()
+    def __repr__(self) -> str:
+        return f"{self.output}<({self.name})-{list(self.inputs)}"
 
     @property
     def name(self):
@@ -127,12 +127,10 @@ class Mux:
         return self._configBit
 
     def extendInputs(self, inputs: Iterable[GenericPort]):
-        uniqueInputs = set([i for i in self.inputs])
-
         for i in inputs:
-            if i not in uniqueInputs:
-                self._inputs.append(i)
-                uniqueInputs.add(i)
+            if i.wireCount != self.output.wireCount:
+                raise ValueError("All inputs and output must have the same width")
+            self._inputs.append(i)
 
         self._configBit = 2 ** (len(self.inputs) - 1).bit_length()
 

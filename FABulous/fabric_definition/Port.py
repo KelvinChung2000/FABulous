@@ -128,6 +128,9 @@ class ConfigPort(Port):
     features: list[tuple[str, int]] = field(default_factory=list)
     featureType: FeatureType = FeatureType.INIT
 
+    def __repr__(self) -> str:
+        return f"ConfigPort({self.ioDirection.value} {self.name}[{self.wireCount-1}:0])"
+
 
 @dataclass(frozen=True, eq=True)
 class SharedPort(Port):

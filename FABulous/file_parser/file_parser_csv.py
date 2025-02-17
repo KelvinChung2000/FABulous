@@ -365,7 +365,9 @@ def parseList(filePath: Path) -> list[Mux]:
         while index > 0 and s[index].isdigit():
             index -= 1
         index += 1
-        return f"{s[:index]}[{s[index:]}]"
+        if index != len(s):
+            return f"{s[:index]}[{s[index:]}]"
+        return f"{s}[0]"
 
     resultDic = {}
     for k, v in result:
@@ -374,8 +376,8 @@ def parseList(filePath: Path) -> list[Mux]:
         resultDic[k].append(v)
 
     for k, v in resultDic.items():
-        inputs = [Port(i, IO.INPUT, 1, False) for i in v]
-        output = Port(k, IO.OUTPUT, 1, False)
+        inputs = [Port(wrapDigit(i), IO.INPUT, 1, False) for i in v]
+        output = Port(wrapDigit(k), IO.OUTPUT, 1, False)
         muxList.append(Mux(k, inputs, output))
 
     return muxList
@@ -387,30 +389,29 @@ def parsePortLine(line: str) -> tuple[list[TilePort], WireType]:
     terminal = temp[1] == "NULL" or temp[4] == "NULL"
     sideOfTile = Side[temp[0].upper()] if temp[0] != "JUMP" else Side.ANY
     tilePorts: list[TilePort] = []
-    for i in range(int(temp[5])):
-        tilePorts.append(
-            TilePort(
-                wireCount=1,
-                name=f"{temp[1]}{i}",
-                ioDirection=IO.OUTPUT,
-                sideOfTile=sideOfTile,
-                isBus=False,
-                terminal=terminal,
-            )
+    tilePorts.append(
+        TilePort(
+            wireCount=int(temp[5]),
+            name=f"{temp[1]}",
+            ioDirection=IO.OUTPUT,
+            sideOfTile=sideOfTile,
+            isBus=False,
+            terminal=terminal,
         )
-        tilePorts.append(
-            TilePort(
-                wireCount=1,
-                name=f"{temp[4]}{i}",
-                ioDirection=IO.INPUT,
-                sideOfTile=sideOfTile,
-                isBus=False,
-                terminal=terminal,
-            )
+    )
+    tilePorts.append(
+        TilePort(
+            wireCount=int(temp[5]),
+            name=f"{temp[4]}",
+            ioDirection=IO.INPUT,
+            sideOfTile=sideOfTile,
+            isBus=False,
+            terminal=terminal,
         )
+    )
 
-    sourcePort = deepcopy(tilePortDict[temp[1]])
-    destPort = deepcopy(tilePortDict[temp[4]])
+    sourcePort = deepcopy(tilePorts[0])
+    destPort = deepcopy(tilePorts[1])
     x = int(temp[2])
     y = int(temp[3])
 

@@ -159,8 +159,6 @@ def parseBelFile(
 
         netBitWidth = len(details.get("bits", [1]))
         attributes = set(details.get("attributes", {}).keys())
-        if "FABulous" not in attributes:
-            continue
 
         port = BelPort(
             name=f"{net}",
@@ -170,7 +168,6 @@ def parseBelFile(
             prefix=belPrefix,
             external=FABulousPortType.EXTERNAL in attributes,
         )
-
         if FABulousPortType.EXTERNAL in attributes:
             externalPort.append(port)
         elif FABulousPortType.CONFIG_BIT in attributes:
@@ -218,7 +215,6 @@ def parseBelFile(
 
         else:
             internalPort.append(port)
-
     return Bel(
         src=filename,
         prefix=belPrefix,

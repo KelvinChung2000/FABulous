@@ -1,0 +1,27 @@
+TILE: LUT4AB
+# {side: <>, source_name: <>, X-offset: <>, Y-offset: <>, destination_name: <>, wires: <>}
+INCLUDE: ../include/Base.yaml
+PORTS: [
+    {side: NORTH, name: Co, inOut: output, wires: 1, terminal: false},
+    {side: NORTH, name: Ci, inOut: input,  wires: 1, terminal: false},
+  ]
+WIRES: [
+  # {source_name: spanOut, X-offset: 2, Y-offset:  0, destination_name: spanIn},
+  {source_name: Co, X-offset: 0, Y-offset: -1, destination_name: Ci},
+  {source_name: J_SR_BEG, X-offset: 0, Y-offset: 0, destination_name: J_SR_END},
+  {source_name: J_EN_BEG, X-offset: 0, Y-offset: 0, destination_name: J_EN_END}
+]
+BELS: [
+  {BEL: ./LUT4c_frame_config_dffesr.v, prefix: LA_},
+  {BEL: ./LUT4c_frame_config_dffesr.v, prefix: LB_},
+  {BEL: ./LUT4c_frame_config_dffesr.v, prefix: LC_},
+  {BEL: ./LUT4c_frame_config_dffesr.v, prefix: LD_},
+  {BEL: ./LUT4c_frame_config_dffesr.v, prefix: LE_},
+  {BEL: ./LUT4c_frame_config_dffesr.v, prefix: LF_},
+  {BEL: ./LUT4c_frame_config_dffesr.v, prefix: LG_},
+  {BEL: ./LUT4c_frame_config_dffesr.v, prefix: LH_},
+  {BEL: ./MUX8LUT_frame_config_mux.v, prefix: }
+
+]
+MATRIX: ./LUT4AB_switch_matrix.list
+CONFIG_MEM: ./LUT4AB_ConfigMem.csv

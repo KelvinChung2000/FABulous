@@ -1,0 +1,68 @@
+TILE: RAM_IO
+PORTS: [
+  # North ports
+  {side: NORTH, name: N1BEG, inOut: output, wires: 4, terminal: false},
+  {side: NORTH, name: N2BEG, inOut: output, wires: 8, terminal: false},
+  {side: NORTH, name: N2BEGb, inOut: output, wires: 8, terminal: false},
+  {side: NORTH, name: N4BEG, inOut: output, wires: 4, terminal: false},
+  {side: NORTH, name: N1END, inOut: input, wires: 4, terminal: false},
+  {side: NORTH, name: N2MID, inOut: input, wires: 8, terminal: false},
+  {side: NORTH, name: N2END, inOut: input, wires: 8, terminal: false},
+  {side: NORTH, name: N4END, inOut: input, wires: 4, terminal: false},
+
+  # East ports (inputs only)
+  {side: EAST, name: E1END, inOut: input, wires: 4, terminal: false},
+  {side: EAST, name: E2MID, inOut: input, wires: 8, terminal: false},
+  {side: EAST, name: E2END, inOut: input, wires: 8, terminal: false},
+  {side: EAST, name: EE4END, inOut: input, wires: 4, terminal: false},
+  {side: EAST, name: E6END, inOut: input, wires: 2, terminal: false},
+
+  # South ports
+  {side: SOUTH, name: S1BEG, inOut: output, wires: 4, terminal: false},
+  {side: SOUTH, name: S2BEG, inOut: output, wires: 8, terminal: false},
+  {side: SOUTH, name: S2BEGb, inOut: output, wires: 8, terminal: false},
+  {side: SOUTH, name: S4BEG, inOut: output, wires: 4, terminal: false},
+  {side: SOUTH, name: S1END, inOut: input, wires: 4, terminal: false},
+  {side: SOUTH, name: S2MID, inOut: input, wires: 8, terminal: false},
+  {side: SOUTH, name: S2END, inOut: input, wires: 8, terminal: false},
+  {side: SOUTH, name: S4END, inOut: input, wires: 4, terminal: false},
+
+  # West ports (outputs only)
+  {side: WEST, name: W1BEG, inOut: output, wires: 4, terminal: false},
+  {side: WEST, name: W2BEG, inOut: output, wires: 8, terminal: false},
+  {side: WEST, name: W2BEGb, inOut: output, wires: 8, terminal: false},
+  {side: WEST, name: WW4BEG, inOut: output, wires: 4, terminal: false},
+  {side: WEST, name: W6BEG, inOut: output, wires: 2, terminal: false}
+]
+
+WIRES: [
+  # Only including non-NULL connections
+  {source_name: N1BEG, X-offset: 0, Y-offset: -1, destination_name: N1END, wires: 4},
+  {source_name: N2BEG, X-offset: 0, Y-offset: -1, destination_name: N2MID, wires: 8},
+  {source_name: N2BEGb, X-offset: 0, Y-offset: -1, destination_name: N2END, wires: 8},
+  {source_name: N4BEG, X-offset: 0, Y-offset: -4, destination_name: N4END, wires: 4},
+  {source_name: S1BEG, X-offset: 0, Y-offset: 1, destination_name: S1END, wires: 4},
+  {source_name: S2BEG, X-offset: 0, Y-offset: 1, destination_name: S2MID, wires: 8},
+  {source_name: S2BEGb, X-offset: 0, Y-offset: 1, destination_name: S2END, wires: 8},
+  {source_name: S4BEG, X-offset: 0, Y-offset: 4, destination_name: S4END, wires: 4},
+  {source_name: J_NS4_BEG, X-offset: 0, Y-offset: 0, destination_name: J_NS4_END, wires: 16},
+  {source_name: J_NS2_BEG, X-offset: 0, Y-offset: 0, destination_name: J_NS2_END, wires: 8},
+  {source_name: J_NS1_BEG, X-offset: 0, Y-offset: 0, destination_name: J_NS1_END, wires: 4}
+]
+
+BELS: [
+  {BEL: ./InPass4_frame_config_mux.v, prefix: RAM2FAB_D0_},
+  {BEL: ./InPass4_frame_config_mux.v, prefix: RAM2FAB_D1_},
+  {BEL: ./InPass4_frame_config_mux.v, prefix: RAM2FAB_D2_},
+  {BEL: ./InPass4_frame_config_mux.v, prefix: RAM2FAB_D3_},
+  {BEL: ./OutPass4_frame_config_mux.v, prefix: FAB2RAM_D0_},
+  {BEL: ./OutPass4_frame_config_mux.v, prefix: FAB2RAM_D1_},
+  {BEL: ./OutPass4_frame_config_mux.v, prefix: FAB2RAM_D2_},
+  {BEL: ./OutPass4_frame_config_mux.v, prefix: FAB2RAM_D3_},
+  {BEL: ./OutPass4_frame_config_mux.v, prefix: FAB2RAM_A0_},
+  {BEL: ./OutPass4_frame_config_mux.v, prefix: FAB2RAM_A1_},
+  {BEL: ./OutPass4_frame_config_mux.v, prefix: FAB2RAM_C_},
+  {BEL: ./Config_access.v, prefix: Config_access}
+]
+
+MATRIX: ./RAM_IO_switch_matrix.list

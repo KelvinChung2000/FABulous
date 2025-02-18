@@ -1,0 +1,8 @@
+TILE: RegFile
+INCLUDE: ../include/Base.yaml
+
+BELS: [
+  {BEL: ./RegFile_32x4.v, prefix: ""}
+]
+
+MATRIX: ./RegFile_switch_matrix.list

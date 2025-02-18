@@ -1,3 +1,4 @@
+from collections import defaultdict
 import csv
 import re
 from copy import deepcopy
@@ -11,7 +12,13 @@ from FABulous.fabric_definition.ConfigMem import (
     ConfigMem,
     ConfigurationMemory,
 )
-from FABulous.fabric_definition.define import IO, ConfigBitMode, MultiplexerStyle, Side
+from FABulous.fabric_definition.define import (
+    IO,
+    ConfigBitMode,
+    Loc,
+    MultiplexerStyle,
+    Side,
+)
 from FABulous.fabric_definition.Fabric import Fabric
 from FABulous.fabric_definition.Port import Port, TilePort
 from FABulous.fabric_definition.SuperTile import SuperTile
@@ -101,25 +108,14 @@ def parseFabricCSV(fileName: Path) -> Fabric:
     commonWirePair: list[tuple[str, str]] = []
 
     fabricTiles = []
-    tileDic = {}
+    tileDict = {}
 
     # list for supertiles
     superTileDic = {}
 
-    # For backwards compatibility parse tiles in fabric config
-    new_tiles = parseTiles(fName)
-    tileTypes += [new_tile.name for new_tile in new_tiles]
-    tileDefs += new_tiles
-    tileDic = dict(zip(tileTypes, tileDefs))
-
-    new_supertiles = parseSupertiles(fName, tileDic)
+    new_supertiles = parseSupertiles(fName, tileDict)
     for new_supertile in new_supertiles:
         superTileDic[new_supertile.name] = new_supertile
-
-    if new_tiles or new_supertiles:
-        logger.warning(
-            f"Deprecation warning: {fName} should not contain tile descriptions."
-        )
 
     # parse the parameters
     height = 0
@@ -146,10 +142,9 @@ def parseFabricCSV(fileName: Path) -> Fabric:
             case "Name":
                 name = value
             case "Tile":
-                new_tiles = parseTiles(filePath.joinpath(i[1]))
-                tileTypes += [new_tile.name for new_tile in new_tiles]
-                tileDefs += new_tiles
-                tileDic = dict(zip(tileTypes, tileDefs))
+                newTile, wireInfo = parseTiles(filePath.joinpath(i[1]))
+                tileDict[newTile.name] = newTile
+                wireDictUnprocessed[newTile.name] = wireInfo
             case "ConfigBitMode":
                 try:
                     configBitMode = ConfigBitMode[value.upper()]
@@ -191,8 +186,8 @@ def parseFabricCSV(fileName: Path) -> Fabric:
             continue
         fabricLine = []
         for i in fabricLineTmp:
-            if i in tileDic:
-                fabricLine.append(deepcopy(tileDic[i]))
+            if i in tileDict:
+                fabricLine.append(i)
                 usedTile.add(i)
             elif i == "Null" or i == "NULL" or i == "None":
                 fabricLine.append(None)
@@ -204,34 +199,69 @@ def parseFabricCSV(fileName: Path) -> Fabric:
     height = len(fabricTiles)
     width = len(fabricTiles[0])
 
-    wireDict = {}
+    wireDict: dict[Loc, list[Wire]] = defaultdict(list)
     for y, row in enumerate(fabricTiles):
-        for x, tile in enumerate(row):
-            wires = []
-            if tile is None:
+        for x, tileName in enumerate(row):
+            # TODO add empty tile that have contains crossing wires
+            if tileName is None:
                 continue
-            for wireType in tile.wireTypes:
-                if (
-                    wireType.sourcePort.ioDirection != IO.OUTPUT
-                    and wireType.destinationPort.ioDirection != IO.INPUT
-                ):
+
+            for wireEntry in wireDictUnprocessed[tileName]:
+                tx = int(wireEntry["X-offset"])
+                ty = int(wireEntry["Y-offset"])
+
+                sourcePort: TilePort = tileDict[tileName].findPortByName(
+                    wireEntry["source_name"]
+                )
+                destinationPort: TilePort = tileDict[
+                    fabricTiles[y + ty][x + tx]
+                ].findPortByName(wireEntry["destination_name"])
+
+                if tx != 0 and ty != 0 and tx != ty:
                     logger.error(
-                        f"Wire {wireType} must be an output port as source_name and input port as destination_name ."
+                        f"Invalid wire offset detected: source port '{sourcePort.name}' to destination port '{destinationPort.name}' "
+                        f"has an offset of X={tx}, Y={ty}. The offset must be either only in the X direction, only in the Y direction, "
+                        "or both X and Y must be the same for diagonal."
+                    )
+                    raise ValueError
+                if sourcePort.wireCount != destinationPort.wireCount:
+                    logger.error(
+                        f"Port {sourcePort.name} and {destinationPort.name} must have the same wire count."
                     )
                     raise ValueError
 
-                wires.append(
+                spanning = False
+                if abs(x) + abs(y) > 1 and x != y:
+                    wireCount = sourcePort.wireCount * (abs(x) + abs(y))
+                    spanning = True
+                elif x == y:
+                    wireCount = sourcePort.wireCount * abs(x)
+                    spanning = True
+                else:
+                    wireCount = sourcePort.wireCount
+
+                wireDict[(x, y)].append(
                     Wire(
-                        source=wireType.sourcePort,
-                        destination=wireType.destinationPort,
-                        xOffset=wireType.offsetX,
-                        yOffset=wireType.offsetY,
+                        source=sourcePort,
+                        xOffset=tx,
+                        yOffset=ty,
+                        destination=destinationPort,
                         sourceTile=f"X{x}Y{y}",
-                        destinationTile=f"X{x + wireType.offsetX}Y{y + wireType.offsetY}",
-                        wireCount=wireType.wireCount,
+                        destinationTile=f"X{x + tx}Y{y + ty}",
+                        wireCount=wireCount,
                     )
                 )
-            wireDict[(x, y)] = wires
+                tileDict[tileName].addWireType(
+                    WireType(
+                        sourcePort=sourcePort,
+                        destinationPort=destinationPort,
+                        offsetX=wireEntry["X-offset"],
+                        offsetY=wireEntry["Y-offset"],
+                        wireCount=sourcePort.wireCount,
+                        cascadeWireCount=wireCount,
+                        spanning=spanning,
+                    )
+                )
 
     return Fabric(
         name=name,
@@ -250,7 +280,7 @@ def parseFabricCSV(fileName: Path) -> Fabric:
         multiplexerStyle=multiplexerStyle,
         numberOfBRAMs=int(height / 2),
         superTileEnable=superTileEnable,
-        tileDict=tileDic,
+        tileDict=tileDict,
         superTileDict=superTileDic,
         wireDict=wireDict,
     )
@@ -1032,7 +1062,7 @@ def vhdl_belMapProcessing(file: str, filename: str) -> dict:
                     length = end - start + 1
                     for i in range(0, 2**length):
                         belMapDic[bel[0]][i] = {}
-                        bitMap = list(f"{2**length-i-1:0{length.bit_length()}b}")
+                        bitMap = list(f"{2**length - i - 1:0{length.bit_length()}b}")
                         for v in range(len(bitMap) - 1, -1, -1):
                             belMapDic[bel[0]][i][v] = bitMap.pop(0)
             else:

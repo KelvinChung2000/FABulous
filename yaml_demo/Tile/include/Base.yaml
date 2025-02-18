@@ -1,0 +1,101 @@
+PORTS: [
+  # North ports
+  {side: NORTH, name: N1BEG, inOut: output, wires: 4, terminal: false},
+  {side: NORTH, name: N1END, inOut: input, wires: 4, terminal: false},
+  {side: NORTH, name: N2BEG, inOut: output, wires: 8, terminal: false},
+  {side: NORTH, name: N2MID, inOut: input, wires: 8, terminal: false},
+  {side: NORTH, name: N2BEGb, inOut: output, wires: 8, terminal: false},
+  {side: NORTH, name: N2END, inOut: input, wires: 8, terminal: false},
+  {side: NORTH, name: N4BEG, inOut: output, wires: 4, terminal: false},
+  {side: NORTH, name: N4END, inOut: input, wires: 4, terminal: false},
+  {side: NORTH, name: NN4BEG, inOut: output, wires: 4, terminal: false},
+  {side: NORTH, name: NN4END, inOut: input, wires: 4, terminal: false},
+
+  # East ports
+  {side: EAST, name: E1BEG, inOut: output, wires: 4, terminal: false},
+  {side: EAST, name: E1END, inOut: input, wires: 4, terminal: false},
+  {side: EAST, name: E2BEG, inOut: output, wires: 8, terminal: false},
+  {side: EAST, name: E2MID, inOut: input, wires: 8, terminal: false},
+  {side: EAST, name: E2BEGb, inOut: output, wires: 8, terminal: false},
+  {side: EAST, name: E2END, inOut: input, wires: 8, terminal: false},
+  {side: EAST, name: EE4BEG, inOut: output, wires: 4, terminal: false},
+  {side: EAST, name: EE4END, inOut: input, wires: 4, terminal: false},
+  {side: EAST, name: E6BEG, inOut: output, wires: 2, terminal: false},
+  {side: EAST, name: E6END, inOut: input, wires: 2, terminal: false},
+
+  # South ports
+  {side: SOUTH, name: S1BEG, inOut: output, wires: 4, terminal: false},
+  {side: SOUTH, name: S1END, inOut: input, wires: 4, terminal: false},
+  {side: SOUTH, name: S2BEG, inOut: output, wires: 8, terminal: false},
+  {side: SOUTH, name: S2MID, inOut: input, wires: 8, terminal: false},
+  {side: SOUTH, name: S2BEGb, inOut: output, wires: 8, terminal: false},
+  {side: SOUTH, name: S2END, inOut: input, wires: 8, terminal: false},
+  {side: SOUTH, name: S4BEG, inOut: output, wires: 4, terminal: false},
+  {side: SOUTH, name: S4END, inOut: input, wires: 4, terminal: false},
+  {side: SOUTH, name: SS4BEG, inOut: output, wires: 4, terminal: false},
+  {side: SOUTH, name: SS4END, inOut: input, wires: 4, terminal: false},
+
+  # West ports
+  {side: WEST, name: W1BEG, inOut: output, wires: 4, terminal: false},
+  {side: WEST, name: W1END, inOut: input, wires: 4, terminal: false},
+  {side: WEST, name: W2BEG, inOut: output, wires: 8, terminal: false},
+  {side: WEST, name: W2MID, inOut: input, wires: 8, terminal: false},
+  {side: WEST, name: W2BEGb, inOut: output, wires: 8, terminal: false},
+  {side: WEST, name: W2END, inOut: input, wires: 8, terminal: false},
+  {side: WEST, name: WW4BEG, inOut: output, wires: 4, terminal: false},
+  {side: WEST, name: WW4END, inOut: input, wires: 4, terminal: false},
+  {side: WEST, name: W6BEG, inOut: output, wires: 2, terminal: false},
+  {side: WEST, name: W6END, inOut: input, wires: 2, terminal: false}
+]
+
+WIRES: [
+  # North connections
+  {source_name: N1BEG, X-offset: 0, Y-offset: -1, destination_name: N1END, wires: 4},
+  {source_name: N2BEG, X-offset: 0, Y-offset: -1, destination_name: N2MID, wires: 8},
+  {source_name: N2BEGb, X-offset: 0, Y-offset: -1, destination_name: N2END, wires: 8},
+  {source_name: N4BEG, X-offset: 0, Y-offset: -4, destination_name: N4END, wires: 4},
+  {source_name: NN4BEG, X-offset: 0, Y-offset: -4, destination_name: NN4END, wires: 4},
+  
+  # East connections
+  {source_name: E1BEG, X-offset: 1, Y-offset: 0, destination_name: E1END, wires: 4},
+  {source_name: E2BEG, X-offset: 1, Y-offset: 0, destination_name: E2MID, wires: 8},
+  {source_name: E2BEGb, X-offset: 1, Y-offset: 0, destination_name: E2END, wires: 8},
+  {source_name: EE4BEG, X-offset: 4, Y-offset: 0, destination_name: EE4END, wires: 4},
+  {source_name: E6BEG, X-offset: 6, Y-offset: 0, destination_name: E6END, wires: 2},
+  
+  # South connections
+  {source_name: S1BEG, X-offset: 0, Y-offset: 1, destination_name: S1END, wires: 4},
+  {source_name: S2BEG, X-offset: 0, Y-offset: 1, destination_name: S2MID, wires: 8},
+  {source_name: S2BEGb, X-offset: 0, Y-offset: 1, destination_name: S2END, wires: 8},
+  {source_name: S4BEG, X-offset: 0, Y-offset: 4, destination_name: S4END, wires: 4},
+  {source_name: SS4BEG, X-offset: 0, Y-offset: 4, destination_name: SS4END, wires: 4},
+  
+  # West connections
+  {source_name: W1BEG, X-offset: -1, Y-offset: 0, destination_name: W1END, wires: 4},
+  {source_name: W2BEG, X-offset: -1, Y-offset: 0, destination_name: W2MID, wires: 8},
+  {source_name: W2BEGb, X-offset: -1, Y-offset: 0, destination_name: W2END, wires: 8},
+  {source_name: WW4BEG, X-offset: -4, Y-offset: 0, destination_name: WW4END, wires: 4},
+  {source_name: W6BEG, X-offset: -6, Y-offset: 0, destination_name: W6END, wires: 2},
+  
+  # Jump connections
+  {source_name: J2MID_ABa_BEG, X-offset: 0, Y-offset: 0, destination_name: J2MID_ABa_END, wires: 4},
+  {source_name: J2MID_CDa_BEG, X-offset: 0, Y-offset: 0, destination_name: J2MID_CDa_END, wires: 4},
+  {source_name: J2MID_EFa_BEG, X-offset: 0, Y-offset: 0, destination_name: J2MID_EFa_END, wires: 4},
+  {source_name: J2MID_GHa_BEG, X-offset: 0, Y-offset: 0, destination_name: J2MID_GHa_END, wires: 4},
+  {source_name: J2MID_ABb_BEG, X-offset: 0, Y-offset: 0, destination_name: J2MID_ABb_END, wires: 4},
+  {source_name: J2MID_CDb_BEG, X-offset: 0, Y-offset: 0, destination_name: J2MID_CDb_END, wires: 4},
+  {source_name: J2MID_EFb_BEG, X-offset: 0, Y-offset: 0, destination_name: J2MID_EFb_END, wires: 4},
+  {source_name: J2MID_GHb_BEG, X-offset: 0, Y-offset: 0, destination_name: J2MID_GHb_END, wires: 4},
+  {source_name: J2END_AB_BEG, X-offset: 0, Y-offset: 0, destination_name: J2END_AB_END, wires: 4},
+  {source_name: J2END_CD_BEG, X-offset: 0, Y-offset: 0, destination_name: J2END_CD_END, wires: 4},
+  {source_name: J2END_EF_BEG, X-offset: 0, Y-offset: 0, destination_name: J2END_EF_END, wires: 4},
+  {source_name: J2END_GH_BEG, X-offset: 0, Y-offset: 0, destination_name: J2END_GH_END, wires: 4},
+  {source_name: JN2BEG, X-offset: 0, Y-offset: 0, destination_name: JN2END, wires: 8},
+  {source_name: JE2BEG, X-offset: 0, Y-offset: 0, destination_name: JE2END, wires: 8},
+  {source_name: JS2BEG, X-offset: 0, Y-offset: 0, destination_name: JS2END, wires: 8},
+  {source_name: JW2BEG, X-offset: 0, Y-offset: 0, destination_name: JW2END, wires: 8},
+  {source_name: J_l_AB_BEG, X-offset: 0, Y-offset: 0, destination_name: J_l_AB_END, wires: 4},
+  {source_name: J_l_CD_BEG, X-offset: 0, Y-offset: 0, destination_name: J_l_CD_END, wires: 4},
+  {source_name: J_l_EF_BEG, X-offset: 0, Y-offset: 0, destination_name: J_l_EF_END, wires: 4},
+  {source_name: J_l_GH_BEG, X-offset: 0, Y-offset: 0, destination_name: J_l_GH_END, wires: 4},
+]

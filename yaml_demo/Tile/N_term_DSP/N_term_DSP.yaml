@@ -1,0 +1,18 @@
+TILE: N_term_DSP
+PORTS: [
+  # North ports (inputs)
+  {side: NORTH, name: N1END, inOut: input, wires: 4, terminal: false},
+  {side: NORTH, name: N2MID, inOut: input, wires: 8, terminal: false},
+  {side: NORTH, name: N2END, inOut: input, wires: 8, terminal: false},
+  {side: NORTH, name: N4END, inOut: input, wires: 4, terminal: false},
+  {side: NORTH, name: NN4END, inOut: input, wires: 4, terminal: false},
+
+  # South ports (outputs)
+  {side: SOUTH, name: S1BEG, inOut: output, wires: 4, terminal: false},
+  {side: SOUTH, name: S2BEG, inOut: output, wires: 8, terminal: false},
+  {side: SOUTH, name: S2BEGb, inOut: output, wires: 8, terminal: false},
+  {side: SOUTH, name: S4BEG, inOut: output, wires: 4, terminal: false},
+  {side: SOUTH, name: SS4BEG, inOut: output, wires: 4, terminal: false}
+]
+
+MATRIX: ./N_term_DSP_switch_matrix.list

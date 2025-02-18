@@ -1,0 +1,42 @@
+FABRIC: [
+  [None,  N_term_single, N_term_single, N_term_single2, N_term_single, N_term_single, N_term_RAM_IO],
+  [W_IO,  LUT4AB,        LUT4AB,        RegFile,        LUT4AB,        LUT4AB,        RAM_IO       ],
+  [W_IO,  LUT4AB,        LUT4AB,        RegFile,        LUT4AB,        LUT4AB,        RAM_IO       ],
+  [W_IO,  LUT4AB,        LUT4AB,        RegFile,        LUT4AB,        LUT4AB,        RAM_IO       ],
+  [W_IO,  LUT4AB,        LUT4AB,        RegFile,        LUT4AB,        LUT4AB,        RAM_IO       ],
+  [W_IO,  LUT4AB,        LUT4AB,        RegFile,        LUT4AB,        LUT4AB,        RAM_IO       ],
+  [W_IO,  LUT4AB,        LUT4AB,        RegFile,        LUT4AB,        LUT4AB,        RAM_IO       ],
+  [W_IO,  LUT4AB,        LUT4AB,        RegFile,        LUT4AB,        LUT4AB,        RAM_IO       ],
+  [W_IO,  LUT4AB,        LUT4AB,        RegFile,        LUT4AB,        LUT4AB,        RAM_IO       ],
+  [W_IO,  LUT4AB,        LUT4AB,        RegFile,        LUT4AB,        LUT4AB,        RAM_IO       ],
+  [W_IO,  LUT4AB,        LUT4AB,        RegFile,        LUT4AB,        LUT4AB,        RAM_IO       ],
+  [W_IO,  LUT4AB,        LUT4AB,        RegFile,        LUT4AB,        LUT4AB,        RAM_IO       ],
+  [W_IO,  LUT4AB,        LUT4AB,        RegFile,        LUT4AB,        LUT4AB,        RAM_IO       ],
+  [W_IO,  LUT4AB,        LUT4AB,        RegFile,        LUT4AB,        LUT4AB,        RAM_IO       ],
+  [W_IO,  LUT4AB,        LUT4AB,        RegFile,        LUT4AB,        LUT4AB,        RAM_IO       ],
+  [None,  S_term_single, S_term_single, S_term_single2, S_term_single, S_term_single, S_term_RAM_IO]
+]
+
+PARAM: {
+  Name: eFPGA,
+  ConfigBitMode: frame_based,
+  GenerateDelayInSwitchMatrix: 80,
+  MultiplexerStyle: custom
+}
+
+TILES: {
+  Tile: ./Tile/LUT4AB/LUT4AB.yaml,
+  Tile: ./Tile/N_term_single/N_term_single.yaml,
+  Tile: ./Tile/S_term_single/S_term_single.yaml,
+  Tile: ./Tile/RAM_IO/RAM_IO.yaml,
+  Tile: ./Tile/N_term_RAM_IO/N_term_RAM_IO.yaml,
+  Tile: ./Tile/S_term_RAM_IO/S_term_RAM_IO.yaml,
+  Tile: ./Tile/RegFile/RegFile.yaml,
+  Tile: ./Tile/N_term_single2/N_term_single2.yaml,
+  Tile: ./Tile/S_term_single2/S_term_single2.yaml,
+  Tile: ./Tile/W_IO/W_IO.yaml,
+  Tile: ./Tile/DSP/DSP_top/DSP_top.yaml,
+  Tile: ./Tile/DSP/DSP_bot/DSP_bot.yaml,
+  Tile: ./Tile/N_term_DSP/N_term_DSP.yaml,
+  Tile: ./Tile/S_term_DSP/S_term_DSP.yaml
+}

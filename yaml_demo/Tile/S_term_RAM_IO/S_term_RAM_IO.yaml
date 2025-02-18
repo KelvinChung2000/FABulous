@@ -1,0 +1,16 @@
+TILE: S_term_RAM_IO
+PORTS: [
+  # North ports (outputs)
+  {side: NORTH, name: N1BEG, inOut: output, wires: 4, terminal: false},
+  {side: NORTH, name: N2BEG, inOut: output, wires: 8, terminal: false},
+  {side: NORTH, name: N2BEGb, inOut: output, wires: 8, terminal: false},
+  {side: NORTH, name: N4BEG, inOut: output, wires: 4, terminal: false},
+
+  # South ports (inputs)
+  {side: SOUTH, name: S1END, inOut: input, wires: 4, terminal: false},
+  {side: SOUTH, name: S2MID, inOut: input, wires: 8, terminal: false},
+  {side: SOUTH, name: S2END, inOut: input, wires: 8, terminal: false},
+  {side: SOUTH, name: S4END, inOut: input, wires: 4, terminal: false}
+]
+
+MATRIX: ./S_term_RAM_IO_switch_matrix.list

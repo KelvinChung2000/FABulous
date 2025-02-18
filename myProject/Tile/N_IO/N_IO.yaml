@@ -2,10 +2,10 @@ TILE: N_IO
 # {side: <>, source_name: <>, X-offset: <>, Y-offset: <>, destination_name: <>, wires: <>}
 INCLUDE:
 PORTS: [
-    {side: NORTH, name: out0, inOut: output, wires: 32, terminal: true},
-    {side: NORTH, name: in0, inOut: input, wires: 32, terminal: true},
+    # {side: NORTH, name: out0, inOut: output, wires: 32, terminal: true},
+    # {side: NORTH, name: in0, inOut: input, wires: 32, terminal: true},
 
-    {side: SOUTH, name: in2, inOut: input, wires: 32, terminal: true},
+    {side: SOUTH, name: in2, inOut: input, wires: 32, terminal: false},
     {side: SOUTH, name: out2, inOut: output, wires: 32, terminal: false},
   ]
 WIRES: [

@@ -29,7 +29,7 @@ PARAM: {
   GenerateDelayInSwitchMatrix: 80,
   MultiplexerStyle: custom, #custom or generic
   SuperTileEnable: True, #True,False
-  ContextCount: 4
+  ContextCount: 1
 }
 
 TILES: {

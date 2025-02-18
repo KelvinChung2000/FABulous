@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, cast
 
@@ -35,9 +35,9 @@ class Tile:
     name: str
     ports: list[TilePort]
     bels: list[Bel]
-    wireTypes: list[WireType]
     switchMatrix: SwitchMatrix
     configMems: ConfigurationMemory
+    wireTypes: list[WireType] = field(default_factory=list)
     globalConfigBits: int = 0
     withUserCLK: bool = False
     tileDir: Path = Path(".")
@@ -182,3 +182,14 @@ class Tile:
             raise ValueError(
                 f"The given port {port} does not exist in tile {self.name}"
             )
+
+    def findPortByName(self, portName: str) -> TilePort:
+        for i in self.ports:
+            if i.name == portName:
+                return i
+        else:
+            raise ValueError(f"The port {portName} does not exist in tile {self.name}")
+
+    def addWireType(self, wireType: WireType) -> None:
+        if wireType not in self.wireTypes:
+            self.wireTypes.append(wireType)

@@ -70,7 +70,7 @@ class Fabric:
     numberOfBRAMs: int = 10
     superTileEnable: bool = True
 
-    tiles: list[list[Tile]] = field(default_factory=list)
+    tiles: list[list[str]] = field(default_factory=list)
     tileDict: dict[str, Tile] = field(default_factory=dict)
     superTileDict: dict[str, SuperTile] = field(default_factory=dict)
     wireDict: dict[Loc, list[Wire]] = field(default_factory=dict)
@@ -129,14 +129,19 @@ class Fabric:
         for row in self.tiles:
             for tile in row:
                 if tile is not None:
-                    tileCountDict[tile.name] += 1
+                    tileCountDict[tile] += 1
 
         return sum(
             len(self.getTileByName(tile).bels) * count
             for tile, count in tileCountDict.items()
         )
 
-    def getFlattenFabric(self) -> Generator[tuple[Loc, Tile], None, None]:
+    def __iter__(self) -> Generator[tuple[Loc, Tile | None], None, None]:
         for y, row in enumerate(self.tiles):
             for x, tile in enumerate(row):
-                yield ((x, y), tile)
+                yield ((x, y), self.tileDict.get(tile, None))
+
+    def getFlattenFabric(self) -> Generator[tuple[Loc, Tile | None], None, None]:
+        for y, row in enumerate(self.tiles):
+            for x, tile in enumerate(row):
+                yield ((x, y), self.tileDict.get(tile, None))

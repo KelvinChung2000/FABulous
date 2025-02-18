@@ -24,65 +24,78 @@ def genSwitchMatrix(tile: Tile, tileType: TileType, context=1):
     if not isinstance(tile.switchMatrix, SwitchMatrix):
         raise ValueError("Switch matrix is not a SwitchMatrix object")
 
-    outportName = set([p for p in tile.ports if p.ioDirection == IO.OUTPUT])
+    outPorts = set([p for p in tile.ports if p.ioDirection == IO.OUTPUT])
     zIn = 0
     zOut = 0
     for c in range(context):
         for i, w in enumerate(tile.wireTypes):
-            for wc in range(w.sourcePort.wireCount):
-                tileType.create_wire(f"{c}_{w.sourcePort.name}[{wc}]", "src", z=i)
             for wc in range(w.destinationPort.wireCount):
                 tileType.create_wire(f"{c}_{w.destinationPort.name}[{wc}]", "dst", z=i)
-            if w.destinationPort in outportName:
-                for wc in range(w.sourcePort.wireCount):
-                    tileType.create_wire(
-                        f"{c}_{w.destinationPort.name}_internal[{wc}]",
-                        "dst_internal",
-                        z=i,
-                    )
+
+            for wc in range(w.sourcePort.wireCount):
+                tileType.create_wire(f"{c}_{w.sourcePort.name}[{wc}]", "src", z=i)
+                if w.sourcePort in outPorts:
+                    for wc in range(w.sourcePort.wireCount):
+                        tileType.create_wire(
+                            f"{c}_{w.sourcePort.name}_internal[{wc}]",
+                            "src_internal",
+                            z=i,
+                        )
+        for p in tile.ports:
+            for wc in range(p.wireCount):
+                tileType.create_wire(f"{c}_{p.name}[{wc}]", z=zIn)
+            zIn += 1
 
         for mux in tile.switchMatrix.muxes:
-            tileType.create_wire(f"{c}_{mux.output.name}")
-            if mux.output.name in outportName:
+            for wc in range(mux.output.wireCount):
+                tileType.create_wire(f"{c}_{mux.output.name}[{wc}]")
+            if mux.output in outPorts:
                 for i in mux.inputs:
-                    tileType.create_pip(
-                        f"{c}_{i.name}", f"{c}_{mux.output.name}_internal"
-                    )
-                    tileType.create_pip(
-                        f"{c}_{mux.output.name}_internal",
-                        f"{c}_{mux.output.name}",
-                    )
+                    for wc in range(i.wireCount):
+                        tileType.create_pip(
+                            f"{c}_{i.name}[{wc}]",
+                            f"{c}_{mux.output.name}_internal[{wc}]",
+                        )
+                        tileType.create_pip(
+                            f"{c}_{mux.output.name}_internal[{wc}]",
+                            f"{c}_{mux.output.name}[{wc}]",
+                        )
             else:
-                print(mux)
                 for i in mux.inputs:
-                    tileType.create_pip(f"{c}_{i.name}", f"{c}_{mux.output.name}")
+                    for wc in range(i.wireCount):
+                        tileType.create_wire(
+                            f"{c}_{i.name}[{wc}]", f"{c}_{mux.output.name}"
+                        )
 
     zOut = 0
     for c in range(context - 1):
         for i, p in enumerate(sorted(tile.getTileOutputPorts())):
-            tileType.create_wire(
-                f"{p.name}_{c}_to_{c+1}_NextCycle", "NextCycle", z=zOut
-            )
+            for wc in range(p.wireCount):
+                tileType.create_wire(
+                    f"{p.name}_{c}_to_{c+1}_NextCycle[{wc}]", "NextCycle", z=zOut
+                )
             zOut += 1
 
     for c in range(context - 1):
         for mux in tile.switchMatrix.muxes:
-            if mux.output in outportName:
-                tileType.create_pip(
-                    f"{c}_{mux.output}_internal",
-                    f"{mux.output}_{c}_to_{c+1}_NextCycle",
-                )
-                tileType.create_pip(
-                    f"{mux.output}_{c}_to_{c+1}_NextCycle",
-                    f"{c+1}_{mux.output}",
-                )
+            if mux.output in outPorts:
+                for wc in range(mux.output.wireCount):
+                    tileType.create_pip(
+                        f"{c}_{mux.output.name}_internal[{wc}]",
+                        f"{mux.output.name}_{c}_to_{c+1}_NextCycle[{wc}]",
+                    )
+                    tileType.create_pip(
+                        f"{mux.output.name}_{c}_to_{c+1}_NextCycle[{wc}]",
+                        f"{c+1}_{mux.output.name}[{wc}]",
+                    )
 
     for c in range(context - 2):
         for i, p in enumerate(sorted(tile.getTileOutputPorts())):
-            tileType.create_pip(
-                f"{p.name}_{c}_to_{c+1}_NextCycle",
-                f"{p.name}_{c+1}_to_{c+2}_NextCycle",
-            )
+            for wc in range(p.wireCount):
+                tileType.create_pip(
+                    f"{p.name}_{c}_to_{c+1}_NextCycle[{wc}]",
+                    f"{p.name}_{c+1}_to_{c+2}_NextCycle[{wc}]",
+                )
 
 
 def genBel(bels: list[Bel], tile: TileType, context=1):
@@ -91,11 +104,15 @@ def genBel(bels: list[Bel], tile: TileType, context=1):
         for z, bel in enumerate(bels):
             for i in bel.externalInputs + bel.inputs:
                 for wc in range(i.wireCount):
-                    tile.create_wire(f"{c}_{i.prefix}{i.name}[{wc}]", f"{bel.name}_{i.name}")
+                    tile.create_wire(
+                        f"{c}_{i.prefix}{i.name}[{wc}]", f"{bel.name}_{i.name}"
+                    )
 
             for i in bel.externalOutputs + bel.outputs:
                 for wc in range(i.wireCount):
-                    tile.create_wire(f"{c}_{i.prefix}{i.name}[{wc}]", f"{bel.name}_{i.name}")
+                    tile.create_wire(
+                        f"{c}_{i.prefix}{i.name}[{wc}]", f"{bel.name}_{i.name}"
+                    )
 
             if bel.userCLK:
                 tile.create_wire(f"{c}_{bel.prefix}{bel.name}_{bel.userCLK.name}")
@@ -155,18 +172,19 @@ def genFabric(fabric: Fabric, chip: Chip, context=1):
             continue
         for c in range(context):
             for wire in wires:
-                node = [
-                    NodeWire(
-                        x,
-                        fabric.numberOfRows - y - 1,
-                        f"{c}_{wire.source.name}",
-                    ),
-                    NodeWire(
-                        x + wire.xOffset,
-                        fabric.numberOfRows - y - 1 - wire.yOffset,
-                        f"{c}_{wire.destination.name}",
-                    ),
-                ]
+                for i in range(wire.source.wireCount):
+                    node = [
+                        NodeWire(
+                            x,
+                            fabric.numberOfRows - y - 1,
+                            f"{c}_{wire.source.name}[{i}]",
+                        ),
+                        NodeWire(
+                            x + wire.xOffset,
+                            fabric.numberOfRows - y - 1 - wire.yOffset,
+                            f"{c}_{wire.destination.name}[{i}]",
+                        ),
+                    ]
                 chip.add_node(node)
     setTiming(chip)
 
@@ -218,14 +236,20 @@ def generateChipDatabase(fabric: Fabric, filePath: Path, baseConstIdsPath: Path)
     logger.info("Generating the chip database")
     ch.create_tile_type("NULL")
 
-    for i in range(fabric.numberOfRows):
-        for j in range(fabric.numberOfColumns):
-            if fabric.tiles[i][j] is not None:
-                ch.set_tile_type(
-                    j, fabric.numberOfRows - i - 1, fabric.tiles[i][j].name
-                )
-            else:
-                ch.set_tile_type(j, fabric.numberOfRows - i - 1, "NULL")
+    for (x, y), tile in fabric:
+        if tile is not None:
+            ch.set_tile_type(x, fabric.numberOfRows - y - 1, tile.name)
+        else:
+            ch.set_tile_type(x, fabric.numberOfRows - y - 1, "NULL")
+
+    # for i in range(fabric.numberOfRows):
+    #     for j in range(fabric.numberOfColumns):
+    #         if fabric.tiles[i][j] is not None:
+    #             ch.set_tile_type(
+    #                 j, fabric.numberOfRows - i - 1, fabric.tiles[i][j].name
+    #             )
+    #         else:
+    #             ch.set_tile_type(j, fabric.numberOfRows - i - 1, "NULL")
 
     genFabric(fabric, ch, context=fabric.contextCount)
 

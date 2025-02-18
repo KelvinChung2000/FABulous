@@ -153,10 +153,13 @@ class SwitchMatrix:
     #     for mux in muxList:
     #         self.addMux(mux.name, list(mux.inputs), mux.output)
 
+    def __repr__(self) -> str:
+        return f"SwitchMatrix({self.muxesDict.values()=}, configBits={self.configBits})"
+
     @property
     def muxes(self) -> list[Mux]:
         return list(self.muxesDict.values())
-    
+
     def __getitem__(self, key: GenericPort):
         if key in self.muxesDict:
             return self.muxesDict[key]

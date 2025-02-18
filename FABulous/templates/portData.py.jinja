@@ -21,6 +21,9 @@ class {{ tileName }}_ports:
 
     {%- endfor %}
 
+        self.GND = MuxPort(Port(name="gnd", ioDirection=IO.OUTPUT, wireCount=1, isBus=False), bitWidth=1)
+        self.VCC = MuxPort(Port(name="vcc", ioDirection=IO.OUTPUT, wireCount=1, isBus=False), bitWidth=1)
+
     def NewWire(self, srcName: str, dstName: str, wireCount: int) -> tuple[MuxPort, MuxPort]:
         portSrc = MuxPort(Port(name=srcName, ioDirection=IO.INPUT, wireCount=wireCount, isBus=False), bitWidth=wireCount, isCreated=True)
         setattr(self, srcName, portSrc)

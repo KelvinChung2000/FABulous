@@ -63,6 +63,9 @@ def genSwitchMatrix(tileName: str, tileDir: Path) -> SwitchMatrix:
         if i.isBelPort and i.port.ioDirection == IO.OUTPUT:
             continue
 
+        if not i.inputs:
+            continue
+
         m = Mux(i.port.name, [p.port for p in i.inputs], i.port)
         sm.addMux(m)
 

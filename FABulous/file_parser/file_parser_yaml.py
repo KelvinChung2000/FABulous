@@ -1,12 +1,18 @@
 import re
-from copy import deepcopy
+from collections import defaultdict
 from pathlib import Path
 
 import yaml
 from loguru import logger
 
 from FABulous.fabric_definition.Bel import Bel
-from FABulous.fabric_definition.define import IO, ConfigBitMode, MultiplexerStyle, Side
+from FABulous.fabric_definition.define import (
+    IO,
+    ConfigBitMode,
+    Loc,
+    MultiplexerStyle,
+    Side,
+)
 from FABulous.fabric_definition.Fabric import Fabric
 from FABulous.fabric_definition.Port import TilePort
 from FABulous.fabric_definition.SwitchMatrix import Mux
@@ -24,6 +30,8 @@ oppositeDic = {
     "JUMP": "ANY",
 }
 
+WireInfo = dict
+
 
 def parseFabricYAML(fileName: Path) -> Fabric:
     fileName = Path(fileName)
@@ -40,18 +48,16 @@ def parseFabricYAML(fileName: Path) -> Fabric:
 
     filePath = fileName.parent
 
-    tileTypes = []
-    tileDefs = []
+    tileDict: dict[str, Tile] = {}
+    wireDictUnprocessed: dict[str, dict] = {}
 
     for i in data["TILES"]:
-        new_tile = parseTileYAML(filePath.joinpath(i))
-        tileTypes.append(new_tile.name)
-        tileDefs.append(new_tile)
-
-    tileDic = dict(zip(tileTypes, tileDefs))
+        newTile, wireInfo = parseTileYAML(filePath.joinpath(i))
+        tileDict[newTile.name] = newTile
+        wireDictUnprocessed[newTile.name] = wireInfo
 
     # TODO: parse supertiles
-    superTileDic = {}
+    superTileDict = {}
     # new_supertiles = parseSupertiles(fName, tileDic)
     # for new_supertile in new_supertiles:
     #     superTileDic[new_supertile.name] = new_supertile
@@ -71,12 +77,12 @@ def parseFabricYAML(fileName: Path) -> Fabric:
     superTileEnable = param.get("SuperTileEnable", True)
 
     usedTile = set()
-    fabricTiles: list[list[Tile]] = []
+    fabricTiles: list[list[str | None]] = []
     for row in data["FABRIC"]:
         fabricLine = []
         for i in row:
-            if i in tileDic:
-                fabricLine.append(deepcopy(tileDic[i]))
+            if i in tileDict:
+                fabricLine.append(i)
                 usedTile.add(i)
             elif i == "Null" or i == "NULL" or i == "None":
                 fabricLine.append(None)
@@ -85,50 +91,89 @@ def parseFabricYAML(fileName: Path) -> Fabric:
                 raise ValueError
         fabricTiles.append(fabricLine)
 
-    for i in list(tileDic.keys()):
+    for i in list(tileDict.keys()):
         if i not in usedTile:
             logger.info(
                 f"Tile {i} is not used in the fabric. Removing from tile dictionary."
             )
-            del tileDic[i]
-    for i in list(superTileDic.keys()):
-        if any(j.name not in usedTile for j in superTileDic[i].tiles):
+            del tileDict[i]
+    for i in list(superTileDict.keys()):
+        if any(j.name not in usedTile for j in superTileDict[i].tiles):
             logger.info(
                 f"Supertile {i} is not used in the fabric. Removing from tile dictionary."
             )
-            del superTileDic[i]
+            del superTileDict[i]
 
     height = len(fabricTiles)
     width = len(fabricTiles[0])
 
-    wireDict = {}
+    wireDict: dict[Loc, list[Wire]] = defaultdict(list)
     for y, row in enumerate(fabricTiles):
-        for x, tile in enumerate(row):
-            wires = []
-            if tile is None:
+        for x, tileName in enumerate(row):
+
+            # TODO add empty tile that have contains crossing wires
+            if tileName is None:
                 continue
-            for wireType in tile.wireTypes:
-                if (
-                    wireType.sourcePort.ioDirection != IO.OUTPUT
-                    and wireType.destinationPort.ioDirection != IO.INPUT
-                ):
+
+            for wireEntry in wireDictUnprocessed[tileName]:
+
+                tx = int(wireEntry["X-offset"])
+                ty = int(wireEntry["Y-offset"])
+
+                sourcePort: TilePort = tileDict[tileName].findPortByName(
+                    wireEntry["source_name"]
+                )
+                destinationPort: TilePort = tileDict[
+                    fabricTiles[y + ty][x + tx]
+                ].findPortByName(wireEntry["destination_name"])
+
+                if tx != 0 and ty != 0 and tx != ty:
                     logger.error(
-                        f"Wire {wireType} must be an output port as source_name and input port as destination_name ."
+                        f"Invalid wire offset detected: source port '{sourcePort.name}' to destination port '{destinationPort.name}' "
+                        f"has an offset of X={tx}, Y={ty}. The offset must be either only in the X direction, only in the Y direction, "
+                        "or both X and Y must be the same for diagonal."
+                    )
+                    raise ValueError
+                if sourcePort.wireCount != destinationPort.wireCount:
+                    logger.error(
+                        f"Port {sourcePort.name} and {destinationPort.name} must have the same wire count."
                     )
                     raise ValueError
 
-                wires.append(
+                spanning = False
+                if abs(x) + abs(y) > 1 and x != y:
+                    wireCount = sourcePort.wireCount * (abs(x) + abs(y))
+                    spanning = True
+                elif x == y:
+                    wireCount = sourcePort.wireCount * abs(x)
+                    spanning = True
+                else:
+                    wireCount = sourcePort.wireCount
+
+                wireDict[(x, y)].append(
                     Wire(
-                        source=wireType.sourcePort,
-                        destination=wireType.destinationPort,
-                        xOffset=wireType.offsetX,
-                        yOffset=wireType.offsetY,
+                        source=sourcePort,
+                        xOffset=tx,
+                        yOffset=ty,
+                        destination=destinationPort,
                         sourceTile=f"X{x}Y{y}",
-                        destinationTile=f"X{x + wireType.offsetX}Y{y + wireType.offsetY}",
-                        wireCount=wireType.wireCount,
+                        destinationTile=f"X{x + tx}Y{y + ty}",
+                        wireCount=wireCount,
                     )
                 )
-            wireDict[(x, y)] = wires
+                tileDict[tileName].addWireType(
+                    WireType(
+                        sourcePort=sourcePort,
+                        destinationPort=destinationPort,
+                        offsetX=wireEntry["X-offset"],
+                        offsetY=wireEntry["Y-offset"],
+                        wireCount=sourcePort.wireCount,
+                        cascadeWireCount=wireCount,
+                        spanning=spanning,
+                    )
+                )
+
+    logger.info("Fabric YAML parsed successfully.")
 
     return Fabric(
         name=name,
@@ -147,8 +192,8 @@ def parseFabricYAML(fileName: Path) -> Fabric:
         multiplexerStyle=multiplexerStyle,
         numberOfBRAMs=int(height / 2),
         superTileEnable=superTileEnable,
-        tileDict=tileDic,
-        superTileDict=superTileDic,
+        tileDict=tileDict,
+        superTileDict=superTileDict,
         wireDict=wireDict,
     )
 
@@ -180,7 +225,7 @@ def parseMatrixAsMux(fileName: Path, tileName: str) -> dict[str, Mux]:
     return connectionsDic
 
 
-def parseTileYAML(fileName: Path) -> Tile:
+def parseTileYAML(fileName: Path) -> tuple[Tile, WireInfo]:
     """Parses a yaml tile configuration file and returns all tile objects.
 
     Args:
@@ -206,7 +251,6 @@ def parseTileYAML(fileName: Path) -> Tile:
     tileName = data["TILE"]
     portsDict: dict[str, TilePort] = {}
     bels: list[Bel] = []
-    wires: list[WireType] = []
     matrixDir: Path | None = None
     withUserCLK = False
     configBit = 0
@@ -224,68 +268,67 @@ def parseTileYAML(fileName: Path) -> Tile:
                 terminal=portEntry.get("terminal", False),
             )
         else:
-            for i in range(int(portEntry["wires"])):
-                portsDict[f"{portEntry["name"]}{i}"] = TilePort(
-                    wireCount=int(portEntry["wires"]),
-                    name=portEntry["name"],
-                    ioDirection=IO[portEntry["inOut"].upper()],
-                    sideOfTile=Side[portEntry["side"].upper()],
-                    isBus=portEntry.get("isBus", False),
-                    terminal=portEntry.get("terminal", False),
-                )
+            portsDict[f"{portEntry["name"]}"] = TilePort(
+                wireCount=int(portEntry["wires"]),
+                name=portEntry["name"],
+                ioDirection=IO[portEntry["inOut"].upper()],
+                sideOfTile=Side[portEntry["side"].upper()],
+                isBus=portEntry.get("isBus", False),
+                terminal=portEntry.get("terminal", False),
+            )
 
         if not portEntry.get("terminal", False):
             normalPorts.add(portEntry["name"])
 
-    for wireEntry in data.get("WIRES", {}):
-        sourcePort = portsDict[wireEntry["source_name"]]
-        destinationPort = portsDict[wireEntry["destination_name"]]
-        x = wireEntry["X-offset"]
-        y = wireEntry["Y-offset"]
-        if x != 0 and y != 0 and x != y:
-            logger.error(
-                f"Invalid wire offset detected: source port '{sourcePort.name}' to destination port '{destinationPort.name}' "
-                f"has an offset of X={x}, Y={y}. The offset must be either only in the X direction, only in the Y direction, "
-                "or both X and Y must be the same for diagonal."
-            )
-            raise ValueError
-        if sourcePort.wireCount != destinationPort.wireCount:
-            logger.error(
-                f"Port {sourcePort.name} and {destinationPort.name} must have the same wire count."
-            )
-            raise ValueError
+    # for wireEntry in data.get("WIRES", {}):
+    #     sourcePort = portsDict[wireEntry["source_name"]]
+    #     destinationPort = portsDict[wireEntry["destination_name"]]
+    #     x = wireEntry["X-offset"]
+    #     y = wireEntry["Y-offset"]
+    #     if x != 0 and y != 0 and x != y:
+    #         logger.error(
+    #             f"Invalid wire offset detected: source port '{sourcePort.name}' to destination port '{destinationPort.name}' "
+    #             f"has an offset of X={x}, Y={y}. The offset must be either only in the X direction, only in the Y direction, "
+    #             "or both X and Y must be the same for diagonal."
+    #         )
+    #         raise ValueError
+    #     if sourcePort.wireCount != destinationPort.wireCount:
+    #         logger.error(
+    #             f"Port {sourcePort.name} and {destinationPort.name} must have the same wire count."
+    #         )
+    #         raise ValueError
 
-        spanning = False
-        if abs(x) + abs(y) > 1 and x != y:
-            wireCount = sourcePort.wireCount * (abs(x) + abs(y))
-            spanning = True
-        elif x == y:
-            wireCount = sourcePort.wireCount * abs(x)
-            spanning = True
-        else:
-            wireCount = sourcePort.wireCount
+    #     spanning = False
+    #     if abs(x) + abs(y) > 1 and x != y:
+    #         wireCount = sourcePort.wireCount * (abs(x) + abs(y))
+    #         spanning = True
+    #     elif x == y:
+    #         wireCount = sourcePort.wireCount * abs(x)
+    #         spanning = True
+    #     else:
+    #         wireCount = sourcePort.wireCount
 
-        wires.append(
-            WireType(
-                sourcePort=sourcePort,
-                destinationPort=destinationPort,
-                offsetX=wireEntry["X-offset"],
-                offsetY=wireEntry["Y-offset"],
-                wireCount=sourcePort.wireCount,
-                cascadeWireCount=wireCount,
-                spanning=spanning,
-            )
-        )
+    #     wires.append(
+    #         WireType(
+    #             sourcePort=sourcePort,
+    #             destinationPort=destinationPort,
+    #             offsetX=wireEntry["X-offset"],
+    #             offsetY=wireEntry["Y-offset"],
+    #             wireCount=sourcePort.wireCount,
+    #             cascadeWireCount=wireCount,
+    #             spanning=spanning,
+    #         )
+    #     )
 
-        normalPorts.discard(wireEntry["source_name"])
-        normalPorts.discard(wireEntry["destination_name"])
+    #     normalPorts.discard(wireEntry["source_name"])
+    #     normalPorts.discard(wireEntry["destination_name"])
 
-    # if the normal port still have things mean some port do not have a connection
-    if normalPorts:
-        logger.error(
-            f"Port {normalPorts} does not have a connection, when defined as non terminal."
-        )
-        raise ValueError
+    # # if the normal port still have things mean some port do not have a connection
+    # if normalPorts:
+    #     logger.error(
+    #         f"Port {normalPorts} does not have a connection, when defined as non terminal."
+    #     )
+    #     raise ValueError
 
     bels = []
     for belEntry in data["BELS"]:
@@ -368,13 +411,12 @@ def parseTileYAML(fileName: Path) -> Tile:
         name=tileName,
         ports=list(portsDict.values()),
         bels=bels,
-        wireTypes=wires,
         switchMatrix=sm,
         configMems=configMems,
         globalConfigBits=configBit,
         withUserCLK=withUserCLK,
         tileDir=fileName,
-    )
+    ), data.get("WIRES", {})
 
 
 def parseConfigMem(

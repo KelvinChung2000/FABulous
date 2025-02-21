@@ -11,7 +11,7 @@
         "FABulous": 1,
         "dynports": 1,
         "cells_not_processed": 1,
-        "src": "demo/Tile/RAM_IO/OutPass4_frame_config_mux.v:23.1-82.10"
+        "src": "yaml_demo/Tile/RAM_IO/OutPass4_frame_config_mux.v:23.1-82.10"
       },
       "parameter_default_values": {
         "NoConfigBits": 4
@@ -43,7 +43,7 @@
             "WIDTH": 4
           },
           "attributes": {
-            "src": "demo/Tile/RAM_IO/OutPass4_frame_config_mux.v:44.5-47.8"
+            "src": "yaml_demo/Tile/RAM_IO/OutPass4_frame_config_mux.v:44.5-47.8"
           },
           "port_directions": {
             "CLK": "input",
@@ -63,7 +63,7 @@
           },
           "attributes": {
             "module_not_derived": 1,
-            "src": "demo/Tile/RAM_IO/OutPass4_frame_config_mux.v:54.15-59.6"
+            "src": "yaml_demo/Tile/RAM_IO/OutPass4_frame_config_mux.v:54.15-59.6"
           },
           "connections": {
             "A0": [ 2 ],
@@ -79,7 +79,7 @@
           },
           "attributes": {
             "module_not_derived": 1,
-            "src": "demo/Tile/RAM_IO/OutPass4_frame_config_mux.v:61.15-66.6"
+            "src": "yaml_demo/Tile/RAM_IO/OutPass4_frame_config_mux.v:61.15-66.6"
           },
           "connections": {
             "A0": [ 3 ],
@@ -95,7 +95,7 @@
           },
           "attributes": {
             "module_not_derived": 1,
-            "src": "demo/Tile/RAM_IO/OutPass4_frame_config_mux.v:68.15-73.6"
+            "src": "yaml_demo/Tile/RAM_IO/OutPass4_frame_config_mux.v:68.15-73.6"
           },
           "connections": {
             "A0": [ 4 ],
@@ -111,7 +111,7 @@
           },
           "attributes": {
             "module_not_derived": 1,
-            "src": "demo/Tile/RAM_IO/OutPass4_frame_config_mux.v:75.15-80.6"
+            "src": "yaml_demo/Tile/RAM_IO/OutPass4_frame_config_mux.v:75.15-80.6"
           },
           "connections": {
             "A0": [ 5 ],
@@ -126,7 +126,7 @@
           "hide_name": 1,
           "bits": [ 2, 3, 4, 5 ],
           "attributes": {
-            "src": "demo/Tile/RAM_IO/OutPass4_frame_config_mux.v:44.5-47.8"
+            "src": "yaml_demo/Tile/RAM_IO/OutPass4_frame_config_mux.v:44.5-47.8"
           }
         },
         "ConfigBits": {
@@ -135,14 +135,14 @@
           "attributes": {
             "FABulous": 1,
             "GLOBAL": 1,
-            "src": "demo/Tile/RAM_IO/OutPass4_frame_config_mux.v:31.53-31.63"
+            "src": "yaml_demo/Tile/RAM_IO/OutPass4_frame_config_mux.v:31.53-31.63"
           }
         },
         "I": {
           "hide_name": 0,
           "bits": [ 2, 3, 4, 5 ],
           "attributes": {
-            "src": "demo/Tile/RAM_IO/OutPass4_frame_config_mux.v:26.17-26.18"
+            "src": "yaml_demo/Tile/RAM_IO/OutPass4_frame_config_mux.v:26.17-26.18"
           }
         },
         "O": {
@@ -151,14 +151,14 @@
           "attributes": {
             "EXTERNAL": 1,
             "FABulous": 1,
-            "src": "demo/Tile/RAM_IO/OutPass4_frame_config_mux.v:27.43-27.44"
+            "src": "yaml_demo/Tile/RAM_IO/OutPass4_frame_config_mux.v:27.43-27.44"
           }
         },
         "Q": {
           "hide_name": 0,
           "bits": [ 15, 16, 17, 18 ],
           "attributes": {
-            "src": "demo/Tile/RAM_IO/OutPass4_frame_config_mux.v:42.15-42.16"
+            "src": "yaml_demo/Tile/RAM_IO/OutPass4_frame_config_mux.v:42.15-42.16"
           }
         },
         "UserCLK": {
@@ -168,7 +168,7 @@
             "EXTERNAL": 1,
             "FABulous": 1,
             "SHARED_PORT": 1,
-            "src": "demo/Tile/RAM_IO/OutPass4_frame_config_mux.v:29.49-29.56"
+            "src": "yaml_demo/Tile/RAM_IO/OutPass4_frame_config_mux.v:29.49-29.56"
           }
         }
       }

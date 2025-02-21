@@ -53,7 +53,6 @@ class TilePort(Port):
 
     sideOfTile: Side
     terminal: bool = False
-    spanning: bool = False
 
     __order = {Side.NORTH: 0, Side.EAST: 1, Side.SOUTH: 2, Side.WEST: 3, Side.ANY: 4}
     __io = {IO.OUTPUT: 0, IO.INPUT: 1, IO.INOUT: 2}
@@ -65,39 +64,39 @@ class TilePort(Port):
         return (
             f"TilePort(name='{self.name}', ioDirection=IO.{self.ioDirection.upper()}, "
             f"wireCount={self.wireCount}, isBus={self.isBus}, sideOfTile=Side.{self.sideOfTile}, "
-            f"terminal={self.terminal}, spanning={self.spanning})"
+            f"terminal={self.terminal})"
         )
 
     def __lt__(self, __o: Any) -> bool:
         if not isinstance(__o, TilePort):
-            return False
+            raise ValueError(f"Cannot compare {self} with {__o}")
         return (self.__order[self.sideOfTile], self.__io[self.ioDirection]) < (
             self.__order[__o.sideOfTile],
-            self.__io[self.ioDirection],
+            self.__io[__o.ioDirection],
         )
 
     def __le__(self, __o: Any) -> bool:
         if not isinstance(__o, TilePort):
-            return False
+            raise ValueError(f"Cannot compare {self} with {__o}")
         return (self.__order[self.sideOfTile], self.__io[self.ioDirection]) <= (
             self.__order[__o.sideOfTile],
-            self.__io[self.ioDirection],
+            self.__io[__o.ioDirection],
         )
 
     def __gt__(self, __o: Any) -> bool:
         if not isinstance(__o, TilePort):
-            return False
+            raise ValueError(f"Cannot compare {self} with {__o}")
         return (self.__order[self.sideOfTile], self.__io[self.ioDirection]) > (
             self.__order[__o.sideOfTile],
-            self.__io[self.ioDirection],
+            self.__io[__o.ioDirection],
         )
 
     def __ge__(self, __o: Any) -> bool:
         if not isinstance(__o, TilePort):
-            return False
+            raise ValueError(f"Cannot compare {self} with {__o}")
         return (self.__order[self.sideOfTile], self.__io[self.ioDirection]) >= (
             self.__order[__o.sideOfTile],
-            self.__io[self.ioDirection],
+            self.__io[__o.ioDirection],
         )
 
 
@@ -117,7 +116,7 @@ class BelPort(Port):
 
     def createSelf(self) -> str:
         return (
-            f"BelPort(name='{self.name}', ioDirection=IO.{self.ioDirection.upper()}, "
+            f"BelPort(name='{self.prefix}{self.name}', ioDirection=IO.{self.ioDirection.upper()}, "
             f"wireCount={self.wireCount}, isBus={self.isBus}, prefix='{self.prefix}', "
             f"external={self.external})"
         )

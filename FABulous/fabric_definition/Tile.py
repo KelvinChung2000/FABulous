@@ -148,6 +148,15 @@ class Tile:
             Side.WEST: self.getWestPorts(io),
         }
 
+    def getWireType(self, port: TilePort) -> WireType:
+        for i in self.wireTypes:
+            if i.sourcePort.name == port.name or i.destinationPort.name == port.name:
+                return i
+        else:
+            raise ValueError(
+                f"The given port {port} does not exist in tile {self.name}"
+            )
+
     def getCascadeWireCount(self, port: TilePort) -> int:
         for i in self.wireTypes:
             if i.sourcePort.name == port.name or i.destinationPort.name == port.name:

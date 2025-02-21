@@ -276,7 +276,7 @@ class FABulous_CLI(Cmd):
         if args.file.is_dir():
             if self.fabricFilePath.exists():
                 logger.info(
-                    "Found fabric.csv in the project directory loading that file as the definition of the fabric"
+                    f"Found {self.fabricFilePath.name} in the project directory loading that file as the definition of the fabric"
                 )
                 self.fabulousAPI.loadFabric(self.fabricFilePath)
             else:

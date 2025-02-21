@@ -2,7 +2,6 @@ module ALU #(
     parameter NoConfigBits = 3,
     parameter WIDTH = 32
 ) (
-    input wire rst,
     input wire en,
     (* FABulous, USER_CLK *) input wire clk,
     (* FABulous, BUS *) input wire [WIDTH-1:0] data_in1,
@@ -23,9 +22,7 @@ module ALU #(
   localparam MUL = 3'b101;
 
   always @(*) begin
-    if (rst) begin
-      data_out = 8'b0;
-    end else if (en) begin
+    if (en) begin
       case (ALU_func)
         ADD: data_out = data_in1 + data_in2;
         SUB: data_out = data_in1 - data_in2;
@@ -35,6 +32,9 @@ module ALU #(
         MUL: data_out = data_in1 * data_in2;
         default: data_out = 8'b0;
       endcase
+    end
+    else begin
+      data_out = 8'b0;
     end
   end
 

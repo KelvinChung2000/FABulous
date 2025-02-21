@@ -12,7 +12,7 @@ class WireType:
     offsetY: int
     wireCount: int
     cascadeWireCount: int
-    spanning: bool = False
+    spanning: int = 0
 
     def __repr__(self) -> str:
         return f"{self.sourcePort.name}-X{self.offsetX}Y{self.offsetY}>{self.destinationPort.name}"

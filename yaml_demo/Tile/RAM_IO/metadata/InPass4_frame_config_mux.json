@@ -11,7 +11,7 @@
         "FABulous": 1,
         "dynports": 1,
         "cells_not_processed": 1,
-        "src": "demo/Tile/RAM_IO/InPass4_frame_config_mux.v:22.1-76.10"
+        "src": "yaml_demo/Tile/RAM_IO/InPass4_frame_config_mux.v:22.1-76.10"
       },
       "parameter_default_values": {
         "NoConfigBits": 4
@@ -43,7 +43,7 @@
             "WIDTH": 4
           },
           "attributes": {
-            "src": "demo/Tile/RAM_IO/InPass4_frame_config_mux.v:39.5-42.8"
+            "src": "yaml_demo/Tile/RAM_IO/InPass4_frame_config_mux.v:39.5-42.8"
           },
           "port_directions": {
             "CLK": "input",
@@ -63,7 +63,7 @@
           },
           "attributes": {
             "module_not_derived": 1,
-            "src": "demo/Tile/RAM_IO/InPass4_frame_config_mux.v:49.15-54.6"
+            "src": "yaml_demo/Tile/RAM_IO/InPass4_frame_config_mux.v:49.15-54.6"
           },
           "connections": {
             "A0": [ 2 ],
@@ -79,7 +79,7 @@
           },
           "attributes": {
             "module_not_derived": 1,
-            "src": "demo/Tile/RAM_IO/InPass4_frame_config_mux.v:56.15-61.6"
+            "src": "yaml_demo/Tile/RAM_IO/InPass4_frame_config_mux.v:56.15-61.6"
           },
           "connections": {
             "A0": [ 3 ],
@@ -95,7 +95,7 @@
           },
           "attributes": {
             "module_not_derived": 1,
-            "src": "demo/Tile/RAM_IO/InPass4_frame_config_mux.v:63.15-68.6"
+            "src": "yaml_demo/Tile/RAM_IO/InPass4_frame_config_mux.v:63.15-68.6"
           },
           "connections": {
             "A0": [ 4 ],
@@ -111,7 +111,7 @@
           },
           "attributes": {
             "module_not_derived": 1,
-            "src": "demo/Tile/RAM_IO/InPass4_frame_config_mux.v:70.15-75.6"
+            "src": "yaml_demo/Tile/RAM_IO/InPass4_frame_config_mux.v:70.15-75.6"
           },
           "connections": {
             "A0": [ 5 ],
@@ -126,7 +126,7 @@
           "hide_name": 1,
           "bits": [ 2, 3, 4, 5 ],
           "attributes": {
-            "src": "demo/Tile/RAM_IO/InPass4_frame_config_mux.v:39.5-42.8"
+            "src": "yaml_demo/Tile/RAM_IO/InPass4_frame_config_mux.v:39.5-42.8"
           }
         },
         "ConfigBits": {
@@ -135,7 +135,7 @@
           "attributes": {
             "FABulous": 1,
             "GLOBAL": 1,
-            "src": "demo/Tile/RAM_IO/InPass4_frame_config_mux.v:29.57-29.67"
+            "src": "yaml_demo/Tile/RAM_IO/InPass4_frame_config_mux.v:29.57-29.67"
           }
         },
         "I": {
@@ -144,21 +144,21 @@
           "attributes": {
             "EXTERNAL": 1,
             "FABulous": 1,
-            "src": "demo/Tile/RAM_IO/InPass4_frame_config_mux.v:24.42-24.43"
+            "src": "yaml_demo/Tile/RAM_IO/InPass4_frame_config_mux.v:24.42-24.43"
           }
         },
         "O": {
           "hide_name": 0,
           "bits": [ 6, 7, 8, 9 ],
           "attributes": {
-            "src": "demo/Tile/RAM_IO/InPass4_frame_config_mux.v:25.18-25.19"
+            "src": "yaml_demo/Tile/RAM_IO/InPass4_frame_config_mux.v:25.18-25.19"
           }
         },
         "Q": {
           "hide_name": 0,
           "bits": [ 15, 16, 17, 18 ],
           "attributes": {
-            "src": "demo/Tile/RAM_IO/InPass4_frame_config_mux.v:37.15-37.16"
+            "src": "yaml_demo/Tile/RAM_IO/InPass4_frame_config_mux.v:37.15-37.16"
           }
         },
         "UserCLK": {
@@ -168,7 +168,7 @@
             "EXTERNAL": 1,
             "FABulous": 1,
             "SHARED_PORT": 1,
-            "src": "demo/Tile/RAM_IO/InPass4_frame_config_mux.v:27.49-27.56"
+            "src": "yaml_demo/Tile/RAM_IO/InPass4_frame_config_mux.v:27.49-27.56"
           }
         }
       }

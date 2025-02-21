@@ -1,5 +1,6 @@
 from pathlib import Path
 from subprocess import run
+from typing import Mapping
 
 from loguru import logger
 
@@ -13,7 +14,6 @@ from FABulous.fabric_cad.chip_database_gen.chip import (
 )
 from FABulous.fabric_cad.chip_database_gen.define import NodeWire, PinType
 from FABulous.fabric_definition.Bel import Bel
-from FABulous.fabric_definition.define import IO
 from FABulous.fabric_definition.Fabric import Fabric
 from FABulous.fabric_definition.SwitchMatrix import SwitchMatrix
 from FABulous.fabric_definition.Tile import Tile
@@ -24,48 +24,71 @@ def genSwitchMatrix(tile: Tile, tileType: TileType, context=1):
     if not isinstance(tile.switchMatrix, SwitchMatrix):
         raise ValueError("Switch matrix is not a SwitchMatrix object")
 
-    outPorts = set([p for p in tile.ports if p.ioDirection == IO.OUTPUT])
     zIn = 0
     zOut = 0
     for c in range(context):
-        for i, w in enumerate(tile.wireTypes):
-            for wc in range(w.destinationPort.wireCount):
-                tileType.create_wire(f"{c}_{w.destinationPort.name}[{wc}]", "dst", z=i)
+        outputMapping: Mapping[str, str] = {}
 
-            for wc in range(w.sourcePort.wireCount):
-                tileType.create_wire(f"{c}_{w.sourcePort.name}[{wc}]", "src", z=i)
-                if w.sourcePort in outPorts:
-                    for wc in range(w.sourcePort.wireCount):
-                        tileType.create_wire(
-                            f"{c}_{w.sourcePort.name}_internal[{wc}]",
-                            "src_internal",
-                            z=i,
-                        )
-        for p in tile.ports:
-            for wc in range(p.wireCount):
-                tileType.create_wire(f"{c}_{p.name}[{wc}]", z=zIn)
+        for p in tile.getTileInputPorts():
+            if p.terminal:
+                for wtc in range(tile.getWireType(p).spanning):
+                    for wc in range(p.wireCount):
+                        tileType.create_wire(f"{c}_{p.name}[{wc}]_{wtc}", "src", z=zIn)
+            else:
+                for wc in range(p.wireCount):
+                    tileType.create_wire(f"{c}_{p.name}[{wc}]", "src", z=zIn)
             zIn += 1
+        for p in tile.getTileOutputPorts():
+            if p.terminal:
+                for wtc in range(tile.getWireType(p).spanning):
+                    for wc in range(p.wireCount):
+                        tileType.create_wire(
+                            f"{c}_{p.name}_internal[{wc}]_{wtc}", "dst", z=zOut
+                        )
+                        tileType.create_wire(f"{c}_{p.name}[{wc}]_{wtc}", "dst", z=zOut)
+                        tileType.create_pip(
+                            f"{c}_{p.name}_internal[{wc}]_{wtc}",
+                            f"{c}_{p.name}[{wc}]_{wtc}",
+                        )
+                        outputMapping[f"{c}_{p.name}[{wc}]_{wtc}"] = (
+                            f"{c}_{p.name}_internal[{wc}]_{wtc}"
+                        )
+            else:
+                for wc in range(p.wireCount):
+                    tileType.create_wire(f"{c}_{p.name}_internal[{wc}]", "dst", z=zOut)
+                    tileType.create_wire(f"{c}_{p.name}[{wc}]", "dst", z=zOut)
+                    tileType.create_pip(
+                        f"{c}_{p.name}_internal[{wc}]", f"{c}_{p.name}[{wc}]"
+                    )
+                    outputMapping[f"{c}_{p.name}[{wc}]"] = (
+                        f"{c}_{p.name}_internal[{wc}]"
+                    )
+            zOut += 1
+
+        # for i, w in enumerate(tile.wireTypes):
+        #     for wc in range(w.destinationPort.wireCount):
+        #         tileType.create_wire(f"{c}_{w.destinationPort.name}[{wc}]", "dst", z=i)
+
+        #     for wc in range(w.sourcePort.wireCount):
+        #         tileType.create_wire(f"{c}_{w.sourcePort.name}[{wc}]", "src", z=i)
+        #         if w.sourcePort in outPorts:
+        #             for wc in range(w.sourcePort.wireCount):
+        #                 tileType.create_wire(
+        #                     f"{c}_{w.sourcePort.name}_internal[{wc}]",
+        #                     "src_internal",
+        #                     z=i,
+        #                 )
 
         for mux in tile.switchMatrix.muxes:
             for wc in range(mux.output.wireCount):
-                tileType.create_wire(f"{c}_{mux.output.name}[{wc}]")
-            if mux.output in outPorts:
+                outTarget = outputMapping.get(
+                    f"{c}_{mux.output.name}[{wc}]", f"{c}_{mux.output.name}[{wc}]"
+                )
                 for i in mux.inputs:
-                    for wc in range(i.wireCount):
-                        tileType.create_pip(
-                            f"{c}_{i.name}[{wc}]",
-                            f"{c}_{mux.output.name}_internal[{wc}]",
-                        )
-                        tileType.create_pip(
-                            f"{c}_{mux.output.name}_internal[{wc}]",
-                            f"{c}_{mux.output.name}[{wc}]",
-                        )
-            else:
-                for i in mux.inputs:
-                    for wc in range(i.wireCount):
-                        tileType.create_wire(
-                            f"{c}_{i.name}[{wc}]", f"{c}_{mux.output.name}"
-                        )
+                    tileType.create_pip(
+                        f"{c}_{i.name}[{wc}]",
+                        outTarget,
+                    )
 
     zOut = 0
     for c in range(context - 1):
@@ -78,16 +101,17 @@ def genSwitchMatrix(tile: Tile, tileType: TileType, context=1):
 
     for c in range(context - 1):
         for mux in tile.switchMatrix.muxes:
-            if mux.output in outPorts:
-                for wc in range(mux.output.wireCount):
-                    tileType.create_pip(
-                        f"{c}_{mux.output.name}_internal[{wc}]",
-                        f"{mux.output.name}_{c}_to_{c+1}_NextCycle[{wc}]",
-                    )
-                    tileType.create_pip(
-                        f"{mux.output.name}_{c}_to_{c+1}_NextCycle[{wc}]",
-                        f"{c+1}_{mux.output.name}[{wc}]",
-                    )
+            for wc in range(mux.output.wireCount):
+                tileType.create_pip(
+                    outputMapping.get(
+                        f"{c}_{mux.output.name}[{wc}]", f"{c}_{mux.output.name}[{wc}]"
+                    ),
+                    f"{mux.output.name}_{c}_to_{c+1}_NextCycle[{wc}]",
+                )
+                tileType.create_pip(
+                    f"{mux.output.name}_{c}_to_{c+1}_NextCycle[{wc}]",
+                    f"{c+1}_{mux.output.name}[{wc}]",
+                )
 
     for c in range(context - 2):
         for i, p in enumerate(sorted(tile.getTileOutputPorts())):
@@ -166,7 +190,15 @@ def genTile(tile: Tile, chip: Chip, context=1) -> TileType:
     return tt
 
 
+# change to base on wire type
 def genFabric(fabric: Fabric, chip: Chip, context=1):
+    def clipX(value):
+        return max(0, min(value, fabric.numberOfColumns - 1))
+
+    def clipY(value):
+        return max(0, min(value, fabric.numberOfRows - 1))
+
+    # TODO fix terminal ports
     for (x, y), wires in fabric.wireDict.items():
         if not wires:
             continue
@@ -175,13 +207,13 @@ def genFabric(fabric: Fabric, chip: Chip, context=1):
                 for i in range(wire.source.wireCount):
                     node = [
                         NodeWire(
-                            x,
-                            fabric.numberOfRows - y - 1,
+                            clipX(x),
+                            clipY(fabric.numberOfRows - y - 1),
                             f"{c}_{wire.source.name}[{i}]",
                         ),
                         NodeWire(
-                            x + wire.xOffset,
-                            fabric.numberOfRows - y - 1 - wire.yOffset,
+                            clipX(x + wire.xOffset),
+                            clipY(fabric.numberOfRows - y - 1 - wire.yOffset),
                             f"{c}_{wire.destination.name}[{i}]",
                         ),
                     ]

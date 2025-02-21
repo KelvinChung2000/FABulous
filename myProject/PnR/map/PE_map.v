@@ -1,51 +1,23 @@
-(* techmap_celltype = "UnaryOp BinaryOp TernaryOp" *)
-module PE_map(A, B, C, Y);
-    parameter WIDTH = 0;
-    parameter _TECHMAP_CELLTYPE_ = "";
-    parameter _TECHMAP_FAIL_ = 0;
-    parameter OP = 0;
-    parameter CONST = 0;
+(* techmap_celltype = "std_add" *)
+module ALU_map #(
+    parameter WIDTH = 32
+) (
+    input [WIDTH-1:0] left,
+    input [WIDTH-1:0] right,
+    output [WIDTH-1:0] out
 
-    input [WIDTH-1:0] A;
-    input [WIDTH-1:0] B;
-    input [WIDTH-1:0] C;
-    output [WIDTH-1:0] Y;
-
+);
     generate
-        localparam OP_TYPE =
-            _TECHMAP_CELLTYPE_ == "UnaryOp" ? 1 :
-            _TECHMAP_CELLTYPE_ == "BinaryOp" ? 2 :
-            _TECHMAP_CELLTYPE_ == "TernaryOp" ? 3 : -1;
+        ALU #(
+            .WIDTH(WIDTH),
+            .ALU_func(3'b000)
+        ) _TECHMAP_REPLACE_ (
+            .en(1'b1),
+            .data_in1(left),
+            .data_in2(right),
+            .data_out(out)
+        );
 
-        if (OP_TYPE == 1)
-            ALU #(
-                .WIDTH(WIDTH),
-                .OP(OP)
-            ) _TECHMAP_REPLACE_ (
-                .data_in1(A),
-                .data_out(Y)
-            );
-        else if (OP_TYPE == 2)
-            ALU #(
-                .WIDTH(WIDTH),
-                .OP(OP)
-            ) _TECHMAP_REPLACE_ (
-                .data_in1(A),
-                .data_in2(B),
-                .data_out(Y)
-            );
-        else if (OP_TYPE == 3)
-            ALU #(
-                .WIDTH(WIDTH),
-                .OP(OP)
-            ) _TECHMAP_REPLACE_ (
-                .data_in1(A),
-                .data_in2(B),
-                .data_in3(C),
-                .data_out(Y)
-            );
-        else
-            wire  _TECHMAP_FAIL_ = 1;
     endgenerate
 
 endmodule

@@ -15,10 +15,10 @@ from FABulous.fabric_definition.define import (
 )
 from FABulous.fabric_definition.Fabric import Fabric
 from FABulous.fabric_definition.Port import TilePort
-from FABulous.fabric_definition.SwitchMatrix import Mux
+from FABulous.fabric_definition.SwitchMatrix import Mux, SwitchMatrix
 from FABulous.fabric_definition.Tile import Tile
 from FABulous.fabric_definition.Wire import Wire, WireType
-from FABulous.file_parser.file_parser_csv import parseList, parseMatrix, parsePortLine
+from FABulous.file_parser.file_parser_csv import parseList, parseMatrix
 from FABulous.file_parser.file_parser_HDL import parseBelFile
 from FABulous.file_parser.parse_py_mux import genSwitchMatrix, setupPortData
 
@@ -30,7 +30,7 @@ oppositeDic = {
     "JUMP": "ANY",
 }
 
-WireInfo = dict
+WireInfo = list[dict]
 
 
 def parseFabricYAML(fileName: Path) -> Fabric:
@@ -49,7 +49,7 @@ def parseFabricYAML(fileName: Path) -> Fabric:
     filePath = fileName.parent
 
     tileDict: dict[str, Tile] = {}
-    wireDictUnprocessed: dict[str, dict] = {}
+    wireDictUnprocessed: dict[str, WireInfo] = {}
 
     for i in data["TILES"]:
         newTile, wireInfo = parseTileYAML(filePath.joinpath(i))
@@ -110,22 +110,29 @@ def parseFabricYAML(fileName: Path) -> Fabric:
     wireDict: dict[Loc, list[Wire]] = defaultdict(list)
     for y, row in enumerate(fabricTiles):
         for x, tileName in enumerate(row):
-
             # TODO add empty tile that have contains crossing wires
             if tileName is None:
                 continue
 
             for wireEntry in wireDictUnprocessed[tileName]:
-
                 tx = int(wireEntry["X-offset"])
                 ty = int(wireEntry["Y-offset"])
+
+                if tx == ty == 0:
+                    continue
 
                 sourcePort: TilePort = tileDict[tileName].findPortByName(
                     wireEntry["source_name"]
                 )
-                destinationPort: TilePort = tileDict[
-                    fabricTiles[y + ty][x + tx]
-                ].findPortByName(wireEntry["destination_name"])
+
+                xCord = max(0, min(x + tx, width - 1))
+                yCord = max(0, min(y + ty, height - 1))
+                targetTileName = fabricTiles[yCord][xCord]
+                if targetTileName is None:
+                    continue
+                destinationPort: TilePort = tileDict[targetTileName].findPortByName(
+                    wireEntry["destination_name"]
+                )
 
                 if tx != 0 and ty != 0 and tx != ty:
                     logger.error(
@@ -140,15 +147,16 @@ def parseFabricYAML(fileName: Path) -> Fabric:
                     )
                     raise ValueError
 
-                spanning = False
-                if abs(x) + abs(y) > 1 and x != y:
+                spanning = 0
+                if abs(x) + abs(y) >= 1 and x != y:
                     wireCount = sourcePort.wireCount * (abs(x) + abs(y))
-                    spanning = True
+                    spanning = abs(x) + abs(y)
                 elif x == y:
                     wireCount = sourcePort.wireCount * abs(x)
-                    spanning = True
+                    spanning = abs(x)
                 else:
                     wireCount = sourcePort.wireCount
+                    spanning = 0
 
                 wireDict[(x, y)].append(
                     Wire(
@@ -165,8 +173,8 @@ def parseFabricYAML(fileName: Path) -> Fabric:
                     WireType(
                         sourcePort=sourcePort,
                         destinationPort=destinationPort,
-                        offsetX=wireEntry["X-offset"],
-                        offsetY=wireEntry["Y-offset"],
+                        offsetX=tx,
+                        offsetY=ty,
                         wireCount=sourcePort.wireCount,
                         cascadeWireCount=wireCount,
                         spanning=spanning,
@@ -248,175 +256,108 @@ def parseTileYAML(fileName: Path) -> tuple[Tile, WireInfo]:
     with open(fileName, "r") as f:
         data = yaml.safe_load(f)
 
-    tileName = data["TILE"]
+    tileName = data.get("TILE", None)
     portsDict: dict[str, TilePort] = {}
     bels: list[Bel] = []
     matrixDir: Path | None = None
     withUserCLK = False
     configBit = 0
+    wires: WireInfo = []
 
-    normalPorts = set()
+    if p := data.get("INCLUDE", None):
+        if isinstance(p, str):
+            p = [p]
+        for i in p:
+            iTile, iWireInfo = parseTileYAML(filePathParent.joinpath(i))
+            for ports in iTile.ports:
+                portsDict[ports.name] = ports
+            for bel in iTile.bels:
+                bels.append(bel)
+            wires.extend(iWireInfo)
 
-    for portEntry in data["PORTS"]:
-        if portEntry.get("isBus", False):
-            portsDict[portEntry["name"]] = TilePort(
-                wireCount=int(portEntry["wires"]),
-                name=portEntry["name"],
-                ioDirection=IO[portEntry["inOut"].upper()],
-                sideOfTile=Side[portEntry["side"].upper()],
-                isBus=portEntry.get("isBus", False),
-                terminal=portEntry.get("terminal", False),
-            )
-        else:
-            portsDict[f"{portEntry["name"]}"] = TilePort(
-                wireCount=int(portEntry["wires"]),
-                name=portEntry["name"],
-                ioDirection=IO[portEntry["inOut"].upper()],
-                sideOfTile=Side[portEntry["side"].upper()],
-                isBus=portEntry.get("isBus", False),
-                terminal=portEntry.get("terminal", False),
-            )
-
-        if not portEntry.get("terminal", False):
-            normalPorts.add(portEntry["name"])
-
-    # for wireEntry in data.get("WIRES", {}):
-    #     sourcePort = portsDict[wireEntry["source_name"]]
-    #     destinationPort = portsDict[wireEntry["destination_name"]]
-    #     x = wireEntry["X-offset"]
-    #     y = wireEntry["Y-offset"]
-    #     if x != 0 and y != 0 and x != y:
-    #         logger.error(
-    #             f"Invalid wire offset detected: source port '{sourcePort.name}' to destination port '{destinationPort.name}' "
-    #             f"has an offset of X={x}, Y={y}. The offset must be either only in the X direction, only in the Y direction, "
-    #             "or both X and Y must be the same for diagonal."
-    #         )
-    #         raise ValueError
-    #     if sourcePort.wireCount != destinationPort.wireCount:
-    #         logger.error(
-    #             f"Port {sourcePort.name} and {destinationPort.name} must have the same wire count."
-    #         )
-    #         raise ValueError
-
-    #     spanning = False
-    #     if abs(x) + abs(y) > 1 and x != y:
-    #         wireCount = sourcePort.wireCount * (abs(x) + abs(y))
-    #         spanning = True
-    #     elif x == y:
-    #         wireCount = sourcePort.wireCount * abs(x)
-    #         spanning = True
-    #     else:
-    #         wireCount = sourcePort.wireCount
-
-    #     wires.append(
-    #         WireType(
-    #             sourcePort=sourcePort,
-    #             destinationPort=destinationPort,
-    #             offsetX=wireEntry["X-offset"],
-    #             offsetY=wireEntry["Y-offset"],
-    #             wireCount=sourcePort.wireCount,
-    #             cascadeWireCount=wireCount,
-    #             spanning=spanning,
-    #         )
-    #     )
-
-    #     normalPorts.discard(wireEntry["source_name"])
-    #     normalPorts.discard(wireEntry["destination_name"])
-
-    # # if the normal port still have things mean some port do not have a connection
-    # if normalPorts:
-    #     logger.error(
-    #         f"Port {normalPorts} does not have a connection, when defined as non terminal."
-    #     )
-    #     raise ValueError
+    for portEntry in data.get("PORTS", []):
+        portsDict[f"{portEntry["name"]}"] = TilePort(
+            wireCount=int(portEntry["wires"]),
+            name=portEntry["name"],
+            ioDirection=IO[portEntry["inOut"].upper()],
+            sideOfTile=Side[portEntry["side"].upper()],
+            isBus=portEntry.get("isBus", False),
+            terminal=portEntry.get("terminal", False),
+        )
 
     bels = []
-    for belEntry in data["BELS"]:
+    for belEntry in data.get("BELS", []):
         belFilePath = filePathParent.joinpath(belEntry["BEL"])
         if belEntry["prefix"] is None:
             belEntry["prefix"] = ""
 
         bels.append(parseBelFile(belFilePath, belEntry["prefix"]))
 
-    matrixDir = fileName.parent.joinpath(data["MATRIX"])
-    configBit = 0
-    match matrixDir.suffix:
-        case ".list":
-            for _, v in parseList(matrixDir, "source").items():
-                muxSize = len(v)
-                if muxSize >= 2:
-                    configBit += muxSize.bit_length() - 1
-        case ".py":
-            setupPortData(tileName, matrixDir, list(portsDict.values()), bels)
-            sm = genSwitchMatrix(tileName, matrixDir)
-            configBit += sm.configBits
-        case "_matrix.csv":
-            for _, v in parseMatrix(matrixDir, tileName).items():
-                muxSize = len(v)
-                if muxSize >= 2:
-                    configBit += muxSize.bit_length() - 1
-        case ".vhdl" | ".v":
-            with open(matrixDir, "r") as f:
-                f = f.read()
-                if configBit := re.search(r"NumberOfConfigBits: (\d+)", f):
-                    configBit = int(configBit.group(1))
-                else:
-                    configBit = 0
-                    logger.warning(
-                        f"Cannot find NumberOfConfigBits in {matrixDir} assume 0 config bits."
-                    )
-        case _:
-            logger.error(
-                f"Unknown file extension '{matrixDir.suffix}' for tile {tileName} switch matrix."
-            )
-            raise ValueError(
-                f"Unknown file extension '{matrixDir.suffix}' for tile {tileName} switch matrix."
-            )
-
-    # switchMatrix = parseMux(matrixDir)
-
-    if p := data["INCLUDE"]:
-        p = fileName.parent.joinpath(p)
-        if not p.exists():
-            logger.error(f"Cannot find {str(p)} in tile {tileName}")
-            raise ValueError
-        with open(p) as f:
-            iFile = f.read()
-            iFile = re.sub(r"#.*", "", iFile)
-        for line in iFile.split("\n"):
-            lineItem = line.split(",")
-            if not lineItem[0]:
-                continue
-
-            port, commonWirePair = parsePortLine(line)
-            ports.extend(port)
-            if commonWirePair:
-                commonWirePairs.append(commonWirePair)
-
     withUserCLK = any(bel.userCLK for bel in bels)
     for b in bels:
         configBit += b.configBit
 
-    configMems = parseConfigMem(
-        fileName.parent.joinpath(data["CONFIG_MEM"]),
-        32,
-        32,
-        configBit,
-    )
+    if mPath := data.get("MATRIX", None):
+        matrixDir = fileName.parent.joinpath(mPath)
+        configBit = 0
+        match matrixDir.suffix:
+            case ".list":
+                sm = SwitchMatrix()
+                for mux in parseList(matrixDir):
+                    sm.addMux(mux)
+                configBit += sm.configBits
+            case ".py":
+                setupPortData(tileName, matrixDir, list(portsDict.values()), bels)
+                sm = genSwitchMatrix(tileName, matrixDir)
+                configBit += sm.configBits
+            case "_matrix.csv":
+                for _, v in parseMatrix(matrixDir, tileName).items():
+                    muxSize = len(v)
+                    if muxSize >= 2:
+                        configBit += muxSize.bit_length() - 1
+            case ".vhdl" | ".v":
+                with open(matrixDir, "r") as f:
+                    f = f.read()
+                    if configBit := re.search(r"NumberOfConfigBits: (\d+)", f):
+                        configBit = int(configBit.group(1))
+                    else:
+                        configBit = 0
+                        logger.warning(
+                            f"Cannot find NumberOfConfigBits in {matrixDir} assume 0 config bits."
+                        )
+            case _:
+                logger.error(
+                    f"Unknown file extension '{matrixDir.suffix}' for tile {tileName} switch matrix."
+                )
+                raise ValueError(
+                    f"Unknown file extension '{matrixDir.suffix}' for tile {tileName} switch matrix."
+                )
+    else:
+        sm = SwitchMatrix()
 
-    if configMems is None:
+    if p := data.get("CONFIG_MEM", None):
+        configMems = parseConfigMem(
+            fileName.parent.joinpath(p),
+            32,
+            32,
+            configBit,
+        )
+    else:
         configMems = []
-
-    return Tile(
-        name=tileName,
-        ports=list(portsDict.values()),
-        bels=bels,
-        switchMatrix=sm,
-        configMems=configMems,
-        globalConfigBits=configBit,
-        withUserCLK=withUserCLK,
-        tileDir=fileName,
-    ), data.get("WIRES", {})
+    wires.extend(data.get("WIRES", {}))
+    return (
+        Tile(
+            name=tileName,
+            ports=list(portsDict.values()),
+            bels=bels,
+            switchMatrix=sm,
+            configMems=configMems,
+            globalConfigBits=configBit,
+            withUserCLK=withUserCLK,
+            tileDir=fileName,
+        ),
+        wires,
+    )
 
 
 def parseConfigMem(

@@ -914,7 +914,7 @@ class Chip:
                 # so we re-use the structure to store the index of the node shape, instead
                 assert (
                     inst.shape.wire_to_node[3 * wire_idx + 0] == MODE_TILE_WIRE
-                ), "attempting to add wire to multiple nodes!"
+                ), f"attempting to add wire {w} to multiple nodes!"
                 inst.shape.wire_to_node[3 * wire_idx + 0] = MODE_IS_ROOT
                 inst.shape.wire_to_node[3 * wire_idx + 1] = _twos(shape_idx & 0xFFFF)
                 inst.shape.wire_to_node[3 * wire_idx + 2] = (shape_idx >> 16) & 0xFFFF
@@ -925,7 +925,7 @@ class Chip:
                 assert dx < MODE_TILE_WIRE, "dx range causes overlap with magic values!"
                 assert (
                     inst.shape.wire_to_node[3 * wire_idx + 0] == MODE_TILE_WIRE
-                ), "attempting to add wire to multiple nodes!"
+                ), f"attempting to add wire {w} to multiple nodes!"
                 inst.shape.wire_to_node[3 * wire_idx + 0] = dx
                 inst.shape.wire_to_node[3 * wire_idx + 1] = dy
                 inst.shape.wire_to_node[3 * wire_idx + 2] = shape.wires[0 * 3 + 2]

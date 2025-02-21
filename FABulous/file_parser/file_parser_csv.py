@@ -1,6 +1,6 @@
-from collections import defaultdict
 import csv
 import re
+from collections import defaultdict
 from copy import deepcopy
 from pathlib import Path
 
@@ -406,8 +406,8 @@ def parseList(filePath: Path) -> list[Mux]:
         resultDic[k].append(v)
 
     for k, v in resultDic.items():
-        inputs = [Port(wrapDigit(i), IO.INPUT, 1, False) for i in v]
-        output = Port(wrapDigit(k), IO.OUTPUT, 1, False)
+        inputs = [Port(i, IO.INPUT, 1, False) for i in v]
+        output = Port(k, IO.OUTPUT, 1, False)
         muxList.append(Mux(k, inputs, output))
 
     return muxList

@@ -5,12 +5,12 @@ from FABulous.fabric_definition.Port import TilePort, Port, BelPort
 class S_IO_ports:
     def __init__(self):
         # tile ports
-        self.in0 = MuxPort(TilePort(name='in0', ioDirection=IO.INPUT, wireCount=32, isBus=False, sideOfTile=Side.NORTH, terminal=False, spanning=False), isTilePort=True, isBus=False, bitWidth=32)
-        self.out0 = MuxPort(TilePort(name='out0', ioDirection=IO.OUTPUT, wireCount=32, isBus=False, sideOfTile=Side.NORTH, terminal=False, spanning=False), isTilePort=True, isBus=False, bitWidth=32)
+        self.in0 = MuxPort(TilePort(name='in0', ioDirection=IO.INPUT, wireCount=32, isBus=False, sideOfTile=Side.NORTH, terminal=False), isTilePort=True, isBus=False, bitWidth=32)
+        self.out0 = MuxPort(TilePort(name='out0', ioDirection=IO.OUTPUT, wireCount=32, isBus=False, sideOfTile=Side.NORTH, terminal=False), isTilePort=True, isBus=False, bitWidth=32)
 
         # bel ports
-        self.S_from_fabric = MuxPort(BelPort(name='from_fabric', ioDirection=IO.INPUT, wireCount=1, isBus=True, prefix='S_', external=False), isBelPort=True, isBus=True, bitWidth=1)
-        self.S_to_fabric = MuxPort(BelPort(name='to_fabric', ioDirection=IO.OUTPUT, wireCount=1, isBus=True, prefix='S_', external=False), isBelPort=True, isBus=True, bitWidth=1)
+        self.S_from_fabric = MuxPort(BelPort(name='S_from_fabric', ioDirection=IO.INPUT, wireCount=1, isBus=True, prefix='S_', external=False), isBelPort=True, isBus=True, bitWidth=1)
+        self.S_to_fabric = MuxPort(BelPort(name='S_to_fabric', ioDirection=IO.OUTPUT, wireCount=1, isBus=True, prefix='S_', external=False), isBelPort=True, isBus=True, bitWidth=1)
 
         self.GND = MuxPort(Port(name="gnd", ioDirection=IO.OUTPUT, wireCount=1, isBus=False), bitWidth=1)
         self.VCC = MuxPort(Port(name="vcc", ioDirection=IO.OUTPUT, wireCount=1, isBus=False), bitWidth=1)

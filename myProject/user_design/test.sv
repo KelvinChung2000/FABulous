@@ -1,4 +1,4 @@
-(* blackbox *)module std_add #(
+(* blackbox *) module std_add #(
     parameter WIDTH = 32
 ) (
     input  logic [WIDTH-1:0] left,
@@ -9,7 +9,7 @@
 endmodule
 
 
-module std_reg #(
+(* blackbox, latency=1 *)module std_reg #(
     parameter WIDTH = 32
 ) (
     (* write_together=1, data=1 *) input wire logic [WIDTH-1:0] in,

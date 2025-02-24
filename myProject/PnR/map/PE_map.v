@@ -8,9 +8,8 @@ module ALU_map #(
 
 );
     generate
-        ALU #(
+        ADD #(
             .WIDTH(WIDTH),
-            .ALU_func(3'b000)
         ) _TECHMAP_REPLACE_ (
             .en(1'b1),
             .data_in1(left),

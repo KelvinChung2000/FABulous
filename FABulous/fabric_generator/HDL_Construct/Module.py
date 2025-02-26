@@ -43,7 +43,10 @@ class Module(Region):
         # self.container.append(self._ports)
         # self.container.append(self._logics)
         if self._writer == WriterType.VERILOG:
-            return f"module {self.name} {''.join([str(i) for i in self.container])}\nendmodule\n"
+            if self.attributes:
+                return f"(* {', '.join([str(i) for i in self.attributes])} *)\nmodule {self.name} {''.join([str(i) for i in self.container])}\nendmodule\n\n"
+            else:
+                return f"module {self.name} {''.join([str(i) for i in self.container])}\nendmodule\n\n"
         else:
 
             return (

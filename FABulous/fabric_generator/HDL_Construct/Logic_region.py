@@ -1,3 +1,4 @@
+from contextlib import contextmanager
 from dataclasses import dataclass
 from typing import Iterable
 
@@ -77,6 +78,18 @@ class LogicRegion(Region):
         self.container.append(_o)
         return _o
 
+    @contextmanager
+    def Generate(self):
+        from FABulous.fabric_generator.HDL_Construct.Generate_region import (
+            GenerateRegion,
+        )
+
+        r = GenerateRegion([], self._writer, self.indent + self.indentCount)
+        try:
+            yield r
+        finally:
+            self.container.append(r)
+
     @dataclass
     class _ConnectPair:
         dst: str
@@ -85,10 +98,7 @@ class LogicRegion(Region):
 
         def __str__(self) -> str:
             if self.writer == WriterType.VERILOG:
-                if self.src:
-                    return f".{self.dst}({self.src})"
-                else:
-                    return f".{self.dst}()"
+                return f".{self.dst}({self.src})"
             else:
                 return f"{self.dst} => {self.src}"
 

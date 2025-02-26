@@ -2,7 +2,13 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from FABulous.fabric_definition.define import IO
-from FABulous.fabric_definition.Port import BelPort, ConfigPort, Port, SharedPort
+from FABulous.fabric_definition.Port import (
+    BelPort,
+    ConfigPort,
+    GenericPort,
+    Port,
+    SharedPort,
+)
 
 
 @dataclass
@@ -87,3 +93,16 @@ class Bel:
 
     def __hash__(self) -> int:
         return hash(f"{self.prefix}{self.name}({self.src})")
+
+    def findPortByName(self, name: str) -> GenericPort:
+        for p in (
+            self.inputs
+            + self.outputs
+            + self.externalInputs
+            + self.externalOutputs
+            + self.configPort
+            + self.sharedPort
+        ):
+            if p.name == name:
+                return p
+        raise ValueError(f"Port {name} not found in {self.name}")

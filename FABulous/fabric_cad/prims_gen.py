@@ -1,13 +1,16 @@
+from functools import partial
 from itertools import product
-import json
-import os
 from pathlib import Path
-import stat
-import subprocess
 
-from FABulous.FABulous_CLI.helper import check_if_application_exists
+from pyosys import libyosys as ys
+
 from FABulous.fabric_definition.Bel import Bel
+from FABulous.fabric_definition.define import IO
 from FABulous.fabric_definition.Fabric import Fabric
+from FABulous.fabric_definition.Port import ConfigPort
+from FABulous.fabric_generator.code_generator_2 import CodeGenerator
+from FABulous.fabric_generator.define import WriterType
+from FABulous.file_parser.file_parser_HDL import parseBelFile
 
 
 def prims_gen(filename: Path, fabric: Fabric):
@@ -24,82 +27,128 @@ def prims_gen(filename: Path, fabric: Fabric):
             f.write("\n")
 
 
-def genPrimsFromBel(filename: Path):
-    if not filename.exists():
-        raise ValueError(f"File {filename} not found.")
+def mergeFiles(inputFiles: list[Path], outputFile: Path):
+    """Merge multiple files into one file.
 
-    Path(filename.parent / "metadata").mkdir(exist_ok=True)
-    json_file = filename.parent / Path("metadata") / filename.with_suffix(".json").name
-    port_file = filename.parent / Path("metadata") / f"stat_{filename.with_suffix(".txt").name}"
+    Parameters
+    ----------
+    inputFiles : list of str
+        List of input file paths to be merged.
+    outputFile : str
+        Path of the output file.
+    """
+    outputPath = Path(outputFile)
+    with outputPath.open("w") as outfile:
+        for file in inputFiles:
+            inputPath = Path(file)
+            if inputPath.is_file():
+                with inputPath.open("r") as inFile:
+                    content = inFile.read()
+                    outfile.write(content)
+                    outfile.write("\n")
+            inputPath.unlink()
 
-    yosys = check_if_application_exists(os.getenv("FAB_YOSYS_PATH", "yosys"))
 
-    yosysCmd = [
-        f"read_verilog -sv {filename}",
-        "hierarchy -auto-top",
-        "proc",
-        "opt;;",
-        f"write_json -compat-int {json_file}",
-        f"tee -q -o {port_file} select -list a:CONTROL a:CONFIG_BIT ",
-    ]
+def genPrimsFromBelHDL(bel: Bel):
+    if not bel.src.exists():
+        raise ValueError(f"File {bel.src} not found.")
 
-    runCmd = [
-        f"{yosys}",
-        "-qp",
-        "; ".join(yosysCmd),
-    ]
+    Path(bel.src.parent / "metadata").mkdir(exist_ok=True)
 
-    try:
-        subprocess.run(runCmd, check=True, text=True, capture_output=True)
-    except subprocess.CalledProcessError as e:
-        raise ValueError(f"Yosys command execution failed. {e.stderr}")
+    design = ys.Design()
+    runPass = partial(lambda design, cmd: ys.run_pass(cmd, design), design)
 
-    with open(f"{json_file}", "r") as f:
-        design_dict = json.load(f)
+    runPass("read_verilog -sv " + str(bel.src))
+    runPass("hierarchy -auto-top")
+    runPass("proc")
+    runPass("opt;;;")
+    runPass("select a:CONTROL a:CONFIG_BIT")
+    runPass("select -del a:INIT")
 
-    with open(f"{port_file}", "r") as f:
-        portList= [i.split("/")[-1].strip() for i in f.readlines()]
+    inputPortsSize: dict[str, int] = {}
 
-    modules = design_dict.get("modules", {})
-    if len(modules) > 1:
+    if len(design.selected_modules()) > 1:
         raise ValueError("Multiple modules found.")
-    elif len(modules) == 0:
+    elif len(design.selected_modules()) == 0:
         raise ValueError("No modules found.")
 
-    module: dict = modules[list(modules.keys())[0]]
-    inputPortsSize: dict[str, int] = {}
-    for p in portList:
-        if pDict := module["ports"].get(p, None):
-            if pDict["direction"] != "input":
-                raise ValueError(f"Port {p} is not an input port.")
-            inputPortsSize[p] = len(pDict["bits"])
+    module = design.top_module()
+    featureWireMap = {}
+    for wire in module.selected_wires():
+        p = bel.findPortByName(wire.name.str()[1:])
+        if isinstance(p, ConfigPort):
+            if len(p.features) == 1:
+                inputPortsSize[wire.name.str()] = 1
+                featureWireMap[wire.name.str()] = [("", 0)] + p.features
+            else:
+                inputPortsSize[wire.name.str()] = len(p.features) - 1
+                featureWireMap[wire.name.str()] = p.features
+        else:
+            inputPortsSize[wire.name.str()] = 1
+            featureWireMap[wire.name.str()] = [
+                ("", 0),
+                (wire.name.str(), 1),
+            ]
 
     keys = list(inputPortsSize.keys())
     ranges = [range(value + 1) for value in inputPortsSize.values()]
     combinations = [tuple(zip(keys, values)) for values in product(*ranges)]
 
-    for i, c in enumerate(combinations):
-        primsFile = filename.parent / Path("metadata") / f"{i}_prims_{filename.with_suffix(".v").name}"
-        yosysCmd = [
-            f"read_verilog -sv {filename}",
-            "proc",
-            "opt;;",
-            "; ".join([f"connect -set {cKey} {cValue}" for cKey, cValue in c]),
-            "opt;;;",
-            f"write_verilog -sv {primsFile}",
-        ]
-        print(yosysCmd)
-        runCmd = [
-            f"{yosys}",
-            "-qp",
-            "; ".join(yosysCmd),
-        ]
+    runPass("cd")
+    runPass("setattr -unset src")
+    runPass("design -save base")
 
-        try:
-            subprocess.run(runCmd, check=True, text=True, capture_output=True)
-        except subprocess.CalledProcessError as e:
-            raise ValueError(f"Yosys command execution failed. {e.stderr}")
+    filePath = bel.src.parent / "metadata"
+
+    cellDict = {}
+    files: list[Path] = []
+    for c in combinations:
+        nameStr = f"{bel.name}_" + "_".join(
+            [f"{cKey.removeprefix("\\")}_{cValue}" for cKey, cValue in c]
+        )
+        for cKey, cValue in c:
+            runPass(f"connect -set {cKey} {cValue}")
+        runPass("opt;")
+        runPass("clean -purge")
+        module = design.top_module()
+        runPass("select c:*")
+        if len(module.selected_cells()) >= 1:
+            runPass(f"rename -top {nameStr}")
+            runPass(f"write_verilog -noattr -sv {filePath / f"{nameStr}.v"}")
+            files.append(filePath / f"{nameStr}.v")
+            cellDict[nameStr] = c
+        runPass("design -load base")
+
+    mergeFiles(files, filePath / f"{bel.name}cells.v")
+
+    module = design.top_module()
+    cg = CodeGenerator(Path(f"{filePath}/{bel.name}_maps.v"), WriterType.VERILOG)
+    for name, c in cellDict.items():
+        with cg.Module(f"map_{name}", [cg.Attribute("techmap_celltype", name)]) as m:
+            with m.PortRegion() as pr:
+                runPass("select i:*")
+                for port in module.selected_wires():
+                    pr.Port(port.name.str().removeprefix("\\"), IO.INPUT, port.width)
+                runPass("select o:*")
+                for port in module.selected_wires():
+                    pr.Port(port.name.str().removeprefix("\\"), IO.OUTPUT, port.width)
+
+            with m.LogicRegion() as lr:
+                with lr.Generate() as g:
+                    runPass("select x:*")
+                    runPass("select -del a:CONFIG_BIT")
+                    runPass("select -del a:USER_CLK")
+                    connect = [
+                        i.name.str().removeprefix("\\") for i in module.selected_wires()
+                    ]
+                    g.InitModule(
+                        bel.name,
+                        "_TECHMAP_REPLACE_",
+                        [g.ConnectPair(i, i) for i in connect],
+                        [g.ConnectPair(i.removeprefix("\\"), j) for i, j in c],
+                    )
 
 
 if __name__ == "__main__":
-    genPrimsFromBel(Path("/Users/kelvin/FABulous/myProject/Tile/PE/ALU.v"))
+    # genPrimsFromBelHDL(Path("./myProject/Tile/PE/ALU.v"))
+    genPrimsFromBelHDL(parseBelFile(Path("./myProject/Tile/PE/ALU.v")))

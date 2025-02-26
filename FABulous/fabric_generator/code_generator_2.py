@@ -52,7 +52,7 @@ class CodeGenerator:
             if self.value is None:
                 return f"{self.name}"
             else:
-                return f"{self.name} = {self.value}"
+                return f'{self.name} = "{self.value}"'
 
     @dataclass
     class _Generate:

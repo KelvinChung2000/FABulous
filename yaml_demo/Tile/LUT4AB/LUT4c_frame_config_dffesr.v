@@ -33,6 +33,8 @@ FF=16,
 IOmux=17,
 SET_NORESET=18
 *)
+
+
 module LUT4c_frame_config_dffesr #(parameter NoConfigBits = 19)(
     // ConfigBits has to be adjusted manually (we don't use an arithmetic parser for the value)
     input [3:0]  I,   // Vector for I0, I1, I2, I3
@@ -42,7 +44,10 @@ module LUT4c_frame_config_dffesr #(parameter NoConfigBits = 19)(
     input        SR,          // SHARED_RESET
     input        EN,          // SHARED_ENABLE
     (* FABulous, EXTERNAL, SHARED_PORT *) input UserCLK, // External and shared clock
-    (* FABulous, GLOBAL *) input [NoConfigBits-1:0] ConfigBits // Config bits as vector
+    (* FABulous, CONFIG_BIT , INIT *) input [15:0] LUT_values,
+    (* FABulous, CONFIG_BIT  *) input c_out_mux,
+    (* FABulous, CONFIG_BIT  *) input c_I0mux,
+    (* FABulous, CONFIG_BIT  *) input c_reset_value
 );
     localparam LUT_SIZE = 4;
     localparam N_LUT_flops = 2 ** LUT_SIZE;
@@ -54,14 +59,9 @@ module LUT4c_frame_config_dffesr #(parameter NoConfigBits = 19)(
     wire I0mux; // normal input '0', or carry input '1'
     wire c_out_mux, c_I0mux, c_reset_value; // extra configuration bits
 
-    assign LUT_values = ConfigBits[15:0];
-    assign c_out_mux  = ConfigBits[16];
-    assign c_I0mux = ConfigBits[17];
-    assign c_reset_value = ConfigBits[18];
-
 //CONFout <= c_I0mux;
 
-    //assign I0mux = c_I0mux ? Ci : I0;
+    // assign I0mux = c_I0mux ? Ci : I0;
     cus_mux21 cus_mux21_I0mux(
     .A0(I[0]),
     .A1(Ci),

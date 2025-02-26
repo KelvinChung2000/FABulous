@@ -143,7 +143,9 @@ def genBel(bels: list[Bel], tile: TileType, context=1):
             for feature in bel.belFeatureMap:
                 # create the bel itself
                 belData = tile.create_bel(
-                    f"{c}_{bel.prefix}{bel.name}.{feature}", bel.name, count
+                    f"{c}_{bel.prefix}{bel.name}.{feature}",
+                    f"{bel.prefix}{bel.name}.{feature}",
+                    count,
                 )
 
                 for i in bel.inputs + bel.externalInputs:

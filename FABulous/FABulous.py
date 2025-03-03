@@ -125,6 +125,12 @@ def main():
 
     parser.add_argument("--debug", action="store_true", help="Enable debug mode")
 
+    parser.add_argument(
+        "-p",
+        "--commands",
+        help="execute <commands> (to chain commands, separate them with semicolon + whitespace: 'cmd1; cmd2')",
+    )
+
     args = parser.parse_args()
 
     setup_logger(args.verbose)
@@ -150,6 +156,7 @@ def main():
             Path(str(os.getenv("FAB_PROJ_DIR"))),
             FABulousScript=args.FABulousScript,
             TCLScript=args.TCLScript,
+            commands=args.commands.split("; ") if args.commands else [],
         )
         fab_CLI.debug = args.debug
 

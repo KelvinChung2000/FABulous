@@ -1,7 +1,7 @@
 from collections import defaultdict
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Generator
+from typing import Any, Generator, Iterable
 
 from FABulous.fabric_definition.Bel import Bel
 from FABulous.fabric_definition.define import ConfigBitMode, Loc, MultiplexerStyle
@@ -118,10 +118,14 @@ class Fabric:
     def getSuperTileByName(self, name: str) -> SuperTile | None:
         return self.superTileDict.get(name)
 
-    def getAllUniqueBels(self) -> list[Bel]:
+    def getAllUniqueBels(self) -> Iterable[Bel]:
         bels = list()
+        belSet = set()
         for tile in self.tileDict.values():
-            bels.extend(tile.bels)
+            for i in tile.bels:
+                if i.name not in belSet:
+                    bels.append(i)
+                    belSet.add(i.name)
         return bels
 
     def getTotalBelCount(self) -> int:

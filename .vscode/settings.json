@@ -5,7 +5,8 @@
   "cSpell.words": [
     "desync",
     "exitcond",
-    "libyosys"
+    "libyosys",
+    "Techmaps"
   ],
   "esbonio.server.enabled": false,
   "C_Cpp_Runner.cCompilerPath": "gcc",

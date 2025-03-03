@@ -3,9 +3,9 @@
   "modules": {
     "IO": {
       "attributes": {
-        "blackbox": 1,
+        "CELL": 1,
         "cells_not_processed": 1,
-        "src": "myProject/Tile/N_IO/IO.v:1.1-9.10"
+        "src": "/home/kelvin/FABulous_fork/myProject/Tile/N_IO/IO.v:2.1-14.10"
       },
       "ports": {
         "from_fabric": {
@@ -18,15 +18,15 @@
         },
         "in": {
           "direction": "input",
-          "bits": [ 4 ]
+          "bits": [ 3 ]
         },
         "out": {
           "direction": "output",
-          "bits": [ 5 ]
+          "bits": [ 2 ]
         },
         "ConfigBits": {
           "direction": "input",
-          "bits": [ 6 ]
+          "bits": [ 4 ]
         }
       },
       "cells": {
@@ -34,13 +34,13 @@
       "netnames": {
         "ConfigBits": {
           "hide_name": 0,
-          "bits": [ 6 ],
+          "bits": [ 4 ],
           "attributes": {
             "CONFIG_BIT": 1,
             "FABulous": 1,
             "FEATURE": "IO",
             "ONE_HOT": 1,
-            "src": "myProject/Tile/N_IO/IO.v:7.61-7.71"
+            "src": "/home/kelvin/FABulous_fork/myProject/Tile/N_IO/IO.v:8.61-8.71"
           }
         },
         "from_fabric": {
@@ -48,28 +48,29 @@
           "bits": [ 2 ],
           "attributes": {
             "BUS": 1,
+            "DATA": 1,
             "FABulous": 1,
-            "src": "myProject/Tile/N_IO/IO.v:3.31-3.42"
+            "src": "/home/kelvin/FABulous_fork/myProject/Tile/N_IO/IO.v:4.37-4.48"
           }
         },
         "in": {
           "hide_name": 0,
-          "bits": [ 4 ],
+          "bits": [ 3 ],
           "attributes": {
             "BUS": 1,
             "EXTERNAL": 1,
             "FABulous": 1,
-            "src": "myProject/Tile/N_IO/IO.v:5.41-5.43"
+            "src": "/home/kelvin/FABulous_fork/myProject/Tile/N_IO/IO.v:6.41-6.43"
           }
         },
         "out": {
           "hide_name": 0,
-          "bits": [ 5 ],
+          "bits": [ 2 ],
           "attributes": {
             "BUS": 1,
             "EXTERNAL": 1,
             "FABulous": 1,
-            "src": "myProject/Tile/N_IO/IO.v:6.42-6.45"
+            "src": "/home/kelvin/FABulous_fork/myProject/Tile/N_IO/IO.v:7.42-7.45"
           }
         },
         "to_fabric": {
@@ -77,8 +78,9 @@
           "bits": [ 3 ],
           "attributes": {
             "BUS": 1,
+            "DATA": 1,
             "FABulous": 1,
-            "src": "myProject/Tile/N_IO/IO.v:4.32-4.41"
+            "src": "/home/kelvin/FABulous_fork/myProject/Tile/N_IO/IO.v:5.38-5.47"
           }
         }
       }

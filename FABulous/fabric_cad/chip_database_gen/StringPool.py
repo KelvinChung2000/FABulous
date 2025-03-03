@@ -24,11 +24,11 @@ class StringPool:
 
     def id(self, val: str):
         if val in self.strs:
-            return IdString(self.strs[val])
+            return IdString(self.strs[val], val)
         else:
             idx = len(self.strs)
             self.strs[val] = idx
-            return IdString(idx)
+            return IdString(idx, val)
 
     def serialise_lists(self, context: str, bba: BBAWriter):
         bba.label(f"{context}_strs")

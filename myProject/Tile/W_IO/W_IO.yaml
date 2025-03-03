@@ -13,7 +13,7 @@ WIRES: [
   
 ]
 BELS: [
-    {BEL: ./IO.v, prefix: "W_"},
+    {BEL: ../include/IO.v, prefix: "W_"},
 
 ]
 MATRIX: ./list.py

@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, cast
+from typing import Any, Iterable, cast
 
 from FABulous.fabric_definition.Bel import Bel
 from FABulous.fabric_definition.ConfigMem import ConfigurationMemory
@@ -202,3 +202,10 @@ class Tile:
     def addWireType(self, wireType: WireType) -> None:
         if wireType not in self.wireTypes:
             self.wireTypes.append(wireType)
+
+    def getUniqueBelType(self) -> Iterable[Bel]:
+        belSet = set()
+        for i in self.bels:
+            if i.name not in belSet:
+                belSet.add(i.name)
+                yield i

@@ -110,6 +110,7 @@ class SlicedPort(Port):
 class BelPort(Port):
     prefix: str
     external: bool
+    control: bool
 
     def __repr__(self) -> str:
         return f"BelPort({self.ioDirection.value} {self.prefix}{self.name}[{self.wireCount-1}:0])"
@@ -118,7 +119,7 @@ class BelPort(Port):
         return (
             f"BelPort(name='{self.prefix}{self.name}', ioDirection=IO.{self.ioDirection.upper()}, "
             f"wireCount={self.wireCount}, isBus={self.isBus}, prefix='{self.prefix}', "
-            f"external={self.external})"
+            f"external={self.external}, control='{self.control}')"
         )
 
 

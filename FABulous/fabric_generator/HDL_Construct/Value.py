@@ -5,7 +5,7 @@ from typing import Self
 @dataclass(frozen=True)
 class Value:
     _value: str
-    _bitWidth: int | Self
+    _bitWidth: int | Self | None
     isSignal: bool
 
     # def __init__(self, name: str, bitWidth: int | Self, isSignal: bool = True):
@@ -36,6 +36,8 @@ class Value:
         return self.value
 
     def __getitem__(self, key: slice | int | Self):
+        if self.bitWidth is None:
+            raise ValueError("Cannot slice or get value with unknown bit width")
         if isinstance(key, int):
             return Value(f"{self.value}[{key}]", 1, self.isSignal)
         elif isinstance(key, slice):

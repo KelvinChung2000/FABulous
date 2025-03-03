@@ -167,6 +167,7 @@ def parseBelFile(
             isBus=FABulousPortType.BUS in attributes,
             prefix=belPrefix,
             external=FABulousPortType.EXTERNAL in attributes,
+            control=FABulousPortType.CONTROL in attributes,
         )
         if FABulousPortType.EXTERNAL in attributes:
             externalPort.append(port)

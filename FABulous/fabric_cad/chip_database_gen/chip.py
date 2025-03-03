@@ -324,6 +324,9 @@ class TileType(BBAStruct):
     def add_extraData(self, extra_data: TileExtraData):
         self.extra_data = extra_data
 
+    def get_wire_from_pip(self, pip: PipData) -> tuple[TileWireData, TileWireData]:
+        return (self.wires[pip.src_wire], self.wires[pip.dst_wire])
+
 
 @dataclass
 class NodeShape(BBAStruct):
@@ -859,7 +862,7 @@ class Chip:
         self.tiles[y][x].type_idx = self.tile_type_idx[type]
         return self.tiles[y][x]
 
-    def tile_type_at(self, x: int, y: int):
+    def tile_type_at(self, x: int, y: int) -> TileType:
         assert (
             self.tiles[y][x].type_idx is not None
         ), f"tile type at ({x}, {y}) must be set"

@@ -1,0 +1,42 @@
+import os
+import subprocess as sp
+from pathlib import Path
+
+from cmd2 import Cmd, Cmd2ArgumentParser, with_argparser, with_category
+from loguru import logger
+
+from FABulous.FABulous_CLI.define import CMD_FABRIC_FLOW
+from FABulous.FABulous_CLI.helper import check_if_application_exists
+
+synthesis_parser = Cmd2ArgumentParser()
+synthesis_parser.add_argument(
+    "file",
+    type=Path,
+    help="Path to the target files.",
+    completer=Cmd.path_complete,
+)
+
+
+@with_category(CMD_FABRIC_FLOW)
+@with_argparser(synthesis_parser)
+def do_synthesis_script(self, args):
+
+    resolvePath: Path = args.file.absolute()
+    if not resolvePath.exists():
+        logger.error(f"{resolvePath} does not exits")
+        return
+
+    yosys = check_if_application_exists(os.getenv("FAB_YOSYS_PATH", "yosys"))
+
+    runCmd = [
+        f"{yosys}",
+        "-q",
+        "-s",
+        f"{resolvePath}",
+    ]
+
+    try:
+        sp.run(runCmd, check=True)
+        logger.info("Synthesis completed")
+    except sp.CalledProcessError:
+        logger.error("Synthesis failed")

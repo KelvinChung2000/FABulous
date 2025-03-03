@@ -1,0 +1,6 @@
+read_verilog -sv /home/kelvin/FABulous_fork/myProject/user_design/test.sv
+prep -auto-top -flatten
+opt;;;
+hilomap -wrap Const O
+show -width
+dump

@@ -29,7 +29,7 @@ def generateTile(codeGen: CodeGenerator, fabric: Fabric, tile: Tile):
         portMapping: Mapping[TilePort | Port, Value] = {}
         with module.PortRegion() as pr:
             for side, ports in tile.getTilePortGrouped().items():
-                pr.Comment(f"{side.name}")
+                pr.Comment(f"{side.name}\n")
                 for p in ports:
                     if p.spanning:
                         portMapping[p] = pr.Port(
@@ -95,7 +95,7 @@ def generateTile(codeGen: CodeGenerator, fabric: Fabric, tile: Tile):
             lr.Comment("Buffering incoming and out outgoing wires")
             lr.NewLine()
             if tile.globalConfigBits > 0:
-                lr.Comment("FrameData Buffer")
+                lr.Comment("FrameData Buffer\n")
                 frameDataOutToIn = lr.Signal("FrameData_internal", frameBitsPerRow - 1)
                 lr.NewLine()
                 lr.InitModule(
@@ -121,7 +121,7 @@ def generateTile(codeGen: CodeGenerator, fabric: Fabric, tile: Tile):
                     ],
                 )
 
-            lr.Comment("FrameStrobe Buffer")
+            lr.Comment("FrameStrobe Buffer\n")
             frameBufferOutToIn = lr.Signal("FrameStrobe_internal", maxFramePerCol - 1)
             lr.NewLine()
             lr.InitModule(
@@ -148,7 +148,7 @@ def generateTile(codeGen: CodeGenerator, fabric: Fabric, tile: Tile):
                 ],
             )
 
-            lr.Comment("User Clock Buffer")
+            lr.Comment("User Clock Buffer\n")
             lr.InitModule(
                 "clk_buf",
                 "inst_clk_buf",
@@ -207,7 +207,7 @@ def generateTile(codeGen: CodeGenerator, fabric: Fabric, tile: Tile):
                 fabric.configBitMode == ConfigBitMode.FRAME_BASED
                 and tile.globalConfigBits > 0
             ):
-                lr.Comment("Init Configuration storage latches")
+                lr.Comment("Init Configuration storage latches\n")
                 lr.InitModule(
                     f"{tile.name}_ConfigMem",
                     f"Inst_{tile.name}_ConfigMem",
@@ -222,7 +222,7 @@ def generateTile(codeGen: CodeGenerator, fabric: Fabric, tile: Tile):
             # init bels
             belConfigBitCounter = 0
             for bel in tile.bels:
-                lr.Comment(f"Instantiate BEL {bel.name}")
+                lr.Comment(f"Instantiate BEL {bel.name}\n")
 
                 connectPairs = []
 

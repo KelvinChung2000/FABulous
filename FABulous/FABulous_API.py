@@ -2,10 +2,14 @@ from pathlib import Path
 
 from loguru import logger
 
-from FABulous.fabric_cad.bitstreamSpec_generator import generateBitsStreamSpec
 import FABulous.fabric_cad.model_generation_npnr as model_gen_npnr
-from FABulous.fabric_cad.chip_database_generator import generateChipDatabase
-from FABulous.fabric_cad.prims_gen import prims_gen
+from FABulous.fabric_cad.bitstreamSpec_generator import generateBitsStreamSpec
+from FABulous.fabric_cad.chip_database_generator import (
+    genRoutingDotGraph,
+    generateChipDatabase,
+)
+from FABulous.fabric_cad.helper import mergeFiles
+from FABulous.fabric_cad.synth_file_generator import genCellsAndMaps, prims_gen
 
 # Importing Modules from FABulous Framework.
 from FABulous.fabric_definition.Bel import Bel
@@ -15,8 +19,8 @@ from FABulous.fabric_definition.Tile import Tile
 from FABulous.fabric_generator.code_generator_2 import CodeGenerator
 from FABulous.fabric_generator.ConfigMem_genenrator import generateConfigMem
 from FABulous.fabric_generator.define import WriterType
-from FABulous.fabric_generator.fabricWrapper_generator import generateFabricTopWrapper
 from FABulous.fabric_generator.fabric_generator import generateFabric
+from FABulous.fabric_generator.fabricWrapper_generator import generateFabricTopWrapper
 from FABulous.fabric_generator.Tile_generator import generateTile
 from FABulous.fabric_generator.TileSwitchMatrix_generator import (
     generateTileSwitchMatrix,
@@ -309,7 +313,9 @@ class FABulous_API:
         """
         return self.fabric.superTileDict.values()
 
-    def genChipDatabase(self, resultDir: Path, baseConstids: Path):
+    def genChipDatabase(
+        self, resultDir: Path, baseConstids: Path, dotDir: Path = Path()
+    ):
         """Generates a chip database using the provided result directory and base
         constant IDs.
 
@@ -320,7 +326,7 @@ class FABulous_API:
         Returns:
             None
         """
-        generateChipDatabase(self.fabric, resultDir, baseConstids)
+        generateChipDatabase(self.fabric, resultDir, baseConstids, dotDir)
 
     def genPrimsLib(self, result: Path):
         """Generates primitives library using the provided result path.
@@ -336,3 +342,18 @@ class FABulous_API:
     def gen_port_data(self):
         for i in self.fabric.tileDict.values():
             setupPortData(i.name, i.tileDir, i.ports, i.bels)
+
+    def gen_cellsAndTechmaps(self, dest: Path):
+        cells = set()
+        maps = set()
+        libs = set()
+
+        for b in self.fabric.getAllUniqueBels():
+            genCellsAndMaps(b)
+            cells.update(Path(f"{b.src.parent}/metadata").glob("cell_*.li"))
+            maps.update(Path(f"{b.src.parent}/metadata").glob("map_*.v"))
+            libs.update(Path(f"{b.src.parent}/metadata").glob("lib_*.v"))
+
+        mergeFiles(cells, Path(f"{dest}/cells.li"))
+        mergeFiles(maps, Path(f"{dest}/techmaps.v"))
+        mergeFiles(libs, Path(f"{dest}/libs.v"))

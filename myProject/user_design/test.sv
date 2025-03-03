@@ -36,7 +36,6 @@ module test(
     input logic reset,
     input logic [31:0] A,
     input logic [31:0] B,
-    input logic [31:0] C,
     output logic [31:0] Y
 );
 
@@ -66,7 +65,7 @@ std_add #(
     .WIDTH(32)
 ) adder2 (
     .left (reg_out),
-    .right(C),
+    .right('d7),
     .out  (Y)
 );
 

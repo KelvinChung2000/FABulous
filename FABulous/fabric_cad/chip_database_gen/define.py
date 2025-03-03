@@ -5,16 +5,15 @@ from enum import Enum
 @dataclass(eq=True, order=True, frozen=True)
 class IdString:
     index: int = 0
+    value: str = ""
 
 
-@dataclass
 class PinType(Enum):
     INPUT = 0
     OUTPUT = 1
     INOUT = 2
 
 
-@dataclass
 class ClockEdge(Enum):
     RISING = 0
     FALLING = 1
@@ -25,4 +24,5 @@ class ClockEdge(Enum):
 class NodeWire:
     x: int
     y: int
+    wire: str
     wire: str

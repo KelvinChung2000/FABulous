@@ -11,6 +11,11 @@ class BelPin(BBAStruct):
     wire: int
     dir: PinType
 
+    def __init__(self, name: IdString, wire: int, dir: PinType):
+        self.name = name
+        self.wire = wire
+        self.dir = dir
+
     def serialise_lists(self, context: str, bba: BBAWriter):
         pass
 

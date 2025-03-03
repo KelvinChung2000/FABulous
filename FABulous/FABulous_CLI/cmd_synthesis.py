@@ -105,6 +105,7 @@ synthesis_parser.add_argument(
     completer=Cmd.path_complete,
     nargs="+",
 )
+
 synthesis_parser.add_argument(
     "-top",
     type=str,

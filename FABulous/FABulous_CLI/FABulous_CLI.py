@@ -35,7 +35,12 @@ from loguru import logger
 
 from FABulous.fabric_generator.define import WriterType
 from FABulous.FABulous_API import FABulous_API
-from FABulous.FABulous_CLI import cmd_helper, cmd_pnr, cmd_synthesis
+from FABulous.FABulous_CLI import (
+    cmd_helper,
+    cmd_pnr,
+    cmd_synthesis,
+    cmd_synthesis_script,
+)
 from FABulous.FABulous_CLI.define import (
     CMD_FABRIC_FLOW,
     CMD_GUI,
@@ -103,6 +108,7 @@ class FABulous_CLI(Cmd):
         projectDir: Path,
         FABulousScript: Path = Path(),
         TCLScript: Path = Path(),
+        commands: list[str] = [],
     ):
         """Initialises the FABulous shell instance.
 
@@ -216,6 +222,10 @@ class FABulous_CLI(Cmd):
         elif not FABulousScript.is_dir() and not FABulousScript.exists():
             logger.error(f"Cannot find {FABulousScript}")
             exit(1)
+
+        if commands:
+            self._startup_commands.extend(commands)
+            self._startup_commands.append("exit")
 
     def do_exit(self, *ignored):
         """Exits the FABulous shell and logs info message."""
@@ -568,14 +578,17 @@ class FABulous_CLI(Cmd):
         logger.info("Running FABulous")
         # self.fabulousAPI.gen_port_data()
         self.do_gen_fabric()
-        self.do_gen_primitive_library(str(self.projectDir / META_DATA_DIR / "prims.v"))
-        self.do_gen_chipdb()
-        self.do_gen_bitStream_spec()
         self.do_gen_top_wrapper()
-        # self.do_gen_model_npnr()
+        self.do_gen_FABulous_CAD_tool_files()
         # self.do_gen_geometry()
         logger.info("FABulous fabric flow complete")
         return
+
+    @with_category(CMD_FABRIC_FLOW)
+    def do_gen_FABulous_CAD_tool_files(self, *ignored):
+        self.do_gen_bitStream_spec()
+        self.do_gen_cells_and_techmaps()
+        self.do_gen_chipdb()
 
     @with_category(CMD_FABRIC_FLOW)
     def do_gen_model_npnr(self, *ignored):
@@ -616,23 +629,21 @@ class FABulous_CLI(Cmd):
         self.fabulousAPI.genChipDatabase(
             self.projectDir / META_DATA_DIR,
             self.projectDir / META_DATA_DIR / "baseConstIds.inc",
+            self.projectDir / META_DATA_DIR / "routing.dot",
         )
         logger.info("Generated chip database")
 
-    @with_argparser(filePathOptionalParser)
-    def do_gen_primitive_library(self, args):
-        """Generates primitive library by calling 'genPrimitiveLibrary'."""
-        logger.info("Generating primitive library")
-        if args.file.is_dir():
-            logger.info(f"Writing to {self.projectDir}/{META_DATA_DIR}/prims.v")
-            self.fabulousAPI.genPrimsLib(self.projectDir / META_DATA_DIR / "prims.v")
-        else:
-            logger.info(f"Writing to {args.file}")
-            self.fabulousAPI.genPrimsLib(args.file)
-
-        logger.info("Generated primitive library")
+    def do_gen_cells_and_techmaps(self, *ignored):
+        """Generates techmaps by calling 'genTechmaps'."""
+        logger.info("Generating techmaps")
+        self.fabulousAPI.gen_cellsAndTechmaps(
+            Path(f"{self.projectDir}/{META_DATA_DIR}")
+        )
+        logger.info("Generated techmaps")
 
     do_synthesis = cmd_synthesis.do_synthesis
+
+    do_synthesis_script = cmd_synthesis_script.do_synthesis_script
 
     do_place_and_route = cmd_pnr.do_place_and_route
 

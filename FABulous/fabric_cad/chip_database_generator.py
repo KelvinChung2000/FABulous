@@ -1,10 +1,11 @@
+from itertools import product
 from pathlib import Path
 from subprocess import run
-from typing import Mapping
+from typing import Iterable, Mapping
 
+import pydot
 from loguru import logger
 
-from FABulous.fabric_cad import prims_gen
 from FABulous.fabric_cad.chip_database_gen.Bel import BelExtraData, TileExtraData
 from FABulous.fabric_cad.chip_database_gen.chip import (
     Chip,
@@ -17,7 +18,6 @@ from FABulous.fabric_definition.Bel import Bel
 from FABulous.fabric_definition.Fabric import Fabric
 from FABulous.fabric_definition.SwitchMatrix import SwitchMatrix
 from FABulous.fabric_definition.Tile import Tile
-from FABulous.fabric_generator.code_generation_Verilog import VerilogWriter
 
 
 def genSwitchMatrix(tile: Tile, tileType: TileType, context=1):
@@ -122,7 +122,7 @@ def genSwitchMatrix(tile: Tile, tileType: TileType, context=1):
                 )
 
 
-def genBel(bels: list[Bel], tile: TileType, context=1):
+def genBel(bels: Iterable[Bel], tile: TileType, context=1):
     count = 0
     for c in range(context):
         for z, bel in enumerate(bels):
@@ -140,40 +140,97 @@ def genBel(bels: list[Bel], tile: TileType, context=1):
 
             if bel.userCLK:
                 tile.create_wire(f"{c}_{bel.prefix}{bel.name}_{bel.userCLK.name}")
-            for feature in bel.belFeatureMap:
-                # create the bel itself
-                belData = tile.create_bel(
-                    f"{c}_{bel.prefix}{bel.name}.{feature}",
-                    f"{bel.prefix}{bel.name}.{feature}",
-                    count,
-                )
+            # create the bel itself
+            belData = tile.create_bel(
+                f"{c}_{bel.prefix}{bel.name}",
+                f"{bel.name}",
+                count,
+            )
 
-                for i in bel.inputs + bel.externalInputs:
-                    for wc in range(i.wireCount):
-                        tile.add_bel_pin(
-                            belData,
-                            f"{bel.prefix}{i.name}[{wc}]",
-                            f"{c}_{bel.prefix}{i.name}[{wc}]",
-                            PinType.INPUT,
-                        )
-                for i in bel.outputs + bel.externalOutputs:
-                    for wc in range(i.wireCount):
-                        tile.add_bel_pin(
-                            belData,
-                            f"{bel.prefix}{i.name}[{wc}]",
-                            f"{c}_{bel.prefix}{i.name}[{wc}]",
-                            PinType.OUTPUT,
-                        )
-
-                if bel.userCLK:
+            for i in bel.inputs:
+                for wc in range(i.wireCount):
                     tile.add_bel_pin(
                         belData,
-                        bel.userCLK.name,
-                        f"{c}_{bel.prefix}{bel.name}_{bel.userCLK.name}",
+                        f"{bel.prefix}{i.name}[{wc}]",
+                        f"{c}_{bel.prefix}{i.name}[{wc}]",
                         PinType.INPUT,
                     )
-                belData.add_extra_data(BelExtraData(context=c))
-                count += 1
+
+            for i in bel.inputs:
+                if i.control:
+                    for wc in range(i.wireCount):
+                        gnd = tile.create_bel("GND_DRV", "GND_DRV", z=count)
+                        tile.create_wire(
+                            f"{c}_{bel.prefix}{i.name}_GND[{wc}]",
+                            "GND",
+                            const_value="GND",
+                        )
+                        tile.add_bel_pin(
+                            gnd,
+                            f"{c}_{bel.prefix}{i.name}_GND[{wc}]",
+                            f"{c}_{bel.prefix}{i.name}_GND[{wc}]",
+                            PinType.OUTPUT,
+                        )
+                        tile.create_pip(
+                            f"{c}_{bel.prefix}{i.name}_GND[{wc}]",
+                            f"{c}_{bel.prefix}{i.name}[{wc}]",
+                        )
+
+                        vcc = tile.create_bel("VCC_DRV", "VCC_DRV", z=count)
+                        tile.create_wire(
+                            f"{c}_{bel.prefix}{i.name}_VCC[{wc}]",
+                            "VCC",
+                            const_value="VCC",
+                        )
+                        tile.add_bel_pin(
+                            vcc,
+                            f"{c}_{bel.prefix}{i.name}_VCC[{wc}]",
+                            f"{c}_{bel.prefix}{i.name}_VCC[{wc}]",
+                            PinType.OUTPUT,
+                        )
+                        tile.create_pip(
+                            f"{c}_{bel.prefix}{i.name}_VCC[{wc}]",
+                            f"{c}_{bel.prefix}{i.name}[{wc}]",
+                        )
+
+            for i in bel.externalInputs:
+                for wc in range(i.wireCount):
+                    inBuf = tile.create_bel(f"{c}_INBUF[{wc}]", "INBUF", count)
+                    tile.add_bel_pin(
+                        inBuf,
+                        f"{c}_{bel.prefix}O[{wc}]",
+                        f"{c}_{bel.prefix}{i.name}[{wc}]",
+                        PinType.OUTPUT,
+                    )
+
+            for i in bel.outputs:
+                for wc in range(i.wireCount):
+                    tile.add_bel_pin(
+                        belData,
+                        f"{bel.prefix}{i.name}[{wc}]",
+                        f"{c}_{bel.prefix}{i.name}[{wc}]",
+                        PinType.OUTPUT,
+                    )
+
+            for i in bel.externalOutputs:
+                for wc in range(i.wireCount):
+                    outBuf = tile.create_bel(f"{c}_OUTBUF[{wc}]", "OUTBUF", count)
+                    tile.add_bel_pin(
+                        outBuf,
+                        f"{c}_{bel.prefix}I[{wc}]",
+                        f"{c}_{bel.prefix}{i.name}[{wc}]",
+                        PinType.INPUT,
+                    )
+
+            if bel.userCLK:
+                tile.add_bel_pin(
+                    belData,
+                    bel.userCLK.name,
+                    f"{c}_{bel.prefix}{bel.name}_{bel.userCLK.name}",
+                    PinType.INPUT,
+                )
+            belData.add_extra_data(BelExtraData(context=c))
+            count += 1
 
 
 def genTile(tile: Tile, chip: Chip, context=1) -> TileType:
@@ -260,7 +317,9 @@ def setTiming(chip: Chip):
     )
 
 
-def generateChipDatabase(fabric: Fabric, filePath: Path, baseConstIdsPath: Path):
+def generateChipDatabase(
+    fabric: Fabric, filePath: Path, baseConstIdsPath: Path, dotDir: Path
+):
     ch = Chip("FABulous", fabric.name, fabric.numberOfColumns, fabric.numberOfRows)
 
     ch.strs.read_constids(str(baseConstIdsPath))
@@ -317,18 +376,70 @@ def generateChipDatabase(fabric: Fabric, filePath: Path, baseConstIdsPath: Path)
         logger.error("Failed to compile the bba file to bit file.")
         raise e
 
+    if dotDir is not Path():
+        genRoutingDotGraph(ch, filePath)
 
-if __name__ == "__main__":
-    f = FABulous_API(VerilogWriter(), str(Path.cwd() / "myProject" / "fabric.yaml"))
-    f.setWriterOutputFile("/home/kelvin/FABulous_fork/test.v")
-    # f.bootstrapSwitchMatrix("LUT4AB", "/home/kelvin/FABulous_fork/tmp.csv")
-    ch = Chip(
-        "FABulous", f.fabric.name, f.fabric.numberOfRows, f.fabric.numberOfColumns
-    )
-    generateChipDatabase(
-        f.fabric,
-        Path(Path.cwd() / "myProject/.FABulous"),
-        Path(Path.cwd() / "myProject/.FABulous" / "baseConstIds.inc"),
-    )
-    prims_gen.prims_gen(Path(Path.cwd() / "myProject/.FABulous" / "prims.v"), f.fabric)
-    prims_gen.prims_gen(Path(Path.cwd() / "myProject/.FABulous" / "prims.v"), f.fabric)
+
+def genRoutingDotGraph(chip: Chip, filePath: Path):
+    graph = pydot.Dot(graph_type="digraph")
+
+    pairs = list(product(range(chip.height), range(chip.width)))
+
+    for x, y in pairs:
+        tileType = chip.tile_type_at(1, 1)
+        subgraph = pydot.Subgraph(
+            f"cluster_{x}_{y}", label=f"tile_{x}_{y}_{tileType.name}"
+        )
+        for bel in tileType.bels:
+            subgraph.add_node(
+                pydot.Node(f"X{x}Y{y}_bel_{bel.name.value}", label=f"{bel.name.value}")
+            )
+            for pin in bel.pins:
+                subgraph.add_node(
+                    pydot.Node(
+                        f"X{x}Y{y}_pin_{pin.name.value}",
+                        label=f"pin_{pin.name.value}",
+                        shape="box",
+                    )
+                )
+                if pin.dir == PinType.INPUT:
+                    subgraph.add_edge(
+                        pydot.Edge(
+                            f"X{x}Y{y}_pin_{pin.name.value}",
+                            f"X{x}Y{y}_bel_{bel.name.value}",
+                        )
+                    )
+                elif pin.dir == PinType.OUTPUT:
+                    subgraph.add_edge(
+                        pydot.Edge(
+                            f"X{x}Y{y}_bel_{bel.name.value}",
+                            f"X{x}Y{y}_pin_{pin.name.value}",
+                        )
+                    )
+
+        for pip in tileType.pips:
+            src, dst = tileType.get_wire_from_pip(pip)
+            subgraph.add_edge(
+                pydot.Edge(f"X{x}Y{y}_{src.name.value}", f"X{x}Y{y}_{dst.name.value}")
+            )
+
+        # subgraph.add_node(pydot.Node(f"tile_{x}_{y}"))
+        graph.add_subgraph(subgraph)
+
+    graph.write(str(filePath / "routing_graph.dot"))
+
+
+# if __name__ == "__main__":
+#     f = FABulous_API(VerilogWriter(), str(Path.cwd() / "myProject" / "fabric.yaml"))
+#     f.setWriterOutputFile("/home/kelvin/FABulous_fork/test.v")
+#     # f.bootstrapSwitchMatrix("LUT4AB", "/home/kelvin/FABulous_fork/tmp.csv")
+#     ch = Chip(
+#         "FABulous", f.fabric.name, f.fabric.numberOfRows, f.fabric.numberOfColumns
+#     )
+#     generateChipDatabase(
+#         f.fabric,
+#         Path(Path.cwd() / "myProject/.FABulous"),
+#         Path(Path.cwd() / "myProject/.FABulous" / "baseConstIds.inc"),
+#     )
+#     synth_file_generator.prims_gen(Path(Path.cwd() / "myProject/.FABulous" / "prims.v"), f.fabric)
+#     synth_file_generator.prims_gen(Path(Path.cwd() / "myProject/.FABulous" / "prims.v"), f.fabric)

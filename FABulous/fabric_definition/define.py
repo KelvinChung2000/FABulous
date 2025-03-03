@@ -41,6 +41,8 @@ class FABulousPortType(StrEnum):
     GLOBAL = "GLOBAL"
     BUS = "BUS"
     SHARED = "SHARED"
+    CONTROL = "CONTROL"
+    DATA = "DATA"
 
 
 class FeatureType(StrEnum):

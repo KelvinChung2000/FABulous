@@ -1,3 +1,0 @@
-ALU/ALU_func
-ALU/en
-ALU/reg_en

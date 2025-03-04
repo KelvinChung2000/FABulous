@@ -10,6 +10,6 @@
 
 FABulous --debug ../../myProject -p "load_fabric; gen_FABulous_CAD_tool_files; synthesis_script synth.ys"
 # xdot /home/kelvin/FABulous_fork/myProject/.FABulous/routing_graph.dot &
-# nextpnr-himbaechel --chipdb ../.FABulous/hycube.bit --device "FABulous" -v \
-#     --json /home/kelvin/FABulous_fork/myProject/user_design/synth_test.json \
-#     --write home/kelvin/FABulous_fork/myProject/user_design/router_test.json
+nextpnr-himbaechel --chipdb ../.FABulous/hycube.bit --device "FABulous" --debug \
+    --json /home/kelvin/FABulous_fork/myProject/user_design/synth_test.json \
+    --write home/kelvin/FABulous_fork/myProject/user_design/router_test.json

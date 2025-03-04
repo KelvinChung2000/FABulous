@@ -1,13 +1,13 @@
-module INBUF #(parameter WIDTH = 8) (
-    input [WIDTH-1:0] PAD,
-    output [WIDTH-1:0] O
+module INBUF #() (
+    input  PAD,
+    output  O
 );
     assign O = PAD;
 endmodule
 
-module OUTBUF #(parameter WIDTH = 8) (
-    output [WIDTH-1:0] PAD,
-    input [WIDTH-1:0] I
+module OUTBUF #() (
+    output  PAD,
+    input I
 );
     assign PAD = I;
 endmodule

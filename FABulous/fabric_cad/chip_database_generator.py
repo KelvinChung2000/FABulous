@@ -1,3 +1,4 @@
+import re
 from itertools import product
 from pathlib import Path
 from subprocess import run
@@ -147,7 +148,7 @@ def genBel(bels: Iterable[Bel], tile: TileType, context=1):
                 count,
             )
 
-            for i in bel.inputs:
+            for i in bel.inputs + bel.externalInputs:
                 for wc in range(i.wireCount):
                     tile.add_bel_pin(
                         belData,
@@ -195,31 +196,43 @@ def genBel(bels: Iterable[Bel], tile: TileType, context=1):
 
             for i in bel.externalInputs:
                 for wc in range(i.wireCount):
+                    tile.create_wire(f"{c}_{bel.prefix}O[{wc}]", "INBUF")
                     inBuf = tile.create_bel(f"{c}_INBUF[{wc}]", "INBUF", count)
                     tile.add_bel_pin(
                         inBuf,
+                        f"{c}_O[{wc}]",
                         f"{c}_{bel.prefix}O[{wc}]",
-                        f"{c}_{bel.prefix}{i.name}[{wc}]",
                         PinType.OUTPUT,
                     )
+                    tile.create_pip(
+                        f"{c}_{bel.prefix}O[{wc}]",
+                        f"{c}_{bel.prefix}{i.name}[{wc}]",
+                    )
 
-            for i in bel.outputs:
+            for i in bel.outputs + bel.externalOutputs:
                 for wc in range(i.wireCount):
+                    tile.create_wire(f"{c}_{bel.prefix}I[{wc}]", "OUTBUF")
                     tile.add_bel_pin(
                         belData,
-                        f"{bel.prefix}{i.name}[{wc}]",
+                        f"{i.name}[{wc}]",
                         f"{c}_{bel.prefix}{i.name}[{wc}]",
                         PinType.OUTPUT,
                     )
 
             for i in bel.externalOutputs:
                 for wc in range(i.wireCount):
+                    tile.create_wire(f"{c}_{bel.prefix}I[{wc}]", "OUTBUF")
                     outBuf = tile.create_bel(f"{c}_OUTBUF[{wc}]", "OUTBUF", count)
                     tile.add_bel_pin(
                         outBuf,
+                        f"{c}_I[{wc}]",
                         f"{c}_{bel.prefix}I[{wc}]",
-                        f"{c}_{bel.prefix}{i.name}[{wc}]",
                         PinType.INPUT,
+                    )
+
+                    tile.create_pip(
+                        f"{c}_{bel.prefix}{i.name}[{wc}]",
+                        f"{c}_{bel.prefix}I[{wc}]",
                     )
 
             if bel.userCLK:
@@ -377,51 +390,72 @@ def generateChipDatabase(
         raise e
 
     if dotDir is not Path():
-        genRoutingDotGraph(ch, filePath)
+        genRoutingDotGraph(ch, filePath, True)
 
 
-def genRoutingDotGraph(chip: Chip, filePath: Path):
+def genRoutingDotGraph(chip: Chip, filePath: Path, expand=False):
     graph = pydot.Dot(graph_type="digraph")
 
-    pairs = list(product(range(chip.height), range(chip.width)))
+    if expand:
 
+        def removeBit(i: str) -> str:
+            return i
+
+    else:
+
+        def removeBit(i: str) -> str:
+            return re.sub(r"\[\d+\]$", "", i)
+
+    pairs = list(product(range(chip.height), range(chip.width)))
+    pairs = [(0, 1)]
     for x, y in pairs:
-        tileType = chip.tile_type_at(1, 1)
+        pinWireMap = {}
+        tileType = chip.tile_type_at(x, y)
         subgraph = pydot.Subgraph(
             f"cluster_{x}_{y}", label=f"tile_{x}_{y}_{tileType.name}"
         )
         for bel in tileType.bels:
-            subgraph.add_node(
-                pydot.Node(f"X{x}Y{y}_bel_{bel.name.value}", label=f"{bel.name.value}")
+            belSupGraph = pydot.Subgraph(
+                f"cluster_{x}_{y}_{bel.name.value}",
+                label=f"{bel.name.value}",
             )
-            for pin in bel.pins:
-                subgraph.add_node(
-                    pydot.Node(
-                        f"X{x}Y{y}_pin_{pin.name.value}",
-                        label=f"pin_{pin.name.value}",
-                        shape="box",
-                    )
+            belSupGraph.add_node(
+                pydot.Node(
+                    f"X{x}Y{y}_bel_{bel.name.value}",
+                    label=f"{bel.name.value}",
+                    shape="box",
                 )
+            )
+            added = set()
+            for pin in bel.pins:
+                pinWire = removeBit(tileType.wires[pin.wire].name.value)
+                if pinWire in added:
+                    continue
+                added.add(pinWire)
                 if pin.dir == PinType.INPUT:
-                    subgraph.add_edge(
+                    belSupGraph.add_edge(
                         pydot.Edge(
-                            f"X{x}Y{y}_pin_{pin.name.value}",
+                            f"X{x}Y{y}_{pinWire}",
                             f"X{x}Y{y}_bel_{bel.name.value}",
                         )
                     )
                 elif pin.dir == PinType.OUTPUT:
-                    subgraph.add_edge(
+                    belSupGraph.add_edge(
                         pydot.Edge(
                             f"X{x}Y{y}_bel_{bel.name.value}",
-                            f"X{x}Y{y}_pin_{pin.name.value}",
+                            f"X{x}Y{y}_{pinWire}",
                         )
                     )
-
+            subgraph.add_subgraph(belSupGraph)
+        addedPairs = set()
         for pip in tileType.pips:
             src, dst = tileType.get_wire_from_pip(pip)
-            subgraph.add_edge(
-                pydot.Edge(f"X{x}Y{y}_{src.name.value}", f"X{x}Y{y}_{dst.name.value}")
-            )
+            srcName = removeBit(src.name.value)
+            dstName = removeBit(dst.name.value)
+            if (srcName, dstName) in addedPairs:
+                continue
+            subgraph.add_edge(pydot.Edge(f"X{x}Y{y}_{srcName}", f"X{x}Y{y}_{dstName}"))
+            addedPairs.add((srcName, dstName))
 
         # subgraph.add_node(pydot.Node(f"tile_{x}_{y}"))
         graph.add_subgraph(subgraph)

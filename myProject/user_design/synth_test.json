@@ -5,7 +5,7 @@
       "attributes": {
         "blackbox": "00000000000000000000000000000001",
         "cells_not_processed": "00000000000000000000000000000001",
-        "src": "/home/kelvin/FABulous_fork/myProject/.FABulous/libs.v:28.1-37.10"
+        "src": "/home/kelvin/FABulous_fork/myProject/.FABulous/libs.v:15.1-24.10"
       },
       "parameter_default_values": {
         "ALU_func": "00000000000000000000000000000000"
@@ -35,28 +35,28 @@
           "hide_name": 0,
           "bits": [ 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33 ],
           "attributes": {
-            "src": "/home/kelvin/FABulous_fork/myProject/.FABulous/libs.v:31.18-31.26"
+            "src": "/home/kelvin/FABulous_fork/myProject/.FABulous/libs.v:18.18-18.26"
           }
         },
         "data_in2": {
           "hide_name": 0,
           "bits": [ 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65 ],
           "attributes": {
-            "src": "/home/kelvin/FABulous_fork/myProject/.FABulous/libs.v:32.18-32.26"
+            "src": "/home/kelvin/FABulous_fork/myProject/.FABulous/libs.v:19.18-19.26"
           }
         },
         "data_in3": {
           "hide_name": 0,
           "bits": [ 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97 ],
           "attributes": {
-            "src": "/home/kelvin/FABulous_fork/myProject/.FABulous/libs.v:33.18-33.26"
+            "src": "/home/kelvin/FABulous_fork/myProject/.FABulous/libs.v:20.18-20.26"
           }
         },
         "data_out": {
           "hide_name": 0,
           "bits": [ 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129 ],
           "attributes": {
-            "src": "/home/kelvin/FABulous_fork/myProject/.FABulous/libs.v:34.19-34.27"
+            "src": "/home/kelvin/FABulous_fork/myProject/.FABulous/libs.v:21.19-21.27"
           }
         }
       }
@@ -159,22 +159,18 @@
     },
     "INBUF": {
       "attributes": {
-        "dynports": "00000000000000000000000000000001",
         "blackbox": "00000000000000000000000000000001",
         "cells_not_processed": "00000000000000000000000000000001",
         "src": "/home/kelvin/FABulous_fork/myProject/.FABulous/IO_buf.v:1.1-6.10"
       },
-      "parameter_default_values": {
-        "WIDTH": "00000000000000000000000000001000"
-      },
       "ports": {
         "PAD": {
           "direction": "input",
-          "bits": [ 2, 3, 4, 5, 6, 7, 8, 9 ]
+          "bits": [ 2 ]
         },
         "O": {
           "direction": "output",
-          "bits": [ 10, 11, 12, 13, 14, 15, 16, 17 ]
+          "bits": [ 3 ]
         }
       },
       "cells": {
@@ -182,16 +178,16 @@
       "netnames": {
         "O": {
           "hide_name": 0,
-          "bits": [ 10, 11, 12, 13, 14, 15, 16, 17 ],
+          "bits": [ 3 ],
           "attributes": {
-            "src": "/home/kelvin/FABulous_fork/myProject/.FABulous/IO_buf.v:3.24-3.25"
+            "src": "/home/kelvin/FABulous_fork/myProject/.FABulous/IO_buf.v:3.13-3.14"
           }
         },
         "PAD": {
           "hide_name": 0,
-          "bits": [ 2, 3, 4, 5, 6, 7, 8, 9 ],
+          "bits": [ 2 ],
           "attributes": {
-            "src": "/home/kelvin/FABulous_fork/myProject/.FABulous/IO_buf.v:2.23-2.26"
+            "src": "/home/kelvin/FABulous_fork/myProject/.FABulous/IO_buf.v:2.12-2.15"
           }
         }
       }
@@ -255,22 +251,18 @@
     },
     "OUTBUF": {
       "attributes": {
-        "dynports": "00000000000000000000000000000001",
         "blackbox": "00000000000000000000000000000001",
         "cells_not_processed": "00000000000000000000000000000001",
         "src": "/home/kelvin/FABulous_fork/myProject/.FABulous/IO_buf.v:8.1-13.10"
       },
-      "parameter_default_values": {
-        "WIDTH": "00000000000000000000000000001000"
-      },
       "ports": {
         "PAD": {
           "direction": "output",
-          "bits": [ 2, 3, 4, 5, 6, 7, 8, 9 ]
+          "bits": [ 2 ]
         },
         "I": {
           "direction": "input",
-          "bits": [ 10, 11, 12, 13, 14, 15, 16, 17 ]
+          "bits": [ 3 ]
         }
       },
       "cells": {
@@ -278,16 +270,16 @@
       "netnames": {
         "I": {
           "hide_name": 0,
-          "bits": [ 10, 11, 12, 13, 14, 15, 16, 17 ],
+          "bits": [ 3 ],
           "attributes": {
-            "src": "/home/kelvin/FABulous_fork/myProject/.FABulous/IO_buf.v:10.23-10.24"
+            "src": "/home/kelvin/FABulous_fork/myProject/.FABulous/IO_buf.v:10.11-10.12"
           }
         },
         "PAD": {
           "hide_name": 0,
-          "bits": [ 2, 3, 4, 5, 6, 7, 8, 9 ],
+          "bits": [ 2 ],
           "attributes": {
-            "src": "/home/kelvin/FABulous_fork/myProject/.FABulous/IO_buf.v:9.24-9.27"
+            "src": "/home/kelvin/FABulous_fork/myProject/.FABulous/IO_buf.v:9.13-9.16"
           }
         }
       }
@@ -323,7 +315,7 @@
       "attributes": {
         "blackbox": "00000000000000000000000000000001",
         "cells_not_processed": "00000000000000000000000000000001",
-        "src": "/home/kelvin/FABulous_fork/myProject/.FABulous/libs.v:15.1-24.10"
+        "src": "/home/kelvin/FABulous_fork/myProject/.FABulous/libs.v:28.1-37.10"
       },
       "ports": {
         "en": {
@@ -350,28 +342,28 @@
           "hide_name": 0,
           "bits": [ 2 ],
           "attributes": {
-            "src": "/home/kelvin/FABulous_fork/myProject/.FABulous/libs.v:18.11-18.13"
+            "src": "/home/kelvin/FABulous_fork/myProject/.FABulous/libs.v:31.11-31.13"
           }
         },
         "reg_in": {
           "hide_name": 0,
           "bits": [ 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34 ],
           "attributes": {
-            "src": "/home/kelvin/FABulous_fork/myProject/.FABulous/libs.v:19.18-19.24"
+            "src": "/home/kelvin/FABulous_fork/myProject/.FABulous/libs.v:32.18-32.24"
           }
         },
         "reg_out": {
           "hide_name": 0,
           "bits": [ 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67 ],
           "attributes": {
-            "src": "/home/kelvin/FABulous_fork/myProject/.FABulous/libs.v:21.19-21.26"
+            "src": "/home/kelvin/FABulous_fork/myProject/.FABulous/libs.v:34.19-34.26"
           }
         },
         "rst": {
           "hide_name": 0,
           "bits": [ 35 ],
           "attributes": {
-            "src": "/home/kelvin/FABulous_fork/myProject/.FABulous/libs.v:20.11-20.14"
+            "src": "/home/kelvin/FABulous_fork/myProject/.FABulous/libs.v:33.11-33.14"
           }
         }
       }
@@ -457,7 +449,7 @@
           },
           "attributes": {
             "module_not_derived": "00000000000000000000000000000001",
-            "src": "/home/kelvin/FABulous_fork/myProject/.FABulous/techmaps.v:19.7-24.6"
+            "src": "/home/kelvin/FABulous_fork/myProject/.FABulous/techmaps.v:116.7-121.6"
           },
           "port_directions": {
             "data_in1": "input",
@@ -480,7 +472,7 @@
           },
           "attributes": {
             "module_not_derived": "00000000000000000000000000000001",
-            "src": "/home/kelvin/FABulous_fork/myProject/.FABulous/techmaps.v:19.7-24.6"
+            "src": "/home/kelvin/FABulous_fork/myProject/.FABulous/techmaps.v:116.7-121.6"
           },
           "port_directions": {
             "data_in1": "input",
@@ -502,7 +494,7 @@
           },
           "attributes": {
             "module_not_derived": "00000000000000000000000000000001",
-            "src": "/home/kelvin/FABulous_fork/myProject/.FABulous/techmaps.v:213.18-218.6"
+            "src": "/home/kelvin/FABulous_fork/myProject/.FABulous/techmaps.v:38.18-43.6"
           },
           "port_directions": {
             "en": "input",

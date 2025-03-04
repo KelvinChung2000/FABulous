@@ -119,7 +119,7 @@ class BelPort(Port):
         return (
             f"BelPort(name='{self.prefix}{self.name}', ioDirection=IO.{self.ioDirection.upper()}, "
             f"wireCount={self.wireCount}, isBus={self.isBus}, prefix='{self.prefix}', "
-            f"external={self.external}, control='{self.control}')"
+            f"external={self.external}, control={self.control})"
         )
 
 

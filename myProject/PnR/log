@@ -1,512 +1,1636 @@
+Warning: wire '\out' is assigned in a block at /home/kelvin/FABulous_fork/myProject/user_design/test.sv:24.7-24.16.
+Warning: wire '\done' is assigned in a block at /home/kelvin/FABulous_fork/myProject/user_design/test.sv:25.7-25.16.
+Warning: wire '\out' is assigned in a block at /home/kelvin/FABulous_fork/myProject/user_design/test.sv:27.7-27.17.
+Warning: wire '\done' is assigned in a block at /home/kelvin/FABulous_fork/myProject/user_design/test.sv:28.7-28.19.
+Warning: wire '\done' is assigned in a block at /home/kelvin/FABulous_fork/myProject/user_design/test.sv:29.14-29.26.
+Warning: Resizing cell port test.regs.reset from 32 bits to 1 bits.
+Warning: Resizing cell port test.regs.write_en from 32 bits to 1 bits.
 Info: Using uarch 'FABulous' for device 'FABulous'
-Info: FABulous uarch initialized with 2 contexts and minII=1
+Info: FABulous uarch initialized with 1 contexts and minII=1
+Info: 6 unique Tile types found.
+Info:    Tile E_IO has 3 unique bel types.
+Info:    Tile N_IO has 3 unique bel types.
+Info:    Tile PE has 6 unique bel types.
+Info:    Tile S_IO has 3 unique bel types.
+Info:    Tile W_IO has 3 unique bel types.
+Info:    Tile NULL has 0 unique bel types.
 
-Info: Checksum: 0x67d44446
+Info: Y[8]
+Info:   driver: $iopadmap$test.Y_9
+Info:   user: Y[8]
+Info: Y[7]
+Info:   driver: $iopadmap$test.Y_8
+Info:   user: Y[7]
+Info: Y[6]
+Info:   driver: $iopadmap$test.Y_7
+Info:   user: Y[6]
+Info: Y[5]
+Info:   driver: $iopadmap$test.Y_6
+Info:   user: Y[5]
+Info: Y[4]
+Info:   driver: $iopadmap$test.Y_5
+Info:   user: Y[4]
+Info: Y[3]
+Info:   driver: $iopadmap$test.Y_4
+Info:   user: Y[3]
+Info: Y[31]
+Info:   driver: $iopadmap$test.Y_32
+Info:   user: Y[31]
+Info: Y[30]
+Info:   driver: $iopadmap$test.Y_31
+Info:   user: Y[30]
+Info: Y[29]
+Info:   driver: $iopadmap$test.Y_30
+Info:   user: Y[29]
+Info: Y[2]
+Info:   driver: $iopadmap$test.Y_3
+Info:   user: Y[2]
+Info: Y[28]
+Info:   driver: $iopadmap$test.Y_29
+Info:   user: Y[28]
+Info: Y[27]
+Info:   driver: $iopadmap$test.Y_28
+Info:   user: Y[27]
+Info: Y[26]
+Info:   driver: $iopadmap$test.Y_27
+Info:   user: Y[26]
+Info: Y[25]
+Info:   driver: $iopadmap$test.Y_26
+Info:   user: Y[25]
+Info: Y[24]
+Info:   driver: $iopadmap$test.Y_25
+Info:   user: Y[24]
+Info: Y[23]
+Info:   driver: $iopadmap$test.Y_24
+Info:   user: Y[23]
+Info: Y[22]
+Info:   driver: $iopadmap$test.Y_23
+Info:   user: Y[22]
+Info: Y[21]
+Info:   driver: $iopadmap$test.Y_22
+Info:   user: Y[21]
+Info: Y[20]
+Info:   driver: $iopadmap$test.Y_21
+Info:   user: Y[20]
+Info: Y[19]
+Info:   driver: $iopadmap$test.Y_20
+Info:   user: Y[19]
+Info: Y[1]
+Info:   driver: $iopadmap$test.Y_2
+Info:   user: Y[1]
+Info: Y[18]
+Info:   driver: $iopadmap$test.Y_19
+Info:   user: Y[18]
+Info: Y[17]
+Info:   driver: $iopadmap$test.Y_18
+Info:   user: Y[17]
+Info: Y[16]
+Info:   driver: $iopadmap$test.Y_17
+Info:   user: Y[16]
+Info: Y[15]
+Info:   driver: $iopadmap$test.Y_16
+Info:   user: Y[15]
+Info: Y[14]
+Info:   driver: $iopadmap$test.Y_15
+Info:   user: Y[14]
+Info: Y[13]
+Info:   driver: $iopadmap$test.Y_14
+Info:   user: Y[13]
+Info: Y[12]
+Info:   driver: $iopadmap$test.Y_13
+Info:   user: Y[12]
+Info: Y[11]
+Info:   driver: $iopadmap$test.Y_12
+Info:   user: Y[11]
+Info: Y[10]
+Info:   driver: $iopadmap$test.Y_11
+Info:   user: Y[10]
+Info: Y[9]
+Info:   driver: $iopadmap$test.Y_10
+Info:   user: Y[9]
+Info: Y[0]
+Info:   driver: $iopadmap$test.Y_1
+Info:   user: Y[0]
+Info: $iopadmap$Y_1[31]
+Info:   driver: $iopadmap$test.Y
+Info:   user: $iopadmap$test.Y_32
+Info: $iopadmap$Y_1[30]
+Info:   driver: $iopadmap$test.Y
+Info:   user: $iopadmap$test.Y_31
+Info: $iopadmap$Y_1[29]
+Info:   driver: $iopadmap$test.Y
+Info:   user: $iopadmap$test.Y_30
+Info: $iopadmap$Y_1[28]
+Info:   driver: $iopadmap$test.Y
+Info:   user: $iopadmap$test.Y_29
+Info: $iopadmap$Y_1[27]
+Info:   driver: $iopadmap$test.Y
+Info:   user: $iopadmap$test.Y_28
+Info: $iopadmap$Y_1[26]
+Info:   driver: $iopadmap$test.Y
+Info:   user: $iopadmap$test.Y_27
+Info: $iopadmap$Y_1[25]
+Info:   driver: $iopadmap$test.Y
+Info:   user: $iopadmap$test.Y_26
+Info: $iopadmap$Y_1[24]
+Info:   driver: $iopadmap$test.Y
+Info:   user: $iopadmap$test.Y_25
+Info: $iopadmap$Y_1[23]
+Info:   driver: $iopadmap$test.Y
+Info:   user: $iopadmap$test.Y_24
+Info: $iopadmap$Y_1[22]
+Info:   driver: $iopadmap$test.Y
+Info:   user: $iopadmap$test.Y_23
+Info: $iopadmap$Y_1[21]
+Info:   driver: $iopadmap$test.Y
+Info:   user: $iopadmap$test.Y_22
+Info: $iopadmap$Y_1[20]
+Info:   driver: $iopadmap$test.Y
+Info:   user: $iopadmap$test.Y_21
+Info: $iopadmap$Y_1[19]
+Info:   driver: $iopadmap$test.Y
+Info:   user: $iopadmap$test.Y_20
+Info: $iopadmap$Y_1[18]
+Info:   driver: $iopadmap$test.Y
+Info:   user: $iopadmap$test.Y_19
+Info: $iopadmap$Y_1[17]
+Info:   driver: $iopadmap$test.Y
+Info:   user: $iopadmap$test.Y_18
+Info: $iopadmap$Y_1[16]
+Info:   driver: $iopadmap$test.Y
+Info:   user: $iopadmap$test.Y_17
+Info: $iopadmap$Y_1[15]
+Info:   driver: $iopadmap$test.Y
+Info:   user: $iopadmap$test.Y_16
+Info: $iopadmap$Y_1[14]
+Info:   driver: $iopadmap$test.Y
+Info:   user: $iopadmap$test.Y_15
+Info: $iopadmap$Y_1[13]
+Info:   driver: $iopadmap$test.Y
+Info:   user: $iopadmap$test.Y_14
+Info: $iopadmap$Y_1[12]
+Info:   driver: $iopadmap$test.Y
+Info:   user: $iopadmap$test.Y_13
+Info: $iopadmap$Y_1[11]
+Info:   driver: $iopadmap$test.Y
+Info:   user: $iopadmap$test.Y_12
+Info: $iopadmap$Y_1[10]
+Info:   driver: $iopadmap$test.Y
+Info:   user: $iopadmap$test.Y_11
+Info: $iopadmap$Y_1[9]
+Info:   driver: $iopadmap$test.Y
+Info:   user: $iopadmap$test.Y_10
+Info: $iopadmap$Y_1[8]
+Info:   driver: $iopadmap$test.Y
+Info:   user: $iopadmap$test.Y_9
+Info: $iopadmap$Y_1[7]
+Info:   driver: $iopadmap$test.Y
+Info:   user: $iopadmap$test.Y_8
+Info: $iopadmap$Y_1[6]
+Info:   driver: $iopadmap$test.Y
+Info:   user: $iopadmap$test.Y_7
+Info: $iopadmap$Y_1[5]
+Info:   driver: $iopadmap$test.Y
+Info:   user: $iopadmap$test.Y_6
+Info: $iopadmap$Y_1[4]
+Info:   driver: $iopadmap$test.Y
+Info:   user: $iopadmap$test.Y_5
+Info: $iopadmap$Y_1[3]
+Info:   driver: $iopadmap$test.Y
+Info:   user: $iopadmap$test.Y_4
+Info: $iopadmap$Y_1[2]
+Info:   driver: $iopadmap$test.Y
+Info:   user: $iopadmap$test.Y_3
+Info: $iopadmap$Y_1[1]
+Info:   driver: $iopadmap$test.Y
+Info:   user: $iopadmap$test.Y_2
+Info: $iopadmap$Y_1[0]
+Info:   driver: $iopadmap$test.Y
+Info:   user: $iopadmap$test.Y_1
+Info: B[8]
+Info:   driver: B[8]
+Info:   user: $iopadmap$test.B_9
+Info: B[7]
+Info:   driver: B[7]
+Info:   user: $iopadmap$test.B_8
+Info: B[6]
+Info:   driver: B[6]
+Info:   user: $iopadmap$test.B_7
+Info: B[5]
+Info:   driver: B[5]
+Info:   user: $iopadmap$test.B_6
+Info: B[4]
+Info:   driver: B[4]
+Info:   user: $iopadmap$test.B_5
+Info: B[3]
+Info:   driver: B[3]
+Info:   user: $iopadmap$test.B_4
+Info: B[31]
+Info:   driver: B[31]
+Info:   user: $iopadmap$test.B_32
+Info: B[30]
+Info:   driver: B[30]
+Info:   user: $iopadmap$test.B_31
+Info: B[29]
+Info:   driver: B[29]
+Info:   user: $iopadmap$test.B_30
+Info: B[2]
+Info:   driver: B[2]
+Info:   user: $iopadmap$test.B_3
+Info: B[28]
+Info:   driver: B[28]
+Info:   user: $iopadmap$test.B_29
+Info: B[27]
+Info:   driver: B[27]
+Info:   user: $iopadmap$test.B_28
+Info: B[26]
+Info:   driver: B[26]
+Info:   user: $iopadmap$test.B_27
+Info: B[25]
+Info:   driver: B[25]
+Info:   user: $iopadmap$test.B_26
+Info: B[24]
+Info:   driver: B[24]
+Info:   user: $iopadmap$test.B_25
+Info: B[23]
+Info:   driver: B[23]
+Info:   user: $iopadmap$test.B_24
+Info: B[22]
+Info:   driver: B[22]
+Info:   user: $iopadmap$test.B_23
+Info: B[21]
+Info:   driver: B[21]
+Info:   user: $iopadmap$test.B_22
+Info: B[20]
+Info:   driver: B[20]
+Info:   user: $iopadmap$test.B_21
+Info: B[19]
+Info:   driver: B[19]
+Info:   user: $iopadmap$test.B_20
+Info: B[1]
+Info:   driver: B[1]
+Info:   user: $iopadmap$test.B_2
+Info: B[18]
+Info:   driver: B[18]
+Info:   user: $iopadmap$test.B_19
+Info: B[17]
+Info:   driver: B[17]
+Info:   user: $iopadmap$test.B_18
+Info: B[16]
+Info:   driver: B[16]
+Info:   user: $iopadmap$test.B_17
+Info: B[15]
+Info:   driver: B[15]
+Info:   user: $iopadmap$test.B_16
+Info: B[14]
+Info:   driver: B[14]
+Info:   user: $iopadmap$test.B_15
+Info: B[13]
+Info:   driver: B[13]
+Info:   user: $iopadmap$test.B_14
+Info: B[12]
+Info:   driver: B[12]
+Info:   user: $iopadmap$test.B_13
+Info: B[11]
+Info:   driver: B[11]
+Info:   user: $iopadmap$test.B_12
+Info: B[10]
+Info:   driver: B[10]
+Info:   user: $iopadmap$test.B_11
+Info: B[9]
+Info:   driver: B[9]
+Info:   user: $iopadmap$test.B_10
+Info: B[0]
+Info:   driver: B[0]
+Info:   user: $iopadmap$test.B_1
+Info: $iopadmap$B_1[31]
+Info:   driver: $iopadmap$test.B_32
+Info:   user: $iopadmap$test.B
+Info: $iopadmap$B_1[30]
+Info:   driver: $iopadmap$test.B_31
+Info:   user: $iopadmap$test.B
+Info: $iopadmap$B_1[29]
+Info:   driver: $iopadmap$test.B_30
+Info:   user: $iopadmap$test.B
+Info: $iopadmap$B_1[28]
+Info:   driver: $iopadmap$test.B_29
+Info:   user: $iopadmap$test.B
+Info: $iopadmap$B_1[27]
+Info:   driver: $iopadmap$test.B_28
+Info:   user: $iopadmap$test.B
+Info: $iopadmap$B_1[26]
+Info:   driver: $iopadmap$test.B_27
+Info:   user: $iopadmap$test.B
+Info: $iopadmap$B_1[25]
+Info:   driver: $iopadmap$test.B_26
+Info:   user: $iopadmap$test.B
+Info: $iopadmap$B_1[24]
+Info:   driver: $iopadmap$test.B_25
+Info:   user: $iopadmap$test.B
+Info: $iopadmap$B_1[23]
+Info:   driver: $iopadmap$test.B_24
+Info:   user: $iopadmap$test.B
+Info: $iopadmap$B_1[22]
+Info:   driver: $iopadmap$test.B_23
+Info:   user: $iopadmap$test.B
+Info: $iopadmap$B_1[21]
+Info:   driver: $iopadmap$test.B_22
+Info:   user: $iopadmap$test.B
+Info: $iopadmap$B_1[20]
+Info:   driver: $iopadmap$test.B_21
+Info:   user: $iopadmap$test.B
+Info: $iopadmap$B_1[19]
+Info:   driver: $iopadmap$test.B_20
+Info:   user: $iopadmap$test.B
+Info: $iopadmap$B_1[18]
+Info:   driver: $iopadmap$test.B_19
+Info:   user: $iopadmap$test.B
+Info: $iopadmap$B_1[17]
+Info:   driver: $iopadmap$test.B_18
+Info:   user: $iopadmap$test.B
+Info: $iopadmap$B_1[16]
+Info:   driver: $iopadmap$test.B_17
+Info:   user: $iopadmap$test.B
+Info: $iopadmap$B_1[15]
+Info:   driver: $iopadmap$test.B_16
+Info:   user: $iopadmap$test.B
+Info: $iopadmap$B_1[14]
+Info:   driver: $iopadmap$test.B_15
+Info:   user: $iopadmap$test.B
+Info: $iopadmap$B_1[13]
+Info:   driver: $iopadmap$test.B_14
+Info:   user: $iopadmap$test.B
+Info: $iopadmap$B_1[12]
+Info:   driver: $iopadmap$test.B_13
+Info:   user: $iopadmap$test.B
+Info: $iopadmap$B_1[11]
+Info:   driver: $iopadmap$test.B_12
+Info:   user: $iopadmap$test.B
+Info: $iopadmap$B_1[10]
+Info:   driver: $iopadmap$test.B_11
+Info:   user: $iopadmap$test.B
+Info: $iopadmap$B_1[9]
+Info:   driver: $iopadmap$test.B_10
+Info:   user: $iopadmap$test.B
+Info: $iopadmap$B_1[8]
+Info:   driver: $iopadmap$test.B_9
+Info:   user: $iopadmap$test.B
+Info: $iopadmap$B_1[7]
+Info:   driver: $iopadmap$test.B_8
+Info:   user: $iopadmap$test.B
+Info: $iopadmap$B_1[6]
+Info:   driver: $iopadmap$test.B_7
+Info:   user: $iopadmap$test.B
+Info: $iopadmap$B_1[5]
+Info:   driver: $iopadmap$test.B_6
+Info:   user: $iopadmap$test.B
+Info: $iopadmap$B_1[4]
+Info:   driver: $iopadmap$test.B_5
+Info:   user: $iopadmap$test.B
+Info: $iopadmap$B_1[3]
+Info:   driver: $iopadmap$test.B_4
+Info:   user: $iopadmap$test.B
+Info: $iopadmap$B_1[2]
+Info:   driver: $iopadmap$test.B_3
+Info:   user: $iopadmap$test.B
+Info: $iopadmap$B_1[1]
+Info:   driver: $iopadmap$test.B_2
+Info:   user: $iopadmap$test.B
+Info: $iopadmap$B_1[0]
+Info:   driver: $iopadmap$test.B_1
+Info:   user: $iopadmap$test.B
+Info: A[8]
+Info:   driver: A[8]
+Info:   user: $iopadmap$test.A_9
+Info: A[7]
+Info:   driver: A[7]
+Info:   user: $iopadmap$test.A_8
+Info: A[6]
+Info:   driver: A[6]
+Info:   user: $iopadmap$test.A_7
+Info: A[5]
+Info:   driver: A[5]
+Info:   user: $iopadmap$test.A_6
+Info: A[4]
+Info:   driver: A[4]
+Info:   user: $iopadmap$test.A_5
+Info: A[3]
+Info:   driver: A[3]
+Info:   user: $iopadmap$test.A_4
+Info: A[31]
+Info:   driver: A[31]
+Info:   user: $iopadmap$test.A_32
+Info: A[30]
+Info:   driver: A[30]
+Info:   user: $iopadmap$test.A_31
+Info: A[29]
+Info:   driver: A[29]
+Info:   user: $iopadmap$test.A_30
+Info: A[2]
+Info:   driver: A[2]
+Info:   user: $iopadmap$test.A_3
+Info: A[28]
+Info:   driver: A[28]
+Info:   user: $iopadmap$test.A_29
+Info: A[27]
+Info:   driver: A[27]
+Info:   user: $iopadmap$test.A_28
+Info: A[26]
+Info:   driver: A[26]
+Info:   user: $iopadmap$test.A_27
+Info: A[25]
+Info:   driver: A[25]
+Info:   user: $iopadmap$test.A_26
+Info: A[24]
+Info:   driver: A[24]
+Info:   user: $iopadmap$test.A_25
+Info: A[23]
+Info:   driver: A[23]
+Info:   user: $iopadmap$test.A_24
+Info: A[22]
+Info:   driver: A[22]
+Info:   user: $iopadmap$test.A_23
+Info: A[21]
+Info:   driver: A[21]
+Info:   user: $iopadmap$test.A_22
+Info: A[20]
+Info:   driver: A[20]
+Info:   user: $iopadmap$test.A_21
+Info: A[19]
+Info:   driver: A[19]
+Info:   user: $iopadmap$test.A_20
+Info: A[1]
+Info:   driver: A[1]
+Info:   user: $iopadmap$test.A_2
+Info: A[18]
+Info:   driver: A[18]
+Info:   user: $iopadmap$test.A_19
+Info: A[17]
+Info:   driver: A[17]
+Info:   user: $iopadmap$test.A_18
+Info: A[16]
+Info:   driver: A[16]
+Info:   user: $iopadmap$test.A_17
+Info: A[15]
+Info:   driver: A[15]
+Info:   user: $iopadmap$test.A_16
+Info: A[14]
+Info:   driver: A[14]
+Info:   user: $iopadmap$test.A_15
+Info: A[13]
+Info:   driver: A[13]
+Info:   user: $iopadmap$test.A_14
+Info: A[12]
+Info:   driver: A[12]
+Info:   user: $iopadmap$test.A_13
+Info: A[11]
+Info:   driver: A[11]
+Info:   user: $iopadmap$test.A_12
+Info: A[10]
+Info:   driver: A[10]
+Info:   user: $iopadmap$test.A_11
+Info: A[9]
+Info:   driver: A[9]
+Info:   user: $iopadmap$test.A_10
+Info: A[0]
+Info:   driver: A[0]
+Info:   user: $iopadmap$test.A_1
+Info: $iopadmap$A_1[31]
+Info:   driver: $iopadmap$test.A_32
+Info:   user: $iopadmap$test.A
+Info: $iopadmap$A_1[30]
+Info:   driver: $iopadmap$test.A_31
+Info:   user: $iopadmap$test.A
+Info: $iopadmap$A_1[29]
+Info:   driver: $iopadmap$test.A_30
+Info:   user: $iopadmap$test.A
+Info: $iopadmap$A_1[28]
+Info:   driver: $iopadmap$test.A_29
+Info:   user: $iopadmap$test.A
+Info: $iopadmap$A_1[27]
+Info:   driver: $iopadmap$test.A_28
+Info:   user: $iopadmap$test.A
+Info: $iopadmap$A_1[26]
+Info:   driver: $iopadmap$test.A_27
+Info:   user: $iopadmap$test.A
+Info: $iopadmap$A_1[25]
+Info:   driver: $iopadmap$test.A_26
+Info:   user: $iopadmap$test.A
+Info: $iopadmap$A_1[24]
+Info:   driver: $iopadmap$test.A_25
+Info:   user: $iopadmap$test.A
+Info: $iopadmap$A_1[23]
+Info:   driver: $iopadmap$test.A_24
+Info:   user: $iopadmap$test.A
+Info: $iopadmap$A_1[22]
+Info:   driver: $iopadmap$test.A_23
+Info:   user: $iopadmap$test.A
+Info: $iopadmap$A_1[21]
+Info:   driver: $iopadmap$test.A_22
+Info:   user: $iopadmap$test.A
+Info: $iopadmap$A_1[20]
+Info:   driver: $iopadmap$test.A_21
+Info:   user: $iopadmap$test.A
+Info: $iopadmap$A_1[19]
+Info:   driver: $iopadmap$test.A_20
+Info:   user: $iopadmap$test.A
+Info: $iopadmap$A_1[18]
+Info:   driver: $iopadmap$test.A_19
+Info:   user: $iopadmap$test.A
+Info: $iopadmap$A_1[17]
+Info:   driver: $iopadmap$test.A_18
+Info:   user: $iopadmap$test.A
+Info: $iopadmap$A_1[16]
+Info:   driver: $iopadmap$test.A_17
+Info:   user: $iopadmap$test.A
+Info: $iopadmap$A_1[15]
+Info:   driver: $iopadmap$test.A_16
+Info:   user: $iopadmap$test.A
+Info: $iopadmap$A_1[14]
+Info:   driver: $iopadmap$test.A_15
+Info:   user: $iopadmap$test.A
+Info: $iopadmap$A_1[13]
+Info:   driver: $iopadmap$test.A_14
+Info:   user: $iopadmap$test.A
+Info: $iopadmap$A_1[12]
+Info:   driver: $iopadmap$test.A_13
+Info:   user: $iopadmap$test.A
+Info: $iopadmap$A_1[11]
+Info:   driver: $iopadmap$test.A_12
+Info:   user: $iopadmap$test.A
+Info: $iopadmap$A_1[10]
+Info:   driver: $iopadmap$test.A_11
+Info:   user: $iopadmap$test.A
+Info: $iopadmap$A_1[9]
+Info:   driver: $iopadmap$test.A_10
+Info:   user: $iopadmap$test.A
+Info: $iopadmap$A_1[8]
+Info:   driver: $iopadmap$test.A_9
+Info:   user: $iopadmap$test.A
+Info: $iopadmap$A_1[7]
+Info:   driver: $iopadmap$test.A_8
+Info:   user: $iopadmap$test.A
+Info: $iopadmap$A_1[6]
+Info:   driver: $iopadmap$test.A_7
+Info:   user: $iopadmap$test.A
+Info: $iopadmap$A_1[5]
+Info:   driver: $iopadmap$test.A_6
+Info:   user: $iopadmap$test.A
+Info: $iopadmap$A_1[4]
+Info:   driver: $iopadmap$test.A_5
+Info:   user: $iopadmap$test.A
+Info: $iopadmap$A_1[3]
+Info:   driver: $iopadmap$test.A_4
+Info:   user: $iopadmap$test.A
+Info: $iopadmap$A_1[2]
+Info:   driver: $iopadmap$test.A_3
+Info:   user: $iopadmap$test.A
+Info: $iopadmap$A_1[1]
+Info:   driver: $iopadmap$test.A_2
+Info:   user: $iopadmap$test.A
+Info: $iopadmap$A_1[0]
+Info:   driver: $iopadmap$test.A_1
+Info:   user: $iopadmap$test.A
+Info: $extract$\reg_unit_en_1_rst_0$40.rst$const
+Info:   driver: $extract$\reg_unit_en_1_rst_0$40.rst$const$GND$1
+Info:   user: $extract$\reg_unit_en_1_rst_0$40
+Info: $extract$\reg_unit_en_1_rst_0$40.en$const
+Info:   driver: $extract$\reg_unit_en_1_rst_0$40.en$const$VCC$0
+Info:   user: $extract$\reg_unit_en_1_rst_0$40
+Info: regs.clk
+Info:   driver: clk_drv_i
+Info:   user: $extract$\reg_unit_en_1_rst_0$40
+Info: $iopadmap$Y[31]
+Info:   driver: $extract$\ALU_ALU_func_0$31
+Info:   user: $iopadmap$test.Y
+Info: $iopadmap$Y[30]
+Info:   driver: $extract$\ALU_ALU_func_0$31
+Info:   user: $iopadmap$test.Y
+Info: $iopadmap$Y[29]
+Info:   driver: $extract$\ALU_ALU_func_0$31
+Info:   user: $iopadmap$test.Y
+Info: $iopadmap$Y[28]
+Info:   driver: $extract$\ALU_ALU_func_0$31
+Info:   user: $iopadmap$test.Y
+Info: $iopadmap$Y[27]
+Info:   driver: $extract$\ALU_ALU_func_0$31
+Info:   user: $iopadmap$test.Y
+Info: $iopadmap$Y[26]
+Info:   driver: $extract$\ALU_ALU_func_0$31
+Info:   user: $iopadmap$test.Y
+Info: $iopadmap$Y[25]
+Info:   driver: $extract$\ALU_ALU_func_0$31
+Info:   user: $iopadmap$test.Y
+Info: $iopadmap$Y[24]
+Info:   driver: $extract$\ALU_ALU_func_0$31
+Info:   user: $iopadmap$test.Y
+Info: $iopadmap$Y[23]
+Info:   driver: $extract$\ALU_ALU_func_0$31
+Info:   user: $iopadmap$test.Y
+Info: $iopadmap$Y[22]
+Info:   driver: $extract$\ALU_ALU_func_0$31
+Info:   user: $iopadmap$test.Y
+Info: $iopadmap$Y[21]
+Info:   driver: $extract$\ALU_ALU_func_0$31
+Info:   user: $iopadmap$test.Y
+Info: $iopadmap$Y[20]
+Info:   driver: $extract$\ALU_ALU_func_0$31
+Info:   user: $iopadmap$test.Y
+Info: $iopadmap$Y[19]
+Info:   driver: $extract$\ALU_ALU_func_0$31
+Info:   user: $iopadmap$test.Y
+Info: $iopadmap$Y[18]
+Info:   driver: $extract$\ALU_ALU_func_0$31
+Info:   user: $iopadmap$test.Y
+Info: $iopadmap$Y[17]
+Info:   driver: $extract$\ALU_ALU_func_0$31
+Info:   user: $iopadmap$test.Y
+Info: $iopadmap$Y[16]
+Info:   driver: $extract$\ALU_ALU_func_0$31
+Info:   user: $iopadmap$test.Y
+Info: $iopadmap$Y[15]
+Info:   driver: $extract$\ALU_ALU_func_0$31
+Info:   user: $iopadmap$test.Y
+Info: $iopadmap$Y[14]
+Info:   driver: $extract$\ALU_ALU_func_0$31
+Info:   user: $iopadmap$test.Y
+Info: $iopadmap$Y[13]
+Info:   driver: $extract$\ALU_ALU_func_0$31
+Info:   user: $iopadmap$test.Y
+Info: $iopadmap$Y[12]
+Info:   driver: $extract$\ALU_ALU_func_0$31
+Info:   user: $iopadmap$test.Y
+Info: $iopadmap$Y[11]
+Info:   driver: $extract$\ALU_ALU_func_0$31
+Info:   user: $iopadmap$test.Y
+Info: $iopadmap$Y[10]
+Info:   driver: $extract$\ALU_ALU_func_0$31
+Info:   user: $iopadmap$test.Y
+Info: $iopadmap$Y[9]
+Info:   driver: $extract$\ALU_ALU_func_0$31
+Info:   user: $iopadmap$test.Y
+Info: $iopadmap$Y[8]
+Info:   driver: $extract$\ALU_ALU_func_0$31
+Info:   user: $iopadmap$test.Y
+Info: $iopadmap$Y[7]
+Info:   driver: $extract$\ALU_ALU_func_0$31
+Info:   user: $iopadmap$test.Y
+Info: $iopadmap$Y[6]
+Info:   driver: $extract$\ALU_ALU_func_0$31
+Info:   user: $iopadmap$test.Y
+Info: $iopadmap$Y[5]
+Info:   driver: $extract$\ALU_ALU_func_0$31
+Info:   user: $iopadmap$test.Y
+Info: $iopadmap$Y[4]
+Info:   driver: $extract$\ALU_ALU_func_0$31
+Info:   user: $iopadmap$test.Y
+Info: $iopadmap$Y[3]
+Info:   driver: $extract$\ALU_ALU_func_0$31
+Info:   user: $iopadmap$test.Y
+Info: $iopadmap$Y[2]
+Info:   driver: $extract$\ALU_ALU_func_0$31
+Info:   user: $iopadmap$test.Y
+Info: $iopadmap$Y[1]
+Info:   driver: $extract$\ALU_ALU_func_0$31
+Info:   user: $iopadmap$test.Y
+Info: $iopadmap$Y[0]
+Info:   driver: $extract$\ALU_ALU_func_0$31
+Info:   user: $iopadmap$test.Y
+Info: regs.out[31]
+Info:   driver: $extract$\reg_unit_en_1_rst_0$40
+Info:   user: $extract$\ALU_ALU_func_0$31
+Info: regs.out[30]
+Info:   driver: $extract$\reg_unit_en_1_rst_0$40
+Info:   user: $extract$\ALU_ALU_func_0$31
+Info: regs.out[29]
+Info:   driver: $extract$\reg_unit_en_1_rst_0$40
+Info:   user: $extract$\ALU_ALU_func_0$31
+Info: regs.out[28]
+Info:   driver: $extract$\reg_unit_en_1_rst_0$40
+Info:   user: $extract$\ALU_ALU_func_0$31
+Info: regs.out[27]
+Info:   driver: $extract$\reg_unit_en_1_rst_0$40
+Info:   user: $extract$\ALU_ALU_func_0$31
+Info: regs.out[26]
+Info:   driver: $extract$\reg_unit_en_1_rst_0$40
+Info:   user: $extract$\ALU_ALU_func_0$31
+Info: regs.out[25]
+Info:   driver: $extract$\reg_unit_en_1_rst_0$40
+Info:   user: $extract$\ALU_ALU_func_0$31
+Info: regs.out[24]
+Info:   driver: $extract$\reg_unit_en_1_rst_0$40
+Info:   user: $extract$\ALU_ALU_func_0$31
+Info: regs.out[23]
+Info:   driver: $extract$\reg_unit_en_1_rst_0$40
+Info:   user: $extract$\ALU_ALU_func_0$31
+Info: regs.out[22]
+Info:   driver: $extract$\reg_unit_en_1_rst_0$40
+Info:   user: $extract$\ALU_ALU_func_0$31
+Info: regs.out[21]
+Info:   driver: $extract$\reg_unit_en_1_rst_0$40
+Info:   user: $extract$\ALU_ALU_func_0$31
+Info: regs.out[20]
+Info:   driver: $extract$\reg_unit_en_1_rst_0$40
+Info:   user: $extract$\ALU_ALU_func_0$31
+Info: regs.out[19]
+Info:   driver: $extract$\reg_unit_en_1_rst_0$40
+Info:   user: $extract$\ALU_ALU_func_0$31
+Info: regs.out[18]
+Info:   driver: $extract$\reg_unit_en_1_rst_0$40
+Info:   user: $extract$\ALU_ALU_func_0$31
+Info: regs.out[17]
+Info:   driver: $extract$\reg_unit_en_1_rst_0$40
+Info:   user: $extract$\ALU_ALU_func_0$31
+Info: regs.out[16]
+Info:   driver: $extract$\reg_unit_en_1_rst_0$40
+Info:   user: $extract$\ALU_ALU_func_0$31
+Info: regs.out[15]
+Info:   driver: $extract$\reg_unit_en_1_rst_0$40
+Info:   user: $extract$\ALU_ALU_func_0$31
+Info: regs.out[14]
+Info:   driver: $extract$\reg_unit_en_1_rst_0$40
+Info:   user: $extract$\ALU_ALU_func_0$31
+Info: regs.out[13]
+Info:   driver: $extract$\reg_unit_en_1_rst_0$40
+Info:   user: $extract$\ALU_ALU_func_0$31
+Info: regs.out[12]
+Info:   driver: $extract$\reg_unit_en_1_rst_0$40
+Info:   user: $extract$\ALU_ALU_func_0$31
+Info: regs.out[11]
+Info:   driver: $extract$\reg_unit_en_1_rst_0$40
+Info:   user: $extract$\ALU_ALU_func_0$31
+Info: regs.out[10]
+Info:   driver: $extract$\reg_unit_en_1_rst_0$40
+Info:   user: $extract$\ALU_ALU_func_0$31
+Info: regs.out[9]
+Info:   driver: $extract$\reg_unit_en_1_rst_0$40
+Info:   user: $extract$\ALU_ALU_func_0$31
+Info: regs.out[8]
+Info:   driver: $extract$\reg_unit_en_1_rst_0$40
+Info:   user: $extract$\ALU_ALU_func_0$31
+Info: regs.out[7]
+Info:   driver: $extract$\reg_unit_en_1_rst_0$40
+Info:   user: $extract$\ALU_ALU_func_0$31
+Info: regs.out[6]
+Info:   driver: $extract$\reg_unit_en_1_rst_0$40
+Info:   user: $extract$\ALU_ALU_func_0$31
+Info: regs.out[5]
+Info:   driver: $extract$\reg_unit_en_1_rst_0$40
+Info:   user: $extract$\ALU_ALU_func_0$31
+Info: regs.out[4]
+Info:   driver: $extract$\reg_unit_en_1_rst_0$40
+Info:   user: $extract$\ALU_ALU_func_0$31
+Info: regs.out[3]
+Info:   driver: $extract$\reg_unit_en_1_rst_0$40
+Info:   user: $extract$\ALU_ALU_func_0$31
+Info: regs.out[2]
+Info:   driver: $extract$\reg_unit_en_1_rst_0$40
+Info:   user: $extract$\ALU_ALU_func_0$31
+Info: regs.out[1]
+Info:   driver: $extract$\reg_unit_en_1_rst_0$40
+Info:   user: $extract$\ALU_ALU_func_0$31
+Info: regs.out[0]
+Info:   driver: $extract$\reg_unit_en_1_rst_0$40
+Info:   user: $extract$\ALU_ALU_func_0$31
+Info: regs.in[31]
+Info:   driver: $extract$\ALU_ALU_func_0$30
+Info:   user: $extract$\reg_unit_en_1_rst_0$40
+Info: regs.in[30]
+Info:   driver: $extract$\ALU_ALU_func_0$30
+Info:   user: $extract$\reg_unit_en_1_rst_0$40
+Info: regs.in[29]
+Info:   driver: $extract$\ALU_ALU_func_0$30
+Info:   user: $extract$\reg_unit_en_1_rst_0$40
+Info: regs.in[28]
+Info:   driver: $extract$\ALU_ALU_func_0$30
+Info:   user: $extract$\reg_unit_en_1_rst_0$40
+Info: regs.in[27]
+Info:   driver: $extract$\ALU_ALU_func_0$30
+Info:   user: $extract$\reg_unit_en_1_rst_0$40
+Info: regs.in[26]
+Info:   driver: $extract$\ALU_ALU_func_0$30
+Info:   user: $extract$\reg_unit_en_1_rst_0$40
+Info: regs.in[25]
+Info:   driver: $extract$\ALU_ALU_func_0$30
+Info:   user: $extract$\reg_unit_en_1_rst_0$40
+Info: regs.in[24]
+Info:   driver: $extract$\ALU_ALU_func_0$30
+Info:   user: $extract$\reg_unit_en_1_rst_0$40
+Info: regs.in[23]
+Info:   driver: $extract$\ALU_ALU_func_0$30
+Info:   user: $extract$\reg_unit_en_1_rst_0$40
+Info: regs.in[22]
+Info:   driver: $extract$\ALU_ALU_func_0$30
+Info:   user: $extract$\reg_unit_en_1_rst_0$40
+Info: regs.in[21]
+Info:   driver: $extract$\ALU_ALU_func_0$30
+Info:   user: $extract$\reg_unit_en_1_rst_0$40
+Info: regs.in[20]
+Info:   driver: $extract$\ALU_ALU_func_0$30
+Info:   user: $extract$\reg_unit_en_1_rst_0$40
+Info: regs.in[19]
+Info:   driver: $extract$\ALU_ALU_func_0$30
+Info:   user: $extract$\reg_unit_en_1_rst_0$40
+Info: regs.in[18]
+Info:   driver: $extract$\ALU_ALU_func_0$30
+Info:   user: $extract$\reg_unit_en_1_rst_0$40
+Info: regs.in[17]
+Info:   driver: $extract$\ALU_ALU_func_0$30
+Info:   user: $extract$\reg_unit_en_1_rst_0$40
+Info: regs.in[16]
+Info:   driver: $extract$\ALU_ALU_func_0$30
+Info:   user: $extract$\reg_unit_en_1_rst_0$40
+Info: regs.in[15]
+Info:   driver: $extract$\ALU_ALU_func_0$30
+Info:   user: $extract$\reg_unit_en_1_rst_0$40
+Info: regs.in[14]
+Info:   driver: $extract$\ALU_ALU_func_0$30
+Info:   user: $extract$\reg_unit_en_1_rst_0$40
+Info: regs.in[13]
+Info:   driver: $extract$\ALU_ALU_func_0$30
+Info:   user: $extract$\reg_unit_en_1_rst_0$40
+Info: regs.in[12]
+Info:   driver: $extract$\ALU_ALU_func_0$30
+Info:   user: $extract$\reg_unit_en_1_rst_0$40
+Info: regs.in[11]
+Info:   driver: $extract$\ALU_ALU_func_0$30
+Info:   user: $extract$\reg_unit_en_1_rst_0$40
+Info: regs.in[10]
+Info:   driver: $extract$\ALU_ALU_func_0$30
+Info:   user: $extract$\reg_unit_en_1_rst_0$40
+Info: regs.in[9]
+Info:   driver: $extract$\ALU_ALU_func_0$30
+Info:   user: $extract$\reg_unit_en_1_rst_0$40
+Info: regs.in[8]
+Info:   driver: $extract$\ALU_ALU_func_0$30
+Info:   user: $extract$\reg_unit_en_1_rst_0$40
+Info: regs.in[7]
+Info:   driver: $extract$\ALU_ALU_func_0$30
+Info:   user: $extract$\reg_unit_en_1_rst_0$40
+Info: regs.in[6]
+Info:   driver: $extract$\ALU_ALU_func_0$30
+Info:   user: $extract$\reg_unit_en_1_rst_0$40
+Info: regs.in[5]
+Info:   driver: $extract$\ALU_ALU_func_0$30
+Info:   user: $extract$\reg_unit_en_1_rst_0$40
+Info: regs.in[4]
+Info:   driver: $extract$\ALU_ALU_func_0$30
+Info:   user: $extract$\reg_unit_en_1_rst_0$40
+Info: regs.in[3]
+Info:   driver: $extract$\ALU_ALU_func_0$30
+Info:   user: $extract$\reg_unit_en_1_rst_0$40
+Info: regs.in[2]
+Info:   driver: $extract$\ALU_ALU_func_0$30
+Info:   user: $extract$\reg_unit_en_1_rst_0$40
+Info: regs.in[1]
+Info:   driver: $extract$\ALU_ALU_func_0$30
+Info:   user: $extract$\reg_unit_en_1_rst_0$40
+Info: regs.in[0]
+Info:   driver: $extract$\ALU_ALU_func_0$30
+Info:   user: $extract$\reg_unit_en_1_rst_0$40
+Info: $iopadmap$B[31]
+Info:   driver: $iopadmap$test.B
+Info:   user: $extract$\ALU_ALU_func_0$30
+Info: $iopadmap$B[30]
+Info:   driver: $iopadmap$test.B
+Info:   user: $extract$\ALU_ALU_func_0$30
+Info: $iopadmap$B[29]
+Info:   driver: $iopadmap$test.B
+Info:   user: $extract$\ALU_ALU_func_0$30
+Info: $iopadmap$B[28]
+Info:   driver: $iopadmap$test.B
+Info:   user: $extract$\ALU_ALU_func_0$30
+Info: $iopadmap$B[27]
+Info:   driver: $iopadmap$test.B
+Info:   user: $extract$\ALU_ALU_func_0$30
+Info: $iopadmap$B[26]
+Info:   driver: $iopadmap$test.B
+Info:   user: $extract$\ALU_ALU_func_0$30
+Info: $iopadmap$B[25]
+Info:   driver: $iopadmap$test.B
+Info:   user: $extract$\ALU_ALU_func_0$30
+Info: $iopadmap$B[24]
+Info:   driver: $iopadmap$test.B
+Info:   user: $extract$\ALU_ALU_func_0$30
+Info: $iopadmap$B[23]
+Info:   driver: $iopadmap$test.B
+Info:   user: $extract$\ALU_ALU_func_0$30
+Info: $iopadmap$B[22]
+Info:   driver: $iopadmap$test.B
+Info:   user: $extract$\ALU_ALU_func_0$30
+Info: $iopadmap$B[21]
+Info:   driver: $iopadmap$test.B
+Info:   user: $extract$\ALU_ALU_func_0$30
+Info: $iopadmap$B[20]
+Info:   driver: $iopadmap$test.B
+Info:   user: $extract$\ALU_ALU_func_0$30
+Info: $iopadmap$B[19]
+Info:   driver: $iopadmap$test.B
+Info:   user: $extract$\ALU_ALU_func_0$30
+Info: $iopadmap$B[18]
+Info:   driver: $iopadmap$test.B
+Info:   user: $extract$\ALU_ALU_func_0$30
+Info: $iopadmap$B[17]
+Info:   driver: $iopadmap$test.B
+Info:   user: $extract$\ALU_ALU_func_0$30
+Info: $iopadmap$B[16]
+Info:   driver: $iopadmap$test.B
+Info:   user: $extract$\ALU_ALU_func_0$30
+Info: $iopadmap$B[15]
+Info:   driver: $iopadmap$test.B
+Info:   user: $extract$\ALU_ALU_func_0$30
+Info: $iopadmap$B[14]
+Info:   driver: $iopadmap$test.B
+Info:   user: $extract$\ALU_ALU_func_0$30
+Info: $iopadmap$B[13]
+Info:   driver: $iopadmap$test.B
+Info:   user: $extract$\ALU_ALU_func_0$30
+Info: $iopadmap$B[12]
+Info:   driver: $iopadmap$test.B
+Info:   user: $extract$\ALU_ALU_func_0$30
+Info: $iopadmap$B[11]
+Info:   driver: $iopadmap$test.B
+Info:   user: $extract$\ALU_ALU_func_0$30
+Info: $iopadmap$B[10]
+Info:   driver: $iopadmap$test.B
+Info:   user: $extract$\ALU_ALU_func_0$30
+Info: $iopadmap$B[9]
+Info:   driver: $iopadmap$test.B
+Info:   user: $extract$\ALU_ALU_func_0$30
+Info: $iopadmap$B[8]
+Info:   driver: $iopadmap$test.B
+Info:   user: $extract$\ALU_ALU_func_0$30
+Info: $iopadmap$B[7]
+Info:   driver: $iopadmap$test.B
+Info:   user: $extract$\ALU_ALU_func_0$30
+Info: $iopadmap$B[6]
+Info:   driver: $iopadmap$test.B
+Info:   user: $extract$\ALU_ALU_func_0$30
+Info: $iopadmap$B[5]
+Info:   driver: $iopadmap$test.B
+Info:   user: $extract$\ALU_ALU_func_0$30
+Info: $iopadmap$B[4]
+Info:   driver: $iopadmap$test.B
+Info:   user: $extract$\ALU_ALU_func_0$30
+Info: $iopadmap$B[3]
+Info:   driver: $iopadmap$test.B
+Info:   user: $extract$\ALU_ALU_func_0$30
+Info: $iopadmap$B[2]
+Info:   driver: $iopadmap$test.B
+Info:   user: $extract$\ALU_ALU_func_0$30
+Info: $iopadmap$B[1]
+Info:   driver: $iopadmap$test.B
+Info:   user: $extract$\ALU_ALU_func_0$30
+Info: $iopadmap$B[0]
+Info:   driver: $iopadmap$test.B
+Info:   user: $extract$\ALU_ALU_func_0$30
+Info: $iopadmap$A[31]
+Info:   driver: $iopadmap$test.A
+Info:   user: $extract$\ALU_ALU_func_0$30
+Info: $iopadmap$A[30]
+Info:   driver: $iopadmap$test.A
+Info:   user: $extract$\ALU_ALU_func_0$30
+Info: $iopadmap$A[29]
+Info:   driver: $iopadmap$test.A
+Info:   user: $extract$\ALU_ALU_func_0$30
+Info: $iopadmap$A[28]
+Info:   driver: $iopadmap$test.A
+Info:   user: $extract$\ALU_ALU_func_0$30
+Info: $iopadmap$A[27]
+Info:   driver: $iopadmap$test.A
+Info:   user: $extract$\ALU_ALU_func_0$30
+Info: $iopadmap$A[26]
+Info:   driver: $iopadmap$test.A
+Info:   user: $extract$\ALU_ALU_func_0$30
+Info: $iopadmap$A[25]
+Info:   driver: $iopadmap$test.A
+Info:   user: $extract$\ALU_ALU_func_0$30
+Info: $iopadmap$A[24]
+Info:   driver: $iopadmap$test.A
+Info:   user: $extract$\ALU_ALU_func_0$30
+Info: $iopadmap$A[23]
+Info:   driver: $iopadmap$test.A
+Info:   user: $extract$\ALU_ALU_func_0$30
+Info: $iopadmap$A[22]
+Info:   driver: $iopadmap$test.A
+Info:   user: $extract$\ALU_ALU_func_0$30
+Info: $iopadmap$A[21]
+Info:   driver: $iopadmap$test.A
+Info:   user: $extract$\ALU_ALU_func_0$30
+Info: $iopadmap$A[20]
+Info:   driver: $iopadmap$test.A
+Info:   user: $extract$\ALU_ALU_func_0$30
+Info: $iopadmap$A[19]
+Info:   driver: $iopadmap$test.A
+Info:   user: $extract$\ALU_ALU_func_0$30
+Info: $iopadmap$A[18]
+Info:   driver: $iopadmap$test.A
+Info:   user: $extract$\ALU_ALU_func_0$30
+Info: $iopadmap$A[17]
+Info:   driver: $iopadmap$test.A
+Info:   user: $extract$\ALU_ALU_func_0$30
+Info: $iopadmap$A[16]
+Info:   driver: $iopadmap$test.A
+Info:   user: $extract$\ALU_ALU_func_0$30
+Info: $iopadmap$A[15]
+Info:   driver: $iopadmap$test.A
+Info:   user: $extract$\ALU_ALU_func_0$30
+Info: $iopadmap$A[14]
+Info:   driver: $iopadmap$test.A
+Info:   user: $extract$\ALU_ALU_func_0$30
+Info: $iopadmap$A[13]
+Info:   driver: $iopadmap$test.A
+Info:   user: $extract$\ALU_ALU_func_0$30
+Info: $iopadmap$A[12]
+Info:   driver: $iopadmap$test.A
+Info:   user: $extract$\ALU_ALU_func_0$30
+Info: $iopadmap$A[11]
+Info:   driver: $iopadmap$test.A
+Info:   user: $extract$\ALU_ALU_func_0$30
+Info: $iopadmap$A[10]
+Info:   driver: $iopadmap$test.A
+Info:   user: $extract$\ALU_ALU_func_0$30
+Info: $iopadmap$A[9]
+Info:   driver: $iopadmap$test.A
+Info:   user: $extract$\ALU_ALU_func_0$30
+Info: $iopadmap$A[8]
+Info:   driver: $iopadmap$test.A
+Info:   user: $extract$\ALU_ALU_func_0$30
+Info: $iopadmap$A[7]
+Info:   driver: $iopadmap$test.A
+Info:   user: $extract$\ALU_ALU_func_0$30
+Info: $iopadmap$A[6]
+Info:   driver: $iopadmap$test.A
+Info:   user: $extract$\ALU_ALU_func_0$30
+Info: $iopadmap$A[5]
+Info:   driver: $iopadmap$test.A
+Info:   user: $extract$\ALU_ALU_func_0$30
+Info: $iopadmap$A[4]
+Info:   driver: $iopadmap$test.A
+Info:   user: $extract$\ALU_ALU_func_0$30
+Info: $iopadmap$A[3]
+Info:   driver: $iopadmap$test.A
+Info:   user: $extract$\ALU_ALU_func_0$30
+Info: $iopadmap$A[2]
+Info:   driver: $iopadmap$test.A
+Info:   user: $extract$\ALU_ALU_func_0$30
+Info: $iopadmap$A[1]
+Info:   driver: $iopadmap$test.A
+Info:   user: $extract$\ALU_ALU_func_0$30
+Info: $iopadmap$A[0]
+Info:   driver: $iopadmap$test.A
+Info:   user: $extract$\ALU_ALU_func_0$30
+Info: $auto$hilomap.cc:40:hilomap_worker$38[31]
+Info:   driver: $auto$hilomap.cc:41:hilomap_worker$39
+Info:   user: $extract$\ALU_ALU_func_0$30
+Info: $auto$hilomap.cc:40:hilomap_worker$38[30]
+Info:   driver: $auto$hilomap.cc:41:hilomap_worker$39
+Info:   user: $extract$\ALU_ALU_func_0$30
+Info: $auto$hilomap.cc:40:hilomap_worker$38[29]
+Info:   driver: $auto$hilomap.cc:41:hilomap_worker$39
+Info:   user: $extract$\ALU_ALU_func_0$30
+Info: $auto$hilomap.cc:40:hilomap_worker$38[28]
+Info:   driver: $auto$hilomap.cc:41:hilomap_worker$39
+Info:   user: $extract$\ALU_ALU_func_0$30
+Info: $auto$hilomap.cc:40:hilomap_worker$38[27]
+Info:   driver: $auto$hilomap.cc:41:hilomap_worker$39
+Info:   user: $extract$\ALU_ALU_func_0$30
+Info: $auto$hilomap.cc:40:hilomap_worker$38[26]
+Info:   driver: $auto$hilomap.cc:41:hilomap_worker$39
+Info:   user: $extract$\ALU_ALU_func_0$30
+Info: $auto$hilomap.cc:40:hilomap_worker$38[25]
+Info:   driver: $auto$hilomap.cc:41:hilomap_worker$39
+Info:   user: $extract$\ALU_ALU_func_0$30
+Info: $auto$hilomap.cc:40:hilomap_worker$38[24]
+Info:   driver: $auto$hilomap.cc:41:hilomap_worker$39
+Info:   user: $extract$\ALU_ALU_func_0$30
+Info: $auto$hilomap.cc:40:hilomap_worker$38[23]
+Info:   driver: $auto$hilomap.cc:41:hilomap_worker$39
+Info:   user: $extract$\ALU_ALU_func_0$30
+Info: $auto$hilomap.cc:40:hilomap_worker$38[22]
+Info:   driver: $auto$hilomap.cc:41:hilomap_worker$39
+Info:   user: $extract$\ALU_ALU_func_0$30
+Info: $auto$hilomap.cc:40:hilomap_worker$38[21]
+Info:   driver: $auto$hilomap.cc:41:hilomap_worker$39
+Info:   user: $extract$\ALU_ALU_func_0$30
+Info: $auto$hilomap.cc:40:hilomap_worker$38[20]
+Info:   driver: $auto$hilomap.cc:41:hilomap_worker$39
+Info:   user: $extract$\ALU_ALU_func_0$30
+Info: $auto$hilomap.cc:40:hilomap_worker$38[19]
+Info:   driver: $auto$hilomap.cc:41:hilomap_worker$39
+Info:   user: $extract$\ALU_ALU_func_0$30
+Info: $auto$hilomap.cc:40:hilomap_worker$38[18]
+Info:   driver: $auto$hilomap.cc:41:hilomap_worker$39
+Info:   user: $extract$\ALU_ALU_func_0$30
+Info: $auto$hilomap.cc:40:hilomap_worker$38[17]
+Info:   driver: $auto$hilomap.cc:41:hilomap_worker$39
+Info:   user: $extract$\ALU_ALU_func_0$30
+Info: $auto$hilomap.cc:40:hilomap_worker$38[16]
+Info:   driver: $auto$hilomap.cc:41:hilomap_worker$39
+Info:   user: $extract$\ALU_ALU_func_0$30
+Info: $auto$hilomap.cc:40:hilomap_worker$38[15]
+Info:   driver: $auto$hilomap.cc:41:hilomap_worker$39
+Info:   user: $extract$\ALU_ALU_func_0$30
+Info: $auto$hilomap.cc:40:hilomap_worker$38[14]
+Info:   driver: $auto$hilomap.cc:41:hilomap_worker$39
+Info:   user: $extract$\ALU_ALU_func_0$30
+Info: $auto$hilomap.cc:40:hilomap_worker$38[13]
+Info:   driver: $auto$hilomap.cc:41:hilomap_worker$39
+Info:   user: $extract$\ALU_ALU_func_0$30
+Info: $auto$hilomap.cc:40:hilomap_worker$38[12]
+Info:   driver: $auto$hilomap.cc:41:hilomap_worker$39
+Info:   user: $extract$\ALU_ALU_func_0$30
+Info: $auto$hilomap.cc:40:hilomap_worker$38[11]
+Info:   driver: $auto$hilomap.cc:41:hilomap_worker$39
+Info:   user: $extract$\ALU_ALU_func_0$30
+Info: $auto$hilomap.cc:40:hilomap_worker$38[10]
+Info:   driver: $auto$hilomap.cc:41:hilomap_worker$39
+Info:   user: $extract$\ALU_ALU_func_0$30
+Info: $auto$hilomap.cc:40:hilomap_worker$38[9]
+Info:   driver: $auto$hilomap.cc:41:hilomap_worker$39
+Info:   user: $extract$\ALU_ALU_func_0$30
+Info: $auto$hilomap.cc:40:hilomap_worker$38[8]
+Info:   driver: $auto$hilomap.cc:41:hilomap_worker$39
+Info:   user: $extract$\ALU_ALU_func_0$30
+Info: $auto$hilomap.cc:40:hilomap_worker$38[7]
+Info:   driver: $auto$hilomap.cc:41:hilomap_worker$39
+Info:   user: $extract$\ALU_ALU_func_0$30
+Info: $auto$hilomap.cc:40:hilomap_worker$38[6]
+Info:   driver: $auto$hilomap.cc:41:hilomap_worker$39
+Info:   user: $extract$\ALU_ALU_func_0$30
+Info: $auto$hilomap.cc:40:hilomap_worker$38[5]
+Info:   driver: $auto$hilomap.cc:41:hilomap_worker$39
+Info:   user: $extract$\ALU_ALU_func_0$30
+Info: $auto$hilomap.cc:40:hilomap_worker$38[4]
+Info:   driver: $auto$hilomap.cc:41:hilomap_worker$39
+Info:   user: $extract$\ALU_ALU_func_0$30
+Info: $auto$hilomap.cc:40:hilomap_worker$38[3]
+Info:   driver: $auto$hilomap.cc:41:hilomap_worker$39
+Info:   user: $extract$\ALU_ALU_func_0$30
+Info: $auto$hilomap.cc:40:hilomap_worker$38[2]
+Info:   driver: $auto$hilomap.cc:41:hilomap_worker$39
+Info:   user: $extract$\ALU_ALU_func_0$30
+Info: $auto$hilomap.cc:40:hilomap_worker$38[1]
+Info:   driver: $auto$hilomap.cc:41:hilomap_worker$39
+Info:   user: $extract$\ALU_ALU_func_0$30
+Info: $auto$hilomap.cc:40:hilomap_worker$38[0]
+Info:   driver: $auto$hilomap.cc:41:hilomap_worker$39
+Info:   user: $extract$\ALU_ALU_func_0$30
+Info: $auto$hilomap.cc:40:hilomap_worker$36[31]
+Info:   driver: $auto$hilomap.cc:41:hilomap_worker$37
+Info:   user: $extract$\ALU_ALU_func_0$31
+Info: $auto$hilomap.cc:40:hilomap_worker$36[30]
+Info:   driver: $auto$hilomap.cc:41:hilomap_worker$37
+Info:   user: $extract$\ALU_ALU_func_0$31
+Info: $auto$hilomap.cc:40:hilomap_worker$36[29]
+Info:   driver: $auto$hilomap.cc:41:hilomap_worker$37
+Info:   user: $extract$\ALU_ALU_func_0$31
+Info: $auto$hilomap.cc:40:hilomap_worker$36[28]
+Info:   driver: $auto$hilomap.cc:41:hilomap_worker$37
+Info:   user: $extract$\ALU_ALU_func_0$31
+Info: $auto$hilomap.cc:40:hilomap_worker$36[27]
+Info:   driver: $auto$hilomap.cc:41:hilomap_worker$37
+Info:   user: $extract$\ALU_ALU_func_0$31
+Info: $auto$hilomap.cc:40:hilomap_worker$36[26]
+Info:   driver: $auto$hilomap.cc:41:hilomap_worker$37
+Info:   user: $extract$\ALU_ALU_func_0$31
+Info: $auto$hilomap.cc:40:hilomap_worker$36[25]
+Info:   driver: $auto$hilomap.cc:41:hilomap_worker$37
+Info:   user: $extract$\ALU_ALU_func_0$31
+Info: $auto$hilomap.cc:40:hilomap_worker$36[24]
+Info:   driver: $auto$hilomap.cc:41:hilomap_worker$37
+Info:   user: $extract$\ALU_ALU_func_0$31
+Info: $auto$hilomap.cc:40:hilomap_worker$36[23]
+Info:   driver: $auto$hilomap.cc:41:hilomap_worker$37
+Info:   user: $extract$\ALU_ALU_func_0$31
+Info: $auto$hilomap.cc:40:hilomap_worker$36[22]
+Info:   driver: $auto$hilomap.cc:41:hilomap_worker$37
+Info:   user: $extract$\ALU_ALU_func_0$31
+Info: $auto$hilomap.cc:40:hilomap_worker$36[21]
+Info:   driver: $auto$hilomap.cc:41:hilomap_worker$37
+Info:   user: $extract$\ALU_ALU_func_0$31
+Info: $auto$hilomap.cc:40:hilomap_worker$36[20]
+Info:   driver: $auto$hilomap.cc:41:hilomap_worker$37
+Info:   user: $extract$\ALU_ALU_func_0$31
+Info: $auto$hilomap.cc:40:hilomap_worker$36[19]
+Info:   driver: $auto$hilomap.cc:41:hilomap_worker$37
+Info:   user: $extract$\ALU_ALU_func_0$31
+Info: $auto$hilomap.cc:40:hilomap_worker$36[18]
+Info:   driver: $auto$hilomap.cc:41:hilomap_worker$37
+Info:   user: $extract$\ALU_ALU_func_0$31
+Info: $auto$hilomap.cc:40:hilomap_worker$36[17]
+Info:   driver: $auto$hilomap.cc:41:hilomap_worker$37
+Info:   user: $extract$\ALU_ALU_func_0$31
+Info: $auto$hilomap.cc:40:hilomap_worker$36[16]
+Info:   driver: $auto$hilomap.cc:41:hilomap_worker$37
+Info:   user: $extract$\ALU_ALU_func_0$31
+Info: $auto$hilomap.cc:40:hilomap_worker$36[15]
+Info:   driver: $auto$hilomap.cc:41:hilomap_worker$37
+Info:   user: $extract$\ALU_ALU_func_0$31
+Info: $auto$hilomap.cc:40:hilomap_worker$36[14]
+Info:   driver: $auto$hilomap.cc:41:hilomap_worker$37
+Info:   user: $extract$\ALU_ALU_func_0$31
+Info: $auto$hilomap.cc:40:hilomap_worker$36[13]
+Info:   driver: $auto$hilomap.cc:41:hilomap_worker$37
+Info:   user: $extract$\ALU_ALU_func_0$31
+Info: $auto$hilomap.cc:40:hilomap_worker$36[12]
+Info:   driver: $auto$hilomap.cc:41:hilomap_worker$37
+Info:   user: $extract$\ALU_ALU_func_0$31
+Info: $auto$hilomap.cc:40:hilomap_worker$36[11]
+Info:   driver: $auto$hilomap.cc:41:hilomap_worker$37
+Info:   user: $extract$\ALU_ALU_func_0$31
+Info: $auto$hilomap.cc:40:hilomap_worker$36[10]
+Info:   driver: $auto$hilomap.cc:41:hilomap_worker$37
+Info:   user: $extract$\ALU_ALU_func_0$31
+Info: $auto$hilomap.cc:40:hilomap_worker$36[9]
+Info:   driver: $auto$hilomap.cc:41:hilomap_worker$37
+Info:   user: $extract$\ALU_ALU_func_0$31
+Info: $auto$hilomap.cc:40:hilomap_worker$36[8]
+Info:   driver: $auto$hilomap.cc:41:hilomap_worker$37
+Info:   user: $extract$\ALU_ALU_func_0$31
+Info: $auto$hilomap.cc:40:hilomap_worker$36[7]
+Info:   driver: $auto$hilomap.cc:41:hilomap_worker$37
+Info:   user: $extract$\ALU_ALU_func_0$31
+Info: $auto$hilomap.cc:40:hilomap_worker$36[6]
+Info:   driver: $auto$hilomap.cc:41:hilomap_worker$37
+Info:   user: $extract$\ALU_ALU_func_0$31
+Info: $auto$hilomap.cc:40:hilomap_worker$36[5]
+Info:   driver: $auto$hilomap.cc:41:hilomap_worker$37
+Info:   user: $extract$\ALU_ALU_func_0$31
+Info: $auto$hilomap.cc:40:hilomap_worker$36[4]
+Info:   driver: $auto$hilomap.cc:41:hilomap_worker$37
+Info:   user: $extract$\ALU_ALU_func_0$31
+Info: $auto$hilomap.cc:40:hilomap_worker$36[3]
+Info:   driver: $auto$hilomap.cc:41:hilomap_worker$37
+Info:   user: $extract$\ALU_ALU_func_0$31
+Info: $auto$hilomap.cc:40:hilomap_worker$36[2]
+Info:   driver: $auto$hilomap.cc:41:hilomap_worker$37
+Info:   user: $extract$\ALU_ALU_func_0$31
+Info: $auto$hilomap.cc:40:hilomap_worker$36[1]
+Info:   driver: $auto$hilomap.cc:41:hilomap_worker$37
+Info:   user: $extract$\ALU_ALU_func_0$31
+Info: $auto$hilomap.cc:40:hilomap_worker$36[0]
+Info:   driver: $auto$hilomap.cc:41:hilomap_worker$37
+Info:   user: $extract$\ALU_ALU_func_0$31
+Info: $auto$hilomap.cc:40:hilomap_worker$34[31]
+Info:   driver: $auto$hilomap.cc:41:hilomap_worker$35
+Info:   user: $extract$\ALU_ALU_func_0$31
+Info: $auto$hilomap.cc:40:hilomap_worker$34[30]
+Info:   driver: $auto$hilomap.cc:41:hilomap_worker$35
+Info:   user: $extract$\ALU_ALU_func_0$31
+Info: $auto$hilomap.cc:40:hilomap_worker$34[29]
+Info:   driver: $auto$hilomap.cc:41:hilomap_worker$35
+Info:   user: $extract$\ALU_ALU_func_0$31
+Info: $auto$hilomap.cc:40:hilomap_worker$34[28]
+Info:   driver: $auto$hilomap.cc:41:hilomap_worker$35
+Info:   user: $extract$\ALU_ALU_func_0$31
+Info: $auto$hilomap.cc:40:hilomap_worker$34[27]
+Info:   driver: $auto$hilomap.cc:41:hilomap_worker$35
+Info:   user: $extract$\ALU_ALU_func_0$31
+Info: $auto$hilomap.cc:40:hilomap_worker$34[26]
+Info:   driver: $auto$hilomap.cc:41:hilomap_worker$35
+Info:   user: $extract$\ALU_ALU_func_0$31
+Info: $auto$hilomap.cc:40:hilomap_worker$34[25]
+Info:   driver: $auto$hilomap.cc:41:hilomap_worker$35
+Info:   user: $extract$\ALU_ALU_func_0$31
+Info: $auto$hilomap.cc:40:hilomap_worker$34[24]
+Info:   driver: $auto$hilomap.cc:41:hilomap_worker$35
+Info:   user: $extract$\ALU_ALU_func_0$31
+Info: $auto$hilomap.cc:40:hilomap_worker$34[23]
+Info:   driver: $auto$hilomap.cc:41:hilomap_worker$35
+Info:   user: $extract$\ALU_ALU_func_0$31
+Info: $auto$hilomap.cc:40:hilomap_worker$34[22]
+Info:   driver: $auto$hilomap.cc:41:hilomap_worker$35
+Info:   user: $extract$\ALU_ALU_func_0$31
+Info: $auto$hilomap.cc:40:hilomap_worker$34[21]
+Info:   driver: $auto$hilomap.cc:41:hilomap_worker$35
+Info:   user: $extract$\ALU_ALU_func_0$31
+Info: $auto$hilomap.cc:40:hilomap_worker$34[20]
+Info:   driver: $auto$hilomap.cc:41:hilomap_worker$35
+Info:   user: $extract$\ALU_ALU_func_0$31
+Info: $auto$hilomap.cc:40:hilomap_worker$34[19]
+Info:   driver: $auto$hilomap.cc:41:hilomap_worker$35
+Info:   user: $extract$\ALU_ALU_func_0$31
+Info: $auto$hilomap.cc:40:hilomap_worker$34[18]
+Info:   driver: $auto$hilomap.cc:41:hilomap_worker$35
+Info:   user: $extract$\ALU_ALU_func_0$31
+Info: $auto$hilomap.cc:40:hilomap_worker$34[17]
+Info:   driver: $auto$hilomap.cc:41:hilomap_worker$35
+Info:   user: $extract$\ALU_ALU_func_0$31
+Info: $auto$hilomap.cc:40:hilomap_worker$34[16]
+Info:   driver: $auto$hilomap.cc:41:hilomap_worker$35
+Info:   user: $extract$\ALU_ALU_func_0$31
+Info: $auto$hilomap.cc:40:hilomap_worker$34[15]
+Info:   driver: $auto$hilomap.cc:41:hilomap_worker$35
+Info:   user: $extract$\ALU_ALU_func_0$31
+Info: $auto$hilomap.cc:40:hilomap_worker$34[14]
+Info:   driver: $auto$hilomap.cc:41:hilomap_worker$35
+Info:   user: $extract$\ALU_ALU_func_0$31
+Info: $auto$hilomap.cc:40:hilomap_worker$34[13]
+Info:   driver: $auto$hilomap.cc:41:hilomap_worker$35
+Info:   user: $extract$\ALU_ALU_func_0$31
+Info: $auto$hilomap.cc:40:hilomap_worker$34[12]
+Info:   driver: $auto$hilomap.cc:41:hilomap_worker$35
+Info:   user: $extract$\ALU_ALU_func_0$31
+Info: $auto$hilomap.cc:40:hilomap_worker$34[11]
+Info:   driver: $auto$hilomap.cc:41:hilomap_worker$35
+Info:   user: $extract$\ALU_ALU_func_0$31
+Info: $auto$hilomap.cc:40:hilomap_worker$34[10]
+Info:   driver: $auto$hilomap.cc:41:hilomap_worker$35
+Info:   user: $extract$\ALU_ALU_func_0$31
+Info: $auto$hilomap.cc:40:hilomap_worker$34[9]
+Info:   driver: $auto$hilomap.cc:41:hilomap_worker$35
+Info:   user: $extract$\ALU_ALU_func_0$31
+Info: $auto$hilomap.cc:40:hilomap_worker$34[8]
+Info:   driver: $auto$hilomap.cc:41:hilomap_worker$35
+Info:   user: $extract$\ALU_ALU_func_0$31
+Info: $auto$hilomap.cc:40:hilomap_worker$34[7]
+Info:   driver: $auto$hilomap.cc:41:hilomap_worker$35
+Info:   user: $extract$\ALU_ALU_func_0$31
+Info: $auto$hilomap.cc:40:hilomap_worker$34[6]
+Info:   driver: $auto$hilomap.cc:41:hilomap_worker$35
+Info:   user: $extract$\ALU_ALU_func_0$31
+Info: $auto$hilomap.cc:40:hilomap_worker$34[5]
+Info:   driver: $auto$hilomap.cc:41:hilomap_worker$35
+Info:   user: $extract$\ALU_ALU_func_0$31
+Info: $auto$hilomap.cc:40:hilomap_worker$34[4]
+Info:   driver: $auto$hilomap.cc:41:hilomap_worker$35
+Info:   user: $extract$\ALU_ALU_func_0$31
+Info: $auto$hilomap.cc:40:hilomap_worker$34[3]
+Info:   driver: $auto$hilomap.cc:41:hilomap_worker$35
+Info:   user: $extract$\ALU_ALU_func_0$31
+Info: $auto$hilomap.cc:40:hilomap_worker$34[2]
+Info:   driver: $auto$hilomap.cc:41:hilomap_worker$35
+Info:   user: $extract$\ALU_ALU_func_0$31
+Info: $auto$hilomap.cc:40:hilomap_worker$34[1]
+Info:   driver: $auto$hilomap.cc:41:hilomap_worker$35
+Info:   user: $extract$\ALU_ALU_func_0$31
+Info: $auto$hilomap.cc:40:hilomap_worker$34[0]
+Info:   driver: $auto$hilomap.cc:41:hilomap_worker$35
+Info:   user: $extract$\ALU_ALU_func_0$31
+Info: Checksum: 0xd2d3545f
 
 Info: Device utilisation:
-Info: 	                 ALU:       8/     32    25%
-Info: 	          const_unit:       3/     32     9%
-Info: 	            reg_unit:       2/     32     6%
-Info: 	                  IO:       8/     32    25%
+Info: 	               INBUF:      64/    512    12%
+Info: 	              OUTBUF:      32/    512     6%
+Info: 	             CLK_DRV:       1/     16     6%
+Info: 	             GND_DRV:       1/    160     0%
+Info: 	             VCC_DRV:       1/    160     0%
+Info: 	                 ALU:       2/     16    12%
+Info: 	          const_unit:       3/     16    18%
+Info: 	            reg_unit:       1/     80     1%
+Info: 	                  IO:       3/     16    18%
 
-Info: Assigning net info:
-Info: Net: i_inc27_const
-Info: Net: i_inc_const
-Info: Net: i_cnt_160_reg2mem28
-Info: Net: i_exitcond_not
-Info: Net: i_inc27
-Info: Net: i_cnt_2_reg2mem26
-Info: Net: i_inc
-Info: Net: i_cmp21
-Info: Net: i_cmp21_const
-Info: Net: i_arrayidx19_1
-Info: Net: i_arrayidx19_0
-Info: Net: i_level
-Info: Net: i_arrayidx18
-Info: Net: i_e_061_reg2mem30
-Info: Net: i_edges
-Info: Net: i_4
-Info: Net: i_0
 Info: Trying placer heap with seed:3549216002486605715 
 Info: Placed 0 cells based on constraints.
-Info: Creating initial analytic placement for 21 cells, random placement wirelen = 67.
+Info: Creating initial analytic placement for 108 cells, random placement wirelen = 1115.
 Info:     at initial placer iter 0, wirelen = 0
 Info:     at initial placer iter 1, wirelen = 0
 Info:     at initial placer iter 2, wirelen = 0
 Info:     at initial placer iter 3, wirelen = 0
 Info: Running main analytical placer, max placement attempts per cell = 10000.
-Info:     at iteration #1, type IO: wirelen solved = 0, spread = 14, legal = 14; time = 0.00s
-Info:     at iteration #1, type const_unit: wirelen solved = 14, spread = 21, legal = 22; time = 0.00s
-Info:     at iteration #1, type reg_unit: wirelen solved = 22, spread = 22, legal = 28; time = 0.00s
-Info:     at iteration #1, type ALU: wirelen solved = 25, spread = 36, legal = 39; time = 0.00s
-Info:     at iteration #1, type ALL: wirelen solved = 0, spread = 50, legal = 42; time = 0.00s
-Info:     at iteration #2, type IO: wirelen solved = 25, spread = 30, legal = 38; time = 0.00s
-Info:     at iteration #2, type const_unit: wirelen solved = 37, spread = 37, legal = 36; time = 0.00s
-Info:     at iteration #2, type reg_unit: wirelen solved = 36, spread = 36, legal = 36; time = 0.00s
-Info:     at iteration #2, type ALU: wirelen solved = 19, spread = 25, legal = 25; time = 0.00s
-Info:     at iteration #2, type ALL: wirelen solved = 1, spread = 28, legal = 31; time = 0.00s
-Info:     at iteration #3, type IO: wirelen solved = 24, spread = 25, legal = 31; time = 0.00s
-Info:     at iteration #3, type const_unit: wirelen solved = 30, spread = 30, legal = 28; time = 0.00s
-Info:     at iteration #3, type reg_unit: wirelen solved = 25, spread = 25, legal = 25; time = 0.00s
-Info:     at iteration #3, type ALU: wirelen solved = 25, spread = 26, legal = 34; time = 0.00s
-Info:     at iteration #3, type ALL: wirelen solved = 2, spread = 29, legal = 28; time = 0.00s
-Info:     at iteration #4, type IO: wirelen solved = 20, spread = 21, legal = 28; time = 0.00s
-Info:     at iteration #4, type const_unit: wirelen solved = 28, spread = 28, legal = 28; time = 0.00s
-Info:     at iteration #4, type reg_unit: wirelen solved = 26, spread = 26, legal = 26; time = 0.00s
-Info:     at iteration #4, type ALU: wirelen solved = 24, spread = 23, legal = 23; time = 0.00s
-Info:     at iteration #4, type ALL: wirelen solved = 5, spread = 22, legal = 27; time = 0.00s
-Info:     at iteration #5, type IO: wirelen solved = 18, spread = 20, legal = 25; time = 0.00s
-Info:     at iteration #5, type const_unit: wirelen solved = 25, spread = 25, legal = 24; time = 0.00s
-Info:     at iteration #5, type reg_unit: wirelen solved = 24, spread = 24, legal = 23; time = 0.00s
-Info:     at iteration #5, type ALU: wirelen solved = 25, spread = 27, legal = 31; time = 0.00s
-Info:     at iteration #5, type ALL: wirelen solved = 6, spread = 26, legal = 26; time = 0.00s
-Info:     at iteration #6, type IO: wirelen solved = 19, spread = 20, legal = 25; time = 0.00s
-Info:     at iteration #6, type const_unit: wirelen solved = 24, spread = 24, legal = 24; time = 0.00s
-Info:     at iteration #6, type reg_unit: wirelen solved = 23, spread = 23, legal = 23; time = 0.00s
-Info:     at iteration #6, type ALU: wirelen solved = 22, spread = 29, legal = 42; time = 0.00s
-Info:     at iteration #6, type ALL: wirelen solved = 8, spread = 34, legal = 37; time = 0.00s
-Info:     at iteration #7, type IO: wirelen solved = 27, spread = 30, legal = 34; time = 0.00s
-Info:     at iteration #7, type const_unit: wirelen solved = 33, spread = 33, legal = 30; time = 0.00s
-Info:     at iteration #7, type reg_unit: wirelen solved = 29, spread = 29, legal = 29; time = 0.00s
-Info:     at iteration #7, type ALU: wirelen solved = 19, spread = 28, legal = 31; time = 0.00s
-Info:     at iteration #7, type ALL: wirelen solved = 5, spread = 22, legal = 32; time = 0.00s
-Info:     at iteration #8, type IO: wirelen solved = 25, spread = 28, legal = 31; time = 0.00s
-Info:     at iteration #8, type const_unit: wirelen solved = 31, spread = 31, legal = 31; time = 0.00s
-Info:     at iteration #8, type reg_unit: wirelen solved = 31, spread = 31, legal = 31; time = 0.00s
-Info:     at iteration #8, type ALU: wirelen solved = 19, spread = 28, legal = 28; time = 0.00s
-Info:     at iteration #8, type ALL: wirelen solved = 8, spread = 27, legal = 29; time = 0.00s
-Info:     at iteration #9, type IO: wirelen solved = 22, spread = 25, legal = 27; time = 0.00s
-Info:     at iteration #9, type const_unit: wirelen solved = 27, spread = 27, legal = 27; time = 0.00s
-Info:     at iteration #9, type reg_unit: wirelen solved = 27, spread = 27, legal = 27; time = 0.00s
-Info:     at iteration #9, type ALU: wirelen solved = 15, spread = 34, legal = 34; time = 0.00s
-Info:     at iteration #9, type ALL: wirelen solved = 7, spread = 28, legal = 39; time = 0.00s
-Info:     at iteration #10, type IO: wirelen solved = 31, spread = 33, legal = 38; time = 0.00s
-Info:     at iteration #10, type const_unit: wirelen solved = 36, spread = 36, legal = 34; time = 0.00s
-Info:     at iteration #10, type reg_unit: wirelen solved = 32, spread = 32, legal = 33; time = 0.00s
-Info:     at iteration #10, type ALU: wirelen solved = 24, spread = 25, legal = 31; time = 0.00s
-Info:     at iteration #10, type ALL: wirelen solved = 10, spread = 34, legal = 34; time = 0.00s
-Warning: post-placement validity check failed for Bel 'X2Y1/1_ALU' (cell 'inst_i_arrayidx18')
-Warning: post-placement validity check failed for Bel 'X2Y2/0_const_unit' (cell 'inst_inst_i_inc_const')
-Info: Trying placer heap with seed:5659617124320425130 
-Info: Placed 0 cells based on constraints.
-Info: Creating initial analytic placement for 21 cells, random placement wirelen = 56.
-Info:     at initial placer iter 0, wirelen = 0
-Info:     at initial placer iter 1, wirelen = 0
-Info:     at initial placer iter 2, wirelen = 0
-Info:     at initial placer iter 3, wirelen = 0
-Info: Running main analytical placer, max placement attempts per cell = 10000.
-Info:     at iteration #1, type IO: wirelen solved = 0, spread = 14, legal = 14; time = 0.00s
-Info:     at iteration #1, type const_unit: wirelen solved = 14, spread = 21, legal = 21; time = 0.00s
-Info:     at iteration #1, type reg_unit: wirelen solved = 21, spread = 21, legal = 27; time = 0.00s
-Info:     at iteration #1, type ALU: wirelen solved = 23, spread = 33, legal = 42; time = 0.00s
-Info:     at iteration #1, type ALL: wirelen solved = 0, spread = 50, legal = 44; time = 0.00s
-Info:     at iteration #2, type IO: wirelen solved = 27, spread = 32, legal = 40; time = 0.00s
-Info:     at iteration #2, type const_unit: wirelen solved = 39, spread = 39, legal = 38; time = 0.00s
-Info:     at iteration #2, type reg_unit: wirelen solved = 37, spread = 37, legal = 37; time = 0.00s
-Info:     at iteration #2, type ALU: wirelen solved = 23, spread = 27, legal = 40; time = 0.00s
-Info:     at iteration #2, type ALL: wirelen solved = 0, spread = 33, legal = 30; time = 0.00s
-Info:     at iteration #3, type IO: wirelen solved = 23, spread = 25, legal = 31; time = 0.00s
-Info:     at iteration #3, type const_unit: wirelen solved = 31, spread = 31, legal = 31; time = 0.00s
-Info:     at iteration #3, type reg_unit: wirelen solved = 29, spread = 29, legal = 29; time = 0.00s
-Info:     at iteration #3, type ALU: wirelen solved = 27, spread = 28, legal = 39; time = 0.00s
-Info:     at iteration #3, type ALL: wirelen solved = 3, spread = 35, legal = 37; time = 0.00s
-Info:     at iteration #4, type IO: wirelen solved = 28, spread = 29, legal = 33; time = 0.00s
-Info:     at iteration #4, type const_unit: wirelen solved = 32, spread = 32, legal = 30; time = 0.00s
-Info:     at iteration #4, type reg_unit: wirelen solved = 27, spread = 27, legal = 27; time = 0.00s
-Info:     at iteration #4, type ALU: wirelen solved = 22, spread = 33, legal = 33; time = 0.00s
-Info:     at iteration #4, type ALL: wirelen solved = 2, spread = 28, legal = 28; time = 0.00s
-Info:     at iteration #5, type IO: wirelen solved = 21, spread = 22, legal = 25; time = 0.00s
-Info:     at iteration #5, type const_unit: wirelen solved = 25, spread = 25, legal = 24; time = 0.00s
-Info:     at iteration #5, type reg_unit: wirelen solved = 24, spread = 24, legal = 24; time = 0.00s
-Info:     at iteration #5, type ALU: wirelen solved = 24, spread = 32, legal = 32; time = 0.00s
-Info:     at iteration #5, type ALL: wirelen solved = 8, spread = 37, legal = 34; time = 0.00s
-Info:     at iteration #6, type IO: wirelen solved = 26, spread = 25, legal = 32; time = 0.00s
-Info:     at iteration #6, type const_unit: wirelen solved = 30, spread = 30, legal = 28; time = 0.00s
-Info:     at iteration #6, type reg_unit: wirelen solved = 27, spread = 27, legal = 28; time = 0.00s
-Info:     at iteration #6, type ALU: wirelen solved = 23, spread = 30, legal = 30; time = 0.00s
-Info:     at iteration #6, type ALL: wirelen solved = 7, spread = 29, legal = 29; time = 0.00s
-Info:     at iteration #7, type IO: wirelen solved = 26, spread = 28, legal = 28; time = 0.00s
-Info:     at iteration #7, type const_unit: wirelen solved = 27, spread = 27, legal = 24; time = 0.00s
-Info:     at iteration #7, type reg_unit: wirelen solved = 24, spread = 24, legal = 24; time = 0.00s
-Info:     at iteration #7, type ALU: wirelen solved = 17, spread = 32, legal = 32; time = 0.00s
-Info:     at iteration #7, type ALL: wirelen solved = 7, spread = 37, legal = 34; time = 0.00s
-Info:     at iteration #8, type IO: wirelen solved = 28, spread = 29, legal = 30; time = 0.00s
-Info:     at iteration #8, type const_unit: wirelen solved = 30, spread = 30, legal = 28; time = 0.00s
-Info:     at iteration #8, type reg_unit: wirelen solved = 28, spread = 28, legal = 28; time = 0.00s
-Info:     at iteration #8, type ALU: wirelen solved = 20, spread = 27, legal = 27; time = 0.00s
-Info:     at iteration #8, type ALL: wirelen solved = 10, spread = 30, legal = 32; time = 0.00s
-Info:     at iteration #9, type IO: wirelen solved = 24, spread = 26, legal = 31; time = 0.00s
-Info:     at iteration #9, type const_unit: wirelen solved = 31, spread = 31, legal = 29; time = 0.00s
-Info:     at iteration #9, type reg_unit: wirelen solved = 28, spread = 28, legal = 28; time = 0.00s
-Info:     at iteration #9, type ALU: wirelen solved = 22, spread = 30, legal = 30; time = 0.00s
-Info:     at iteration #9, type ALL: wirelen solved = 10, spread = 31, legal = 31; time = 0.00s
-Warning: post-placement validity check failed for Bel 'X1Y1/0_const_unit' (cell 'inst_inst_i_inc_const')
-Info: Trying placer heap with seed:6176937498645257248 
-Info: Placed 0 cells based on constraints.
-Info: Creating initial analytic placement for 21 cells, random placement wirelen = 52.
-Info:     at initial placer iter 0, wirelen = 0
-Info:     at initial placer iter 1, wirelen = 0
-Info:     at initial placer iter 2, wirelen = 0
-Info:     at initial placer iter 3, wirelen = 0
-Info: Running main analytical placer, max placement attempts per cell = 10000.
-Info:     at iteration #1, type IO: wirelen solved = 0, spread = 14, legal = 14; time = 0.00s
-Info:     at iteration #1, type const_unit: wirelen solved = 14, spread = 21, legal = 22; time = 0.00s
-Info:     at iteration #1, type reg_unit: wirelen solved = 22, spread = 22, legal = 27; time = 0.00s
-Info:     at iteration #1, type ALU: wirelen solved = 23, spread = 33, legal = 43; time = 0.00s
-Info:     at iteration #1, type ALL: wirelen solved = 0, spread = 50, legal = 45; time = 0.00s
-Info:     at iteration #2, type IO: wirelen solved = 26, spread = 31, legal = 36; time = 0.00s
-Info:     at iteration #2, type const_unit: wirelen solved = 35, spread = 35, legal = 34; time = 0.00s
-Info:     at iteration #2, type reg_unit: wirelen solved = 33, spread = 33, legal = 35; time = 0.00s
-Info:     at iteration #2, type ALU: wirelen solved = 21, spread = 25, legal = 29; time = 0.00s
-Info:     at iteration #2, type ALL: wirelen solved = 0, spread = 25, legal = 27; time = 0.00s
-Info:     at iteration #3, type IO: wirelen solved = 22, spread = 23, legal = 28; time = 0.00s
-Info:     at iteration #3, type const_unit: wirelen solved = 28, spread = 28, legal = 27; time = 0.00s
-Info:     at iteration #3, type reg_unit: wirelen solved = 26, spread = 26, legal = 26; time = 0.00s
-Info:     at iteration #3, type ALU: wirelen solved = 23, spread = 32, legal = 32; time = 0.00s
-Info:     at iteration #3, type ALL: wirelen solved = 2, spread = 29, legal = 27; time = 0.00s
-Info:     at iteration #4, type IO: wirelen solved = 21, spread = 23, legal = 27; time = 0.00s
-Info:     at iteration #4, type const_unit: wirelen solved = 27, spread = 27, legal = 25; time = 0.00s
-Info:     at iteration #4, type reg_unit: wirelen solved = 25, spread = 25, legal = 25; time = 0.00s
-Info:     at iteration #4, type ALU: wirelen solved = 18, spread = 31, legal = 31; time = 0.00s
-Info:     at iteration #4, type ALL: wirelen solved = 5, spread = 32, legal = 31; time = 0.00s
-Info:     at iteration #5, type IO: wirelen solved = 23, spread = 25, legal = 33; time = 0.00s
-Info:     at iteration #5, type const_unit: wirelen solved = 33, spread = 33, legal = 31; time = 0.00s
-Info:     at iteration #5, type reg_unit: wirelen solved = 31, spread = 31, legal = 31; time = 0.00s
-Info:     at iteration #5, type ALU: wirelen solved = 27, spread = 29, legal = 44; time = 0.00s
-Info:     at iteration #5, type ALL: wirelen solved = 4, spread = 34, legal = 29; time = 0.00s
-Info:     at iteration #6, type IO: wirelen solved = 24, spread = 25, legal = 31; time = 0.00s
-Info:     at iteration #6, type const_unit: wirelen solved = 30, spread = 30, legal = 30; time = 0.00s
-Info:     at iteration #6, type reg_unit: wirelen solved = 30, spread = 30, legal = 30; time = 0.00s
-Info:     at iteration #6, type ALU: wirelen solved = 28, spread = 26, legal = 40; time = 0.00s
-Info:     at iteration #6, type ALL: wirelen solved = 8, spread = 30, legal = 28; time = 0.00s
-Info:     at iteration #7, type IO: wirelen solved = 25, spread = 25, legal = 28; time = 0.00s
-Info:     at iteration #7, type const_unit: wirelen solved = 28, spread = 28, legal = 25; time = 0.00s
-Info:     at iteration #7, type reg_unit: wirelen solved = 25, spread = 25, legal = 25; time = 0.00s
-Info:     at iteration #7, type ALU: wirelen solved = 23, spread = 22, legal = 22; time = 0.00s
-Info:     at iteration #7, type ALL: wirelen solved = 7, spread = 25, legal = 27; time = 0.00s
-Warning: post-placement validity check failed for Bel 'X2Y0/1_S_IO' (cell 'inst_i_level')
-Warning: post-placement validity check failed for Bel 'X2Y1/0_const_unit' (cell 'inst_inst_i_cmp21_const')
-Info: Trying placer heap with seed:14959890827522091460 
-Info: Placed 0 cells based on constraints.
-Info: Creating initial analytic placement for 21 cells, random placement wirelen = 54.
-Info:     at initial placer iter 0, wirelen = 0
-Info:     at initial placer iter 1, wirelen = 0
-Info:     at initial placer iter 2, wirelen = 0
-Info:     at initial placer iter 3, wirelen = 0
-Info: Running main analytical placer, max placement attempts per cell = 10000.
-Info:     at iteration #1, type IO: wirelen solved = 0, spread = 14, legal = 14; time = 0.00s
-Info:     at iteration #1, type const_unit: wirelen solved = 14, spread = 21, legal = 24; time = 0.00s
-Info:     at iteration #1, type reg_unit: wirelen solved = 24, spread = 24, legal = 31; time = 0.00s
-Info:     at iteration #1, type ALU: wirelen solved = 25, spread = 43, legal = 43; time = 0.00s
-Info:     at iteration #1, type ALL: wirelen solved = 0, spread = 50, legal = 41; time = 0.00s
-Info:     at iteration #2, type IO: wirelen solved = 23, spread = 28, legal = 36; time = 0.00s
-Info:     at iteration #2, type const_unit: wirelen solved = 36, spread = 36, legal = 36; time = 0.00s
-Info:     at iteration #2, type reg_unit: wirelen solved = 36, spread = 36, legal = 36; time = 0.00s
-Info:     at iteration #2, type ALU: wirelen solved = 19, spread = 33, legal = 33; time = 0.00s
-Info:     at iteration #2, type ALL: wirelen solved = 1, spread = 27, legal = 31; time = 0.00s
-Info:     at iteration #3, type IO: wirelen solved = 23, spread = 24, legal = 30; time = 0.00s
-Info:     at iteration #3, type const_unit: wirelen solved = 29, spread = 29, legal = 28; time = 0.00s
-Info:     at iteration #3, type reg_unit: wirelen solved = 26, spread = 26, legal = 26; time = 0.00s
-Info:     at iteration #3, type ALU: wirelen solved = 28, spread = 38, legal = 38; time = 0.00s
-Info:     at iteration #3, type ALL: wirelen solved = 0, spread = 27, legal = 30; time = 0.00s
-Info:     at iteration #4, type IO: wirelen solved = 24, spread = 26, legal = 28; time = 0.00s
-Info:     at iteration #4, type const_unit: wirelen solved = 25, spread = 25, legal = 23; time = 0.00s
-Info:     at iteration #4, type reg_unit: wirelen solved = 22, spread = 22, legal = 22; time = 0.00s
-Info:     at iteration #4, type ALU: wirelen solved = 28, spread = 22, legal = 22; time = 0.00s
-Info:     at iteration #4, type ALL: wirelen solved = 9, spread = 23, legal = 30; time = 0.00s
-Info:     at iteration #5, type IO: wirelen solved = 21, spread = 26, legal = 30; time = 0.00s
-Info:     at iteration #5, type const_unit: wirelen solved = 29, spread = 29, legal = 28; time = 0.00s
-Info:     at iteration #5, type reg_unit: wirelen solved = 28, spread = 28, legal = 28; time = 0.00s
-Info:     at iteration #5, type ALU: wirelen solved = 23, spread = 36, legal = 36; time = 0.00s
-Info:     at iteration #5, type ALL: wirelen solved = 4, spread = 34, legal = 32; time = 0.00s
-Info:     at iteration #6, type IO: wirelen solved = 24, spread = 27, legal = 28; time = 0.00s
-Info:     at iteration #6, type const_unit: wirelen solved = 28, spread = 28, legal = 26; time = 0.00s
-Info:     at iteration #6, type reg_unit: wirelen solved = 26, spread = 26, legal = 26; time = 0.00s
-Info:     at iteration #6, type ALU: wirelen solved = 24, spread = 32, legal = 32; time = 0.00s
-Info:     at iteration #6, type ALL: wirelen solved = 8, spread = 35, legal = 34; time = 0.00s
-Info:     at iteration #7, type IO: wirelen solved = 24, spread = 27, legal = 33; time = 0.00s
-Info:     at iteration #7, type const_unit: wirelen solved = 33, spread = 33, legal = 31; time = 0.00s
-Info:     at iteration #7, type reg_unit: wirelen solved = 31, spread = 31, legal = 31; time = 0.00s
-Info:     at iteration #7, type ALU: wirelen solved = 20, spread = 23, legal = 27; time = 0.00s
-Info:     at iteration #7, type ALL: wirelen solved = 7, spread = 39, legal = 36; time = 0.00s
-Info:     at iteration #8, type IO: wirelen solved = 29, spread = 31, legal = 34; time = 0.00s
-Info:     at iteration #8, type const_unit: wirelen solved = 32, spread = 32, legal = 30; time = 0.00s
-Info:     at iteration #8, type reg_unit: wirelen solved = 30, spread = 30, legal = 30; time = 0.00s
-Info:     at iteration #8, type ALU: wirelen solved = 28, spread = 26, legal = 32; time = 0.00s
-Info:     at iteration #8, type ALL: wirelen solved = 8, spread = 26, legal = 31; time = 0.00s
-Warning: post-placement validity check failed for Bel 'X1Y1/0_const_unit' (cell 'inst_inst_i_cmp21_const')
-Warning: post-placement validity check failed for Bel 'X2Y3/0_const_unit' (cell 'inst_inst_i_inc_const')
-Info: Trying placer heap with seed:521494586791226707 
-Info: Placed 0 cells based on constraints.
-Info: Creating initial analytic placement for 21 cells, random placement wirelen = 57.
-Info:     at initial placer iter 0, wirelen = 0
-Info:     at initial placer iter 1, wirelen = 0
-Info:     at initial placer iter 2, wirelen = 0
-Info:     at initial placer iter 3, wirelen = 0
-Info: Running main analytical placer, max placement attempts per cell = 10000.
-Info:     at iteration #1, type IO: wirelen solved = 0, spread = 14, legal = 14; time = 0.00s
-Info:     at iteration #1, type const_unit: wirelen solved = 14, spread = 21, legal = 22; time = 0.00s
-Info:     at iteration #1, type reg_unit: wirelen solved = 22, spread = 22, legal = 27; time = 0.00s
-Info:     at iteration #1, type ALU: wirelen solved = 22, spread = 36, legal = 45; time = 0.00s
-Info:     at iteration #1, type ALL: wirelen solved = 0, spread = 50, legal = 42; time = 0.00s
-Info:     at iteration #2, type IO: wirelen solved = 26, spread = 30, legal = 40; time = 0.00s
-Info:     at iteration #2, type const_unit: wirelen solved = 39, spread = 39, legal = 39; time = 0.00s
-Info:     at iteration #2, type reg_unit: wirelen solved = 39, spread = 39, legal = 39; time = 0.00s
-Info:     at iteration #2, type ALU: wirelen solved = 26, spread = 31, legal = 31; time = 0.00s
-Info:     at iteration #2, type ALL: wirelen solved = 1, spread = 31, legal = 35; time = 0.00s
-Info:     at iteration #3, type IO: wirelen solved = 27, spread = 28, legal = 35; time = 0.00s
-Info:     at iteration #3, type const_unit: wirelen solved = 34, spread = 34, legal = 30; time = 0.00s
-Info:     at iteration #3, type reg_unit: wirelen solved = 27, spread = 27, legal = 27; time = 0.00s
-Info:     at iteration #3, type ALU: wirelen solved = 25, spread = 29, legal = 29; time = 0.00s
-Info:     at iteration #3, type ALL: wirelen solved = 2, spread = 29, legal = 32; time = 0.00s
-Info:     at iteration #4, type IO: wirelen solved = 26, spread = 28, legal = 34; time = 0.00s
-Info:     at iteration #4, type const_unit: wirelen solved = 32, spread = 32, legal = 29; time = 0.00s
-Info:     at iteration #4, type reg_unit: wirelen solved = 27, spread = 27, legal = 27; time = 0.00s
-Info:     at iteration #4, type ALU: wirelen solved = 27, spread = 31, legal = 33; time = 0.00s
-Info:     at iteration #4, type ALL: wirelen solved = 4, spread = 21, legal = 29; time = 0.00s
-Info:     at iteration #5, type IO: wirelen solved = 26, spread = 28, legal = 31; time = 0.00s
-Info:     at iteration #5, type const_unit: wirelen solved = 28, spread = 28, legal = 26; time = 0.00s
-Info:     at iteration #5, type reg_unit: wirelen solved = 24, spread = 24, legal = 24; time = 0.00s
-Info:     at iteration #5, type ALU: wirelen solved = 20, spread = 22, legal = 30; time = 0.00s
-Info:     at iteration #5, type ALL: wirelen solved = 7, spread = 24, legal = 33; time = 0.00s
-Info:     at iteration #6, type IO: wirelen solved = 23, spread = 27, legal = 28; time = 0.00s
-Info:     at iteration #6, type const_unit: wirelen solved = 28, spread = 28, legal = 28; time = 0.00s
-Info:     at iteration #6, type reg_unit: wirelen solved = 26, spread = 26, legal = 26; time = 0.00s
-Info:     at iteration #6, type ALU: wirelen solved = 22, spread = 35, legal = 35; time = 0.00s
-Info:     at iteration #6, type ALL: wirelen solved = 10, spread = 25, legal = 32; time = 0.00s
-Info:     at iteration #7, type IO: wirelen solved = 27, spread = 29, legal = 29; time = 0.00s
-Info:     at iteration #7, type const_unit: wirelen solved = 28, spread = 28, legal = 28; time = 0.00s
-Info:     at iteration #7, type reg_unit: wirelen solved = 28, spread = 28, legal = 27; time = 0.00s
-Info:     at iteration #7, type ALU: wirelen solved = 22, spread = 26, legal = 38; time = 0.00s
-Info:     at iteration #7, type ALL: wirelen solved = 7, spread = 28, legal = 27; time = 0.00s
-Info:     at iteration #8, type IO: wirelen solved = 22, spread = 25, legal = 25; time = 0.00s
-Info:     at iteration #8, type const_unit: wirelen solved = 24, spread = 24, legal = 24; time = 0.00s
-Info:     at iteration #8, type reg_unit: wirelen solved = 24, spread = 24, legal = 23; time = 0.00s
-Info:     at iteration #8, type ALU: wirelen solved = 22, spread = 23, legal = 29; time = 0.00s
-Info:     at iteration #8, type ALL: wirelen solved = 8, spread = 28, legal = 29; time = 0.00s
-Info:     at iteration #9, type IO: wirelen solved = 28, spread = 29, legal = 31; time = 0.00s
-Info:     at iteration #9, type const_unit: wirelen solved = 29, spread = 29, legal = 27; time = 0.00s
-Info:     at iteration #9, type reg_unit: wirelen solved = 26, spread = 26, legal = 26; time = 0.00s
-Info:     at iteration #9, type ALU: wirelen solved = 22, spread = 25, legal = 36; time = 0.00s
-Info:     at iteration #9, type ALL: wirelen solved = 9, spread = 26, legal = 27; time = 0.00s
-Info:     at iteration #10, type IO: wirelen solved = 23, spread = 25, legal = 29; time = 0.00s
-Info:     at iteration #10, type const_unit: wirelen solved = 29, spread = 29, legal = 29; time = 0.00s
-Info:     at iteration #10, type reg_unit: wirelen solved = 29, spread = 29, legal = 29; time = 0.00s
-Info:     at iteration #10, type ALU: wirelen solved = 23, spread = 29, legal = 29; time = 0.00s
-Info:     at iteration #10, type ALL: wirelen solved = 10, spread = 28, legal = 23; time = 0.00s
-Info:     at iteration #11, type IO: wirelen solved = 21, spread = 22, legal = 22; time = 0.00s
-Info:     at iteration #11, type const_unit: wirelen solved = 22, spread = 22, legal = 22; time = 0.00s
-Info:     at iteration #11, type reg_unit: wirelen solved = 22, spread = 22, legal = 22; time = 0.00s
-Info:     at iteration #11, type ALU: wirelen solved = 18, spread = 31, legal = 31; time = 0.00s
-Info:     at iteration #11, type ALL: wirelen solved = 9, spread = 38, legal = 38; time = 0.00s
-Info:     at iteration #12, type IO: wirelen solved = 34, spread = 34, legal = 35; time = 0.00s
-Info:     at iteration #12, type const_unit: wirelen solved = 34, spread = 34, legal = 29; time = 0.00s
-Info:     at iteration #12, type reg_unit: wirelen solved = 28, spread = 28, legal = 28; time = 0.00s
-Info:     at iteration #12, type ALU: wirelen solved = 25, spread = 27, legal = 27; time = 0.00s
-Info:     at iteration #12, type ALL: wirelen solved = 9, spread = 24, legal = 28; time = 0.00s
-Info:     at iteration #13, type IO: wirelen solved = 27, spread = 29, legal = 29; time = 0.00s
-Info:     at iteration #13, type const_unit: wirelen solved = 29, spread = 29, legal = 27; time = 0.00s
-Info:     at iteration #13, type reg_unit: wirelen solved = 27, spread = 27, legal = 27; time = 0.00s
-Info:     at iteration #13, type ALU: wirelen solved = 21, spread = 32, legal = 32; time = 0.00s
-Info:     at iteration #13, type ALL: wirelen solved = 7, spread = 26, legal = 36; time = 0.00s
-Info:     at iteration #14, type IO: wirelen solved = 34, spread = 34, legal = 38; time = 0.00s
-Info:     at iteration #14, type const_unit: wirelen solved = 37, spread = 37, legal = 33; time = 0.00s
-Info:     at iteration #14, type reg_unit: wirelen solved = 32, spread = 32, legal = 32; time = 0.00s
-Info:     at iteration #14, type ALU: wirelen solved = 28, spread = 34, legal = 34; time = 0.00s
-Info:     at iteration #14, type ALL: wirelen solved = 9, spread = 35, legal = 35; time = 0.00s
-Info:     at iteration #15, type IO: wirelen solved = 30, spread = 31, legal = 35; time = 0.00s
-Info:     at iteration #15, type const_unit: wirelen solved = 35, spread = 35, legal = 31; time = 0.00s
-Info:     at iteration #15, type reg_unit: wirelen solved = 31, spread = 31, legal = 31; time = 0.00s
-Info:     at iteration #15, type ALU: wirelen solved = 27, spread = 31, legal = 31; time = 0.00s
-Info:     at iteration #15, type ALL: wirelen solved = 8, spread = 38, legal = 35; time = 0.00s
+Info:     at iteration #1, type CLK_DRV: wirelen solved = 0, spread = 0, legal = 3; time = 0.00s
+Info:     at iteration #1, type OUTBUF: wirelen solved = 3, spread = 19, legal = 45; time = 0.00s
+Info:     at iteration #1, type IO: wirelen solved = 45, spread = 295, legal = 295; time = 0.00s
+Info:     at iteration #1, type INBUF: wirelen solved = 199, spread = 199, legal = 199; time = 0.00s
+Info:     at iteration #1, type GND_DRV: wirelen solved = 199, spread = 199, legal = 202; time = 0.00s
+Info:     at iteration #1, type VCC_DRV: wirelen solved = 202, spread = 202, legal = 206; time = 0.00s
+Info:     at iteration #1, type reg_unit: wirelen solved = 206, spread = 206, legal = 454; time = 0.00s
+Info:     at iteration #1, type ALU: wirelen solved = 390, spread = 454, legal = 582; time = 0.00s
+Info:     at iteration #1, type const_unit: wirelen solved = 230, spread = 294, legal = 294; time = 0.00s
+Info:     at iteration #1, type ALL: wirelen solved = 0, spread = 720, legal = 696; time = 0.00s
+Info:     at iteration #2, type CLK_DRV: wirelen solved = 695, spread = 695, legal = 695; time = 0.00s
+Info:     at iteration #2, type OUTBUF: wirelen solved = 666, spread = 682, legal = 686; time = 0.00s
+Info:     at iteration #2, type IO: wirelen solved = 390, spread = 384, legal = 472; time = 0.00s
+Info:     at iteration #2, type INBUF: wirelen solved = 440, spread = 440, legal = 440; time = 0.00s
+Info:     at iteration #2, type GND_DRV: wirelen solved = 440, spread = 440, legal = 440; time = 0.00s
+Info:     at iteration #2, type VCC_DRV: wirelen solved = 440, spread = 440, legal = 440; time = 0.00s
+Info:     at iteration #2, type reg_unit: wirelen solved = 437, spread = 437, legal = 437; time = 0.00s
+Info:     at iteration #2, type ALU: wirelen solved = 373, spread = 437, legal = 565; time = 0.00s
+Info:     at iteration #2, type const_unit: wirelen solved = 533, spread = 565, legal = 565; time = 0.00s
+Info:     at iteration #2, type ALL: wirelen solved = 0, spread = 528, legal = 535; time = 0.00s
+Info:     at iteration #3, type CLK_DRV: wirelen solved = 535, spread = 535, legal = 535; time = 0.00s
+Info:     at iteration #3, type OUTBUF: wirelen solved = 505, spread = 521, legal = 524; time = 0.00s
+Info:     at iteration #3, type IO: wirelen solved = 420, spread = 418, legal = 506; time = 0.00s
+Info:     at iteration #3, type INBUF: wirelen solved = 474, spread = 474, legal = 474; time = 0.00s
+Info:     at iteration #3, type GND_DRV: wirelen solved = 473, spread = 473, legal = 473; time = 0.00s
+Info:     at iteration #3, type VCC_DRV: wirelen solved = 471, spread = 471, legal = 471; time = 0.00s
+Info:     at iteration #3, type reg_unit: wirelen solved = 471, spread = 471, legal = 471; time = 0.00s
+Info:     at iteration #3, type ALU: wirelen solved = 471, spread = 407, legal = 343; time = 0.00s
+Info:     at iteration #3, type const_unit: wirelen solved = 279, spread = 279, legal = 279; time = 0.00s
+Info:     at iteration #3, type ALL: wirelen solved = 0, spread = 528, legal = 631; time = 0.00s
+Info:     at iteration #4, type CLK_DRV: wirelen solved = 631, spread = 631, legal = 631; time = 0.00s
+Info:     at iteration #4, type OUTBUF: wirelen solved = 600, spread = 616, legal = 616; time = 0.00s
+Info:     at iteration #4, type IO: wirelen solved = 580, spread = 548, legal = 584; time = 0.00s
+Info:     at iteration #4, type INBUF: wirelen solved = 568, spread = 568, legal = 568; time = 0.00s
+Info:     at iteration #4, type GND_DRV: wirelen solved = 568, spread = 568, legal = 568; time = 0.00s
+Info:     at iteration #4, type VCC_DRV: wirelen solved = 568, spread = 568, legal = 568; time = 0.00s
+Info:     at iteration #4, type reg_unit: wirelen solved = 567, spread = 567, legal = 567; time = 0.00s
+Info:     at iteration #4, type ALU: wirelen solved = 375, spread = 375, legal = 375; time = 0.00s
+Info:     at iteration #4, type const_unit: wirelen solved = 343, spread = 375, legal = 375; time = 0.00s
+Info:     at iteration #4, type ALL: wirelen solved = 16, spread = 528, legal = 408; time = 0.00s
+Info:     at iteration #5, type CLK_DRV: wirelen solved = 408, spread = 408, legal = 408; time = 0.00s
+Info:     at iteration #5, type OUTBUF: wirelen solved = 376, spread = 392, legal = 394; time = 0.00s
+Info:     at iteration #5, type IO: wirelen solved = 446, spread = 414, legal = 414; time = 0.00s
+Info:     at iteration #5, type INBUF: wirelen solved = 398, spread = 398, legal = 398; time = 0.00s
+Info:     at iteration #5, type GND_DRV: wirelen solved = 398, spread = 398, legal = 398; time = 0.00s
+Info:     at iteration #5, type VCC_DRV: wirelen solved = 398, spread = 398, legal = 398; time = 0.00s
+Info:     at iteration #5, type reg_unit: wirelen solved = 463, spread = 463, legal = 463; time = 0.00s
+Info:     at iteration #5, type ALU: wirelen solved = 335, spread = 399, legal = 335; time = 0.00s
+Info:     at iteration #5, type const_unit: wirelen solved = 271, spread = 303, legal = 303; time = 0.00s
+Info:     at iteration #5, type ALL: wirelen solved = 37, spread = 530, legal = 514; time = 0.00s
+Info:     at iteration #6, type CLK_DRV: wirelen solved = 513, spread = 513, legal = 513; time = 0.00s
+Info:     at iteration #6, type OUTBUF: wirelen solved = 478, spread = 494, legal = 497; time = 0.00s
+Info:     at iteration #6, type IO: wirelen solved = 561, spread = 529, legal = 529; time = 0.00s
+Info:     at iteration #6, type INBUF: wirelen solved = 513, spread = 513, legal = 513; time = 0.00s
+Info:     at iteration #6, type GND_DRV: wirelen solved = 512, spread = 512, legal = 512; time = 0.00s
+Info:     at iteration #6, type VCC_DRV: wirelen solved = 511, spread = 511, legal = 511; time = 0.00s
+Info:     at iteration #6, type reg_unit: wirelen solved = 511, spread = 511, legal = 511; time = 0.00s
+Info:     at iteration #6, type ALU: wirelen solved = 319, spread = 319, legal = 383; time = 0.00s
+Info:     at iteration #6, type const_unit: wirelen solved = 319, spread = 319, legal = 319; time = 0.00s
+Info:     at iteration #6, type ALL: wirelen solved = 39, spread = 531, legal = 416; time = 0.00s
+Info:     at iteration #7, type CLK_DRV: wirelen solved = 416, spread = 416, legal = 416; time = 0.00s
+Info:     at iteration #7, type OUTBUF: wirelen solved = 380, spread = 396, legal = 403; time = 0.00s
+Info:     at iteration #7, type IO: wirelen solved = 423, spread = 403, legal = 403; time = 0.00s
+Info:     at iteration #7, type INBUF: wirelen solved = 403, spread = 403, legal = 403; time = 0.00s
+Info:     at iteration #7, type GND_DRV: wirelen solved = 403, spread = 403, legal = 403; time = 0.00s
+Info:     at iteration #7, type VCC_DRV: wirelen solved = 402, spread = 402, legal = 402; time = 0.00s
+Info:     at iteration #7, type reg_unit: wirelen solved = 339, spread = 339, legal = 339; time = 0.00s
+Info:     at iteration #7, type ALU: wirelen solved = 339, spread = 403, legal = 403; time = 0.00s
+Info:     at iteration #7, type const_unit: wirelen solved = 307, spread = 307, legal = 307; time = 0.00s
+Info:     at iteration #7, type ALL: wirelen solved = 41, spread = 530, legal = 415; time = 0.00s
+Info:     at iteration #8, type CLK_DRV: wirelen solved = 414, spread = 414, legal = 414; time = 0.00s
+Info:     at iteration #8, type OUTBUF: wirelen solved = 378, spread = 394, legal = 396; time = 0.00s
+Info:     at iteration #8, type IO: wirelen solved = 384, spread = 380, legal = 380; time = 0.00s
+Info:     at iteration #8, type INBUF: wirelen solved = 348, spread = 348, legal = 348; time = 0.00s
+Info:     at iteration #8, type GND_DRV: wirelen solved = 348, spread = 348, legal = 348; time = 0.00s
+Info:     at iteration #8, type VCC_DRV: wirelen solved = 347, spread = 347, legal = 347; time = 0.00s
+Info:     at iteration #8, type reg_unit: wirelen solved = 347, spread = 347, legal = 347; time = 0.00s
+Info:     at iteration #8, type ALU: wirelen solved = 347, spread = 411, legal = 475; time = 0.00s
+Info:     at iteration #8, type const_unit: wirelen solved = 411, spread = 443, legal = 443; time = 0.00s
+Info:     at iteration #8, type ALL: wirelen solved = 40, spread = 530, legal = 540; time = 0.00s
+Info:     at iteration #9, type CLK_DRV: wirelen solved = 540, spread = 540, legal = 540; time = 0.00s
+Info:     at iteration #9, type OUTBUF: wirelen solved = 506, spread = 522, legal = 525; time = 0.00s
+Info:     at iteration #9, type IO: wirelen solved = 549, spread = 517, legal = 621; time = 0.00s
+Info:     at iteration #9, type INBUF: wirelen solved = 573, spread = 565, legal = 576; time = 0.00s
+Info:     at iteration #9, type GND_DRV: wirelen solved = 576, spread = 576, legal = 576; time = 0.00s
+Info:     at iteration #9, type VCC_DRV: wirelen solved = 576, spread = 576, legal = 576; time = 0.00s
+Info:     at iteration #9, type reg_unit: wirelen solved = 641, spread = 641, legal = 641; time = 0.00s
+Info:     at iteration #9, type ALU: wirelen solved = 385, spread = 385, legal = 385; time = 0.00s
+Info:     at iteration #9, type const_unit: wirelen solved = 289, spread = 289, legal = 289; time = 0.00s
+Info:     at iteration #9, type ALL: wirelen solved = 62, spread = 529, legal = 503; time = 0.00s
 Info: HeAP Placer Time: 0.02s
-Info:   of which solving equations: 0.00s
+Info:   of which solving equations: 0.02s
 Info:   of which spreading cells: 0.00s
-Info:   of which strict legalisation: 0.02s
+Info:   of which strict legalisation: 0.00s
 
 Info: Running simulated annealing placer for refinement.
-Info:   at iteration #1: temp = 0.000000, timing cost = 0, wirelen = 23
-Info:   at iteration #5: temp = 0.000000, timing cost = 0, wirelen = 16
-Info:   at iteration #9: temp = 0.000000, timing cost = 0, wirelen = 15 
-Info: SA placement time 0.04s
-ERROR: post-placement validity check failed for Bel 'X2Y0/1_S_IO' (cell 'inst_i_0')
-Info: Trying placer heap with seed:16799879965222963250 
-Info: Placed 0 cells based on constraints.
-Info: Creating initial analytic placement for 21 cells, random placement wirelen = 55.
-Info:     at initial placer iter 0, wirelen = 0
-Info:     at initial placer iter 1, wirelen = 0
-Info:     at initial placer iter 2, wirelen = 0
-Info:     at initial placer iter 3, wirelen = 0
-Info: Running main analytical placer, max placement attempts per cell = 10000.
-Info:     at iteration #1, type IO: wirelen solved = 0, spread = 14, legal = 14; time = 0.00s
-Info:     at iteration #1, type const_unit: wirelen solved = 14, spread = 21, legal = 24; time = 0.00s
-Info:     at iteration #1, type reg_unit: wirelen solved = 24, spread = 24, legal = 29; time = 0.00s
-Info:     at iteration #1, type ALU: wirelen solved = 25, spread = 34, legal = 36; time = 0.00s
-Info:     at iteration #1, type ALL: wirelen solved = 0, spread = 50, legal = 42; time = 0.00s
-Info:     at iteration #2, type IO: wirelen solved = 23, spread = 28, legal = 32; time = 0.00s
-Info:     at iteration #2, type const_unit: wirelen solved = 32, spread = 32, legal = 32; time = 0.00s
-Info:     at iteration #2, type reg_unit: wirelen solved = 32, spread = 32, legal = 32; time = 0.00s
-Info:     at iteration #2, type ALU: wirelen solved = 25, spread = 31, legal = 36; time = 0.00s
-Info:     at iteration #2, type ALL: wirelen solved = 1, spread = 29, legal = 27; time = 0.00s
-Info:     at iteration #3, type IO: wirelen solved = 19, spread = 21, legal = 25; time = 0.00s
-Info:     at iteration #3, type const_unit: wirelen solved = 25, spread = 25, legal = 25; time = 0.00s
-Info:     at iteration #3, type reg_unit: wirelen solved = 24, spread = 24, legal = 24; time = 0.00s
-Info:     at iteration #3, type ALU: wirelen solved = 23, spread = 33, legal = 33; time = 0.00s
-Info:     at iteration #3, type ALL: wirelen solved = 1, spread = 22, legal = 37; time = 0.00s
-Info:     at iteration #4, type IO: wirelen solved = 27, spread = 27, legal = 32; time = 0.00s
-Info:     at iteration #4, type const_unit: wirelen solved = 29, spread = 29, legal = 26; time = 0.00s
-Info:     at iteration #4, type reg_unit: wirelen solved = 24, spread = 24, legal = 24; time = 0.00s
-Info:     at iteration #4, type ALU: wirelen solved = 23, spread = 34, legal = 34; time = 0.00s
-Info:     at iteration #4, type ALL: wirelen solved = 5, spread = 23, legal = 32; time = 0.00s
-Info:     at iteration #5, type IO: wirelen solved = 28, spread = 30, legal = 32; time = 0.00s
-Info:     at iteration #5, type const_unit: wirelen solved = 31, spread = 31, legal = 27; time = 0.00s
-Info:     at iteration #5, type reg_unit: wirelen solved = 26, spread = 26, legal = 26; time = 0.00s
-Info:     at iteration #5, type ALU: wirelen solved = 25, spread = 27, legal = 27; time = 0.00s
-Info:     at iteration #5, type ALL: wirelen solved = 5, spread = 21, legal = 32; time = 0.00s
-Info:     at iteration #6, type IO: wirelen solved = 24, spread = 26, legal = 32; time = 0.00s
-Info:     at iteration #6, type const_unit: wirelen solved = 32, spread = 32, legal = 30; time = 0.00s
-Info:     at iteration #6, type reg_unit: wirelen solved = 30, spread = 30, legal = 30; time = 0.00s
-Info:     at iteration #6, type ALU: wirelen solved = 28, spread = 27, legal = 40; time = 0.00s
-Info:     at iteration #6, type ALL: wirelen solved = 5, spread = 25, legal = 31; time = 0.00s
-Info:     at iteration #7, type IO: wirelen solved = 24, spread = 27, legal = 31; time = 0.00s
-Info:     at iteration #7, type const_unit: wirelen solved = 31, spread = 31, legal = 30; time = 0.00s
-Info:     at iteration #7, type reg_unit: wirelen solved = 30, spread = 30, legal = 30; time = 0.00s
-Info:     at iteration #7, type ALU: wirelen solved = 22, spread = 36, legal = 36; time = 0.00s
-Info:     at iteration #7, type ALL: wirelen solved = 5, spread = 31, legal = 26; time = 0.00s
-Info:     at iteration #8, type IO: wirelen solved = 22, spread = 24, legal = 24; time = 0.00s
-Info:     at iteration #8, type const_unit: wirelen solved = 24, spread = 24, legal = 23; time = 0.00s
-Info:     at iteration #8, type reg_unit: wirelen solved = 23, spread = 23, legal = 23; time = 0.00s
-Info:     at iteration #8, type ALU: wirelen solved = 18, spread = 23, legal = 28; time = 0.00s
-Info:     at iteration #8, type ALL: wirelen solved = 7, spread = 30, legal = 26; time = 0.00s
-Info:     at iteration #9, type IO: wirelen solved = 22, spread = 24, legal = 26; time = 0.00s
-Info:     at iteration #9, type const_unit: wirelen solved = 25, spread = 25, legal = 25; time = 0.00s
-Info:     at iteration #9, type reg_unit: wirelen solved = 25, spread = 25, legal = 25; time = 0.00s
-Info:     at iteration #9, type ALU: wirelen solved = 18, spread = 25, legal = 29; time = 0.00s
-Info:     at iteration #9, type ALL: wirelen solved = 8, spread = 26, legal = 40; time = 0.00s
-Info:     at iteration #10, type IO: wirelen solved = 29, spread = 30, legal = 31; time = 0.00s
-Info:     at iteration #10, type const_unit: wirelen solved = 31, spread = 31, legal = 27; time = 0.00s
-Info:     at iteration #10, type reg_unit: wirelen solved = 27, spread = 27, legal = 27; time = 0.00s
-Info:     at iteration #10, type ALU: wirelen solved = 23, spread = 32, legal = 32; time = 0.00s
-Info:     at iteration #10, type ALL: wirelen solved = 8, spread = 28, legal = 29; time = 0.00s
-Info:     at iteration #11, type IO: wirelen solved = 22, spread = 28, legal = 28; time = 0.00s
-Info:     at iteration #11, type const_unit: wirelen solved = 28, spread = 28, legal = 26; time = 0.00s
-Info:     at iteration #11, type reg_unit: wirelen solved = 26, spread = 26, legal = 26; time = 0.00s
-Info:     at iteration #11, type ALU: wirelen solved = 23, spread = 29, legal = 29; time = 0.00s
-Info:     at iteration #11, type ALL: wirelen solved = 9, spread = 33, legal = 29; time = 0.00s
-Info:     at iteration #12, type IO: wirelen solved = 28, spread = 28, legal = 30; time = 0.00s
-Info:     at iteration #12, type const_unit: wirelen solved = 30, spread = 30, legal = 29; time = 0.00s
-Info:     at iteration #12, type reg_unit: wirelen solved = 29, spread = 29, legal = 29; time = 0.00s
-Info:     at iteration #12, type ALU: wirelen solved = 22, spread = 31, legal = 31; time = 0.00s
-Info:     at iteration #12, type ALL: wirelen solved = 10, spread = 26, legal = 33; time = 0.00s
-Warning: post-placement validity check failed for Bel 'X1Y1/0_const_unit' (cell 'inst_inst_i_inc27_const')
-Warning: post-placement validity check failed for Bel 'X0Y2/1_W_IO' (cell 'inst_i_4')
-Info: Trying placer heap with seed:8881959346757288541 
-Info: Placed 0 cells based on constraints.
-Info: Creating initial analytic placement for 21 cells, random placement wirelen = 63.
-Info:     at initial placer iter 0, wirelen = 0
-Info:     at initial placer iter 1, wirelen = 0
-Info:     at initial placer iter 2, wirelen = 0
-Info:     at initial placer iter 3, wirelen = 0
-Info: Running main analytical placer, max placement attempts per cell = 10000.
-Info:     at iteration #1, type IO: wirelen solved = 0, spread = 14, legal = 14; time = 0.00s
-Info:     at iteration #1, type const_unit: wirelen solved = 14, spread = 21, legal = 22; time = 0.00s
-Info:     at iteration #1, type reg_unit: wirelen solved = 22, spread = 22, legal = 30; time = 0.00s
-Info:     at iteration #1, type ALU: wirelen solved = 24, spread = 41, legal = 41; time = 0.00s
-Info:     at iteration #1, type ALL: wirelen solved = 0, spread = 50, legal = 43; time = 0.00s
-Info:     at iteration #2, type IO: wirelen solved = 24, spread = 29, legal = 34; time = 0.00s
-Info:     at iteration #2, type const_unit: wirelen solved = 34, spread = 34, legal = 34; time = 0.00s
-Info:     at iteration #2, type reg_unit: wirelen solved = 33, spread = 33, legal = 33; time = 0.00s
-Info:     at iteration #2, type ALU: wirelen solved = 24, spread = 41, legal = 41; time = 0.00s
-Info:     at iteration #2, type ALL: wirelen solved = 0, spread = 29, legal = 35; time = 0.00s
-Info:     at iteration #3, type IO: wirelen solved = 23, spread = 23, legal = 29; time = 0.00s
-Info:     at iteration #3, type const_unit: wirelen solved = 28, spread = 28, legal = 26; time = 0.00s
-Info:     at iteration #3, type reg_unit: wirelen solved = 24, spread = 24, legal = 24; time = 0.00s
-Info:     at iteration #3, type ALU: wirelen solved = 25, spread = 27, legal = 30; time = 0.00s
-Info:     at iteration #3, type ALL: wirelen solved = 3, spread = 27, legal = 26; time = 0.00s
-Info:     at iteration #4, type IO: wirelen solved = 18, spread = 20, legal = 25; time = 0.00s
-Info:     at iteration #4, type const_unit: wirelen solved = 25, spread = 25, legal = 25; time = 0.00s
-Info:     at iteration #4, type reg_unit: wirelen solved = 25, spread = 25, legal = 25; time = 0.00s
-Info:     at iteration #4, type ALU: wirelen solved = 21, spread = 27, legal = 36; time = 0.00s
-Info:     at iteration #4, type ALL: wirelen solved = 1, spread = 21, legal = 22; time = 0.00s
-Info:     at iteration #5, type IO: wirelen solved = 17, spread = 19, legal = 22; time = 0.00s
-Info:     at iteration #5, type const_unit: wirelen solved = 22, spread = 22, legal = 22; time = 0.00s
-Info:     at iteration #5, type reg_unit: wirelen solved = 22, spread = 22, legal = 22; time = 0.00s
-Info:     at iteration #5, type ALU: wirelen solved = 24, spread = 27, legal = 31; time = 0.00s
-Info:     at iteration #5, type ALL: wirelen solved = 5, spread = 22, legal = 24; time = 0.00s
-Info:     at iteration #6, type IO: wirelen solved = 18, spread = 21, legal = 26; time = 0.00s
-Info:     at iteration #6, type const_unit: wirelen solved = 25, spread = 25, legal = 24; time = 0.00s
-Info:     at iteration #6, type reg_unit: wirelen solved = 24, spread = 24, legal = 24; time = 0.00s
-Info:     at iteration #6, type ALU: wirelen solved = 22, spread = 29, legal = 29; time = 0.00s
-Info:     at iteration #6, type ALL: wirelen solved = 6, spread = 25, legal = 29; time = 0.00s
-Info:     at iteration #7, type IO: wirelen solved = 22, spread = 23, legal = 24; time = 0.00s
-Info:     at iteration #7, type const_unit: wirelen solved = 22, spread = 22, legal = 22; time = 0.00s
-Info:     at iteration #7, type reg_unit: wirelen solved = 21, spread = 21, legal = 21; time = 0.00s
-Info:     at iteration #7, type ALU: wirelen solved = 23, spread = 32, legal = 32; time = 0.00s
-Info:     at iteration #7, type ALL: wirelen solved = 5, spread = 22, legal = 23; time = 0.00s
-Info:     at iteration #8, type IO: wirelen solved = 18, spread = 19, legal = 26; time = 0.00s
-Info:     at iteration #8, type const_unit: wirelen solved = 26, spread = 26, legal = 26; time = 0.00s
-Info:     at iteration #8, type reg_unit: wirelen solved = 26, spread = 26, legal = 26; time = 0.00s
-Info:     at iteration #8, type ALU: wirelen solved = 20, spread = 33, legal = 33; time = 0.00s
-Info:     at iteration #8, type ALL: wirelen solved = 5, spread = 24, legal = 26; time = 0.00s
-Info:     at iteration #9, type IO: wirelen solved = 21, spread = 22, legal = 24; time = 0.00s
-Info:     at iteration #9, type const_unit: wirelen solved = 24, spread = 24, legal = 24; time = 0.00s
-Info:     at iteration #9, type reg_unit: wirelen solved = 23, spread = 23, legal = 23; time = 0.00s
-Info:     at iteration #9, type ALU: wirelen solved = 17, spread = 31, legal = 31; time = 0.00s
-Info:     at iteration #9, type ALL: wirelen solved = 8, spread = 25, legal = 35; time = 0.00s
-Info: HeAP Placer Time: 0.01s
-Info:   of which solving equations: 0.00s
-Info:   of which spreading cells: 0.00s
-Info:   of which strict legalisation: 0.01s
+Info:   at iteration #1: temp = 0.000000, timing cost = 0, wirelen = 408
+Info:   at iteration #5: temp = 0.000000, timing cost = 0, wirelen = 278
+Info:   at iteration #10: temp = 0.000000, timing cost = 0, wirelen = 266
+Info:   at iteration #15: temp = 0.000000, timing cost = 0, wirelen = 230
+Info:   at iteration #18: temp = 0.000000, timing cost = 0, wirelen = 230 
+Info: SA placement time 0.01s
+Info: Checksum: 0xe3a3f52a
+Info: Heap placer took 0 iterations and 0.03s seconds
 
-Info: Running simulated annealing placer for refinement.
-Info:   at iteration #1: temp = 0.000000, timing cost = 0, wirelen = 22
-Info:   at iteration #5: temp = 0.000000, timing cost = 0, wirelen = 18
-Info:   at iteration #6: temp = 0.000000, timing cost = 0, wirelen = 18 
-Info: SA placement time 0.03s
-Info: Checksum: 0x74a93ace
 Info: ================== Final Placement ===================
-Info: X1Y0/1_S_IO: out_i_exitcond_not
-Info: X0Y3/1_W_IO: out_i_cnt_2_reg2mem26
-Info: X2Y5/0_N_IO: out_i_cmp21
-Info: X2Y0/1_S_IO: out_i_arrayidx19_1
-Info: X1Y2/0_const_unit: inst_inst_i_inc_const
-Info: X1Y1/0_const_unit: inst_inst_i_inc27_const
-Info: X2Y1/0_reg_unit: inst_inst_i_e_061_reg2mem30
-Info: X1Y2/0_reg_unit: inst_inst_i_cnt_160_reg2mem28
-Info: X2Y3/0_const_unit: inst_inst_i_cmp21_const
-Info: X2Y0/0_S_IO: inst_i_level
-Info: X1Y1/0_ALU: inst_i_inc27
-Info: X1Y2/0_ALU: inst_i_inc
-Info: X1Y1/1_ALU: inst_i_exitcond_not
-Info: X5Y1/0_E_IO: inst_i_edges
-Info: X1Y2/1_ALU: inst_i_cnt_2_reg2mem26
-Info: X2Y3/0_ALU: inst_i_cmp21
-Info: X2Y1/1_ALU: inst_i_arrayidx19_1
-Info: X2Y2/0_ALU: inst_i_arrayidx19_0
-Info: X3Y1/0_ALU: inst_i_arrayidx18
-Info: X1Y0/0_S_IO: inst_i_4
-Info: X3Y0/1_S_IO: inst_i_0
-
-Info: Running router2...
-Info: Setting up routing resources...
-Info: Running main router loop...
-Info:     iter=1 wires=88 overused=1 overuse=1 archfail=NA
-Info:     iter=2 wires=89 overused=0 overuse=0 archfail=0
-Info: Router2 time 0.00s
-Info: Running router1 to check that route is legal...
+Info: X2Y1/CLK_DRV: clk_drv_i
+Info: X0Y1/0_OUTBUF[22]: $iopadmap$test.Y_9
+Info: X0Y1/0_OUTBUF[15]: $iopadmap$test.Y_8
+Info: X0Y1/0_OUTBUF[31]: $iopadmap$test.Y_7
+Info: X0Y1/0_OUTBUF[23]: $iopadmap$test.Y_6
+Info: X0Y1/0_OUTBUF[9]: $iopadmap$test.Y_5
+Info: X0Y2/0_OUTBUF[7]: $iopadmap$test.Y_4
+Info: X0Y1/0_OUTBUF[17]: $iopadmap$test.Y_32
+Info: X0Y1/0_OUTBUF[7]: $iopadmap$test.Y_31
+Info: X0Y1/0_OUTBUF[20]: $iopadmap$test.Y_30
+Info: X0Y1/0_OUTBUF[8]: $iopadmap$test.Y_3
+Info: X0Y1/0_OUTBUF[1]: $iopadmap$test.Y_29
+Info: X0Y1/0_OUTBUF[6]: $iopadmap$test.Y_28
+Info: X0Y1/0_OUTBUF[2]: $iopadmap$test.Y_27
+Info: X0Y1/0_OUTBUF[4]: $iopadmap$test.Y_26
+Info: X0Y1/0_OUTBUF[18]: $iopadmap$test.Y_25
+Info: X0Y1/0_OUTBUF[16]: $iopadmap$test.Y_24
+Info: X0Y2/0_OUTBUF[0]: $iopadmap$test.Y_23
+Info: X0Y1/0_OUTBUF[12]: $iopadmap$test.Y_22
+Info: X0Y1/0_OUTBUF[0]: $iopadmap$test.Y_21
+Info: X0Y1/0_OUTBUF[28]: $iopadmap$test.Y_20
+Info: X0Y1/0_OUTBUF[19]: $iopadmap$test.Y_2
+Info: X0Y1/0_OUTBUF[25]: $iopadmap$test.Y_19
+Info: X0Y1/0_OUTBUF[27]: $iopadmap$test.Y_18
+Info: X0Y1/0_OUTBUF[24]: $iopadmap$test.Y_17
+Info: X0Y1/0_OUTBUF[3]: $iopadmap$test.Y_16
+Info: X0Y1/0_OUTBUF[30]: $iopadmap$test.Y_15
+Info: X0Y1/0_OUTBUF[29]: $iopadmap$test.Y_14
+Info: X0Y1/0_OUTBUF[11]: $iopadmap$test.Y_13
+Info: X0Y1/0_OUTBUF[21]: $iopadmap$test.Y_12
+Info: X0Y1/0_OUTBUF[26]: $iopadmap$test.Y_11
+Info: X0Y1/0_OUTBUF[5]: $iopadmap$test.Y_10
+Info: X0Y1/0_OUTBUF[14]: $iopadmap$test.Y_1
+Info: X0Y1/0_W_IO: $iopadmap$test.Y
+Info: X2Y0/0_INBUF[31]: $iopadmap$test.B_9
+Info: X2Y0/0_INBUF[24]: $iopadmap$test.B_8
+Info: X2Y0/0_INBUF[5]: $iopadmap$test.B_7
+Info: X2Y0/0_INBUF[22]: $iopadmap$test.B_6
+Info: X2Y0/0_INBUF[17]: $iopadmap$test.B_5
+Info: X2Y0/0_INBUF[8]: $iopadmap$test.B_4
+Info: X2Y0/0_INBUF[18]: $iopadmap$test.B_32
+Info: X2Y0/0_INBUF[15]: $iopadmap$test.B_31
+Info: X2Y0/0_INBUF[21]: $iopadmap$test.B_30
+Info: X2Y0/0_INBUF[4]: $iopadmap$test.B_3
+Info: X2Y0/0_INBUF[20]: $iopadmap$test.B_29
+Info: X2Y0/0_INBUF[3]: $iopadmap$test.B_28
+Info: X2Y0/0_INBUF[28]: $iopadmap$test.B_27
+Info: X2Y0/0_INBUF[0]: $iopadmap$test.B_26
+Info: X2Y0/0_INBUF[10]: $iopadmap$test.B_25
+Info: X2Y0/0_INBUF[19]: $iopadmap$test.B_24
+Info: X2Y0/0_INBUF[25]: $iopadmap$test.B_23
+Info: X2Y0/0_INBUF[30]: $iopadmap$test.B_22
+Info: X3Y0/0_INBUF[8]: $iopadmap$test.B_21
+Info: X2Y0/0_INBUF[2]: $iopadmap$test.B_20
+Info: X2Y0/0_INBUF[26]: $iopadmap$test.B_2
+Info: X2Y0/0_INBUF[16]: $iopadmap$test.B_19
+Info: X2Y0/0_INBUF[27]: $iopadmap$test.B_18
+Info: X2Y0/0_INBUF[1]: $iopadmap$test.B_17
+Info: X2Y0/0_INBUF[29]: $iopadmap$test.B_16
+Info: X2Y0/0_INBUF[11]: $iopadmap$test.B_15
+Info: X2Y0/0_INBUF[6]: $iopadmap$test.B_14
+Info: X2Y0/0_INBUF[12]: $iopadmap$test.B_13
+Info: X2Y0/0_INBUF[9]: $iopadmap$test.B_12
+Info: X2Y0/0_INBUF[23]: $iopadmap$test.B_11
+Info: X2Y0/0_INBUF[7]: $iopadmap$test.B_10
+Info: X2Y0/0_INBUF[13]: $iopadmap$test.B_1
+Info: X2Y0/0_S_IO: $iopadmap$test.B
+Info: X0Y2/0_INBUF[10]: $iopadmap$test.A_9
+Info: X0Y2/0_INBUF[20]: $iopadmap$test.A_8
+Info: X0Y2/0_INBUF[0]: $iopadmap$test.A_7
+Info: X0Y2/0_INBUF[27]: $iopadmap$test.A_6
+Info: X0Y2/0_INBUF[25]: $iopadmap$test.A_5
+Info: X0Y2/0_INBUF[13]: $iopadmap$test.A_4
+Info: X0Y2/0_INBUF[24]: $iopadmap$test.A_32
+Info: X0Y2/0_INBUF[14]: $iopadmap$test.A_31
+Info: X0Y2/0_INBUF[2]: $iopadmap$test.A_30
+Info: X0Y2/0_INBUF[7]: $iopadmap$test.A_3
+Info: X0Y2/0_INBUF[18]: $iopadmap$test.A_29
+Info: X0Y2/0_INBUF[22]: $iopadmap$test.A_28
+Info: X0Y2/0_INBUF[31]: $iopadmap$test.A_27
+Info: X0Y2/0_INBUF[28]: $iopadmap$test.A_26
+Info: X0Y2/0_INBUF[12]: $iopadmap$test.A_25
+Info: X0Y2/0_INBUF[5]: $iopadmap$test.A_24
+Info: X0Y2/0_INBUF[3]: $iopadmap$test.A_23
+Info: X0Y2/0_INBUF[29]: $iopadmap$test.A_22
+Info: X0Y2/0_INBUF[9]: $iopadmap$test.A_21
+Info: X0Y2/0_INBUF[16]: $iopadmap$test.A_20
+Info: X0Y2/0_INBUF[21]: $iopadmap$test.A_2
+Info: X0Y2/0_INBUF[26]: $iopadmap$test.A_19
+Info: X0Y2/0_INBUF[4]: $iopadmap$test.A_18
+Info: X0Y2/0_INBUF[30]: $iopadmap$test.A_17
+Info: X0Y2/0_INBUF[11]: $iopadmap$test.A_16
+Info: X0Y1/0_INBUF[0]: $iopadmap$test.A_15
+Info: X0Y3/0_INBUF[23]: $iopadmap$test.A_14
+Info: X0Y2/0_INBUF[6]: $iopadmap$test.A_13
+Info: X0Y2/0_INBUF[19]: $iopadmap$test.A_12
+Info: X0Y2/0_INBUF[23]: $iopadmap$test.A_11
+Info: X0Y2/0_INBUF[1]: $iopadmap$test.A_10
+Info: X0Y1/0_INBUF[20]: $iopadmap$test.A_1
+Info: X0Y2/0_W_IO: $iopadmap$test.A
+Info: X2Y1/0_E_rst_GND_DRV: $PACKER_GND_DRV
+Info: X2Y1/0_E_en_VCC_DRV: $PACKER_VCC_DRV
+Info: X2Y1/0_N_reg_unit: $extract$\reg_unit_en_1_rst_0$40
+Info: X1Y1/0_ALU: $extract$\ALU_ALU_func_0$31
+Info: X2Y1/0_ALU: $extract$\ALU_ALU_func_0$30
+Info: X2Y1/0_const_unit: $auto$hilomap.cc:41:hilomap_worker$39
+Info: X1Y1/0_const_unit: $auto$hilomap.cc:41:hilomap_worker$37
+Info: X1Y2/0_const_unit: $auto$hilomap.cc:41:hilomap_worker$35
 
 Info: Routing..
 Info: Setting up routing queue.
-Info: Routing 0 arcs.
+Info: Routing 355 arcs.
 Info:            |   (re-)routed arcs  |   delta    | remaining|       time spent     |
 Info:    IterCnt |  w/ripup   wo/ripup |  w/r  wo/r |      arcs| batch(sec) total(sec)|
-Info:          0 |        0          0 |    0     0 |         0|       0.00       0.00|
-Info: Routing complete.
-Info: Router1 time 0.00s
-Info: Checksum: 0xd3d386c2
-
-Info: No Fmax available; no interior timing paths found in design.
-
-9 warnings, 1 error
-
-Info: Program finished normally.
+-- 1 --
+Routing arc 0 on net $iopadmap$B[5] (1 arcs total):
+  source ... X2Y0/0_S_to_fabric[5]
+  sink ..... X2Y1/0_data_in2[5]
+  total number of visited nodes: 7
+  final route delay:       0.30
+  final route penalty:     0.00
+  final route bonus:       0.00
+  node X2Y1/0_data_in2[5] (+0.20 +0.20)
+    bind pip X2Y1/0_data_in2[5]/0_in2[5]
+  node X2Y0/0_out0[5] (+0.20 +0.00)
+    bind pip X2Y0/0_out0[5]/0_out0_internal[5]
+  node X2Y0/0_out0_internal[5] (+0.10 -0.10)
+    bind pip X2Y0/0_out0_internal[5]/0_S_to_fabric[5]
+  node X2Y0/0_S_to_fabric[5] (+0.00 -0.10)
+    bind wire X2Y0/0_S_to_fabric[5]
+-- 2 --
+Routing arc 0 on net $iopadmap$B_1[3] (1 arcs total):
+  source ... X2Y0/0_S_O[8]
+  sink ..... X2Y0/0_S_in[3]
+  total number of visited nodes: 3
+  no route found for this arc
+Warning: Failed to find a route for arc 0 of net $iopadmap$B_1[3].
+ERROR: Routing design failed.
+1 warning, 1 error

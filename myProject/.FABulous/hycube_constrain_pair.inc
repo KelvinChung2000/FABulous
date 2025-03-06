@@ -3,7 +3,7 @@
 #const_unit
 
 #reg_unit
-CLK_DRV:CLK_O 1 reg_unit:clk 1 983040
+CLK_DRV:CLK_O 1 reg_unit:clk 1 9998
 
 #IO
 INBUF:O 1 IO:in 32 983040

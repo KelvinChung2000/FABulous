@@ -129,7 +129,7 @@ def genBel(bels: Iterable[Bel], tile: TileType, context=1):
     count = len(list(bels))
     useClk = any([i.userCLK for i in bels])
     if useClk:
-        clkDRV = tile.create_bel("CLK_DRV", "CLK_DRV", count + GENERATED_OFFSET)
+        clkDRV = tile.create_bel("CLK_DRV", "CLK_DRV", 10000)
         tile.create_wire("user_clk_o", "CLK")
         tile.add_bel_pin(clkDRV, "CLK_O", "user_clk_o", PinType.OUTPUT)
         count += 1
@@ -341,7 +341,6 @@ def genFabric(fabric: Fabric, chip: Chip, context=1):
                             f"{c}_{wire.destination.name}[{i}]",
                         ),
                     ]
-                    print(node)
                     chip.add_node(node)
     setTiming(chip)
 
@@ -398,7 +397,7 @@ def generateConstrainPair(fabric: Fabric, dest: Path):
                 )
             if bel.userCLK:
                 f.write(
-                    f"CLK_DRV:CLK_O {1} {bel.name}:{bel.userCLK.name} {1} {GENERATED_OFFSET}\n"
+                    f"CLK_DRV:CLK_O {1} {bel.name}:{bel.userCLK.name} {1} {10000-2}\n"
                 )
             f.write("\n")
 
@@ -496,7 +495,7 @@ def genRoutingDotGraph(chip: Chip, filePath: Path, expand=False):
 
     pairs = list(product(range(chip.height), range(chip.width)))
     globalPairs = set()
-    pairs = [(1, 1), (1, 0)]
+    pairs = [(0, 2), (1, 2)]
     for x, y in pairs:
         tileType = chip.tile_type_at(x, y)
         subgraph = pydot.Subgraph(
@@ -528,7 +527,7 @@ def genRoutingDotGraph(chip: Chip, filePath: Path, expand=False):
                     continue
                 added.add(pinWire)
                 if pin.dir == PinType.INPUT:
-                    belPin = f"{bel.name.value}{pin.name.value}"
+                    belPin = f"X{x}Y{y}_{bel.name.value}{pin.name.value}"
                     belSupGraph.add_node(
                         pydot.Node(belPin, label=pin.name.value, shape="hexagon")
                     )
@@ -545,7 +544,7 @@ def genRoutingDotGraph(chip: Chip, filePath: Path, expand=False):
                         )
                     )
                 elif pin.dir == PinType.OUTPUT:
-                    belPin = f"{bel.name.value}{pin.name.value}"
+                    belPin = f"X{x}Y{y}_{bel.name.value}{pin.name.value}"
                     belSupGraph.add_node(
                         pydot.Node(belPin, label=pin.name.value, shape="hexagon")
                     )
@@ -573,6 +572,7 @@ def genRoutingDotGraph(chip: Chip, filePath: Path, expand=False):
         graph.add_subgraph(subgraph)
         for i in range(len(chip.node_shapes)):
             wires = chip.get_node_wires_from_shape(i)
+            print(wires)
             idx = (
                 hash(tuple([f"X{x}Y{y}_{removeBit(name)}" for x, y, name in wires]))
                 & 0xFFFFFF
@@ -587,6 +587,7 @@ def genRoutingDotGraph(chip: Chip, filePath: Path, expand=False):
                 graph.add_edge(
                     pydot.Edge(srcName, f"shape{idx}", dir="none", color="blue")
                 )
+                print(pydot.Edge(srcName, f"shape{idx}", dir="none", color="blue"))
 
     graph.write(str(filePath / "routing_graph.dot"))
 

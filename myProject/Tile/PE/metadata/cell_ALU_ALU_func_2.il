@@ -10,26 +10,23 @@ module \ALU_ALU_func_2
   attribute \FABulous 1
   attribute \FEATURE "ADD;SUB;AND;OR;XOR;MUL"
   attribute \FEATURE_MAP "std_add(left=>data_in1, right=>data_in2, out=>data_out);"
-  wire width 3 input 6 \ALU_func
-  attribute \FABulous 1
-  attribute \USER_CLK 1
-  wire input 1 \clk
+  wire width 3 input 5 \ALU_func
   attribute \BUS 1
   attribute \DATA 1
   attribute \FABulous 1
-  wire width 32 input 2 \data_in1
+  wire width 32 input 1 \data_in1
   attribute \BUS 1
   attribute \DATA 1
   attribute \FABulous 1
-  wire width 32 input 3 \data_in2
+  wire width 32 input 2 \data_in2
   attribute \BUS 1
   attribute \DATA 1
   attribute \FABulous 1
-  wire width 32 input 4 \data_in3
+  wire width 32 input 3 \data_in3
   attribute \BUS 1
   attribute \DATA 1
   attribute \FABulous 1
-  wire width 32 output 5 \data_out
+  wire width 32 output 4 \data_out
   cell $and $and$../../myProject/Tile/PE/ALU.v:31$4
     parameter \A_SIGNED 0
     parameter \A_WIDTH 32

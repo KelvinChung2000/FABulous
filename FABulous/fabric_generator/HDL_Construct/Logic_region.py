@@ -98,7 +98,10 @@ class LogicRegion(Region):
 
         def __str__(self) -> str:
             if self.writer == WriterType.VERILOG:
-                return f".{self.dst}({self.src})"
+                if isinstance(self.src, int):
+                    return f".{self.dst}({max(self.src.bit_length(), 1)}'d{self.src})"
+                else:
+                    return f".{self.dst}({self.src})"
             else:
                 return f"{self.dst} => {self.src}"
 

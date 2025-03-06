@@ -46,6 +46,8 @@ def genCellsAndMaps(bel: Bel):
                 pr.Port(i.name, IO.INPUT, i.wireCount)
             for i in bel.outputs + bel.externalOutputs:
                 pr.Port(i.name, IO.OUTPUT, i.wireCount)
+            if bel.userCLK:
+                pr.Port(bel.userCLK.name, IO.INPUT, 1)
 
     # generate cells
     design = ys.Design()
@@ -148,7 +150,7 @@ def genCellsAndMaps(bel: Bel):
                 with lr.Generate() as g:
                     runPass("select x:*")
                     runPass("select -del a:CONFIG_BIT")
-                    runPass("select -del a:USER_CLK")
+                    # runPass("select -del a:USER_CLK")
                     wires = [
                         i.name.str().removeprefix("\\") for i in module.selected_wires()
                     ]
@@ -156,7 +158,6 @@ def genCellsAndMaps(bel: Bel):
                     for i, j in c:
                         if i in tDict and j != "z":
                             tDict[i] = j
-                    print(tDict)
 
                     portConnect = []
                     for i, j in tDict.items():

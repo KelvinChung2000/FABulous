@@ -1,5 +1,5 @@
 import re
-from itertools import product
+from itertools import islice, product
 from pathlib import Path
 from subprocess import run
 from typing import Iterable, Mapping
@@ -19,6 +19,8 @@ from FABulous.fabric_definition.Bel import Bel
 from FABulous.fabric_definition.Fabric import Fabric
 from FABulous.fabric_definition.SwitchMatrix import SwitchMatrix
 from FABulous.fabric_definition.Tile import Tile
+
+GENERATED_OFFSET = 0xF0000
 
 
 def genSwitchMatrix(tile: Tile, tileType: TileType, context=1):
@@ -124,14 +126,23 @@ def genSwitchMatrix(tile: Tile, tileType: TileType, context=1):
 
 
 def genBel(bels: Iterable[Bel], tile: TileType, context=1):
-    count = 0
+    count = len(list(bels))
+    useClk = any([i.userCLK for i in bels])
+    if useClk:
+        clkDRV = tile.create_bel("CLK_DRV", "CLK_DRV", count + GENERATED_OFFSET)
+        tile.create_wire("user_clk_o", "CLK")
+        tile.add_bel_pin(clkDRV, "CLK_O", "user_clk_o", PinType.OUTPUT)
+        count += 1
     for c in range(context):
         for z, bel in enumerate(bels):
             for i in bel.externalInputs + bel.inputs:
-                for wc in range(i.wireCount):
-                    tile.create_wire(
-                        f"{c}_{i.prefix}{i.name}[{wc}]", f"{bel.name}_{i.name}"
-                    )
+                if i.wireCount == 1:
+                    tile.create_wire(f"{c}_{i.prefix}{i.name}", f"{bel.name}_{i.name}")
+                else:
+                    for wc in range(i.wireCount):
+                        tile.create_wire(
+                            f"{c}_{i.prefix}{i.name}[{wc}]", f"{bel.name}_{i.name}"
+                        )
 
             for i in bel.externalOutputs + bel.outputs:
                 for wc in range(i.wireCount):
@@ -139,68 +150,44 @@ def genBel(bels: Iterable[Bel], tile: TileType, context=1):
                         f"{c}_{i.prefix}{i.name}[{wc}]", f"{bel.name}_{i.name}"
                     )
 
-            if bel.userCLK:
-                tile.create_wire(f"{c}_{bel.prefix}{bel.name}_{bel.userCLK.name}")
             # create the bel itself
             belData = tile.create_bel(
                 f"{c}_{bel.prefix}{bel.name}",
                 f"{bel.name}",
-                count,
+                bel.z,
             )
 
             for i in bel.inputs + bel.externalInputs:
-                for wc in range(i.wireCount):
+                if i.wireCount == 1:
                     tile.add_bel_pin(
                         belData,
-                        f"{bel.prefix}{i.name}[{wc}]",
-                        f"{c}_{bel.prefix}{i.name}[{wc}]",
+                        f"{i.name}",
+                        f"{c}_{bel.prefix}{i.name}",
                         PinType.INPUT,
                     )
-
-            for i in bel.inputs:
-                if i.control:
+                else:
                     for wc in range(i.wireCount):
-                        gnd = tile.create_bel("GND_DRV", "GND_DRV", z=count)
-                        tile.create_wire(
-                            f"{c}_{bel.prefix}{i.name}_GND[{wc}]",
-                            "GND",
-                            const_value="GND",
-                        )
                         tile.add_bel_pin(
-                            gnd,
-                            f"{c}_{bel.prefix}{i.name}_GND[{wc}]",
-                            f"{c}_{bel.prefix}{i.name}_GND[{wc}]",
-                            PinType.OUTPUT,
-                        )
-                        tile.create_pip(
-                            f"{c}_{bel.prefix}{i.name}_GND[{wc}]",
+                            belData,
+                            f"{i.name}[{wc}]",
                             f"{c}_{bel.prefix}{i.name}[{wc}]",
-                        )
-
-                        vcc = tile.create_bel("VCC_DRV", "VCC_DRV", z=count)
-                        tile.create_wire(
-                            f"{c}_{bel.prefix}{i.name}_VCC[{wc}]",
-                            "VCC",
-                            const_value="VCC",
-                        )
-                        tile.add_bel_pin(
-                            vcc,
-                            f"{c}_{bel.prefix}{i.name}_VCC[{wc}]",
-                            f"{c}_{bel.prefix}{i.name}_VCC[{wc}]",
-                            PinType.OUTPUT,
-                        )
-                        tile.create_pip(
-                            f"{c}_{bel.prefix}{i.name}_VCC[{wc}]",
-                            f"{c}_{bel.prefix}{i.name}[{wc}]",
+                            PinType.INPUT,
                         )
 
             for i in bel.externalInputs:
                 for wc in range(i.wireCount):
                     tile.create_wire(f"{c}_{bel.prefix}O[{wc}]", "INBUF")
-                    inBuf = tile.create_bel(f"{c}_INBUF[{wc}]", "INBUF", count)
+                    tile.create_wire(f"{c}_{bel.prefix}PAD[{wc}]", "INBUF")
+                    inBuf = tile.create_bel(
+                        f"{c}_INBUF[{wc}]", "INBUF", count + GENERATED_OFFSET
+                    )
+                    count += 1
+                    tile.add_bel_pin(
+                        inBuf, "PAD", f"{c}_{bel.prefix}PAD[{wc}]", PinType.INOUT
+                    )
                     tile.add_bel_pin(
                         inBuf,
-                        f"{c}_O[{wc}]",
+                        "O",
                         f"{c}_{bel.prefix}O[{wc}]",
                         PinType.OUTPUT,
                     )
@@ -219,13 +206,24 @@ def genBel(bels: Iterable[Bel], tile: TileType, context=1):
                         PinType.OUTPUT,
                     )
 
+            # external output buffer
             for i in bel.externalOutputs:
                 for wc in range(i.wireCount):
                     tile.create_wire(f"{c}_{bel.prefix}I[{wc}]", "OUTBUF")
-                    outBuf = tile.create_bel(f"{c}_OUTBUF[{wc}]", "OUTBUF", count)
+                    tile.create_wire(f"{c}_{bel.prefix}PAD[{wc}]", "OUTBUF")
+                    outBuf = tile.create_bel(
+                        f"{c}_OUTBUF[{wc}]", "OUTBUF", count + GENERATED_OFFSET
+                    )
+                    count += 1
                     tile.add_bel_pin(
                         outBuf,
-                        f"{c}_I[{wc}]",
+                        "PAD",
+                        f"{c}_{bel.prefix}PAD[{wc}]",
+                        PinType.INOUT,
+                    )
+                    tile.add_bel_pin(
+                        outBuf,
+                        "I",
                         f"{c}_{bel.prefix}I[{wc}]",
                         PinType.INPUT,
                     )
@@ -235,15 +233,69 @@ def genBel(bels: Iterable[Bel], tile: TileType, context=1):
                         f"{c}_{bel.prefix}I[{wc}]",
                     )
 
+            for i in bel.inputs:
+                if i.control:
+                    if i.wireCount == 1:
+                        gnd = tile.create_bel(
+                            f"{c}_{bel.prefix}{i.name}_GND_DRV",
+                            "GND_DRV",
+                            z=count + GENERATED_OFFSET,
+                        )
+                        count += 1
+                        tile.create_wire(
+                            f"{c}_{bel.prefix}{i.name}_GND",
+                            "GND",
+                            const_value="GND",
+                        )
+                        tile.add_bel_pin(
+                            gnd,
+                            "GND",
+                            f"{c}_{bel.prefix}{i.name}_GND",
+                            PinType.OUTPUT,
+                        )
+                        tile.create_pip(
+                            f"{c}_{bel.prefix}{i.name}_GND",
+                            f"{c}_{bel.prefix}{i.name}",
+                        )
+
+                        vcc = tile.create_bel(
+                            f"{c}_{bel.prefix}{i.name}_VCC_DRV",
+                            "VCC_DRV",
+                            z=count + GENERATED_OFFSET,
+                        )
+                        count += 1
+                        tile.create_wire(
+                            f"{c}_{bel.prefix}{i.name}_VCC",
+                            "VCC",
+                            const_value="VCC",
+                        )
+                        tile.add_bel_pin(
+                            vcc,
+                            "VCC",
+                            f"{c}_{bel.prefix}{i.name}_VCC",
+                            PinType.OUTPUT,
+                        )
+                        tile.create_pip(
+                            f"{c}_{bel.prefix}{i.name}_VCC",
+                            f"{c}_{bel.prefix}{i.name}",
+                        )
+
             if bel.userCLK:
+                tile.create_wire(f"{c}_{bel.prefix}{bel.name}_clk_i", "CLK")
                 tile.add_bel_pin(
                     belData,
                     bel.userCLK.name,
-                    f"{c}_{bel.prefix}{bel.name}_{bel.userCLK.name}",
+                    f"{c}_{bel.prefix}{bel.name}_clk_i",
                     PinType.INPUT,
+                )
+                tile.create_pip(
+                    "user_clk_o",
+                    f"{c}_{bel.prefix}{bel.name}_clk_i",
                 )
             belData.add_extra_data(BelExtraData(context=c))
             count += 1
+            if count > GENERATED_OFFSET:
+                raise ValueError("Too many BELs generated")
 
 
 def genTile(tile: Tile, chip: Chip, context=1) -> TileType:
@@ -289,7 +341,8 @@ def genFabric(fabric: Fabric, chip: Chip, context=1):
                             f"{c}_{wire.destination.name}[{i}]",
                         ),
                     ]
-                chip.add_node(node)
+                    print(node)
+                    chip.add_node(node)
     setTiming(chip)
 
 
@@ -328,6 +381,26 @@ def setTiming(chip: Chip):
         in_cap=TimingValue(50000),
         out_res=TimingValue(8000),
     )
+
+
+def generateConstrainPair(fabric: Fabric, dest: Path):
+    with open(dest, "w") as f:
+        for bel in fabric.getAllUniqueBels():
+            print(bel)
+            f.write(f"#{bel.name}\n")
+            for i in bel.externalInputs:
+                f.write(
+                    f"INBUF:O 1 {bel.name}:{i.name} {i.wireCount} {GENERATED_OFFSET}\n"
+                )
+            for i in bel.externalOutputs:
+                f.write(
+                    f"{bel.name}:{i.name} {i.wireCount} OUTBUF:I 1 {GENERATED_OFFSET}\n"
+                )
+            if bel.userCLK:
+                f.write(
+                    f"CLK_DRV:CLK_O {1} {bel.name}:{bel.userCLK.name} {1} {GENERATED_OFFSET}\n"
+                )
+            f.write("\n")
 
 
 def generateChipDatabase(
@@ -389,8 +462,23 @@ def generateChipDatabase(
         logger.error("Failed to compile the bba file to bit file.")
         raise e
 
+    logger.info(
+        f"Writing the constrain pair file to {filePath / fabric.name}_constrain_pair.inc"
+    )
+    generateConstrainPair(fabric, filePath / f"{fabric.name}_constrain_pair.inc")
+
     if dotDir is not Path():
-        genRoutingDotGraph(ch, filePath, True)
+        genRoutingDotGraph(ch, filePath, False)
+
+
+def groupByThree(inputList: list) -> list:
+    iterator = iter(inputList)
+    result = []
+
+    while chunk := list(islice(iterator, 3)):
+        result.append(chunk)
+
+    return result
 
 
 def genRoutingDotGraph(chip: Chip, filePath: Path, expand=False):
@@ -407,14 +495,21 @@ def genRoutingDotGraph(chip: Chip, filePath: Path, expand=False):
             return re.sub(r"\[\d+\]$", "", i)
 
     pairs = list(product(range(chip.height), range(chip.width)))
-    pairs = [(0, 1)]
+    globalPairs = set()
+    pairs = [(1, 1), (1, 0)]
     for x, y in pairs:
-        pinWireMap = {}
         tileType = chip.tile_type_at(x, y)
         subgraph = pydot.Subgraph(
             f"cluster_{x}_{y}", label=f"tile_{x}_{y}_{tileType.name}"
         )
         for bel in tileType.bels:
+            # if "INBUF" in bel.name.value:
+            #     continue
+            # if "OUTBUF" in bel.name.value:
+            #     continue
+            # if "DRV" in bel.name.value:
+            #     continue
+
             belSupGraph = pydot.Subgraph(
                 f"cluster_{x}_{y}_{bel.name.value}",
                 label=f"{bel.name.value}",
@@ -422,7 +517,7 @@ def genRoutingDotGraph(chip: Chip, filePath: Path, expand=False):
             belSupGraph.add_node(
                 pydot.Node(
                     f"X{x}Y{y}_bel_{bel.name.value}",
-                    label=f"{bel.name.value}",
+                    label=f"bel_{bel.name.value}",
                     shape="box",
                 )
             )
@@ -433,16 +528,33 @@ def genRoutingDotGraph(chip: Chip, filePath: Path, expand=False):
                     continue
                 added.add(pinWire)
                 if pin.dir == PinType.INPUT:
+                    belPin = f"{bel.name.value}{pin.name.value}"
+                    belSupGraph.add_node(
+                        pydot.Node(belPin, label=pin.name.value, shape="hexagon")
+                    )
                     belSupGraph.add_edge(
                         pydot.Edge(
                             f"X{x}Y{y}_{pinWire}",
+                            belPin,
+                        )
+                    )
+                    belSupGraph.add_edge(
+                        pydot.Edge(
+                            belPin,
                             f"X{x}Y{y}_bel_{bel.name.value}",
                         )
                     )
                 elif pin.dir == PinType.OUTPUT:
+                    belPin = f"{bel.name.value}{pin.name.value}"
+                    belSupGraph.add_node(
+                        pydot.Node(belPin, label=pin.name.value, shape="hexagon")
+                    )
+                    belSupGraph.add_edge(
+                        pydot.Edge(f"X{x}Y{y}_bel_{bel.name.value}", belPin)
+                    )
                     belSupGraph.add_edge(
                         pydot.Edge(
-                            f"X{x}Y{y}_bel_{bel.name.value}",
+                            belPin,
                             f"X{x}Y{y}_{pinWire}",
                         )
                     )
@@ -459,6 +571,22 @@ def genRoutingDotGraph(chip: Chip, filePath: Path, expand=False):
 
         # subgraph.add_node(pydot.Node(f"tile_{x}_{y}"))
         graph.add_subgraph(subgraph)
+        for i in range(len(chip.node_shapes)):
+            wires = chip.get_node_wires_from_shape(i)
+            idx = (
+                hash(tuple([f"X{x}Y{y}_{removeBit(name)}" for x, y, name in wires]))
+                & 0xFFFFFF
+            )
+            graph.add_node(pydot.Node(f"shape{idx}"))
+            for x, y, name in wires:
+                srcName = f"X{x}Y{y}_{removeBit(name)}"
+                if (srcName, f"shape{idx}") in globalPairs:
+                    continue
+                globalPairs.add((srcName, f"shape{idx}"))
+
+                graph.add_edge(
+                    pydot.Edge(srcName, f"shape{idx}", dir="none", color="blue")
+                )
 
     graph.write(str(filePath / "routing_graph.dot"))
 

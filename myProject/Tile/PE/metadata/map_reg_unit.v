@@ -12,10 +12,11 @@ module map_reg_unit_en_1_rst_0 #(
 
 generate
     reg_unit #() _TECHMAP_REPLACE_ (
-        .en(1),
+        .clk(clk),
+        .en(1'd1),
         .reg_in(reg_in),
         .reg_out(reg_out),
-        .rst(0)
+        .rst(1'd0)
     );
 
 endgenerate
@@ -36,7 +37,8 @@ module map_reg_unit_en_1_rst_z #(
 
 generate
     reg_unit #() _TECHMAP_REPLACE_ (
-        .en(1),
+        .clk(clk),
+        .en(1'd1),
         .reg_in(reg_in),
         .reg_out(reg_out),
         .rst(rst)
@@ -60,10 +62,11 @@ module map_reg_unit_en_z_rst_0 #(
 
 generate
     reg_unit #() _TECHMAP_REPLACE_ (
+        .clk(clk),
         .en(en),
         .reg_in(reg_in),
         .reg_out(reg_out),
-        .rst(0)
+        .rst(1'd0)
     );
 
 endgenerate
@@ -84,6 +87,7 @@ module map_reg_unit_en_z_rst_z #(
 
 generate
     reg_unit #() _TECHMAP_REPLACE_ (
+        .clk(clk),
         .en(en),
         .reg_in(reg_in),
         .reg_out(reg_out),

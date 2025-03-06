@@ -21,14 +21,14 @@ techmap -map /home/kelvin/FABulous_fork/myProject/.FABulous/techmaps.v
 read_rtlil -lib /home/kelvin/FABulous_fork/myProject/Tile/PE/metadata/cell_const_unit.il
 hilomap -wrap const_unit const_out ConfigBits
 
-
-extract -map /home/kelvin/FABulous_fork/myProject/Tile/PE/metadata/cell_reg_unit_en_1_rst_z.il
+extract -map /home/kelvin/FABulous_fork/myProject/Tile/PE/metadata/cell_reg_unit_en_1_rst_0.il
 techmap -map /home/kelvin/FABulous_fork/myProject/.FABulous/techmaps.v
+
 iopadmap -widthparam WIDTH -outpad IO from_fabric:out -inpad IO to_fabric:in
 iopadmap -bits -outpad OUTBUF I:PAD -inpad INBUF O:PAD
 
+opt;;;
 clean -purge
-
 show -width
 
 write_json /home/kelvin/FABulous_fork/myProject/user_design/synth_test.json

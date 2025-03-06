@@ -6,7 +6,6 @@ module map_ALU_ALU_func_0 #(
     parameter _TECHMAP_CONSTVAL_data_out_ = 32'bx
 )(
     input [2:0] ALU_func,
-    input clk,
     input [31:0] data_in1,
     input [31:0] data_in2,
     input [31:0] data_in3,
@@ -15,7 +14,7 @@ module map_ALU_ALU_func_0 #(
 
 generate
     ALU #(
-        .ALU_func(0)
+        .ALU_func(1'd0)
     ) _TECHMAP_REPLACE_ (
         .data_in1(data_in1),
         .data_in2(data_in2),
@@ -35,7 +34,6 @@ module map_ALU_ALU_func_1 #(
     parameter _TECHMAP_CONSTVAL_data_out_ = 32'bx
 )(
     input [2:0] ALU_func,
-    input clk,
     input [31:0] data_in1,
     input [31:0] data_in2,
     input [31:0] data_in3,
@@ -44,7 +42,7 @@ module map_ALU_ALU_func_1 #(
 
 generate
     ALU #(
-        .ALU_func(1)
+        .ALU_func(1'd1)
     ) _TECHMAP_REPLACE_ (
         .data_in1(data_in1),
         .data_in2(data_in2),
@@ -64,7 +62,6 @@ module map_ALU_ALU_func_2 #(
     parameter _TECHMAP_CONSTVAL_data_out_ = 32'bx
 )(
     input [2:0] ALU_func,
-    input clk,
     input [31:0] data_in1,
     input [31:0] data_in2,
     input [31:0] data_in3,
@@ -73,7 +70,7 @@ module map_ALU_ALU_func_2 #(
 
 generate
     ALU #(
-        .ALU_func(2)
+        .ALU_func(2'd2)
     ) _TECHMAP_REPLACE_ (
         .data_in1(data_in1),
         .data_in2(data_in2),
@@ -93,7 +90,6 @@ module map_ALU_ALU_func_3 #(
     parameter _TECHMAP_CONSTVAL_data_out_ = 32'bx
 )(
     input [2:0] ALU_func,
-    input clk,
     input [31:0] data_in1,
     input [31:0] data_in2,
     input [31:0] data_in3,
@@ -102,7 +98,7 @@ module map_ALU_ALU_func_3 #(
 
 generate
     ALU #(
-        .ALU_func(3)
+        .ALU_func(2'd3)
     ) _TECHMAP_REPLACE_ (
         .data_in1(data_in1),
         .data_in2(data_in2),
@@ -122,7 +118,6 @@ module map_ALU_ALU_func_4 #(
     parameter _TECHMAP_CONSTVAL_data_out_ = 32'bx
 )(
     input [2:0] ALU_func,
-    input clk,
     input [31:0] data_in1,
     input [31:0] data_in2,
     input [31:0] data_in3,
@@ -131,7 +126,7 @@ module map_ALU_ALU_func_4 #(
 
 generate
     ALU #(
-        .ALU_func(4)
+        .ALU_func(3'd4)
     ) _TECHMAP_REPLACE_ (
         .data_in1(data_in1),
         .data_in2(data_in2),
@@ -151,7 +146,6 @@ module map_ALU_ALU_func_5 #(
     parameter _TECHMAP_CONSTVAL_data_out_ = 32'bx
 )(
     input [2:0] ALU_func,
-    input clk,
     input [31:0] data_in1,
     input [31:0] data_in2,
     input [31:0] data_in3,
@@ -160,7 +154,7 @@ module map_ALU_ALU_func_5 #(
 
 generate
     ALU #(
-        .ALU_func(5)
+        .ALU_func(3'd5)
     ) _TECHMAP_REPLACE_ (
         .data_in1(data_in1),
         .data_in2(data_in2),

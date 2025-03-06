@@ -286,12 +286,14 @@ def parseTileYAML(fileName: Path) -> tuple[Tile, WireInfo]:
         )
 
     bels = []
-    for belEntry in data.get("BELS", []):
+    for z, belEntry in enumerate(data.get("BELS", [])):
         belFilePath = filePathParent.joinpath(belEntry["BEL"])
         if belEntry["prefix"] is None:
             belEntry["prefix"] = ""
 
-        bels.append(parseBelFile(belFilePath, belEntry["prefix"]))
+        bel = parseBelFile(belFilePath, belEntry["prefix"])
+        bel.z = z
+        bels.append(bel)
 
     withUserCLK = any(bel.userCLK for bel in bels)
     for b in bels:

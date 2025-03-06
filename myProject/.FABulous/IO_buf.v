@@ -11,3 +11,9 @@ module OUTBUF #() (
 );
     assign PAD = I;
 endmodule
+
+module CLK_DRV #() (
+    output  CLK_O
+);
+
+endmodule

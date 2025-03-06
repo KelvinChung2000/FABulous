@@ -65,6 +65,7 @@ class Bel:
     configBit: int
     belFeatureMap: dict[str, int]
     userCLK: Port | None
+    z: int = 0
 
     def __init__(
         self,
@@ -90,6 +91,7 @@ class Bel:
         self.configBit = configBit
         self.userCLK = userCLK
         self.belFeatureMap = belFeatureMap
+        self.z = 0
 
     def __hash__(self) -> int:
         return hash(f"{self.prefix}{self.name}({self.src})")

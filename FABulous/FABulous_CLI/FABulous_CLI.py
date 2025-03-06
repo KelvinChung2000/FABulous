@@ -587,7 +587,7 @@ class FABulous_CLI(Cmd):
     @with_category(CMD_FABRIC_FLOW)
     def do_gen_FABulous_CAD_tool_files(self, *ignored):
         self.do_gen_bitStream_spec()
-        # self.do_gen_cells_and_techmaps()
+        self.do_gen_cells_and_techmaps()
         self.do_gen_chipdb()
 
     @with_category(CMD_FABRIC_FLOW)

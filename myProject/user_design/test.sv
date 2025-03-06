@@ -32,15 +32,18 @@ endmodule
 
 
 module test(
-    input logic clk,
-    input logic reset,
     input logic [31:0] A,
     input logic [31:0] B,
-    output logic [31:0] Y
+    output logic [31:0] Y,
 );
 
 logic [31:0] C_out;
 logic [31:0] reg_out;
+logic clk;
+
+CLK_DRV clk_drv_i (
+    .CLK_O(clk)
+);
 
 std_add #(
     .WIDTH(32)
@@ -56,7 +59,7 @@ std_reg #(
     .in(C_out),
     .write_en(1),
     .clk(clk),
-    .reset(reset),
+    .reset(0),
     .out(reg_out),
     .done()
 );

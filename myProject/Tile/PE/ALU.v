@@ -2,7 +2,7 @@ module ALU #(
     parameter NoConfigBits = 3,
     parameter WIDTH = 32
 ) (
-    (* FABulous, USER_CLK *) input wire clk,
+    // (* FABulous, USER_CLK *) input wire clk,
     // (* FABulous, CONTROL *)input wire en,
     (* FABulous, BUS, DATA *) input wire [WIDTH-1:0] data_in1,
     (* FABulous, BUS, DATA *) input wire [WIDTH-1:0] data_in2,

@@ -20,6 +20,7 @@ class MuxList(PE_ports):
             self.S_reg_in,
             self.W_reg_in,
         ]
+        self.data_in3 //= [self.in0, self.in1, self.in2, self.in3, self.const_out]
 
         self.RES_reg_in //= self.data_out
 

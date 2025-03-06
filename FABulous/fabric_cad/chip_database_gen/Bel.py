@@ -4,14 +4,16 @@ from FABulous.fabric_cad.bba import BBAWriter
 from FABulous.fabric_cad.chip_database_gen.BBAStruct import BBAStruct
 from FABulous.fabric_cad.chip_database_gen.define import IdString, PinType
 
+WireIndex = int
+
 
 @dataclass
 class BelPin(BBAStruct):
     name: IdString
-    wire: int
+    wire: WireIndex
     dir: PinType
 
-    def __init__(self, name: IdString, wire: int, dir: PinType):
+    def __init__(self, name: IdString, wire: WireIndex, dir: PinType):
         self.name = name
         self.wire = wire
         self.dir = dir

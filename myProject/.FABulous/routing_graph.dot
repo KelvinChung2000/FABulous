@@ -1,651 +1,1695 @@
 digraph G {
-subgraph cluster_0_1 {
-label="tile_0_1_W_IO";
-subgraph cluster_0_1_0_W_IO {
-label="0_W_IO";
-X0Y1_bel_0_W_IO [label="0_W_IO", shape=box];
-X0Y1_bel_0_W_IO -> "X0Y1_0_W_to_fabric[0]";
-X0Y1_bel_0_W_IO -> "X0Y1_0_W_to_fabric[1]";
-X0Y1_bel_0_W_IO -> "X0Y1_0_W_to_fabric[2]";
-X0Y1_bel_0_W_IO -> "X0Y1_0_W_to_fabric[3]";
-X0Y1_bel_0_W_IO -> "X0Y1_0_W_to_fabric[4]";
-X0Y1_bel_0_W_IO -> "X0Y1_0_W_to_fabric[5]";
-X0Y1_bel_0_W_IO -> "X0Y1_0_W_to_fabric[6]";
-X0Y1_bel_0_W_IO -> "X0Y1_0_W_to_fabric[7]";
-X0Y1_bel_0_W_IO -> "X0Y1_0_W_to_fabric[8]";
-X0Y1_bel_0_W_IO -> "X0Y1_0_W_to_fabric[9]";
-X0Y1_bel_0_W_IO -> "X0Y1_0_W_to_fabric[10]";
-X0Y1_bel_0_W_IO -> "X0Y1_0_W_to_fabric[11]";
-X0Y1_bel_0_W_IO -> "X0Y1_0_W_to_fabric[12]";
-X0Y1_bel_0_W_IO -> "X0Y1_0_W_to_fabric[13]";
-X0Y1_bel_0_W_IO -> "X0Y1_0_W_to_fabric[14]";
-X0Y1_bel_0_W_IO -> "X0Y1_0_W_to_fabric[15]";
-X0Y1_bel_0_W_IO -> "X0Y1_0_W_to_fabric[16]";
-X0Y1_bel_0_W_IO -> "X0Y1_0_W_to_fabric[17]";
-X0Y1_bel_0_W_IO -> "X0Y1_0_W_to_fabric[18]";
-X0Y1_bel_0_W_IO -> "X0Y1_0_W_to_fabric[19]";
-X0Y1_bel_0_W_IO -> "X0Y1_0_W_to_fabric[20]";
-X0Y1_bel_0_W_IO -> "X0Y1_0_W_to_fabric[21]";
-X0Y1_bel_0_W_IO -> "X0Y1_0_W_to_fabric[22]";
-X0Y1_bel_0_W_IO -> "X0Y1_0_W_to_fabric[23]";
-X0Y1_bel_0_W_IO -> "X0Y1_0_W_to_fabric[24]";
-X0Y1_bel_0_W_IO -> "X0Y1_0_W_to_fabric[25]";
-X0Y1_bel_0_W_IO -> "X0Y1_0_W_to_fabric[26]";
-X0Y1_bel_0_W_IO -> "X0Y1_0_W_to_fabric[27]";
-X0Y1_bel_0_W_IO -> "X0Y1_0_W_to_fabric[28]";
-X0Y1_bel_0_W_IO -> "X0Y1_0_W_to_fabric[29]";
-X0Y1_bel_0_W_IO -> "X0Y1_0_W_to_fabric[30]";
-X0Y1_bel_0_W_IO -> "X0Y1_0_W_to_fabric[31]";
-X0Y1_bel_0_W_IO -> "X0Y1_0_W_out[0]";
-X0Y1_bel_0_W_IO -> "X0Y1_0_W_out[1]";
-X0Y1_bel_0_W_IO -> "X0Y1_0_W_out[2]";
-X0Y1_bel_0_W_IO -> "X0Y1_0_W_out[3]";
-X0Y1_bel_0_W_IO -> "X0Y1_0_W_out[4]";
-X0Y1_bel_0_W_IO -> "X0Y1_0_W_out[5]";
-X0Y1_bel_0_W_IO -> "X0Y1_0_W_out[6]";
-X0Y1_bel_0_W_IO -> "X0Y1_0_W_out[7]";
-X0Y1_bel_0_W_IO -> "X0Y1_0_W_out[8]";
-X0Y1_bel_0_W_IO -> "X0Y1_0_W_out[9]";
-X0Y1_bel_0_W_IO -> "X0Y1_0_W_out[10]";
-X0Y1_bel_0_W_IO -> "X0Y1_0_W_out[11]";
-X0Y1_bel_0_W_IO -> "X0Y1_0_W_out[12]";
-X0Y1_bel_0_W_IO -> "X0Y1_0_W_out[13]";
-X0Y1_bel_0_W_IO -> "X0Y1_0_W_out[14]";
-X0Y1_bel_0_W_IO -> "X0Y1_0_W_out[15]";
-X0Y1_bel_0_W_IO -> "X0Y1_0_W_out[16]";
-X0Y1_bel_0_W_IO -> "X0Y1_0_W_out[17]";
-X0Y1_bel_0_W_IO -> "X0Y1_0_W_out[18]";
-X0Y1_bel_0_W_IO -> "X0Y1_0_W_out[19]";
-X0Y1_bel_0_W_IO -> "X0Y1_0_W_out[20]";
-X0Y1_bel_0_W_IO -> "X0Y1_0_W_out[21]";
-X0Y1_bel_0_W_IO -> "X0Y1_0_W_out[22]";
-X0Y1_bel_0_W_IO -> "X0Y1_0_W_out[23]";
-X0Y1_bel_0_W_IO -> "X0Y1_0_W_out[24]";
-X0Y1_bel_0_W_IO -> "X0Y1_0_W_out[25]";
-X0Y1_bel_0_W_IO -> "X0Y1_0_W_out[26]";
-X0Y1_bel_0_W_IO -> "X0Y1_0_W_out[27]";
-X0Y1_bel_0_W_IO -> "X0Y1_0_W_out[28]";
-X0Y1_bel_0_W_IO -> "X0Y1_0_W_out[29]";
-X0Y1_bel_0_W_IO -> "X0Y1_0_W_out[30]";
-X0Y1_bel_0_W_IO -> "X0Y1_0_W_out[31]";
-"X0Y1_0_W_from_fabric[0]" -> X0Y1_bel_0_W_IO;
-"X0Y1_0_W_from_fabric[1]" -> X0Y1_bel_0_W_IO;
-"X0Y1_0_W_from_fabric[2]" -> X0Y1_bel_0_W_IO;
-"X0Y1_0_W_from_fabric[3]" -> X0Y1_bel_0_W_IO;
-"X0Y1_0_W_from_fabric[4]" -> X0Y1_bel_0_W_IO;
-"X0Y1_0_W_from_fabric[5]" -> X0Y1_bel_0_W_IO;
-"X0Y1_0_W_from_fabric[6]" -> X0Y1_bel_0_W_IO;
-"X0Y1_0_W_from_fabric[7]" -> X0Y1_bel_0_W_IO;
-"X0Y1_0_W_from_fabric[8]" -> X0Y1_bel_0_W_IO;
-"X0Y1_0_W_from_fabric[9]" -> X0Y1_bel_0_W_IO;
-"X0Y1_0_W_from_fabric[10]" -> X0Y1_bel_0_W_IO;
-"X0Y1_0_W_from_fabric[11]" -> X0Y1_bel_0_W_IO;
-"X0Y1_0_W_from_fabric[12]" -> X0Y1_bel_0_W_IO;
-"X0Y1_0_W_from_fabric[13]" -> X0Y1_bel_0_W_IO;
-"X0Y1_0_W_from_fabric[14]" -> X0Y1_bel_0_W_IO;
-"X0Y1_0_W_from_fabric[15]" -> X0Y1_bel_0_W_IO;
-"X0Y1_0_W_from_fabric[16]" -> X0Y1_bel_0_W_IO;
-"X0Y1_0_W_from_fabric[17]" -> X0Y1_bel_0_W_IO;
-"X0Y1_0_W_from_fabric[18]" -> X0Y1_bel_0_W_IO;
-"X0Y1_0_W_from_fabric[19]" -> X0Y1_bel_0_W_IO;
-"X0Y1_0_W_from_fabric[20]" -> X0Y1_bel_0_W_IO;
-"X0Y1_0_W_from_fabric[21]" -> X0Y1_bel_0_W_IO;
-"X0Y1_0_W_from_fabric[22]" -> X0Y1_bel_0_W_IO;
-"X0Y1_0_W_from_fabric[23]" -> X0Y1_bel_0_W_IO;
-"X0Y1_0_W_from_fabric[24]" -> X0Y1_bel_0_W_IO;
-"X0Y1_0_W_from_fabric[25]" -> X0Y1_bel_0_W_IO;
-"X0Y1_0_W_from_fabric[26]" -> X0Y1_bel_0_W_IO;
-"X0Y1_0_W_from_fabric[27]" -> X0Y1_bel_0_W_IO;
-"X0Y1_0_W_from_fabric[28]" -> X0Y1_bel_0_W_IO;
-"X0Y1_0_W_from_fabric[29]" -> X0Y1_bel_0_W_IO;
-"X0Y1_0_W_from_fabric[30]" -> X0Y1_bel_0_W_IO;
-"X0Y1_0_W_from_fabric[31]" -> X0Y1_bel_0_W_IO;
-"X0Y1_0_W_in[0]" -> X0Y1_bel_0_W_IO;
-"X0Y1_0_W_in[1]" -> X0Y1_bel_0_W_IO;
-"X0Y1_0_W_in[2]" -> X0Y1_bel_0_W_IO;
-"X0Y1_0_W_in[3]" -> X0Y1_bel_0_W_IO;
-"X0Y1_0_W_in[4]" -> X0Y1_bel_0_W_IO;
-"X0Y1_0_W_in[5]" -> X0Y1_bel_0_W_IO;
-"X0Y1_0_W_in[6]" -> X0Y1_bel_0_W_IO;
-"X0Y1_0_W_in[7]" -> X0Y1_bel_0_W_IO;
-"X0Y1_0_W_in[8]" -> X0Y1_bel_0_W_IO;
-"X0Y1_0_W_in[9]" -> X0Y1_bel_0_W_IO;
-"X0Y1_0_W_in[10]" -> X0Y1_bel_0_W_IO;
-"X0Y1_0_W_in[11]" -> X0Y1_bel_0_W_IO;
-"X0Y1_0_W_in[12]" -> X0Y1_bel_0_W_IO;
-"X0Y1_0_W_in[13]" -> X0Y1_bel_0_W_IO;
-"X0Y1_0_W_in[14]" -> X0Y1_bel_0_W_IO;
-"X0Y1_0_W_in[15]" -> X0Y1_bel_0_W_IO;
-"X0Y1_0_W_in[16]" -> X0Y1_bel_0_W_IO;
-"X0Y1_0_W_in[17]" -> X0Y1_bel_0_W_IO;
-"X0Y1_0_W_in[18]" -> X0Y1_bel_0_W_IO;
-"X0Y1_0_W_in[19]" -> X0Y1_bel_0_W_IO;
-"X0Y1_0_W_in[20]" -> X0Y1_bel_0_W_IO;
-"X0Y1_0_W_in[21]" -> X0Y1_bel_0_W_IO;
-"X0Y1_0_W_in[22]" -> X0Y1_bel_0_W_IO;
-"X0Y1_0_W_in[23]" -> X0Y1_bel_0_W_IO;
-"X0Y1_0_W_in[24]" -> X0Y1_bel_0_W_IO;
-"X0Y1_0_W_in[25]" -> X0Y1_bel_0_W_IO;
-"X0Y1_0_W_in[26]" -> X0Y1_bel_0_W_IO;
-"X0Y1_0_W_in[27]" -> X0Y1_bel_0_W_IO;
-"X0Y1_0_W_in[28]" -> X0Y1_bel_0_W_IO;
-"X0Y1_0_W_in[29]" -> X0Y1_bel_0_W_IO;
-"X0Y1_0_W_in[30]" -> X0Y1_bel_0_W_IO;
-"X0Y1_0_W_in[31]" -> X0Y1_bel_0_W_IO;
+subgraph cluster_1_1 {
+label="tile_1_1_PE";
+subgraph cluster_1_1_CLK_DRV {
+label="CLK_DRV";
+X1Y1_bel_CLK_DRV [label="bel_CLK_DRV", shape=box];
+CLK_DRVCLK_O [label="CLK_O", shape=hexagon];
+X1Y1_bel_CLK_DRV -> CLK_DRVCLK_O;
+CLK_DRVCLK_O -> X1Y1_user_clk_o;
 }
 
-subgraph "cluster_0_1_0_INBUF[0]" {
+subgraph cluster_1_1_0_ALU {
+label="0_ALU";
+X1Y1_bel_0_ALU [label="bel_0_ALU", shape=box];
+"0_ALUdata_in1[0]" [label="data_in1[0]", shape=hexagon];
+X1Y1_0_data_in1 -> "0_ALUdata_in1[0]";
+"0_ALUdata_in1[0]" -> X1Y1_bel_0_ALU;
+"0_ALUdata_in2[0]" [label="data_in2[0]", shape=hexagon];
+X1Y1_0_data_in2 -> "0_ALUdata_in2[0]";
+"0_ALUdata_in2[0]" -> X1Y1_bel_0_ALU;
+"0_ALUdata_in3[0]" [label="data_in3[0]", shape=hexagon];
+X1Y1_0_data_in3 -> "0_ALUdata_in3[0]";
+"0_ALUdata_in3[0]" -> X1Y1_bel_0_ALU;
+"0_ALUdata_out[0]" [label="data_out[0]", shape=hexagon];
+X1Y1_bel_0_ALU -> "0_ALUdata_out[0]";
+"0_ALUdata_out[0]" -> X1Y1_0_data_out;
+}
+
+subgraph cluster_1_1_0_const_unit {
+label="0_const_unit";
+X1Y1_bel_0_const_unit [label="bel_0_const_unit", shape=box];
+"0_const_unitconst_out[0]" [label="const_out[0]", shape=hexagon];
+X1Y1_bel_0_const_unit -> "0_const_unitconst_out[0]";
+"0_const_unitconst_out[0]" -> X1Y1_0_const_out;
+}
+
+subgraph cluster_1_1_0_RES_reg_unit {
+label="0_RES_reg_unit";
+X1Y1_bel_0_RES_reg_unit [label="bel_0_RES_reg_unit", shape=box];
+"0_RES_reg_uniten" [label=en, shape=hexagon];
+X1Y1_0_RES_en -> "0_RES_reg_uniten";
+"0_RES_reg_uniten" -> X1Y1_bel_0_RES_reg_unit;
+"0_RES_reg_unitreg_in[0]" [label="reg_in[0]", shape=hexagon];
+X1Y1_0_RES_reg_in -> "0_RES_reg_unitreg_in[0]";
+"0_RES_reg_unitreg_in[0]" -> X1Y1_bel_0_RES_reg_unit;
+"0_RES_reg_unitrst" [label=rst, shape=hexagon];
+X1Y1_0_RES_rst -> "0_RES_reg_unitrst";
+"0_RES_reg_unitrst" -> X1Y1_bel_0_RES_reg_unit;
+"0_RES_reg_unitreg_out[0]" [label="reg_out[0]", shape=hexagon];
+X1Y1_bel_0_RES_reg_unit -> "0_RES_reg_unitreg_out[0]";
+"0_RES_reg_unitreg_out[0]" -> X1Y1_0_RES_reg_out;
+"0_RES_reg_unitclk" [label=clk, shape=hexagon];
+X1Y1_0_RES_reg_unit_clk_i -> "0_RES_reg_unitclk";
+"0_RES_reg_unitclk" -> X1Y1_bel_0_RES_reg_unit;
+}
+
+subgraph cluster_1_1_0_RES_en_GND_DRV {
+label="0_RES_en_GND_DRV";
+X1Y1_bel_0_RES_en_GND_DRV [label="bel_0_RES_en_GND_DRV", shape=box];
+"0_RES_en_GND_DRVGND" [label=GND, shape=hexagon];
+X1Y1_bel_0_RES_en_GND_DRV -> "0_RES_en_GND_DRVGND";
+"0_RES_en_GND_DRVGND" -> X1Y1_0_RES_en_GND;
+}
+
+subgraph cluster_1_1_0_RES_en_VCC_DRV {
+label="0_RES_en_VCC_DRV";
+X1Y1_bel_0_RES_en_VCC_DRV [label="bel_0_RES_en_VCC_DRV", shape=box];
+"0_RES_en_VCC_DRVVCC" [label=VCC, shape=hexagon];
+X1Y1_bel_0_RES_en_VCC_DRV -> "0_RES_en_VCC_DRVVCC";
+"0_RES_en_VCC_DRVVCC" -> X1Y1_0_RES_en_VCC;
+}
+
+subgraph cluster_1_1_0_RES_rst_GND_DRV {
+label="0_RES_rst_GND_DRV";
+X1Y1_bel_0_RES_rst_GND_DRV [label="bel_0_RES_rst_GND_DRV", shape=box];
+"0_RES_rst_GND_DRVGND" [label=GND, shape=hexagon];
+X1Y1_bel_0_RES_rst_GND_DRV -> "0_RES_rst_GND_DRVGND";
+"0_RES_rst_GND_DRVGND" -> X1Y1_0_RES_rst_GND;
+}
+
+subgraph cluster_1_1_0_RES_rst_VCC_DRV {
+label="0_RES_rst_VCC_DRV";
+X1Y1_bel_0_RES_rst_VCC_DRV [label="bel_0_RES_rst_VCC_DRV", shape=box];
+"0_RES_rst_VCC_DRVVCC" [label=VCC, shape=hexagon];
+X1Y1_bel_0_RES_rst_VCC_DRV -> "0_RES_rst_VCC_DRVVCC";
+"0_RES_rst_VCC_DRVVCC" -> X1Y1_0_RES_rst_VCC;
+}
+
+subgraph cluster_1_1_0_N_reg_unit {
+label="0_N_reg_unit";
+X1Y1_bel_0_N_reg_unit [label="bel_0_N_reg_unit", shape=box];
+"0_N_reg_uniten" [label=en, shape=hexagon];
+X1Y1_0_N_en -> "0_N_reg_uniten";
+"0_N_reg_uniten" -> X1Y1_bel_0_N_reg_unit;
+"0_N_reg_unitreg_in[0]" [label="reg_in[0]", shape=hexagon];
+X1Y1_0_N_reg_in -> "0_N_reg_unitreg_in[0]";
+"0_N_reg_unitreg_in[0]" -> X1Y1_bel_0_N_reg_unit;
+"0_N_reg_unitrst" [label=rst, shape=hexagon];
+X1Y1_0_N_rst -> "0_N_reg_unitrst";
+"0_N_reg_unitrst" -> X1Y1_bel_0_N_reg_unit;
+"0_N_reg_unitreg_out[0]" [label="reg_out[0]", shape=hexagon];
+X1Y1_bel_0_N_reg_unit -> "0_N_reg_unitreg_out[0]";
+"0_N_reg_unitreg_out[0]" -> X1Y1_0_N_reg_out;
+"0_N_reg_unitclk" [label=clk, shape=hexagon];
+X1Y1_0_N_reg_unit_clk_i -> "0_N_reg_unitclk";
+"0_N_reg_unitclk" -> X1Y1_bel_0_N_reg_unit;
+}
+
+subgraph cluster_1_1_0_N_en_GND_DRV {
+label="0_N_en_GND_DRV";
+X1Y1_bel_0_N_en_GND_DRV [label="bel_0_N_en_GND_DRV", shape=box];
+"0_N_en_GND_DRVGND" [label=GND, shape=hexagon];
+X1Y1_bel_0_N_en_GND_DRV -> "0_N_en_GND_DRVGND";
+"0_N_en_GND_DRVGND" -> X1Y1_0_N_en_GND;
+}
+
+subgraph cluster_1_1_0_N_en_VCC_DRV {
+label="0_N_en_VCC_DRV";
+X1Y1_bel_0_N_en_VCC_DRV [label="bel_0_N_en_VCC_DRV", shape=box];
+"0_N_en_VCC_DRVVCC" [label=VCC, shape=hexagon];
+X1Y1_bel_0_N_en_VCC_DRV -> "0_N_en_VCC_DRVVCC";
+"0_N_en_VCC_DRVVCC" -> X1Y1_0_N_en_VCC;
+}
+
+subgraph cluster_1_1_0_N_rst_GND_DRV {
+label="0_N_rst_GND_DRV";
+X1Y1_bel_0_N_rst_GND_DRV [label="bel_0_N_rst_GND_DRV", shape=box];
+"0_N_rst_GND_DRVGND" [label=GND, shape=hexagon];
+X1Y1_bel_0_N_rst_GND_DRV -> "0_N_rst_GND_DRVGND";
+"0_N_rst_GND_DRVGND" -> X1Y1_0_N_rst_GND;
+}
+
+subgraph cluster_1_1_0_N_rst_VCC_DRV {
+label="0_N_rst_VCC_DRV";
+X1Y1_bel_0_N_rst_VCC_DRV [label="bel_0_N_rst_VCC_DRV", shape=box];
+"0_N_rst_VCC_DRVVCC" [label=VCC, shape=hexagon];
+X1Y1_bel_0_N_rst_VCC_DRV -> "0_N_rst_VCC_DRVVCC";
+"0_N_rst_VCC_DRVVCC" -> X1Y1_0_N_rst_VCC;
+}
+
+subgraph cluster_1_1_0_E_reg_unit {
+label="0_E_reg_unit";
+X1Y1_bel_0_E_reg_unit [label="bel_0_E_reg_unit", shape=box];
+"0_E_reg_uniten" [label=en, shape=hexagon];
+X1Y1_0_E_en -> "0_E_reg_uniten";
+"0_E_reg_uniten" -> X1Y1_bel_0_E_reg_unit;
+"0_E_reg_unitreg_in[0]" [label="reg_in[0]", shape=hexagon];
+X1Y1_0_E_reg_in -> "0_E_reg_unitreg_in[0]";
+"0_E_reg_unitreg_in[0]" -> X1Y1_bel_0_E_reg_unit;
+"0_E_reg_unitrst" [label=rst, shape=hexagon];
+X1Y1_0_E_rst -> "0_E_reg_unitrst";
+"0_E_reg_unitrst" -> X1Y1_bel_0_E_reg_unit;
+"0_E_reg_unitreg_out[0]" [label="reg_out[0]", shape=hexagon];
+X1Y1_bel_0_E_reg_unit -> "0_E_reg_unitreg_out[0]";
+"0_E_reg_unitreg_out[0]" -> X1Y1_0_E_reg_out;
+"0_E_reg_unitclk" [label=clk, shape=hexagon];
+X1Y1_0_E_reg_unit_clk_i -> "0_E_reg_unitclk";
+"0_E_reg_unitclk" -> X1Y1_bel_0_E_reg_unit;
+}
+
+subgraph cluster_1_1_0_E_en_GND_DRV {
+label="0_E_en_GND_DRV";
+X1Y1_bel_0_E_en_GND_DRV [label="bel_0_E_en_GND_DRV", shape=box];
+"0_E_en_GND_DRVGND" [label=GND, shape=hexagon];
+X1Y1_bel_0_E_en_GND_DRV -> "0_E_en_GND_DRVGND";
+"0_E_en_GND_DRVGND" -> X1Y1_0_E_en_GND;
+}
+
+subgraph cluster_1_1_0_E_en_VCC_DRV {
+label="0_E_en_VCC_DRV";
+X1Y1_bel_0_E_en_VCC_DRV [label="bel_0_E_en_VCC_DRV", shape=box];
+"0_E_en_VCC_DRVVCC" [label=VCC, shape=hexagon];
+X1Y1_bel_0_E_en_VCC_DRV -> "0_E_en_VCC_DRVVCC";
+"0_E_en_VCC_DRVVCC" -> X1Y1_0_E_en_VCC;
+}
+
+subgraph cluster_1_1_0_E_rst_GND_DRV {
+label="0_E_rst_GND_DRV";
+X1Y1_bel_0_E_rst_GND_DRV [label="bel_0_E_rst_GND_DRV", shape=box];
+"0_E_rst_GND_DRVGND" [label=GND, shape=hexagon];
+X1Y1_bel_0_E_rst_GND_DRV -> "0_E_rst_GND_DRVGND";
+"0_E_rst_GND_DRVGND" -> X1Y1_0_E_rst_GND;
+}
+
+subgraph cluster_1_1_0_E_rst_VCC_DRV {
+label="0_E_rst_VCC_DRV";
+X1Y1_bel_0_E_rst_VCC_DRV [label="bel_0_E_rst_VCC_DRV", shape=box];
+"0_E_rst_VCC_DRVVCC" [label=VCC, shape=hexagon];
+X1Y1_bel_0_E_rst_VCC_DRV -> "0_E_rst_VCC_DRVVCC";
+"0_E_rst_VCC_DRVVCC" -> X1Y1_0_E_rst_VCC;
+}
+
+subgraph cluster_1_1_0_S_reg_unit {
+label="0_S_reg_unit";
+X1Y1_bel_0_S_reg_unit [label="bel_0_S_reg_unit", shape=box];
+"0_S_reg_uniten" [label=en, shape=hexagon];
+X1Y1_0_S_en -> "0_S_reg_uniten";
+"0_S_reg_uniten" -> X1Y1_bel_0_S_reg_unit;
+"0_S_reg_unitreg_in[0]" [label="reg_in[0]", shape=hexagon];
+X1Y1_0_S_reg_in -> "0_S_reg_unitreg_in[0]";
+"0_S_reg_unitreg_in[0]" -> X1Y1_bel_0_S_reg_unit;
+"0_S_reg_unitrst" [label=rst, shape=hexagon];
+X1Y1_0_S_rst -> "0_S_reg_unitrst";
+"0_S_reg_unitrst" -> X1Y1_bel_0_S_reg_unit;
+"0_S_reg_unitreg_out[0]" [label="reg_out[0]", shape=hexagon];
+X1Y1_bel_0_S_reg_unit -> "0_S_reg_unitreg_out[0]";
+"0_S_reg_unitreg_out[0]" -> X1Y1_0_S_reg_out;
+"0_S_reg_unitclk" [label=clk, shape=hexagon];
+X1Y1_0_S_reg_unit_clk_i -> "0_S_reg_unitclk";
+"0_S_reg_unitclk" -> X1Y1_bel_0_S_reg_unit;
+}
+
+subgraph cluster_1_1_0_S_en_GND_DRV {
+label="0_S_en_GND_DRV";
+X1Y1_bel_0_S_en_GND_DRV [label="bel_0_S_en_GND_DRV", shape=box];
+"0_S_en_GND_DRVGND" [label=GND, shape=hexagon];
+X1Y1_bel_0_S_en_GND_DRV -> "0_S_en_GND_DRVGND";
+"0_S_en_GND_DRVGND" -> X1Y1_0_S_en_GND;
+}
+
+subgraph cluster_1_1_0_S_en_VCC_DRV {
+label="0_S_en_VCC_DRV";
+X1Y1_bel_0_S_en_VCC_DRV [label="bel_0_S_en_VCC_DRV", shape=box];
+"0_S_en_VCC_DRVVCC" [label=VCC, shape=hexagon];
+X1Y1_bel_0_S_en_VCC_DRV -> "0_S_en_VCC_DRVVCC";
+"0_S_en_VCC_DRVVCC" -> X1Y1_0_S_en_VCC;
+}
+
+subgraph cluster_1_1_0_S_rst_GND_DRV {
+label="0_S_rst_GND_DRV";
+X1Y1_bel_0_S_rst_GND_DRV [label="bel_0_S_rst_GND_DRV", shape=box];
+"0_S_rst_GND_DRVGND" [label=GND, shape=hexagon];
+X1Y1_bel_0_S_rst_GND_DRV -> "0_S_rst_GND_DRVGND";
+"0_S_rst_GND_DRVGND" -> X1Y1_0_S_rst_GND;
+}
+
+subgraph cluster_1_1_0_S_rst_VCC_DRV {
+label="0_S_rst_VCC_DRV";
+X1Y1_bel_0_S_rst_VCC_DRV [label="bel_0_S_rst_VCC_DRV", shape=box];
+"0_S_rst_VCC_DRVVCC" [label=VCC, shape=hexagon];
+X1Y1_bel_0_S_rst_VCC_DRV -> "0_S_rst_VCC_DRVVCC";
+"0_S_rst_VCC_DRVVCC" -> X1Y1_0_S_rst_VCC;
+}
+
+subgraph cluster_1_1_0_W_reg_unit {
+label="0_W_reg_unit";
+X1Y1_bel_0_W_reg_unit [label="bel_0_W_reg_unit", shape=box];
+"0_W_reg_uniten" [label=en, shape=hexagon];
+X1Y1_0_W_en -> "0_W_reg_uniten";
+"0_W_reg_uniten" -> X1Y1_bel_0_W_reg_unit;
+"0_W_reg_unitreg_in[0]" [label="reg_in[0]", shape=hexagon];
+X1Y1_0_W_reg_in -> "0_W_reg_unitreg_in[0]";
+"0_W_reg_unitreg_in[0]" -> X1Y1_bel_0_W_reg_unit;
+"0_W_reg_unitrst" [label=rst, shape=hexagon];
+X1Y1_0_W_rst -> "0_W_reg_unitrst";
+"0_W_reg_unitrst" -> X1Y1_bel_0_W_reg_unit;
+"0_W_reg_unitreg_out[0]" [label="reg_out[0]", shape=hexagon];
+X1Y1_bel_0_W_reg_unit -> "0_W_reg_unitreg_out[0]";
+"0_W_reg_unitreg_out[0]" -> X1Y1_0_W_reg_out;
+"0_W_reg_unitclk" [label=clk, shape=hexagon];
+X1Y1_0_W_reg_unit_clk_i -> "0_W_reg_unitclk";
+"0_W_reg_unitclk" -> X1Y1_bel_0_W_reg_unit;
+}
+
+subgraph cluster_1_1_0_W_en_GND_DRV {
+label="0_W_en_GND_DRV";
+X1Y1_bel_0_W_en_GND_DRV [label="bel_0_W_en_GND_DRV", shape=box];
+"0_W_en_GND_DRVGND" [label=GND, shape=hexagon];
+X1Y1_bel_0_W_en_GND_DRV -> "0_W_en_GND_DRVGND";
+"0_W_en_GND_DRVGND" -> X1Y1_0_W_en_GND;
+}
+
+subgraph cluster_1_1_0_W_en_VCC_DRV {
+label="0_W_en_VCC_DRV";
+X1Y1_bel_0_W_en_VCC_DRV [label="bel_0_W_en_VCC_DRV", shape=box];
+"0_W_en_VCC_DRVVCC" [label=VCC, shape=hexagon];
+X1Y1_bel_0_W_en_VCC_DRV -> "0_W_en_VCC_DRVVCC";
+"0_W_en_VCC_DRVVCC" -> X1Y1_0_W_en_VCC;
+}
+
+subgraph cluster_1_1_0_W_rst_GND_DRV {
+label="0_W_rst_GND_DRV";
+X1Y1_bel_0_W_rst_GND_DRV [label="bel_0_W_rst_GND_DRV", shape=box];
+"0_W_rst_GND_DRVGND" [label=GND, shape=hexagon];
+X1Y1_bel_0_W_rst_GND_DRV -> "0_W_rst_GND_DRVGND";
+"0_W_rst_GND_DRVGND" -> X1Y1_0_W_rst_GND;
+}
+
+subgraph cluster_1_1_0_W_rst_VCC_DRV {
+label="0_W_rst_VCC_DRV";
+X1Y1_bel_0_W_rst_VCC_DRV [label="bel_0_W_rst_VCC_DRV", shape=box];
+"0_W_rst_VCC_DRVVCC" [label=VCC, shape=hexagon];
+X1Y1_bel_0_W_rst_VCC_DRV -> "0_W_rst_VCC_DRVVCC";
+"0_W_rst_VCC_DRVVCC" -> X1Y1_0_W_rst_VCC;
+}
+
+X1Y1_0_RES_en_GND -> X1Y1_0_RES_en;
+X1Y1_0_RES_en_VCC -> X1Y1_0_RES_en;
+X1Y1_0_RES_rst_GND -> X1Y1_0_RES_rst;
+X1Y1_0_RES_rst_VCC -> X1Y1_0_RES_rst;
+X1Y1_user_clk_o -> X1Y1_0_RES_reg_unit_clk_i;
+X1Y1_0_N_en_GND -> X1Y1_0_N_en;
+X1Y1_0_N_en_VCC -> X1Y1_0_N_en;
+X1Y1_0_N_rst_GND -> X1Y1_0_N_rst;
+X1Y1_0_N_rst_VCC -> X1Y1_0_N_rst;
+X1Y1_user_clk_o -> X1Y1_0_N_reg_unit_clk_i;
+X1Y1_0_E_en_GND -> X1Y1_0_E_en;
+X1Y1_0_E_en_VCC -> X1Y1_0_E_en;
+X1Y1_0_E_rst_GND -> X1Y1_0_E_rst;
+X1Y1_0_E_rst_VCC -> X1Y1_0_E_rst;
+X1Y1_user_clk_o -> X1Y1_0_E_reg_unit_clk_i;
+X1Y1_0_S_en_GND -> X1Y1_0_S_en;
+X1Y1_0_S_en_VCC -> X1Y1_0_S_en;
+X1Y1_0_S_rst_GND -> X1Y1_0_S_rst;
+X1Y1_0_S_rst_VCC -> X1Y1_0_S_rst;
+X1Y1_user_clk_o -> X1Y1_0_S_reg_unit_clk_i;
+X1Y1_0_W_en_GND -> X1Y1_0_W_en;
+X1Y1_0_W_en_VCC -> X1Y1_0_W_en;
+X1Y1_0_W_rst_GND -> X1Y1_0_W_rst;
+X1Y1_0_W_rst_VCC -> X1Y1_0_W_rst;
+X1Y1_user_clk_o -> X1Y1_0_W_reg_unit_clk_i;
+X1Y1_0_out0_internal -> X1Y1_0_out0;
+X1Y1_0_out1_internal -> X1Y1_0_out1;
+X1Y1_0_out2_internal -> X1Y1_0_out2;
+X1Y1_0_out3_internal -> X1Y1_0_out3;
+X1Y1_0_data_out -> X1Y1_0_out0_internal;
+X1Y1_0_data_out -> X1Y1_0_out1_internal;
+X1Y1_0_data_out -> X1Y1_0_out2_internal;
+X1Y1_0_data_out -> X1Y1_0_out3_internal;
+X1Y1_0_in0 -> X1Y1_0_data_in1;
+X1Y1_0_in1 -> X1Y1_0_data_in1;
+X1Y1_0_in2 -> X1Y1_0_data_in1;
+X1Y1_0_in3 -> X1Y1_0_data_in1;
+X1Y1_0_RES_reg_out -> X1Y1_0_data_in1;
+X1Y1_0_N_reg_out -> X1Y1_0_data_in1;
+X1Y1_0_E_reg_out -> X1Y1_0_data_in1;
+X1Y1_0_S_reg_out -> X1Y1_0_data_in1;
+X1Y1_0_W_reg_out -> X1Y1_0_data_in1;
+X1Y1_0_in0 -> X1Y1_0_data_in2;
+X1Y1_0_in1 -> X1Y1_0_data_in2;
+X1Y1_0_in2 -> X1Y1_0_data_in2;
+X1Y1_0_in3 -> X1Y1_0_data_in2;
+X1Y1_0_const_out -> X1Y1_0_data_in2;
+X1Y1_0_RES_reg_in -> X1Y1_0_data_in2;
+X1Y1_0_N_reg_in -> X1Y1_0_data_in2;
+X1Y1_0_E_reg_in -> X1Y1_0_data_in2;
+X1Y1_0_S_reg_in -> X1Y1_0_data_in2;
+X1Y1_0_W_reg_in -> X1Y1_0_data_in2;
+X1Y1_0_in0 -> X1Y1_0_data_in3;
+X1Y1_0_in1 -> X1Y1_0_data_in3;
+X1Y1_0_in2 -> X1Y1_0_data_in3;
+X1Y1_0_in3 -> X1Y1_0_data_in3;
+X1Y1_0_const_out -> X1Y1_0_data_in3;
+X1Y1_0_data_out -> X1Y1_0_RES_reg_in;
+X1Y1_0_in0 -> X1Y1_0_N_reg_in;
+X1Y1_0_N_reg_out -> X1Y1_0_N_reg_in;
+X1Y1_0_in1 -> X1Y1_0_E_reg_in;
+X1Y1_0_E_reg_out -> X1Y1_0_E_reg_in;
+X1Y1_0_in2 -> X1Y1_0_S_reg_in;
+X1Y1_0_S_reg_out -> X1Y1_0_S_reg_in;
+X1Y1_0_in3 -> X1Y1_0_W_reg_in;
+X1Y1_0_W_reg_out -> X1Y1_0_W_reg_in;
+}
+
+shape15825635;
+X1Y5_0_out2 -> shape15825635 [dir=none, color=blue];
+X1Y4_0_in0 -> shape15825635 [dir=none, color=blue];
+shape15825635;
+shape15825635;
+shape15825635;
+shape15825635;
+shape15825635;
+shape15825635;
+shape15825635;
+shape15825635;
+shape15825635;
+shape15825635;
+shape15825635;
+shape15825635;
+shape15825635;
+shape15825635;
+shape15825635;
+shape15825635;
+shape15825635;
+shape15825635;
+shape15825635;
+shape15825635;
+shape15825635;
+shape15825635;
+shape15825635;
+shape15825635;
+shape15825635;
+shape15825635;
+shape15825635;
+shape15825635;
+shape15825635;
+shape15825635;
+shape15825635;
+shape9096309;
+X0Y1_0_out1 -> shape9096309 [dir=none, color=blue];
+X1Y1_0_in3 -> shape9096309 [dir=none, color=blue];
+shape9096309;
+shape9096309;
+shape9096309;
+shape9096309;
+shape9096309;
+shape9096309;
+shape9096309;
+shape9096309;
+shape9096309;
+shape9096309;
+shape9096309;
+shape9096309;
+shape9096309;
+shape9096309;
+shape9096309;
+shape9096309;
+shape9096309;
+shape9096309;
+shape9096309;
+shape9096309;
+shape9096309;
+shape9096309;
+shape9096309;
+shape9096309;
+shape9096309;
+shape9096309;
+shape9096309;
+shape9096309;
+shape9096309;
+shape9096309;
+shape9096309;
+shape471936;
+X1Y4_0_out0 -> shape471936 [dir=none, color=blue];
+X1Y5_0_in2 -> shape471936 [dir=none, color=blue];
+shape471936;
+shape471936;
+shape471936;
+shape471936;
+shape471936;
+shape471936;
+shape471936;
+shape471936;
+shape471936;
+shape471936;
+shape471936;
+shape471936;
+shape471936;
+shape471936;
+shape471936;
+shape471936;
+shape471936;
+shape471936;
+shape471936;
+shape471936;
+shape471936;
+shape471936;
+shape471936;
+shape471936;
+shape471936;
+shape471936;
+shape471936;
+shape471936;
+shape471936;
+shape471936;
+shape471936;
+shape12261425;
+X1Y1_0_out1 -> shape12261425 [dir=none, color=blue];
+X2Y1_0_in3 -> shape12261425 [dir=none, color=blue];
+shape12261425;
+shape12261425;
+shape12261425;
+shape12261425;
+shape12261425;
+shape12261425;
+shape12261425;
+shape12261425;
+shape12261425;
+shape12261425;
+shape12261425;
+shape12261425;
+shape12261425;
+shape12261425;
+shape12261425;
+shape12261425;
+shape12261425;
+shape12261425;
+shape12261425;
+shape12261425;
+shape12261425;
+shape12261425;
+shape12261425;
+shape12261425;
+shape12261425;
+shape12261425;
+shape12261425;
+shape12261425;
+shape12261425;
+shape12261425;
+shape12261425;
+shape16341145;
+X1Y2_0_out2 -> shape16341145 [dir=none, color=blue];
+X1Y1_0_in0 -> shape16341145 [dir=none, color=blue];
+shape16341145;
+shape16341145;
+shape16341145;
+shape16341145;
+shape16341145;
+shape16341145;
+shape16341145;
+shape16341145;
+shape16341145;
+shape16341145;
+shape16341145;
+shape16341145;
+shape16341145;
+shape16341145;
+shape16341145;
+shape16341145;
+shape16341145;
+shape16341145;
+shape16341145;
+shape16341145;
+shape16341145;
+shape16341145;
+shape16341145;
+shape16341145;
+shape16341145;
+shape16341145;
+shape16341145;
+shape16341145;
+shape16341145;
+shape16341145;
+shape16341145;
+shape5104850;
+X1Y1_0_out3 -> shape5104850 [dir=none, color=blue];
+X0Y1_0_in1 -> shape5104850 [dir=none, color=blue];
+shape5104850;
+shape5104850;
+shape5104850;
+shape5104850;
+shape5104850;
+shape5104850;
+shape5104850;
+shape5104850;
+shape5104850;
+shape5104850;
+shape5104850;
+shape5104850;
+shape5104850;
+shape5104850;
+shape5104850;
+shape5104850;
+shape5104850;
+shape5104850;
+shape5104850;
+shape5104850;
+shape5104850;
+shape5104850;
+shape5104850;
+shape5104850;
+shape5104850;
+shape5104850;
+shape5104850;
+shape5104850;
+shape5104850;
+shape5104850;
+shape5104850;
+shape7716976;
+X2Y1_0_out3 -> shape7716976 [dir=none, color=blue];
+X1Y1_0_in1 -> shape7716976 [dir=none, color=blue];
+shape7716976;
+shape7716976;
+shape7716976;
+shape7716976;
+shape7716976;
+shape7716976;
+shape7716976;
+shape7716976;
+shape7716976;
+shape7716976;
+shape7716976;
+shape7716976;
+shape7716976;
+shape7716976;
+shape7716976;
+shape7716976;
+shape7716976;
+shape7716976;
+shape7716976;
+shape7716976;
+shape7716976;
+shape7716976;
+shape7716976;
+shape7716976;
+shape7716976;
+shape7716976;
+shape7716976;
+shape7716976;
+shape7716976;
+shape7716976;
+shape7716976;
+shape1665221;
+X4Y1_0_out1 -> shape1665221 [dir=none, color=blue];
+X5Y1_0_in3 -> shape1665221 [dir=none, color=blue];
+shape1665221;
+shape1665221;
+shape1665221;
+shape1665221;
+shape1665221;
+shape1665221;
+shape1665221;
+shape1665221;
+shape1665221;
+shape1665221;
+shape1665221;
+shape1665221;
+shape1665221;
+shape1665221;
+shape1665221;
+shape1665221;
+shape1665221;
+shape1665221;
+shape1665221;
+shape1665221;
+shape1665221;
+shape1665221;
+shape1665221;
+shape1665221;
+shape1665221;
+shape1665221;
+shape1665221;
+shape1665221;
+shape1665221;
+shape1665221;
+shape1665221;
+shape15940220;
+X5Y1_0_out3 -> shape15940220 [dir=none, color=blue];
+X4Y1_0_in1 -> shape15940220 [dir=none, color=blue];
+shape15940220;
+shape15940220;
+shape15940220;
+shape15940220;
+shape15940220;
+shape15940220;
+shape15940220;
+shape15940220;
+shape15940220;
+shape15940220;
+shape15940220;
+shape15940220;
+shape15940220;
+shape15940220;
+shape15940220;
+shape15940220;
+shape15940220;
+shape15940220;
+shape15940220;
+shape15940220;
+shape15940220;
+shape15940220;
+shape15940220;
+shape15940220;
+shape15940220;
+shape15940220;
+shape15940220;
+shape15940220;
+shape15940220;
+shape15940220;
+shape15940220;
+shape15154681;
+X1Y1_0_out0 -> shape15154681 [dir=none, color=blue];
+X1Y2_0_in2 -> shape15154681 [dir=none, color=blue];
+shape15154681;
+shape15154681;
+shape15154681;
+shape15154681;
+shape15154681;
+shape15154681;
+shape15154681;
+shape15154681;
+shape15154681;
+shape15154681;
+shape15154681;
+shape15154681;
+shape15154681;
+shape15154681;
+shape15154681;
+shape15154681;
+shape15154681;
+shape15154681;
+shape15154681;
+shape15154681;
+shape15154681;
+shape15154681;
+shape15154681;
+shape15154681;
+shape15154681;
+shape15154681;
+shape15154681;
+shape15154681;
+shape15154681;
+shape15154681;
+shape15154681;
+shape8471251;
+X1Y1_0_out2 -> shape8471251 [dir=none, color=blue];
+X1Y0_0_in0 -> shape8471251 [dir=none, color=blue];
+shape8471251;
+shape8471251;
+shape8471251;
+shape8471251;
+shape8471251;
+shape8471251;
+shape8471251;
+shape8471251;
+shape8471251;
+shape8471251;
+shape8471251;
+shape8471251;
+shape8471251;
+shape8471251;
+shape8471251;
+shape8471251;
+shape8471251;
+shape8471251;
+shape8471251;
+shape8471251;
+shape8471251;
+shape8471251;
+shape8471251;
+shape8471251;
+shape8471251;
+shape8471251;
+shape8471251;
+shape8471251;
+shape8471251;
+shape8471251;
+shape8471251;
+shape9000964;
+X1Y0_0_out0 -> shape9000964 [dir=none, color=blue];
+X1Y1_0_in2 -> shape9000964 [dir=none, color=blue];
+shape9000964;
+shape9000964;
+shape9000964;
+shape9000964;
+shape9000964;
+shape9000964;
+shape9000964;
+shape9000964;
+shape9000964;
+shape9000964;
+shape9000964;
+shape9000964;
+shape9000964;
+shape9000964;
+shape9000964;
+shape9000964;
+shape9000964;
+shape9000964;
+shape9000964;
+shape9000964;
+shape9000964;
+shape9000964;
+shape9000964;
+shape9000964;
+shape9000964;
+shape9000964;
+shape9000964;
+shape9000964;
+shape9000964;
+shape9000964;
+shape9000964;
+subgraph cluster_1_0 {
+label="tile_1_0_S_IO";
+subgraph cluster_1_0_0_S_IO {
+label="0_S_IO";
+X1Y0_bel_0_S_IO [label="bel_0_S_IO", shape=box];
+"0_S_IOfrom_fabric[0]" [label="from_fabric[0]", shape=hexagon];
+X1Y0_0_S_from_fabric -> "0_S_IOfrom_fabric[0]";
+"0_S_IOfrom_fabric[0]" -> X1Y0_bel_0_S_IO;
+"0_S_IOin[0]" [label="in[0]", shape=hexagon];
+X1Y0_0_S_in -> "0_S_IOin[0]";
+"0_S_IOin[0]" -> X1Y0_bel_0_S_IO;
+"0_S_IOto_fabric[0]" [label="to_fabric[0]", shape=hexagon];
+X1Y0_bel_0_S_IO -> "0_S_IOto_fabric[0]";
+"0_S_IOto_fabric[0]" -> X1Y0_0_S_to_fabric;
+"0_S_IOout[0]" [label="out[0]", shape=hexagon];
+X1Y0_bel_0_S_IO -> "0_S_IOout[0]";
+"0_S_IOout[0]" -> X1Y0_0_S_out;
+}
+
+subgraph "cluster_1_0_0_INBUF[0]" {
 label="0_INBUF[0]";
-"X0Y1_bel_0_INBUF[0]" [label="0_INBUF[0]", shape=box];
-"X0Y1_bel_0_INBUF[0]" -> "X0Y1_0_W_O[0]";
+"X1Y0_bel_0_INBUF[0]" [label="bel_0_INBUF[0]", shape=box];
+"0_INBUF[0]O" [label=O, shape=hexagon];
+"X1Y0_bel_0_INBUF[0]" -> "0_INBUF[0]O";
+"0_INBUF[0]O" -> X1Y0_0_S_O;
 }
 
-subgraph "cluster_0_1_0_INBUF[1]" {
+subgraph "cluster_1_0_0_INBUF[1]" {
 label="0_INBUF[1]";
-"X0Y1_bel_0_INBUF[1]" [label="0_INBUF[1]", shape=box];
-"X0Y1_bel_0_INBUF[1]" -> "X0Y1_0_W_O[1]";
+"X1Y0_bel_0_INBUF[1]" [label="bel_0_INBUF[1]", shape=box];
+"0_INBUF[1]O" [label=O, shape=hexagon];
+"X1Y0_bel_0_INBUF[1]" -> "0_INBUF[1]O";
+"0_INBUF[1]O" -> X1Y0_0_S_O;
 }
 
-subgraph "cluster_0_1_0_INBUF[2]" {
+subgraph "cluster_1_0_0_INBUF[2]" {
 label="0_INBUF[2]";
-"X0Y1_bel_0_INBUF[2]" [label="0_INBUF[2]", shape=box];
-"X0Y1_bel_0_INBUF[2]" -> "X0Y1_0_W_O[2]";
+"X1Y0_bel_0_INBUF[2]" [label="bel_0_INBUF[2]", shape=box];
+"0_INBUF[2]O" [label=O, shape=hexagon];
+"X1Y0_bel_0_INBUF[2]" -> "0_INBUF[2]O";
+"0_INBUF[2]O" -> X1Y0_0_S_O;
 }
 
-subgraph "cluster_0_1_0_INBUF[3]" {
+subgraph "cluster_1_0_0_INBUF[3]" {
 label="0_INBUF[3]";
-"X0Y1_bel_0_INBUF[3]" [label="0_INBUF[3]", shape=box];
-"X0Y1_bel_0_INBUF[3]" -> "X0Y1_0_W_O[3]";
+"X1Y0_bel_0_INBUF[3]" [label="bel_0_INBUF[3]", shape=box];
+"0_INBUF[3]O" [label=O, shape=hexagon];
+"X1Y0_bel_0_INBUF[3]" -> "0_INBUF[3]O";
+"0_INBUF[3]O" -> X1Y0_0_S_O;
 }
 
-subgraph "cluster_0_1_0_INBUF[4]" {
+subgraph "cluster_1_0_0_INBUF[4]" {
 label="0_INBUF[4]";
-"X0Y1_bel_0_INBUF[4]" [label="0_INBUF[4]", shape=box];
-"X0Y1_bel_0_INBUF[4]" -> "X0Y1_0_W_O[4]";
+"X1Y0_bel_0_INBUF[4]" [label="bel_0_INBUF[4]", shape=box];
+"0_INBUF[4]O" [label=O, shape=hexagon];
+"X1Y0_bel_0_INBUF[4]" -> "0_INBUF[4]O";
+"0_INBUF[4]O" -> X1Y0_0_S_O;
 }
 
-subgraph "cluster_0_1_0_INBUF[5]" {
+subgraph "cluster_1_0_0_INBUF[5]" {
 label="0_INBUF[5]";
-"X0Y1_bel_0_INBUF[5]" [label="0_INBUF[5]", shape=box];
-"X0Y1_bel_0_INBUF[5]" -> "X0Y1_0_W_O[5]";
+"X1Y0_bel_0_INBUF[5]" [label="bel_0_INBUF[5]", shape=box];
+"0_INBUF[5]O" [label=O, shape=hexagon];
+"X1Y0_bel_0_INBUF[5]" -> "0_INBUF[5]O";
+"0_INBUF[5]O" -> X1Y0_0_S_O;
 }
 
-subgraph "cluster_0_1_0_INBUF[6]" {
+subgraph "cluster_1_0_0_INBUF[6]" {
 label="0_INBUF[6]";
-"X0Y1_bel_0_INBUF[6]" [label="0_INBUF[6]", shape=box];
-"X0Y1_bel_0_INBUF[6]" -> "X0Y1_0_W_O[6]";
+"X1Y0_bel_0_INBUF[6]" [label="bel_0_INBUF[6]", shape=box];
+"0_INBUF[6]O" [label=O, shape=hexagon];
+"X1Y0_bel_0_INBUF[6]" -> "0_INBUF[6]O";
+"0_INBUF[6]O" -> X1Y0_0_S_O;
 }
 
-subgraph "cluster_0_1_0_INBUF[7]" {
+subgraph "cluster_1_0_0_INBUF[7]" {
 label="0_INBUF[7]";
-"X0Y1_bel_0_INBUF[7]" [label="0_INBUF[7]", shape=box];
-"X0Y1_bel_0_INBUF[7]" -> "X0Y1_0_W_O[7]";
+"X1Y0_bel_0_INBUF[7]" [label="bel_0_INBUF[7]", shape=box];
+"0_INBUF[7]O" [label=O, shape=hexagon];
+"X1Y0_bel_0_INBUF[7]" -> "0_INBUF[7]O";
+"0_INBUF[7]O" -> X1Y0_0_S_O;
 }
 
-subgraph "cluster_0_1_0_INBUF[8]" {
+subgraph "cluster_1_0_0_INBUF[8]" {
 label="0_INBUF[8]";
-"X0Y1_bel_0_INBUF[8]" [label="0_INBUF[8]", shape=box];
-"X0Y1_bel_0_INBUF[8]" -> "X0Y1_0_W_O[8]";
+"X1Y0_bel_0_INBUF[8]" [label="bel_0_INBUF[8]", shape=box];
+"0_INBUF[8]O" [label=O, shape=hexagon];
+"X1Y0_bel_0_INBUF[8]" -> "0_INBUF[8]O";
+"0_INBUF[8]O" -> X1Y0_0_S_O;
 }
 
-subgraph "cluster_0_1_0_INBUF[9]" {
+subgraph "cluster_1_0_0_INBUF[9]" {
 label="0_INBUF[9]";
-"X0Y1_bel_0_INBUF[9]" [label="0_INBUF[9]", shape=box];
-"X0Y1_bel_0_INBUF[9]" -> "X0Y1_0_W_O[9]";
+"X1Y0_bel_0_INBUF[9]" [label="bel_0_INBUF[9]", shape=box];
+"0_INBUF[9]O" [label=O, shape=hexagon];
+"X1Y0_bel_0_INBUF[9]" -> "0_INBUF[9]O";
+"0_INBUF[9]O" -> X1Y0_0_S_O;
 }
 
-subgraph "cluster_0_1_0_INBUF[10]" {
+subgraph "cluster_1_0_0_INBUF[10]" {
 label="0_INBUF[10]";
-"X0Y1_bel_0_INBUF[10]" [label="0_INBUF[10]", shape=box];
-"X0Y1_bel_0_INBUF[10]" -> "X0Y1_0_W_O[10]";
+"X1Y0_bel_0_INBUF[10]" [label="bel_0_INBUF[10]", shape=box];
+"0_INBUF[10]O" [label=O, shape=hexagon];
+"X1Y0_bel_0_INBUF[10]" -> "0_INBUF[10]O";
+"0_INBUF[10]O" -> X1Y0_0_S_O;
 }
 
-subgraph "cluster_0_1_0_INBUF[11]" {
+subgraph "cluster_1_0_0_INBUF[11]" {
 label="0_INBUF[11]";
-"X0Y1_bel_0_INBUF[11]" [label="0_INBUF[11]", shape=box];
-"X0Y1_bel_0_INBUF[11]" -> "X0Y1_0_W_O[11]";
+"X1Y0_bel_0_INBUF[11]" [label="bel_0_INBUF[11]", shape=box];
+"0_INBUF[11]O" [label=O, shape=hexagon];
+"X1Y0_bel_0_INBUF[11]" -> "0_INBUF[11]O";
+"0_INBUF[11]O" -> X1Y0_0_S_O;
 }
 
-subgraph "cluster_0_1_0_INBUF[12]" {
+subgraph "cluster_1_0_0_INBUF[12]" {
 label="0_INBUF[12]";
-"X0Y1_bel_0_INBUF[12]" [label="0_INBUF[12]", shape=box];
-"X0Y1_bel_0_INBUF[12]" -> "X0Y1_0_W_O[12]";
+"X1Y0_bel_0_INBUF[12]" [label="bel_0_INBUF[12]", shape=box];
+"0_INBUF[12]O" [label=O, shape=hexagon];
+"X1Y0_bel_0_INBUF[12]" -> "0_INBUF[12]O";
+"0_INBUF[12]O" -> X1Y0_0_S_O;
 }
 
-subgraph "cluster_0_1_0_INBUF[13]" {
+subgraph "cluster_1_0_0_INBUF[13]" {
 label="0_INBUF[13]";
-"X0Y1_bel_0_INBUF[13]" [label="0_INBUF[13]", shape=box];
-"X0Y1_bel_0_INBUF[13]" -> "X0Y1_0_W_O[13]";
+"X1Y0_bel_0_INBUF[13]" [label="bel_0_INBUF[13]", shape=box];
+"0_INBUF[13]O" [label=O, shape=hexagon];
+"X1Y0_bel_0_INBUF[13]" -> "0_INBUF[13]O";
+"0_INBUF[13]O" -> X1Y0_0_S_O;
 }
 
-subgraph "cluster_0_1_0_INBUF[14]" {
+subgraph "cluster_1_0_0_INBUF[14]" {
 label="0_INBUF[14]";
-"X0Y1_bel_0_INBUF[14]" [label="0_INBUF[14]", shape=box];
-"X0Y1_bel_0_INBUF[14]" -> "X0Y1_0_W_O[14]";
+"X1Y0_bel_0_INBUF[14]" [label="bel_0_INBUF[14]", shape=box];
+"0_INBUF[14]O" [label=O, shape=hexagon];
+"X1Y0_bel_0_INBUF[14]" -> "0_INBUF[14]O";
+"0_INBUF[14]O" -> X1Y0_0_S_O;
 }
 
-subgraph "cluster_0_1_0_INBUF[15]" {
+subgraph "cluster_1_0_0_INBUF[15]" {
 label="0_INBUF[15]";
-"X0Y1_bel_0_INBUF[15]" [label="0_INBUF[15]", shape=box];
-"X0Y1_bel_0_INBUF[15]" -> "X0Y1_0_W_O[15]";
+"X1Y0_bel_0_INBUF[15]" [label="bel_0_INBUF[15]", shape=box];
+"0_INBUF[15]O" [label=O, shape=hexagon];
+"X1Y0_bel_0_INBUF[15]" -> "0_INBUF[15]O";
+"0_INBUF[15]O" -> X1Y0_0_S_O;
 }
 
-subgraph "cluster_0_1_0_INBUF[16]" {
+subgraph "cluster_1_0_0_INBUF[16]" {
 label="0_INBUF[16]";
-"X0Y1_bel_0_INBUF[16]" [label="0_INBUF[16]", shape=box];
-"X0Y1_bel_0_INBUF[16]" -> "X0Y1_0_W_O[16]";
+"X1Y0_bel_0_INBUF[16]" [label="bel_0_INBUF[16]", shape=box];
+"0_INBUF[16]O" [label=O, shape=hexagon];
+"X1Y0_bel_0_INBUF[16]" -> "0_INBUF[16]O";
+"0_INBUF[16]O" -> X1Y0_0_S_O;
 }
 
-subgraph "cluster_0_1_0_INBUF[17]" {
+subgraph "cluster_1_0_0_INBUF[17]" {
 label="0_INBUF[17]";
-"X0Y1_bel_0_INBUF[17]" [label="0_INBUF[17]", shape=box];
-"X0Y1_bel_0_INBUF[17]" -> "X0Y1_0_W_O[17]";
+"X1Y0_bel_0_INBUF[17]" [label="bel_0_INBUF[17]", shape=box];
+"0_INBUF[17]O" [label=O, shape=hexagon];
+"X1Y0_bel_0_INBUF[17]" -> "0_INBUF[17]O";
+"0_INBUF[17]O" -> X1Y0_0_S_O;
 }
 
-subgraph "cluster_0_1_0_INBUF[18]" {
+subgraph "cluster_1_0_0_INBUF[18]" {
 label="0_INBUF[18]";
-"X0Y1_bel_0_INBUF[18]" [label="0_INBUF[18]", shape=box];
-"X0Y1_bel_0_INBUF[18]" -> "X0Y1_0_W_O[18]";
+"X1Y0_bel_0_INBUF[18]" [label="bel_0_INBUF[18]", shape=box];
+"0_INBUF[18]O" [label=O, shape=hexagon];
+"X1Y0_bel_0_INBUF[18]" -> "0_INBUF[18]O";
+"0_INBUF[18]O" -> X1Y0_0_S_O;
 }
 
-subgraph "cluster_0_1_0_INBUF[19]" {
+subgraph "cluster_1_0_0_INBUF[19]" {
 label="0_INBUF[19]";
-"X0Y1_bel_0_INBUF[19]" [label="0_INBUF[19]", shape=box];
-"X0Y1_bel_0_INBUF[19]" -> "X0Y1_0_W_O[19]";
+"X1Y0_bel_0_INBUF[19]" [label="bel_0_INBUF[19]", shape=box];
+"0_INBUF[19]O" [label=O, shape=hexagon];
+"X1Y0_bel_0_INBUF[19]" -> "0_INBUF[19]O";
+"0_INBUF[19]O" -> X1Y0_0_S_O;
 }
 
-subgraph "cluster_0_1_0_INBUF[20]" {
+subgraph "cluster_1_0_0_INBUF[20]" {
 label="0_INBUF[20]";
-"X0Y1_bel_0_INBUF[20]" [label="0_INBUF[20]", shape=box];
-"X0Y1_bel_0_INBUF[20]" -> "X0Y1_0_W_O[20]";
+"X1Y0_bel_0_INBUF[20]" [label="bel_0_INBUF[20]", shape=box];
+"0_INBUF[20]O" [label=O, shape=hexagon];
+"X1Y0_bel_0_INBUF[20]" -> "0_INBUF[20]O";
+"0_INBUF[20]O" -> X1Y0_0_S_O;
 }
 
-subgraph "cluster_0_1_0_INBUF[21]" {
+subgraph "cluster_1_0_0_INBUF[21]" {
 label="0_INBUF[21]";
-"X0Y1_bel_0_INBUF[21]" [label="0_INBUF[21]", shape=box];
-"X0Y1_bel_0_INBUF[21]" -> "X0Y1_0_W_O[21]";
+"X1Y0_bel_0_INBUF[21]" [label="bel_0_INBUF[21]", shape=box];
+"0_INBUF[21]O" [label=O, shape=hexagon];
+"X1Y0_bel_0_INBUF[21]" -> "0_INBUF[21]O";
+"0_INBUF[21]O" -> X1Y0_0_S_O;
 }
 
-subgraph "cluster_0_1_0_INBUF[22]" {
+subgraph "cluster_1_0_0_INBUF[22]" {
 label="0_INBUF[22]";
-"X0Y1_bel_0_INBUF[22]" [label="0_INBUF[22]", shape=box];
-"X0Y1_bel_0_INBUF[22]" -> "X0Y1_0_W_O[22]";
+"X1Y0_bel_0_INBUF[22]" [label="bel_0_INBUF[22]", shape=box];
+"0_INBUF[22]O" [label=O, shape=hexagon];
+"X1Y0_bel_0_INBUF[22]" -> "0_INBUF[22]O";
+"0_INBUF[22]O" -> X1Y0_0_S_O;
 }
 
-subgraph "cluster_0_1_0_INBUF[23]" {
+subgraph "cluster_1_0_0_INBUF[23]" {
 label="0_INBUF[23]";
-"X0Y1_bel_0_INBUF[23]" [label="0_INBUF[23]", shape=box];
-"X0Y1_bel_0_INBUF[23]" -> "X0Y1_0_W_O[23]";
+"X1Y0_bel_0_INBUF[23]" [label="bel_0_INBUF[23]", shape=box];
+"0_INBUF[23]O" [label=O, shape=hexagon];
+"X1Y0_bel_0_INBUF[23]" -> "0_INBUF[23]O";
+"0_INBUF[23]O" -> X1Y0_0_S_O;
 }
 
-subgraph "cluster_0_1_0_INBUF[24]" {
+subgraph "cluster_1_0_0_INBUF[24]" {
 label="0_INBUF[24]";
-"X0Y1_bel_0_INBUF[24]" [label="0_INBUF[24]", shape=box];
-"X0Y1_bel_0_INBUF[24]" -> "X0Y1_0_W_O[24]";
+"X1Y0_bel_0_INBUF[24]" [label="bel_0_INBUF[24]", shape=box];
+"0_INBUF[24]O" [label=O, shape=hexagon];
+"X1Y0_bel_0_INBUF[24]" -> "0_INBUF[24]O";
+"0_INBUF[24]O" -> X1Y0_0_S_O;
 }
 
-subgraph "cluster_0_1_0_INBUF[25]" {
+subgraph "cluster_1_0_0_INBUF[25]" {
 label="0_INBUF[25]";
-"X0Y1_bel_0_INBUF[25]" [label="0_INBUF[25]", shape=box];
-"X0Y1_bel_0_INBUF[25]" -> "X0Y1_0_W_O[25]";
+"X1Y0_bel_0_INBUF[25]" [label="bel_0_INBUF[25]", shape=box];
+"0_INBUF[25]O" [label=O, shape=hexagon];
+"X1Y0_bel_0_INBUF[25]" -> "0_INBUF[25]O";
+"0_INBUF[25]O" -> X1Y0_0_S_O;
 }
 
-subgraph "cluster_0_1_0_INBUF[26]" {
+subgraph "cluster_1_0_0_INBUF[26]" {
 label="0_INBUF[26]";
-"X0Y1_bel_0_INBUF[26]" [label="0_INBUF[26]", shape=box];
-"X0Y1_bel_0_INBUF[26]" -> "X0Y1_0_W_O[26]";
+"X1Y0_bel_0_INBUF[26]" [label="bel_0_INBUF[26]", shape=box];
+"0_INBUF[26]O" [label=O, shape=hexagon];
+"X1Y0_bel_0_INBUF[26]" -> "0_INBUF[26]O";
+"0_INBUF[26]O" -> X1Y0_0_S_O;
 }
 
-subgraph "cluster_0_1_0_INBUF[27]" {
+subgraph "cluster_1_0_0_INBUF[27]" {
 label="0_INBUF[27]";
-"X0Y1_bel_0_INBUF[27]" [label="0_INBUF[27]", shape=box];
-"X0Y1_bel_0_INBUF[27]" -> "X0Y1_0_W_O[27]";
+"X1Y0_bel_0_INBUF[27]" [label="bel_0_INBUF[27]", shape=box];
+"0_INBUF[27]O" [label=O, shape=hexagon];
+"X1Y0_bel_0_INBUF[27]" -> "0_INBUF[27]O";
+"0_INBUF[27]O" -> X1Y0_0_S_O;
 }
 
-subgraph "cluster_0_1_0_INBUF[28]" {
+subgraph "cluster_1_0_0_INBUF[28]" {
 label="0_INBUF[28]";
-"X0Y1_bel_0_INBUF[28]" [label="0_INBUF[28]", shape=box];
-"X0Y1_bel_0_INBUF[28]" -> "X0Y1_0_W_O[28]";
+"X1Y0_bel_0_INBUF[28]" [label="bel_0_INBUF[28]", shape=box];
+"0_INBUF[28]O" [label=O, shape=hexagon];
+"X1Y0_bel_0_INBUF[28]" -> "0_INBUF[28]O";
+"0_INBUF[28]O" -> X1Y0_0_S_O;
 }
 
-subgraph "cluster_0_1_0_INBUF[29]" {
+subgraph "cluster_1_0_0_INBUF[29]" {
 label="0_INBUF[29]";
-"X0Y1_bel_0_INBUF[29]" [label="0_INBUF[29]", shape=box];
-"X0Y1_bel_0_INBUF[29]" -> "X0Y1_0_W_O[29]";
+"X1Y0_bel_0_INBUF[29]" [label="bel_0_INBUF[29]", shape=box];
+"0_INBUF[29]O" [label=O, shape=hexagon];
+"X1Y0_bel_0_INBUF[29]" -> "0_INBUF[29]O";
+"0_INBUF[29]O" -> X1Y0_0_S_O;
 }
 
-subgraph "cluster_0_1_0_INBUF[30]" {
+subgraph "cluster_1_0_0_INBUF[30]" {
 label="0_INBUF[30]";
-"X0Y1_bel_0_INBUF[30]" [label="0_INBUF[30]", shape=box];
-"X0Y1_bel_0_INBUF[30]" -> "X0Y1_0_W_O[30]";
+"X1Y0_bel_0_INBUF[30]" [label="bel_0_INBUF[30]", shape=box];
+"0_INBUF[30]O" [label=O, shape=hexagon];
+"X1Y0_bel_0_INBUF[30]" -> "0_INBUF[30]O";
+"0_INBUF[30]O" -> X1Y0_0_S_O;
 }
 
-subgraph "cluster_0_1_0_INBUF[31]" {
+subgraph "cluster_1_0_0_INBUF[31]" {
 label="0_INBUF[31]";
-"X0Y1_bel_0_INBUF[31]" [label="0_INBUF[31]", shape=box];
-"X0Y1_bel_0_INBUF[31]" -> "X0Y1_0_W_O[31]";
+"X1Y0_bel_0_INBUF[31]" [label="bel_0_INBUF[31]", shape=box];
+"0_INBUF[31]O" [label=O, shape=hexagon];
+"X1Y0_bel_0_INBUF[31]" -> "0_INBUF[31]O";
+"0_INBUF[31]O" -> X1Y0_0_S_O;
 }
 
-subgraph "cluster_0_1_0_OUTBUF[0]" {
+subgraph "cluster_1_0_0_OUTBUF[0]" {
 label="0_OUTBUF[0]";
-"X0Y1_bel_0_OUTBUF[0]" [label="0_OUTBUF[0]", shape=box];
-"X0Y1_0_W_I[0]" -> "X0Y1_bel_0_OUTBUF[0]";
+"X1Y0_bel_0_OUTBUF[0]" [label="bel_0_OUTBUF[0]", shape=box];
+"0_OUTBUF[0]I" [label=I, shape=hexagon];
+X1Y0_0_S_I -> "0_OUTBUF[0]I";
+"0_OUTBUF[0]I" -> "X1Y0_bel_0_OUTBUF[0]";
 }
 
-subgraph "cluster_0_1_0_OUTBUF[1]" {
+subgraph "cluster_1_0_0_OUTBUF[1]" {
 label="0_OUTBUF[1]";
-"X0Y1_bel_0_OUTBUF[1]" [label="0_OUTBUF[1]", shape=box];
-"X0Y1_0_W_I[1]" -> "X0Y1_bel_0_OUTBUF[1]";
+"X1Y0_bel_0_OUTBUF[1]" [label="bel_0_OUTBUF[1]", shape=box];
+"0_OUTBUF[1]I" [label=I, shape=hexagon];
+X1Y0_0_S_I -> "0_OUTBUF[1]I";
+"0_OUTBUF[1]I" -> "X1Y0_bel_0_OUTBUF[1]";
 }
 
-subgraph "cluster_0_1_0_OUTBUF[2]" {
+subgraph "cluster_1_0_0_OUTBUF[2]" {
 label="0_OUTBUF[2]";
-"X0Y1_bel_0_OUTBUF[2]" [label="0_OUTBUF[2]", shape=box];
-"X0Y1_0_W_I[2]" -> "X0Y1_bel_0_OUTBUF[2]";
+"X1Y0_bel_0_OUTBUF[2]" [label="bel_0_OUTBUF[2]", shape=box];
+"0_OUTBUF[2]I" [label=I, shape=hexagon];
+X1Y0_0_S_I -> "0_OUTBUF[2]I";
+"0_OUTBUF[2]I" -> "X1Y0_bel_0_OUTBUF[2]";
 }
 
-subgraph "cluster_0_1_0_OUTBUF[3]" {
+subgraph "cluster_1_0_0_OUTBUF[3]" {
 label="0_OUTBUF[3]";
-"X0Y1_bel_0_OUTBUF[3]" [label="0_OUTBUF[3]", shape=box];
-"X0Y1_0_W_I[3]" -> "X0Y1_bel_0_OUTBUF[3]";
+"X1Y0_bel_0_OUTBUF[3]" [label="bel_0_OUTBUF[3]", shape=box];
+"0_OUTBUF[3]I" [label=I, shape=hexagon];
+X1Y0_0_S_I -> "0_OUTBUF[3]I";
+"0_OUTBUF[3]I" -> "X1Y0_bel_0_OUTBUF[3]";
 }
 
-subgraph "cluster_0_1_0_OUTBUF[4]" {
+subgraph "cluster_1_0_0_OUTBUF[4]" {
 label="0_OUTBUF[4]";
-"X0Y1_bel_0_OUTBUF[4]" [label="0_OUTBUF[4]", shape=box];
-"X0Y1_0_W_I[4]" -> "X0Y1_bel_0_OUTBUF[4]";
+"X1Y0_bel_0_OUTBUF[4]" [label="bel_0_OUTBUF[4]", shape=box];
+"0_OUTBUF[4]I" [label=I, shape=hexagon];
+X1Y0_0_S_I -> "0_OUTBUF[4]I";
+"0_OUTBUF[4]I" -> "X1Y0_bel_0_OUTBUF[4]";
 }
 
-subgraph "cluster_0_1_0_OUTBUF[5]" {
+subgraph "cluster_1_0_0_OUTBUF[5]" {
 label="0_OUTBUF[5]";
-"X0Y1_bel_0_OUTBUF[5]" [label="0_OUTBUF[5]", shape=box];
-"X0Y1_0_W_I[5]" -> "X0Y1_bel_0_OUTBUF[5]";
+"X1Y0_bel_0_OUTBUF[5]" [label="bel_0_OUTBUF[5]", shape=box];
+"0_OUTBUF[5]I" [label=I, shape=hexagon];
+X1Y0_0_S_I -> "0_OUTBUF[5]I";
+"0_OUTBUF[5]I" -> "X1Y0_bel_0_OUTBUF[5]";
 }
 
-subgraph "cluster_0_1_0_OUTBUF[6]" {
+subgraph "cluster_1_0_0_OUTBUF[6]" {
 label="0_OUTBUF[6]";
-"X0Y1_bel_0_OUTBUF[6]" [label="0_OUTBUF[6]", shape=box];
-"X0Y1_0_W_I[6]" -> "X0Y1_bel_0_OUTBUF[6]";
+"X1Y0_bel_0_OUTBUF[6]" [label="bel_0_OUTBUF[6]", shape=box];
+"0_OUTBUF[6]I" [label=I, shape=hexagon];
+X1Y0_0_S_I -> "0_OUTBUF[6]I";
+"0_OUTBUF[6]I" -> "X1Y0_bel_0_OUTBUF[6]";
 }
 
-subgraph "cluster_0_1_0_OUTBUF[7]" {
+subgraph "cluster_1_0_0_OUTBUF[7]" {
 label="0_OUTBUF[7]";
-"X0Y1_bel_0_OUTBUF[7]" [label="0_OUTBUF[7]", shape=box];
-"X0Y1_0_W_I[7]" -> "X0Y1_bel_0_OUTBUF[7]";
+"X1Y0_bel_0_OUTBUF[7]" [label="bel_0_OUTBUF[7]", shape=box];
+"0_OUTBUF[7]I" [label=I, shape=hexagon];
+X1Y0_0_S_I -> "0_OUTBUF[7]I";
+"0_OUTBUF[7]I" -> "X1Y0_bel_0_OUTBUF[7]";
 }
 
-subgraph "cluster_0_1_0_OUTBUF[8]" {
+subgraph "cluster_1_0_0_OUTBUF[8]" {
 label="0_OUTBUF[8]";
-"X0Y1_bel_0_OUTBUF[8]" [label="0_OUTBUF[8]", shape=box];
-"X0Y1_0_W_I[8]" -> "X0Y1_bel_0_OUTBUF[8]";
+"X1Y0_bel_0_OUTBUF[8]" [label="bel_0_OUTBUF[8]", shape=box];
+"0_OUTBUF[8]I" [label=I, shape=hexagon];
+X1Y0_0_S_I -> "0_OUTBUF[8]I";
+"0_OUTBUF[8]I" -> "X1Y0_bel_0_OUTBUF[8]";
 }
 
-subgraph "cluster_0_1_0_OUTBUF[9]" {
+subgraph "cluster_1_0_0_OUTBUF[9]" {
 label="0_OUTBUF[9]";
-"X0Y1_bel_0_OUTBUF[9]" [label="0_OUTBUF[9]", shape=box];
-"X0Y1_0_W_I[9]" -> "X0Y1_bel_0_OUTBUF[9]";
+"X1Y0_bel_0_OUTBUF[9]" [label="bel_0_OUTBUF[9]", shape=box];
+"0_OUTBUF[9]I" [label=I, shape=hexagon];
+X1Y0_0_S_I -> "0_OUTBUF[9]I";
+"0_OUTBUF[9]I" -> "X1Y0_bel_0_OUTBUF[9]";
 }
 
-subgraph "cluster_0_1_0_OUTBUF[10]" {
+subgraph "cluster_1_0_0_OUTBUF[10]" {
 label="0_OUTBUF[10]";
-"X0Y1_bel_0_OUTBUF[10]" [label="0_OUTBUF[10]", shape=box];
-"X0Y1_0_W_I[10]" -> "X0Y1_bel_0_OUTBUF[10]";
+"X1Y0_bel_0_OUTBUF[10]" [label="bel_0_OUTBUF[10]", shape=box];
+"0_OUTBUF[10]I" [label=I, shape=hexagon];
+X1Y0_0_S_I -> "0_OUTBUF[10]I";
+"0_OUTBUF[10]I" -> "X1Y0_bel_0_OUTBUF[10]";
 }
 
-subgraph "cluster_0_1_0_OUTBUF[11]" {
+subgraph "cluster_1_0_0_OUTBUF[11]" {
 label="0_OUTBUF[11]";
-"X0Y1_bel_0_OUTBUF[11]" [label="0_OUTBUF[11]", shape=box];
-"X0Y1_0_W_I[11]" -> "X0Y1_bel_0_OUTBUF[11]";
+"X1Y0_bel_0_OUTBUF[11]" [label="bel_0_OUTBUF[11]", shape=box];
+"0_OUTBUF[11]I" [label=I, shape=hexagon];
+X1Y0_0_S_I -> "0_OUTBUF[11]I";
+"0_OUTBUF[11]I" -> "X1Y0_bel_0_OUTBUF[11]";
 }
 
-subgraph "cluster_0_1_0_OUTBUF[12]" {
+subgraph "cluster_1_0_0_OUTBUF[12]" {
 label="0_OUTBUF[12]";
-"X0Y1_bel_0_OUTBUF[12]" [label="0_OUTBUF[12]", shape=box];
-"X0Y1_0_W_I[12]" -> "X0Y1_bel_0_OUTBUF[12]";
+"X1Y0_bel_0_OUTBUF[12]" [label="bel_0_OUTBUF[12]", shape=box];
+"0_OUTBUF[12]I" [label=I, shape=hexagon];
+X1Y0_0_S_I -> "0_OUTBUF[12]I";
+"0_OUTBUF[12]I" -> "X1Y0_bel_0_OUTBUF[12]";
 }
 
-subgraph "cluster_0_1_0_OUTBUF[13]" {
+subgraph "cluster_1_0_0_OUTBUF[13]" {
 label="0_OUTBUF[13]";
-"X0Y1_bel_0_OUTBUF[13]" [label="0_OUTBUF[13]", shape=box];
-"X0Y1_0_W_I[13]" -> "X0Y1_bel_0_OUTBUF[13]";
+"X1Y0_bel_0_OUTBUF[13]" [label="bel_0_OUTBUF[13]", shape=box];
+"0_OUTBUF[13]I" [label=I, shape=hexagon];
+X1Y0_0_S_I -> "0_OUTBUF[13]I";
+"0_OUTBUF[13]I" -> "X1Y0_bel_0_OUTBUF[13]";
 }
 
-subgraph "cluster_0_1_0_OUTBUF[14]" {
+subgraph "cluster_1_0_0_OUTBUF[14]" {
 label="0_OUTBUF[14]";
-"X0Y1_bel_0_OUTBUF[14]" [label="0_OUTBUF[14]", shape=box];
-"X0Y1_0_W_I[14]" -> "X0Y1_bel_0_OUTBUF[14]";
+"X1Y0_bel_0_OUTBUF[14]" [label="bel_0_OUTBUF[14]", shape=box];
+"0_OUTBUF[14]I" [label=I, shape=hexagon];
+X1Y0_0_S_I -> "0_OUTBUF[14]I";
+"0_OUTBUF[14]I" -> "X1Y0_bel_0_OUTBUF[14]";
 }
 
-subgraph "cluster_0_1_0_OUTBUF[15]" {
+subgraph "cluster_1_0_0_OUTBUF[15]" {
 label="0_OUTBUF[15]";
-"X0Y1_bel_0_OUTBUF[15]" [label="0_OUTBUF[15]", shape=box];
-"X0Y1_0_W_I[15]" -> "X0Y1_bel_0_OUTBUF[15]";
+"X1Y0_bel_0_OUTBUF[15]" [label="bel_0_OUTBUF[15]", shape=box];
+"0_OUTBUF[15]I" [label=I, shape=hexagon];
+X1Y0_0_S_I -> "0_OUTBUF[15]I";
+"0_OUTBUF[15]I" -> "X1Y0_bel_0_OUTBUF[15]";
 }
 
-subgraph "cluster_0_1_0_OUTBUF[16]" {
+subgraph "cluster_1_0_0_OUTBUF[16]" {
 label="0_OUTBUF[16]";
-"X0Y1_bel_0_OUTBUF[16]" [label="0_OUTBUF[16]", shape=box];
-"X0Y1_0_W_I[16]" -> "X0Y1_bel_0_OUTBUF[16]";
+"X1Y0_bel_0_OUTBUF[16]" [label="bel_0_OUTBUF[16]", shape=box];
+"0_OUTBUF[16]I" [label=I, shape=hexagon];
+X1Y0_0_S_I -> "0_OUTBUF[16]I";
+"0_OUTBUF[16]I" -> "X1Y0_bel_0_OUTBUF[16]";
 }
 
-subgraph "cluster_0_1_0_OUTBUF[17]" {
+subgraph "cluster_1_0_0_OUTBUF[17]" {
 label="0_OUTBUF[17]";
-"X0Y1_bel_0_OUTBUF[17]" [label="0_OUTBUF[17]", shape=box];
-"X0Y1_0_W_I[17]" -> "X0Y1_bel_0_OUTBUF[17]";
+"X1Y0_bel_0_OUTBUF[17]" [label="bel_0_OUTBUF[17]", shape=box];
+"0_OUTBUF[17]I" [label=I, shape=hexagon];
+X1Y0_0_S_I -> "0_OUTBUF[17]I";
+"0_OUTBUF[17]I" -> "X1Y0_bel_0_OUTBUF[17]";
 }
 
-subgraph "cluster_0_1_0_OUTBUF[18]" {
+subgraph "cluster_1_0_0_OUTBUF[18]" {
 label="0_OUTBUF[18]";
-"X0Y1_bel_0_OUTBUF[18]" [label="0_OUTBUF[18]", shape=box];
-"X0Y1_0_W_I[18]" -> "X0Y1_bel_0_OUTBUF[18]";
+"X1Y0_bel_0_OUTBUF[18]" [label="bel_0_OUTBUF[18]", shape=box];
+"0_OUTBUF[18]I" [label=I, shape=hexagon];
+X1Y0_0_S_I -> "0_OUTBUF[18]I";
+"0_OUTBUF[18]I" -> "X1Y0_bel_0_OUTBUF[18]";
 }
 
-subgraph "cluster_0_1_0_OUTBUF[19]" {
+subgraph "cluster_1_0_0_OUTBUF[19]" {
 label="0_OUTBUF[19]";
-"X0Y1_bel_0_OUTBUF[19]" [label="0_OUTBUF[19]", shape=box];
-"X0Y1_0_W_I[19]" -> "X0Y1_bel_0_OUTBUF[19]";
+"X1Y0_bel_0_OUTBUF[19]" [label="bel_0_OUTBUF[19]", shape=box];
+"0_OUTBUF[19]I" [label=I, shape=hexagon];
+X1Y0_0_S_I -> "0_OUTBUF[19]I";
+"0_OUTBUF[19]I" -> "X1Y0_bel_0_OUTBUF[19]";
 }
 
-subgraph "cluster_0_1_0_OUTBUF[20]" {
+subgraph "cluster_1_0_0_OUTBUF[20]" {
 label="0_OUTBUF[20]";
-"X0Y1_bel_0_OUTBUF[20]" [label="0_OUTBUF[20]", shape=box];
-"X0Y1_0_W_I[20]" -> "X0Y1_bel_0_OUTBUF[20]";
+"X1Y0_bel_0_OUTBUF[20]" [label="bel_0_OUTBUF[20]", shape=box];
+"0_OUTBUF[20]I" [label=I, shape=hexagon];
+X1Y0_0_S_I -> "0_OUTBUF[20]I";
+"0_OUTBUF[20]I" -> "X1Y0_bel_0_OUTBUF[20]";
 }
 
-subgraph "cluster_0_1_0_OUTBUF[21]" {
+subgraph "cluster_1_0_0_OUTBUF[21]" {
 label="0_OUTBUF[21]";
-"X0Y1_bel_0_OUTBUF[21]" [label="0_OUTBUF[21]", shape=box];
-"X0Y1_0_W_I[21]" -> "X0Y1_bel_0_OUTBUF[21]";
+"X1Y0_bel_0_OUTBUF[21]" [label="bel_0_OUTBUF[21]", shape=box];
+"0_OUTBUF[21]I" [label=I, shape=hexagon];
+X1Y0_0_S_I -> "0_OUTBUF[21]I";
+"0_OUTBUF[21]I" -> "X1Y0_bel_0_OUTBUF[21]";
 }
 
-subgraph "cluster_0_1_0_OUTBUF[22]" {
+subgraph "cluster_1_0_0_OUTBUF[22]" {
 label="0_OUTBUF[22]";
-"X0Y1_bel_0_OUTBUF[22]" [label="0_OUTBUF[22]", shape=box];
-"X0Y1_0_W_I[22]" -> "X0Y1_bel_0_OUTBUF[22]";
+"X1Y0_bel_0_OUTBUF[22]" [label="bel_0_OUTBUF[22]", shape=box];
+"0_OUTBUF[22]I" [label=I, shape=hexagon];
+X1Y0_0_S_I -> "0_OUTBUF[22]I";
+"0_OUTBUF[22]I" -> "X1Y0_bel_0_OUTBUF[22]";
 }
 
-subgraph "cluster_0_1_0_OUTBUF[23]" {
+subgraph "cluster_1_0_0_OUTBUF[23]" {
 label="0_OUTBUF[23]";
-"X0Y1_bel_0_OUTBUF[23]" [label="0_OUTBUF[23]", shape=box];
-"X0Y1_0_W_I[23]" -> "X0Y1_bel_0_OUTBUF[23]";
+"X1Y0_bel_0_OUTBUF[23]" [label="bel_0_OUTBUF[23]", shape=box];
+"0_OUTBUF[23]I" [label=I, shape=hexagon];
+X1Y0_0_S_I -> "0_OUTBUF[23]I";
+"0_OUTBUF[23]I" -> "X1Y0_bel_0_OUTBUF[23]";
 }
 
-subgraph "cluster_0_1_0_OUTBUF[24]" {
+subgraph "cluster_1_0_0_OUTBUF[24]" {
 label="0_OUTBUF[24]";
-"X0Y1_bel_0_OUTBUF[24]" [label="0_OUTBUF[24]", shape=box];
-"X0Y1_0_W_I[24]" -> "X0Y1_bel_0_OUTBUF[24]";
+"X1Y0_bel_0_OUTBUF[24]" [label="bel_0_OUTBUF[24]", shape=box];
+"0_OUTBUF[24]I" [label=I, shape=hexagon];
+X1Y0_0_S_I -> "0_OUTBUF[24]I";
+"0_OUTBUF[24]I" -> "X1Y0_bel_0_OUTBUF[24]";
 }
 
-subgraph "cluster_0_1_0_OUTBUF[25]" {
+subgraph "cluster_1_0_0_OUTBUF[25]" {
 label="0_OUTBUF[25]";
-"X0Y1_bel_0_OUTBUF[25]" [label="0_OUTBUF[25]", shape=box];
-"X0Y1_0_W_I[25]" -> "X0Y1_bel_0_OUTBUF[25]";
+"X1Y0_bel_0_OUTBUF[25]" [label="bel_0_OUTBUF[25]", shape=box];
+"0_OUTBUF[25]I" [label=I, shape=hexagon];
+X1Y0_0_S_I -> "0_OUTBUF[25]I";
+"0_OUTBUF[25]I" -> "X1Y0_bel_0_OUTBUF[25]";
 }
 
-subgraph "cluster_0_1_0_OUTBUF[26]" {
+subgraph "cluster_1_0_0_OUTBUF[26]" {
 label="0_OUTBUF[26]";
-"X0Y1_bel_0_OUTBUF[26]" [label="0_OUTBUF[26]", shape=box];
-"X0Y1_0_W_I[26]" -> "X0Y1_bel_0_OUTBUF[26]";
+"X1Y0_bel_0_OUTBUF[26]" [label="bel_0_OUTBUF[26]", shape=box];
+"0_OUTBUF[26]I" [label=I, shape=hexagon];
+X1Y0_0_S_I -> "0_OUTBUF[26]I";
+"0_OUTBUF[26]I" -> "X1Y0_bel_0_OUTBUF[26]";
 }
 
-subgraph "cluster_0_1_0_OUTBUF[27]" {
+subgraph "cluster_1_0_0_OUTBUF[27]" {
 label="0_OUTBUF[27]";
-"X0Y1_bel_0_OUTBUF[27]" [label="0_OUTBUF[27]", shape=box];
-"X0Y1_0_W_I[27]" -> "X0Y1_bel_0_OUTBUF[27]";
+"X1Y0_bel_0_OUTBUF[27]" [label="bel_0_OUTBUF[27]", shape=box];
+"0_OUTBUF[27]I" [label=I, shape=hexagon];
+X1Y0_0_S_I -> "0_OUTBUF[27]I";
+"0_OUTBUF[27]I" -> "X1Y0_bel_0_OUTBUF[27]";
 }
 
-subgraph "cluster_0_1_0_OUTBUF[28]" {
+subgraph "cluster_1_0_0_OUTBUF[28]" {
 label="0_OUTBUF[28]";
-"X0Y1_bel_0_OUTBUF[28]" [label="0_OUTBUF[28]", shape=box];
-"X0Y1_0_W_I[28]" -> "X0Y1_bel_0_OUTBUF[28]";
+"X1Y0_bel_0_OUTBUF[28]" [label="bel_0_OUTBUF[28]", shape=box];
+"0_OUTBUF[28]I" [label=I, shape=hexagon];
+X1Y0_0_S_I -> "0_OUTBUF[28]I";
+"0_OUTBUF[28]I" -> "X1Y0_bel_0_OUTBUF[28]";
 }
 
-subgraph "cluster_0_1_0_OUTBUF[29]" {
+subgraph "cluster_1_0_0_OUTBUF[29]" {
 label="0_OUTBUF[29]";
-"X0Y1_bel_0_OUTBUF[29]" [label="0_OUTBUF[29]", shape=box];
-"X0Y1_0_W_I[29]" -> "X0Y1_bel_0_OUTBUF[29]";
+"X1Y0_bel_0_OUTBUF[29]" [label="bel_0_OUTBUF[29]", shape=box];
+"0_OUTBUF[29]I" [label=I, shape=hexagon];
+X1Y0_0_S_I -> "0_OUTBUF[29]I";
+"0_OUTBUF[29]I" -> "X1Y0_bel_0_OUTBUF[29]";
 }
 
-subgraph "cluster_0_1_0_OUTBUF[30]" {
+subgraph "cluster_1_0_0_OUTBUF[30]" {
 label="0_OUTBUF[30]";
-"X0Y1_bel_0_OUTBUF[30]" [label="0_OUTBUF[30]", shape=box];
-"X0Y1_0_W_I[30]" -> "X0Y1_bel_0_OUTBUF[30]";
+"X1Y0_bel_0_OUTBUF[30]" [label="bel_0_OUTBUF[30]", shape=box];
+"0_OUTBUF[30]I" [label=I, shape=hexagon];
+X1Y0_0_S_I -> "0_OUTBUF[30]I";
+"0_OUTBUF[30]I" -> "X1Y0_bel_0_OUTBUF[30]";
 }
 
-subgraph "cluster_0_1_0_OUTBUF[31]" {
+subgraph "cluster_1_0_0_OUTBUF[31]" {
 label="0_OUTBUF[31]";
-"X0Y1_bel_0_OUTBUF[31]" [label="0_OUTBUF[31]", shape=box];
-"X0Y1_0_W_I[31]" -> "X0Y1_bel_0_OUTBUF[31]";
+"X1Y0_bel_0_OUTBUF[31]" [label="bel_0_OUTBUF[31]", shape=box];
+"0_OUTBUF[31]I" [label=I, shape=hexagon];
+X1Y0_0_S_I -> "0_OUTBUF[31]I";
+"0_OUTBUF[31]I" -> "X1Y0_bel_0_OUTBUF[31]";
 }
 
-"X0Y1_0_W_O[0]" -> "X0Y1_0_W_in[0]";
-"X0Y1_0_W_O[1]" -> "X0Y1_0_W_in[1]";
-"X0Y1_0_W_O[2]" -> "X0Y1_0_W_in[2]";
-"X0Y1_0_W_O[3]" -> "X0Y1_0_W_in[3]";
-"X0Y1_0_W_O[4]" -> "X0Y1_0_W_in[4]";
-"X0Y1_0_W_O[5]" -> "X0Y1_0_W_in[5]";
-"X0Y1_0_W_O[6]" -> "X0Y1_0_W_in[6]";
-"X0Y1_0_W_O[7]" -> "X0Y1_0_W_in[7]";
-"X0Y1_0_W_O[8]" -> "X0Y1_0_W_in[8]";
-"X0Y1_0_W_O[9]" -> "X0Y1_0_W_in[9]";
-"X0Y1_0_W_O[10]" -> "X0Y1_0_W_in[10]";
-"X0Y1_0_W_O[11]" -> "X0Y1_0_W_in[11]";
-"X0Y1_0_W_O[12]" -> "X0Y1_0_W_in[12]";
-"X0Y1_0_W_O[13]" -> "X0Y1_0_W_in[13]";
-"X0Y1_0_W_O[14]" -> "X0Y1_0_W_in[14]";
-"X0Y1_0_W_O[15]" -> "X0Y1_0_W_in[15]";
-"X0Y1_0_W_O[16]" -> "X0Y1_0_W_in[16]";
-"X0Y1_0_W_O[17]" -> "X0Y1_0_W_in[17]";
-"X0Y1_0_W_O[18]" -> "X0Y1_0_W_in[18]";
-"X0Y1_0_W_O[19]" -> "X0Y1_0_W_in[19]";
-"X0Y1_0_W_O[20]" -> "X0Y1_0_W_in[20]";
-"X0Y1_0_W_O[21]" -> "X0Y1_0_W_in[21]";
-"X0Y1_0_W_O[22]" -> "X0Y1_0_W_in[22]";
-"X0Y1_0_W_O[23]" -> "X0Y1_0_W_in[23]";
-"X0Y1_0_W_O[24]" -> "X0Y1_0_W_in[24]";
-"X0Y1_0_W_O[25]" -> "X0Y1_0_W_in[25]";
-"X0Y1_0_W_O[26]" -> "X0Y1_0_W_in[26]";
-"X0Y1_0_W_O[27]" -> "X0Y1_0_W_in[27]";
-"X0Y1_0_W_O[28]" -> "X0Y1_0_W_in[28]";
-"X0Y1_0_W_O[29]" -> "X0Y1_0_W_in[29]";
-"X0Y1_0_W_O[30]" -> "X0Y1_0_W_in[30]";
-"X0Y1_0_W_O[31]" -> "X0Y1_0_W_in[31]";
-"X0Y1_0_W_out[0]" -> "X0Y1_0_W_I[0]";
-"X0Y1_0_W_out[1]" -> "X0Y1_0_W_I[1]";
-"X0Y1_0_W_out[2]" -> "X0Y1_0_W_I[2]";
-"X0Y1_0_W_out[3]" -> "X0Y1_0_W_I[3]";
-"X0Y1_0_W_out[4]" -> "X0Y1_0_W_I[4]";
-"X0Y1_0_W_out[5]" -> "X0Y1_0_W_I[5]";
-"X0Y1_0_W_out[6]" -> "X0Y1_0_W_I[6]";
-"X0Y1_0_W_out[7]" -> "X0Y1_0_W_I[7]";
-"X0Y1_0_W_out[8]" -> "X0Y1_0_W_I[8]";
-"X0Y1_0_W_out[9]" -> "X0Y1_0_W_I[9]";
-"X0Y1_0_W_out[10]" -> "X0Y1_0_W_I[10]";
-"X0Y1_0_W_out[11]" -> "X0Y1_0_W_I[11]";
-"X0Y1_0_W_out[12]" -> "X0Y1_0_W_I[12]";
-"X0Y1_0_W_out[13]" -> "X0Y1_0_W_I[13]";
-"X0Y1_0_W_out[14]" -> "X0Y1_0_W_I[14]";
-"X0Y1_0_W_out[15]" -> "X0Y1_0_W_I[15]";
-"X0Y1_0_W_out[16]" -> "X0Y1_0_W_I[16]";
-"X0Y1_0_W_out[17]" -> "X0Y1_0_W_I[17]";
-"X0Y1_0_W_out[18]" -> "X0Y1_0_W_I[18]";
-"X0Y1_0_W_out[19]" -> "X0Y1_0_W_I[19]";
-"X0Y1_0_W_out[20]" -> "X0Y1_0_W_I[20]";
-"X0Y1_0_W_out[21]" -> "X0Y1_0_W_I[21]";
-"X0Y1_0_W_out[22]" -> "X0Y1_0_W_I[22]";
-"X0Y1_0_W_out[23]" -> "X0Y1_0_W_I[23]";
-"X0Y1_0_W_out[24]" -> "X0Y1_0_W_I[24]";
-"X0Y1_0_W_out[25]" -> "X0Y1_0_W_I[25]";
-"X0Y1_0_W_out[26]" -> "X0Y1_0_W_I[26]";
-"X0Y1_0_W_out[27]" -> "X0Y1_0_W_I[27]";
-"X0Y1_0_W_out[28]" -> "X0Y1_0_W_I[28]";
-"X0Y1_0_W_out[29]" -> "X0Y1_0_W_I[29]";
-"X0Y1_0_W_out[30]" -> "X0Y1_0_W_I[30]";
-"X0Y1_0_W_out[31]" -> "X0Y1_0_W_I[31]";
-"X0Y1_0_out1_internal[0]" -> "X0Y1_0_out1[0]";
-"X0Y1_0_out1_internal[1]" -> "X0Y1_0_out1[1]";
-"X0Y1_0_out1_internal[2]" -> "X0Y1_0_out1[2]";
-"X0Y1_0_out1_internal[3]" -> "X0Y1_0_out1[3]";
-"X0Y1_0_out1_internal[4]" -> "X0Y1_0_out1[4]";
-"X0Y1_0_out1_internal[5]" -> "X0Y1_0_out1[5]";
-"X0Y1_0_out1_internal[6]" -> "X0Y1_0_out1[6]";
-"X0Y1_0_out1_internal[7]" -> "X0Y1_0_out1[7]";
-"X0Y1_0_out1_internal[8]" -> "X0Y1_0_out1[8]";
-"X0Y1_0_out1_internal[9]" -> "X0Y1_0_out1[9]";
-"X0Y1_0_out1_internal[10]" -> "X0Y1_0_out1[10]";
-"X0Y1_0_out1_internal[11]" -> "X0Y1_0_out1[11]";
-"X0Y1_0_out1_internal[12]" -> "X0Y1_0_out1[12]";
-"X0Y1_0_out1_internal[13]" -> "X0Y1_0_out1[13]";
-"X0Y1_0_out1_internal[14]" -> "X0Y1_0_out1[14]";
-"X0Y1_0_out1_internal[15]" -> "X0Y1_0_out1[15]";
-"X0Y1_0_out1_internal[16]" -> "X0Y1_0_out1[16]";
-"X0Y1_0_out1_internal[17]" -> "X0Y1_0_out1[17]";
-"X0Y1_0_out1_internal[18]" -> "X0Y1_0_out1[18]";
-"X0Y1_0_out1_internal[19]" -> "X0Y1_0_out1[19]";
-"X0Y1_0_out1_internal[20]" -> "X0Y1_0_out1[20]";
-"X0Y1_0_out1_internal[21]" -> "X0Y1_0_out1[21]";
-"X0Y1_0_out1_internal[22]" -> "X0Y1_0_out1[22]";
-"X0Y1_0_out1_internal[23]" -> "X0Y1_0_out1[23]";
-"X0Y1_0_out1_internal[24]" -> "X0Y1_0_out1[24]";
-"X0Y1_0_out1_internal[25]" -> "X0Y1_0_out1[25]";
-"X0Y1_0_out1_internal[26]" -> "X0Y1_0_out1[26]";
-"X0Y1_0_out1_internal[27]" -> "X0Y1_0_out1[27]";
-"X0Y1_0_out1_internal[28]" -> "X0Y1_0_out1[28]";
-"X0Y1_0_out1_internal[29]" -> "X0Y1_0_out1[29]";
-"X0Y1_0_out1_internal[30]" -> "X0Y1_0_out1[30]";
-"X0Y1_0_out1_internal[31]" -> "X0Y1_0_out1[31]";
-"X0Y1_0_W_from_fabric[0]" -> "X0Y1_0_out1_internal[0]";
-"X0Y1_0_W_from_fabric[1]" -> "X0Y1_0_out1_internal[1]";
-"X0Y1_0_W_from_fabric[2]" -> "X0Y1_0_out1_internal[2]";
-"X0Y1_0_W_from_fabric[3]" -> "X0Y1_0_out1_internal[3]";
-"X0Y1_0_W_from_fabric[4]" -> "X0Y1_0_out1_internal[4]";
-"X0Y1_0_W_from_fabric[5]" -> "X0Y1_0_out1_internal[5]";
-"X0Y1_0_W_from_fabric[6]" -> "X0Y1_0_out1_internal[6]";
-"X0Y1_0_W_from_fabric[7]" -> "X0Y1_0_out1_internal[7]";
-"X0Y1_0_W_from_fabric[8]" -> "X0Y1_0_out1_internal[8]";
-"X0Y1_0_W_from_fabric[9]" -> "X0Y1_0_out1_internal[9]";
-"X0Y1_0_W_from_fabric[10]" -> "X0Y1_0_out1_internal[10]";
-"X0Y1_0_W_from_fabric[11]" -> "X0Y1_0_out1_internal[11]";
-"X0Y1_0_W_from_fabric[12]" -> "X0Y1_0_out1_internal[12]";
-"X0Y1_0_W_from_fabric[13]" -> "X0Y1_0_out1_internal[13]";
-"X0Y1_0_W_from_fabric[14]" -> "X0Y1_0_out1_internal[14]";
-"X0Y1_0_W_from_fabric[15]" -> "X0Y1_0_out1_internal[15]";
-"X0Y1_0_W_from_fabric[16]" -> "X0Y1_0_out1_internal[16]";
-"X0Y1_0_W_from_fabric[17]" -> "X0Y1_0_out1_internal[17]";
-"X0Y1_0_W_from_fabric[18]" -> "X0Y1_0_out1_internal[18]";
-"X0Y1_0_W_from_fabric[19]" -> "X0Y1_0_out1_internal[19]";
-"X0Y1_0_W_from_fabric[20]" -> "X0Y1_0_out1_internal[20]";
-"X0Y1_0_W_from_fabric[21]" -> "X0Y1_0_out1_internal[21]";
-"X0Y1_0_W_from_fabric[22]" -> "X0Y1_0_out1_internal[22]";
-"X0Y1_0_W_from_fabric[23]" -> "X0Y1_0_out1_internal[23]";
-"X0Y1_0_W_from_fabric[24]" -> "X0Y1_0_out1_internal[24]";
-"X0Y1_0_W_from_fabric[25]" -> "X0Y1_0_out1_internal[25]";
-"X0Y1_0_W_from_fabric[26]" -> "X0Y1_0_out1_internal[26]";
-"X0Y1_0_W_from_fabric[27]" -> "X0Y1_0_out1_internal[27]";
-"X0Y1_0_W_from_fabric[28]" -> "X0Y1_0_out1_internal[28]";
-"X0Y1_0_W_from_fabric[29]" -> "X0Y1_0_out1_internal[29]";
-"X0Y1_0_W_from_fabric[30]" -> "X0Y1_0_out1_internal[30]";
-"X0Y1_0_W_from_fabric[31]" -> "X0Y1_0_out1_internal[31]";
+X1Y0_0_S_O -> X1Y0_0_S_in;
+X1Y0_0_S_out -> X1Y0_0_S_I;
+X1Y0_0_out0_internal -> X1Y0_0_out0;
+X1Y0_0_S_to_fabric -> X1Y0_0_out0_internal;
+X1Y0_0_in0 -> X1Y0_0_S_from_fabric;
 }
 
+shape15825635;
+shape15825635;
+shape15825635;
+shape15825635;
+shape15825635;
+shape15825635;
+shape15825635;
+shape15825635;
+shape15825635;
+shape15825635;
+shape15825635;
+shape15825635;
+shape15825635;
+shape15825635;
+shape15825635;
+shape15825635;
+shape15825635;
+shape15825635;
+shape15825635;
+shape15825635;
+shape15825635;
+shape15825635;
+shape15825635;
+shape15825635;
+shape15825635;
+shape15825635;
+shape15825635;
+shape15825635;
+shape15825635;
+shape15825635;
+shape15825635;
+shape15825635;
+shape9096309;
+shape9096309;
+shape9096309;
+shape9096309;
+shape9096309;
+shape9096309;
+shape9096309;
+shape9096309;
+shape9096309;
+shape9096309;
+shape9096309;
+shape9096309;
+shape9096309;
+shape9096309;
+shape9096309;
+shape9096309;
+shape9096309;
+shape9096309;
+shape9096309;
+shape9096309;
+shape9096309;
+shape9096309;
+shape9096309;
+shape9096309;
+shape9096309;
+shape9096309;
+shape9096309;
+shape9096309;
+shape9096309;
+shape9096309;
+shape9096309;
+shape9096309;
+shape471936;
+shape471936;
+shape471936;
+shape471936;
+shape471936;
+shape471936;
+shape471936;
+shape471936;
+shape471936;
+shape471936;
+shape471936;
+shape471936;
+shape471936;
+shape471936;
+shape471936;
+shape471936;
+shape471936;
+shape471936;
+shape471936;
+shape471936;
+shape471936;
+shape471936;
+shape471936;
+shape471936;
+shape471936;
+shape471936;
+shape471936;
+shape471936;
+shape471936;
+shape471936;
+shape471936;
+shape471936;
+shape12261425;
+shape12261425;
+shape12261425;
+shape12261425;
+shape12261425;
+shape12261425;
+shape12261425;
+shape12261425;
+shape12261425;
+shape12261425;
+shape12261425;
+shape12261425;
+shape12261425;
+shape12261425;
+shape12261425;
+shape12261425;
+shape12261425;
+shape12261425;
+shape12261425;
+shape12261425;
+shape12261425;
+shape12261425;
+shape12261425;
+shape12261425;
+shape12261425;
+shape12261425;
+shape12261425;
+shape12261425;
+shape12261425;
+shape12261425;
+shape12261425;
+shape12261425;
+shape16341145;
+shape16341145;
+shape16341145;
+shape16341145;
+shape16341145;
+shape16341145;
+shape16341145;
+shape16341145;
+shape16341145;
+shape16341145;
+shape16341145;
+shape16341145;
+shape16341145;
+shape16341145;
+shape16341145;
+shape16341145;
+shape16341145;
+shape16341145;
+shape16341145;
+shape16341145;
+shape16341145;
+shape16341145;
+shape16341145;
+shape16341145;
+shape16341145;
+shape16341145;
+shape16341145;
+shape16341145;
+shape16341145;
+shape16341145;
+shape16341145;
+shape16341145;
+shape5104850;
+shape5104850;
+shape5104850;
+shape5104850;
+shape5104850;
+shape5104850;
+shape5104850;
+shape5104850;
+shape5104850;
+shape5104850;
+shape5104850;
+shape5104850;
+shape5104850;
+shape5104850;
+shape5104850;
+shape5104850;
+shape5104850;
+shape5104850;
+shape5104850;
+shape5104850;
+shape5104850;
+shape5104850;
+shape5104850;
+shape5104850;
+shape5104850;
+shape5104850;
+shape5104850;
+shape5104850;
+shape5104850;
+shape5104850;
+shape5104850;
+shape5104850;
+shape7716976;
+shape7716976;
+shape7716976;
+shape7716976;
+shape7716976;
+shape7716976;
+shape7716976;
+shape7716976;
+shape7716976;
+shape7716976;
+shape7716976;
+shape7716976;
+shape7716976;
+shape7716976;
+shape7716976;
+shape7716976;
+shape7716976;
+shape7716976;
+shape7716976;
+shape7716976;
+shape7716976;
+shape7716976;
+shape7716976;
+shape7716976;
+shape7716976;
+shape7716976;
+shape7716976;
+shape7716976;
+shape7716976;
+shape7716976;
+shape7716976;
+shape7716976;
+shape1665221;
+shape1665221;
+shape1665221;
+shape1665221;
+shape1665221;
+shape1665221;
+shape1665221;
+shape1665221;
+shape1665221;
+shape1665221;
+shape1665221;
+shape1665221;
+shape1665221;
+shape1665221;
+shape1665221;
+shape1665221;
+shape1665221;
+shape1665221;
+shape1665221;
+shape1665221;
+shape1665221;
+shape1665221;
+shape1665221;
+shape1665221;
+shape1665221;
+shape1665221;
+shape1665221;
+shape1665221;
+shape1665221;
+shape1665221;
+shape1665221;
+shape1665221;
+shape15940220;
+shape15940220;
+shape15940220;
+shape15940220;
+shape15940220;
+shape15940220;
+shape15940220;
+shape15940220;
+shape15940220;
+shape15940220;
+shape15940220;
+shape15940220;
+shape15940220;
+shape15940220;
+shape15940220;
+shape15940220;
+shape15940220;
+shape15940220;
+shape15940220;
+shape15940220;
+shape15940220;
+shape15940220;
+shape15940220;
+shape15940220;
+shape15940220;
+shape15940220;
+shape15940220;
+shape15940220;
+shape15940220;
+shape15940220;
+shape15940220;
+shape15940220;
+shape15154681;
+shape15154681;
+shape15154681;
+shape15154681;
+shape15154681;
+shape15154681;
+shape15154681;
+shape15154681;
+shape15154681;
+shape15154681;
+shape15154681;
+shape15154681;
+shape15154681;
+shape15154681;
+shape15154681;
+shape15154681;
+shape15154681;
+shape15154681;
+shape15154681;
+shape15154681;
+shape15154681;
+shape15154681;
+shape15154681;
+shape15154681;
+shape15154681;
+shape15154681;
+shape15154681;
+shape15154681;
+shape15154681;
+shape15154681;
+shape15154681;
+shape15154681;
+shape8471251;
+shape8471251;
+shape8471251;
+shape8471251;
+shape8471251;
+shape8471251;
+shape8471251;
+shape8471251;
+shape8471251;
+shape8471251;
+shape8471251;
+shape8471251;
+shape8471251;
+shape8471251;
+shape8471251;
+shape8471251;
+shape8471251;
+shape8471251;
+shape8471251;
+shape8471251;
+shape8471251;
+shape8471251;
+shape8471251;
+shape8471251;
+shape8471251;
+shape8471251;
+shape8471251;
+shape8471251;
+shape8471251;
+shape8471251;
+shape8471251;
+shape8471251;
+shape9000964;
+shape9000964;
+shape9000964;
+shape9000964;
+shape9000964;
+shape9000964;
+shape9000964;
+shape9000964;
+shape9000964;
+shape9000964;
+shape9000964;
+shape9000964;
+shape9000964;
+shape9000964;
+shape9000964;
+shape9000964;
+shape9000964;
+shape9000964;
+shape9000964;
+shape9000964;
+shape9000964;
+shape9000964;
+shape9000964;
+shape9000964;
+shape9000964;
+shape9000964;
+shape9000964;
+shape9000964;
+shape9000964;
+shape9000964;
+shape9000964;
+shape9000964;
 }

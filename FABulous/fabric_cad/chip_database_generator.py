@@ -570,24 +570,21 @@ def genRoutingDotGraph(chip: Chip, filePath: Path, expand=False):
 
         # subgraph.add_node(pydot.Node(f"tile_{x}_{y}"))
         graph.add_subgraph(subgraph)
-        for i in range(len(chip.node_shapes)):
-            wires = chip.get_node_wires_from_shape(i)
-            print(wires)
-            idx = (
-                hash(tuple([f"X{x}Y{y}_{removeBit(name)}" for x, y, name in wires]))
-                & 0xFFFFFF
-            )
-            graph.add_node(pydot.Node(f"shape{idx}"))
-            for x, y, name in wires:
-                srcName = f"X{x}Y{y}_{removeBit(name)}"
-                if (srcName, f"shape{idx}") in globalPairs:
+        wires = chip.get_node_wires_from_tile(x, y)
+        for shape in wires:
+            x, y, name = shape[0]
+            srcName = f"X{x}Y{y}_{removeBit(name)}"
+            for x, y, name in shape[1:]:
+                dstName = f"X{x}Y{y}_{removeBit(name)}"
+                if (srcName, dstName) in globalPairs or (
+                    dstName,
+                    srcName,
+                ) in globalPairs:
                     continue
-                globalPairs.add((srcName, f"shape{idx}"))
+                globalPairs.add((srcName, dstName))
+                globalPairs.add((dstName, srcName))
 
-                graph.add_edge(
-                    pydot.Edge(srcName, f"shape{idx}", dir="none", color="blue")
-                )
-                print(pydot.Edge(srcName, f"shape{idx}", dir="none", color="blue"))
+                graph.add_edge(pydot.Edge(srcName, dstName, dir="none", color="blue"))
 
     graph.write(str(filePath / "routing_graph.dot"))
 

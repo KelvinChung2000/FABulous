@@ -1,6 +1,7 @@
 import hashlib
 import struct
 from dataclasses import dataclass, field
+from enum import IntEnum
 from typing import Optional
 
 from loguru import logger
@@ -351,15 +352,16 @@ class NodeShape(BBAStruct):
         bba.u32(self.timing_index)  # timing index (not yet used)
 
 
-MODE_TILE_WIRE = 0x7000
-MODE_IS_ROOT = 0x7001
-MODE_ROW_CONST = 0x7002
-MODE_GLB_CONST = 0x7003
+class MODE(IntEnum):
+    MODE_TILE_WIRE = 0x7000
+    MODE_IS_ROOT = 0x7001
+    MODE_ROW_CONST = 0x7002
+    MODE_GLB_CONST = 0x7003
 
 
 @dataclass
 class RelNodeRef(BBAStruct):
-    dx_mode: int = MODE_TILE_WIRE
+    dx_mode: int = MODE.MODE_TILE_WIRE
     dy: int = 0
     wire: int = 0
 
@@ -906,32 +908,41 @@ class Chip:
             self.node_shape_idx[key] = shape_idx
             self.node_shapes.append(shape)
         # update tile wire to node ref
+
+        if wires[1].x == 0:
+            print(wires)
         for i, w in enumerate(wires):
             inst = self.tiles[w.y][w.x]
             wire_idx = shape.wires[i * 3 + 2]
             # make sure there's actually enough space; first
             while 3 * wire_idx >= len(inst.shape.wire_to_node):
-                inst.shape.wire_to_node += [MODE_TILE_WIRE, 0, 0]
+                inst.shape.wire_to_node += [MODE.MODE_TILE_WIRE, 0, 0]
             if i == 0:
                 # root of the node. we don't need to back-reference anything because the node is based here
                 # so we re-use the structure to store the index of the node shape, instead
                 assert (
-                    inst.shape.wire_to_node[3 * wire_idx + 0] == MODE_TILE_WIRE
+                    inst.shape.wire_to_node[3 * wire_idx + 0] == MODE.MODE_TILE_WIRE
                 ), f"attempting to add wire {w} to multiple nodes!"
-                inst.shape.wire_to_node[3 * wire_idx + 0] = MODE_IS_ROOT
+                inst.shape.wire_to_node[3 * wire_idx + 0] = MODE.MODE_IS_ROOT
                 inst.shape.wire_to_node[3 * wire_idx + 1] = _twos(shape_idx & 0xFFFF)
                 inst.shape.wire_to_node[3 * wire_idx + 2] = (shape_idx >> 16) & 0xFFFF
             else:
                 # back-reference to the root of the node
                 dx = x0 - w.x
                 dy = y0 - w.y
-                assert dx < MODE_TILE_WIRE, "dx range causes overlap with magic values!"
                 assert (
-                    inst.shape.wire_to_node[3 * wire_idx + 0] == MODE_TILE_WIRE
+                    dx < MODE.MODE_TILE_WIRE
+                ), "dx range causes overlap with magic values!"
+                assert (
+                    inst.shape.wire_to_node[3 * wire_idx + 0] == MODE.MODE_TILE_WIRE
                 ), f"attempting to add wire {w} to multiple nodes!"
                 inst.shape.wire_to_node[3 * wire_idx + 0] = dx
                 inst.shape.wire_to_node[3 * wire_idx + 1] = dy
                 inst.shape.wire_to_node[3 * wire_idx + 2] = shape.wires[0 * 3 + 2]
+            if wires[1].x == 0:
+                print(w, inst.shape.wire_to_node[3 * wire_idx : 3 * wire_idx + 3])
+        if wires[1].x == 0:
+            print()
 
     def flatten_tile_shapes(self):
         logger.info("Deduplicating tile shapes...")
@@ -1050,84 +1061,109 @@ class Chip:
     def set_chip_extra_data(self, ChipExtraData):
         self.extra_data = ChipExtraData
 
-    def get_node_wires_from_shape(self, shapeIndex):
-        if shapeIndex >= len(self.node_shapes):
-            logger.error(f"Invalid node shape index: {shapeIndex}")
-            return []
+    def get_tile_type(self, tileX, tileY: int):
+        """Get the tile type of the specified tile.
 
-        shape = self.node_shapes[shapeIndex]
-        wires = []
+        Parameters
+        ----------
+        tileX : int
+            X coordinate of the tile
+        tileY : int
+            Y coordinate of the tile
 
-        # The base x and y coordinates for the node
-        # These are relative to the first wire in the shape
-        baseX = baseY = None
+        Returns
+        -------
+        TileType
+            Tile type of the specified tile
+        """
+        # Validate coordinates
+        if tileX < 0 or tileX >= self.width or tileY < 0 or tileY >= self.height:
+            logger.error(f"Invalid tile coordinates: ({tileX}, {tileY})")
+            return None
 
-        # Process each wire in the shape
-        # Each wire is represented by 3 consecutive values: dx, dy, wire_index
-        for i in range(0, len(shape.wires), 3):
-            dx = shape.wires[i]
-            dy = shape.wires[i + 1]
-            wireIndex = shape.wires[i + 2]
+        # Get tile instance
+        tileInst = self.tiles[tileY][tileX]
 
-            # For the first wire, we need to find its actual location in the chip
-            if i == 0:
-                # Search for the root tile
-                for y in range(self.height):
-                    for x in range(self.width):
-                        inst = self.tiles[y][x]
+        # If tile has no type, return None
+        if tileInst.type_idx is None:
+            logger.error(f"Tile at ({tileX}, {tileY}) has no type assigned")
+            return None
 
-                        # Check if this tile has enough wire_to_node entries
-                        if 3 * wireIndex >= len(inst.shape.wire_to_node):
-                            continue
+        return self.tile_types[tileInst.type_idx]
 
-                        # Check if this is the root of the node
-                        if (
-                            inst.shape.wire_to_node[3 * wireIndex] == MODE_IS_ROOT
-                            and (
-                                (inst.shape.wire_to_node[3 * wireIndex + 1] & 0xFFFF)
-                                | (
-                                    (
-                                        inst.shape.wire_to_node[3 * wireIndex + 2]
-                                        & 0xFFFF
-                                    )
-                                    << 16
-                                )
-                            )
-                            == shapeIndex
-                        ):
-                            baseX = x
-                            baseY = y
-                            break
+    def get_node_wires_from_tile(self, tileX: int, tileY: int):
+        """Get all wires that are part of nodes in the specified tile.
 
-                    if baseX is not None:
-                        break
+        Parameters
+        ----------
+        tileX : int
+            X coordinate of the tile
+        tileY : int
+            Y coordinate of the tile
 
-                if baseX is None:
-                    logger.error(
-                        f"Could not find root tile for node shape {shapeIndex}"
-                    )
-                    return []
+        Returns
+        -------
+        dict
+            Dictionary mapping wire name to list of (x, y, wire_name) tuples
+            representing all wires in the node
+        """
+        # Validate coordinates
+        if tileX < 0 or tileX >= self.width or tileY < 0 or tileY >= self.height:
+            logger.error(f"Invalid tile coordinates: ({tileX}, {tileY})")
+            return {}
 
-            # Calculate actual x, y coordinates
-            x = baseX + dx
-            y = baseY + dy
+        # Get tile instance
+        tileInst = self.tiles[tileY][tileX]
 
-            # Get the wire name from the tile type
-            tileType = self.tile_type_at(x, y)
-            wireName = None
+        # If tile has no type, it can't have wires
+        if tileInst.type_idx is None:
+            logger.error(f"Tile at ({tileX}, {tileY}) has no type assigned")
+            return {}
 
-            # Find wire name by index
-            for name, idx in tileType._wire2idx.items():
-                if idx == wireIndex:
-                    wireName = self.strs[name]
-                    break
+        tileType = self.tile_types[tileInst.type_idx]
+        print(tileType.name)
 
-            if wireName is None:
-                logger.warning(
-                    f"Could not find wire name for index {wireIndex} in tile ({x}, {y})"
+        # Result dictionary: wire name -> list of connections
+        nodeWires = []
+
+        # Check all wires in the tile
+        for wireName, wireIndex in tileType._wire2idx.items():
+            # Skip if wire index is outside the shape's range
+            if 3 * wireIndex >= len(tileInst.shape.wire_to_node):
+                continue
+
+            # Get node shape index and root info
+            mode = tileInst.shape.wire_to_node[3 * wireIndex]
+
+            # If this is a regular tile wire with no node connectivity
+            if mode == MODE.MODE_TILE_WIRE:
+                # wireNameStr = self.strs[wireName]
+                # nodeWireMap[wireNameStr] = [(tileX, tileY, wireNameStr)]
+                continue
+
+            # If this wire is a root of a node
+            if mode == MODE.MODE_IS_ROOT:
+                shapeIdx = (tileInst.shape.wire_to_node[3 * wireIndex + 1] & 0xFFFF) | (
+                    (tileInst.shape.wire_to_node[3 * wireIndex + 2] & 0xFFFF) << 16
                 )
-                wireName = f"unknown_wire_{wireIndex}"
+                # Use existing method to get all wires from this shape
+                shape = self.node_shapes[shapeIdx]
+                w = []
+                for i in range(0, len(shape.wires), 3):
+                    dx = shape.wires[i]
+                    dy = shape.wires[i + 1]
+                    wireIndex = shape.wires[i + 2]
+                    targetTileType = self.get_tile_type(tileX + dx, tileY + dy)
+                    if targetTileType is None:
+                        continue
+                    for wireName, wireIdx in targetTileType._wire2idx.items():
+                        if wireIdx == wireIndex:
+                            w.append((tileX + dx, tileY + dy, self.strs[wireName]))
+                            break
+                    else:
+                        logger.error(
+                            f"Wire index {wireIndex} not found in tile type {tileType.name}"
+                        )
+                nodeWires.append(w)
 
-            wires.append((x, y, wireName))
-
-        return wires
+        return nodeWires

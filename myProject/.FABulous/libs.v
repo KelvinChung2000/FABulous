@@ -1,8 +1,11 @@
 (* blackbox *)
-module const_unit #(
-    parameter ConfigBits = 0
+module IO #(
+
 )(
-    output [31:0] const_out
+    input [31:0] from_fabric,
+    input [31:0] in,
+    output [31:0] to_fabric,
+    output [31:0] out
 );
 
 endmodule
@@ -36,13 +39,10 @@ endmodule
 
 
 (* blackbox *)
-module IO #(
-
+module const_unit #(
+    parameter ConfigBits = 0
 )(
-    input [31:0] from_fabric,
-    input [31:0] in,
-    output [31:0] to_fabric,
-    output [31:0] out
+    output [31:0] const_out
 );
 
 endmodule

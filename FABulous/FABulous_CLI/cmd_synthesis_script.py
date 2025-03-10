@@ -15,8 +15,12 @@ synthesis_parser.add_argument(
     help="Path to the target files.",
     completer=Cmd.path_complete,
 )
-synthesis_parser.add_argument("-q", "--quiet", action="store_true", help="Quiet mode")
-
+synthesis_parser.add_argument(
+    "-q", "--quiet", action="store_true", help="Quiet mode"
+)
+scriptTypeGroup = synthesis_parser.add_mutually_exclusive_group(required=True)
+scriptTypeGroup.add_argument("-tcl", action="store_true", help="Run TCL script")
+scriptTypeGroup.add_argument("-ys", action="store_true", help="Run Yosys script")
 
 @with_category(CMD_FABRIC_FLOW)
 @with_argparser(synthesis_parser)
@@ -31,7 +35,8 @@ def do_synthesis_script(self, args):
     runCmd = [
         f"{yosys}",
         "-q" if args.quiet else "",
-        "-s",
+        "-s" if args.ys else "",
+        "-c" if args.tcl else "",
         f"{resolvePath}",
     ]
     runCmd = [i for i in runCmd if i != ""]

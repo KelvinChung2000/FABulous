@@ -1,0 +1,2332 @@
+{
+  "creator": "Next Generation Place and Route (Version nextpnr-0.7-195-g77e39dc1)",
+  "modules": {
+    "top": {
+      "settings": {
+        "pack": "00000000000000000000000000000001",
+        "synth": "00000000000000000000000000000001",
+        "placerHeap/timingWeight": "10 ",
+        "placerHeap/exportInitPlacement": " ",
+        "placerHeap/legalisationStrategy": "largest-marco",
+        "placerHeap/criticalityExponent": "2",
+        "placerHeap/beta": "0.900000",
+        "placerHeap/alpha": "0.100000",
+        "seed": "0011000101000001010110010010011001010011010110001001011110010011",
+        "arch.type": " ",
+        "arch.name": "ARCHNAME",
+        "router": "router1",
+        "placer": "heap",
+        "auto_freq": "00000000000000000000000000000000",
+        "slack_redist_iter": "00000000000000000000000000000000",
+        "timing_driven": "00000000000000000000000000000001",
+        "target_freq": "12000000.000000"
+      },
+      "attributes": {
+        "top": "00000000000000000000000000000001",
+        "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:34.1-75.10"
+      },
+      "ports": {
+        "Y": {
+          "direction": "output",
+          "bits": [ 2920, 2942, 2964, 2972, 2974, 2976, 2978, 2980, 2982, 2922, 2924, 2926, 2928, 2930, 2932, 2934, 2936, 2938, 2940, 2944, 2946, 2948, 2950, 2952, 2954, 2956, 2958, 2960, 2962, 2966, 2968, 2970 ]
+        },
+        "B": {
+          "direction": "input",
+          "bits": [ 2821, 2843, 2865, 2873, 2875, 2877, 2879, 2881, 2883, 2823, 2825, 2827, 2829, 2831, 2833, 2835, 2837, 2839, 2841, 2845, 2847, 2849, 2851, 2853, 2855, 2857, 2859, 2861, 2863, 2867, 2869, 2871 ]
+        },
+        "A": {
+          "direction": "input",
+          "bits": [ 2724, 2746, 2768, 2776, 2778, 2780, 2782, 2784, 2786, 2726, 2728, 2730, 2732, 2734, 2736, 2738, 2740, 2742, 2744, 2748, 2750, 2752, 2754, 2756, 2758, 2760, 2762, 2764, 2766, 2770, 2772, 2774 ]
+        }
+      },
+      "cells": {
+        "$iopadmap$test.B": {
+          "hide_name": 1,
+          "type": "IO",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000100000"
+          },
+          "attributes": {
+            "keep": "00000000000000000000000000000001"
+          },
+          "port_directions": {
+            "to_fabric": "output",
+            "in": "input"
+          },
+          "connections": {
+            "to_fabric": [ 2614, 2615, 2616, 2617, 2618, 2619, 2620, 2621, 2622, 2623, 2624, 2625, 2626, 2627, 2628, 2629, 2630, 2631, 2632, 2633, 2634, 2635, 2636, 2637, 2638, 2639, 2640, 2641, 2642, 2643, 2644, 2645 ],
+            "in": [ 4003, 4004, 4005, 4006, 4007, 4008, 4009, 4010, 4011, 4012, 4013, 4014, 4015, 4016, 4017, 4018, 4019, 4020, 4021, 4022, 4023, 4024, 4025, 4026, 4027, 4028, 4029, 4030, 4031, 4032, 4033, 4034 ]
+          }
+        },
+        "$iopadmap$test.A": {
+          "hide_name": 1,
+          "type": "IO",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000100000"
+          },
+          "attributes": {
+            "keep": "00000000000000000000000000000001"
+          },
+          "port_directions": {
+            "to_fabric": "output",
+            "in": "input"
+          },
+          "connections": {
+            "to_fabric": [ 2582, 2583, 2584, 2585, 2586, 2587, 2588, 2589, 2590, 2591, 2592, 2593, 2594, 2595, 2596, 2597, 2598, 2599, 2600, 2601, 2602, 2603, 2604, 2605, 2606, 2607, 2608, 2609, 2610, 2611, 2612, 2613 ],
+            "in": [ 4035, 4036, 4037, 4038, 4039, 4040, 4041, 4042, 4043, 4044, 4045, 4046, 4047, 4048, 4049, 4050, 4051, 4052, 4053, 4054, 4055, 4056, 4057, 4058, 4059, 4060, 4061, 4062, 4063, 4064, 4065, 4066 ]
+          }
+        },
+        "$PACKER_GND_DRV": {
+          "hide_name": 1,
+          "type": "GND_DRV",
+          "parameters": {
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "GND": "output"
+          },
+          "connections": {
+            "GND": [ 2998 ]
+          }
+        },
+        "$PACKER_VCC_DRV": {
+          "hide_name": 1,
+          "type": "VCC_DRV",
+          "parameters": {
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "VCC": "output"
+          },
+          "connections": {
+            "VCC": [ 2997 ]
+          }
+        },
+        "$extract$\\reg_unit_en_1_rst_0$40": {
+          "hide_name": 1,
+          "type": "reg_unit",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/.FABulous/techmaps.v:183.18-189.6",
+            "module_not_derived": "00000000000000000000000000000001"
+          },
+          "port_directions": {
+            "rst": "input",
+            "reg_out": "output",
+            "reg_in": "input",
+            "en": "input",
+            "clk": "input"
+          },
+          "connections": {
+            "rst": [ 2998 ],
+            "reg_out": [ 2515, 2516, 2517, 2518, 2519, 2520, 2521, 2522, 2523, 2524, 2525, 2526, 2527, 2528, 2529, 2530, 2531, 2532, 2533, 2534, 2535, 2536, 2537, 2538, 2539, 2540, 2541, 2542, 2543, 2544, 2545, 2546 ],
+            "reg_in": [ 2646, 2647, 2648, 2649, 2650, 2651, 2652, 2653, 2654, 2655, 2656, 2657, 2658, 2659, 2660, 2661, 2662, 2663, 2664, 2665, 2666, 2667, 2668, 2669, 2670, 2671, 2672, 2673, 2674, 2675, 2676, 2677 ],
+            "en": [ 2997 ],
+            "clk": [ 2681 ]
+          }
+        },
+        "$extract$\\ALU_ALU_func_0$31": {
+          "hide_name": 1,
+          "type": "ALU",
+          "parameters": {
+            "ALU_func": "0"
+          },
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/.FABulous/techmaps.v:18.7-23.6",
+            "module_not_derived": "00000000000000000000000000000001"
+          },
+          "port_directions": {
+            "data_out": "output",
+            "data_in3": "input",
+            "data_in2": "input",
+            "data_in1": "input"
+          },
+          "connections": {
+            "data_out": [ 2646, 2647, 2648, 2649, 2650, 2651, 2652, 2653, 2654, 2655, 2656, 2657, 2658, 2659, 2660, 2661, 2662, 2663, 2664, 2665, 2666, 2667, 2668, 2669, 2670, 2671, 2672, 2673, 2674, 2675, 2676, 2677 ],
+            "data_in3": [ 4067, 4068, 4069, 4070, 4071, 4072, 4073, 4074, 4075, 4076, 4077, 4078, 4079, 4080, 4081, 4082, 4083, 4084, 4085, 4086, 4087, 4088, 4089, 4090, 4091, 4092, 4093, 4094, 4095, 4096, 4097, 4098 ],
+            "data_in2": [ 2614, 2615, 2616, 2617, 2618, 2619, 2620, 2621, 2622, 2623, 2624, 2625, 2626, 2627, 2628, 2629, 2630, 2631, 2632, 2633, 2634, 2635, 2636, 2637, 2638, 2639, 2640, 2641, 2642, 2643, 2644, 2645 ],
+            "data_in1": [ 2582, 2583, 2584, 2585, 2586, 2587, 2588, 2589, 2590, 2591, 2592, 2593, 2594, 2595, 2596, 2597, 2598, 2599, 2600, 2601, 2602, 2603, 2604, 2605, 2606, 2607, 2608, 2609, 2610, 2611, 2612, 2613 ]
+          }
+        },
+        "$extract$\\ALU_ALU_func_0$30": {
+          "hide_name": 1,
+          "type": "ALU",
+          "parameters": {
+            "ALU_func": "0"
+          },
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/.FABulous/techmaps.v:18.7-23.6",
+            "module_not_derived": "00000000000000000000000000000001"
+          },
+          "port_directions": {
+            "data_out": "output",
+            "data_in3": "input",
+            "data_in2": "input",
+            "data_in1": "input"
+          },
+          "connections": {
+            "data_out": [ 2547, 2548, 2549, 2550, 2551, 2552, 2553, 2554, 2555, 2556, 2557, 2558, 2559, 2560, 2561, 2562, 2563, 2564, 2565, 2566, 2567, 2568, 2569, 2570, 2571, 2572, 2573, 2574, 2575, 2576, 2577, 2578 ],
+            "data_in3": [ 4099, 4100, 4101, 4102, 4103, 4104, 4105, 4106, 4107, 4108, 4109, 4110, 4111, 4112, 4113, 4114, 4115, 4116, 4117, 4118, 4119, 4120, 4121, 4122, 4123, 4124, 4125, 4126, 4127, 4128, 4129, 4130 ],
+            "data_in2": [ 2478, 2479, 2480, 2481, 2482, 2483, 2484, 2485, 2486, 2487, 2488, 2489, 2490, 2491, 2492, 2493, 2494, 2495, 2496, 2497, 2498, 2499, 2500, 2501, 2502, 2503, 2504, 2505, 2506, 2507, 2508, 2509 ],
+            "data_in1": [ 2515, 2516, 2517, 2518, 2519, 2520, 2521, 2522, 2523, 2524, 2525, 2526, 2527, 2528, 2529, 2530, 2531, 2532, 2533, 2534, 2535, 2536, 2537, 2538, 2539, 2540, 2541, 2542, 2543, 2544, 2545, 2546 ]
+          }
+        },
+        "$auto$hilomap.cc:41:hilomap_worker$39": {
+          "hide_name": 1,
+          "type": "const_unit",
+          "parameters": {
+            "ConfigBits": "00000000000000000000000000000111"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "const_out": "output"
+          },
+          "connections": {
+            "const_out": [ 2478, 2479, 2480, 2481, 2482, 2483, 2484, 2485, 2486, 2487, 2488, 2489, 2490, 2491, 2492, 2493, 2494, 2495, 2496, 2497, 2498, 2499, 2500, 2501, 2502, 2503, 2504, 2505, 2506, 2507, 2508, 2509 ]
+          }
+        },
+        "$iopadmap$test.Y": {
+          "hide_name": 1,
+          "type": "IO",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000100000"
+          },
+          "attributes": {
+            "keep": "00000000000000000000000000000001"
+          },
+          "port_directions": {
+            "out": "output",
+            "from_fabric": "input"
+          },
+          "connections": {
+            "out": [ 4131, 4132, 4133, 4134, 4135, 4136, 4137, 4138, 4139, 4140, 4141, 4142, 4143, 4144, 4145, 4146, 4147, 4148, 4149, 4150, 4151, 4152, 4153, 4154, 4155, 4156, 4157, 4158, 4159, 4160, 4161, 4162 ],
+            "from_fabric": [ 2547, 2548, 2549, 2550, 2551, 2552, 2553, 2554, 2555, 2556, 2557, 2558, 2559, 2560, 2561, 2562, 2563, 2564, 2565, 2566, 2567, 2568, 2569, 2570, 2571, 2572, 2573, 2574, 2575, 2576, 2577, 2578 ]
+          }
+        },
+        "clk_drv_i": {
+          "hide_name": 0,
+          "type": "CLK_DRV",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:44.9-46.2",
+            "module_not_derived": "00000000000000000000000000000001"
+          },
+          "port_directions": {
+            "CLK_O": "output"
+          },
+          "connections": {
+            "CLK_O": [ 2681 ]
+          }
+        }
+      },
+      "netnames": {
+        "B[8]": {
+          "hide_name": 0,
+          "bits": [ 2883 ] ,
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:36.24-36.25"
+          }
+        },
+        "B[7]": {
+          "hide_name": 0,
+          "bits": [ 2881 ] ,
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:36.24-36.25"
+          }
+        },
+        "B[6]": {
+          "hide_name": 0,
+          "bits": [ 2879 ] ,
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:36.24-36.25"
+          }
+        },
+        "B[5]": {
+          "hide_name": 0,
+          "bits": [ 2877 ] ,
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:36.24-36.25"
+          }
+        },
+        "B[4]": {
+          "hide_name": 0,
+          "bits": [ 2875 ] ,
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:36.24-36.25"
+          }
+        },
+        "B[3]": {
+          "hide_name": 0,
+          "bits": [ 2873 ] ,
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:36.24-36.25"
+          }
+        },
+        "B[31]": {
+          "hide_name": 0,
+          "bits": [ 2871 ] ,
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:36.24-36.25"
+          }
+        },
+        "B[30]": {
+          "hide_name": 0,
+          "bits": [ 2869 ] ,
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:36.24-36.25"
+          }
+        },
+        "B[29]": {
+          "hide_name": 0,
+          "bits": [ 2867 ] ,
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:36.24-36.25"
+          }
+        },
+        "B[2]": {
+          "hide_name": 0,
+          "bits": [ 2865 ] ,
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:36.24-36.25"
+          }
+        },
+        "B[28]": {
+          "hide_name": 0,
+          "bits": [ 2863 ] ,
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:36.24-36.25"
+          }
+        },
+        "B[27]": {
+          "hide_name": 0,
+          "bits": [ 2861 ] ,
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:36.24-36.25"
+          }
+        },
+        "B[26]": {
+          "hide_name": 0,
+          "bits": [ 2859 ] ,
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:36.24-36.25"
+          }
+        },
+        "B[25]": {
+          "hide_name": 0,
+          "bits": [ 2857 ] ,
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:36.24-36.25"
+          }
+        },
+        "B[24]": {
+          "hide_name": 0,
+          "bits": [ 2855 ] ,
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:36.24-36.25"
+          }
+        },
+        "B[23]": {
+          "hide_name": 0,
+          "bits": [ 2853 ] ,
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:36.24-36.25"
+          }
+        },
+        "B[22]": {
+          "hide_name": 0,
+          "bits": [ 2851 ] ,
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:36.24-36.25"
+          }
+        },
+        "B[21]": {
+          "hide_name": 0,
+          "bits": [ 2849 ] ,
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:36.24-36.25"
+          }
+        },
+        "B[20]": {
+          "hide_name": 0,
+          "bits": [ 2847 ] ,
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:36.24-36.25"
+          }
+        },
+        "B[19]": {
+          "hide_name": 0,
+          "bits": [ 2845 ] ,
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:36.24-36.25"
+          }
+        },
+        "B[1]": {
+          "hide_name": 0,
+          "bits": [ 2843 ] ,
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:36.24-36.25"
+          }
+        },
+        "B[18]": {
+          "hide_name": 0,
+          "bits": [ 2841 ] ,
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:36.24-36.25"
+          }
+        },
+        "B[17]": {
+          "hide_name": 0,
+          "bits": [ 2839 ] ,
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:36.24-36.25"
+          }
+        },
+        "B[16]": {
+          "hide_name": 0,
+          "bits": [ 2837 ] ,
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:36.24-36.25"
+          }
+        },
+        "B[15]": {
+          "hide_name": 0,
+          "bits": [ 2835 ] ,
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:36.24-36.25"
+          }
+        },
+        "B[14]": {
+          "hide_name": 0,
+          "bits": [ 2833 ] ,
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:36.24-36.25"
+          }
+        },
+        "B[13]": {
+          "hide_name": 0,
+          "bits": [ 2831 ] ,
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:36.24-36.25"
+          }
+        },
+        "B[12]": {
+          "hide_name": 0,
+          "bits": [ 2829 ] ,
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:36.24-36.25"
+          }
+        },
+        "B[11]": {
+          "hide_name": 0,
+          "bits": [ 2827 ] ,
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:36.24-36.25"
+          }
+        },
+        "B[10]": {
+          "hide_name": 0,
+          "bits": [ 2825 ] ,
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:36.24-36.25"
+          }
+        },
+        "B[9]": {
+          "hide_name": 0,
+          "bits": [ 2823 ] ,
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:36.24-36.25"
+          }
+        },
+        "B[0]": {
+          "hide_name": 0,
+          "bits": [ 2821 ] ,
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:36.24-36.25"
+          }
+        },
+        "$PACKER_GND": {
+          "hide_name": 1,
+          "bits": [ 2998 ] ,
+          "attributes": {
+          }
+        },
+        "$PACKER_VCC": {
+          "hide_name": 1,
+          "bits": [ 2997 ] ,
+          "attributes": {
+          }
+        },
+        "regs.clk": {
+          "hide_name": 0,
+          "bits": [ 2681 ] ,
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:17.34-17.37",
+            "hdlname": "regs clk",
+            "clk": "00000000000000000000000000000001"
+          }
+        },
+        "regs.in[31]": {
+          "hide_name": 0,
+          "bits": [ 2677 ] ,
+          "attributes": {
+            "write_together": "00000000000000000000000000000001",
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:15.65-15.67",
+            "hdlname": "regs in",
+            "data": "00000000000000000000000000000001"
+          }
+        },
+        "regs.in[30]": {
+          "hide_name": 0,
+          "bits": [ 2676 ] ,
+          "attributes": {
+            "write_together": "00000000000000000000000000000001",
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:15.65-15.67",
+            "hdlname": "regs in",
+            "data": "00000000000000000000000000000001"
+          }
+        },
+        "regs.in[29]": {
+          "hide_name": 0,
+          "bits": [ 2675 ] ,
+          "attributes": {
+            "write_together": "00000000000000000000000000000001",
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:15.65-15.67",
+            "hdlname": "regs in",
+            "data": "00000000000000000000000000000001"
+          }
+        },
+        "regs.in[28]": {
+          "hide_name": 0,
+          "bits": [ 2674 ] ,
+          "attributes": {
+            "write_together": "00000000000000000000000000000001",
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:15.65-15.67",
+            "hdlname": "regs in",
+            "data": "00000000000000000000000000000001"
+          }
+        },
+        "regs.in[27]": {
+          "hide_name": 0,
+          "bits": [ 2673 ] ,
+          "attributes": {
+            "write_together": "00000000000000000000000000000001",
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:15.65-15.67",
+            "hdlname": "regs in",
+            "data": "00000000000000000000000000000001"
+          }
+        },
+        "regs.in[26]": {
+          "hide_name": 0,
+          "bits": [ 2672 ] ,
+          "attributes": {
+            "write_together": "00000000000000000000000000000001",
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:15.65-15.67",
+            "hdlname": "regs in",
+            "data": "00000000000000000000000000000001"
+          }
+        },
+        "regs.in[25]": {
+          "hide_name": 0,
+          "bits": [ 2671 ] ,
+          "attributes": {
+            "write_together": "00000000000000000000000000000001",
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:15.65-15.67",
+            "hdlname": "regs in",
+            "data": "00000000000000000000000000000001"
+          }
+        },
+        "regs.in[24]": {
+          "hide_name": 0,
+          "bits": [ 2670 ] ,
+          "attributes": {
+            "write_together": "00000000000000000000000000000001",
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:15.65-15.67",
+            "hdlname": "regs in",
+            "data": "00000000000000000000000000000001"
+          }
+        },
+        "regs.in[23]": {
+          "hide_name": 0,
+          "bits": [ 2669 ] ,
+          "attributes": {
+            "write_together": "00000000000000000000000000000001",
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:15.65-15.67",
+            "hdlname": "regs in",
+            "data": "00000000000000000000000000000001"
+          }
+        },
+        "regs.in[22]": {
+          "hide_name": 0,
+          "bits": [ 2668 ] ,
+          "attributes": {
+            "write_together": "00000000000000000000000000000001",
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:15.65-15.67",
+            "hdlname": "regs in",
+            "data": "00000000000000000000000000000001"
+          }
+        },
+        "regs.in[21]": {
+          "hide_name": 0,
+          "bits": [ 2667 ] ,
+          "attributes": {
+            "write_together": "00000000000000000000000000000001",
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:15.65-15.67",
+            "hdlname": "regs in",
+            "data": "00000000000000000000000000000001"
+          }
+        },
+        "regs.in[20]": {
+          "hide_name": 0,
+          "bits": [ 2666 ] ,
+          "attributes": {
+            "write_together": "00000000000000000000000000000001",
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:15.65-15.67",
+            "hdlname": "regs in",
+            "data": "00000000000000000000000000000001"
+          }
+        },
+        "regs.in[19]": {
+          "hide_name": 0,
+          "bits": [ 2665 ] ,
+          "attributes": {
+            "write_together": "00000000000000000000000000000001",
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:15.65-15.67",
+            "hdlname": "regs in",
+            "data": "00000000000000000000000000000001"
+          }
+        },
+        "regs.in[18]": {
+          "hide_name": 0,
+          "bits": [ 2664 ] ,
+          "attributes": {
+            "write_together": "00000000000000000000000000000001",
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:15.65-15.67",
+            "hdlname": "regs in",
+            "data": "00000000000000000000000000000001"
+          }
+        },
+        "regs.in[17]": {
+          "hide_name": 0,
+          "bits": [ 2663 ] ,
+          "attributes": {
+            "write_together": "00000000000000000000000000000001",
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:15.65-15.67",
+            "hdlname": "regs in",
+            "data": "00000000000000000000000000000001"
+          }
+        },
+        "regs.in[16]": {
+          "hide_name": 0,
+          "bits": [ 2662 ] ,
+          "attributes": {
+            "write_together": "00000000000000000000000000000001",
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:15.65-15.67",
+            "hdlname": "regs in",
+            "data": "00000000000000000000000000000001"
+          }
+        },
+        "regs.in[15]": {
+          "hide_name": 0,
+          "bits": [ 2661 ] ,
+          "attributes": {
+            "write_together": "00000000000000000000000000000001",
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:15.65-15.67",
+            "hdlname": "regs in",
+            "data": "00000000000000000000000000000001"
+          }
+        },
+        "regs.in[14]": {
+          "hide_name": 0,
+          "bits": [ 2660 ] ,
+          "attributes": {
+            "write_together": "00000000000000000000000000000001",
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:15.65-15.67",
+            "hdlname": "regs in",
+            "data": "00000000000000000000000000000001"
+          }
+        },
+        "regs.in[13]": {
+          "hide_name": 0,
+          "bits": [ 2659 ] ,
+          "attributes": {
+            "write_together": "00000000000000000000000000000001",
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:15.65-15.67",
+            "hdlname": "regs in",
+            "data": "00000000000000000000000000000001"
+          }
+        },
+        "regs.in[12]": {
+          "hide_name": 0,
+          "bits": [ 2658 ] ,
+          "attributes": {
+            "write_together": "00000000000000000000000000000001",
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:15.65-15.67",
+            "hdlname": "regs in",
+            "data": "00000000000000000000000000000001"
+          }
+        },
+        "regs.in[11]": {
+          "hide_name": 0,
+          "bits": [ 2657 ] ,
+          "attributes": {
+            "write_together": "00000000000000000000000000000001",
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:15.65-15.67",
+            "hdlname": "regs in",
+            "data": "00000000000000000000000000000001"
+          }
+        },
+        "regs.in[10]": {
+          "hide_name": 0,
+          "bits": [ 2656 ] ,
+          "attributes": {
+            "write_together": "00000000000000000000000000000001",
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:15.65-15.67",
+            "hdlname": "regs in",
+            "data": "00000000000000000000000000000001"
+          }
+        },
+        "regs.in[9]": {
+          "hide_name": 0,
+          "bits": [ 2655 ] ,
+          "attributes": {
+            "write_together": "00000000000000000000000000000001",
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:15.65-15.67",
+            "hdlname": "regs in",
+            "data": "00000000000000000000000000000001"
+          }
+        },
+        "regs.in[8]": {
+          "hide_name": 0,
+          "bits": [ 2654 ] ,
+          "attributes": {
+            "write_together": "00000000000000000000000000000001",
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:15.65-15.67",
+            "hdlname": "regs in",
+            "data": "00000000000000000000000000000001"
+          }
+        },
+        "regs.in[7]": {
+          "hide_name": 0,
+          "bits": [ 2653 ] ,
+          "attributes": {
+            "write_together": "00000000000000000000000000000001",
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:15.65-15.67",
+            "hdlname": "regs in",
+            "data": "00000000000000000000000000000001"
+          }
+        },
+        "regs.in[6]": {
+          "hide_name": 0,
+          "bits": [ 2652 ] ,
+          "attributes": {
+            "write_together": "00000000000000000000000000000001",
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:15.65-15.67",
+            "hdlname": "regs in",
+            "data": "00000000000000000000000000000001"
+          }
+        },
+        "regs.in[5]": {
+          "hide_name": 0,
+          "bits": [ 2651 ] ,
+          "attributes": {
+            "write_together": "00000000000000000000000000000001",
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:15.65-15.67",
+            "hdlname": "regs in",
+            "data": "00000000000000000000000000000001"
+          }
+        },
+        "regs.in[4]": {
+          "hide_name": 0,
+          "bits": [ 2650 ] ,
+          "attributes": {
+            "write_together": "00000000000000000000000000000001",
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:15.65-15.67",
+            "hdlname": "regs in",
+            "data": "00000000000000000000000000000001"
+          }
+        },
+        "regs.in[3]": {
+          "hide_name": 0,
+          "bits": [ 2649 ] ,
+          "attributes": {
+            "write_together": "00000000000000000000000000000001",
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:15.65-15.67",
+            "hdlname": "regs in",
+            "data": "00000000000000000000000000000001"
+          }
+        },
+        "regs.in[2]": {
+          "hide_name": 0,
+          "bits": [ 2648 ] ,
+          "attributes": {
+            "write_together": "00000000000000000000000000000001",
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:15.65-15.67",
+            "hdlname": "regs in",
+            "data": "00000000000000000000000000000001"
+          }
+        },
+        "regs.in[1]": {
+          "hide_name": 0,
+          "bits": [ 2647 ] ,
+          "attributes": {
+            "write_together": "00000000000000000000000000000001",
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:15.65-15.67",
+            "hdlname": "regs in",
+            "data": "00000000000000000000000000000001"
+          }
+        },
+        "regs.in[0]": {
+          "hide_name": 0,
+          "bits": [ 2646 ] ,
+          "attributes": {
+            "write_together": "00000000000000000000000000000001",
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:15.65-15.67",
+            "hdlname": "regs in",
+            "data": "00000000000000000000000000000001"
+          }
+        },
+        "$iopadmap$B[31]": {
+          "hide_name": 1,
+          "bits": [ 2645 ] ,
+          "attributes": {
+          }
+        },
+        "$iopadmap$B[30]": {
+          "hide_name": 1,
+          "bits": [ 2644 ] ,
+          "attributes": {
+          }
+        },
+        "$iopadmap$B[29]": {
+          "hide_name": 1,
+          "bits": [ 2643 ] ,
+          "attributes": {
+          }
+        },
+        "$iopadmap$B[28]": {
+          "hide_name": 1,
+          "bits": [ 2642 ] ,
+          "attributes": {
+          }
+        },
+        "$iopadmap$B[27]": {
+          "hide_name": 1,
+          "bits": [ 2641 ] ,
+          "attributes": {
+          }
+        },
+        "$iopadmap$B[26]": {
+          "hide_name": 1,
+          "bits": [ 2640 ] ,
+          "attributes": {
+          }
+        },
+        "$iopadmap$B[25]": {
+          "hide_name": 1,
+          "bits": [ 2639 ] ,
+          "attributes": {
+          }
+        },
+        "$iopadmap$B[24]": {
+          "hide_name": 1,
+          "bits": [ 2638 ] ,
+          "attributes": {
+          }
+        },
+        "$iopadmap$B[23]": {
+          "hide_name": 1,
+          "bits": [ 2637 ] ,
+          "attributes": {
+          }
+        },
+        "$iopadmap$B[22]": {
+          "hide_name": 1,
+          "bits": [ 2636 ] ,
+          "attributes": {
+          }
+        },
+        "$iopadmap$B[21]": {
+          "hide_name": 1,
+          "bits": [ 2635 ] ,
+          "attributes": {
+          }
+        },
+        "$iopadmap$B[20]": {
+          "hide_name": 1,
+          "bits": [ 2634 ] ,
+          "attributes": {
+          }
+        },
+        "$iopadmap$B[19]": {
+          "hide_name": 1,
+          "bits": [ 2633 ] ,
+          "attributes": {
+          }
+        },
+        "$iopadmap$B[18]": {
+          "hide_name": 1,
+          "bits": [ 2632 ] ,
+          "attributes": {
+          }
+        },
+        "$iopadmap$B[17]": {
+          "hide_name": 1,
+          "bits": [ 2631 ] ,
+          "attributes": {
+          }
+        },
+        "$iopadmap$B[16]": {
+          "hide_name": 1,
+          "bits": [ 2630 ] ,
+          "attributes": {
+          }
+        },
+        "$iopadmap$B[15]": {
+          "hide_name": 1,
+          "bits": [ 2629 ] ,
+          "attributes": {
+          }
+        },
+        "$iopadmap$B[14]": {
+          "hide_name": 1,
+          "bits": [ 2628 ] ,
+          "attributes": {
+          }
+        },
+        "$iopadmap$B[13]": {
+          "hide_name": 1,
+          "bits": [ 2627 ] ,
+          "attributes": {
+          }
+        },
+        "$iopadmap$B[12]": {
+          "hide_name": 1,
+          "bits": [ 2626 ] ,
+          "attributes": {
+          }
+        },
+        "$iopadmap$B[11]": {
+          "hide_name": 1,
+          "bits": [ 2625 ] ,
+          "attributes": {
+          }
+        },
+        "$iopadmap$B[10]": {
+          "hide_name": 1,
+          "bits": [ 2624 ] ,
+          "attributes": {
+          }
+        },
+        "$iopadmap$B[9]": {
+          "hide_name": 1,
+          "bits": [ 2623 ] ,
+          "attributes": {
+          }
+        },
+        "$iopadmap$B[8]": {
+          "hide_name": 1,
+          "bits": [ 2622 ] ,
+          "attributes": {
+          }
+        },
+        "$iopadmap$B[7]": {
+          "hide_name": 1,
+          "bits": [ 2621 ] ,
+          "attributes": {
+          }
+        },
+        "$iopadmap$B[6]": {
+          "hide_name": 1,
+          "bits": [ 2620 ] ,
+          "attributes": {
+          }
+        },
+        "$iopadmap$B[5]": {
+          "hide_name": 1,
+          "bits": [ 2619 ] ,
+          "attributes": {
+          }
+        },
+        "$iopadmap$B[4]": {
+          "hide_name": 1,
+          "bits": [ 2618 ] ,
+          "attributes": {
+          }
+        },
+        "$iopadmap$B[3]": {
+          "hide_name": 1,
+          "bits": [ 2617 ] ,
+          "attributes": {
+          }
+        },
+        "$iopadmap$B[2]": {
+          "hide_name": 1,
+          "bits": [ 2616 ] ,
+          "attributes": {
+          }
+        },
+        "$iopadmap$B[1]": {
+          "hide_name": 1,
+          "bits": [ 2615 ] ,
+          "attributes": {
+          }
+        },
+        "$iopadmap$B[0]": {
+          "hide_name": 1,
+          "bits": [ 2614 ] ,
+          "attributes": {
+          }
+        },
+        "$iopadmap$A[31]": {
+          "hide_name": 1,
+          "bits": [ 2613 ] ,
+          "attributes": {
+          }
+        },
+        "$iopadmap$A[30]": {
+          "hide_name": 1,
+          "bits": [ 2612 ] ,
+          "attributes": {
+          }
+        },
+        "$iopadmap$A[29]": {
+          "hide_name": 1,
+          "bits": [ 2611 ] ,
+          "attributes": {
+          }
+        },
+        "$iopadmap$A[28]": {
+          "hide_name": 1,
+          "bits": [ 2610 ] ,
+          "attributes": {
+          }
+        },
+        "$iopadmap$A[27]": {
+          "hide_name": 1,
+          "bits": [ 2609 ] ,
+          "attributes": {
+          }
+        },
+        "$iopadmap$A[26]": {
+          "hide_name": 1,
+          "bits": [ 2608 ] ,
+          "attributes": {
+          }
+        },
+        "$iopadmap$A[25]": {
+          "hide_name": 1,
+          "bits": [ 2607 ] ,
+          "attributes": {
+          }
+        },
+        "$iopadmap$A[24]": {
+          "hide_name": 1,
+          "bits": [ 2606 ] ,
+          "attributes": {
+          }
+        },
+        "$iopadmap$A[23]": {
+          "hide_name": 1,
+          "bits": [ 2605 ] ,
+          "attributes": {
+          }
+        },
+        "$iopadmap$A[22]": {
+          "hide_name": 1,
+          "bits": [ 2604 ] ,
+          "attributes": {
+          }
+        },
+        "$iopadmap$A[21]": {
+          "hide_name": 1,
+          "bits": [ 2603 ] ,
+          "attributes": {
+          }
+        },
+        "$iopadmap$A[20]": {
+          "hide_name": 1,
+          "bits": [ 2602 ] ,
+          "attributes": {
+          }
+        },
+        "$iopadmap$A[19]": {
+          "hide_name": 1,
+          "bits": [ 2601 ] ,
+          "attributes": {
+          }
+        },
+        "$iopadmap$A[18]": {
+          "hide_name": 1,
+          "bits": [ 2600 ] ,
+          "attributes": {
+          }
+        },
+        "$iopadmap$A[17]": {
+          "hide_name": 1,
+          "bits": [ 2599 ] ,
+          "attributes": {
+          }
+        },
+        "$iopadmap$A[16]": {
+          "hide_name": 1,
+          "bits": [ 2598 ] ,
+          "attributes": {
+          }
+        },
+        "$iopadmap$A[15]": {
+          "hide_name": 1,
+          "bits": [ 2597 ] ,
+          "attributes": {
+          }
+        },
+        "$iopadmap$A[14]": {
+          "hide_name": 1,
+          "bits": [ 2596 ] ,
+          "attributes": {
+          }
+        },
+        "$iopadmap$A[13]": {
+          "hide_name": 1,
+          "bits": [ 2595 ] ,
+          "attributes": {
+          }
+        },
+        "$iopadmap$A[12]": {
+          "hide_name": 1,
+          "bits": [ 2594 ] ,
+          "attributes": {
+          }
+        },
+        "$iopadmap$A[11]": {
+          "hide_name": 1,
+          "bits": [ 2593 ] ,
+          "attributes": {
+          }
+        },
+        "$iopadmap$A[10]": {
+          "hide_name": 1,
+          "bits": [ 2592 ] ,
+          "attributes": {
+          }
+        },
+        "$iopadmap$A[9]": {
+          "hide_name": 1,
+          "bits": [ 2591 ] ,
+          "attributes": {
+          }
+        },
+        "$iopadmap$A[8]": {
+          "hide_name": 1,
+          "bits": [ 2590 ] ,
+          "attributes": {
+          }
+        },
+        "$iopadmap$A[7]": {
+          "hide_name": 1,
+          "bits": [ 2589 ] ,
+          "attributes": {
+          }
+        },
+        "$iopadmap$A[6]": {
+          "hide_name": 1,
+          "bits": [ 2588 ] ,
+          "attributes": {
+          }
+        },
+        "$iopadmap$A[5]": {
+          "hide_name": 1,
+          "bits": [ 2587 ] ,
+          "attributes": {
+          }
+        },
+        "$iopadmap$A[4]": {
+          "hide_name": 1,
+          "bits": [ 2586 ] ,
+          "attributes": {
+          }
+        },
+        "$iopadmap$A[3]": {
+          "hide_name": 1,
+          "bits": [ 2585 ] ,
+          "attributes": {
+          }
+        },
+        "$iopadmap$A[2]": {
+          "hide_name": 1,
+          "bits": [ 2584 ] ,
+          "attributes": {
+          }
+        },
+        "$iopadmap$A[1]": {
+          "hide_name": 1,
+          "bits": [ 2583 ] ,
+          "attributes": {
+          }
+        },
+        "$iopadmap$A[0]": {
+          "hide_name": 1,
+          "bits": [ 2582 ] ,
+          "attributes": {
+          }
+        },
+        "$iopadmap$Y[31]": {
+          "hide_name": 1,
+          "bits": [ 2578 ] ,
+          "attributes": {
+          }
+        },
+        "$iopadmap$Y[30]": {
+          "hide_name": 1,
+          "bits": [ 2577 ] ,
+          "attributes": {
+          }
+        },
+        "$iopadmap$Y[29]": {
+          "hide_name": 1,
+          "bits": [ 2576 ] ,
+          "attributes": {
+          }
+        },
+        "$iopadmap$Y[28]": {
+          "hide_name": 1,
+          "bits": [ 2575 ] ,
+          "attributes": {
+          }
+        },
+        "$iopadmap$Y[27]": {
+          "hide_name": 1,
+          "bits": [ 2574 ] ,
+          "attributes": {
+          }
+        },
+        "$iopadmap$Y[26]": {
+          "hide_name": 1,
+          "bits": [ 2573 ] ,
+          "attributes": {
+          }
+        },
+        "$iopadmap$Y[25]": {
+          "hide_name": 1,
+          "bits": [ 2572 ] ,
+          "attributes": {
+          }
+        },
+        "$iopadmap$Y[24]": {
+          "hide_name": 1,
+          "bits": [ 2571 ] ,
+          "attributes": {
+          }
+        },
+        "$iopadmap$Y[23]": {
+          "hide_name": 1,
+          "bits": [ 2570 ] ,
+          "attributes": {
+          }
+        },
+        "$iopadmap$Y[22]": {
+          "hide_name": 1,
+          "bits": [ 2569 ] ,
+          "attributes": {
+          }
+        },
+        "$iopadmap$Y[21]": {
+          "hide_name": 1,
+          "bits": [ 2568 ] ,
+          "attributes": {
+          }
+        },
+        "$iopadmap$Y[20]": {
+          "hide_name": 1,
+          "bits": [ 2567 ] ,
+          "attributes": {
+          }
+        },
+        "$iopadmap$Y[19]": {
+          "hide_name": 1,
+          "bits": [ 2566 ] ,
+          "attributes": {
+          }
+        },
+        "$iopadmap$Y[18]": {
+          "hide_name": 1,
+          "bits": [ 2565 ] ,
+          "attributes": {
+          }
+        },
+        "$iopadmap$Y[17]": {
+          "hide_name": 1,
+          "bits": [ 2564 ] ,
+          "attributes": {
+          }
+        },
+        "$iopadmap$Y[16]": {
+          "hide_name": 1,
+          "bits": [ 2563 ] ,
+          "attributes": {
+          }
+        },
+        "$iopadmap$Y[15]": {
+          "hide_name": 1,
+          "bits": [ 2562 ] ,
+          "attributes": {
+          }
+        },
+        "$iopadmap$Y[14]": {
+          "hide_name": 1,
+          "bits": [ 2561 ] ,
+          "attributes": {
+          }
+        },
+        "$iopadmap$Y[13]": {
+          "hide_name": 1,
+          "bits": [ 2560 ] ,
+          "attributes": {
+          }
+        },
+        "$iopadmap$Y[12]": {
+          "hide_name": 1,
+          "bits": [ 2559 ] ,
+          "attributes": {
+          }
+        },
+        "$iopadmap$Y[11]": {
+          "hide_name": 1,
+          "bits": [ 2558 ] ,
+          "attributes": {
+          }
+        },
+        "$iopadmap$Y[10]": {
+          "hide_name": 1,
+          "bits": [ 2557 ] ,
+          "attributes": {
+          }
+        },
+        "$iopadmap$Y[9]": {
+          "hide_name": 1,
+          "bits": [ 2556 ] ,
+          "attributes": {
+          }
+        },
+        "$iopadmap$Y[8]": {
+          "hide_name": 1,
+          "bits": [ 2555 ] ,
+          "attributes": {
+          }
+        },
+        "$iopadmap$Y[7]": {
+          "hide_name": 1,
+          "bits": [ 2554 ] ,
+          "attributes": {
+          }
+        },
+        "$iopadmap$Y[6]": {
+          "hide_name": 1,
+          "bits": [ 2553 ] ,
+          "attributes": {
+          }
+        },
+        "$iopadmap$Y[5]": {
+          "hide_name": 1,
+          "bits": [ 2552 ] ,
+          "attributes": {
+          }
+        },
+        "$iopadmap$Y[4]": {
+          "hide_name": 1,
+          "bits": [ 2551 ] ,
+          "attributes": {
+          }
+        },
+        "$iopadmap$Y[3]": {
+          "hide_name": 1,
+          "bits": [ 2550 ] ,
+          "attributes": {
+          }
+        },
+        "$iopadmap$Y[2]": {
+          "hide_name": 1,
+          "bits": [ 2549 ] ,
+          "attributes": {
+          }
+        },
+        "$iopadmap$Y[1]": {
+          "hide_name": 1,
+          "bits": [ 2548 ] ,
+          "attributes": {
+          }
+        },
+        "$iopadmap$Y[0]": {
+          "hide_name": 1,
+          "bits": [ 2547 ] ,
+          "attributes": {
+          }
+        },
+        "regs.out[31]": {
+          "hide_name": 0,
+          "bits": [ 2546 ] ,
+          "attributes": {
+            "stable": "00000000000000000000000000000001",
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:19.58-19.61",
+            "hdlname": "regs out",
+            "data": "00000000000000000000000000000001"
+          }
+        },
+        "regs.out[30]": {
+          "hide_name": 0,
+          "bits": [ 2545 ] ,
+          "attributes": {
+            "stable": "00000000000000000000000000000001",
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:19.58-19.61",
+            "hdlname": "regs out",
+            "data": "00000000000000000000000000000001"
+          }
+        },
+        "regs.out[29]": {
+          "hide_name": 0,
+          "bits": [ 2544 ] ,
+          "attributes": {
+            "stable": "00000000000000000000000000000001",
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:19.58-19.61",
+            "hdlname": "regs out",
+            "data": "00000000000000000000000000000001"
+          }
+        },
+        "regs.out[28]": {
+          "hide_name": 0,
+          "bits": [ 2543 ] ,
+          "attributes": {
+            "stable": "00000000000000000000000000000001",
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:19.58-19.61",
+            "hdlname": "regs out",
+            "data": "00000000000000000000000000000001"
+          }
+        },
+        "regs.out[27]": {
+          "hide_name": 0,
+          "bits": [ 2542 ] ,
+          "attributes": {
+            "stable": "00000000000000000000000000000001",
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:19.58-19.61",
+            "hdlname": "regs out",
+            "data": "00000000000000000000000000000001"
+          }
+        },
+        "regs.out[26]": {
+          "hide_name": 0,
+          "bits": [ 2541 ] ,
+          "attributes": {
+            "stable": "00000000000000000000000000000001",
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:19.58-19.61",
+            "hdlname": "regs out",
+            "data": "00000000000000000000000000000001"
+          }
+        },
+        "regs.out[25]": {
+          "hide_name": 0,
+          "bits": [ 2540 ] ,
+          "attributes": {
+            "stable": "00000000000000000000000000000001",
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:19.58-19.61",
+            "hdlname": "regs out",
+            "data": "00000000000000000000000000000001"
+          }
+        },
+        "regs.out[24]": {
+          "hide_name": 0,
+          "bits": [ 2539 ] ,
+          "attributes": {
+            "stable": "00000000000000000000000000000001",
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:19.58-19.61",
+            "hdlname": "regs out",
+            "data": "00000000000000000000000000000001"
+          }
+        },
+        "regs.out[23]": {
+          "hide_name": 0,
+          "bits": [ 2538 ] ,
+          "attributes": {
+            "stable": "00000000000000000000000000000001",
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:19.58-19.61",
+            "hdlname": "regs out",
+            "data": "00000000000000000000000000000001"
+          }
+        },
+        "regs.out[22]": {
+          "hide_name": 0,
+          "bits": [ 2537 ] ,
+          "attributes": {
+            "stable": "00000000000000000000000000000001",
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:19.58-19.61",
+            "hdlname": "regs out",
+            "data": "00000000000000000000000000000001"
+          }
+        },
+        "regs.out[21]": {
+          "hide_name": 0,
+          "bits": [ 2536 ] ,
+          "attributes": {
+            "stable": "00000000000000000000000000000001",
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:19.58-19.61",
+            "hdlname": "regs out",
+            "data": "00000000000000000000000000000001"
+          }
+        },
+        "regs.out[20]": {
+          "hide_name": 0,
+          "bits": [ 2535 ] ,
+          "attributes": {
+            "stable": "00000000000000000000000000000001",
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:19.58-19.61",
+            "hdlname": "regs out",
+            "data": "00000000000000000000000000000001"
+          }
+        },
+        "regs.out[19]": {
+          "hide_name": 0,
+          "bits": [ 2534 ] ,
+          "attributes": {
+            "stable": "00000000000000000000000000000001",
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:19.58-19.61",
+            "hdlname": "regs out",
+            "data": "00000000000000000000000000000001"
+          }
+        },
+        "regs.out[18]": {
+          "hide_name": 0,
+          "bits": [ 2533 ] ,
+          "attributes": {
+            "stable": "00000000000000000000000000000001",
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:19.58-19.61",
+            "hdlname": "regs out",
+            "data": "00000000000000000000000000000001"
+          }
+        },
+        "regs.out[17]": {
+          "hide_name": 0,
+          "bits": [ 2532 ] ,
+          "attributes": {
+            "stable": "00000000000000000000000000000001",
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:19.58-19.61",
+            "hdlname": "regs out",
+            "data": "00000000000000000000000000000001"
+          }
+        },
+        "regs.out[16]": {
+          "hide_name": 0,
+          "bits": [ 2531 ] ,
+          "attributes": {
+            "stable": "00000000000000000000000000000001",
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:19.58-19.61",
+            "hdlname": "regs out",
+            "data": "00000000000000000000000000000001"
+          }
+        },
+        "regs.out[15]": {
+          "hide_name": 0,
+          "bits": [ 2530 ] ,
+          "attributes": {
+            "stable": "00000000000000000000000000000001",
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:19.58-19.61",
+            "hdlname": "regs out",
+            "data": "00000000000000000000000000000001"
+          }
+        },
+        "regs.out[14]": {
+          "hide_name": 0,
+          "bits": [ 2529 ] ,
+          "attributes": {
+            "stable": "00000000000000000000000000000001",
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:19.58-19.61",
+            "hdlname": "regs out",
+            "data": "00000000000000000000000000000001"
+          }
+        },
+        "regs.out[13]": {
+          "hide_name": 0,
+          "bits": [ 2528 ] ,
+          "attributes": {
+            "stable": "00000000000000000000000000000001",
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:19.58-19.61",
+            "hdlname": "regs out",
+            "data": "00000000000000000000000000000001"
+          }
+        },
+        "regs.out[12]": {
+          "hide_name": 0,
+          "bits": [ 2527 ] ,
+          "attributes": {
+            "stable": "00000000000000000000000000000001",
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:19.58-19.61",
+            "hdlname": "regs out",
+            "data": "00000000000000000000000000000001"
+          }
+        },
+        "regs.out[11]": {
+          "hide_name": 0,
+          "bits": [ 2526 ] ,
+          "attributes": {
+            "stable": "00000000000000000000000000000001",
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:19.58-19.61",
+            "hdlname": "regs out",
+            "data": "00000000000000000000000000000001"
+          }
+        },
+        "regs.out[10]": {
+          "hide_name": 0,
+          "bits": [ 2525 ] ,
+          "attributes": {
+            "stable": "00000000000000000000000000000001",
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:19.58-19.61",
+            "hdlname": "regs out",
+            "data": "00000000000000000000000000000001"
+          }
+        },
+        "regs.out[9]": {
+          "hide_name": 0,
+          "bits": [ 2524 ] ,
+          "attributes": {
+            "stable": "00000000000000000000000000000001",
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:19.58-19.61",
+            "hdlname": "regs out",
+            "data": "00000000000000000000000000000001"
+          }
+        },
+        "regs.out[8]": {
+          "hide_name": 0,
+          "bits": [ 2523 ] ,
+          "attributes": {
+            "stable": "00000000000000000000000000000001",
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:19.58-19.61",
+            "hdlname": "regs out",
+            "data": "00000000000000000000000000000001"
+          }
+        },
+        "regs.out[7]": {
+          "hide_name": 0,
+          "bits": [ 2522 ] ,
+          "attributes": {
+            "stable": "00000000000000000000000000000001",
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:19.58-19.61",
+            "hdlname": "regs out",
+            "data": "00000000000000000000000000000001"
+          }
+        },
+        "regs.out[6]": {
+          "hide_name": 0,
+          "bits": [ 2521 ] ,
+          "attributes": {
+            "stable": "00000000000000000000000000000001",
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:19.58-19.61",
+            "hdlname": "regs out",
+            "data": "00000000000000000000000000000001"
+          }
+        },
+        "regs.out[5]": {
+          "hide_name": 0,
+          "bits": [ 2520 ] ,
+          "attributes": {
+            "stable": "00000000000000000000000000000001",
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:19.58-19.61",
+            "hdlname": "regs out",
+            "data": "00000000000000000000000000000001"
+          }
+        },
+        "regs.out[4]": {
+          "hide_name": 0,
+          "bits": [ 2519 ] ,
+          "attributes": {
+            "stable": "00000000000000000000000000000001",
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:19.58-19.61",
+            "hdlname": "regs out",
+            "data": "00000000000000000000000000000001"
+          }
+        },
+        "regs.out[3]": {
+          "hide_name": 0,
+          "bits": [ 2518 ] ,
+          "attributes": {
+            "stable": "00000000000000000000000000000001",
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:19.58-19.61",
+            "hdlname": "regs out",
+            "data": "00000000000000000000000000000001"
+          }
+        },
+        "regs.out[2]": {
+          "hide_name": 0,
+          "bits": [ 2517 ] ,
+          "attributes": {
+            "stable": "00000000000000000000000000000001",
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:19.58-19.61",
+            "hdlname": "regs out",
+            "data": "00000000000000000000000000000001"
+          }
+        },
+        "regs.out[1]": {
+          "hide_name": 0,
+          "bits": [ 2516 ] ,
+          "attributes": {
+            "stable": "00000000000000000000000000000001",
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:19.58-19.61",
+            "hdlname": "regs out",
+            "data": "00000000000000000000000000000001"
+          }
+        },
+        "regs.out[0]": {
+          "hide_name": 0,
+          "bits": [ 2515 ] ,
+          "attributes": {
+            "stable": "00000000000000000000000000000001",
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:19.58-19.61",
+            "hdlname": "regs out",
+            "data": "00000000000000000000000000000001"
+          }
+        },
+        "$auto$hilomap.cc:40:hilomap_worker$38[31]": {
+          "hide_name": 1,
+          "bits": [ 2509 ] ,
+          "attributes": {
+          }
+        },
+        "$auto$hilomap.cc:40:hilomap_worker$38[30]": {
+          "hide_name": 1,
+          "bits": [ 2508 ] ,
+          "attributes": {
+          }
+        },
+        "$auto$hilomap.cc:40:hilomap_worker$38[29]": {
+          "hide_name": 1,
+          "bits": [ 2507 ] ,
+          "attributes": {
+          }
+        },
+        "$auto$hilomap.cc:40:hilomap_worker$38[28]": {
+          "hide_name": 1,
+          "bits": [ 2506 ] ,
+          "attributes": {
+          }
+        },
+        "$auto$hilomap.cc:40:hilomap_worker$38[27]": {
+          "hide_name": 1,
+          "bits": [ 2505 ] ,
+          "attributes": {
+          }
+        },
+        "$auto$hilomap.cc:40:hilomap_worker$38[26]": {
+          "hide_name": 1,
+          "bits": [ 2504 ] ,
+          "attributes": {
+          }
+        },
+        "$auto$hilomap.cc:40:hilomap_worker$38[25]": {
+          "hide_name": 1,
+          "bits": [ 2503 ] ,
+          "attributes": {
+          }
+        },
+        "$auto$hilomap.cc:40:hilomap_worker$38[24]": {
+          "hide_name": 1,
+          "bits": [ 2502 ] ,
+          "attributes": {
+          }
+        },
+        "$auto$hilomap.cc:40:hilomap_worker$38[23]": {
+          "hide_name": 1,
+          "bits": [ 2501 ] ,
+          "attributes": {
+          }
+        },
+        "$auto$hilomap.cc:40:hilomap_worker$38[22]": {
+          "hide_name": 1,
+          "bits": [ 2500 ] ,
+          "attributes": {
+          }
+        },
+        "$auto$hilomap.cc:40:hilomap_worker$38[21]": {
+          "hide_name": 1,
+          "bits": [ 2499 ] ,
+          "attributes": {
+          }
+        },
+        "$auto$hilomap.cc:40:hilomap_worker$38[20]": {
+          "hide_name": 1,
+          "bits": [ 2498 ] ,
+          "attributes": {
+          }
+        },
+        "$auto$hilomap.cc:40:hilomap_worker$38[19]": {
+          "hide_name": 1,
+          "bits": [ 2497 ] ,
+          "attributes": {
+          }
+        },
+        "$auto$hilomap.cc:40:hilomap_worker$38[18]": {
+          "hide_name": 1,
+          "bits": [ 2496 ] ,
+          "attributes": {
+          }
+        },
+        "$auto$hilomap.cc:40:hilomap_worker$38[17]": {
+          "hide_name": 1,
+          "bits": [ 2495 ] ,
+          "attributes": {
+          }
+        },
+        "$auto$hilomap.cc:40:hilomap_worker$38[16]": {
+          "hide_name": 1,
+          "bits": [ 2494 ] ,
+          "attributes": {
+          }
+        },
+        "$auto$hilomap.cc:40:hilomap_worker$38[15]": {
+          "hide_name": 1,
+          "bits": [ 2493 ] ,
+          "attributes": {
+          }
+        },
+        "$auto$hilomap.cc:40:hilomap_worker$38[14]": {
+          "hide_name": 1,
+          "bits": [ 2492 ] ,
+          "attributes": {
+          }
+        },
+        "$auto$hilomap.cc:40:hilomap_worker$38[13]": {
+          "hide_name": 1,
+          "bits": [ 2491 ] ,
+          "attributes": {
+          }
+        },
+        "$auto$hilomap.cc:40:hilomap_worker$38[12]": {
+          "hide_name": 1,
+          "bits": [ 2490 ] ,
+          "attributes": {
+          }
+        },
+        "$auto$hilomap.cc:40:hilomap_worker$38[11]": {
+          "hide_name": 1,
+          "bits": [ 2489 ] ,
+          "attributes": {
+          }
+        },
+        "$auto$hilomap.cc:40:hilomap_worker$38[10]": {
+          "hide_name": 1,
+          "bits": [ 2488 ] ,
+          "attributes": {
+          }
+        },
+        "$auto$hilomap.cc:40:hilomap_worker$38[9]": {
+          "hide_name": 1,
+          "bits": [ 2487 ] ,
+          "attributes": {
+          }
+        },
+        "$auto$hilomap.cc:40:hilomap_worker$38[8]": {
+          "hide_name": 1,
+          "bits": [ 2486 ] ,
+          "attributes": {
+          }
+        },
+        "$auto$hilomap.cc:40:hilomap_worker$38[7]": {
+          "hide_name": 1,
+          "bits": [ 2485 ] ,
+          "attributes": {
+          }
+        },
+        "$auto$hilomap.cc:40:hilomap_worker$38[6]": {
+          "hide_name": 1,
+          "bits": [ 2484 ] ,
+          "attributes": {
+          }
+        },
+        "$auto$hilomap.cc:40:hilomap_worker$38[5]": {
+          "hide_name": 1,
+          "bits": [ 2483 ] ,
+          "attributes": {
+          }
+        },
+        "$auto$hilomap.cc:40:hilomap_worker$38[4]": {
+          "hide_name": 1,
+          "bits": [ 2482 ] ,
+          "attributes": {
+          }
+        },
+        "$auto$hilomap.cc:40:hilomap_worker$38[3]": {
+          "hide_name": 1,
+          "bits": [ 2481 ] ,
+          "attributes": {
+          }
+        },
+        "$auto$hilomap.cc:40:hilomap_worker$38[2]": {
+          "hide_name": 1,
+          "bits": [ 2480 ] ,
+          "attributes": {
+          }
+        },
+        "$auto$hilomap.cc:40:hilomap_worker$38[1]": {
+          "hide_name": 1,
+          "bits": [ 2479 ] ,
+          "attributes": {
+          }
+        },
+        "$auto$hilomap.cc:40:hilomap_worker$38[0]": {
+          "hide_name": 1,
+          "bits": [ 2478 ] ,
+          "attributes": {
+          }
+        },
+        "Y[8]": {
+          "hide_name": 0,
+          "bits": [ 2982 ] ,
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:37.25-37.26"
+          }
+        },
+        "Y[7]": {
+          "hide_name": 0,
+          "bits": [ 2980 ] ,
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:37.25-37.26"
+          }
+        },
+        "Y[6]": {
+          "hide_name": 0,
+          "bits": [ 2978 ] ,
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:37.25-37.26"
+          }
+        },
+        "Y[5]": {
+          "hide_name": 0,
+          "bits": [ 2976 ] ,
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:37.25-37.26"
+          }
+        },
+        "Y[4]": {
+          "hide_name": 0,
+          "bits": [ 2974 ] ,
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:37.25-37.26"
+          }
+        },
+        "Y[3]": {
+          "hide_name": 0,
+          "bits": [ 2972 ] ,
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:37.25-37.26"
+          }
+        },
+        "Y[31]": {
+          "hide_name": 0,
+          "bits": [ 2970 ] ,
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:37.25-37.26"
+          }
+        },
+        "Y[30]": {
+          "hide_name": 0,
+          "bits": [ 2968 ] ,
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:37.25-37.26"
+          }
+        },
+        "Y[29]": {
+          "hide_name": 0,
+          "bits": [ 2966 ] ,
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:37.25-37.26"
+          }
+        },
+        "Y[2]": {
+          "hide_name": 0,
+          "bits": [ 2964 ] ,
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:37.25-37.26"
+          }
+        },
+        "Y[28]": {
+          "hide_name": 0,
+          "bits": [ 2962 ] ,
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:37.25-37.26"
+          }
+        },
+        "Y[27]": {
+          "hide_name": 0,
+          "bits": [ 2960 ] ,
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:37.25-37.26"
+          }
+        },
+        "Y[26]": {
+          "hide_name": 0,
+          "bits": [ 2958 ] ,
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:37.25-37.26"
+          }
+        },
+        "Y[25]": {
+          "hide_name": 0,
+          "bits": [ 2956 ] ,
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:37.25-37.26"
+          }
+        },
+        "Y[24]": {
+          "hide_name": 0,
+          "bits": [ 2954 ] ,
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:37.25-37.26"
+          }
+        },
+        "Y[23]": {
+          "hide_name": 0,
+          "bits": [ 2952 ] ,
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:37.25-37.26"
+          }
+        },
+        "Y[22]": {
+          "hide_name": 0,
+          "bits": [ 2950 ] ,
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:37.25-37.26"
+          }
+        },
+        "Y[21]": {
+          "hide_name": 0,
+          "bits": [ 2948 ] ,
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:37.25-37.26"
+          }
+        },
+        "Y[20]": {
+          "hide_name": 0,
+          "bits": [ 2946 ] ,
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:37.25-37.26"
+          }
+        },
+        "Y[19]": {
+          "hide_name": 0,
+          "bits": [ 2944 ] ,
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:37.25-37.26"
+          }
+        },
+        "Y[1]": {
+          "hide_name": 0,
+          "bits": [ 2942 ] ,
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:37.25-37.26"
+          }
+        },
+        "Y[18]": {
+          "hide_name": 0,
+          "bits": [ 2940 ] ,
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:37.25-37.26"
+          }
+        },
+        "Y[17]": {
+          "hide_name": 0,
+          "bits": [ 2938 ] ,
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:37.25-37.26"
+          }
+        },
+        "Y[16]": {
+          "hide_name": 0,
+          "bits": [ 2936 ] ,
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:37.25-37.26"
+          }
+        },
+        "Y[15]": {
+          "hide_name": 0,
+          "bits": [ 2934 ] ,
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:37.25-37.26"
+          }
+        },
+        "Y[14]": {
+          "hide_name": 0,
+          "bits": [ 2932 ] ,
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:37.25-37.26"
+          }
+        },
+        "Y[13]": {
+          "hide_name": 0,
+          "bits": [ 2930 ] ,
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:37.25-37.26"
+          }
+        },
+        "Y[12]": {
+          "hide_name": 0,
+          "bits": [ 2928 ] ,
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:37.25-37.26"
+          }
+        },
+        "Y[11]": {
+          "hide_name": 0,
+          "bits": [ 2926 ] ,
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:37.25-37.26"
+          }
+        },
+        "Y[10]": {
+          "hide_name": 0,
+          "bits": [ 2924 ] ,
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:37.25-37.26"
+          }
+        },
+        "Y[9]": {
+          "hide_name": 0,
+          "bits": [ 2922 ] ,
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:37.25-37.26"
+          }
+        },
+        "Y[0]": {
+          "hide_name": 0,
+          "bits": [ 2920 ] ,
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:37.25-37.26"
+          }
+        },
+        "A[8]": {
+          "hide_name": 0,
+          "bits": [ 2786 ] ,
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:35.24-35.25"
+          }
+        },
+        "A[7]": {
+          "hide_name": 0,
+          "bits": [ 2784 ] ,
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:35.24-35.25"
+          }
+        },
+        "A[6]": {
+          "hide_name": 0,
+          "bits": [ 2782 ] ,
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:35.24-35.25"
+          }
+        },
+        "A[5]": {
+          "hide_name": 0,
+          "bits": [ 2780 ] ,
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:35.24-35.25"
+          }
+        },
+        "A[4]": {
+          "hide_name": 0,
+          "bits": [ 2778 ] ,
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:35.24-35.25"
+          }
+        },
+        "A[3]": {
+          "hide_name": 0,
+          "bits": [ 2776 ] ,
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:35.24-35.25"
+          }
+        },
+        "A[31]": {
+          "hide_name": 0,
+          "bits": [ 2774 ] ,
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:35.24-35.25"
+          }
+        },
+        "A[30]": {
+          "hide_name": 0,
+          "bits": [ 2772 ] ,
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:35.24-35.25"
+          }
+        },
+        "A[29]": {
+          "hide_name": 0,
+          "bits": [ 2770 ] ,
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:35.24-35.25"
+          }
+        },
+        "A[2]": {
+          "hide_name": 0,
+          "bits": [ 2768 ] ,
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:35.24-35.25"
+          }
+        },
+        "A[28]": {
+          "hide_name": 0,
+          "bits": [ 2766 ] ,
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:35.24-35.25"
+          }
+        },
+        "A[27]": {
+          "hide_name": 0,
+          "bits": [ 2764 ] ,
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:35.24-35.25"
+          }
+        },
+        "A[26]": {
+          "hide_name": 0,
+          "bits": [ 2762 ] ,
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:35.24-35.25"
+          }
+        },
+        "A[25]": {
+          "hide_name": 0,
+          "bits": [ 2760 ] ,
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:35.24-35.25"
+          }
+        },
+        "A[24]": {
+          "hide_name": 0,
+          "bits": [ 2758 ] ,
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:35.24-35.25"
+          }
+        },
+        "A[23]": {
+          "hide_name": 0,
+          "bits": [ 2756 ] ,
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:35.24-35.25"
+          }
+        },
+        "A[22]": {
+          "hide_name": 0,
+          "bits": [ 2754 ] ,
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:35.24-35.25"
+          }
+        },
+        "A[21]": {
+          "hide_name": 0,
+          "bits": [ 2752 ] ,
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:35.24-35.25"
+          }
+        },
+        "A[20]": {
+          "hide_name": 0,
+          "bits": [ 2750 ] ,
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:35.24-35.25"
+          }
+        },
+        "A[19]": {
+          "hide_name": 0,
+          "bits": [ 2748 ] ,
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:35.24-35.25"
+          }
+        },
+        "A[1]": {
+          "hide_name": 0,
+          "bits": [ 2746 ] ,
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:35.24-35.25"
+          }
+        },
+        "A[18]": {
+          "hide_name": 0,
+          "bits": [ 2744 ] ,
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:35.24-35.25"
+          }
+        },
+        "A[17]": {
+          "hide_name": 0,
+          "bits": [ 2742 ] ,
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:35.24-35.25"
+          }
+        },
+        "A[16]": {
+          "hide_name": 0,
+          "bits": [ 2740 ] ,
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:35.24-35.25"
+          }
+        },
+        "A[15]": {
+          "hide_name": 0,
+          "bits": [ 2738 ] ,
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:35.24-35.25"
+          }
+        },
+        "A[14]": {
+          "hide_name": 0,
+          "bits": [ 2736 ] ,
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:35.24-35.25"
+          }
+        },
+        "A[13]": {
+          "hide_name": 0,
+          "bits": [ 2734 ] ,
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:35.24-35.25"
+          }
+        },
+        "A[12]": {
+          "hide_name": 0,
+          "bits": [ 2732 ] ,
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:35.24-35.25"
+          }
+        },
+        "A[11]": {
+          "hide_name": 0,
+          "bits": [ 2730 ] ,
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:35.24-35.25"
+          }
+        },
+        "A[10]": {
+          "hide_name": 0,
+          "bits": [ 2728 ] ,
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:35.24-35.25"
+          }
+        },
+        "A[9]": {
+          "hide_name": 0,
+          "bits": [ 2726 ] ,
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:35.24-35.25"
+          }
+        },
+        "A[0]": {
+          "hide_name": 0,
+          "bits": [ 2724 ] ,
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:35.24-35.25"
+          }
+        }
+      }
+    }
+  }
+}

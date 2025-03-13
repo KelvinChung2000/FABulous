@@ -1,6 +1,7 @@
 from subprocess import run
 
-from FABulous.fabric_cad.chip_database_gen.chip import Chip, TimingValue
+from FABulous.fabric_cad.chip_database_gen.chip import Chip
+from FABulous.fabric_cad.chip_database_gen.database_timing import TimingValue
 from FABulous.fabric_cad.chip_database_gen.define import NodeWire, PinType
 
 ch = Chip("example", "example", 4, 4)

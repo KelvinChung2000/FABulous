@@ -16,6 +16,9 @@
         "cmake.configureArgs": [
             "-DARCH=himbaechel",
             "-DHIMBAECHEL_UARCH=fabulous"
-        ]
+        ],
+        "cmake.sourceDirectory": "${workspaceFolder}/../nextpnr",
+        "cmake.ctestPath": "${workspaceFolder}/../nextpnr",
+        "cmake.buildDirectory": "${workspaceFolder}/../nextpnr/build"
     }
 }

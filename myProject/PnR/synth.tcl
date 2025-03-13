@@ -16,7 +16,7 @@ yosys read_rtlil $fabRoot/myProject/Tile/PE/metadata/cell_ALU_ALU_func_0.il
 yosys techmap -map $fabRoot/myProject/.FABulous/wrap_map.v
 yosys design -save __add_xmap
 yosys design -pop
-yosys extract -constports -ignore_parameters -map %__add_xmap -swap "$__add_wrapper" A,B;;
+yosys extract -constports -ignore_parameters -map %__add_xmap -swap "\$__add_wrapper" A,B;;
 yosys techmap -map $fabRoot/myProject/.FABulous/unwrap_map.v
 yosys techmap -map $fabRoot/myProject/.FABulous/techmaps.v
 

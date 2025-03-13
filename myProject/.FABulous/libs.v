@@ -12,14 +12,10 @@ endmodule
 
 
 (* blackbox *)
-module reg_unit #(
-
+module const_unit #(
+    parameter ConfigBits = 0
 )(
-    input en,
-    input [31:0] reg_in,
-    input rst,
-    output [31:0] reg_out,
-    input clk
+    output [31:0] const_out
 );
 
 endmodule
@@ -39,10 +35,14 @@ endmodule
 
 
 (* blackbox *)
-module const_unit #(
-    parameter ConfigBits = 0
+module reg_unit #(
+
 )(
-    output [31:0] const_out
+    input en,
+    input [31:0] reg_in,
+    input rst,
+    output [31:0] reg_out,
+    input clk
 );
 
 endmodule

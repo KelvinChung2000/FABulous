@@ -1,9 +1,17 @@
 import sys
 from os import path
 
+from FABulous.fabric_cad.chip_database_gen.database_timing import TimingValue
+
 sys.path.append(path.join(path.dirname(__file__), "../.."))
-from FABulous.fabric_cad.chip_database_gen.chip import Chip, ClockEdge, NodeWire, PinType, TimingValue
 from himbaechel_dbgen.chip import *
+
+from FABulous.fabric_cad.chip_database_gen.chip import (
+    Chip,
+    ClockEdge,
+    NodeWire,
+    PinType,
+)
 
 # Grid size including IOBs at edges
 X = 100
@@ -283,4 +291,5 @@ def main():
 
 
 if __name__ == "__main__":
+    main()
     main()

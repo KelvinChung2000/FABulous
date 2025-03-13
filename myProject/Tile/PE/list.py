@@ -14,11 +14,11 @@ class MuxList(PE_ports):
         ]
         self.data_in2 //= [self.in0, self.in1, self.in2, self.in3, self.const_out]
         self.data_in2 //= [
-            self.RES_reg_in,
-            self.N_reg_in,
-            self.E_reg_in,
-            self.S_reg_in,
-            self.W_reg_in,
+            self.RES_reg_out,
+            self.N_reg_out,
+            self.E_reg_out,
+            self.S_reg_out,
+            self.W_reg_out,
         ]
         self.data_in3 //= [self.in0, self.in1, self.in2, self.in3, self.const_out]
 
@@ -26,6 +26,7 @@ class MuxList(PE_ports):
 
         for i in range(4):
             self[f"out{i}"] //= self.data_out
+            self[f"out{i}"] //= self.RES_reg_out
 
         self.N_reg_in //= self.in0
         self.E_reg_in //= self.in1
@@ -36,6 +37,7 @@ class MuxList(PE_ports):
         self.E_reg_in //= self.E_reg_out
         self.S_reg_in //= self.S_reg_out
         self.W_reg_in //= self.W_reg_out
+
 
         # self.spanOut[1] //= self.spanIn[0]
         # self.spanOut[0] //= self.spanIn[1]

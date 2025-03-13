@@ -9,8 +9,8 @@ class S_IO_ports:
         self.out0 = MuxPort(TilePort(name='out0', ioDirection=IO.OUTPUT, wireCount=32, isBus=False, sideOfTile=Side.NORTH, terminal=False), isTilePort=True, isBus=False, bitWidth=32)
 
         # bel ports
-        self.S_from_fabric = MuxPort(BelPort(name='S_from_fabric', ioDirection=IO.INPUT, wireCount=32, isBus=True, prefix='S_', external=False, control=False), isBelPort=True, isBus=True, bitWidth=32)
-        self.S_to_fabric = MuxPort(BelPort(name='S_to_fabric', ioDirection=IO.OUTPUT, wireCount=32, isBus=True, prefix='S_', external=False, control=False), isBelPort=True, isBus=True, bitWidth=32)
+        self.S_from_fabric = MuxPort(BelPort(name='from_fabric', ioDirection=IO.INPUT, wireCount=32, isBus=True, prefix='S_', external=False, control=False), isBelPort=True, isBus=True, bitWidth=32)
+        self.S_to_fabric = MuxPort(BelPort(name='to_fabric', ioDirection=IO.OUTPUT, wireCount=32, isBus=True, prefix='S_', external=False, control=False), isBelPort=True, isBus=True, bitWidth=32)
 
         self.GND = MuxPort(Port(name="gnd", ioDirection=IO.OUTPUT, wireCount=1, isBus=False), bitWidth=1)
         self.VCC = MuxPort(Port(name="vcc", ioDirection=IO.OUTPUT, wireCount=1, isBus=False), bitWidth=1)

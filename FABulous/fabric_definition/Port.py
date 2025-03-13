@@ -117,7 +117,7 @@ class BelPort(Port):
 
     def createSelf(self) -> str:
         return (
-            f"BelPort(name='{self.prefix}{self.name}', ioDirection=IO.{self.ioDirection.upper()}, "
+            f"BelPort(name='{self.name}', ioDirection=IO.{self.ioDirection.upper()}, "
             f"wireCount={self.wireCount}, isBus={self.isBus}, prefix='{self.prefix}', "
             f"external={self.external}, control={self.control})"
         )

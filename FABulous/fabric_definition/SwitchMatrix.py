@@ -154,7 +154,7 @@ class SwitchMatrix:
     #         self.addMux(mux.name, list(mux.inputs), mux.output)
 
     def __repr__(self) -> str:
-        return f"SwitchMatrix({self.muxesDict.values()=}, configBits={self.configBits})"
+        return f"SwitchMatrix({list(self.muxesDict.values())}, configBits={self.configBits})"
 
     @property
     def muxes(self) -> list[Mux]:

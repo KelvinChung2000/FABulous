@@ -1,46 +1,23 @@
-#ALU
+#RES_reg_unit:en
 
-#const_unit
+#RES_reg_unit:reg_in
+ALU:data_out 32 reg_unit:reg_in 32 2 
 
-#reg_unit
-reg_unit:en 1 GND_DRV:GND 1  8192
-reg_unit:en 1 VCC_DRV:VCC 1 16384
-reg_unit:rst 1 GND_DRV:GND 1  8704
-reg_unit:rst 1 VCC_DRV:VCC 1 16896
+#RES_reg_unit:rst
 
-#IO
+#N_reg_unit:en
 
-#BelPort(input data_in1[31:0])<(data_in1)-[TilePort({NORTH} input in0[31:0]), TilePort({EAST} input in1[31:0]), TilePort({SOUTH} input in2[31:0]), TilePort({WEST} input in3[31:0]), BelPort(output RES_reg_out[31:0]), BelPort(output N_reg_out[31:0]), BelPort(output E_reg_out[31:0]), BelPort(output S_reg_out[31:0]), BelPort(output W_reg_out[31:0])]
-#BelPort(input data_in1[31:0])<(data_in1)-[TilePort({NORTH} input in0[31:0]), TilePort({EAST} input in1[31:0]), TilePort({SOUTH} input in2[31:0]), TilePort({WEST} input in3[31:0]), BelPort(output RES_reg_out[31:0]), BelPort(output N_reg_out[31:0]), BelPort(output E_reg_out[31:0]), BelPort(output S_reg_out[31:0]), BelPort(output W_reg_out[31:0])]
-#BelPort(input data_in1[31:0])<(data_in1)-[TilePort({NORTH} input in0[31:0]), TilePort({EAST} input in1[31:0]), TilePort({SOUTH} input in2[31:0]), TilePort({WEST} input in3[31:0]), BelPort(output RES_reg_out[31:0]), BelPort(output N_reg_out[31:0]), BelPort(output E_reg_out[31:0]), BelPort(output S_reg_out[31:0]), BelPort(output W_reg_out[31:0])]
-#BelPort(input data_in1[31:0])<(data_in1)-[TilePort({NORTH} input in0[31:0]), TilePort({EAST} input in1[31:0]), TilePort({SOUTH} input in2[31:0]), TilePort({WEST} input in3[31:0]), BelPort(output RES_reg_out[31:0]), BelPort(output N_reg_out[31:0]), BelPort(output E_reg_out[31:0]), BelPort(output S_reg_out[31:0]), BelPort(output W_reg_out[31:0])]
-#BelPort(input data_in1[31:0])<(data_in1)-[TilePort({NORTH} input in0[31:0]), TilePort({EAST} input in1[31:0]), TilePort({SOUTH} input in2[31:0]), TilePort({WEST} input in3[31:0]), BelPort(output RES_reg_out[31:0]), BelPort(output N_reg_out[31:0]), BelPort(output E_reg_out[31:0]), BelPort(output S_reg_out[31:0]), BelPort(output W_reg_out[31:0])]
-#BelPort(input data_in1[31:0])<(data_in1)-[TilePort({NORTH} input in0[31:0]), TilePort({EAST} input in1[31:0]), TilePort({SOUTH} input in2[31:0]), TilePort({WEST} input in3[31:0]), BelPort(output RES_reg_out[31:0]), BelPort(output N_reg_out[31:0]), BelPort(output E_reg_out[31:0]), BelPort(output S_reg_out[31:0]), BelPort(output W_reg_out[31:0])]
-#BelPort(input data_in1[31:0])<(data_in1)-[TilePort({NORTH} input in0[31:0]), TilePort({EAST} input in1[31:0]), TilePort({SOUTH} input in2[31:0]), TilePort({WEST} input in3[31:0]), BelPort(output RES_reg_out[31:0]), BelPort(output N_reg_out[31:0]), BelPort(output E_reg_out[31:0]), BelPort(output S_reg_out[31:0]), BelPort(output W_reg_out[31:0])]
-#BelPort(input data_in1[31:0])<(data_in1)-[TilePort({NORTH} input in0[31:0]), TilePort({EAST} input in1[31:0]), TilePort({SOUTH} input in2[31:0]), TilePort({WEST} input in3[31:0]), BelPort(output RES_reg_out[31:0]), BelPort(output N_reg_out[31:0]), BelPort(output E_reg_out[31:0]), BelPort(output S_reg_out[31:0]), BelPort(output W_reg_out[31:0])]
-#BelPort(input data_in1[31:0])<(data_in1)-[TilePort({NORTH} input in0[31:0]), TilePort({EAST} input in1[31:0]), TilePort({SOUTH} input in2[31:0]), TilePort({WEST} input in3[31:0]), BelPort(output RES_reg_out[31:0]), BelPort(output N_reg_out[31:0]), BelPort(output E_reg_out[31:0]), BelPort(output S_reg_out[31:0]), BelPort(output W_reg_out[31:0])]
-#BelPort(input data_in1[31:0])<(data_in1)-[TilePort({NORTH} input in0[31:0]), TilePort({EAST} input in1[31:0]), TilePort({SOUTH} input in2[31:0]), TilePort({WEST} input in3[31:0]), BelPort(output RES_reg_out[31:0]), BelPort(output N_reg_out[31:0]), BelPort(output E_reg_out[31:0]), BelPort(output S_reg_out[31:0]), BelPort(output W_reg_out[31:0])]
-#BelPort(input data_in2[31:0])<(data_in2)-[TilePort({NORTH} input in0[31:0]), TilePort({EAST} input in1[31:0]), TilePort({SOUTH} input in2[31:0]), TilePort({WEST} input in3[31:0]), BelPort(output const_out[31:0]), BelPort(output RES_reg_out[31:0]), BelPort(output N_reg_out[31:0]), BelPort(output E_reg_out[31:0]), BelPort(output S_reg_out[31:0]), BelPort(output W_reg_out[31:0])]
-#BelPort(input data_in2[31:0])<(data_in2)-[TilePort({NORTH} input in0[31:0]), TilePort({EAST} input in1[31:0]), TilePort({SOUTH} input in2[31:0]), TilePort({WEST} input in3[31:0]), BelPort(output const_out[31:0]), BelPort(output RES_reg_out[31:0]), BelPort(output N_reg_out[31:0]), BelPort(output E_reg_out[31:0]), BelPort(output S_reg_out[31:0]), BelPort(output W_reg_out[31:0])]
-#BelPort(input data_in2[31:0])<(data_in2)-[TilePort({NORTH} input in0[31:0]), TilePort({EAST} input in1[31:0]), TilePort({SOUTH} input in2[31:0]), TilePort({WEST} input in3[31:0]), BelPort(output const_out[31:0]), BelPort(output RES_reg_out[31:0]), BelPort(output N_reg_out[31:0]), BelPort(output E_reg_out[31:0]), BelPort(output S_reg_out[31:0]), BelPort(output W_reg_out[31:0])]
-#BelPort(input data_in2[31:0])<(data_in2)-[TilePort({NORTH} input in0[31:0]), TilePort({EAST} input in1[31:0]), TilePort({SOUTH} input in2[31:0]), TilePort({WEST} input in3[31:0]), BelPort(output const_out[31:0]), BelPort(output RES_reg_out[31:0]), BelPort(output N_reg_out[31:0]), BelPort(output E_reg_out[31:0]), BelPort(output S_reg_out[31:0]), BelPort(output W_reg_out[31:0])]
-#BelPort(input data_in2[31:0])<(data_in2)-[TilePort({NORTH} input in0[31:0]), TilePort({EAST} input in1[31:0]), TilePort({SOUTH} input in2[31:0]), TilePort({WEST} input in3[31:0]), BelPort(output const_out[31:0]), BelPort(output RES_reg_out[31:0]), BelPort(output N_reg_out[31:0]), BelPort(output E_reg_out[31:0]), BelPort(output S_reg_out[31:0]), BelPort(output W_reg_out[31:0])]
-#BelPort(input data_in2[31:0])<(data_in2)-[TilePort({NORTH} input in0[31:0]), TilePort({EAST} input in1[31:0]), TilePort({SOUTH} input in2[31:0]), TilePort({WEST} input in3[31:0]), BelPort(output const_out[31:0]), BelPort(output RES_reg_out[31:0]), BelPort(output N_reg_out[31:0]), BelPort(output E_reg_out[31:0]), BelPort(output S_reg_out[31:0]), BelPort(output W_reg_out[31:0])]
-#BelPort(input data_in2[31:0])<(data_in2)-[TilePort({NORTH} input in0[31:0]), TilePort({EAST} input in1[31:0]), TilePort({SOUTH} input in2[31:0]), TilePort({WEST} input in3[31:0]), BelPort(output const_out[31:0]), BelPort(output RES_reg_out[31:0]), BelPort(output N_reg_out[31:0]), BelPort(output E_reg_out[31:0]), BelPort(output S_reg_out[31:0]), BelPort(output W_reg_out[31:0])]
-#BelPort(input data_in2[31:0])<(data_in2)-[TilePort({NORTH} input in0[31:0]), TilePort({EAST} input in1[31:0]), TilePort({SOUTH} input in2[31:0]), TilePort({WEST} input in3[31:0]), BelPort(output const_out[31:0]), BelPort(output RES_reg_out[31:0]), BelPort(output N_reg_out[31:0]), BelPort(output E_reg_out[31:0]), BelPort(output S_reg_out[31:0]), BelPort(output W_reg_out[31:0])]
-#BelPort(input data_in2[31:0])<(data_in2)-[TilePort({NORTH} input in0[31:0]), TilePort({EAST} input in1[31:0]), TilePort({SOUTH} input in2[31:0]), TilePort({WEST} input in3[31:0]), BelPort(output const_out[31:0]), BelPort(output RES_reg_out[31:0]), BelPort(output N_reg_out[31:0]), BelPort(output E_reg_out[31:0]), BelPort(output S_reg_out[31:0]), BelPort(output W_reg_out[31:0])]
-#BelPort(input data_in2[31:0])<(data_in2)-[TilePort({NORTH} input in0[31:0]), TilePort({EAST} input in1[31:0]), TilePort({SOUTH} input in2[31:0]), TilePort({WEST} input in3[31:0]), BelPort(output const_out[31:0]), BelPort(output RES_reg_out[31:0]), BelPort(output N_reg_out[31:0]), BelPort(output E_reg_out[31:0]), BelPort(output S_reg_out[31:0]), BelPort(output W_reg_out[31:0])]
-#BelPort(input data_in2[31:0])<(data_in2)-[TilePort({NORTH} input in0[31:0]), TilePort({EAST} input in1[31:0]), TilePort({SOUTH} input in2[31:0]), TilePort({WEST} input in3[31:0]), BelPort(output const_out[31:0]), BelPort(output RES_reg_out[31:0]), BelPort(output N_reg_out[31:0]), BelPort(output E_reg_out[31:0]), BelPort(output S_reg_out[31:0]), BelPort(output W_reg_out[31:0])]
-#BelPort(input data_in2[31:0])<(data_in2)-[TilePort({NORTH} input in0[31:0]), TilePort({EAST} input in1[31:0]), TilePort({SOUTH} input in2[31:0]), TilePort({WEST} input in3[31:0]), BelPort(output const_out[31:0]), BelPort(output RES_reg_out[31:0]), BelPort(output N_reg_out[31:0]), BelPort(output E_reg_out[31:0]), BelPort(output S_reg_out[31:0]), BelPort(output W_reg_out[31:0])]
-#BelPort(input data_in3[31:0])<(data_in3)-[TilePort({NORTH} input in0[31:0]), TilePort({EAST} input in1[31:0]), TilePort({SOUTH} input in2[31:0]), TilePort({WEST} input in3[31:0]), BelPort(output const_out[31:0])]
-#BelPort(input data_in3[31:0])<(data_in3)-[TilePort({NORTH} input in0[31:0]), TilePort({EAST} input in1[31:0]), TilePort({SOUTH} input in2[31:0]), TilePort({WEST} input in3[31:0]), BelPort(output const_out[31:0])]
-#BelPort(input RES_reg_in[31:0])<(reg_in)-[BelPort(output data_out[31:0])]
-#BelPort(input RES_reg_in[31:0])<(reg_in)-[BelPort(output data_out[31:0])]
-#BelPort(input N_reg_in[31:0])<(reg_in)-[TilePort({NORTH} input in0[31:0]), BelPort(output N_reg_out[31:0])]
-#BelPort(input N_reg_in[31:0])<(reg_in)-[TilePort({NORTH} input in0[31:0]), BelPort(output N_reg_out[31:0])]
-#BelPort(input E_reg_in[31:0])<(reg_in)-[TilePort({EAST} input in1[31:0]), BelPort(output E_reg_out[31:0])]
-#BelPort(input E_reg_in[31:0])<(reg_in)-[TilePort({EAST} input in1[31:0]), BelPort(output E_reg_out[31:0])]
-#BelPort(input S_reg_in[31:0])<(reg_in)-[TilePort({SOUTH} input in2[31:0]), BelPort(output S_reg_out[31:0])]
-#BelPort(input S_reg_in[31:0])<(reg_in)-[TilePort({SOUTH} input in2[31:0]), BelPort(output S_reg_out[31:0])]
-#BelPort(input W_reg_in[31:0])<(reg_in)-[TilePort({WEST} input in3[31:0]), BelPort(output W_reg_out[31:0])]
-#BelPort(input W_reg_in[31:0])<(reg_in)-[TilePort({WEST} input in3[31:0]), BelPort(output W_reg_out[31:0])]
+#N_reg_unit:rst
+
+#E_reg_unit:en
+
+#E_reg_unit:rst
+
+#S_reg_unit:en
+
+#S_reg_unit:rst
+
+#W_reg_unit:en
+
+#W_reg_unit:rst
+

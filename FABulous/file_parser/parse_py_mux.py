@@ -17,7 +17,20 @@ def setupPortData(
 ):
     environment = Environment(loader=PackageLoader("FABulous"))
     template = environment.get_template("portData.py.jinja")
-    content = template.render(tileName=tileName, tilePorts=tilePorts, bels=bels)
+    belInputs = []
+    belOutputs = []
+    for bel in bels:
+        for port in bel.inputs:
+            belInputs.append(port)
+        for port in bel.outputs:
+            belOutputs.append(port)
+
+    content = template.render(
+        tileName=tileName,
+        tilePorts=tilePorts,
+        belInputs=belInputs,
+        belOutputs=belOutputs,
+    )
     with open(tileDir.parent / f"metadata/{tileName}_ports.py", "w") as f:
         f.write(content)
 
@@ -32,7 +45,9 @@ def setupPortData(
             f.write(content)
 
 
-def genSwitchMatrix(tileName: str, tileDir: Path) -> SwitchMatrix:
+def genSwitchMatrix(
+    tileName: str, tileDir: Path, ports: list[TilePort], bels: list[Bel]
+) -> SwitchMatrix:
     if listModuleSpec := spec_from_file_location(
         tileDir.parent.name, tileDir.parent / "list.py"
     ):
@@ -44,8 +59,14 @@ def genSwitchMatrix(tileName: str, tileDir: Path) -> SwitchMatrix:
             raise ValueError("No loader found")
     else:
         raise ValueError("File loading failed")
-
-    muxList = listModule.MuxList()
+    belInputs = []
+    belOutputs = []
+    for bel in bels:
+        for port in bel.inputs:
+            belInputs.append(port)
+        for port in bel.outputs:
+            belOutputs.append(port)
+    muxList = listModule.MuxList(ports, belInputs, belOutputs)
     muxList.construct()
     sm = SwitchMatrix()
     slicedPort: list[MuxPort] = []

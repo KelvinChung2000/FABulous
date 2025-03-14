@@ -66,6 +66,7 @@ class Bel:
     belFeatureMap: dict[str, int]
     userCLK: Port | None
     z: int = 0
+    constantBel: bool = False
 
     def __init__(
         self,
@@ -92,6 +93,9 @@ class Bel:
         self.userCLK = userCLK
         self.belFeatureMap = belFeatureMap
         self.z = 0
+
+        if len(self.inputs) + len(self.externalInputs) == 0:
+            self.constantBel = True
 
     def __hash__(self) -> int:
         return hash(f"{self.prefix}{self.name}({self.src})")

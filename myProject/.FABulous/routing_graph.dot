@@ -54,38 +54,6 @@ X1Y1_0_RES_reg_unit_clk_i -> X1Y1_0_RES_reg_unitclk;
 X1Y1_0_RES_reg_unitclk -> X1Y1_bel_0_RES_reg_unit;
 }
 
-subgraph cluster_1_1_0_RES_en_GND_DRV {
-label="0_RES_en_GND_DRV";
-X1Y1_bel_0_RES_en_GND_DRV [label="bel_0_RES_en_GND_DRV(z=0x2002)", shape=box];
-X1Y1_0_RES_en_GND_DRVGND [label=GND, shape=hexagon];
-X1Y1_bel_0_RES_en_GND_DRV -> X1Y1_0_RES_en_GND_DRVGND;
-X1Y1_0_RES_en_GND_DRVGND -> X1Y1_0_RES_en_GND;
-}
-
-subgraph cluster_1_1_0_RES_en_VCC_DRV {
-label="0_RES_en_VCC_DRV";
-X1Y1_bel_0_RES_en_VCC_DRV [label="bel_0_RES_en_VCC_DRV(z=0x4002)", shape=box];
-X1Y1_0_RES_en_VCC_DRVVCC [label=VCC, shape=hexagon];
-X1Y1_bel_0_RES_en_VCC_DRV -> X1Y1_0_RES_en_VCC_DRVVCC;
-X1Y1_0_RES_en_VCC_DRVVCC -> X1Y1_0_RES_en_VCC;
-}
-
-subgraph cluster_1_1_0_RES_rst_GND_DRV {
-label="0_RES_rst_GND_DRV";
-X1Y1_bel_0_RES_rst_GND_DRV [label="bel_0_RES_rst_GND_DRV(z=0x2202)", shape=box];
-X1Y1_0_RES_rst_GND_DRVGND [label=GND, shape=hexagon];
-X1Y1_bel_0_RES_rst_GND_DRV -> X1Y1_0_RES_rst_GND_DRVGND;
-X1Y1_0_RES_rst_GND_DRVGND -> X1Y1_0_RES_rst_GND;
-}
-
-subgraph cluster_1_1_0_RES_rst_VCC_DRV {
-label="0_RES_rst_VCC_DRV";
-X1Y1_bel_0_RES_rst_VCC_DRV [label="bel_0_RES_rst_VCC_DRV(z=0x4202)", shape=box];
-X1Y1_0_RES_rst_VCC_DRVVCC [label=VCC, shape=hexagon];
-X1Y1_bel_0_RES_rst_VCC_DRV -> X1Y1_0_RES_rst_VCC_DRVVCC;
-X1Y1_0_RES_rst_VCC_DRVVCC -> X1Y1_0_RES_rst_VCC;
-}
-
 subgraph cluster_1_1_0_N_reg_unit {
 label="0_N_reg_unit";
 X1Y1_bel_0_N_reg_unit [label="bel_0_N_reg_unit(z=0x0003)", shape=box];
@@ -104,38 +72,6 @@ X1Y1_bel_0_N_reg_unit -> "X1Y1_0_N_reg_unitreg_out[0]";
 X1Y1_0_N_reg_unitclk [label=clk, shape=hexagon];
 X1Y1_0_N_reg_unit_clk_i -> X1Y1_0_N_reg_unitclk;
 X1Y1_0_N_reg_unitclk -> X1Y1_bel_0_N_reg_unit;
-}
-
-subgraph cluster_1_1_0_N_en_GND_DRV {
-label="0_N_en_GND_DRV";
-X1Y1_bel_0_N_en_GND_DRV [label="bel_0_N_en_GND_DRV(z=0x2003)", shape=box];
-X1Y1_0_N_en_GND_DRVGND [label=GND, shape=hexagon];
-X1Y1_bel_0_N_en_GND_DRV -> X1Y1_0_N_en_GND_DRVGND;
-X1Y1_0_N_en_GND_DRVGND -> X1Y1_0_N_en_GND;
-}
-
-subgraph cluster_1_1_0_N_en_VCC_DRV {
-label="0_N_en_VCC_DRV";
-X1Y1_bel_0_N_en_VCC_DRV [label="bel_0_N_en_VCC_DRV(z=0x4003)", shape=box];
-X1Y1_0_N_en_VCC_DRVVCC [label=VCC, shape=hexagon];
-X1Y1_bel_0_N_en_VCC_DRV -> X1Y1_0_N_en_VCC_DRVVCC;
-X1Y1_0_N_en_VCC_DRVVCC -> X1Y1_0_N_en_VCC;
-}
-
-subgraph cluster_1_1_0_N_rst_GND_DRV {
-label="0_N_rst_GND_DRV";
-X1Y1_bel_0_N_rst_GND_DRV [label="bel_0_N_rst_GND_DRV(z=0x2203)", shape=box];
-X1Y1_0_N_rst_GND_DRVGND [label=GND, shape=hexagon];
-X1Y1_bel_0_N_rst_GND_DRV -> X1Y1_0_N_rst_GND_DRVGND;
-X1Y1_0_N_rst_GND_DRVGND -> X1Y1_0_N_rst_GND;
-}
-
-subgraph cluster_1_1_0_N_rst_VCC_DRV {
-label="0_N_rst_VCC_DRV";
-X1Y1_bel_0_N_rst_VCC_DRV [label="bel_0_N_rst_VCC_DRV(z=0x4203)", shape=box];
-X1Y1_0_N_rst_VCC_DRVVCC [label=VCC, shape=hexagon];
-X1Y1_bel_0_N_rst_VCC_DRV -> X1Y1_0_N_rst_VCC_DRVVCC;
-X1Y1_0_N_rst_VCC_DRVVCC -> X1Y1_0_N_rst_VCC;
 }
 
 subgraph cluster_1_1_0_E_reg_unit {
@@ -158,38 +94,6 @@ X1Y1_0_E_reg_unit_clk_i -> X1Y1_0_E_reg_unitclk;
 X1Y1_0_E_reg_unitclk -> X1Y1_bel_0_E_reg_unit;
 }
 
-subgraph cluster_1_1_0_E_en_GND_DRV {
-label="0_E_en_GND_DRV";
-X1Y1_bel_0_E_en_GND_DRV [label="bel_0_E_en_GND_DRV(z=0x2004)", shape=box];
-X1Y1_0_E_en_GND_DRVGND [label=GND, shape=hexagon];
-X1Y1_bel_0_E_en_GND_DRV -> X1Y1_0_E_en_GND_DRVGND;
-X1Y1_0_E_en_GND_DRVGND -> X1Y1_0_E_en_GND;
-}
-
-subgraph cluster_1_1_0_E_en_VCC_DRV {
-label="0_E_en_VCC_DRV";
-X1Y1_bel_0_E_en_VCC_DRV [label="bel_0_E_en_VCC_DRV(z=0x4004)", shape=box];
-X1Y1_0_E_en_VCC_DRVVCC [label=VCC, shape=hexagon];
-X1Y1_bel_0_E_en_VCC_DRV -> X1Y1_0_E_en_VCC_DRVVCC;
-X1Y1_0_E_en_VCC_DRVVCC -> X1Y1_0_E_en_VCC;
-}
-
-subgraph cluster_1_1_0_E_rst_GND_DRV {
-label="0_E_rst_GND_DRV";
-X1Y1_bel_0_E_rst_GND_DRV [label="bel_0_E_rst_GND_DRV(z=0x2204)", shape=box];
-X1Y1_0_E_rst_GND_DRVGND [label=GND, shape=hexagon];
-X1Y1_bel_0_E_rst_GND_DRV -> X1Y1_0_E_rst_GND_DRVGND;
-X1Y1_0_E_rst_GND_DRVGND -> X1Y1_0_E_rst_GND;
-}
-
-subgraph cluster_1_1_0_E_rst_VCC_DRV {
-label="0_E_rst_VCC_DRV";
-X1Y1_bel_0_E_rst_VCC_DRV [label="bel_0_E_rst_VCC_DRV(z=0x4204)", shape=box];
-X1Y1_0_E_rst_VCC_DRVVCC [label=VCC, shape=hexagon];
-X1Y1_bel_0_E_rst_VCC_DRV -> X1Y1_0_E_rst_VCC_DRVVCC;
-X1Y1_0_E_rst_VCC_DRVVCC -> X1Y1_0_E_rst_VCC;
-}
-
 subgraph cluster_1_1_0_S_reg_unit {
 label="0_S_reg_unit";
 X1Y1_bel_0_S_reg_unit [label="bel_0_S_reg_unit(z=0x0005)", shape=box];
@@ -208,38 +112,6 @@ X1Y1_bel_0_S_reg_unit -> "X1Y1_0_S_reg_unitreg_out[0]";
 X1Y1_0_S_reg_unitclk [label=clk, shape=hexagon];
 X1Y1_0_S_reg_unit_clk_i -> X1Y1_0_S_reg_unitclk;
 X1Y1_0_S_reg_unitclk -> X1Y1_bel_0_S_reg_unit;
-}
-
-subgraph cluster_1_1_0_S_en_GND_DRV {
-label="0_S_en_GND_DRV";
-X1Y1_bel_0_S_en_GND_DRV [label="bel_0_S_en_GND_DRV(z=0x2005)", shape=box];
-X1Y1_0_S_en_GND_DRVGND [label=GND, shape=hexagon];
-X1Y1_bel_0_S_en_GND_DRV -> X1Y1_0_S_en_GND_DRVGND;
-X1Y1_0_S_en_GND_DRVGND -> X1Y1_0_S_en_GND;
-}
-
-subgraph cluster_1_1_0_S_en_VCC_DRV {
-label="0_S_en_VCC_DRV";
-X1Y1_bel_0_S_en_VCC_DRV [label="bel_0_S_en_VCC_DRV(z=0x4005)", shape=box];
-X1Y1_0_S_en_VCC_DRVVCC [label=VCC, shape=hexagon];
-X1Y1_bel_0_S_en_VCC_DRV -> X1Y1_0_S_en_VCC_DRVVCC;
-X1Y1_0_S_en_VCC_DRVVCC -> X1Y1_0_S_en_VCC;
-}
-
-subgraph cluster_1_1_0_S_rst_GND_DRV {
-label="0_S_rst_GND_DRV";
-X1Y1_bel_0_S_rst_GND_DRV [label="bel_0_S_rst_GND_DRV(z=0x2205)", shape=box];
-X1Y1_0_S_rst_GND_DRVGND [label=GND, shape=hexagon];
-X1Y1_bel_0_S_rst_GND_DRV -> X1Y1_0_S_rst_GND_DRVGND;
-X1Y1_0_S_rst_GND_DRVGND -> X1Y1_0_S_rst_GND;
-}
-
-subgraph cluster_1_1_0_S_rst_VCC_DRV {
-label="0_S_rst_VCC_DRV";
-X1Y1_bel_0_S_rst_VCC_DRV [label="bel_0_S_rst_VCC_DRV(z=0x4205)", shape=box];
-X1Y1_0_S_rst_VCC_DRVVCC [label=VCC, shape=hexagon];
-X1Y1_bel_0_S_rst_VCC_DRV -> X1Y1_0_S_rst_VCC_DRVVCC;
-X1Y1_0_S_rst_VCC_DRVVCC -> X1Y1_0_S_rst_VCC;
 }
 
 subgraph cluster_1_1_0_W_reg_unit {
@@ -262,62 +134,10 @@ X1Y1_0_W_reg_unit_clk_i -> X1Y1_0_W_reg_unitclk;
 X1Y1_0_W_reg_unitclk -> X1Y1_bel_0_W_reg_unit;
 }
 
-subgraph cluster_1_1_0_W_en_GND_DRV {
-label="0_W_en_GND_DRV";
-X1Y1_bel_0_W_en_GND_DRV [label="bel_0_W_en_GND_DRV(z=0x2006)", shape=box];
-X1Y1_0_W_en_GND_DRVGND [label=GND, shape=hexagon];
-X1Y1_bel_0_W_en_GND_DRV -> X1Y1_0_W_en_GND_DRVGND;
-X1Y1_0_W_en_GND_DRVGND -> X1Y1_0_W_en_GND;
-}
-
-subgraph cluster_1_1_0_W_en_VCC_DRV {
-label="0_W_en_VCC_DRV";
-X1Y1_bel_0_W_en_VCC_DRV [label="bel_0_W_en_VCC_DRV(z=0x4006)", shape=box];
-X1Y1_0_W_en_VCC_DRVVCC [label=VCC, shape=hexagon];
-X1Y1_bel_0_W_en_VCC_DRV -> X1Y1_0_W_en_VCC_DRVVCC;
-X1Y1_0_W_en_VCC_DRVVCC -> X1Y1_0_W_en_VCC;
-}
-
-subgraph cluster_1_1_0_W_rst_GND_DRV {
-label="0_W_rst_GND_DRV";
-X1Y1_bel_0_W_rst_GND_DRV [label="bel_0_W_rst_GND_DRV(z=0x2206)", shape=box];
-X1Y1_0_W_rst_GND_DRVGND [label=GND, shape=hexagon];
-X1Y1_bel_0_W_rst_GND_DRV -> X1Y1_0_W_rst_GND_DRVGND;
-X1Y1_0_W_rst_GND_DRVGND -> X1Y1_0_W_rst_GND;
-}
-
-subgraph cluster_1_1_0_W_rst_VCC_DRV {
-label="0_W_rst_VCC_DRV";
-X1Y1_bel_0_W_rst_VCC_DRV [label="bel_0_W_rst_VCC_DRV(z=0x4206)", shape=box];
-X1Y1_0_W_rst_VCC_DRVVCC [label=VCC, shape=hexagon];
-X1Y1_bel_0_W_rst_VCC_DRV -> X1Y1_0_W_rst_VCC_DRVVCC;
-X1Y1_0_W_rst_VCC_DRVVCC -> X1Y1_0_W_rst_VCC;
-}
-
-X1Y1_0_RES_en_GND -> X1Y1_0_RES_en;
-X1Y1_0_RES_en_VCC -> X1Y1_0_RES_en;
-X1Y1_0_RES_rst_GND -> X1Y1_0_RES_rst;
-X1Y1_0_RES_rst_VCC -> X1Y1_0_RES_rst;
 X1Y1_user_clk_o -> X1Y1_0_RES_reg_unit_clk_i;
-X1Y1_0_N_en_GND -> X1Y1_0_N_en;
-X1Y1_0_N_en_VCC -> X1Y1_0_N_en;
-X1Y1_0_N_rst_GND -> X1Y1_0_N_rst;
-X1Y1_0_N_rst_VCC -> X1Y1_0_N_rst;
 X1Y1_user_clk_o -> X1Y1_0_N_reg_unit_clk_i;
-X1Y1_0_E_en_GND -> X1Y1_0_E_en;
-X1Y1_0_E_en_VCC -> X1Y1_0_E_en;
-X1Y1_0_E_rst_GND -> X1Y1_0_E_rst;
-X1Y1_0_E_rst_VCC -> X1Y1_0_E_rst;
 X1Y1_user_clk_o -> X1Y1_0_E_reg_unit_clk_i;
-X1Y1_0_S_en_GND -> X1Y1_0_S_en;
-X1Y1_0_S_en_VCC -> X1Y1_0_S_en;
-X1Y1_0_S_rst_GND -> X1Y1_0_S_rst;
-X1Y1_0_S_rst_VCC -> X1Y1_0_S_rst;
 X1Y1_user_clk_o -> X1Y1_0_S_reg_unit_clk_i;
-X1Y1_0_W_en_GND -> X1Y1_0_W_en;
-X1Y1_0_W_en_VCC -> X1Y1_0_W_en;
-X1Y1_0_W_rst_GND -> X1Y1_0_W_rst;
-X1Y1_0_W_rst_VCC -> X1Y1_0_W_rst;
 X1Y1_user_clk_o -> X1Y1_0_W_reg_unit_clk_i;
 X1Y1_0_out0_internal -> X1Y1_0_out0;
 X1Y1_0_out1_internal -> X1Y1_0_out1;
@@ -325,12 +145,16 @@ X1Y1_0_out2_internal -> X1Y1_0_out2;
 X1Y1_0_out3_internal -> X1Y1_0_out3;
 X1Y1_0_data_out -> X1Y1_0_out0_internal;
 X1Y1_0_RES_reg_out -> X1Y1_0_out0_internal;
+X1Y1_0_in2 -> X1Y1_0_out0_internal;
 X1Y1_0_data_out -> X1Y1_0_out1_internal;
 X1Y1_0_RES_reg_out -> X1Y1_0_out1_internal;
+X1Y1_0_in3 -> X1Y1_0_out1_internal;
 X1Y1_0_data_out -> X1Y1_0_out2_internal;
 X1Y1_0_RES_reg_out -> X1Y1_0_out2_internal;
+X1Y1_0_in0 -> X1Y1_0_out2_internal;
 X1Y1_0_data_out -> X1Y1_0_out3_internal;
 X1Y1_0_RES_reg_out -> X1Y1_0_out3_internal;
+X1Y1_0_in1 -> X1Y1_0_out3_internal;
 X1Y1_0_in0 -> X1Y1_0_data_in1;
 X1Y1_0_in1 -> X1Y1_0_data_in1;
 X1Y1_0_in2 -> X1Y1_0_data_in1;
@@ -425,38 +249,6 @@ X2Y1_0_RES_reg_unit_clk_i -> X2Y1_0_RES_reg_unitclk;
 X2Y1_0_RES_reg_unitclk -> X2Y1_bel_0_RES_reg_unit;
 }
 
-subgraph cluster_2_1_0_RES_en_GND_DRV {
-label="0_RES_en_GND_DRV";
-X2Y1_bel_0_RES_en_GND_DRV [label="bel_0_RES_en_GND_DRV(z=0x2002)", shape=box];
-X2Y1_0_RES_en_GND_DRVGND [label=GND, shape=hexagon];
-X2Y1_bel_0_RES_en_GND_DRV -> X2Y1_0_RES_en_GND_DRVGND;
-X2Y1_0_RES_en_GND_DRVGND -> X2Y1_0_RES_en_GND;
-}
-
-subgraph cluster_2_1_0_RES_en_VCC_DRV {
-label="0_RES_en_VCC_DRV";
-X2Y1_bel_0_RES_en_VCC_DRV [label="bel_0_RES_en_VCC_DRV(z=0x4002)", shape=box];
-X2Y1_0_RES_en_VCC_DRVVCC [label=VCC, shape=hexagon];
-X2Y1_bel_0_RES_en_VCC_DRV -> X2Y1_0_RES_en_VCC_DRVVCC;
-X2Y1_0_RES_en_VCC_DRVVCC -> X2Y1_0_RES_en_VCC;
-}
-
-subgraph cluster_2_1_0_RES_rst_GND_DRV {
-label="0_RES_rst_GND_DRV";
-X2Y1_bel_0_RES_rst_GND_DRV [label="bel_0_RES_rst_GND_DRV(z=0x2202)", shape=box];
-X2Y1_0_RES_rst_GND_DRVGND [label=GND, shape=hexagon];
-X2Y1_bel_0_RES_rst_GND_DRV -> X2Y1_0_RES_rst_GND_DRVGND;
-X2Y1_0_RES_rst_GND_DRVGND -> X2Y1_0_RES_rst_GND;
-}
-
-subgraph cluster_2_1_0_RES_rst_VCC_DRV {
-label="0_RES_rst_VCC_DRV";
-X2Y1_bel_0_RES_rst_VCC_DRV [label="bel_0_RES_rst_VCC_DRV(z=0x4202)", shape=box];
-X2Y1_0_RES_rst_VCC_DRVVCC [label=VCC, shape=hexagon];
-X2Y1_bel_0_RES_rst_VCC_DRV -> X2Y1_0_RES_rst_VCC_DRVVCC;
-X2Y1_0_RES_rst_VCC_DRVVCC -> X2Y1_0_RES_rst_VCC;
-}
-
 subgraph cluster_2_1_0_N_reg_unit {
 label="0_N_reg_unit";
 X2Y1_bel_0_N_reg_unit [label="bel_0_N_reg_unit(z=0x0003)", shape=box];
@@ -475,38 +267,6 @@ X2Y1_bel_0_N_reg_unit -> "X2Y1_0_N_reg_unitreg_out[0]";
 X2Y1_0_N_reg_unitclk [label=clk, shape=hexagon];
 X2Y1_0_N_reg_unit_clk_i -> X2Y1_0_N_reg_unitclk;
 X2Y1_0_N_reg_unitclk -> X2Y1_bel_0_N_reg_unit;
-}
-
-subgraph cluster_2_1_0_N_en_GND_DRV {
-label="0_N_en_GND_DRV";
-X2Y1_bel_0_N_en_GND_DRV [label="bel_0_N_en_GND_DRV(z=0x2003)", shape=box];
-X2Y1_0_N_en_GND_DRVGND [label=GND, shape=hexagon];
-X2Y1_bel_0_N_en_GND_DRV -> X2Y1_0_N_en_GND_DRVGND;
-X2Y1_0_N_en_GND_DRVGND -> X2Y1_0_N_en_GND;
-}
-
-subgraph cluster_2_1_0_N_en_VCC_DRV {
-label="0_N_en_VCC_DRV";
-X2Y1_bel_0_N_en_VCC_DRV [label="bel_0_N_en_VCC_DRV(z=0x4003)", shape=box];
-X2Y1_0_N_en_VCC_DRVVCC [label=VCC, shape=hexagon];
-X2Y1_bel_0_N_en_VCC_DRV -> X2Y1_0_N_en_VCC_DRVVCC;
-X2Y1_0_N_en_VCC_DRVVCC -> X2Y1_0_N_en_VCC;
-}
-
-subgraph cluster_2_1_0_N_rst_GND_DRV {
-label="0_N_rst_GND_DRV";
-X2Y1_bel_0_N_rst_GND_DRV [label="bel_0_N_rst_GND_DRV(z=0x2203)", shape=box];
-X2Y1_0_N_rst_GND_DRVGND [label=GND, shape=hexagon];
-X2Y1_bel_0_N_rst_GND_DRV -> X2Y1_0_N_rst_GND_DRVGND;
-X2Y1_0_N_rst_GND_DRVGND -> X2Y1_0_N_rst_GND;
-}
-
-subgraph cluster_2_1_0_N_rst_VCC_DRV {
-label="0_N_rst_VCC_DRV";
-X2Y1_bel_0_N_rst_VCC_DRV [label="bel_0_N_rst_VCC_DRV(z=0x4203)", shape=box];
-X2Y1_0_N_rst_VCC_DRVVCC [label=VCC, shape=hexagon];
-X2Y1_bel_0_N_rst_VCC_DRV -> X2Y1_0_N_rst_VCC_DRVVCC;
-X2Y1_0_N_rst_VCC_DRVVCC -> X2Y1_0_N_rst_VCC;
 }
 
 subgraph cluster_2_1_0_E_reg_unit {
@@ -529,38 +289,6 @@ X2Y1_0_E_reg_unit_clk_i -> X2Y1_0_E_reg_unitclk;
 X2Y1_0_E_reg_unitclk -> X2Y1_bel_0_E_reg_unit;
 }
 
-subgraph cluster_2_1_0_E_en_GND_DRV {
-label="0_E_en_GND_DRV";
-X2Y1_bel_0_E_en_GND_DRV [label="bel_0_E_en_GND_DRV(z=0x2004)", shape=box];
-X2Y1_0_E_en_GND_DRVGND [label=GND, shape=hexagon];
-X2Y1_bel_0_E_en_GND_DRV -> X2Y1_0_E_en_GND_DRVGND;
-X2Y1_0_E_en_GND_DRVGND -> X2Y1_0_E_en_GND;
-}
-
-subgraph cluster_2_1_0_E_en_VCC_DRV {
-label="0_E_en_VCC_DRV";
-X2Y1_bel_0_E_en_VCC_DRV [label="bel_0_E_en_VCC_DRV(z=0x4004)", shape=box];
-X2Y1_0_E_en_VCC_DRVVCC [label=VCC, shape=hexagon];
-X2Y1_bel_0_E_en_VCC_DRV -> X2Y1_0_E_en_VCC_DRVVCC;
-X2Y1_0_E_en_VCC_DRVVCC -> X2Y1_0_E_en_VCC;
-}
-
-subgraph cluster_2_1_0_E_rst_GND_DRV {
-label="0_E_rst_GND_DRV";
-X2Y1_bel_0_E_rst_GND_DRV [label="bel_0_E_rst_GND_DRV(z=0x2204)", shape=box];
-X2Y1_0_E_rst_GND_DRVGND [label=GND, shape=hexagon];
-X2Y1_bel_0_E_rst_GND_DRV -> X2Y1_0_E_rst_GND_DRVGND;
-X2Y1_0_E_rst_GND_DRVGND -> X2Y1_0_E_rst_GND;
-}
-
-subgraph cluster_2_1_0_E_rst_VCC_DRV {
-label="0_E_rst_VCC_DRV";
-X2Y1_bel_0_E_rst_VCC_DRV [label="bel_0_E_rst_VCC_DRV(z=0x4204)", shape=box];
-X2Y1_0_E_rst_VCC_DRVVCC [label=VCC, shape=hexagon];
-X2Y1_bel_0_E_rst_VCC_DRV -> X2Y1_0_E_rst_VCC_DRVVCC;
-X2Y1_0_E_rst_VCC_DRVVCC -> X2Y1_0_E_rst_VCC;
-}
-
 subgraph cluster_2_1_0_S_reg_unit {
 label="0_S_reg_unit";
 X2Y1_bel_0_S_reg_unit [label="bel_0_S_reg_unit(z=0x0005)", shape=box];
@@ -579,38 +307,6 @@ X2Y1_bel_0_S_reg_unit -> "X2Y1_0_S_reg_unitreg_out[0]";
 X2Y1_0_S_reg_unitclk [label=clk, shape=hexagon];
 X2Y1_0_S_reg_unit_clk_i -> X2Y1_0_S_reg_unitclk;
 X2Y1_0_S_reg_unitclk -> X2Y1_bel_0_S_reg_unit;
-}
-
-subgraph cluster_2_1_0_S_en_GND_DRV {
-label="0_S_en_GND_DRV";
-X2Y1_bel_0_S_en_GND_DRV [label="bel_0_S_en_GND_DRV(z=0x2005)", shape=box];
-X2Y1_0_S_en_GND_DRVGND [label=GND, shape=hexagon];
-X2Y1_bel_0_S_en_GND_DRV -> X2Y1_0_S_en_GND_DRVGND;
-X2Y1_0_S_en_GND_DRVGND -> X2Y1_0_S_en_GND;
-}
-
-subgraph cluster_2_1_0_S_en_VCC_DRV {
-label="0_S_en_VCC_DRV";
-X2Y1_bel_0_S_en_VCC_DRV [label="bel_0_S_en_VCC_DRV(z=0x4005)", shape=box];
-X2Y1_0_S_en_VCC_DRVVCC [label=VCC, shape=hexagon];
-X2Y1_bel_0_S_en_VCC_DRV -> X2Y1_0_S_en_VCC_DRVVCC;
-X2Y1_0_S_en_VCC_DRVVCC -> X2Y1_0_S_en_VCC;
-}
-
-subgraph cluster_2_1_0_S_rst_GND_DRV {
-label="0_S_rst_GND_DRV";
-X2Y1_bel_0_S_rst_GND_DRV [label="bel_0_S_rst_GND_DRV(z=0x2205)", shape=box];
-X2Y1_0_S_rst_GND_DRVGND [label=GND, shape=hexagon];
-X2Y1_bel_0_S_rst_GND_DRV -> X2Y1_0_S_rst_GND_DRVGND;
-X2Y1_0_S_rst_GND_DRVGND -> X2Y1_0_S_rst_GND;
-}
-
-subgraph cluster_2_1_0_S_rst_VCC_DRV {
-label="0_S_rst_VCC_DRV";
-X2Y1_bel_0_S_rst_VCC_DRV [label="bel_0_S_rst_VCC_DRV(z=0x4205)", shape=box];
-X2Y1_0_S_rst_VCC_DRVVCC [label=VCC, shape=hexagon];
-X2Y1_bel_0_S_rst_VCC_DRV -> X2Y1_0_S_rst_VCC_DRVVCC;
-X2Y1_0_S_rst_VCC_DRVVCC -> X2Y1_0_S_rst_VCC;
 }
 
 subgraph cluster_2_1_0_W_reg_unit {
@@ -633,62 +329,10 @@ X2Y1_0_W_reg_unit_clk_i -> X2Y1_0_W_reg_unitclk;
 X2Y1_0_W_reg_unitclk -> X2Y1_bel_0_W_reg_unit;
 }
 
-subgraph cluster_2_1_0_W_en_GND_DRV {
-label="0_W_en_GND_DRV";
-X2Y1_bel_0_W_en_GND_DRV [label="bel_0_W_en_GND_DRV(z=0x2006)", shape=box];
-X2Y1_0_W_en_GND_DRVGND [label=GND, shape=hexagon];
-X2Y1_bel_0_W_en_GND_DRV -> X2Y1_0_W_en_GND_DRVGND;
-X2Y1_0_W_en_GND_DRVGND -> X2Y1_0_W_en_GND;
-}
-
-subgraph cluster_2_1_0_W_en_VCC_DRV {
-label="0_W_en_VCC_DRV";
-X2Y1_bel_0_W_en_VCC_DRV [label="bel_0_W_en_VCC_DRV(z=0x4006)", shape=box];
-X2Y1_0_W_en_VCC_DRVVCC [label=VCC, shape=hexagon];
-X2Y1_bel_0_W_en_VCC_DRV -> X2Y1_0_W_en_VCC_DRVVCC;
-X2Y1_0_W_en_VCC_DRVVCC -> X2Y1_0_W_en_VCC;
-}
-
-subgraph cluster_2_1_0_W_rst_GND_DRV {
-label="0_W_rst_GND_DRV";
-X2Y1_bel_0_W_rst_GND_DRV [label="bel_0_W_rst_GND_DRV(z=0x2206)", shape=box];
-X2Y1_0_W_rst_GND_DRVGND [label=GND, shape=hexagon];
-X2Y1_bel_0_W_rst_GND_DRV -> X2Y1_0_W_rst_GND_DRVGND;
-X2Y1_0_W_rst_GND_DRVGND -> X2Y1_0_W_rst_GND;
-}
-
-subgraph cluster_2_1_0_W_rst_VCC_DRV {
-label="0_W_rst_VCC_DRV";
-X2Y1_bel_0_W_rst_VCC_DRV [label="bel_0_W_rst_VCC_DRV(z=0x4206)", shape=box];
-X2Y1_0_W_rst_VCC_DRVVCC [label=VCC, shape=hexagon];
-X2Y1_bel_0_W_rst_VCC_DRV -> X2Y1_0_W_rst_VCC_DRVVCC;
-X2Y1_0_W_rst_VCC_DRVVCC -> X2Y1_0_W_rst_VCC;
-}
-
-X2Y1_0_RES_en_GND -> X2Y1_0_RES_en;
-X2Y1_0_RES_en_VCC -> X2Y1_0_RES_en;
-X2Y1_0_RES_rst_GND -> X2Y1_0_RES_rst;
-X2Y1_0_RES_rst_VCC -> X2Y1_0_RES_rst;
 X2Y1_user_clk_o -> X2Y1_0_RES_reg_unit_clk_i;
-X2Y1_0_N_en_GND -> X2Y1_0_N_en;
-X2Y1_0_N_en_VCC -> X2Y1_0_N_en;
-X2Y1_0_N_rst_GND -> X2Y1_0_N_rst;
-X2Y1_0_N_rst_VCC -> X2Y1_0_N_rst;
 X2Y1_user_clk_o -> X2Y1_0_N_reg_unit_clk_i;
-X2Y1_0_E_en_GND -> X2Y1_0_E_en;
-X2Y1_0_E_en_VCC -> X2Y1_0_E_en;
-X2Y1_0_E_rst_GND -> X2Y1_0_E_rst;
-X2Y1_0_E_rst_VCC -> X2Y1_0_E_rst;
 X2Y1_user_clk_o -> X2Y1_0_E_reg_unit_clk_i;
-X2Y1_0_S_en_GND -> X2Y1_0_S_en;
-X2Y1_0_S_en_VCC -> X2Y1_0_S_en;
-X2Y1_0_S_rst_GND -> X2Y1_0_S_rst;
-X2Y1_0_S_rst_VCC -> X2Y1_0_S_rst;
 X2Y1_user_clk_o -> X2Y1_0_S_reg_unit_clk_i;
-X2Y1_0_W_en_GND -> X2Y1_0_W_en;
-X2Y1_0_W_en_VCC -> X2Y1_0_W_en;
-X2Y1_0_W_rst_GND -> X2Y1_0_W_rst;
-X2Y1_0_W_rst_VCC -> X2Y1_0_W_rst;
 X2Y1_user_clk_o -> X2Y1_0_W_reg_unit_clk_i;
 X2Y1_0_out0_internal -> X2Y1_0_out0;
 X2Y1_0_out1_internal -> X2Y1_0_out1;
@@ -696,12 +340,16 @@ X2Y1_0_out2_internal -> X2Y1_0_out2;
 X2Y1_0_out3_internal -> X2Y1_0_out3;
 X2Y1_0_data_out -> X2Y1_0_out0_internal;
 X2Y1_0_RES_reg_out -> X2Y1_0_out0_internal;
+X2Y1_0_in2 -> X2Y1_0_out0_internal;
 X2Y1_0_data_out -> X2Y1_0_out1_internal;
 X2Y1_0_RES_reg_out -> X2Y1_0_out1_internal;
+X2Y1_0_in3 -> X2Y1_0_out1_internal;
 X2Y1_0_data_out -> X2Y1_0_out2_internal;
 X2Y1_0_RES_reg_out -> X2Y1_0_out2_internal;
+X2Y1_0_in0 -> X2Y1_0_out2_internal;
 X2Y1_0_data_out -> X2Y1_0_out3_internal;
 X2Y1_0_RES_reg_out -> X2Y1_0_out3_internal;
+X2Y1_0_in1 -> X2Y1_0_out3_internal;
 X2Y1_0_in0 -> X2Y1_0_data_in1;
 X2Y1_0_in1 -> X2Y1_0_data_in1;
 X2Y1_0_in2 -> X2Y1_0_data_in1;

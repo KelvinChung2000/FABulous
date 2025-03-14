@@ -5,7 +5,7 @@ from typing import Any, Iterable, cast
 from FABulous.fabric_definition.Bel import Bel
 from FABulous.fabric_definition.ConfigMem import ConfigurationMemory
 from FABulous.fabric_definition.define import IO, Side
-from FABulous.fabric_definition.Port import TilePort
+from FABulous.fabric_definition.Port import BelPort, TilePort
 from FABulous.fabric_definition.SwitchMatrix import SwitchMatrix
 from FABulous.fabric_definition.Wire import WireType
 
@@ -209,3 +209,12 @@ class Tile:
             if i.name not in belSet:
                 belSet.add(i.name)
                 yield i
+
+    def getBelByBelPort(self, belPort: BelPort) -> Bel:
+        for i in self.bels:
+            if belPort in i.inputs or belPort in i.outputs:
+                return i
+        else:
+            raise ValueError(
+                f"The given port {belPort} does not exist in tile {self.name}"
+            )

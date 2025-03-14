@@ -3,23 +3,21 @@ from FABulous.fabric_definition.define import IO, Side
 from FABulous.fabric_definition.Port import TilePort, Port, BelPort
 
 class {{ tileName }}_ports:
-    def __init__(self):
+    def __init__(self, tilePorts: list[TilePort], belInputs: list[BelPort], belOutputs: list[BelPort]):
         # tile ports
     {%- for p in tilePorts %}
-        self.{{ p.name }} = MuxPort({{ p.createSelf() }}, isTilePort=True, isBus={{ p.isBus }}, bitWidth={{ p.wireCount }})
+        self.{{ p.name }} = MuxPort(tilePorts[{{ loop.index0 }}], isTilePort=True, isBus={{ p.isBus }}, bitWidth={{ p.wireCount }})
     {%- endfor %}
 
         # bel ports
-    {%- for bel in bels -%}
-    {%- for p in bel.inputs %}
-        self.{{ bel.prefix }}{{ p.name }} = MuxPort({{ p.createSelf() }}, isBelPort=True, isBus={{ p.isBus }}, bitWidth={{ p.wireCount }})
+    {%- for p in belInputs %}
+        self.{{ p.prefix }}{{ p.name }} = MuxPort(belInputs[{{ loop.index0 }}], isBelPort=True, isBus={{ p.isBus }}, bitWidth={{ p.wireCount }})
     {%- endfor %}
 
-    {%- for p in bel.outputs %}
-        self.{{ bel.prefix }}{{ p.name }} = MuxPort({{ p.createSelf() }}, isBelPort=True, isBus={{ p.isBus }}, bitWidth={{ p.wireCount }})
+    {%- for p in belOutputs %}
+        self.{{ p.prefix }}{{ p.name }} = MuxPort(belOutputs[{{ loop.index0 }}], isBelPort=True, isBus={{ p.isBus }}, bitWidth={{ p.wireCount }})
     {%- endfor %}
 
-    {%- endfor %}
 
         self.GND = MuxPort(Port(name="gnd", ioDirection=IO.OUTPUT, wireCount=1, isBus=False), bitWidth=1)
         self.VCC = MuxPort(Port(name="vcc", ioDirection=IO.OUTPUT, wireCount=1, isBus=False), bitWidth=1)

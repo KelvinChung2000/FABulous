@@ -192,3 +192,19 @@ class SwitchMatrix:
                     deduplicatingInput.add(i)
                     resultList.append(i)
         return resultList
+
+    def getPortUsers(self, port: GenericPort) -> list[GenericPort]:
+        sinkList: set[GenericPort] = set()
+        for mux in self.muxesDict.values():
+            for i in mux.inputs:
+                if i == port:
+                    sinkList.add(mux.output)
+        return list(sinkList)
+
+    def getPortDrivers(self, port: GenericPort) -> list[GenericPort]:
+        sourceList: set[GenericPort] = set()
+        for mux in self.muxesDict.values():
+            if mux.output == port:
+                for i in mux.inputs:
+                    sourceList.add(i)
+        return list(sourceList)

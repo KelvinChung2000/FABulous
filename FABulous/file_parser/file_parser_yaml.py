@@ -310,7 +310,9 @@ def parseTileYAML(fileName: Path) -> tuple[Tile, WireInfo]:
                 configBit += sm.configBits
             case ".py":
                 setupPortData(tileName, matrixDir, list(portsDict.values()), bels)
-                sm = genSwitchMatrix(tileName, matrixDir)
+                sm = genSwitchMatrix(
+                    tileName, matrixDir, list(portsDict.values()), bels
+                )
                 configBit += sm.configBits
             case "_matrix.csv":
                 for _, v in parseMatrix(matrixDir, tileName).items():

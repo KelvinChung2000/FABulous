@@ -28,6 +28,12 @@ class MuxList(PE_ports):
             self[f"out{i}"] //= self.data_out
             self[f"out{i}"] //= self.RES_reg_out
 
+
+        self.out0 //= self.in2
+        self.out1 //= self.in3
+        self.out2 //= self.in0
+        self.out3 //= self.in1
+
         self.N_reg_in //= self.in0
         self.E_reg_in //= self.in1
         self.S_reg_in //= self.in2

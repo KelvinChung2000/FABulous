@@ -10,7 +10,7 @@
 
 FABulous --debug ../../myProject -p "load_fabric; gen_FABulous_CAD_tool_files; synthesis_script -q -tcl synth.tcl"
 # xdot /home/kelvin/FABulous_fork/myProject/.FABulous/routing_graph.dot &
-nextpnr-himbaechel --chipdb ../.FABulous/hycube.bit --device "FABulous" --debug-router \
-    --json $my_FAB_ROOT/myProject/user_design/synth_test.json \
-    --write $my_FAB_ROOT/myProject/user_design/router_test.json \
-    -o constrain-pair=/home/kelvin/FABulous_fork/myProject/.FABulous/hycube_constrain_pair.inc
+nextpnr-himbaechel --chipdb ../.FABulous/hycube.bit --device "FABulous" \
+                   --json $my_FAB_ROOT/myProject/user_design/synth_test.json \
+                   --write $my_FAB_ROOT/myProject/user_design/router_test.json \
+                   -o constrain-pair=$my_FAB_ROOT/myProject/.FABulous/hycube_constrain_pair.inc

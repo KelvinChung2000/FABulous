@@ -31,6 +31,6 @@ yosys iopadmap -bits -outpad OUTBUF I:PAD -inpad INBUF O:PAD
 
 yosys opt;;;
 yosys clean -purge
-yosys show -width
+#syosys show -width
 
 yosys write_json $fabRoot/myProject/user_design/synth_test.json

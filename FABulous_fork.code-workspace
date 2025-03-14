@@ -89,7 +89,8 @@
             "typeinfo": "cpp",
             "valarray": "cpp",
             "variant": "cpp",
-            "expected": "cpp"
+            "expected": "cpp",
+            "text_encoding": "cpp"
         },
         "cmake.configureArgs": [
             "-DARCH=himbaechel",

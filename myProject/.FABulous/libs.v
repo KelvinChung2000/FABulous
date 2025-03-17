@@ -1,4 +1,14 @@
 (* blackbox *)
+module const_unit #(
+    parameter ConfigBits = 0
+)(
+    output [31:0] const_out
+);
+
+endmodule
+
+
+(* blackbox *)
 module reg_unit #(
 
 )(
@@ -7,16 +17,6 @@ module reg_unit #(
     input rst,
     output [31:0] reg_out,
     input clk
-);
-
-endmodule
-
-
-(* blackbox *)
-module const_unit #(
-    parameter ConfigBits = 0
-)(
-    output [31:0] const_out
 );
 
 endmodule

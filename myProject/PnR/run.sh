@@ -15,3 +15,4 @@ nextpnr-himbaechel --chipdb ../.FABulous/hycube.bit --device "FABulous" \
                    --write $my_FAB_ROOT/myProject/user_design/router_test.json \
                    -o constrain-pair=$my_FAB_ROOT/myProject/.FABulous/hycube_constrain_pair.inc \
                    -o fasm=$my_FAB_ROOT/myProject/user_design/router_test.fasm
+/home/kelvin/FABulous_fork/.venv/bin/python /home/kelvin/FABulous_fork/FABulous/fabric_cad/graph_draw.py

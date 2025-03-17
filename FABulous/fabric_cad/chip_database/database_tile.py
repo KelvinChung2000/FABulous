@@ -3,18 +3,18 @@ from dataclasses import dataclass, field
 from loguru import logger
 
 from FABulous.fabric_cad.bba import BBAWriter
-from FABulous.fabric_cad.chip_database_gen.BBAStruct import BBAStruct
-from FABulous.fabric_cad.chip_database_gen.database_bel import (
+from FABulous.fabric_cad.chip_database.BBAStruct import BBAStruct
+from FABulous.fabric_cad.chip_database.database_bel import (
     BelData,
     BelPin,
     BelPinRef,
     TileExtraData,
 )
-from FABulous.fabric_cad.chip_database_gen.database_group import GroupData
-from FABulous.fabric_cad.chip_database_gen.database_pip import PipData
-from FABulous.fabric_cad.chip_database_gen.define import IdString, PinType
-from FABulous.fabric_cad.chip_database_gen.StringPool import StringPool
-from FABulous.fabric_cad.chip_database_gen.database_timing import TimingPool
+from FABulous.fabric_cad.chip_database.database_group import GroupData
+from FABulous.fabric_cad.chip_database.database_pip import PipData
+from FABulous.fabric_cad.chip_database.define import IdString, PinType
+from FABulous.fabric_cad.chip_database.StringPool import StringPool
+from FABulous.fabric_cad.chip_database.database_timing import TimingPool
 
 
 @dataclass

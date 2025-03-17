@@ -1,24 +1,19 @@
-import re
-from itertools import islice, product
+from itertools import islice
 from pathlib import Path
 from subprocess import run
 from typing import Iterable, Mapping, cast
 
-import pydot
 from loguru import logger
 
-from FABulous.fabric_cad.chip_database_gen.chip import Chip, ChipExtraData
-from FABulous.fabric_cad.chip_database_gen.database_bel import (
-    BelExtraData,
-    TileExtraData,
-)
-from FABulous.fabric_cad.chip_database_gen.database_tile import TileType
-from FABulous.fabric_cad.chip_database_gen.database_timing import TimingValue
-from FABulous.fabric_cad.chip_database_gen.define import NodeWire, PinType
+from FABulous.fabric_cad.chip_database.chip import Chip, ChipExtraData
+from FABulous.fabric_cad.chip_database.database_bel import BelExtraData, TileExtraData
+from FABulous.fabric_cad.chip_database.database_tile import TileType
+from FABulous.fabric_cad.chip_database.database_timing import TimingValue
+from FABulous.fabric_cad.chip_database.define import NodeWire, PinType
+from FABulous.fabric_cad.graph_draw import genRoutingResourceGraph
 from FABulous.fabric_definition.Bel import Bel
-from FABulous.fabric_definition.define import IO
 from FABulous.fabric_definition.Fabric import Fabric
-from FABulous.fabric_definition.Port import BelPort, TilePort
+from FABulous.fabric_definition.Port import BelPort
 from FABulous.fabric_definition.SwitchMatrix import SwitchMatrix
 from FABulous.fabric_definition.Tile import Tile
 
@@ -388,7 +383,7 @@ def generateChipDatabase(
     generateConstrainPair(fabric, filePath / f"{fabric.name}_constrain_pair.inc")
 
     if dotDir is not Path():
-        genRoutingDotGraph(ch, filePath, False)
+        genRoutingResourceGraph(ch, filePath, False)
 
 
 def groupByThree(inputList: list) -> list:
@@ -399,115 +394,6 @@ def groupByThree(inputList: list) -> list:
         result.append(chunk)
 
     return result
-
-
-def genRoutingDotGraph(chip: Chip, filePath: Path, expand=False):
-    graph = pydot.Dot(graph_type="digraph")
-
-    if expand:
-
-        def removeBit(i: str) -> str:
-            return i
-
-    else:
-
-        def removeBit(i: str) -> str:
-            return re.sub(r"\[\d+\]$", "", i)
-
-    pairs = list(product(range(chip.height), range(chip.width)))
-    globalPairs = set()
-    pairs = [(1, 1), (2, 1)]
-    for x, y in pairs:
-        tileType = chip.tile_type_at(x, y)
-        subgraph = pydot.Subgraph(
-            f"cluster_{x}_{y}", label=f"tile_{x}_{y}_{tileType.name}"
-        )
-        for bel in tileType.bels:
-            # if "INBUF" in bel.name.value:
-            #     continue
-            # if "OUTBUF" in bel.name.value:
-            #     continue
-            # if "DRV" in bel.name.value:
-            #     continue
-
-            belSupGraph = pydot.Subgraph(
-                f"cluster_{x}_{y}_{bel.name.value}",
-                label=f"{bel.name.value}",
-            )
-            belSupGraph.add_node(
-                pydot.Node(
-                    f"X{x}Y{y}.bel_{bel.name.value}",
-                    label=f"bel_{bel.name.value}(z=0x{bel.z:04x})",
-                    shape="box",
-                )
-            )
-            added = set()
-            for pin in bel.pins:
-                pinWire = removeBit(tileType.wires[pin.wire].name.value)
-                if pinWire in added:
-                    continue
-                added.add(pinWire)
-                if pin.dir == PinType.INPUT:
-                    belPin = f"X{x}Y{y}.{bel.name.value}{pin.name.value}"
-                    belSupGraph.add_node(
-                        pydot.Node(belPin, label=pin.name.value, shape="hexagon")
-                    )
-                    belSupGraph.add_edge(
-                        pydot.Edge(
-                            f"X{x}Y{y}.{pinWire}",
-                            belPin,
-                        )
-                    )
-                    belSupGraph.add_edge(
-                        pydot.Edge(
-                            belPin,
-                            f"X{x}Y{y}.bel_{bel.name.value}",
-                        )
-                    )
-                elif pin.dir == PinType.OUTPUT:
-                    belPin = f"X{x}Y{y}.{bel.name.value}{pin.name.value}"
-                    belSupGraph.add_node(
-                        pydot.Node(belPin, label=pin.name.value, shape="hexagon")
-                    )
-                    belSupGraph.add_edge(
-                        pydot.Edge(f"X{x}Y{y}.bel_{bel.name.value}", belPin)
-                    )
-                    belSupGraph.add_edge(
-                        pydot.Edge(
-                            belPin,
-                            f"X{x}Y{y}.{pinWire}",
-                        )
-                    )
-            subgraph.add_subgraph(belSupGraph)
-        addedPairs = set()
-        for pip in tileType.pips:
-            src, dst = tileType.get_wire_from_pip(pip)
-            srcName = removeBit(src.name.value)
-            dstName = removeBit(dst.name.value)
-            if (srcName, dstName) in addedPairs:
-                continue
-            subgraph.add_edge(pydot.Edge(f"X{x}Y{y}.{srcName}", f"X{x}Y{y}.{dstName}"))
-            addedPairs.add((srcName, dstName))
-
-        # subgraph.add_node(pydot.Node(f"tile_{x}_{y}"))
-        graph.add_subgraph(subgraph)
-        wires = chip.get_node_wires_from_tile(x, y)
-        for shape in wires:
-            x, y, name = shape[0]
-            srcName = f"X{x}Y{y}.{removeBit(name)}"
-            for x, y, name in shape[1:]:
-                dstName = f"X{x}Y{y}.{removeBit(name)}"
-                if (srcName, dstName) in globalPairs or (
-                    dstName,
-                    srcName,
-                ) in globalPairs:
-                    continue
-                globalPairs.add((srcName, dstName))
-                globalPairs.add((dstName, srcName))
-
-                graph.add_edge(pydot.Edge(srcName, dstName, dir="none", color="blue"))
-
-    graph.write(str(filePath / "routing_graph.dot"))
 
 
 # if __name__ == "__main__":

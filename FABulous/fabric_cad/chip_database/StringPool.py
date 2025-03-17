@@ -1,5 +1,5 @@
 from FABulous.fabric_cad.bba import BBAWriter
-from FABulous.fabric_cad.chip_database_gen.define import IdString
+from FABulous.fabric_cad.chip_database.define import IdString
 
 
 class StringPool:

@@ -4,10 +4,7 @@ from loguru import logger
 
 import FABulous.fabric_cad.model_generation_npnr as model_gen_npnr
 from FABulous.fabric_cad.bitstreamSpec_generator import generateBitsStreamSpec
-from FABulous.fabric_cad.chip_database_generator import (
-    genRoutingDotGraph,
-    generateChipDatabase,
-)
+from FABulous.fabric_cad.chip_database_generator import generateChipDatabase
 from FABulous.fabric_cad.helper import mergeFiles
 from FABulous.fabric_cad.synth_file_generator import genCellsAndMaps, prims_gen
 

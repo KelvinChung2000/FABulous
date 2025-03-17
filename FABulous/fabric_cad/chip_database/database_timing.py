@@ -2,9 +2,9 @@ from dataclasses import dataclass, field
 from typing import Optional
 
 from FABulous.fabric_cad.bba import BBAWriter
-from FABulous.fabric_cad.chip_database_gen.BBAStruct import BBAStruct
-from FABulous.fabric_cad.chip_database_gen.define import ClockEdge
-from FABulous.fabric_cad.chip_database_gen.StringPool import StringPool
+from FABulous.fabric_cad.chip_database.BBAStruct import BBAStruct
+from FABulous.fabric_cad.chip_database.define import ClockEdge
+from FABulous.fabric_cad.chip_database.StringPool import StringPool
 
 
 class TimingValue(BBAStruct):

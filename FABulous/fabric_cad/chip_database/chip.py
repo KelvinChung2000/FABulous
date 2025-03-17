@@ -7,11 +7,11 @@ from typing import Optional
 from loguru import logger
 
 from FABulous.fabric_cad.bba import BBAWriter
-from FABulous.fabric_cad.chip_database_gen.BBAStruct import BBAStruct
-from FABulous.fabric_cad.chip_database_gen.database_tile import TileType
-from FABulous.fabric_cad.chip_database_gen.database_timing import TimingPool
-from FABulous.fabric_cad.chip_database_gen.define import IdString, NodeWire
-from FABulous.fabric_cad.chip_database_gen.StringPool import StringPool
+from FABulous.fabric_cad.chip_database.BBAStruct import BBAStruct
+from FABulous.fabric_cad.chip_database.database_tile import TileType
+from FABulous.fabric_cad.chip_database.database_timing import TimingPool
+from FABulous.fabric_cad.chip_database.define import IdString, NodeWire
+from FABulous.fabric_cad.chip_database.StringPool import StringPool
 
 """
 This provides a semi-flattened routing graph that is built into a deduplicated one.

@@ -6,6 +6,7 @@ import yaml
 from loguru import logger
 
 from FABulous.fabric_definition.Bel import Bel
+from FABulous.fabric_definition.ConfigMem import ConfigurationMemory
 from FABulous.fabric_definition.define import (
     IO,
     ConfigBitMode,
@@ -18,7 +19,8 @@ from FABulous.fabric_definition.Port import TilePort
 from FABulous.fabric_definition.SwitchMatrix import Mux, SwitchMatrix
 from FABulous.fabric_definition.Tile import Tile
 from FABulous.fabric_definition.Wire import Wire, WireType
-from FABulous.file_parser.file_parser_csv import parseList, parseMatrix
+from FABulous.fabric_generator.ConfigMem_genenrator import generateConfigMemInit
+from FABulous.file_parser.file_parser_csv import parseConfigMem, parseList, parseMatrix
 from FABulous.file_parser.file_parser_HDL import parseBelFile
 from FABulous.file_parser.parse_py_mux import genSwitchMatrix, setupPortData
 
@@ -48,20 +50,6 @@ def parseFabricYAML(fileName: Path) -> Fabric:
 
     filePath = fileName.parent
 
-    tileDict: dict[str, Tile] = {}
-    wireDictUnprocessed: dict[str, WireInfo] = {}
-
-    for i in data["TILES"]:
-        newTile, wireInfo = parseTileYAML(filePath.joinpath(i))
-        tileDict[newTile.name] = newTile
-        wireDictUnprocessed[newTile.name] = wireInfo
-
-    # TODO: parse supertiles
-    superTileDict = {}
-    # new_supertiles = parseSupertiles(fName, tileDic)
-    # for new_supertile in new_supertiles:
-    #     superTileDic[new_supertile.name] = new_supertile
-
     # parse the parameters
     param = data["PARAM"]
     height = 0
@@ -75,6 +63,22 @@ def parseFabricYAML(fileName: Path) -> Fabric:
     generateDelayInSwitchMatrix = int(param.get("GenerateDelayInSwitchMatrix", 80))
     multiplexerStyle = MultiplexerStyle[param.get("MultiplexerStyle", "CUSTOM").upper()]
     superTileEnable = param.get("SuperTileEnable", True)
+
+    tileDict: dict[str, Tile] = {}
+    wireDictUnprocessed: dict[str, WireInfo] = {}
+
+    for i in data["TILES"]:
+        newTile, wireInfo = parseTileYAML(
+            filePath.joinpath(i), frameBitsPerRow, maxFramesPerCol
+        )
+        tileDict[newTile.name] = newTile
+        wireDictUnprocessed[newTile.name] = wireInfo
+
+    # TODO: parse supertiles
+    superTileDict = {}
+    # new_supertiles = parseSupertiles(fName, tileDic)
+    # for new_supertile in new_supertiles:
+    #     superTileDic[new_supertile.name] = new_supertile
 
     usedTile = set()
     fabricTiles: list[list[str | None]] = []
@@ -234,7 +238,9 @@ def parseMatrixAsMux(fileName: Path, tileName: str) -> dict[str, Mux]:
     return connectionsDic
 
 
-def parseTileYAML(fileName: Path) -> tuple[Tile, WireInfo]:
+def parseTileYAML(
+    fileName: Path, frameBitsPerRow: int, maxFramePerCol: int
+) -> tuple[Tile, WireInfo]:
     """Parses a yaml tile configuration file and returns all tile objects.
 
     Args:
@@ -269,7 +275,9 @@ def parseTileYAML(fileName: Path) -> tuple[Tile, WireInfo]:
         if isinstance(p, str):
             p = [p]
         for i in p:
-            iTile, iWireInfo = parseTileYAML(filePathParent.joinpath(i))
+            iTile, iWireInfo = parseTileYAML(
+                filePathParent.joinpath(i), frameBitsPerRow, maxFramePerCol
+            )
             for ports in iTile.ports:
                 portsDict[ports.name] = ports
             for bel in iTile.bels:
@@ -298,7 +306,7 @@ def parseTileYAML(fileName: Path) -> tuple[Tile, WireInfo]:
 
     withUserCLK = any(bel.userCLK for bel in bels)
     for b in bels:
-        configBit += b.configBit
+        configBit += b.configBits
 
     if mPath := data.get("MATRIX", None):
         matrixDir = fileName.parent.joinpath(mPath)
@@ -343,12 +351,20 @@ def parseTileYAML(fileName: Path) -> tuple[Tile, WireInfo]:
     if p := data.get("CONFIG_MEM", None):
         configMems = parseConfigMem(
             fileName.parent.joinpath(p),
-            32,
-            32,
-            configBit,
+            frameBitsPerRow=frameBitsPerRow,
+            maxFramePerCol=maxFramePerCol,
+            configBit=configBit,
         )
     else:
-        configMems = []
+        dstPath = fileName.parent.joinpath(f"{tileName}_configMem.csv")
+        generateConfigMemInit(dstPath, configBit, frameBitsPerRow, maxFramePerCol)
+        configMems = parseConfigMem(
+            dstPath,
+            frameBitsPerRow=frameBitsPerRow,
+            maxFramePerCol=maxFramePerCol,
+            configBit=configBit,
+        )
+
     wires.extend(data.get("WIRES", {}))
     return (
         Tile(
@@ -357,15 +373,8 @@ def parseTileYAML(fileName: Path) -> tuple[Tile, WireInfo]:
             bels=bels,
             switchMatrix=sm,
             configMems=configMems,
-            globalConfigBits=configBit,
             withUserCLK=withUserCLK,
             tileDir=fileName,
         ),
         wires,
     )
-
-
-def parseConfigMem(
-    fileName: Path, maxFramePerCol: int, frameBitPerRow: int, configBitCount: int
-):
-    pass

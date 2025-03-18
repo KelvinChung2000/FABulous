@@ -1,6 +1,7 @@
 module PE_switch_matrix #(
-    parameter NoConfigBits = 65
-)(
+    parameter NoConfigBits = 23
+)
+(
     output [31:0] out0,
     output [31:0] out1,
     output [31:0] out2,
@@ -28,8 +29,8 @@ module PE_switch_matrix #(
     input [NoConfigBits - 1:0] ConfigBits_N
 );
 
-localparam reg GND = 32'd0;
-localparam reg VCC = 32'd1;
+localparam GND = 32'd0;
+localparam VCC = 32'd1;
 
 // switch matrix multiplexer out0 MUX-3
 cus_mux41_buf_pack #(
@@ -174,42 +175,42 @@ cus_mux81_buf_pack #(
     .X(data_in3)
 );
 
-// switch matrix multiplexer reg_in MUX-1
+// switch matrix multiplexer RES_reg_in MUX-1
 assign RES_reg_in = data_out;
-// switch matrix multiplexer reg_in MUX-2
+// switch matrix multiplexer N_reg_in MUX-2
 cus_mux21_pack #(
     .WIDTH(6'd32)
-) inst_cus_mux21_pack_reg_in (
+) inst_cus_mux21_pack_N_reg_in (
     .A0(N_reg_out),
     .A1(in0),
     .S(ConfigBits[19]),
     .X(N_reg_in)
 );
 
-// switch matrix multiplexer reg_in MUX-2
+// switch matrix multiplexer E_reg_in MUX-2
 cus_mux21_pack #(
     .WIDTH(6'd32)
-) inst_cus_mux21_pack_reg_in (
+) inst_cus_mux21_pack_E_reg_in (
     .A0(E_reg_out),
     .A1(in1),
     .S(ConfigBits[20]),
     .X(E_reg_in)
 );
 
-// switch matrix multiplexer reg_in MUX-2
+// switch matrix multiplexer S_reg_in MUX-2
 cus_mux21_pack #(
     .WIDTH(6'd32)
-) inst_cus_mux21_pack_reg_in (
+) inst_cus_mux21_pack_S_reg_in (
     .A0(S_reg_out),
     .A1(in2),
     .S(ConfigBits[21]),
     .X(S_reg_in)
 );
 
-// switch matrix multiplexer reg_in MUX-2
+// switch matrix multiplexer W_reg_in MUX-2
 cus_mux21_pack #(
     .WIDTH(6'd32)
-) inst_cus_mux21_pack_reg_in (
+) inst_cus_mux21_pack_W_reg_in (
     .A0(W_reg_out),
     .A1(in3),
     .S(ConfigBits[22]),

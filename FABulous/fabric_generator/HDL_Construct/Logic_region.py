@@ -1,6 +1,6 @@
 from contextlib import contextmanager
 from dataclasses import dataclass
-from typing import Iterable
+from typing import Any, Iterable
 
 from FABulous.fabric_generator.define import WriterType
 from FABulous.fabric_generator.HDL_Construct.Region import Region
@@ -85,6 +85,16 @@ class LogicRegion(Region):
         )
 
         r = GenerateRegion([], self._writer, self.indent + self.indentCount)
+        try:
+            yield r
+        finally:
+            self.container.append(r)
+
+    @contextmanager
+    def IfElse(self, cond: Value):
+        from FABulous.fabric_generator.HDL_Construct.IfElse_region import IfElseRegion
+
+        r = IfElseRegion(cond, [], [], self._writer, self.indent)
         try:
             yield r
         finally:
@@ -191,7 +201,7 @@ class LogicRegion(Region):
 
         def __str__(self) -> str:
             if self.writer == WriterType.VERILOG:
-                return f"localparam reg {self.name} = 32'd{self.value};"
+                return f"localparam {self.name} = 32'd{self.value};"
             else:
                 return f"constant {self.name} : integer := {self.value};"
 

@@ -1,4 +1,3 @@
-from pathlib import Path
 from typing import Mapping
 
 from FABulous.fabric_definition.define import IO, ConfigBitMode
@@ -18,8 +17,11 @@ def generateTile(codeGen: CodeGenerator, fabric: Fabric, tile: Tile):
             )
             frameBitsPerRow = pr.Parameter("FrameBitsPerRow", fabric.frameBitsPerRow)
 
-            if tile.globalConfigBits > 0:
-                NoConfigBitsParam = pr.Parameter("NoConfigBits", tile.globalConfigBits)
+            if tile.configBits > 0:
+                NoConfigBitsParam = pr.Parameter("NoConfigBits", tile.configBits)
+            pr.Comment("Emulation Parameters")
+            emuEn = pr.Parameter("EMULATION_ENABLE", 0)
+            emuCfg = pr.Parameter("EMULATION_CONFIG", 0)
 
         portMapping: Mapping[TilePort | Port, Value] = {}
         with module.PortRegion() as pr:
@@ -41,7 +43,7 @@ def generateTile(codeGen: CodeGenerator, fabric: Fabric, tile: Tile):
             userClkOut = pr.Port("UserCLKo", IO.OUTPUT)
 
             if fabric.configBitMode == ConfigBitMode.FRAME_BASED:
-                if tile.globalConfigBits > 0:
+                if tile.configBits > 0:
                     frameData = pr.Port("FrameData", IO.INPUT, frameBitsPerRow - 1)
                     frameDataOut = pr.Port(
                         "FrameData_O", IO.OUTPUT, frameBitsPerRow - 1
@@ -78,7 +80,7 @@ def generateTile(codeGen: CodeGenerator, fabric: Fabric, tile: Tile):
                 for port in bel.sharedPort:
                     sharePortDict[port.sharedWith] = lr.Signal(port.name)
 
-            if tile.globalConfigBits > 0:
+            if tile.configBits > 0:
                 lr.NewLine()
                 lr.Comment("ConfigBits Wires")
                 configBitsSignal = lr.Signal("ConfigBits", NoConfigBitsParam - 1)
@@ -86,7 +88,7 @@ def generateTile(codeGen: CodeGenerator, fabric: Fabric, tile: Tile):
 
             lr.NewLine()
             lr.Comment("Buffering incoming and out outgoing wires")
-            if tile.globalConfigBits > 0:
+            if tile.configBits > 0:
                 lr.Comment("FrameData Buffer")
                 frameDataOutToIn = lr.Signal("FrameData_internal", frameBitsPerRow - 1)
                 lr.NewLine()
@@ -195,7 +197,7 @@ def generateTile(codeGen: CodeGenerator, fabric: Fabric, tile: Tile):
             # init config memory
             if (
                 fabric.configBitMode == ConfigBitMode.FRAME_BASED
-                and tile.globalConfigBits > 0
+                and tile.configBits > 0
             ):
                 lr.Comment("Init Configuration storage latches\n")
                 lr.InitModule(
@@ -207,12 +209,16 @@ def generateTile(codeGen: CodeGenerator, fabric: Fabric, tile: Tile):
                         lr.ConnectPair("ConfigBits", configBitsSignal),
                         lr.ConnectPair("ConfigBits_N", configBitsNSignal),
                     ],
+                    [
+                        lr.ConnectPair("EMULATION_ENABLE", emuEn),
+                        lr.ConnectPair("EMULATION_CONFIG", emuCfg),
+                    ],
                 )
 
             # init bels
             belConfigBitCounter = 0
             for bel in tile.bels:
-                lr.Comment(f"Instantiate BEL {bel.name}")
+                lr.Comment(f"Instantiate BEL {bel.prefix}{bel.name}")
 
                 connectPairs = []
 
@@ -314,26 +320,24 @@ def generateTile(codeGen: CodeGenerator, fabric: Fabric, tile: Tile):
             #     connectPairs.append(("CLK", "CLK"))
 
             if fabric.configBitMode == ConfigBitMode.FRAME_BASED:
-                if tile.globalConfigBits > 0:
+                if tile.configBits > 0:
                     connectPairs.append(
                         lr.ConnectPair(
                             "ConfigBits",
-                            configBitsSignal[
-                                tile.globalConfigBits - 1 : belConfigBitCounter
-                            ],
+                            configBitsSignal[tile.configBits - 1 : belConfigBitCounter],
                         )
                     )
                     connectPairs.append(
                         lr.ConnectPair(
                             "ConfigBits_N",
                             configBitsNSignal[
-                                tile.globalConfigBits - 1 : belConfigBitCounter
+                                tile.configBits - 1 : belConfigBitCounter
                             ],
                         )
                     )
             lr.Comment("Init Switch Matrix")
             lr.InitModule(
-                f"{tile.name}_SwitchMatrix",
-                f"Inst_{tile.name}_SwitchMatrix",
+                f"{tile.name}_switch_matrix",
+                f"Inst_{tile.name}_switch_matrix",
                 connectPairs,
             )

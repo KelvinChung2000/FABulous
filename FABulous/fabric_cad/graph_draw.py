@@ -33,9 +33,7 @@ def genRoutingResourceGraph(
         Writes the routing graph to a dot file
     """
     # Configure graph with forced grid layout settings
-    graph = pydot.Dot(
-        graph_type="digraph",
-    )
+    graph = pydot.Dot(graph_type="digraph", rankdir="TB")
 
     if expand:
 
@@ -54,9 +52,9 @@ def genRoutingResourceGraph(
     if pairFilter:
         pairs = pairFilter
 
-    # rankX = []
-    # for i in range(chip.height):
-    #     rankX.append(pydot.Subgraph(f"rankX_{i}", rankdir="LR"))
+    rankX = []
+    for i in range(chip.height):
+        rankX.append(pydot.Subgraph(f"rankX_{i}", rankdir="LR"))
 
     logger.info("Adding tile subgraphs")
     for x, y in pairs:
@@ -136,14 +134,14 @@ def genRoutingResourceGraph(
             subgraph.add_edge(pydot.Edge(f"X{x}Y{y}.{srcName}", f"X{x}Y{y}.{dstName}"))
             addedPairs.add((srcName, dstName))
 
-        # rankX[x].add_subgraph(subgraph)
         subgraph.add_node(
             pydot.Node(
                 f"anchor_X{x}Y{y}",
                 style="invis",
             )
         )
-        graph.add_subgraph(subgraph)
+        rankX[x].add_subgraph(subgraph)
+        # graph.add_subgraph(subgraph)
 
         wires = chip.get_node_wires_from_tile(x, y)
         for shape in wires:
@@ -159,14 +157,10 @@ def genRoutingResourceGraph(
                 globalPairs.add((srcName, dstName))
                 globalPairs.add((dstName, srcName))
 
-                graph.add_edge(
-                    pydot.Edge(
-                        srcName, dstName, dir="none", color="blue", weight="10000"
-                    )
-                )
+                graph.add_edge(pydot.Edge(srcName, dstName, dir="none", color="blue"))
 
-    # for i in rankX:
-    #     graph.add_subgraph(i)
+    for i in rankX:
+        graph.add_subgraph(i)
     for x in range(chip.width):
         for y in range(chip.height):
             if x + 1 < chip.width:
@@ -273,7 +267,6 @@ def genRoutedGraph(
 
 
 if __name__ == "__main__":
-
     genRoutedGraph(
         Path("/home/kelvin/FABulous_fork/myProject/.FABulous/routing_graph.dot"),
         Path("/home/kelvin/FABulous_fork/myProject/user_design/router_test.fasm"),

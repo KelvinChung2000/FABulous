@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 
+from FABulous.fabric_generator.HDL_Construct._Comment import _Comment
 from FABulous.fabric_generator.define import WriterType
 from FABulous.fabric_generator.HDL_Construct.Region import Region
 from FABulous.fabric_generator.HDL_Construct.Value import Value
@@ -25,7 +26,18 @@ class ParameterRegion(Region):
 
     def __str__(self) -> str:
         if self._writer == WriterType.VERILOG:
-            return f"#(\n{",\n".join([f"{' '*self.indent}{str(i)}" for i in self.container])}\n)"
+            lines = []
+
+            for idx, item in enumerate(self.container):
+                if isinstance(item, _Comment):
+                    lines.append(f"{' ' * self.indent}{str(item)}")
+                else:
+                    if idx == len(self.container) - 1:
+                        lines.append(f"{' ' * self.indent}{str(item)}")
+                    else:
+                        lines.append(f"{' ' * self.indent}{str(item)},")
+
+            return f"#(\n{''.join([f'{line}\n' for line in lines])})\n"
         else:
             return f"generic(\n{";\n".join([f"{' '*self.indent}{str(i)}" for i in self.container])}\n);"
 

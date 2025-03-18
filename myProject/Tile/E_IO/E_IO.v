@@ -1,8 +1,11 @@
 module E_IO #(
     parameter MaxFramesPerCol = 32,
     parameter FrameBitsPerRow = 32,
-    parameter NoConfigBits = 2
-)(
+    // Emulation Parameters
+    parameter EMULATION_ENABLE = 0,
+    parameter EMULATION_CONFIG = 0
+)
+(
     // NORTH
     // EAST
     // SOUTH
@@ -13,8 +16,6 @@ module E_IO #(
     output [31:0] out,
     input UserCLK,
     output UserCLKo,
-    input [FrameBitsPerRow - 1:0] FrameData,
-    output [FrameBitsPerRow - 1:0] FrameData_O,
     input [MaxFramesPerCol - 1:0] FrameStrobe,
     output [MaxFramesPerCol - 1:0] FrameStrobe_O
 );
@@ -25,28 +26,7 @@ reg [31:0] E_to_fabric;
 reg [31:0] E_in;
 reg [31:0] E_out;
 
-// ConfigBits Wires
-reg [NoConfigBits - 1:0] ConfigBits;
-reg [NoConfigBits - 1:0] ConfigBits_N;
-
 // Buffering incoming and out outgoing wires
-// FrameData Buffer
-reg [FrameBitsPerRow - 1:0] FrameData_internal;
-
-my_buf_pack #(
-    .WIDTH(FrameBitsPerRow)
-) data_inbuf (
-    .A(FrameData),
-    .X(FrameData_internal)
-);
-
-my_buf_pack #(
-    .WIDTH(FrameBitsPerRow)
-) data_outbuf (
-    .A(FrameData_internal),
-    .X(FrameData_O)
-);
-
 // FrameStrobe Buffer
 reg [MaxFramesPerCol - 1:0] FrameStrobe_internal;
 
@@ -70,16 +50,7 @@ clk_buf #() inst_clk_buf (
     .X(UserCLKo)
 );
 
-// Init Configuration storage latches
-
-E_IO_ConfigMem #() Inst_E_IO_ConfigMem (
-    .FrameData(FrameData),
-    .FrameStrobe(FrameStrobe),
-    .ConfigBits(ConfigBits),
-    .ConfigBits_N(ConfigBits_N)
-);
-
-// Instantiate BEL IO
+// Instantiate BEL E_IO
 IO #() Inst_E_IO (
     .from_fabric(E_from_fabric),
     .to_fabric(E_to_fabric),
@@ -88,13 +59,11 @@ IO #() Inst_E_IO (
 );
 
 // Init Switch Matrix
-E_IO_SwitchMatrix #() Inst_E_IO_SwitchMatrix (
+E_IO_switch_matrix #() Inst_E_IO_switch_matrix (
     .out3(out3),
     .E_from_fabric(E_from_fabric),
     .E_to_fabric(E_to_fabric),
-    .in3(in3),
-    .ConfigBits(ConfigBits[1:0]),
-    .ConfigBits_N(ConfigBits_N[1:0])
+    .in3(in3)
 );
 
 endmodule

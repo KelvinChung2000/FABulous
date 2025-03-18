@@ -168,7 +168,7 @@
             "BUS": 1,
             "DATA": 1,
             "FABulous": 1,
-            "src": "../../myProject/Tile/PE/reg_unit.v:9.55-9.62"
+            "src": "../../myProject/Tile/PE/reg_unit.v:9.54-9.61"
           }
         },
         "rst": {

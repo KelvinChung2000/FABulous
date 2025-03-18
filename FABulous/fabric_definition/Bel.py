@@ -62,7 +62,7 @@ class Bel:
     externalOutputs: list[BelPort]
     configPort: list[ConfigPort]
     sharedPort: list[SharedPort]
-    configBit: int
+    configBits: int
     belFeatureMap: dict[str, int]
     userCLK: Port | None
     z: int = 0
@@ -89,7 +89,7 @@ class Bel:
         self.externalOutputs = [p for p in external if p.ioDirection == IO.OUTPUT]
         self.configPort = configPort
         self.sharedPort = sharedPort
-        self.configBit = configBit
+        self.configBits = configBit
         self.userCLK = userCLK
         self.belFeatureMap = belFeatureMap
         self.z = 0

@@ -17,4 +17,4 @@ BELS: [
 
 ]
 MATRIX: ./list.py
-CONFIG_MEM: ./W_IO_ConfigMem.csv
+# CONFIG_MEM: ./W_IO_ConfigMem.csv

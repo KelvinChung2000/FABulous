@@ -146,3 +146,6 @@ def generateTileSwitchMatrix(codeGen: CodeGenerator, fabric: Fabric, tile: Tile)
                         )
 
                     configBitstreamPosition += paddedMuxSize.bit_length() - 1
+    assert (
+        configBitstreamPosition == tile.switchMatrix.configBits
+    ), "Config bitstream length mismatch"

@@ -1,8 +1,12 @@
 module PE #(
     parameter MaxFramesPerCol = 32,
     parameter FrameBitsPerRow = 32,
-    parameter NoConfigBits = 65
-)(
+    parameter NoConfigBits = 34,
+    // Emulation Parameters
+    parameter EMULATION_ENABLE = 0,
+    parameter EMULATION_CONFIG = 0
+)
+(
     // NORTH
     input [31:0] in0,
     output [31:0] out0,
@@ -97,7 +101,10 @@ clk_buf #() inst_clk_buf (
 
 // Init Configuration storage latches
 
-PE_ConfigMem #() Inst_PE_ConfigMem (
+PE_ConfigMem #(
+    .EMULATION_ENABLE(EMULATION_ENABLE),
+    .EMULATION_CONFIG(EMULATION_CONFIG)
+) Inst_PE_ConfigMem (
     .FrameData(FrameData),
     .FrameStrobe(FrameStrobe),
     .ConfigBits(ConfigBits),
@@ -119,7 +126,7 @@ const_unit #() Inst_const_unit (
     .ConfigBits(ConfigBits[10:3])
 );
 
-// Instantiate BEL reg_unit
+// Instantiate BEL RES_reg_unit
 reg_unit #() Inst_RES_reg_unit (
     .en(RES_en),
     .reg_in(RES_reg_in),
@@ -128,7 +135,7 @@ reg_unit #() Inst_RES_reg_unit (
     .clk(UserCLK)
 );
 
-// Instantiate BEL reg_unit
+// Instantiate BEL N_reg_unit
 reg_unit #() Inst_N_reg_unit (
     .en(N_en),
     .reg_in(N_reg_in),
@@ -137,7 +144,7 @@ reg_unit #() Inst_N_reg_unit (
     .clk(UserCLK)
 );
 
-// Instantiate BEL reg_unit
+// Instantiate BEL E_reg_unit
 reg_unit #() Inst_E_reg_unit (
     .en(E_en),
     .reg_in(E_reg_in),
@@ -146,7 +153,7 @@ reg_unit #() Inst_E_reg_unit (
     .clk(UserCLK)
 );
 
-// Instantiate BEL reg_unit
+// Instantiate BEL S_reg_unit
 reg_unit #() Inst_S_reg_unit (
     .en(S_en),
     .reg_in(S_reg_in),
@@ -155,7 +162,7 @@ reg_unit #() Inst_S_reg_unit (
     .clk(UserCLK)
 );
 
-// Instantiate BEL reg_unit
+// Instantiate BEL W_reg_unit
 reg_unit #() Inst_W_reg_unit (
     .en(W_en),
     .reg_in(W_reg_in),
@@ -165,7 +172,7 @@ reg_unit #() Inst_W_reg_unit (
 );
 
 // Init Switch Matrix
-PE_SwitchMatrix #() Inst_PE_SwitchMatrix (
+PE_switch_matrix #() Inst_PE_switch_matrix (
     .out0(out0),
     .out1(out1),
     .out2(out2),
@@ -189,8 +196,8 @@ PE_SwitchMatrix #() Inst_PE_SwitchMatrix (
     .S_reg_out(S_reg_out),
     .W_reg_out(W_reg_out),
     .const_out(const_out),
-    .ConfigBits(ConfigBits[64:11]),
-    .ConfigBits_N(ConfigBits_N[64:11])
+    .ConfigBits(ConfigBits[33:11]),
+    .ConfigBits_N(ConfigBits_N[33:11])
 );
 
 endmodule

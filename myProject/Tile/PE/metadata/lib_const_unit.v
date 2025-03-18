@@ -6,4 +6,3 @@ module const_unit #(
 );
 
 endmodule
-

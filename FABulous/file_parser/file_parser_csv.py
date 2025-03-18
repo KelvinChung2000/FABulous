@@ -559,7 +559,7 @@ def parseTiles(fileName: Path) -> list[Tile]:
                 wireTypes=wires,
                 switchMatrix=sm,
                 configMems=configMems,
-                globalConfigBits=configBit,
+                configBits=configBit,
                 withUserCLK=withUserCLK,
                 tileDir=fileName,
             )
@@ -1070,7 +1070,9 @@ def vhdl_belMapProcessing(file: str, filename: str) -> dict:
     return belMapDic
 
 
-def parseConfigMem(fileName: Path) -> ConfigurationMemory:
+def parseConfigMem(
+    fileName: Path, maxFramePerCol: int, frameBitsPerRow: int, configBit: int
+) -> ConfigurationMemory:
     """Parse the config memory CSV file into a list of ConfigMem objects.
 
     Parameters
@@ -1100,6 +1102,10 @@ def parseConfigMem(fileName: Path) -> ConfigurationMemory:
     list[ConfigMem]
         List of ConfigMem objects parsed from the config memory CSV file.
     """
+    if not fileName.exists():
+        logger.error(f"The file {fileName} does not exist.")
+        raise ValueError
+
     with open(fileName) as f:
         mappingFile = list(csv.DictReader(f))
 

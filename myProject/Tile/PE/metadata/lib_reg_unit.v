@@ -10,4 +10,3 @@ module reg_unit #(
 );
 
 endmodule
-

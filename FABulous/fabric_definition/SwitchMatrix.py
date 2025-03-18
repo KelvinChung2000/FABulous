@@ -1,5 +1,6 @@
 from collections import defaultdict, namedtuple
 from dataclasses import dataclass, field
+from pprint import pprint
 from typing import Any, Iterable, Self
 
 from FABulous.fabric_definition.define import IO
@@ -90,7 +91,6 @@ class Mux:
     _inputs: list[GenericPort]
     _output: GenericPort
     _width: int
-    _configBit: int = 0
 
     def __init__(self, name: str, inputs: list[GenericPort], output: GenericPort):
         for p in inputs:
@@ -100,11 +100,10 @@ class Mux:
         self._name = name
         self._inputs = inputs
         self._output = output
-        self._configBit = 2 ** (len(self.inputs) - 1).bit_length()
         self._width = output.width
 
     def __repr__(self) -> str:
-        return f"{self.output}<({self.name})-{list(self.inputs)}"
+        return f"{self.output}<({self.name}({self.configBits}))-{list(self.inputs)}"
 
     @property
     def name(self):
@@ -123,8 +122,8 @@ class Mux:
         return self._width
 
     @property
-    def configBit(self):
-        return self._configBit
+    def configBits(self):
+        return (len(self.inputs) - 1).bit_length()
 
     def extendInputs(self, inputs: Iterable[GenericPort]):
         for i in inputs:
@@ -132,14 +131,11 @@ class Mux:
                 raise ValueError("All inputs and output must have the same width")
             self._inputs.append(i)
 
-        self._configBit = 2 ** (len(self.inputs) - 1).bit_length()
-
 
 @dataclass
 class SwitchMatrix:
     muxesDict: dict[GenericPort, Mux] = field(default_factory=dict)
     _uniqueOutput: set[GenericPort] = field(default_factory=set)
-    configBits: int = 0
     # muxTypeDict: dict[int, str] = {
     #     2: "cus_mux21",
     #     4: "cus_mux41_buf",
@@ -160,6 +156,10 @@ class SwitchMatrix:
     def muxes(self) -> list[Mux]:
         return list(self.muxesDict.values())
 
+    @property
+    def configBits(self) -> int:
+        return sum(mux.configBits for mux in self.muxesDict.values())
+
     def __getitem__(self, key: GenericPort):
         if key in self.muxesDict:
             return self.muxesDict[key]
@@ -176,8 +176,6 @@ class SwitchMatrix:
         else:
             self.muxesDict[mux.output] = mux
             self._uniqueOutput.add(mux.output)
-
-        self.configBits += mux.configBit
 
     def getOutputs(self) -> list[GenericPort]:
         return [mux.output for mux in self.muxesDict.values()]

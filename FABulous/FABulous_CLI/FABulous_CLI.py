@@ -350,7 +350,6 @@ class FABulous_CLI(Cmd):
             logger.info(f"Generating configMem for {i}")
             self.fabulousAPI.genConfigMem(
                 i,
-                self.projectDir / f"Tile/{i}/{i}_ConfigMem.csv",
                 self.projectDir / f"Tile/{i}/{i}_ConfigMem{self.extension}",
             )
         logger.info("Generating configMem complete")

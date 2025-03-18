@@ -11,7 +11,6 @@ from FABulous.file_parser.file_parser_yaml import parseFabricYAML
 
 
 def generateFabric(codeGen: CodeGenerator, fabric: Fabric):
-    flattenFabric = fabric.getFlattenFabric()
     with codeGen.Module(fabric.name) as m:
         with m.ParameterRegion() as pr:
             maxFramePerCol = pr.Parameter("MaxFramePerCol", fabric.maxFramesPerCol)
@@ -19,7 +18,7 @@ def generateFabric(codeGen: CodeGenerator, fabric: Fabric):
 
         externalSignalMapping: Mapping[Loc, Mapping[BelPort, Value]] = {}
         with m.PortRegion() as pr:
-            for (x, y), tile in flattenFabric:
+            for (x, y), tile in fabric:
                 if tile is None:
                     continue
 
@@ -27,13 +26,13 @@ def generateFabric(codeGen: CodeGenerator, fabric: Fabric):
                 for bel in tile.bels:
                     for externalInput in bel.externalInputs:
                         mapping[externalInput] = pr.Port(
-                            f"Tile_X{x}Y{y}_{externalInput.name}",
+                            f"Tile_X{x}Y{y}_{bel.prefix}{externalInput.name}",
                             externalInput.ioDirection,
                             externalInput.width,
                         )
                     for externalOutput in bel.externalOutputs:
                         mapping[externalOutput] = pr.Port(
-                            f"Tile_X{x}Y{y}_{externalOutput.name}",
+                            f"Tile_X{x}Y{y}_{bel.prefix}{externalOutput.name}",
                             externalOutput.ioDirection,
                             externalOutput.width,
                         )
@@ -53,7 +52,7 @@ def generateFabric(codeGen: CodeGenerator, fabric: Fabric):
             clkWireInMapping: Mapping[Loc, Value] = {}
             clkWireOutMapping: Mapping[Loc, Value] = {}
             lr.Comment("User Clock wire")
-            for (x, y), tile in flattenFabric:
+            for (x, y), tile in fabric:
                 if y == fabric.numberOfColumns - 1:
                     clkWireInMapping[(x, y)] = userClk
                 else:
@@ -64,11 +63,11 @@ def generateFabric(codeGen: CodeGenerator, fabric: Fabric):
             frameDataOutMapping: Mapping[Loc, Value] = {}
             lr.NewLine()
             lr.Comment("Frame Data wire")
-            for (x, y), tile in flattenFabric:
+            for (x, y), tile in fabric:
                 frameDataOutMapping[(x, y)] = lr.Signal(
                     f"Tile_X{x}Y{y}_FrameData", frameBitsPerRow - 1
                 )
-            for (x, y), tile in flattenFabric:
+            for (x, y), tile in fabric:
                 if x == 0:
                     frameDataInMapping[(x, y)] = lr.Signal(
                         f"Row{y}_FrameData", frameBitsPerRow - 1
@@ -80,11 +79,11 @@ def generateFabric(codeGen: CodeGenerator, fabric: Fabric):
             frameStrobeOutMapping: Mapping[Loc, Value] = {}
             lr.NewLine()
             lr.Comment("Frame Strobe wire")
-            for (x, y), tile in flattenFabric:
+            for (x, y), tile in fabric:
                 frameStrobeOutMapping[(x, y)] = lr.Signal(
                     f"Tile_X{x}Y{y}_FrameStrobe", maxFramePerCol - 1
                 )
-            for (x, y), tile in flattenFabric:
+            for (x, y), tile in fabric:
                 if y == fabric.numberOfColumns - 1:
                     frameStrobeInMapping[(x, y)] = lr.Signal(
                         f"Col{x}_FrameStrobe", maxFramePerCol - 1
@@ -100,7 +99,7 @@ def generateFabric(codeGen: CodeGenerator, fabric: Fabric):
             )
             lr.NewLine()
             lr.Comment("Tile to Tile wire")
-            for (x, y), tile in flattenFabric:
+            for (x, y), tile in fabric:
                 if tile is None:
                     continue
 
@@ -109,10 +108,9 @@ def generateFabric(codeGen: CodeGenerator, fabric: Fabric):
                     outputOnSide[port.sideOfTile].append(
                         lr.Signal(f"Tile_X{x}Y{y}_{port.name}", port.width)
                     )
-
                 tileToTileOutMapping[(x, y)] = outputOnSide
 
-            for (x, y), tile in flattenFabric:
+            for (x, y), tile in fabric:
                 if tile is None:
                     continue
 
@@ -122,32 +120,41 @@ def generateFabric(codeGen: CodeGenerator, fabric: Fabric):
                         case Side.NORTH:
                             if y - 1 < 0:
                                 continue
+                            if fabric[(x, y - 1)] is None:
+                                continue
                             inputOnSide[Side.NORTH].extend(
                                 tileToTileOutMapping[(x, y - 1)][Side.SOUTH]
                             )
                         case Side.EAST:
-                            if x - 1 < 0:
+                            if x + 1 >= fabric.numberOfColumns:
+                                continue
+                            if fabric[(x + 1, y)] is None:
                                 continue
                             inputOnSide[Side.EAST].extend(
-                                tileToTileOutMapping[(x - 1, y)][Side.WEST]
+                                tileToTileOutMapping[(x + 1, y)][Side.WEST]
                             )
+
                         case Side.SOUTH:
                             if y + 1 >= fabric.numberOfRows:
+                                continue
+                            if fabric[(x, y + 1)] is None:
                                 continue
                             inputOnSide[Side.SOUTH].extend(
                                 tileToTileOutMapping[(x, y + 1)][Side.NORTH]
                             )
                         case Side.WEST:
-                            if x + 1 >= fabric.numberOfColumns:
+                            if x - 1 < 0:
+                                continue
+                            if fabric[(x - 1, y)] is None:
                                 continue
                             inputOnSide[Side.WEST].extend(
-                                tileToTileOutMapping[(x + 1, y)][Side.EAST]
+                                tileToTileOutMapping[(x - 1, y)][Side.EAST]
                             )
                 tileToTileInMapping[(x, y)] = inputOnSide
 
             lr.NewLine()
             lr.Comment("Frame Data connection")
-            for (x, y), tile in flattenFabric:
+            for (x, y), tile in fabric:
                 if x == 0:
                     lr.Assign(
                         frameDataInMapping[(x, y)],
@@ -158,7 +165,7 @@ def generateFabric(codeGen: CodeGenerator, fabric: Fabric):
 
             lr.NewLine()
             lr.Comment("Frame Strobe connection")
-            for (x, y), tile in flattenFabric:
+            for (x, y), tile in fabric:
                 if y == fabric.numberOfColumns - 1:
                     lr.Assign(
                         frameStrobeInMapping[(x, y)],
@@ -168,7 +175,7 @@ def generateFabric(codeGen: CodeGenerator, fabric: Fabric):
                     )
 
             lr.Comment("Create Tiles")
-            for (x, y), tile in flattenFabric:
+            for (x, y), tile in fabric:
                 if tile is None:
                     lr.InitModule(
                         "EmptyTile",
@@ -201,6 +208,9 @@ def generateFabric(codeGen: CodeGenerator, fabric: Fabric):
                             ]
                         )
                     for side, ports in tile.getTilePortGrouped(IO.INPUT).items():
+                        # print(tile.name)
+                        # print(tileToTileInMapping[(x, y)][side])
+                        # print(ports)
                         connection.extend(
                             [
                                 lr.ConnectPair(f"{port.name}", signal)
@@ -232,6 +242,11 @@ def generateFabric(codeGen: CodeGenerator, fabric: Fabric):
                             lr.ConnectPair(
                                 "FrameStrobe_o", frameStrobeOutMapping[(x, y)]
                             ),
+                        ],
+                        [
+                            lr.ConnectPair("MaxFramePerCol", maxFramePerCol),
+                            lr.ConnectPair("FrameBitsPerRow", frameBitsPerRow),
+                            lr.ConnectPair("NoConfigBits", tile.configBits),
                         ],
                     )
 

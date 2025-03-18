@@ -38,7 +38,6 @@ class Tile:
     switchMatrix: SwitchMatrix
     configMems: ConfigurationMemory
     wireTypes: list[WireType] = field(default_factory=list)
-    globalConfigBits: int = 0
     withUserCLK: bool = False
     tileDir: Path = Path(".")
     partOfSuperTile = False
@@ -47,6 +46,10 @@ class Tile:
         if __o is None or not isinstance(__o, Tile):
             return False
         return self.name == __o.name
+
+    @property
+    def configBits(self):
+        return sum(bel.configBits for bel in self.bels) + self.switchMatrix.configBits
 
     def getWestPorts(self, io: IO | None = None) -> list[TilePort]:
         """Retrieve the list of ports located on the west side of the tile.

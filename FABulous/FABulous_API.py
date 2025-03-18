@@ -132,7 +132,7 @@ class FABulous_API:
         """
         self.fabricGenerator.list2CSV(list, matrix)
 
-    def genConfigMem(self, tileName: str, configMem: Path, dest: Path):
+    def genConfigMem(self, tileName: str, dest: Path):
         """Generate configuration memory for specified tile.
 
         Parameters
@@ -144,7 +144,7 @@ class FABulous_API:
         """
         cg = CodeGenerator(dest, self.writerType)
         if tile := self.fabric.getTileByName(tileName):
-            generateConfigMem(cg, self.fabric, tile, configMem)
+            generateConfigMem(cg, self.fabric, tile)
         else:
             raise ValueError(f"Tile {tileName} not found")
 

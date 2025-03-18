@@ -34,8 +34,8 @@ class ConfigMem:
 
 @dataclass
 class ConfigurationMemory:
-    configMappings: list[ConfigBitMapping]
-    configMemEntries: list[ConfigMem]
+    configMappings: list[ConfigBitMapping] = field(default_factory=list)
+    configMemEntries: list[ConfigMem] = field(default_factory=list)
 
     def __getitems__(self, key) -> int:
         if isinstance(key, tuple):

@@ -22,7 +22,6 @@ generate
 endgenerate
 
 endmodule
-
 (* techmap_celltype = "reg_unit_en_1_rst_z" *)
 module map_reg_unit_en_1_rst_z #(
     parameter _TECHMAP_CONSTVAL_reg_in_ = 32'bx,
@@ -47,7 +46,6 @@ generate
 endgenerate
 
 endmodule
-
 (* techmap_celltype = "reg_unit_en_z_rst_0" *)
 module map_reg_unit_en_z_rst_0 #(
     parameter _TECHMAP_CONSTVAL_reg_in_ = 32'bx,
@@ -72,7 +70,6 @@ generate
 endgenerate
 
 endmodule
-
 (* techmap_celltype = "reg_unit_en_z_rst_z" *)
 module map_reg_unit_en_z_rst_z #(
     parameter _TECHMAP_CONSTVAL_reg_in_ = 32'bx,
@@ -97,4 +94,3 @@ generate
 endgenerate
 
 endmodule
-

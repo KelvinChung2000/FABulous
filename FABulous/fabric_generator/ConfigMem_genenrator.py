@@ -1,17 +1,14 @@
 import csv
 from pathlib import Path
 
-from loguru import logger
-
 from FABulous.fabric_definition.define import IO
 from FABulous.fabric_definition.Fabric import Fabric
 from FABulous.fabric_definition.Tile import Tile
 from FABulous.fabric_generator.code_generator_2 import CodeGenerator
-from FABulous.file_parser.file_parser_csv import parseConfigMem
 
 
 def generateConfigMemInit(
-    fabric: Fabric, file: Path, globalConfigBitsCounter: int
+    dst: Path, totalConfigBits: int, frameBitsPerRow: int, maxFramesPerCol: int
 ) -> None:
     """This function is used to generate the config memory initialization file for a
     given amount of configuration bits. The amount of configuration bits is determined
@@ -27,7 +24,7 @@ def generateConfigMemInit(
     globalConfigBitsCounter : int
         The number of global config bits of the tile.
     """
-    bitsLeftToPackInFrames = globalConfigBitsCounter
+    bitsLeftToPackInFrames = totalConfigBits
 
     fieldName = [
         "frame_name",
@@ -37,34 +34,33 @@ def generateConfigMemInit(
         "ConfigBits_ranges",
     ]
 
-    frameBitPerRow = fabric.frameBitsPerRow
-    with open(file, "w") as f:
+    with open(dst, "w") as f:
         writer = csv.writer(f)
         writer.writerow(fieldName)
-        for k in range(fabric.maxFramesPerCol):
+        for k in range(maxFramesPerCol):
             entry = []
             # frame0, frame1, ...
             entry.append(f"frame{k}")
             # and the index (0, 1, 2, ...), in case we need
             entry.append(str(k))
             # size of the frame in bits
-            if bitsLeftToPackInFrames >= frameBitPerRow:
-                entry.append(str(frameBitPerRow))
+            if bitsLeftToPackInFrames >= frameBitsPerRow:
+                entry.append(str(frameBitsPerRow))
                 # generate a string encoding a '1' for each flop used
-                frameBitsMask = f"{2**frameBitPerRow-1:_b}"
+                frameBitsMask = f"{2**frameBitsPerRow-1:_b}"
                 entry.append(frameBitsMask)
                 entry.append(
-                    f"{bitsLeftToPackInFrames-1}:{bitsLeftToPackInFrames-frameBitPerRow}"
+                    f"{bitsLeftToPackInFrames-1}:{bitsLeftToPackInFrames-frameBitsPerRow}"
                 )
-                bitsLeftToPackInFrames -= frameBitPerRow
+                bitsLeftToPackInFrames -= frameBitsPerRow
             else:
                 entry.append(str(bitsLeftToPackInFrames))
                 # generate a string encoding a '1' for each flop used
                 # this will allow us to kick out flops in the middle (e.g. for alignment padding)
-                frameBitsMask = (2**frameBitPerRow - 1) - (
-                    2 ** (frameBitPerRow - bitsLeftToPackInFrames) - 1
+                frameBitsMask = (2**frameBitsPerRow - 1) - (
+                    2 ** (frameBitsPerRow - bitsLeftToPackInFrames) - 1
                 )
-                frameBitsMask = f"{frameBitsMask:0{frameBitPerRow+7}_b}"
+                frameBitsMask = f"{frameBitsMask:0{frameBitsPerRow+7}_b}"
                 entry.append(frameBitsMask)
                 if bitsLeftToPackInFrames > 0:
                     entry.append(f"{bitsLeftToPackInFrames-1}:0")
@@ -80,32 +76,7 @@ def generateConfigMemInit(
             writer.writerow(entry)
 
 
-def generateConfigMem(
-    codeGen: CodeGenerator, fabric: Fabric, tile: Tile, configMemCSV: Path
-):
-    if configMemCSV.exists():
-        if tile.globalConfigBits <= 0:
-            logger.warning(
-                f"Found bitstram mapping file {tile.name}_configMem.csv for tile {tile.name}, but no global config bits are defined"
-            )
-        else:
-            logger.info(
-                f"Found bitstream mapping file {tile.name}_configMem.csv for tile {tile.name}"
-            )
-        logger.info(f"Parsing {tile.name}_configMem.csv")
-        configMem = parseConfigMem(configMemCSV)
-    elif tile.globalConfigBits > 0:
-        logger.info(f"{tile.name}_configMem.csv does not exist")
-        logger.info(f"Generating a default configMem for {tile.name}")
-        generateConfigMemInit(fabric, configMemCSV, tile.globalConfigBits)
-        logger.info(f"Parsing {tile.name}_configMem.csv")
-        configMem = parseConfigMem(configMemCSV)
-    else:
-        logger.info(
-            f"No config bits defined and no bitstream mapping file provided for tile {tile.name}"
-        )
-        return
-
+def generateConfigMem(codeGen: CodeGenerator, fabric: Fabric, tile: Tile):
     with codeGen.Module(
         f"{tile.name}_ConfigMem",
     ) as module:
@@ -114,7 +85,10 @@ def generateConfigMem(
                 maxFramePerCol = pr.Parameter("MaxFramesPerCol", fabric.maxFramesPerCol)
             if fabric.frameBitsPerRow > 0:
                 framBitPerRow = pr.Parameter("FrameBitsPerRow", fabric.frameBitsPerRow)
-            noConfigBits = pr.Parameter("NoConfigBits", tile.globalConfigBits)
+            noConfigBits = pr.Parameter("NoConfigBits", tile.configBits)
+            pr.Comment("Emulation parameter")
+            emuEn = pr.Parameter("EMULATION_ENABLE", 0)
+            emuCfg = pr.Parameter("EMULATION_CONFIG", 0)
 
         with module.PortRegion() as pr:
             frameData = pr.Port("FrameData", IO.INPUT, framBitPerRow - 1)
@@ -123,6 +97,42 @@ def generateConfigMem(
             configBitsN = pr.Port("ConfigBits_N", IO.OUTPUT, noConfigBits - 1)
 
         with module.LogicRegion() as lr:
+
+            with lr.Generate() as lrGen:
+                with lrGen.IfElse(emuEn == 0) as ifElse:
+                    with ifElse.TrueRegion() as t:
+                        t.Comment("instantiate frame latches")
+                        for i in tile.configMems.configMemEntries:
+                            counter = 0
+                            for k in range(fabric.frameBitsPerRow):
+                                if i.usedBitMask[k] == "1":
+                                    t.InitModule(
+                                        module="LHQD1",
+                                        initName=f"Inst_{i.frameName}_bit{fabric.frameBitsPerRow-1-k}",
+                                        ports=[
+                                            t.ConnectPair(
+                                                "D",
+                                                frameData[
+                                                    fabric.frameBitsPerRow - 1 - k
+                                                ],
+                                            ),
+                                            t.ConnectPair(
+                                                "E", frameStrobe[i.frameIndex]
+                                            ),
+                                            t.ConnectPair(
+                                                "Q",
+                                                configBits[i.configBitRanges[counter]],
+                                            ),
+                                            t.ConnectPair(
+                                                "QN",
+                                                configBitsN[i.configBitRanges[counter]],
+                                            ),
+                                        ],
+                                    )
+                                    counter += 1
+                    with ifElse.FalseRegion() as f:
+                        f.Assign(configBits, emuCfg)
+                        f.Assign(configBitsN, emuCfg)
 
             # with lr.IfDef("EMULATION") as lrIfDef:
             #     for i in configMemList:
@@ -134,27 +144,3 @@ def generateConfigMem(
             #                     src=f"Emulate_Bitstream[{i.frameIndex*self.fabric.frameBitsPerRow + (self.fabric.frameBitsPerRow-1-k)}]",
             #                 )
             #             counter += 1
-
-            lr.Comment("instantiate frame latches")
-
-            for i in configMem.configMemEntries:
-                counter = 0
-                for k in range(fabric.frameBitsPerRow):
-                    if i.usedBitMask[k] == "1":
-                        lr.InitModule(
-                            module="LHQD1",
-                            initName=f"Inst_{i.frameName}_bit{fabric.frameBitsPerRow-1-k}",
-                            ports=[
-                                lr.ConnectPair(
-                                    "D", frameData[fabric.frameBitsPerRow - 1 - k]
-                                ),
-                                lr.ConnectPair("E", frameStrobe[i.frameIndex]),
-                                lr.ConnectPair(
-                                    "Q", configBits[i.configBitRanges[counter]]
-                                ),
-                                lr.ConnectPair(
-                                    "QN", configBitsN[i.configBitRanges[counter]]
-                                ),
-                            ],
-                        )
-                        counter += 1

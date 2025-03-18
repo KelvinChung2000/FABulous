@@ -6,7 +6,7 @@ from jinja2 import Environment, PackageLoader
 
 from FABulous.fabric_definition.Bel import Bel
 from FABulous.fabric_definition.define import IO
-from FABulous.fabric_definition.Port import Port, SlicedPort, TilePort
+from FABulous.fabric_definition.Port import BelPort, Port, SlicedPort, TilePort
 from FABulous.fabric_definition.SwitchMatrix import Mux, MuxPort, SwitchMatrix
 
 GenericPort = Port | TilePort
@@ -87,7 +87,12 @@ def genSwitchMatrix(
         if not i.inputs:
             continue
 
-        m = Mux(i.port.name, [p.port for p in i.inputs], i.port)
+        if i.isBelPort:
+            assert isinstance(i.port, BelPort)
+            m = Mux(f"{i.port.prefix}{i.port.name}", [p.port for p in i.inputs], i.port)
+        else:
+            m = Mux(i.port.name, [p.port for p in i.inputs], i.port)
+
         sm.addMux(m)
 
     for sPort in slicedPort:

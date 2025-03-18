@@ -5,10 +5,11 @@ import shutil
 import sys
 from importlib.metadata import version
 from pathlib import Path
-from typing import Literal
 
 from dotenv import load_dotenv
 from loguru import logger
+
+from FABulous.fabric_generator.define import WriterType
 
 MAX_BITBYTES = 16384
 
@@ -126,7 +127,7 @@ def setup_project_env_vars(args: argparse.Namespace) -> None:
         os.environ["FAB_PROJ_LANG"] = args.writer
 
 
-def create_project(project_dir: Path, type: Literal["verilog", "vhdl"] = "verilog"):
+def create_project(project_dir: Path, type: WriterType = WriterType.VERILOG):
     """Creates a FABulous project containing all required files by copying the
     appropriate project template and the synthesis directory.
 
@@ -149,7 +150,7 @@ def create_project(project_dir: Path, type: Literal["verilog", "vhdl"] = "verilo
 
     # set default type, since "None" overwrites the default value
     if not type:
-        type = "verilog"
+        type = WriterType.VERILOG
 
     Path(project_dir / ".FABulous").mkdir()
     Path(project_dir / "Tile").mkdir()
@@ -166,6 +167,15 @@ def create_project(project_dir: Path, type: Literal["verilog", "vhdl"] = "verilo
     with open(project_dir / ".FABulous/.env", "w") as env_file:
         env_file.write(f"version={version('FABulous-FPGA')}\n")
         env_file.write(f"FAB_PROJ_LANG={type}\n")
+        if type == WriterType.VERILOG:
+            env_file.write("SIMULATOR=icarus\n")
+        elif type == WriterType.VHDL:
+            env_file.write("SIMULATOR=ghdl\n")
+        elif type == WriterType.SYSTEM_VERILOG:
+            env_file.write("SIMULATOR=verilator\n")
+        else:
+            logger.error("Invalid project type.")
+            sys.exit(1)
 
     with open(project_dir / "fabric.yaml", "w") as f:
         f.write("FABRIC: [[]] \n")

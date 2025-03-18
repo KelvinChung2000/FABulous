@@ -33,4 +33,4 @@ BELS: [
 
 ]
 MATRIX: list.py
-CONFIG_MEM: PE_ConfigMem.csv
+# CONFIG_MEM: PE_ConfigMem.csv

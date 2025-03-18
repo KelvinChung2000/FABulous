@@ -332,7 +332,7 @@ class FabricGenerator:
         # if not, we will take the default, which was passed on from  GenerateConfigMemInit
         configMemList: List[ConfigMem] = []
         if os.path.exists(configMemCsv):
-            if tile.globalConfigBits <= 0:
+            if tile.configBits <= 0:
                 logger.warning(
                     f"Found bitstram mapping file {tile.name}_configMem.csv for tile {tile.name}, but no global config bits are defined"
                 )
@@ -345,18 +345,18 @@ class FabricGenerator:
                 configMemCsv,
                 self.fabric.maxFramesPerCol,
                 self.fabric.frameBitsPerRow,
-                tile.globalConfigBits,
+                tile.configBits,
             )
-        elif tile.globalConfigBits > 0:
+        elif tile.configBits > 0:
             logger.info(f"{tile.name}_configMem.csv does not exist")
             logger.info(f"Generating a default configMem for {tile.name}")
-            self.generateConfigMemInit(configMemCsv, tile.globalConfigBits)
+            self.generateConfigMemInit(configMemCsv, tile.configBits)
             logger.info(f"Parsing {tile.name}_configMem.csv")
             configMemList = parseConfigMem(
                 configMemCsv,
                 self.fabric.maxFramesPerCol,
                 self.fabric.frameBitsPerRow,
-                tile.globalConfigBits,
+                tile.configBits,
             )
         else:
             logger.info(
@@ -383,7 +383,7 @@ class FabricGenerator:
                 "FrameBitsPerRow", "integer", self.fabric.frameBitsPerRow, indentLevel=2
             )
         self.writer.addParameter(
-            "NoConfigBits", "integer", tile.globalConfigBits, indentLevel=2
+            "NoConfigBits", "integer", tile.configBits, indentLevel=2
         )
         self.writer.addParameterEnd(indentLevel=1)
         self.writer.addPortStart(indentLevel=1)
@@ -796,9 +796,9 @@ class FabricGenerator:
         self.writer.addParameter(
             "FrameBitsPerRow", "integer", self.fabric.frameBitsPerRow, indentLevel=2
         )
-        if tile.globalConfigBits > 0:
+        if tile.configBits > 0:
             self.writer.addParameter(
-                "NoConfigBits", "integer", tile.globalConfigBits, indentLevel=2
+                "NoConfigBits", "integer", tile.configBits, indentLevel=2
             )
 
         self.writer.addParameterEnd(indentLevel=1)
@@ -893,7 +893,7 @@ class FabricGenerator:
                 )
                 raise ValueError
 
-            if tile.globalConfigBits > 0:
+            if tile.configBits > 0:
                 if (basePath / f"{tile.name}_ConfigMem.vhdl").exists():
                     self.writer.addComponentDeclarationForFile(
                         f"{basePath}/{tile.name}_ConfigMem.vhdl"
@@ -944,7 +944,7 @@ class FabricGenerator:
         # maybe even useful if we want to add a buffer here
 
         # all the signal wire need to declare first for compatibility with VHDL
-        if tile.globalConfigBits > 0:
+        if tile.configBits > 0:
             self.writer.addConnectionVector("ConfigBits", "NoConfigBits-1", 0)
             self.writer.addConnectionVector("ConfigBits_N", "NoConfigBits-1", 0)
 
@@ -1075,7 +1075,7 @@ class FabricGenerator:
         # the <entity>_ConfigMem module is only parametrized through generics, so we hard code its instantiation here
         if (
             self.fabric.configBitMode == ConfigBitMode.FRAME_BASED
-            and tile.globalConfigBits > 0
+            and tile.configBits > 0
         ):
             self.writer.addComment("configuration storage latches", onNewLine=True)
             self.writer.addInstantiation(
@@ -1148,11 +1148,11 @@ class FabricGenerator:
                 portsPairs.append(userclk_pair)
 
             if self.fabric.configBitMode == ConfigBitMode.FRAME_BASED:
-                if bel.configBit > 0:
+                if bel.configBits > 0:
                     portsPairs.append(
                         (
                             "ConfigBits",
-                            f"ConfigBits[{belConfigBitsCounter+bel.configBit}-1:{belConfigBitsCounter}]",
+                            f"ConfigBits[{belConfigBitsCounter+bel.configBits}-1:{belConfigBitsCounter}]",
                         )
                     )
             elif self.fabric.configBitMode == ConfigBitMode.FLIPFLOP_CHAIN:
@@ -1168,7 +1168,7 @@ class FabricGenerator:
             )
 
             belCounter += 2
-            belConfigBitsCounter += bel.configBit
+            belConfigBitsCounter += bel.configBits
 
             # self.writer.addBELInstantiations(
             #     b, belConfigBitsCounter, self.fabric.configBitMode, belCounter)
@@ -1244,17 +1244,17 @@ class FabricGenerator:
             portsPairs.append(("CLK", "CLK"))
 
         if self.fabric.configBitMode == ConfigBitMode.FRAME_BASED:
-            if tile.globalConfigBits > 0:
+            if tile.configBits > 0:
                 portsPairs.append(
                     (
                         "ConfigBits",
-                        f"ConfigBits[{tile.globalConfigBits}-1:{belConfigBitsCounter}]",
+                        f"ConfigBits[{tile.configBits}-1:{belConfigBitsCounter}]",
                     )
                 )
                 portsPairs.append(
                     (
                         "ConfigBits_N",
-                        f"ConfigBits_N[{tile.globalConfigBits}-1:{belConfigBitsCounter}]",
+                        f"ConfigBits_N[{tile.configBits}-1:{belConfigBitsCounter}]",
                     )
                 )
 

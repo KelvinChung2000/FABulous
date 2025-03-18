@@ -25,7 +25,6 @@ generate
 endgenerate
 
 endmodule
-
 (* techmap_celltype = "ALU_ALU_func_1" *)
 module map_ALU_ALU_func_1 #(
     parameter _TECHMAP_CONSTVAL_data_in1_ = 32'bx,
@@ -53,7 +52,6 @@ generate
 endgenerate
 
 endmodule
-
 (* techmap_celltype = "ALU_ALU_func_2" *)
 module map_ALU_ALU_func_2 #(
     parameter _TECHMAP_CONSTVAL_data_in1_ = 32'bx,
@@ -81,7 +79,6 @@ generate
 endgenerate
 
 endmodule
-
 (* techmap_celltype = "ALU_ALU_func_3" *)
 module map_ALU_ALU_func_3 #(
     parameter _TECHMAP_CONSTVAL_data_in1_ = 32'bx,
@@ -109,7 +106,6 @@ generate
 endgenerate
 
 endmodule
-
 (* techmap_celltype = "ALU_ALU_func_4" *)
 module map_ALU_ALU_func_4 #(
     parameter _TECHMAP_CONSTVAL_data_in1_ = 32'bx,
@@ -137,7 +133,6 @@ generate
 endgenerate
 
 endmodule
-
 (* techmap_celltype = "ALU_ALU_func_5" *)
 module map_ALU_ALU_func_5 #(
     parameter _TECHMAP_CONSTVAL_data_in1_ = 32'bx,
@@ -165,4 +160,3 @@ generate
 endgenerate
 
 endmodule
-

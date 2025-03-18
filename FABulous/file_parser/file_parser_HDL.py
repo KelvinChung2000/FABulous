@@ -163,7 +163,7 @@ def parseBelFile(
         port = BelPort(
             name=f"{net}",
             ioDirection=ports[net],
-            wireCount=netBitWidth,
+            width=netBitWidth,
             isBus=FABulousPortType.BUS in attributes,
             prefix=belPrefix,
             external=FABulousPortType.EXTERNAL in attributes,
@@ -195,7 +195,7 @@ def parseBelFile(
                 ConfigPort(
                     name=f"{net}",
                     ioDirection=IO.INPUT,
-                    wireCount=netBitWidth,
+                    width=netBitWidth,
                     isBus=FABulousPortType.BUS in attributes,
                     features=[(feature, i) for i, feature in enumerate(features)],
                     featureType=FeatureType.INIT,
@@ -208,7 +208,7 @@ def parseBelFile(
                 SharedPort(
                     name=f"{belPrefix}{net}",
                     ioDirection=ports[net],
-                    wireCount=netBitWidth,
+                    width=netBitWidth,
                     isBus=FABulousPortType.BUS in attributes,
                     sharedWith=details.get("attributes", {}).get("SHARED_WITH", ""),
                 )
@@ -223,7 +223,7 @@ def parseBelFile(
         external=externalPort,
         configPort=configPort,
         sharedPort=sharedPort,
-        configBit=sum([i.wireCount for i in configPort]),
+        configBit=sum([i.width for i in configPort]),
         belFeatureMap=belFeatureMap,
         userCLK=userClk,
     )

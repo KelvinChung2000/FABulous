@@ -8,17 +8,11 @@ from FABulous.fabric_definition.define import IO, FeatureType, Side
 class Port:
     name: str
     ioDirection: IO
-    wireCount: int
+    width: int
     isBus: bool
 
     def __repr__(self) -> str:
-        return f"Port({self.ioDirection.value} {self.name}[{self.wireCount-1}:0])"
-
-    def createSelf(self) -> str:
-        return (
-            f"Port(name='{self.name}', ioDirection=IO.{self.ioDirection.upper()}, "
-            f"wireCount={self.wireCount}, isBus={self.isBus})"
-        )
+        return f"Port({self.ioDirection.value} {self.name}[{self.width-1}:0])"
 
 
 @dataclass(frozen=True, eq=True)
@@ -58,14 +52,7 @@ class TilePort(Port):
     __io = {IO.OUTPUT: 0, IO.INPUT: 1, IO.INOUT: 2}
 
     def __repr__(self) -> str:
-        return f"TilePort({{{self.sideOfTile}}} {self.ioDirection.value} {self.name}[{self.wireCount-1}:0])"
-
-    def createSelf(self) -> str:
-        return (
-            f"TilePort(name='{self.name}', ioDirection=IO.{self.ioDirection.upper()}, "
-            f"wireCount={self.wireCount}, isBus={self.isBus}, sideOfTile=Side.{self.sideOfTile}, "
-            f"terminal={self.terminal})"
-        )
+        return f"TilePort({{{self.sideOfTile}}} {self.ioDirection.value} {self.name}[{self.width-1}:0])"
 
     def __lt__(self, __o: Any) -> bool:
         if not isinstance(__o, TilePort):
@@ -113,14 +100,7 @@ class BelPort(Port):
     control: bool
 
     def __repr__(self) -> str:
-        return f"BelPort({self.ioDirection.value} {self.prefix}{self.name}[{self.wireCount-1}:0])"
-
-    def createSelf(self) -> str:
-        return (
-            f"BelPort(name='{self.name}', ioDirection=IO.{self.ioDirection.upper()}, "
-            f"wireCount={self.wireCount}, isBus={self.isBus}, prefix='{self.prefix}', "
-            f"external={self.external}, control={self.control})"
-        )
+        return f"BelPort({self.ioDirection.value} {self.prefix}{self.name}[{self.width-1}:0])"
 
 
 @dataclass(frozen=True, eq=True)
@@ -129,7 +109,7 @@ class ConfigPort(Port):
     featureType: FeatureType = FeatureType.INIT
 
     def __repr__(self) -> str:
-        return f"ConfigPort({self.ioDirection.value} {self.name}[{self.wireCount-1}:0])"
+        return f"ConfigPort({self.ioDirection.value} {self.name}[{self.width-1}:0])"
 
 
 @dataclass(frozen=True, eq=True)

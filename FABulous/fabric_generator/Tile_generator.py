@@ -7,11 +7,6 @@ from FABulous.fabric_definition.Port import BelPort, Port, SlicedPort, TilePort
 from FABulous.fabric_definition.Tile import Tile
 from FABulous.fabric_generator.code_generator_2 import CodeGenerator
 from FABulous.fabric_generator.HDL_Construct.Value import Value
-from FABulous.fabric_generator.TileSwitchMatrix_generator import (
-    generateTileSwitchMatrix,
-)
-from FABulous.file_parser.file_parser_yaml import parseFabricYAML
-from FABulous.file_parser.parse_py_mux import genSwitchMatrix, setupPortData
 
 
 def generateTile(codeGen: CodeGenerator, fabric: Fabric, tile: Tile):
@@ -29,20 +24,18 @@ def generateTile(codeGen: CodeGenerator, fabric: Fabric, tile: Tile):
         portMapping: Mapping[TilePort | Port, Value] = {}
         with module.PortRegion() as pr:
             for side, ports in tile.getTilePortGrouped().items():
-                pr.Comment(f"{side.name}\n")
+                pr.Comment(f"{side.name}")
+
                 for p in ports:
-                    if p.spanning:
-                        portMapping[p] = pr.Port(
-                            p.name, p.ioDirection, tile.getCascadeWireCount(p)
-                        )
-                    else:
-                        portMapping[p] = pr.Port(p.name, p.ioDirection, p.wireCount)
+                    portMapping[p] = pr.Port(
+                        p.name, p.ioDirection, tile.getCascadeWireCount(p)
+                    )
 
             for bel in tile.bels:
                 for p in bel.externalInputs:
-                    pr.Port(p.name, p.ioDirection, p.wireCount)
+                    pr.Port(p.name, p.ioDirection, p.width)
                 for p in bel.externalOutputs:
-                    pr.Port(p.name, p.ioDirection, p.wireCount)
+                    pr.Port(p.name, p.ioDirection, p.width)
 
             userClkIn = pr.Port("UserCLK", IO.INPUT)
             userClkOut = pr.Port("UserCLKo", IO.OUTPUT)
@@ -76,7 +69,7 @@ def generateTile(codeGen: CodeGenerator, fabric: Fabric, tile: Tile):
                         raise ValueError(
                             f"Detected repeat naming of port in tile {tile.name} for bel {bel.name} for port {sig}"
                         )
-                    sigValue = lr.Signal(sig, port.wireCount)
+                    sigValue = lr.Signal(sig, port.width)
                     repeatSet.add(sig)
                     belPortMapping[port] = sigValue
 
@@ -93,9 +86,8 @@ def generateTile(codeGen: CodeGenerator, fabric: Fabric, tile: Tile):
 
             lr.NewLine()
             lr.Comment("Buffering incoming and out outgoing wires")
-            lr.NewLine()
             if tile.globalConfigBits > 0:
-                lr.Comment("FrameData Buffer\n")
+                lr.Comment("FrameData Buffer")
                 frameDataOutToIn = lr.Signal("FrameData_internal", frameBitsPerRow - 1)
                 lr.NewLine()
                 lr.InitModule(
@@ -121,7 +113,7 @@ def generateTile(codeGen: CodeGenerator, fabric: Fabric, tile: Tile):
                     ],
                 )
 
-            lr.Comment("FrameStrobe Buffer\n")
+            lr.Comment("FrameStrobe Buffer")
             frameBufferOutToIn = lr.Signal("FrameStrobe_internal", maxFramePerCol - 1)
             lr.NewLine()
             lr.InitModule(
@@ -148,7 +140,7 @@ def generateTile(codeGen: CodeGenerator, fabric: Fabric, tile: Tile):
                 ],
             )
 
-            lr.Comment("User Clock Buffer\n")
+            lr.Comment("User Clock Buffer")
             lr.InitModule(
                 "clk_buf",
                 "inst_clk_buf",
@@ -157,7 +149,6 @@ def generateTile(codeGen: CodeGenerator, fabric: Fabric, tile: Tile):
                     lr.ConnectPair("X", userClkOut),
                 ],
             )
-
             for wire in tile.wireTypes:
                 if not wire.spanning:
                     continue
@@ -168,7 +159,6 @@ def generateTile(codeGen: CodeGenerator, fabric: Fabric, tile: Tile):
                     f"{wire.destinationPort.name}_to_{wire.sourcePort.name}",
                     wire.cascadeWireCount - wire.wireCount,
                 )
-
                 lr.InitModule(
                     "my_buf_pack",
                     f"{wire.destinationPort.name}_inbuf",
@@ -222,7 +212,7 @@ def generateTile(codeGen: CodeGenerator, fabric: Fabric, tile: Tile):
             # init bels
             belConfigBitCounter = 0
             for bel in tile.bels:
-                lr.Comment(f"Instantiate BEL {bel.name}\n")
+                lr.Comment(f"Instantiate BEL {bel.name}")
 
                 connectPairs = []
 
@@ -252,12 +242,12 @@ def generateTile(codeGen: CodeGenerator, fabric: Fabric, tile: Tile):
                             port.name,
                             configBitsSignal[
                                 belConfigBitCounter
-                                + port.wireCount
+                                + port.width
                                 - 1 : belConfigBitCounter
                             ],
                         )
                     )
-                    belConfigBitCounter += port.wireCount
+                    belConfigBitCounter += port.width
 
                 lr.InitModule(
                     bel.name,
@@ -271,14 +261,9 @@ def generateTile(codeGen: CodeGenerator, fabric: Fabric, tile: Tile):
             for output in tile.switchMatrix.getOutputs():
                 repeatSet.add(output)
                 if isinstance(output, TilePort):
-                    if output.spanning:
-                        connectPairs.append(
-                            lr.ConnectPair(output.name, portMapping[output][:2])
-                        )
-                    else:
-                        connectPairs.append(
-                            lr.ConnectPair(output.name, portMapping[output])
-                        )
+                    connectPairs.append(
+                        lr.ConnectPair(output.name, portMapping[output])
+                    )
                 elif isinstance(output, BelPort):
                     connectPairs.append(
                         lr.ConnectPair(
@@ -301,14 +286,7 @@ def generateTile(codeGen: CodeGenerator, fabric: Fabric, tile: Tile):
                 if input in repeatSet:
                     continue
                 if isinstance(input, TilePort):
-                    if input.spanning:
-                        connectPairs.append(
-                            lr.ConnectPair(input.name, portMapping[input][:2])
-                        )
-                    else:
-                        connectPairs.append(
-                            lr.ConnectPair(input.name, portMapping[input])
-                        )
+                    connectPairs.append(lr.ConnectPair(input.name, portMapping[input]))
                 elif isinstance(input, BelPort):
                     connectPairs.append(
                         lr.ConnectPair(
@@ -359,14 +337,3 @@ def generateTile(codeGen: CodeGenerator, fabric: Fabric, tile: Tile):
                 f"Inst_{tile.name}_SwitchMatrix",
                 connectPairs,
             )
-
-
-if __name__ == "__main__":
-    fabric = parseFabricYAML(Path("/home/kelvin/FABulous_fork/myProject/fabric.yaml"))
-    for tile in fabric.tileDict.values():
-        setupPortData(fabric, tile)
-        # print(f"Generated port hinting for tile {tile.name}")
-    sm = genSwitchMatrix(fabric.tileDict["PE"].tileDir)
-    fabric.tileDict["PE"].switchMatrix = sm
-    generateTileSwitchMatrix(fabric, fabric.tileDict["PE"], Path("../test_sm.v"))
-    generateTile(fabric, fabric.tileDict["PE"], Path("../test_tile.v"))

@@ -43,9 +43,9 @@ def genCellsAndMaps(bel: Bel):
 
         with m.PortRegion() as pr:
             for i in bel.inputs + bel.externalInputs:
-                pr.Port(i.name, IO.INPUT, i.wireCount)
+                pr.Port(i.name, IO.INPUT, i.width)
             for i in bel.outputs + bel.externalOutputs:
-                pr.Port(i.name, IO.OUTPUT, i.wireCount)
+                pr.Port(i.name, IO.OUTPUT, i.width)
             if bel.userCLK:
                 pr.Port(bel.userCLK.name, IO.INPUT, 1)
 

@@ -15,4 +15,5 @@ We use PascalCase for all of our class name
 We use CONSTANT_CASE for all of our constants
 
 We use numpy doc style for all of our doc strings
-  
+
+Only create working example when only asked to write or demonstrate in code. However, if providing a small coding example helps to explain what is possible, then do it.

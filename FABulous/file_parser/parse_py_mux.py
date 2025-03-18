@@ -98,8 +98,8 @@ def genSwitchMatrix(
         for targetRange in sPort.slicingAssignDict.keys():
             combinedAssignWidth += (targetRange.start - targetRange.end) + 1
 
-        if combinedAssignWidth != sPort.port.wireCount:
-            print(combinedAssignWidth, sPort.port.wireCount)
+        if combinedAssignWidth != sPort.port.width:
+            print(combinedAssignWidth, sPort.port.width)
             raise ValueError("not all the signal of the original port is assigned")
 
         for test_range in sPort.slicingAssignDict.keys():
@@ -115,7 +115,7 @@ def genSwitchMatrix(
             uniqueSWidth = set()
             for signal in slicedSignals:
                 if signal.sliceRange == (-1, -1):
-                    uniqueSWidth.add(signal.port.wireCount)
+                    uniqueSWidth.add(signal.port.width)
                 else:
                     uniqueSWidth.add(
                         signal.sliceRange.start - signal.sliceRange.end + 1
@@ -131,7 +131,7 @@ def genSwitchMatrix(
                 newTargetPort = SlicedPort(
                     name=f"{sPort.port.name}_{start}_{end}",
                     ioDirection=sPort.port.ioDirection,
-                    wireCount=start - end + 1,
+                    width=start - end + 1,
                     isBus=False,
                     originalPort=sPort.port,
                     sliceRange=targetRange,
@@ -146,7 +146,7 @@ def genSwitchMatrix(
                             SlicedPort(
                                 name=f"{i.port.name}_{i.sliceRange.start}_{i.sliceRange.end}",
                                 ioDirection=i.port.ioDirection,
-                                wireCount=i.sliceRange.start - i.sliceRange.end + 1,
+                                width=i.sliceRange.start - i.sliceRange.end + 1,
                                 isBus=False,
                                 originalPort=i.port,
                                 sliceRange=i.sliceRange,

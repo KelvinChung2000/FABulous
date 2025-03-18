@@ -224,7 +224,7 @@ def parseFabricCSV(fileName: Path) -> Fabric:
                         "or both X and Y must be the same for diagonal."
                     )
                     raise ValueError
-                if sourcePort.wireCount != destinationPort.wireCount:
+                if sourcePort.width != destinationPort.width:
                     logger.error(
                         f"Port {sourcePort.name} and {destinationPort.name} must have the same wire count."
                     )
@@ -232,13 +232,13 @@ def parseFabricCSV(fileName: Path) -> Fabric:
 
                 spanning = False
                 if abs(x) + abs(y) > 1 and x != y:
-                    wireCount = sourcePort.wireCount * (abs(x) + abs(y))
+                    wireCount = sourcePort.width * (abs(x) + abs(y))
                     spanning = True
                 elif x == y:
-                    wireCount = sourcePort.wireCount * abs(x)
+                    wireCount = sourcePort.width * abs(x)
                     spanning = True
                 else:
-                    wireCount = sourcePort.wireCount
+                    wireCount = sourcePort.width
 
                 wireDict[(x, y)].append(
                     Wire(
@@ -257,7 +257,7 @@ def parseFabricCSV(fileName: Path) -> Fabric:
                         destinationPort=destinationPort,
                         offsetX=wireEntry["X-offset"],
                         offsetY=wireEntry["Y-offset"],
-                        wireCount=sourcePort.wireCount,
+                        wireCount=sourcePort.width,
                         cascadeWireCount=wireCount,
                         spanning=spanning,
                     )
@@ -421,7 +421,7 @@ def parsePortLine(line: str) -> tuple[list[TilePort], WireType]:
     tilePorts: list[TilePort] = []
     tilePorts.append(
         TilePort(
-            wireCount=int(temp[5]),
+            width=int(temp[5]),
             name=f"{temp[1]}",
             ioDirection=IO.OUTPUT,
             sideOfTile=sideOfTile,
@@ -431,7 +431,7 @@ def parsePortLine(line: str) -> tuple[list[TilePort], WireType]:
     )
     tilePorts.append(
         TilePort(
-            wireCount=int(temp[5]),
+            width=int(temp[5]),
             name=f"{temp[4]}",
             ioDirection=IO.INPUT,
             sideOfTile=sideOfTile,
@@ -447,19 +447,19 @@ def parsePortLine(line: str) -> tuple[list[TilePort], WireType]:
 
     spanning = False
     if abs(x) + abs(y) > 1 and x != y:
-        wireCount = sourcePort.wireCount * (abs(x) + abs(y))
+        wireCount = sourcePort.width * (abs(x) + abs(y))
         spanning = True
     elif x == y:
-        wireCount = sourcePort.wireCount * abs(x)
+        wireCount = sourcePort.width * abs(x)
         spanning = True
     else:
-        wireCount = sourcePort.wireCount
+        wireCount = sourcePort.width
     wire = WireType(
         sourcePort=sourcePort,
         destinationPort=destPort,
         offsetX=x,
         offsetY=y,
-        wireCount=sourcePort.wireCount,
+        wireCount=sourcePort.width,
         cascadeWireCount=wireCount,
         spanning=spanning,
     )

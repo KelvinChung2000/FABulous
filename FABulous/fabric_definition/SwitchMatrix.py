@@ -23,7 +23,7 @@ class MuxPort:
     isSliced: bool = False
     isBus: bool = False
     isCreated: bool = False
-    bitWidth: int = 1
+    width: int = 1
     sliceRange: SliceRange = SliceRange(-1, -1)
     slicingAssignDict: dict[SliceRange, list[SlicedSignal]] = field(
         default_factory=lambda: defaultdict(list)
@@ -35,7 +35,7 @@ class MuxPort:
                 raise ValueError("Cannot slice a bus")
             if key.step is not None:
                 raise ValueError("Cannot slice with step")
-            if abs(key.start - key.stop) > self.bitWidth:
+            if abs(key.start - key.stop) > self.width:
                 raise ValueError("Slice width is greater than bit width")
             self.isSliced = True
             self.sliceRange = SliceRange(key.start, key.stop)
@@ -43,7 +43,7 @@ class MuxPort:
         elif isinstance(key, int):
             if self.isBus:
                 raise ValueError("Cannot slice a bus")
-            if key >= self.bitWidth:
+            if key >= self.width:
                 raise ValueError("Index out of range")
             self.isSliced = True
             self.sliceRange = SliceRange(key, key)
@@ -94,14 +94,14 @@ class Mux:
 
     def __init__(self, name: str, inputs: list[GenericPort], output: GenericPort):
         for p in inputs:
-            if p.wireCount != output.wireCount:
+            if p.width != output.width:
                 raise ValueError("All inputs and output must have the same width")
 
         self._name = name
         self._inputs = inputs
         self._output = output
         self._configBit = 2 ** (len(self.inputs) - 1).bit_length()
-        self._width = output.wireCount
+        self._width = output.width
 
     def __repr__(self) -> str:
         return f"{self.output}<({self.name})-{list(self.inputs)}"
@@ -128,7 +128,7 @@ class Mux:
 
     def extendInputs(self, inputs: Iterable[GenericPort]):
         for i in inputs:
-            if i.wireCount != self.output.wireCount:
+            if i.width != self.output.width:
                 raise ValueError("All inputs and output must have the same width")
             self._inputs.append(i)
 

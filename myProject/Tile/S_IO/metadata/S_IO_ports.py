@@ -5,21 +5,21 @@ from FABulous.fabric_definition.Port import TilePort, Port, BelPort
 class S_IO_ports:
     def __init__(self, tilePorts: list[TilePort], belInputs: list[BelPort], belOutputs: list[BelPort]):
         # tile ports
-        self.in0 = MuxPort(tilePorts[0], isTilePort=True, isBus=False, bitWidth=32)
-        self.out0 = MuxPort(tilePorts[1], isTilePort=True, isBus=False, bitWidth=32)
+        self.in0 = MuxPort(tilePorts[0], isTilePort=True, isBus=False, width=32)
+        self.out0 = MuxPort(tilePorts[1], isTilePort=True, isBus=False, width=32)
 
         # bel ports
-        self.S_from_fabric = MuxPort(belInputs[0], isBelPort=True, isBus=True, bitWidth=32)
-        self.S_to_fabric = MuxPort(belOutputs[0], isBelPort=True, isBus=True, bitWidth=32)
+        self.S_from_fabric = MuxPort(belInputs[0], isBelPort=True, isBus=True, width=32)
+        self.S_to_fabric = MuxPort(belOutputs[0], isBelPort=True, isBus=True, width=32)
 
 
-        self.GND = MuxPort(Port(name="gnd", ioDirection=IO.OUTPUT, wireCount=1, isBus=False), bitWidth=1)
-        self.VCC = MuxPort(Port(name="vcc", ioDirection=IO.OUTPUT, wireCount=1, isBus=False), bitWidth=1)
+        self.GND = MuxPort(Port(name="gnd", ioDirection=IO.OUTPUT, width=1, isBus=False), width=1)
+        self.VCC = MuxPort(Port(name="vcc", ioDirection=IO.OUTPUT, width=1, isBus=False), width=1)
 
-    def NewWire(self, srcName: str, dstName: str, wireCount: int) -> tuple[MuxPort, MuxPort]:
-        portSrc = MuxPort(Port(name=srcName, ioDirection=IO.INPUT, wireCount=wireCount, isBus=False), bitWidth=wireCount, isCreated=True)
+    def NewWire(self, srcName: str, dstName: str, width: int) -> tuple[MuxPort, MuxPort]:
+        portSrc = MuxPort(Port(name=srcName, ioDirection=IO.INPUT, width=width, isBus=False), width=width, isCreated=True)
         setattr(self, srcName, portSrc)
-        portDst = MuxPort(Port(name=dstName, ioDirection=IO.OUTPUT, wireCount=wireCount, isBus=False), bitWidth=wireCount, isCreated=True)
+        portDst = MuxPort(Port(name=dstName, ioDirection=IO.OUTPUT, width=width, isBus=False), width=width, isCreated=True)
         setattr(self, dstName, portDst)
         return portSrc, portDst
 

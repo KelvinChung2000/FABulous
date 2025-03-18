@@ -34,16 +34,16 @@ def genSwitchMatrix(tile: Tile, tileType: TileType, context=1):
         for p in tile.getTileInputPorts():
             if p.terminal:
                 for wtc in range(tile.getWireType(p).spanning):
-                    for wc in range(p.wireCount):
+                    for wc in range(p.width):
                         tileType.create_wire(f"c{c}.{p.name}[{wc}]_{wtc}", "src", z=zIn)
             else:
-                for wc in range(p.wireCount):
+                for wc in range(p.width):
                     tileType.create_wire(f"c{c}.{p.name}[{wc}]", "src", z=zIn)
             zIn += 1
         for p in tile.getTileOutputPorts():
             if p.terminal:
                 for wtc in range(tile.getWireType(p).spanning):
-                    for wc in range(p.wireCount):
+                    for wc in range(p.width):
                         tileType.create_wire(
                             f"c{c}.{p.name}_internal[{wc}]_{wtc}", "dst", z=zOut
                         )
@@ -58,7 +58,7 @@ def genSwitchMatrix(tile: Tile, tileType: TileType, context=1):
                             f"c{c}.{p.name}_internal[{wc}]_{wtc}"
                         )
             else:
-                for wc in range(p.wireCount):
+                for wc in range(p.width):
                     tileType.create_wire(f"c{c}.{p.name}_internal[{wc}]", "dst", z=zOut)
                     tileType.create_wire(f"c{c}.{p.name}[{wc}]", "dst", z=zOut)
                     tileType.create_pip(
@@ -70,7 +70,7 @@ def genSwitchMatrix(tile: Tile, tileType: TileType, context=1):
             zOut += 1
 
         for mux in tile.switchMatrix.muxes:
-            for wc in range(mux.output.wireCount):
+            for wc in range(mux.output.width):
                 if isinstance(mux.output, BelPort):
                     outTarget = outputMapping.get(
                         f"c{c}.{mux.output.prefix}{mux.output.name}[{wc}]",
@@ -95,7 +95,7 @@ def genSwitchMatrix(tile: Tile, tileType: TileType, context=1):
     zOut = 0
     for c in range(context - 1):
         for i, p in enumerate(sorted(tile.getTileOutputPorts())):
-            for wc in range(p.wireCount):
+            for wc in range(p.width):
                 tileType.create_wire(
                     f"{p.name}_{c}_to_{c+1}_NextCycle[{wc}]", "NextCycle", z=zOut
                 )
@@ -103,7 +103,7 @@ def genSwitchMatrix(tile: Tile, tileType: TileType, context=1):
 
     for c in range(context - 1):
         for mux in tile.switchMatrix.muxes:
-            for wc in range(mux.output.wireCount):
+            for wc in range(mux.output.width):
                 tileType.create_pip(
                     outputMapping.get(
                         f"c{c}.{mux.output.name}[{wc}]", f"c{c}.{mux.output.name}[{wc}]"
@@ -117,7 +117,7 @@ def genSwitchMatrix(tile: Tile, tileType: TileType, context=1):
 
     for c in range(context - 2):
         for i, p in enumerate(sorted(tile.getTileOutputPorts())):
-            for wc in range(p.wireCount):
+            for wc in range(p.width):
                 tileType.create_pip(
                     f"{p.name}_{c}_to_{c+1}_NextCycle[{wc}]",
                     f"{p.name}_{c+1}_to_{c+2}_NextCycle[{wc}]",
@@ -135,16 +135,16 @@ def genBel(bels: Iterable[Bel], tile: TileType, context=1):
     for c in range(context):
         for z, bel in enumerate(bels):
             for i in bel.externalInputs + bel.inputs:
-                if i.wireCount == 1:
+                if i.width == 1:
                     tile.create_wire(f"c{c}.{i.prefix}{i.name}", f"{bel.name}_{i.name}")
                 else:
-                    for wc in range(i.wireCount):
+                    for wc in range(i.width):
                         tile.create_wire(
                             f"c{c}.{i.prefix}{i.name}[{wc}]", f"{bel.name}_{i.name}"
                         )
 
             for i in bel.externalOutputs + bel.outputs:
-                for wc in range(i.wireCount):
+                for wc in range(i.width):
                     tile.create_wire(
                         f"c{c}.{i.prefix}{i.name}[{wc}]", f"{bel.name}_{i.name}"
                     )
@@ -157,7 +157,7 @@ def genBel(bels: Iterable[Bel], tile: TileType, context=1):
             )
 
             for i in bel.inputs + bel.externalInputs:
-                if i.wireCount == 1:
+                if i.width == 1:
                     tile.add_bel_pin(
                         belData,
                         f"{i.name}",
@@ -165,7 +165,7 @@ def genBel(bels: Iterable[Bel], tile: TileType, context=1):
                         PinType.INPUT,
                     )
                 else:
-                    for wc in range(i.wireCount):
+                    for wc in range(i.width):
                         tile.add_bel_pin(
                             belData,
                             f"{i.name}[{wc}]",
@@ -174,7 +174,7 @@ def genBel(bels: Iterable[Bel], tile: TileType, context=1):
                         )
 
             for i in bel.outputs + bel.externalOutputs:
-                for wc in range(i.wireCount):
+                for wc in range(i.width):
                     tile.add_bel_pin(
                         belData,
                         f"{i.name}[{wc}]",
@@ -228,7 +228,7 @@ def genFabric(fabric: Fabric, chip: Chip, context=1):
             continue
         for c in range(context):
             for wire in wires:
-                for i in range(wire.source.wireCount):
+                for i in range(wire.source.width):
                     node = [
                         NodeWire(
                             clipX(x),
@@ -309,11 +309,11 @@ def generateConstrainPair(fabric: Fabric, dest: Path):
 
                             if tBel.z < bel.z:
                                 f.write(
-                                    f"{tBel.name}:{d.name} {d.wireCount} {bel.name}:{i.name} {i.wireCount} {bel.z - tBel.z} \n"
+                                    f"{tBel.name}:{d.name} {d.width} {bel.name}:{i.name} {i.width} {bel.z - tBel.z} \n"
                                 )
                             else:
                                 f.write(
-                                    f"{bel.name}:{i.name} {i.wireCount} {tBel.name}:{d.name} {d.wireCount} {tBel.z - bel.z} \n"
+                                    f"{bel.name}:{i.name} {i.width} {tBel.name}:{d.name} {d.width} {tBel.z - bel.z} \n"
                                 )
                         f.write("\n")
 

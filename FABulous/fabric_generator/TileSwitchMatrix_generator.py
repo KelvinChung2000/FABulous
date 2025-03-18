@@ -31,20 +31,18 @@ def generateTileSwitchMatrix(codeGen: CodeGenerator, fabric: Fabric, tile: Tile)
                     portMapping[output] = pr.Port(
                         output.prefix + output.name,
                         IO.OUTPUT,
-                        output.wireCount,
+                        output.width,
                     )
                 else:
-                    portMapping[output] = pr.Port(
-                        output.name, IO.OUTPUT, output.wireCount
-                    )
+                    portMapping[output] = pr.Port(output.name, IO.OUTPUT, output.width)
                 uniqueName.add(output.name)
             for i in sm.getInputs():
                 if i.name in uniqueName:
                     continue
                 if isinstance(i, BelPort):
-                    portMapping[i] = pr.Port(i.prefix + i.name, IO.INPUT, i.wireCount)
+                    portMapping[i] = pr.Port(i.prefix + i.name, IO.INPUT, i.width)
                 else:
-                    portMapping[i] = pr.Port(i.name, IO.INPUT, i.wireCount)
+                    portMapping[i] = pr.Port(i.name, IO.INPUT, i.width)
 
             if tile.switchMatrix.configBits > 0:
                 if fabric.configBitMode == ConfigBitMode.FLIPFLOP_CHAIN:
@@ -61,12 +59,8 @@ def generateTileSwitchMatrix(codeGen: CodeGenerator, fabric: Fabric, tile: Tile)
                     )
 
         with module.LogicRegion() as lr:
-            gnd = lr.Constant("GND0", 0)
-            lr.Constant("GND", 0)
-            lr.Constant("VCC0", 1)
+            gnd = lr.Constant("GND", 0)
             lr.Constant("VCC", 1)
-            lr.Constant("VDD0", 1)
-            lr.Constant("VDD", 1)
             lr.NewLine()
 
             configBitstreamPosition = 0
@@ -83,8 +77,6 @@ def generateTileSwitchMatrix(codeGen: CodeGenerator, fabric: Fabric, tile: Tile)
                     lr.Assign(portMapping[mux.output], portMapping[mux.inputs[0]])
                 else:
                     # this is the case for a configurable switch matrix multiplexer
-                    old_ConfigBitstreamPosition = configBitstreamPosition
-
                     if fabric.multiplexerStyle == MultiplexerStyle.CUSTOM:
                         # Pad mux size to the next power of 2
                         paddedMuxSize = 2 ** (inputCount - 1).bit_length()
@@ -146,7 +138,11 @@ def generateTileSwitchMatrix(codeGen: CodeGenerator, fabric: Fabric, tile: Tile)
                         # generic multiplexer
                         lr.Assign(
                             portMapping[mux.output],
-                            f"{mux.output}_input[ConfigBits[{configBitstreamPosition - 1}:{configBitstreamPosition}]]",
+                            Value(
+                                f"{mux.output}_input[ConfigBits[{configBitstreamPosition - 1}:{configBitstreamPosition}]]",
+                                None,
+                                False,
+                            ),
                         )
 
                     configBitstreamPosition += paddedMuxSize.bit_length() - 1

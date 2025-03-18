@@ -5,6 +5,8 @@ from typing import cast
 from lark import Lark, Transformer, v_args
 
 from FABulous.fabric_cad.define import FASMFeature
+import timeit
+from loguru import logger
 
 FASMGrammar = r"""
     start: fasm_line*
@@ -105,3 +107,38 @@ def parseFASM(fasmFile: Path) -> list[FASMFeature]:
         content = f.read().strip() + "\n"
         result = FASMParser.parse(content)
     return cast(list[FASMFeature], result)
+
+
+if __name__ == "__main__":
+    # Example FASM file path - replace with an actual path
+    TEST_FASM_FILE = Path(
+        "/home/kelvin/FABulous_fork/myProject/user_design/router_test.fasm"
+    )
+
+    # Create a simple example FASM file if it doesn't exist
+    if not TEST_FASM_FILE.exists():
+        with open(TEST_FASM_FILE, "w") as f:
+            f.write("feature1.subfeature\n")
+            f.write("feature2.subfeature[3] = 1'b1\n")
+            f.write('feature3.subfeature[0:3] = 4\'hF {test="value"}\n')
+            f.write("# This is a comment\n")
+
+    # Time the function with multiple runs
+    def time_parse_fasm():
+        return parseFASM(TEST_FASM_FILE)
+
+    # Run the timing test
+    number_of_runs = 100
+    total_time = timeit.timeit(time_parse_fasm, number=number_of_runs)
+    average_time = total_time / number_of_runs
+
+    logger.info(f"FASM parser timing results:")
+    logger.info(f"Total time for {number_of_runs} runs: {total_time:.4f} seconds")
+    logger.info(f"Average time per run: {average_time:.6f} seconds")
+    logger.info(f"Average time per run: {average_time * 1000:.2f} ms")
+
+    # Print sample parsed output
+    result = parseFASM(TEST_FASM_FILE)
+    logger.info(f"Sample parsed output (first 3 features):")
+    for feature in result[:3]:
+        logger.info(f"  {feature}")

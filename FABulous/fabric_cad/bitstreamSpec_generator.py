@@ -32,13 +32,13 @@ def generateBitsStreamSpec(fabric: Fabric) -> FeatureMap:
 
         for i, bel in enumerate(tile.bels):
             for config in bel.configPort:
-                if config.wireCount == 1 and len(config.features) == 1:
+                if config.width == 1 and len(config.features) == 1:
                     featureToBitString[
                         f"X{x}Y{y}.{bel.prefix}{bel.name}.{config.features[0]}"
                     ] = FeatureValue((x, y), [next(indexCounter)], 1)
                 else:
                     multiBitIndex: list[tuple[int, int] | tuple[None, None]] = [
-                        next(indexCounter) for _ in range(config.wireCount)
+                        next(indexCounter) for _ in range(config.width)
                     ]
                     for i, (feature, value) in enumerate(config.features):
                         featureToBitString[

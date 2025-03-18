@@ -1,4 +1,0 @@
-S_out:out2
-S_in:in2
-S_from_fabric:in0
-out0:S_to_fabric

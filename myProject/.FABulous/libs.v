@@ -9,6 +9,19 @@ endmodule
 
 
 (* blackbox *)
+module ALU #(
+    parameter ALU_func = 0
+)(
+    input [31:0] data_in1,
+    input [31:0] data_in2,
+    input [31:0] data_in3,
+    output [31:0] data_out
+);
+
+endmodule
+
+
+(* blackbox *)
 module reg_unit #(
 
 )(
@@ -17,19 +30,6 @@ module reg_unit #(
     input rst,
     output [31:0] reg_out,
     input clk
-);
-
-endmodule
-
-
-(* blackbox *)
-module ALU #(
-    parameter ALU_func = 0
-)(
-    input [31:0] data_in1,
-    input [31:0] data_in2,
-    input [31:0] data_in3,
-    output [31:0] data_out
 );
 
 endmodule

@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from contextlib import contextmanager
-from dataclasses import dataclass
+from FABulous.fabric_generator.HDL_Construct._Comment import _Comment
 
 
 class Region(ABC):
@@ -26,7 +26,7 @@ class Region(ABC):
         self._indentCount = value
 
     def Comment(self, comment: str):
-        _o = self._Comment(comment)
+        _o = _Comment(comment)
         self.container.append(_o)
         return _o
 
@@ -42,10 +42,3 @@ class Region(ABC):
             yield r
         finally:
             self.container.append(r)
-
-    @dataclass
-    class _Comment:
-        comment: str
-
-        def __str__(self):
-            return f"// {self.comment}"

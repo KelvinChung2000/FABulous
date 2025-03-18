@@ -1,18 +1,16 @@
 module W_IO #(
     parameter MaxFramesPerCol = 32,
     parameter FrameBitsPerRow = 32,
-    parameter NoConfigBits = 5
+    parameter NoConfigBits = 2
 )(
-    // NORTH,
-    // EAST,
+    // NORTH
+    // EAST
     input [31:0] in1,
     output [31:0] out1,
-    // SOUTH,
-    // WEST,
-    output [31:0] out3,
-    input [31:0] in3,
-    input in,
-    output out,
+    // SOUTH
+    // WEST
+    input [31:0] in,
+    output [31:0] out,
     input UserCLK,
     output UserCLKo,
     input [FrameBitsPerRow - 1:0] FrameData,
@@ -21,55 +19,82 @@ module W_IO #(
     output [MaxFramesPerCol - 1:0] FrameStrobe_O
 );
 
-// Signal Creationreg W_from_fabric;reg W_to_fabric;reg W_in;reg W_out;// ConfigBits Wiresreg [NoConfigBits - 1:0] ConfigBits;reg [NoConfigBits - 1:0] ConfigBits_N;// Buffering incoming and out outgoing wires// FrameData Bufferreg [FrameBitsPerRow - 1:0] FrameData_internal;my_buf_pack #(
+// Signal Creation
+reg [31:0] W_from_fabric;
+reg [31:0] W_to_fabric;
+reg [31:0] W_in;
+reg [31:0] W_out;
+
+// ConfigBits Wires
+reg [NoConfigBits - 1:0] ConfigBits;
+reg [NoConfigBits - 1:0] ConfigBits_N;
+
+// Buffering incoming and out outgoing wires
+// FrameData Buffer
+reg [FrameBitsPerRow - 1:0] FrameData_internal;
+
+my_buf_pack #(
     .WIDTH(FrameBitsPerRow)
 ) data_inbuf (
     .A(FrameData),
     .X(FrameData_internal)
 );
+
 my_buf_pack #(
     .WIDTH(FrameBitsPerRow)
 ) data_outbuf (
     .A(FrameData_internal),
     .X(FrameData_O)
 );
-// FrameStrobe Bufferreg [MaxFramesPerCol - 1:0] FrameStrobe_internal;my_buf_pack #(
+
+// FrameStrobe Buffer
+reg [MaxFramesPerCol - 1:0] FrameStrobe_internal;
+
+my_buf_pack #(
     .WIDTH(MaxFramesPerCol)
 ) strobe_inbuf (
     .A(FrameStrobe),
     .X(FrameStrobe_internal)
 );
+
 my_buf_pack #(
     .WIDTH(MaxFramesPerCol)
 ) strobe_outbuf (
     .A(FrameStrobe_internal),
     .X(FrameStrobe_O)
 );
-// User Clock Bufferclk_buf #() inst_clk_buf (
+
+// User Clock Buffer
+clk_buf #() inst_clk_buf (
     .A(UserCLK),
     .X(UserCLKo)
 );
-// Init Configuration storage latchesW_IO_ConfigMem #() Inst_W_IO_ConfigMem (
+
+// Init Configuration storage latches
+
+W_IO_ConfigMem #() Inst_W_IO_ConfigMem (
     .FrameData(FrameData),
     .FrameStrobe(FrameStrobe),
     .ConfigBits(ConfigBits),
     .ConfigBits_N(ConfigBits_N)
 );
-// Instantiate BEL IOIO #() Inst_W_IO (
+
+// Instantiate BEL IO
+IO #() Inst_W_IO (
     .from_fabric(W_from_fabric),
     .to_fabric(W_to_fabric),
     .in(W_in),
-    .out(W_out),
-    .ConfigBits(ConfigBits[0])
+    .out(W_out)
 );
-// Init Switch MatrixW_IO_SwitchMatrix #() Inst_W_IO_SwitchMatrix (
-    .out3(out3),
+
+// Init Switch Matrix
+W_IO_SwitchMatrix #() Inst_W_IO_SwitchMatrix (
     .out1(out1),
     .W_from_fabric(W_from_fabric),
+    .W_to_fabric(W_to_fabric),
     .in1(in1),
-    .in3(in3),
-    .ConfigBits(ConfigBits[4:1]),
-    .ConfigBits_N(ConfigBits_N[4:1])
+    .ConfigBits(ConfigBits[1:0]),
+    .ConfigBits_N(ConfigBits_N[1:0])
 );
 
 endmodule

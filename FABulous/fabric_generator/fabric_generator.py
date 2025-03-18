@@ -29,13 +29,13 @@ def generateFabric(codeGen: CodeGenerator, fabric: Fabric):
                         mapping[externalInput] = pr.Port(
                             f"Tile_X{x}Y{y}_{externalInput.name}",
                             externalInput.ioDirection,
-                            externalInput.wireCount,
+                            externalInput.width,
                         )
                     for externalOutput in bel.externalOutputs:
                         mapping[externalOutput] = pr.Port(
                             f"Tile_X{x}Y{y}_{externalOutput.name}",
                             externalOutput.ioDirection,
-                            externalOutput.wireCount,
+                            externalOutput.width,
                         )
                     externalSignalMapping[(x, y)] = mapping
 
@@ -107,7 +107,7 @@ def generateFabric(codeGen: CodeGenerator, fabric: Fabric):
                 outputOnSide: Mapping[Side, list[Value]] = defaultdict(list)
                 for port in tile.getTileOutputPorts():
                     outputOnSide[port.sideOfTile].append(
-                        lr.Signal(f"Tile_X{x}Y{y}_{port.name}", port.wireCount)
+                        lr.Signal(f"Tile_X{x}Y{y}_{port.name}", port.width)
                     )
 
                 tileToTileOutMapping[(x, y)] = outputOnSide

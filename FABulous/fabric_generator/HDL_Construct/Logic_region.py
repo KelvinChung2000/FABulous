@@ -19,7 +19,7 @@ class LogicRegion(Region):
 
     def __str__(self) -> str:
         if self._writer == WriterType.VERILOG:
-            return f"\n{''.join([str(i) for i in self.container])}"
+            return f"\n{'\n'.join([str(i) for i in self.container])}"
         else:
             signal = []
             other = []
@@ -191,7 +191,7 @@ class LogicRegion(Region):
 
         def __str__(self) -> str:
             if self.writer == WriterType.VERILOG:
-                return f"localparam reg {self.name} = {self.value};"
+                return f"localparam reg {self.name} = 32'd{self.value};"
             else:
                 return f"constant {self.name} : integer := {self.value};"
 

@@ -160,11 +160,9 @@ class Tile:
     def getCascadeWireCount(self, port: TilePort) -> int:
         for i in self.wireTypes:
             if i.sourcePort.name == port.name or i.destinationPort.name == port.name:
-                return port.wireCount * (abs(i.offsetX) + abs(i.offsetY))
+                return port.width * (abs(i.offsetX) + abs(i.offsetY))
         else:
-            raise ValueError(
-                f"The given port {port} does not exist in tile {self.name}"
-            )
+            return port.width
 
     def getEndPointPort(self, port: TilePort) -> TilePort:
         if port.ioDirection == IO.OUTPUT:

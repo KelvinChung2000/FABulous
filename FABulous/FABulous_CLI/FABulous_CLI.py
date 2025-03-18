@@ -351,7 +351,7 @@ class FABulous_CLI(Cmd):
             self.fabulousAPI.genConfigMem(
                 i,
                 self.projectDir / f"Tile/{i}/{i}_ConfigMem.csv",
-                self.projectDir / f"Tile/{i}/{i}_ConfigMem.{self.extension}",
+                self.projectDir / f"Tile/{i}/{i}_ConfigMem{self.extension}",
             )
         logger.info("Generating configMem complete")
 
@@ -367,7 +367,7 @@ class FABulous_CLI(Cmd):
         for i in args.tiles:
             logger.info(f"Generating switch matrix for {i}")
             self.fabulousAPI.genSwitchMatrix(
-                i, self.projectDir / f"Tile/{i}/{i}_switch_matrix.{self.extension}"
+                i, self.projectDir / f"Tile/{i}/{i}_switch_matrix{self.extension}"
             )
         logger.info("Switch matrix generation complete")
 
@@ -396,7 +396,7 @@ class FABulous_CLI(Cmd):
                     self.fabulousAPI.genSwitchMatrix(
                         st,
                         Path(
-                            f"{self.projectDir}/Tile/{t}/{st}/{st}_switch_matrix.{self.extension}"
+                            f"{self.projectDir}/Tile/{t}/{st}/{st}_switch_matrix{self.extension}"
                         ),
                     )
                     logger.info(f"Generated switch matrix for {st}")
@@ -408,7 +408,7 @@ class FABulous_CLI(Cmd):
                         st,
                         self.projectDir / f"Tile/{t}/{st}/{st}_ConfigMem.csv",
                         Path(
-                            f"{self.projectDir}/Tile/{t}/{st}/{st}_ConfigMem.{self.extension}"
+                            f"{self.projectDir}/Tile/{t}/{st}/{st}_ConfigMem{self.extension}"
                         ),
                     )
                     logger.info(f"Generated configMem for {st}")
@@ -418,14 +418,14 @@ class FABulous_CLI(Cmd):
                     logger.info(f"Generating subtile {st}")
                     self.fabulousAPI.genTile(
                         st,
-                        Path(f"{self.projectDir}/Tile/{t}/{st}/{st}.{self.extension}"),
+                        Path(f"{self.projectDir}/Tile/{t}/{st}/{st}{self.extension}"),
                     )
                     logger.info(f"Generated subtile {st}")
 
                 # Gen super tile
                 logger.info(f"Generating super tile {t}")
                 self.fabulousAPI.genSuperTile(
-                    t, Path(f"{self.projectDir}/Tile/{t}/{t}.{self.extension}")
+                    t, Path(f"{self.projectDir}/Tile/{t}/{t}{self.extension}")
                 )
                 logger.info(f"Generated super tile {t}")
                 continue
@@ -439,7 +439,7 @@ class FABulous_CLI(Cmd):
             logger.info(f"Generating tile {t}")
             # Gen tile
             self.fabulousAPI.genTile(
-                t, Path(f"{self.projectDir}/Tile/{t}/{t}.{self.extension}")
+                t, Path(f"{self.projectDir}/Tile/{t}/{t}{self.extension}")
             )
             logger.info(f"Generated tile {t}")
 

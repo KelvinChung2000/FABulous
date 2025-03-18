@@ -924,9 +924,9 @@ class FabricGenerator:
                     and p.destinationName != "NULL"
                     and p.ioDirection == IO.OUTPUT
                 ):
-                    self.writer.addConnectionVector(p.name, f"{p.wireCount}-1")
+                    self.writer.addConnectionVector(p.name, f"{p.width}-1")
 
-                for k in range(p.wireCount):
+                for k in range(p.width):
                     allJumpWireList.append(f"{p.name}( {k} )")
 
         # internal configuration data signal to daisy-chain all BELs (if any and in the order they are listed in the fabric.csv)
@@ -965,12 +965,12 @@ class FabricGenerator:
                 and port.sourceName != "NULL"
                 and port.destinationName != "NULL"
             ):
-                highBoundIndex = span * port.wireCount - 1
+                highBoundIndex = span * port.width - 1
                 self.writer.addConnectionVector(
                     f"{port.destinationName}_i", highBoundIndex
                 )
                 self.writer.addConnectionVector(
-                    f"{port.sourceName}_i", highBoundIndex - port.wireCount
+                    f"{port.sourceName}_i", highBoundIndex - port.width
                 )
                 added.add((port.sourceName, port.destinationName))
 
@@ -1026,24 +1026,24 @@ class FabricGenerator:
                 and port.sourceName != "NULL"
                 and port.destinationName != "NULL"
             ):
-                highBoundIndex = span * port.wireCount - 1
+                highBoundIndex = span * port.width - 1
                 # using scalar assignment to connect the two vectors
                 # could replace with assign as vector, but will lose the - wireCount readability
                 self.writer.addAssignScalar(
-                    f"{port.sourceName}_i[{highBoundIndex}-{port.wireCount}:0]",
-                    f"{port.destinationName}_i[{highBoundIndex}:{port.wireCount}]",
+                    f"{port.sourceName}_i[{highBoundIndex}-{port.width}:0]",
+                    f"{port.destinationName}_i[{highBoundIndex}:{port.width}]",
                 )
                 self.writer.addNewLine()
-                for i in range(highBoundIndex - port.wireCount + 1):
+                for i in range(highBoundIndex - port.width + 1):
                     self.writer.addInstantiation(
                         "my_buf",
                         f"{port.destinationName}_inbuf_{i}",
                         portsPairs=[
-                            ("A", f"{port.destinationName}[{i+port.wireCount}]"),
-                            ("X", f"{port.destinationName}_i[{i+port.wireCount}]"),
+                            ("A", f"{port.destinationName}[{i+port.width}]"),
+                            ("X", f"{port.destinationName}_i[{i+port.width}]"),
                         ],
                     )
-                for i in range(highBoundIndex - port.wireCount + 1):
+                for i in range(highBoundIndex - port.width + 1):
                     self.writer.addInstantiation(
                         "my_buf",
                         f"{port.sourceName}_outbuf_{i}",
@@ -1319,7 +1319,7 @@ class FabricGenerator:
                     indentLevel=1,
                 )
                 for p in pList:
-                    wire = (abs(p.xOffset) + abs(p.yOffset)) * p.wireCount - 1
+                    wire = (abs(p.xOffset) + abs(p.yOffset)) * p.width - 1
                     self.writer.addPortVector(
                         f"Tile_X{x}Y{y}_{p.name}", p.ioDirection, wire, indentLevel=2
                     )
@@ -1423,7 +1423,7 @@ class FabricGenerator:
                 )
                 for p in i:
                     if p.ioDirection == IO.OUTPUT:
-                        wire = (abs(p.xOffset) + abs(p.yOffset)) * p.wireCount - 1
+                        wire = (abs(p.xOffset) + abs(p.yOffset)) * p.width - 1
                         self.writer.addConnectionVector(
                             f"Tile_X{x}Y{y}_{p.name}", wire, indentLevel=1
                         )

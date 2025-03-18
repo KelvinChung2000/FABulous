@@ -6,26 +6,26 @@ class {{ tileName }}_ports:
     def __init__(self, tilePorts: list[TilePort], belInputs: list[BelPort], belOutputs: list[BelPort]):
         # tile ports
     {%- for p in tilePorts %}
-        self.{{ p.name }} = MuxPort(tilePorts[{{ loop.index0 }}], isTilePort=True, isBus={{ p.isBus }}, bitWidth={{ p.wireCount }})
+        self.{{ p.name }} = MuxPort(tilePorts[{{ loop.index0 }}], isTilePort=True, isBus={{ p.isBus }}, width={{ p.width }})
     {%- endfor %}
 
         # bel ports
     {%- for p in belInputs %}
-        self.{{ p.prefix }}{{ p.name }} = MuxPort(belInputs[{{ loop.index0 }}], isBelPort=True, isBus={{ p.isBus }}, bitWidth={{ p.wireCount }})
+        self.{{ p.prefix }}{{ p.name }} = MuxPort(belInputs[{{ loop.index0 }}], isBelPort=True, isBus={{ p.isBus }}, width={{ p.width }})
     {%- endfor %}
 
     {%- for p in belOutputs %}
-        self.{{ p.prefix }}{{ p.name }} = MuxPort(belOutputs[{{ loop.index0 }}], isBelPort=True, isBus={{ p.isBus }}, bitWidth={{ p.wireCount }})
+        self.{{ p.prefix }}{{ p.name }} = MuxPort(belOutputs[{{ loop.index0 }}], isBelPort=True, isBus={{ p.isBus }}, width={{ p.width }})
     {%- endfor %}
 
 
-        self.GND = MuxPort(Port(name="gnd", ioDirection=IO.OUTPUT, wireCount=1, isBus=False), bitWidth=1)
-        self.VCC = MuxPort(Port(name="vcc", ioDirection=IO.OUTPUT, wireCount=1, isBus=False), bitWidth=1)
+        self.GND = MuxPort(Port(name="gnd", ioDirection=IO.OUTPUT, width=1, isBus=False), width=1)
+        self.VCC = MuxPort(Port(name="vcc", ioDirection=IO.OUTPUT, width=1, isBus=False), width=1)
 
-    def NewWire(self, srcName: str, dstName: str, wireCount: int) -> tuple[MuxPort, MuxPort]:
-        portSrc = MuxPort(Port(name=srcName, ioDirection=IO.INPUT, wireCount=wireCount, isBus=False), bitWidth=wireCount, isCreated=True)
+    def NewWire(self, srcName: str, dstName: str, width: int) -> tuple[MuxPort, MuxPort]:
+        portSrc = MuxPort(Port(name=srcName, ioDirection=IO.INPUT, width=width, isBus=False), width=width, isCreated=True)
         setattr(self, srcName, portSrc)
-        portDst = MuxPort(Port(name=dstName, ioDirection=IO.OUTPUT, wireCount=wireCount, isBus=False), bitWidth=wireCount, isCreated=True)
+        portDst = MuxPort(Port(name=dstName, ioDirection=IO.OUTPUT, width=width, isBus=False), width=width, isCreated=True)
         setattr(self, dstName, portDst)
         return portSrc, portDst
 

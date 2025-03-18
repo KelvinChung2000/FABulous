@@ -141,21 +141,21 @@ def parseFabricYAML(fileName: Path) -> Fabric:
                         "or both X and Y must be the same for diagonal."
                     )
                     raise ValueError
-                if sourcePort.wireCount != destinationPort.wireCount:
+                if sourcePort.width != destinationPort.width:
                     logger.error(
                         f"Port {sourcePort.name} and {destinationPort.name} must have the same wire count."
                     )
                     raise ValueError
 
                 spanning = 0
-                if abs(x) + abs(y) >= 1 and x != y:
-                    wireCount = sourcePort.wireCount * (abs(x) + abs(y))
-                    spanning = abs(x) + abs(y)
-                elif x == y:
-                    wireCount = sourcePort.wireCount * abs(x)
-                    spanning = abs(x)
+                if abs(tx) + abs(ty) > 1 and tx != ty:
+                    wireCount = sourcePort.width * (abs(tx) + abs(ty))
+                    spanning = abs(tx) + abs(ty)
+                elif tx == ty:
+                    wireCount = sourcePort.width * abs(tx)
+                    spanning = abs(tx)
                 else:
-                    wireCount = sourcePort.wireCount
+                    wireCount = sourcePort.width
                     spanning = 0
 
                 wireDict[(x, y)].append(
@@ -169,13 +169,14 @@ def parseFabricYAML(fileName: Path) -> Fabric:
                         wireCount=wireCount,
                     )
                 )
+
                 tileDict[tileName].addWireType(
                     WireType(
                         sourcePort=sourcePort,
                         destinationPort=destinationPort,
                         offsetX=tx,
                         offsetY=ty,
-                        wireCount=sourcePort.wireCount,
+                        wireCount=sourcePort.width,
                         cascadeWireCount=wireCount,
                         spanning=spanning,
                     )
@@ -277,7 +278,7 @@ def parseTileYAML(fileName: Path) -> tuple[Tile, WireInfo]:
 
     for portEntry in data.get("PORTS", []):
         portsDict[f"{portEntry["name"]}"] = TilePort(
-            wireCount=int(portEntry["wires"]),
+            width=int(portEntry["wires"]),
             name=portEntry["name"],
             ioDirection=IO[portEntry["inOut"].upper()],
             sideOfTile=Side[portEntry["side"].upper()],

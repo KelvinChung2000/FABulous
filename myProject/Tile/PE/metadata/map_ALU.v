@@ -4,7 +4,8 @@ module map_ALU_ALU_func_0 #(
     parameter _TECHMAP_CONSTVAL_data_in2_ = 32'bx,
     parameter _TECHMAP_CONSTVAL_data_in3_ = 32'bx,
     parameter _TECHMAP_CONSTVAL_data_out_ = 32'bx
-)(
+)
+(
     input [2:0] ALU_func,
     input [31:0] data_in1,
     input [31:0] data_in2,
@@ -31,7 +32,8 @@ module map_ALU_ALU_func_1 #(
     parameter _TECHMAP_CONSTVAL_data_in2_ = 32'bx,
     parameter _TECHMAP_CONSTVAL_data_in3_ = 32'bx,
     parameter _TECHMAP_CONSTVAL_data_out_ = 32'bx
-)(
+)
+(
     input [2:0] ALU_func,
     input [31:0] data_in1,
     input [31:0] data_in2,
@@ -58,7 +60,8 @@ module map_ALU_ALU_func_2 #(
     parameter _TECHMAP_CONSTVAL_data_in2_ = 32'bx,
     parameter _TECHMAP_CONSTVAL_data_in3_ = 32'bx,
     parameter _TECHMAP_CONSTVAL_data_out_ = 32'bx
-)(
+)
+(
     input [2:0] ALU_func,
     input [31:0] data_in1,
     input [31:0] data_in2,
@@ -85,7 +88,8 @@ module map_ALU_ALU_func_3 #(
     parameter _TECHMAP_CONSTVAL_data_in2_ = 32'bx,
     parameter _TECHMAP_CONSTVAL_data_in3_ = 32'bx,
     parameter _TECHMAP_CONSTVAL_data_out_ = 32'bx
-)(
+)
+(
     input [2:0] ALU_func,
     input [31:0] data_in1,
     input [31:0] data_in2,
@@ -112,7 +116,8 @@ module map_ALU_ALU_func_4 #(
     parameter _TECHMAP_CONSTVAL_data_in2_ = 32'bx,
     parameter _TECHMAP_CONSTVAL_data_in3_ = 32'bx,
     parameter _TECHMAP_CONSTVAL_data_out_ = 32'bx
-)(
+)
+(
     input [2:0] ALU_func,
     input [31:0] data_in1,
     input [31:0] data_in2,
@@ -139,7 +144,8 @@ module map_ALU_ALU_func_5 #(
     parameter _TECHMAP_CONSTVAL_data_in2_ = 32'bx,
     parameter _TECHMAP_CONSTVAL_data_in3_ = 32'bx,
     parameter _TECHMAP_CONSTVAL_data_out_ = 32'bx
-)(
+)
+(
     input [2:0] ALU_func,
     input [31:0] data_in1,
     input [31:0] data_in2,

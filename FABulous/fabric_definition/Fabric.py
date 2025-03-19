@@ -77,12 +77,16 @@ class Fabric:
 
     def __getitem__(self, index: Any) -> Tile | SuperTile | None:
         if isinstance(index, tuple):
-            return self.tiles[index[1]][index[0]]
+            if t := self.tiles[index[1]][index[0]]:
+                return self.tileDict[t]
+            return None
         if isinstance(index, str):
             if index in self.tileDict:
                 return self.tileDict[index]
             elif index in self.superTileDict:
                 return self.superTileDict[index]
+            else:
+                raise ValueError(f"Cannot find '{index}' in Fabric")
         else:
             raise ValueError("Invalid index for Fabric")
 
@@ -93,7 +97,7 @@ class Fabric:
                 if self.tiles[i][j] is None:
                     fabric += "Null".ljust(15) + "\t"
                 else:
-                    fabric += f"{str(self.tiles[i][j].name).ljust(15)}\t"
+                    fabric += f"{str(self.tiles[i][j]).ljust(15)}\t"
             fabric += "\n"
 
         fabric += (

@@ -5,7 +5,7 @@
       "attributes": {
         "dynports": 1,
         "cells_not_processed": 1,
-        "src": "../../myProject/Tile/PE/reg_unit.v:1.1-21.10"
+        "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/reg_unit.v:1.1-21.10"
       },
       "parameter_default_values": {
         "NoConfigBits": 3,
@@ -42,7 +42,7 @@
             "WIDTH": 32
           },
           "attributes": {
-            "src": "../../myProject/Tile/PE/reg_unit.v:12.1-19.4"
+            "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/reg_unit.v:12.1-19.4"
           },
           "port_directions": {
             "CLK": "input",
@@ -62,7 +62,7 @@
             "WIDTH": 32
           },
           "attributes": {
-            "src": "../../myProject/Tile/PE/reg_unit.v:16.14-16.16|../../myProject/Tile/PE/reg_unit.v:16.10-18.8"
+            "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/reg_unit.v:16.14-16.16|/home/kelvin/FABulous_fork/myProject/Tile/PE/reg_unit.v:16.10-18.8"
           },
           "port_directions": {
             "A": "input",
@@ -85,7 +85,7 @@
           },
           "attributes": {
             "full_case": 1,
-            "src": "../../myProject/Tile/PE/reg_unit.v:13.9-13.12|../../myProject/Tile/PE/reg_unit.v:13.5-18.8"
+            "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/reg_unit.v:13.9-13.12|/home/kelvin/FABulous_fork/myProject/Tile/PE/reg_unit.v:13.5-18.8"
           },
           "port_directions": {
             "A": "input",
@@ -106,7 +106,7 @@
           "hide_name": 1,
           "bits": [ 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100 ],
           "attributes": {
-            "src": "../../myProject/Tile/PE/reg_unit.v:12.1-19.4"
+            "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/reg_unit.v:12.1-19.4"
           }
         },
         "$procmux$2_Y": {
@@ -139,7 +139,7 @@
           "attributes": {
             "FABulous": 1,
             "USER_CLK": 1,
-            "src": "../../myProject/Tile/PE/reg_unit.v:7.41-7.44"
+            "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/reg_unit.v:7.41-7.44"
           }
         },
         "en": {
@@ -148,7 +148,7 @@
           "attributes": {
             "CONTROL": 1,
             "FABulous": 1,
-            "src": "../../myProject/Tile/PE/reg_unit.v:6.39-6.41"
+            "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/reg_unit.v:6.39-6.41"
           }
         },
         "reg_in": {
@@ -158,7 +158,7 @@
             "BUS": 1,
             "DATA": 1,
             "FABulous": 1,
-            "src": "../../myProject/Tile/PE/reg_unit.v:8.55-8.61"
+            "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/reg_unit.v:8.55-8.61"
           }
         },
         "reg_out": {
@@ -168,7 +168,7 @@
             "BUS": 1,
             "DATA": 1,
             "FABulous": 1,
-            "src": "../../myProject/Tile/PE/reg_unit.v:9.54-9.61"
+            "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/reg_unit.v:9.54-9.61"
           }
         },
         "rst": {
@@ -177,7 +177,7 @@
           "attributes": {
             "CONTROL": 1,
             "FABulous": 1,
-            "src": "../../myProject/Tile/PE/reg_unit.v:5.39-5.42"
+            "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/reg_unit.v:5.39-5.42"
           }
         }
       }

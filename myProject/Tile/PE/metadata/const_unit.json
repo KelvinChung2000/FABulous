@@ -6,7 +6,7 @@
         "CELL": 1,
         "dynports": 1,
         "cells_not_processed": 1,
-        "src": "../../myProject/Tile/PE/const_unit.v:2.1-12.10"
+        "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/const_unit.v:2.1-12.10"
       },
       "parameter_default_values": {
         "NoConfigBits": 3,
@@ -32,7 +32,7 @@
             "CONFIG_BIT": 1,
             "FABulous": 1,
             "INIT": 1,
-            "src": "../../myProject/Tile/PE/const_unit.v:7.50-7.60"
+            "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/const_unit.v:7.50-7.60"
           }
         },
         "const_out": {
@@ -42,7 +42,7 @@
             "BUS": 1,
             "DATA": 1,
             "FABulous": 1,
-            "src": "../../myProject/Tile/PE/const_unit.v:6.55-6.64"
+            "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/const_unit.v:6.55-6.64"
           }
         }
       }

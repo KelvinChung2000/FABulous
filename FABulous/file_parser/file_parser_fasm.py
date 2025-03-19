@@ -13,10 +13,9 @@ FASMGrammar = r"""
 
     fasm_line: [set_fasm_feature] [annotations] _NEW_LINE
 
-    ?set_fasm_feature: feature [feature_address] ["=" verilog_value]
+    ?set_fasm_feature: FEATURE [feature_address] ["=" verilog_value]
 
-    feature: IDENTIFIER ("." IDENTIFIER)*
-    IDENTIFIER: /[a-zA-Z][0-9a-zA-Z_]*/
+    FEATURE: /[a-zA-Z][0-9a-zA-Z_.]*/
 
     ?feature_address: "[" DEC [":" DEC] "]"
 
@@ -60,9 +59,6 @@ class FASMTransformer(Transformer):
             annotations,
         )
 
-    def feature(self, items):
-        return ".".join(items)
-
     @v_args(inline=True)
     def set_fasm_feature(self, feature, address=None, value=None):
         if feature is not None and value is None:
@@ -88,6 +84,7 @@ class FASMTransformer(Transformer):
     annotation = tuple
     ANNOTATION_NAME = str
     IDENTIFIER = str
+    FEATURE = str
 
     def ESCAPED_STRING(self, items):
         return items[1:-1]

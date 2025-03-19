@@ -1,11 +1,11 @@
 <testsuites name="results">
   <testsuite name="all" package="all">
-    <property name="random_seed" value="1742338497" />
-    <testcase name="adder_basic_test" classname="test_tile" file="/home/kelvin/FABulous_fork/myProject/Test/test_tile.py" lineno="15" time="0.0007092952728271484" sim_time_ns="1000000000" ratio_time="1409850084033.6135">
-      <failure message="Test failed with RANDOM_SEED=1742338497" />
+    <property name="random_seed" value="1742380664" />
+    <testcase name="adder_basic_test" classname="test_tile" file="/home/kelvin/FABulous_fork/myProject/Test/test_tile.py" lineno="15" time="0.0006852149963378906" sim_time_ns="1000000000" ratio_time="1459395963813.5002">
+      <failure message="Test failed with RANDOM_SEED=1742380664" />
     </testcase>
-    <testcase name="adder_randomised_test" classname="test_tile" file="/home/kelvin/FABulous_fork/myProject/Test/test_tile.py" lineno="32" time="5.841255187988281e-05" sim_time_ns="1000000000" ratio_time="17119608163265.307">
-      <failure message="Test failed with RANDOM_SEED=1742338497" />
+    <testcase name="adder_randomised_test" classname="test_tile" file="/home/kelvin/FABulous_fork/myProject/Test/test_tile.py" lineno="32" time="6.0558319091796875e-05" sim_time_ns="1000000000" ratio_time="16513007874015.748">
+      <failure message="Test failed with RANDOM_SEED=1742380664" />
     </testcase>
   </testsuite>
 </testsuites>

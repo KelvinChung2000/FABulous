@@ -2,7 +2,8 @@
 module map_reg_unit_en_1_rst_0 #(
     parameter _TECHMAP_CONSTVAL_reg_in_ = 32'bx,
     parameter _TECHMAP_CONSTVAL_reg_out_ = 32'bx
-)(
+)
+(
     input clk,
     input en,
     input [31:0] reg_in,
@@ -26,7 +27,8 @@ endmodule
 module map_reg_unit_en_1_rst_z #(
     parameter _TECHMAP_CONSTVAL_reg_in_ = 32'bx,
     parameter _TECHMAP_CONSTVAL_reg_out_ = 32'bx
-)(
+)
+(
     input clk,
     input en,
     input [31:0] reg_in,
@@ -50,7 +52,8 @@ endmodule
 module map_reg_unit_en_z_rst_0 #(
     parameter _TECHMAP_CONSTVAL_reg_in_ = 32'bx,
     parameter _TECHMAP_CONSTVAL_reg_out_ = 32'bx
-)(
+)
+(
     input clk,
     input en,
     input [31:0] reg_in,
@@ -74,7 +77,8 @@ endmodule
 module map_reg_unit_en_z_rst_z #(
     parameter _TECHMAP_CONSTVAL_reg_in_ = 32'bx,
     parameter _TECHMAP_CONSTVAL_reg_out_ = 32'bx
-)(
+)
+(
     input clk,
     input en,
     input [31:0] reg_in,

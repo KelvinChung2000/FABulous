@@ -1,38 +1,12 @@
 digraph G {
 rankdir=TB;
+packmode="array_ri3";
 layout=dot;
-"X0Y1.c0.out1";
-"X1Y1.c0.in3";
-"X0Y1.c0.out1" -> "X1Y1.c0.in3" [dir=none, color=blue];
-"X1Y0.c0.out0";
-"X1Y1.c0.in2";
-"X1Y0.c0.out0" -> "X1Y1.c0.in2" [dir=none, color=blue];
-"X1Y1.c0.out0";
-"X1Y2.c0.in2";
-"X1Y1.c0.out0" -> "X1Y2.c0.in2" [dir=none, color=blue];
-"X1Y1.c0.out1";
-"X2Y1.c0.in3";
-"X1Y1.c0.out1" -> "X2Y1.c0.in3" [dir=none, color=blue];
-"X1Y1.c0.out2";
-"X1Y0.c0.in0";
-"X1Y1.c0.out2" -> "X1Y0.c0.in0" [dir=none, color=blue];
-"X1Y1.c0.out3";
-"X0Y1.c0.in1";
-"X1Y1.c0.out3" -> "X0Y1.c0.in1" [dir=none, color=blue];
-"X1Y2.c0.out2";
-"X1Y1.c0.in0";
-"X1Y2.c0.out2" -> "X1Y1.c0.in0" [dir=none, color=blue];
-"X2Y1.c0.out3";
-"X1Y1.c0.in1";
-"X2Y1.c0.out3" -> "X1Y1.c0.in1" [dir=none, color=blue];
-subgraph rankX_0 {
-rankdir=LR;
 subgraph cluster_0_0 {
 label="tile_0_0_NULL";
 margin=15;
 style=rounded;
 rank=source;
-anchor_X0Y0 [style=invis];
 }
 subgraph cluster_0_1 {
 label="tile_0_1_W_IO";
@@ -65,18 +39,13 @@ label="c0.W_IO";
 "X0Y1.c0.W_to_fabric" -> "X0Y1.c0.out1_internal";
 "X0Y1.c0.in1";
 "X0Y1.c0.in1" -> "X0Y1.c0.W_from_fabric";
-anchor_X0Y1 [style=invis];
 }
 subgraph cluster_0_2 {
 label="tile_0_2_NULL";
 margin=15;
 style=rounded;
 rank=source;
-anchor_X0Y2 [style=invis];
 }
-}
-subgraph rankX_1 {
-rankdir=LR;
 subgraph cluster_1_0 {
 label="tile_1_0_S_IO";
 margin=15;
@@ -108,7 +77,6 @@ label="c0.S_IO";
 "X1Y0.c0.S_to_fabric" -> "X1Y0.c0.out0_internal";
 "X1Y0.c0.in0";
 "X1Y0.c0.in0" -> "X1Y0.c0.S_from_fabric";
-anchor_X1Y0 [style=invis];
 }
 subgraph cluster_1_1 {
 label="tile_1_1_PE";
@@ -337,7 +305,6 @@ label="c0.W_reg_unit";
 "X1Y1.c0.S_reg_out" -> "X1Y1.c0.S_reg_in";
 "X1Y1.c0.in3" -> "X1Y1.c0.W_reg_in";
 "X1Y1.c0.W_reg_out" -> "X1Y1.c0.W_reg_in";
-anchor_X1Y1 [style=invis];
 }
 subgraph cluster_1_2 {
 label="tile_1_2_N_IO";
@@ -370,17 +337,12 @@ label="c0.N_IO";
 "X1Y2.c0.N_to_fabric" -> "X1Y2.c0.out2_internal";
 "X1Y2.c0.in2";
 "X1Y2.c0.in2" -> "X1Y2.c0.N_from_fabric";
-anchor_X1Y2 [style=invis];
 }
-}
-subgraph rankX_2 {
-rankdir=LR;
 subgraph cluster_2_0 {
 label="tile_2_0_NULL";
 margin=15;
 style=rounded;
 rank=source;
-anchor_X2Y0 [style=invis];
 }
 subgraph cluster_2_1 {
 label="tile_2_1_E_IO";
@@ -413,20 +375,11 @@ label="c0.E_IO";
 "X2Y1.c0.E_to_fabric" -> "X2Y1.c0.out3_internal";
 "X2Y1.c0.in3";
 "X2Y1.c0.in3" -> "X2Y1.c0.E_from_fabric";
-anchor_X2Y1 [style=invis];
 }
 subgraph cluster_2_2 {
 label="tile_2_2_NULL";
 margin=15;
 style=rounded;
 rank=source;
-anchor_X2Y2 [style=invis];
 }
-}
-anchor_X0Y0 -> anchor_X1Y0 [style=invis, weight=10000];
-anchor_X0Y1 -> anchor_X1Y1 [style=invis, weight=10000];
-anchor_X0Y2 -> anchor_X1Y2 [style=invis, weight=10000];
-anchor_X1Y0 -> anchor_X2Y0 [style=invis, weight=10000];
-anchor_X1Y1 -> anchor_X2Y1 [style=invis, weight=10000];
-anchor_X1Y2 -> anchor_X2Y2 [style=invis, weight=10000];
 }

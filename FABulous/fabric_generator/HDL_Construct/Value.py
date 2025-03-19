@@ -170,9 +170,9 @@ class Value:
 
     def __eq__(self, other):
         if isinstance(other, Value):
-            return Value(f"{self.value} == {other.value}", 1, self.isSignal)
+            return self.value == other.value
         else:
-            return Value(f"{self.value} == {other}", 1, self.isSignal)
+            return False
 
     def __ne__(self, other):
         if isinstance(other, Value):
@@ -276,8 +276,20 @@ class Value:
         else:
             return Value(f"{other} | {self.value}", self.bitWidth, self.isSignal)
 
-    def case_eq(self, other):
+    def full_eq(self, other):
         if isinstance(other, Value):
             return Value(f"{self.value} === {other.value}", 1, self.isSignal)
         else:
             return Value(f"{self.value} === {other}", 1, self.isSignal)
+
+    def full_ne(self, other):
+        if isinstance(other, Value):
+            return Value(f"{self.value} !== {other.value}", 1, self.isSignal)
+        else:
+            return Value(f"{self.value} !== {other}", 1, self.isSignal)
+
+    def eq(self, other):
+        if isinstance(other, Value):
+            return Value(f"{self.value} == {other.value}", 1, self.isSignal)
+        else:
+            return Value(f"{self.value} == {other}", 1, self.isSignal)

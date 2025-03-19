@@ -77,9 +77,7 @@ def generateConfigMemInit(
 
 
 def generateConfigMem(codeGen: CodeGenerator, fabric: Fabric, tile: Tile):
-    with codeGen.Module(
-        f"{tile.name}_ConfigMem",
-    ) as module:
+    with codeGen.Module(f"{tile.name}_ConfigMem") as module:
         with module.ParameterRegion() as pr:
             if fabric.maxFramesPerCol > 0:
                 maxFramePerCol = pr.Parameter("MaxFramesPerCol", fabric.maxFramesPerCol)
@@ -96,10 +94,10 @@ def generateConfigMem(codeGen: CodeGenerator, fabric: Fabric, tile: Tile):
             configBits = pr.Port("ConfigBits", IO.OUTPUT, noConfigBits - 1)
             configBitsN = pr.Port("ConfigBits_N", IO.OUTPUT, noConfigBits - 1)
 
+        totalCount = 0
         with module.LogicRegion() as lr:
-
             with lr.Generate() as lrGen:
-                with lrGen.IfElse(emuEn == 0) as ifElse:
+                with lrGen.IfElse(emuEn.eq(0)) as ifElse:
                     with ifElse.TrueRegion() as t:
                         t.Comment("instantiate frame latches")
                         for i in tile.configMems.configMemEntries:
@@ -130,17 +128,9 @@ def generateConfigMem(codeGen: CodeGenerator, fabric: Fabric, tile: Tile):
                                         ],
                                     )
                                     counter += 1
+                                    totalCount += 1
                     with ifElse.FalseRegion() as f:
                         f.Assign(configBits, emuCfg)
-                        f.Assign(configBitsN, emuCfg)
+                        f.Assign(configBitsN, ~emuCfg)
 
-            # with lr.IfDef("EMULATION") as lrIfDef:
-            #     for i in configMemList:
-            #         counter = 0
-            #         for k in range(fabric.frameBitsPerRow):
-            #             if i.usedBitMask[k] == "1":
-            #                 lrIfDef.Assign(
-            #                     configBits[i.configBitRanges[counter]],
-            #                     src=f"Emulate_Bitstream[{i.frameIndex*self.fabric.frameBitsPerRow + (self.fabric.frameBitsPerRow-1-k)}]",
-            #                 )
-            #             counter += 1
+    assert totalCount == tile.configBits, "Not all config bits are assigned"

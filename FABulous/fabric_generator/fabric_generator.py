@@ -11,10 +11,21 @@ from FABulous.file_parser.file_parser_yaml import parseFabricYAML
 
 
 def generateFabric(codeGen: CodeGenerator, fabric: Fabric):
+    bitStreamMap = {}
+    count = 0
+    for x in range(fabric.numberOfColumns):
+        for y in range(fabric.numberOfRows):
+            if t := fabric[(x, y)]:
+                bitStreamMap[(x, y)] = (count, count + t.configBits)
+                count += t.configBits
+
     with codeGen.Module(fabric.name) as m:
         with m.ParameterRegion() as pr:
             maxFramePerCol = pr.Parameter("MaxFramePerCol", fabric.maxFramesPerCol)
             frameBitsPerRow = pr.Parameter("FrameBitsPerRow", fabric.frameBitsPerRow)
+            pr.Comment("Emulation parameter")
+            emuEn = pr.Parameter("EMULATION_ENABLE", 0)
+            emuCfg = pr.Parameter("EMULATION_CONFIG", 0)
 
         externalSignalMapping: Mapping[Loc, Mapping[BelPort, Value]] = {}
         with m.PortRegion() as pr:
@@ -49,6 +60,8 @@ def generateFabric(codeGen: CodeGenerator, fabric: Fabric):
             userClk = pr.Port("UserCLK", IO.INPUT)
 
         with m.LogicRegion() as lr:
+            cfg = lr.Signal("cfg")
+            lr.Assign(cfg, emuCfg)
             clkWireInMapping: Mapping[Loc, Value] = {}
             clkWireOutMapping: Mapping[Loc, Value] = {}
             lr.Comment("User Clock wire")
@@ -229,6 +242,12 @@ def generateFabric(codeGen: CodeGenerator, fabric: Fabric):
                                 )
                             )
 
+                    cfgRange = bitStreamMap[(x, y)]
+                    if cfgRange[1] - cfgRange[0] > 0:
+                        c = cfg[cfgRange[0] : cfgRange[1]]
+                    else:
+                        c = 0
+
                     lr.InitModule(
                         tile.name,
                         f"{tile.name}_Tile_X{x}Y{y}",
@@ -247,10 +266,7 @@ def generateFabric(codeGen: CodeGenerator, fabric: Fabric):
                             lr.ConnectPair("MaxFramePerCol", maxFramePerCol),
                             lr.ConnectPair("FrameBitsPerRow", frameBitsPerRow),
                             lr.ConnectPair("NoConfigBits", tile.configBits),
+                            lr.ConnectPair("EMULATION_ENABLE", emuEn),
+                            lr.ConnectPair("EMULATION_CONFIG", c),
                         ],
                     )
-
-
-if __name__ == "__main__":
-    fabric = parseFabricYAML(Path("/home/kelvin/FABulous_fork/myProject/fabric.yaml"))
-    generateFabric(fabric, Path("./test_fabric.v"))

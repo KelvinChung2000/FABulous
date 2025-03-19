@@ -2,6 +2,7 @@ from typing import Generator, Mapping
 
 from FABulous.fabric_cad.define import FeatureMap, FeatureValue
 from FABulous.fabric_definition.Fabric import Fabric
+from FABulous.fabric_definition.Port import BelPort
 
 
 def generateBitsStreamSpec(fabric: Fabric) -> FeatureMap:
@@ -30,42 +31,89 @@ def generateBitsStreamSpec(fabric: Fabric) -> FeatureMap:
 
         indexCounter = frameIndexCounter()
 
-        for i, bel in enumerate(tile.bels):
-            for config in bel.configPort:
-                if config.width == 1 and len(config.features) == 1:
-                    featureToBitString[
-                        f"X{x}Y{y}.{bel.prefix}{bel.name}.{config.features[0]}"
-                    ] = FeatureValue((x, y), [next(indexCounter)], 1)
-                else:
-                    multiBitIndex: list[tuple[int, int] | tuple[None, None]] = [
-                        next(indexCounter) for _ in range(config.width)
-                    ]
-                    for i, (feature, value) in enumerate(config.features):
+        for c in range(fabric.contextCount):
+            for i, bel in enumerate(tile.bels):
+                for config in bel.configPort:
+                    if config.width == 1 and len(config.features) == 1:
                         featureToBitString[
-                            f"X{x}Y{y}.{bel.prefix}{bel.name}.{feature}[{i}]"
-                        ] = FeatureValue((x, y), multiBitIndex, value)
+                            f"X{x}Y{y}.c{c}.{bel.prefix}{bel.name}.{config.name}"
+                        ] = FeatureValue((x, y), (next(indexCounter),), None)
+                    else:
+                        multiBitIndex = tuple(
+                            [next(indexCounter) for _ in range(config.width)]
+                        )
+                        featureToBitString[
+                            f"X{x}Y{y}.c{c}.{bel.prefix}{bel.name}.{config.name}"
+                        ] = FeatureValue((x, y), multiBitIndex, None)
+                for input in bel.inputs:
+                    if not input.control:
+                        continue
 
-        for mux in tile.switchMatrix.muxes:
-            if len(mux.inputs) == 1:
-                # This is a wire
-                featureToBitString[
-                    f"X{x}Y{y}.{mux.inputs[0].name}.{mux.output.name}"
-                ] = FeatureValue((x, y), [(None, None)], 0)
-                continue
+                    if input.width != 1:
+                        raise NotImplementedError(
+                            "Control input with width != 1 is not supported"
+                        )
 
-            multiBitIndex: list[tuple[int, int] | tuple[None, None]] = [
-                next(indexCounter) for _ in range(len(mux.inputs).bit_length() - 1)
-            ]
-            for i, input in enumerate(reversed(mux.inputs)):
-                featureToBitString[f"X{x}Y{y}.{input.name}.{mux.output.name}"] = (
-                    FeatureValue((x, y), multiBitIndex, i)
-                )
+                    featureToBitString[
+                        f"X{x}Y{y}.c{c}.{bel.prefix}{bel.name}.{input.name}"
+                    ] = FeatureValue((x, y), (next(indexCounter),), None)
 
-        # And now we add empty config bit mappings for immutable connections (i.e. wires), as nextpnr sees these the same as normal pips
-        for wire in tile.wireTypes:
-            for i in range(wire.wireCount):
-                featureToBitString[
-                    f"X{x}Y{y}.{wire.sourcePort.name}{i}.{wire.destinationPort.name}{i}"
-                ] = FeatureValue((x, y), [(None, None)], 0)
+            for mux in tile.switchMatrix.muxes:
+                if isinstance(mux.output, BelPort):
+                    outputName = f"c{c}.{mux.output.prefix}{mux.output.name}"
+                else:
+                    outputName = f"c{c}.{mux.output.name}"
+
+                inputNames = []
+                for i in mux.inputs:
+                    if isinstance(i, BelPort):
+                        inputNames.append(f"c{c}.{i.prefix}{i.name}")
+                    else:
+                        inputNames.append(f"c{c}.{i.name}")
+
+                if mux.width == 1:
+                    if len(mux.inputs) == 1:
+                        # This is a wire
+                        featureToBitString[
+                            f"X{x}Y{y}.{outputName}.{mux.inputs[0].name}"
+                        ] = FeatureValue((x, y), ((None, None),), 0)
+                        continue
+
+                    multiBitIndex = tuple(
+                        [
+                            next(indexCounter)
+                            for _ in range(len(mux.inputs).bit_length() - 1)
+                        ]
+                    )
+                    for i, input in enumerate(reversed(inputNames)):
+                        featureToBitString[f"X{x}Y{y}.c{c}.{outputName}.{input}"] = (
+                            FeatureValue((x, y), multiBitIndex, i)
+                        )
+                else:
+                    if len(mux.inputs) == 1:
+                        # This is a wire
+                        for w in range(mux.width):
+                            featureToBitString[
+                                f"X{x}Y{y}.{outputName}__{w}.{inputNames[0]}__{w}"
+                            ] = FeatureValue((x, y), ((None, None),), 0)
+                        continue
+
+                    multiBitIndex = tuple(
+                        [
+                            next(indexCounter)
+                            for _ in range(len(mux.inputs).bit_length() - 1)
+                        ]
+                    )
+                    for i, input in enumerate(reversed(inputNames)):
+                        for w in range(mux.width):
+                            featureToBitString[
+                                f"X{x}Y{y}.{outputName}__{w}.{input}__{w}"
+                            ] = FeatureValue((x, y), multiBitIndex, i)
+
+            for wire in tile.wireTypes:
+                for i in range(wire.wireCount):
+                    featureToBitString[
+                        f"X{x}Y{y}.c{c}.{wire.sourcePort.name}__{i}.{wire.destinationPort.name}__{i}"
+                    ] = FeatureValue((x, y), [(None, None)], 0)
 
     return featureToBitString

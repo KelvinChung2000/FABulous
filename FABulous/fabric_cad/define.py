@@ -7,11 +7,11 @@ FrameIdx = int
 BitIdx = int
 
 
-@dataclass(slots=True)
+@dataclass(slots=True, frozen=True)
 class FeatureValue:
     tileLoc: Loc
-    bitPosition: list[tuple[FrameIdx, BitIdx] | tuple[None, None]]
-    value: int
+    bitPosition: tuple[tuple[FrameIdx, BitIdx], ...] | tuple[tuple[None, None]]
+    value: int | None
 
 
 @dataclass

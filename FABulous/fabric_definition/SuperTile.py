@@ -26,6 +26,7 @@ class SuperTile:
     tiles: list[Tile]
     tileMap: list[list[Tile]]
     bels: list[Bel] = field(default_factory=list)
+    configBits: int = 0
     withUserCLK: bool = False
 
     def getPortsAroundTile(self) -> dict[str, list[list[Port]]]:

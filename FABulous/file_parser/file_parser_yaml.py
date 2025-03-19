@@ -310,7 +310,6 @@ def parseTileYAML(
 
     if mPath := data.get("MATRIX", None):
         matrixDir = fileName.parent.joinpath(mPath)
-        configBit = 0
         match matrixDir.suffix:
             case ".list":
                 sm = SwitchMatrix()

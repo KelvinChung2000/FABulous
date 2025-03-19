@@ -19,7 +19,7 @@ if(EMULATION_ENABLE == 0) begin
 end
 else begin
 assign ConfigBits = EMULATION_CONFIG;
-assign ConfigBits_N = EMULATION_CONFIG;
+assign ConfigBits_N = ~EMULATION_CONFIG;
 end
 
 endgenerate

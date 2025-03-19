@@ -24,7 +24,6 @@ def bitstringToBytes(s):
 
 def genBitstream(fabric: Fabric, fasmFile: Path, featureMap: FeatureMap, dest: Path):
     fasm: list[FASMFeature] = parseFASM(fasmFile)
-    print("FASM parsed")
     bitstream: dict[Loc, list] = {}
     for (x, y), _ in fabric.getFlattenFabric():
         bitstream[(x, y)] = [

@@ -16,14 +16,16 @@ def generateTile(codeGen: CodeGenerator, fabric: Fabric, tile: Tile):
                 fabric.maxFramesPerCol,
             )
             frameBitsPerRow = pr.Parameter("FrameBitsPerRow", fabric.frameBitsPerRow)
-
             if tile.configBits > 0:
                 NoConfigBitsParam = pr.Parameter("NoConfigBits", tile.configBits)
             pr.Comment("Emulation Parameters")
             emuEn = pr.Parameter("EMULATION_ENABLE", 0)
             emuCfg = pr.Parameter("EMULATION_CONFIG", 0)
+            xCord = pr.Parameter("X_CORD", -1)
+            yCord = pr.Parameter("Y_CORD", -1)
 
         portMapping: Mapping[TilePort | Port, Value] = {}
+        externalBelPortMapping: Mapping[BelPort, Value] = {}
         with module.PortRegion() as pr:
             for side, ports in tile.getTilePortGrouped().items():
                 pr.Comment(f"{side.name}")
@@ -35,21 +37,22 @@ def generateTile(codeGen: CodeGenerator, fabric: Fabric, tile: Tile):
 
             for bel in tile.bels:
                 for p in bel.externalInputs:
-                    pr.Port(p.name, p.ioDirection, p.width)
+                    externalBelPortMapping[p] = pr.Port(
+                        f"{p.prefix}{p.name}", p.ioDirection, p.width
+                    )
                 for p in bel.externalOutputs:
-                    pr.Port(p.name, p.ioDirection, p.width)
+                    externalBelPortMapping[p] = pr.Port(
+                        f"{p.prefix}{p.name}", p.ioDirection, p.width
+                    )
 
             userClkIn = pr.Port("UserCLK", IO.INPUT)
-            userClkOut = pr.Port("UserCLKo", IO.OUTPUT)
+            userClkOut = pr.Port("UserCLK_o", IO.OUTPUT)
 
             if fabric.configBitMode == ConfigBitMode.FRAME_BASED:
-                if tile.configBits > 0:
-                    frameData = pr.Port("FrameData", IO.INPUT, frameBitsPerRow - 1)
-                    frameDataOut = pr.Port(
-                        "FrameData_O", IO.OUTPUT, frameBitsPerRow - 1
-                    )
+                frameData = pr.Port("FrameData", IO.INPUT, frameBitsPerRow - 1)
+                frameDataOut = pr.Port("FrameData_o", IO.OUTPUT, frameBitsPerRow - 1)
                 frameStrobe = pr.Port("FrameStrobe", IO.INPUT, maxFramePerCol - 1)
-                frameStrobeOut = pr.Port("FrameStrobe_O", IO.OUTPUT, maxFramePerCol - 1)
+                frameStrobeOut = pr.Port("FrameStrobe_o", IO.OUTPUT, maxFramePerCol - 1)
 
             else:
                 pr.Port("MODE", IO.INPUT)
@@ -63,9 +66,7 @@ def generateTile(codeGen: CodeGenerator, fabric: Fabric, tile: Tile):
             belPortMapping: Mapping[BelPort, Value] = {}
             repeatSet = set()
             for bel in tile.bels:
-                for port in (
-                    bel.inputs + bel.outputs + bel.externalInputs + bel.externalOutputs
-                ):
+                for port in bel.inputs + bel.outputs:
                     sig = f"{bel.prefix}{port.name}"
                     if sig in repeatSet:
                         raise ValueError(
@@ -74,6 +75,15 @@ def generateTile(codeGen: CodeGenerator, fabric: Fabric, tile: Tile):
                     sigValue = lr.Signal(sig, port.width)
                     repeatSet.add(sig)
                     belPortMapping[port] = sigValue
+
+                for port in bel.externalInputs + bel.externalOutputs:
+                    sig = f"{port.prefix}{port.name}"
+                    if sig in repeatSet:
+                        raise ValueError(
+                            f"Detected repeat naming of port in tile {tile.name} for bel {bel.name} for port {sig}"
+                        )
+                    repeatSet.add(sig)
+                    belPortMapping[port] = externalBelPortMapping[port]
 
             sharePortDict: Mapping[str, Value] = {}
             for bel in tile.bels:
@@ -212,6 +222,8 @@ def generateTile(codeGen: CodeGenerator, fabric: Fabric, tile: Tile):
                     [
                         lr.ConnectPair("EMULATION_ENABLE", emuEn),
                         lr.ConnectPair("EMULATION_CONFIG", emuCfg),
+                        lr.ConnectPair("X_CORD", xCord),
+                        lr.ConnectPair("Y_CORD", yCord),
                     ],
                 )
 

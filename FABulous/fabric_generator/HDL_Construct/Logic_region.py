@@ -46,7 +46,7 @@ class LogicRegion(Region):
         self.container.append(_o)
         return Value(name, bits, isSignal=True)
 
-    def Assign(self, dst: Value, src: Value):
+    def Assign(self, dst: Value, src: Value | int):
         _o = self._Assign(dst, src, self._writer)
         self.container.append(_o)
         return _o
@@ -58,6 +58,19 @@ class LogicRegion(Region):
 
     def Concat(self, *args):
         return self._Concat(*args, writer=self._writer)
+
+    def ReadMem(
+        self,
+        file: Value | str,
+        dst: str,
+        width: int,
+        depth: int,
+        start: int = 0,
+        end: int = 0,
+    ):
+        _o = self._ReadMem(file, dst, self._writer, width, depth, start, end)
+        self.container.append(_o)
+        return Value(dst, depth, isSignal=True)
 
     def InitModule(
         self,
@@ -95,6 +108,16 @@ class LogicRegion(Region):
         from FABulous.fabric_generator.HDL_Construct.IfElse_region import IfElseRegion
 
         r = IfElseRegion(cond, [], [], self._writer, self.indent)
+        try:
+            yield r
+        finally:
+            self.container.append(r)
+
+    @contextmanager
+    def Initial(self):
+        from FABulous.fabric_generator.HDL_Construct.Initial_region import InitialRegion
+
+        r = InitialRegion([], self._writer, self.indent + self.indentCount)
         try:
             yield r
         finally:
@@ -162,11 +185,13 @@ class LogicRegion(Region):
     @dataclass
     class _Assign:
         dst: Value
-        src: Value
+        src: Value | int
         writer: WriterType
 
         def __str__(self) -> str:
             if self.writer == WriterType.VERILOG:
+                if isinstance(self.src, int):
+                    return f"assign {self.dst} = {max(int(self.dst.bitWidth), 1)}'d{self.src};"
                 return f"assign {self.dst} = {self.src};"
             else:
                 return f"{self.dst} <= {self.src};"
@@ -219,3 +244,28 @@ class LogicRegion(Region):
         @property
         def value(self) -> str:
             return self.__str__()
+
+    @dataclass
+    class _ReadMem:
+        file: Value | str
+        dst: str
+        writer: WriterType
+        width: int
+        depth: int
+        start: int = 0
+        end: int = 0
+
+        def __str__(self) -> str:
+            if self.writer == WriterType.VERILOG:
+                if isinstance(self.file, str):
+                    return (
+                        f"reg [{self.width - 1}:0] {self.dst} [0:{self.depth-1}];\n"
+                        f'initial $readmemh("{self.file}", {self.dst});'
+                    )
+                else:
+                    return (
+                        f"reg [{self.width - 1}:0] {self.dst} [0:{self.depth - 1}];\n"
+                        f"initial $readmemh({self.file}, {self.dst});"
+                    )
+            else:
+                raise NotImplementedError

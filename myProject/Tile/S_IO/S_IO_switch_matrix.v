@@ -2,10 +2,10 @@ module S_IO_switch_matrix #(
     parameter NoConfigBits = 0
 )
 (
-    output [31:0] out0,
-    output [31:0] S_from_fabric,
-    input [31:0] S_to_fabric,
-    input [31:0] in0
+    output reg[31:0] out0,
+    output reg[31:0] S_from_fabric,
+    input wire[31:0] S_to_fabric,
+    input wire[31:0] in0
 );
 
 localparam GND = 32'd0;

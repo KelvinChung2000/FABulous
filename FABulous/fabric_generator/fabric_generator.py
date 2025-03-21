@@ -1,31 +1,23 @@
 from collections import defaultdict
-from pathlib import Path
 from typing import Mapping
+
+from numpy import flip
 
 from FABulous.fabric_definition.define import IO, ConfigBitMode, Loc, Side
 from FABulous.fabric_definition.Fabric import Fabric
 from FABulous.fabric_definition.Port import BelPort
 from FABulous.fabric_generator.code_generator_2 import CodeGenerator
 from FABulous.fabric_generator.HDL_Construct.Value import Value
-from FABulous.file_parser.file_parser_yaml import parseFabricYAML
 
 
 def generateFabric(codeGen: CodeGenerator, fabric: Fabric):
-    bitStreamMap = {}
-    count = 0
-    for x in range(fabric.numberOfColumns):
-        for y in range(fabric.numberOfRows):
-            if t := fabric[(x, y)]:
-                bitStreamMap[(x, y)] = (count, count + t.configBits)
-                count += t.configBits
-
     with codeGen.Module(fabric.name) as m:
         with m.ParameterRegion() as pr:
-            maxFramePerCol = pr.Parameter("MaxFramePerCol", fabric.maxFramesPerCol)
+            maxFramePerCol = pr.Parameter("MaxFramesPerCol", fabric.maxFramesPerCol)
             frameBitsPerRow = pr.Parameter("FrameBitsPerRow", fabric.frameBitsPerRow)
             pr.Comment("Emulation parameter")
             emuEn = pr.Parameter("EMULATION_ENABLE", 0)
-            emuCfg = pr.Parameter("EMULATION_CONFIG", 0)
+            emuCfg = pr.Parameter("EMULATION_CONFIG", Value('""', 1, False))
 
         externalSignalMapping: Mapping[Loc, Mapping[BelPort, Value]] = {}
         with m.PortRegion() as pr:
@@ -60,8 +52,6 @@ def generateFabric(codeGen: CodeGenerator, fabric: Fabric):
             userClk = pr.Port("UserCLK", IO.INPUT)
 
         with m.LogicRegion() as lr:
-            cfg = lr.Signal("cfg")
-            lr.Assign(cfg, emuCfg)
             clkWireInMapping: Mapping[Loc, Value] = {}
             clkWireOutMapping: Mapping[Loc, Value] = {}
             lr.Comment("User Clock wire")
@@ -204,7 +194,7 @@ def generateFabric(codeGen: CodeGenerator, fabric: Fabric):
                             ),
                         ],
                         [
-                            lr.ConnectPair("MaxFramePerCol", maxFramePerCol),
+                            lr.ConnectPair("MaxFramesPerCol", maxFramePerCol),
                             lr.ConnectPair("FrameBitsPerRow", frameBitsPerRow),
                         ],
                     )
@@ -241,13 +231,6 @@ def generateFabric(codeGen: CodeGenerator, fabric: Fabric):
                                     externalSignalMapping[(x, y)][port],
                                 )
                             )
-
-                    cfgRange = bitStreamMap[(x, y)]
-                    if cfgRange[1] - cfgRange[0] > 0:
-                        c = cfg[cfgRange[0] : cfgRange[1]]
-                    else:
-                        c = 0
-
                     lr.InitModule(
                         tile.name,
                         f"{tile.name}_Tile_X{x}Y{y}",
@@ -263,10 +246,11 @@ def generateFabric(codeGen: CodeGenerator, fabric: Fabric):
                             ),
                         ],
                         [
-                            lr.ConnectPair("MaxFramePerCol", maxFramePerCol),
+                            lr.ConnectPair("MaxFramesPerCol", maxFramePerCol),
                             lr.ConnectPair("FrameBitsPerRow", frameBitsPerRow),
-                            lr.ConnectPair("NoConfigBits", tile.configBits),
                             lr.ConnectPair("EMULATION_ENABLE", emuEn),
-                            lr.ConnectPair("EMULATION_CONFIG", c),
+                            lr.ConnectPair("EMULATION_CONFIG", emuCfg),
+                            lr.ConnectPair("X_CORD", x),
+                            lr.ConnectPair("Y_CORD", y),
                         ],
                     )

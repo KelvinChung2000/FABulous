@@ -16,7 +16,7 @@ def generateBitsStreamSpec(fabric: Fabric) -> FeatureMap:
     """
 
     featureToBitString: Mapping[str, FeatureValue] = {}
-    for (x, y), tile in fabric.getFlattenFabric():
+    for (x, y), tile in fabric:
         if tile is None:
             continue
 
@@ -114,6 +114,6 @@ def generateBitsStreamSpec(fabric: Fabric) -> FeatureMap:
                 for i in range(wire.wireCount):
                     featureToBitString[
                         f"X{x}Y{y}.c{c}.{wire.sourcePort.name}__{i}.{wire.destinationPort.name}__{i}"
-                    ] = FeatureValue((x, y), [(None, None)], 0)
+                    ] = FeatureValue((x, y), ((None, None),), 0)
 
     return featureToBitString

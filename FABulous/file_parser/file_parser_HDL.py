@@ -173,16 +173,12 @@ def parseBelFile(
             externalPort.append(port)
         elif FABulousPortType.CONFIG_BIT in attributes:
             features = details.get("attributes", {}).get("FEATURE", "")
-            features = features.split(";")
+            features = list(filter(lambda x: x != "", features.split(";")))
             featureType = attributes - set(["FABulous", "CONFIG_BIT", "src", "FEATURE"])
             if len(features) == 0:
                 raise ValueError(
                     f"CONFIG_BIT port and {net} in file {filename} must have at least one feature."
                 )
-            # if len(featureType) != 1:
-            #     raise ValueError(
-            #         f"CONFIG_BIT port and {net} in file {filename} must have exactly one feature type."
-            #     )
             if ports[net] != IO.INPUT:
                 raise ValueError(
                     f"CONFIG_BIT port {net} in file {filename} must be an input port."
@@ -213,9 +209,15 @@ def parseBelFile(
                     sharedWith=details.get("attributes", {}).get("SHARED_WITH", ""),
                 )
             )
-
+        elif FABulousPortType.CONTROL in attributes:
+            if port.width != 1:
+                raise ValueError(
+                    f"Control port {net} in file {filename} must have a width of 1."
+                )
+            internalPort.append(port)
         else:
             internalPort.append(port)
+
     return Bel(
         src=filename,
         prefix=belPrefix,

@@ -56,4 +56,4 @@ class ParameterRegion(Region):
     def Parameter(self, name: str, value: Value | int):
         _o = self._Parameter(name, value, writer=self._writer)
         self.container.append(_o)
-        return Value(name, 1, isSignal=False)
+        return Value(name, 1, isSignal=True)

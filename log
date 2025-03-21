@@ -1,934 +1,280 @@
-16:15:28 | INFO | Running mapping for /home/kelvin/MachSuite/benchmark/dfg/aes_aes/
-16:15:28 | INFO | Running mapping for /home/kelvin/MachSuite/benchmark/dfg/fft_transpose/
-16:15:28 | INFO | Running mapping for /home/kelvin/MachSuite/benchmark/dfg/gemm_blocked/
-16:15:28 | INFO | Running mapping for /home/kelvin/MachSuite/benchmark/dfg/bfs_queue/
-16:15:28 | INFO | Running mapping for /home/kelvin/MachSuite/benchmark/dfg/fft_transpose/Loop2/fft_transpose_dfg_0.dot
-16:15:28 | INFO | II: 4
-16:15:28 | INFO | Number of unique memory: 2
-16:15:28 | INFO | Name of memory: {'%data_y', '%invariant.gep.i'}
-16:15:28 | INFO | Dot to Verilog
-16:15:28 | INFO | Running mapping for /home/kelvin/MachSuite/benchmark/dfg/gemm_blocked/Loop0/gemm_blocked_dfg_0.dot
-16:15:28 | INFO | II: 4
-16:15:28 | INFO | Number of unique memory: 2
-16:15:28 | INFO | Name of memory: {'%prod', '%gep'}
-16:15:28 | INFO | Dot to Verilog
-16:15:28 | INFO | Running mapping for /home/kelvin/MachSuite/benchmark/dfg/bfs_queue/Loop0/bfs_queue_dfg_2.dot
-16:15:28 | INFO | II: 4
-16:15:28 | INFO | Number of unique memory: 4
-16:15:28 | INFO | Name of memory: {'%edges', '%level_counts', '%queue', '%level'}
-16:15:28 | INFO | Dot to Verilog
-16:15:28 | INFO | Running mapping for /home/kelvin/MachSuite/benchmark/dfg/aes_aes/Loop2/aes_aes_dfg_0.dot
-16:15:28 | INFO | II: 4
-16:15:28 | INFO | Number of unique memory: 1
-16:15:28 | INFO | Name of memory: {'%buf'}
-16:15:28 | INFO | Dot to Verilog
-16:15:28 | INFO | Start init mapping
-16:15:28 | INFO | Synthesising
-16:15:28 | INFO | yosys -q /home/kelvin/MachSuite/benchmark/dfg/fft_transpose/Loop2/fft_transpose_dfg_0.v /home/kelvin/FABulous_fork/myProject/PnR/synth.ys -o /home/kelvin/MachSuite/benchmark/dfg/fft_transpose/Loop2/fft_transpose_dfg_0.json
-16:15:28 | INFO | Start init mapping
-16:15:28 | INFO | Synthesising
-16:15:28 | INFO | yosys -q /home/kelvin/MachSuite/benchmark/dfg/gemm_blocked/Loop0/gemm_blocked_dfg_0.v /home/kelvin/FABulous_fork/myProject/PnR/synth.ys -o /home/kelvin/MachSuite/benchmark/dfg/gemm_blocked/Loop0/gemm_blocked_dfg_0.json
-16:15:28 | INFO | nextpnr-himbaechel -q --chipdb /home/kelvin/FABulous_fork/myProject/.FABulous/eFPGA.bit --device FABulous --json /home/kelvin/MachSuite/benchmark/dfg/fft_transpose/Loop2/fft_transpose_dfg_0.json --write /home/kelvin/MachSuite/benchmark/dfg/fft_transpose/Loop2/fft_transpose_dfg_0_routed.json -o minII=2 -o placeTrial=200 --placer-heap-export-init-placement /home/kelvin/MachSuite/benchmark/dfg/fft_transpose/Loop2/fft_transpose_dfg_0.csv
-16:15:28 | INFO | nextpnr-himbaechel -q --chipdb /home/kelvin/FABulous_fork/myProject/.FABulous/eFPGA.bit --device FABulous --json /home/kelvin/MachSuite/benchmark/dfg/gemm_blocked/Loop0/gemm_blocked_dfg_0.json --write /home/kelvin/MachSuite/benchmark/dfg/gemm_blocked/Loop0/gemm_blocked_dfg_0_routed.json -o minII=2 -o placeTrial=200 --placer-heap-export-init-placement /home/kelvin/MachSuite/benchmark/dfg/gemm_blocked/Loop0/gemm_blocked_dfg_0.csv
-16:15:28 | ERROR | Invalid number of inputs
-16:15:28 | INFO | Running mapping for /home/kelvin/MachSuite/benchmark/dfg/fft_strided/
-16:15:28 | INFO | Running mapping for /home/kelvin/MachSuite/benchmark/dfg/fft_strided/Loop0/fft_strided_dfg_3.dot
-16:15:28 | INFO | II: 4
-16:15:28 | INFO | Number of unique memory: 4
-16:15:28 | INFO | Name of memory: {'%real_twid', '%img_twid', '%real', '%img'}
-16:15:28 | INFO | Dot to Verilog
-16:15:28 | ERROR | Invalid number of inputs
-16:15:28 | INFO | Running mapping for /home/kelvin/MachSuite/benchmark/dfg/aes_aes/Loop4/aes_aes_dfg_0.dot
-16:15:28 | INFO | II: 4
-16:15:28 | INFO | Number of unique memory: 4
-16:15:28 | INFO | Name of memory: {'%arrayidx12.i', '%arrayidx9.i65', '%arrayidx.i64.reg2mem.0.arrayidx.i64.reload', '%buf'}
-16:15:28 | INFO | Dot to Verilog
-16:15:28 | INFO | Start init mapping
-16:15:28 | INFO | Synthesising
-16:15:28 | INFO | yosys -q /home/kelvin/MachSuite/benchmark/dfg/fft_strided/Loop0/fft_strided_dfg_3.v /home/kelvin/FABulous_fork/myProject/PnR/synth.ys -o /home/kelvin/MachSuite/benchmark/dfg/fft_strided/Loop0/fft_strided_dfg_3.json
-16:15:28 | ERROR | An error has been caught in function 'mapstar', process 'ForkPoolWorker-2' (1099434), thread 'MainThread' (129958224818176):
-Traceback (most recent call last):
-
-  File "/home/kelvin/FABulous_fork/myProject/PnR/runExperiment.py", line 157, in <module>
-    with Pool(4) as p:
-         └ <bound method BaseContext.Pool of <multiprocessing.context.DefaultContext object at 0x7632408d78f0>>
-
-  File "/usr/lib/python3.12/multiprocessing/context.py", line 119, in Pool
-    return Pool(processes, initializer, initargs, maxtasksperchild,
-           │    │          │            │         └ None
-           │    │          │            └ ()
-           │    │          └ None
-           │    └ 4
-           └ <class 'multiprocessing.pool.Pool'>
-  File "/usr/lib/python3.12/multiprocessing/pool.py", line 215, in __init__
-    self._repopulate_pool()
-    │    └ <function Pool._repopulate_pool at 0x76323f6dfba0>
-    └ <multiprocessing.pool.Pool state=INIT pool_size=1>
-  File "/usr/lib/python3.12/multiprocessing/pool.py", line 306, in _repopulate_pool
-    return self._repopulate_pool_static(self._ctx, self.Process,
-           │    │                       │    │     │    └ <staticmethod(<function Pool.Process at 0x76323f6df740>)>
-           │    │                       │    │     └ <multiprocessing.pool.Pool state=INIT pool_size=1>
-           │    │                       │    └ <multiprocessing.context.ForkContext object at 0x7632408d78c0>
-           │    │                       └ <multiprocessing.pool.Pool state=INIT pool_size=1>
-           │    └ <staticmethod(<function Pool._repopulate_pool_static at 0x76323f6dfc40>)>
-           └ <multiprocessing.pool.Pool state=INIT pool_size=1>
-  File "/usr/lib/python3.12/multiprocessing/pool.py", line 329, in _repopulate_pool_static
-    w.start()
-    │ └ <function BaseProcess.start at 0x7632408e0b80>
-    └ <ForkProcess name='ForkPoolWorker-2' parent=1099397 started daemon>
-  File "/usr/lib/python3.12/multiprocessing/process.py", line 121, in start
-    self._popen = self._Popen(self)
-    │    │        │    │      └ <ForkProcess name='ForkPoolWorker-2' parent=1099397 started daemon>
-    │    │        │    └ <staticmethod(<function ForkProcess._Popen at 0x76324074f560>)>
-    │    │        └ <ForkProcess name='ForkPoolWorker-2' parent=1099397 started daemon>
-    │    └ None
-    └ <ForkProcess name='ForkPoolWorker-2' parent=1099397 started daemon>
-  File "/usr/lib/python3.12/multiprocessing/context.py", line 282, in _Popen
-    return Popen(process_obj)
-           │     └ <ForkProcess name='ForkPoolWorker-2' parent=1099397 started daemon>
-           └ <class 'multiprocessing.popen_fork.Popen'>
-  File "/usr/lib/python3.12/multiprocessing/popen_fork.py", line 19, in __init__
-    self._launch(process_obj)
-    │    │       └ <ForkProcess name='ForkPoolWorker-2' parent=1099397 started daemon>
-    │    └ <function Popen._launch at 0x76323f706520>
-    └ <multiprocessing.popen_fork.Popen object at 0x76323f6f9a90>
-  File "/usr/lib/python3.12/multiprocessing/popen_fork.py", line 71, in _launch
-    code = process_obj._bootstrap(parent_sentinel=child_r)
-           │           │                          └ 15
-           │           └ <function BaseProcess._bootstrap at 0x7632408e1580>
-           └ <ForkProcess name='ForkPoolWorker-2' parent=1099397 started daemon>
-  File "/usr/lib/python3.12/multiprocessing/process.py", line 314, in _bootstrap
-    self.run()
-    │    └ <function BaseProcess.run at 0x7632408e0ae0>
-    └ <ForkProcess name='ForkPoolWorker-2' parent=1099397 started daemon>
-  File "/usr/lib/python3.12/multiprocessing/process.py", line 108, in run
-    self._target(*self._args, **self._kwargs)
-    │    │        │    │        │    └ {}
-    │    │        │    │        └ <ForkProcess name='ForkPoolWorker-2' parent=1099397 started daemon>
-    │    │        │    └ (<multiprocessing.queues.SimpleQueue object at 0x7632400ad910>, <multiprocessing.queues.SimpleQueue object at 0x76323f6d3aa0>...
-    │    │        └ <ForkProcess name='ForkPoolWorker-2' parent=1099397 started daemon>
-    │    └ <function worker at 0x76323f6df240>
-    └ <ForkProcess name='ForkPoolWorker-2' parent=1099397 started daemon>
-  File "/usr/lib/python3.12/multiprocessing/pool.py", line 125, in worker
-    result = (True, func(*args, **kwds))
-                    │     │       └ {}
-                    │     └ ((functools.partial(<function runMapping at 0x76323f6de700>, context=4, row=4, col=4), ('bfs_queue', 'fft_strided')),)
-                    └ <function mapstar at 0x76323f6dede0>
-> File "/usr/lib/python3.12/multiprocessing/pool.py", line 48, in mapstar
-    return list(map(*args))
-                     └ (functools.partial(<function runMapping at 0x76323f6de700>, context=4, row=4, col=4), ('bfs_queue', 'fft_strided'))
-
-  File "/home/kelvin/FABulous_fork/myProject/PnR/runExperiment.py", line 105, in runMapping
-    result = sp.run(cmd, check=True)
-             │  │   └ ['yosys', '-q', '/home/kelvin/MachSuite/benchmark/dfg/fft_strided/Loop0/fft_strided_dfg_3.v', '/home/kelvin/FABulous_fork/myP...
-             │  └ <function run at 0x7632408ddc60>
-             └ <module 'subprocess' from '/usr/lib/python3.12/subprocess.py'>
-
-  File "/usr/lib/python3.12/subprocess.py", line 571, in run
-    raise CalledProcessError(retcode, process.args,
-          │                  │        │       └ ['yosys', '-q', '/home/kelvin/MachSuite/benchmark/dfg/fft_strided/Loop0/fft_strided_dfg_3.v', '/home/kelvin/FABulous_fork/myP...
-          │                  │        └ <Popen: returncode: 1 args: ['yosys', '-q', '/home/kelvin/MachSuite/benchmar...>
-          │                  └ 1
-          └ <class 'subprocess.CalledProcessError'>
-
-subprocess.CalledProcessError: Command '['yosys', '-q', '/home/kelvin/MachSuite/benchmark/dfg/fft_strided/Loop0/fft_strided_dfg_3.v', '/home/kelvin/FABulous_fork/myProject/PnR/synth.ys', '-o', '/home/kelvin/MachSuite/benchmark/dfg/fft_strided/Loop0/fft_strided_dfg_3.json']' returned non-zero exit status 1.
-16:15:28 | INFO | Running mapping for /home/kelvin/MachSuite/benchmark/dfg/md_knn/
-16:15:28 | INFO | Running mapping for /home/kelvin/MachSuite/benchmark/dfg/md_knn/Loop0/md_knn_dfg_0.dot
-16:15:28 | INFO | II: 4
-16:15:28 | INFO | Number of unique memory: 4
-16:15:28 | INFO | Name of memory: {'%position_z', '%position_y', '%invariant.gep', '%position_x'}
-16:15:28 | INFO | Dot to Verilog
-16:15:28 | INFO | Start init mapping
-16:15:28 | INFO | Synthesising
-16:15:28 | INFO | yosys -q /home/kelvin/MachSuite/benchmark/dfg/md_knn/Loop0/md_knn_dfg_0.v /home/kelvin/FABulous_fork/myProject/PnR/synth.ys -o /home/kelvin/MachSuite/benchmark/dfg/md_knn/Loop0/md_knn_dfg_0.json
-16:15:28 | ERROR | An error has been caught in function 'mapstar', process 'ForkPoolWorker-2' (1099434), thread 'MainThread' (129958224818176):
-Traceback (most recent call last):
-
-  File "/home/kelvin/FABulous_fork/myProject/PnR/runExperiment.py", line 157, in <module>
-    with Pool(4) as p:
-         └ <bound method BaseContext.Pool of <multiprocessing.context.DefaultContext object at 0x7632408d78f0>>
-
-  File "/usr/lib/python3.12/multiprocessing/context.py", line 119, in Pool
-    return Pool(processes, initializer, initargs, maxtasksperchild,
-           │    │          │            │         └ None
-           │    │          │            └ ()
-           │    │          └ None
-           │    └ 4
-           └ <class 'multiprocessing.pool.Pool'>
-  File "/usr/lib/python3.12/multiprocessing/pool.py", line 215, in __init__
-    self._repopulate_pool()
-    │    └ <function Pool._repopulate_pool at 0x76323f6dfba0>
-    └ <multiprocessing.pool.Pool state=INIT pool_size=1>
-  File "/usr/lib/python3.12/multiprocessing/pool.py", line 306, in _repopulate_pool
-    return self._repopulate_pool_static(self._ctx, self.Process,
-           │    │                       │    │     │    └ <staticmethod(<function Pool.Process at 0x76323f6df740>)>
-           │    │                       │    │     └ <multiprocessing.pool.Pool state=INIT pool_size=1>
-           │    │                       │    └ <multiprocessing.context.ForkContext object at 0x7632408d78c0>
-           │    │                       └ <multiprocessing.pool.Pool state=INIT pool_size=1>
-           │    └ <staticmethod(<function Pool._repopulate_pool_static at 0x76323f6dfc40>)>
-           └ <multiprocessing.pool.Pool state=INIT pool_size=1>
-  File "/usr/lib/python3.12/multiprocessing/pool.py", line 329, in _repopulate_pool_static
-    w.start()
-    │ └ <function BaseProcess.start at 0x7632408e0b80>
-    └ <ForkProcess name='ForkPoolWorker-2' parent=1099397 started daemon>
-  File "/usr/lib/python3.12/multiprocessing/process.py", line 121, in start
-    self._popen = self._Popen(self)
-    │    │        │    │      └ <ForkProcess name='ForkPoolWorker-2' parent=1099397 started daemon>
-    │    │        │    └ <staticmethod(<function ForkProcess._Popen at 0x76324074f560>)>
-    │    │        └ <ForkProcess name='ForkPoolWorker-2' parent=1099397 started daemon>
-    │    └ None
-    └ <ForkProcess name='ForkPoolWorker-2' parent=1099397 started daemon>
-  File "/usr/lib/python3.12/multiprocessing/context.py", line 282, in _Popen
-    return Popen(process_obj)
-           │     └ <ForkProcess name='ForkPoolWorker-2' parent=1099397 started daemon>
-           └ <class 'multiprocessing.popen_fork.Popen'>
-  File "/usr/lib/python3.12/multiprocessing/popen_fork.py", line 19, in __init__
-    self._launch(process_obj)
-    │    │       └ <ForkProcess name='ForkPoolWorker-2' parent=1099397 started daemon>
-    │    └ <function Popen._launch at 0x76323f706520>
-    └ <multiprocessing.popen_fork.Popen object at 0x76323f6f9a90>
-  File "/usr/lib/python3.12/multiprocessing/popen_fork.py", line 71, in _launch
-    code = process_obj._bootstrap(parent_sentinel=child_r)
-           │           │                          └ 15
-           │           └ <function BaseProcess._bootstrap at 0x7632408e1580>
-           └ <ForkProcess name='ForkPoolWorker-2' parent=1099397 started daemon>
-  File "/usr/lib/python3.12/multiprocessing/process.py", line 314, in _bootstrap
-    self.run()
-    │    └ <function BaseProcess.run at 0x7632408e0ae0>
-    └ <ForkProcess name='ForkPoolWorker-2' parent=1099397 started daemon>
-  File "/usr/lib/python3.12/multiprocessing/process.py", line 108, in run
-    self._target(*self._args, **self._kwargs)
-    │    │        │    │        │    └ {}
-    │    │        │    │        └ <ForkProcess name='ForkPoolWorker-2' parent=1099397 started daemon>
-    │    │        │    └ (<multiprocessing.queues.SimpleQueue object at 0x7632400ad910>, <multiprocessing.queues.SimpleQueue object at 0x76323f6d3aa0>...
-    │    │        └ <ForkProcess name='ForkPoolWorker-2' parent=1099397 started daemon>
-    │    └ <function worker at 0x76323f6df240>
-    └ <ForkProcess name='ForkPoolWorker-2' parent=1099397 started daemon>
-  File "/usr/lib/python3.12/multiprocessing/pool.py", line 125, in worker
-    result = (True, func(*args, **kwds))
-                    │     │       └ {}
-                    │     └ ((functools.partial(<function runMapping at 0x76323f6de700>, context=4, row=4, col=4), ('md_knn', 'md_grid')),)
-                    └ <function mapstar at 0x76323f6dede0>
-> File "/usr/lib/python3.12/multiprocessing/pool.py", line 48, in mapstar
-    return list(map(*args))
-                     └ (functools.partial(<function runMapping at 0x76323f6de700>, context=4, row=4, col=4), ('md_knn', 'md_grid'))
-
-  File "/home/kelvin/FABulous_fork/myProject/PnR/runExperiment.py", line 105, in runMapping
-    result = sp.run(cmd, check=True)
-             │  │   └ ['yosys', '-q', '/home/kelvin/MachSuite/benchmark/dfg/md_knn/Loop0/md_knn_dfg_0.v', '/home/kelvin/FABulous_fork/myProject/PnR...
-             │  └ <function run at 0x7632408ddc60>
-             └ <module 'subprocess' from '/usr/lib/python3.12/subprocess.py'>
-
-  File "/usr/lib/python3.12/subprocess.py", line 571, in run
-    raise CalledProcessError(retcode, process.args,
-          │                  │        │       └ ['yosys', '-q', '/home/kelvin/MachSuite/benchmark/dfg/md_knn/Loop0/md_knn_dfg_0.v', '/home/kelvin/FABulous_fork/myProject/PnR...
-          │                  │        └ <Popen: returncode: 1 args: ['yosys', '-q', '/home/kelvin/MachSuite/benchmar...>
-          │                  └ 1
-          └ <class 'subprocess.CalledProcessError'>
-
-subprocess.CalledProcessError: Command '['yosys', '-q', '/home/kelvin/MachSuite/benchmark/dfg/md_knn/Loop0/md_knn_dfg_0.v', '/home/kelvin/FABulous_fork/myProject/PnR/synth.ys', '-o', '/home/kelvin/MachSuite/benchmark/dfg/md_knn/Loop0/md_knn_dfg_0.json']' returned non-zero exit status 1.
-16:15:28 | INFO | Running mapping for /home/kelvin/MachSuite/benchmark/dfg/md_grid/
-16:15:28 | INFO | Running mapping for /home/kelvin/MachSuite/benchmark/dfg/md_grid/Loop0/md_grid_dfg_0.dot
-16:15:28 | INFO | II: 4
-16:15:28 | INFO | Number of unique memory: 1
-16:15:28 | INFO | Name of memory: {'%arrayidx79.us.us.us'}
-16:15:28 | INFO | Dot to Verilog
-16:15:28 | INFO | Start init mapping
-16:15:28 | INFO | Synthesising
-16:15:28 | INFO | yosys -q /home/kelvin/MachSuite/benchmark/dfg/aes_aes/Loop4/aes_aes_dfg_0.v /home/kelvin/FABulous_fork/myProject/PnR/synth.ys -o /home/kelvin/MachSuite/benchmark/dfg/aes_aes/Loop4/aes_aes_dfg_0.json
-16:15:28 | INFO | nextpnr-himbaechel -q --chipdb /home/kelvin/FABulous_fork/myProject/.FABulous/eFPGA.bit --device FABulous --json /home/kelvin/MachSuite/benchmark/dfg/aes_aes/Loop4/aes_aes_dfg_0.json --write /home/kelvin/MachSuite/benchmark/dfg/aes_aes/Loop4/aes_aes_dfg_0_routed.json -o minII=2 -o placeTrial=200 --placer-heap-export-init-placement /home/kelvin/MachSuite/benchmark/dfg/aes_aes/Loop4/aes_aes_dfg_0.csv
-16:15:28 | INFO | Start init mapping
-16:15:28 | INFO | Synthesising
-16:15:28 | INFO | yosys -q /home/kelvin/MachSuite/benchmark/dfg/md_grid/Loop0/md_grid_dfg_0.v /home/kelvin/FABulous_fork/myProject/PnR/synth.ys -o /home/kelvin/MachSuite/benchmark/dfg/md_grid/Loop0/md_grid_dfg_0.json
-16:15:28 | ERROR | An error has been caught in function 'mapstar', process 'ForkPoolWorker-2' (1099434), thread 'MainThread' (129958224818176):
-Traceback (most recent call last):
-
-  File "/home/kelvin/FABulous_fork/myProject/PnR/runExperiment.py", line 157, in <module>
-    with Pool(4) as p:
-         └ <bound method BaseContext.Pool of <multiprocessing.context.DefaultContext object at 0x7632408d78f0>>
-
-  File "/usr/lib/python3.12/multiprocessing/context.py", line 119, in Pool
-    return Pool(processes, initializer, initargs, maxtasksperchild,
-           │    │          │            │         └ None
-           │    │          │            └ ()
-           │    │          └ None
-           │    └ 4
-           └ <class 'multiprocessing.pool.Pool'>
-  File "/usr/lib/python3.12/multiprocessing/pool.py", line 215, in __init__
-    self._repopulate_pool()
-    │    └ <function Pool._repopulate_pool at 0x76323f6dfba0>
-    └ <multiprocessing.pool.Pool state=INIT pool_size=1>
-  File "/usr/lib/python3.12/multiprocessing/pool.py", line 306, in _repopulate_pool
-    return self._repopulate_pool_static(self._ctx, self.Process,
-           │    │                       │    │     │    └ <staticmethod(<function Pool.Process at 0x76323f6df740>)>
-           │    │                       │    │     └ <multiprocessing.pool.Pool state=INIT pool_size=1>
-           │    │                       │    └ <multiprocessing.context.ForkContext object at 0x7632408d78c0>
-           │    │                       └ <multiprocessing.pool.Pool state=INIT pool_size=1>
-           │    └ <staticmethod(<function Pool._repopulate_pool_static at 0x76323f6dfc40>)>
-           └ <multiprocessing.pool.Pool state=INIT pool_size=1>
-  File "/usr/lib/python3.12/multiprocessing/pool.py", line 329, in _repopulate_pool_static
-    w.start()
-    │ └ <function BaseProcess.start at 0x7632408e0b80>
-    └ <ForkProcess name='ForkPoolWorker-2' parent=1099397 started daemon>
-  File "/usr/lib/python3.12/multiprocessing/process.py", line 121, in start
-    self._popen = self._Popen(self)
-    │    │        │    │      └ <ForkProcess name='ForkPoolWorker-2' parent=1099397 started daemon>
-    │    │        │    └ <staticmethod(<function ForkProcess._Popen at 0x76324074f560>)>
-    │    │        └ <ForkProcess name='ForkPoolWorker-2' parent=1099397 started daemon>
-    │    └ None
-    └ <ForkProcess name='ForkPoolWorker-2' parent=1099397 started daemon>
-  File "/usr/lib/python3.12/multiprocessing/context.py", line 282, in _Popen
-    return Popen(process_obj)
-           │     └ <ForkProcess name='ForkPoolWorker-2' parent=1099397 started daemon>
-           └ <class 'multiprocessing.popen_fork.Popen'>
-  File "/usr/lib/python3.12/multiprocessing/popen_fork.py", line 19, in __init__
-    self._launch(process_obj)
-    │    │       └ <ForkProcess name='ForkPoolWorker-2' parent=1099397 started daemon>
-    │    └ <function Popen._launch at 0x76323f706520>
-    └ <multiprocessing.popen_fork.Popen object at 0x76323f6f9a90>
-  File "/usr/lib/python3.12/multiprocessing/popen_fork.py", line 71, in _launch
-    code = process_obj._bootstrap(parent_sentinel=child_r)
-           │           │                          └ 15
-           │           └ <function BaseProcess._bootstrap at 0x7632408e1580>
-           └ <ForkProcess name='ForkPoolWorker-2' parent=1099397 started daemon>
-  File "/usr/lib/python3.12/multiprocessing/process.py", line 314, in _bootstrap
-    self.run()
-    │    └ <function BaseProcess.run at 0x7632408e0ae0>
-    └ <ForkProcess name='ForkPoolWorker-2' parent=1099397 started daemon>
-  File "/usr/lib/python3.12/multiprocessing/process.py", line 108, in run
-    self._target(*self._args, **self._kwargs)
-    │    │        │    │        │    └ {}
-    │    │        │    │        └ <ForkProcess name='ForkPoolWorker-2' parent=1099397 started daemon>
-    │    │        │    └ (<multiprocessing.queues.SimpleQueue object at 0x7632400ad910>, <multiprocessing.queues.SimpleQueue object at 0x76323f6d3aa0>...
-    │    │        └ <ForkProcess name='ForkPoolWorker-2' parent=1099397 started daemon>
-    │    └ <function worker at 0x76323f6df240>
-    └ <ForkProcess name='ForkPoolWorker-2' parent=1099397 started daemon>
-  File "/usr/lib/python3.12/multiprocessing/pool.py", line 125, in worker
-    result = (True, func(*args, **kwds))
-                    │     │       └ {}
-                    │     └ ((functools.partial(<function runMapping at 0x76323f6de700>, context=4, row=4, col=4), ('md_knn', 'md_grid')),)
-                    └ <function mapstar at 0x76323f6dede0>
-> File "/usr/lib/python3.12/multiprocessing/pool.py", line 48, in mapstar
-    return list(map(*args))
-                     └ (functools.partial(<function runMapping at 0x76323f6de700>, context=4, row=4, col=4), ('md_knn', 'md_grid'))
-
-  File "/home/kelvin/FABulous_fork/myProject/PnR/runExperiment.py", line 105, in runMapping
-    result = sp.run(cmd, check=True)
-             │  │   └ ['yosys', '-q', '/home/kelvin/MachSuite/benchmark/dfg/md_grid/Loop0/md_grid_dfg_0.v', '/home/kelvin/FABulous_fork/myProject/P...
-             │  └ <function run at 0x7632408ddc60>
-             └ <module 'subprocess' from '/usr/lib/python3.12/subprocess.py'>
-
-  File "/usr/lib/python3.12/subprocess.py", line 571, in run
-    raise CalledProcessError(retcode, process.args,
-          │                  │        │       └ ['yosys', '-q', '/home/kelvin/MachSuite/benchmark/dfg/md_grid/Loop0/md_grid_dfg_0.v', '/home/kelvin/FABulous_fork/myProject/P...
-          │                  │        └ <Popen: returncode: 1 args: ['yosys', '-q', '/home/kelvin/MachSuite/benchmar...>
-          │                  └ 1
-          └ <class 'subprocess.CalledProcessError'>
-
-subprocess.CalledProcessError: Command '['yosys', '-q', '/home/kelvin/MachSuite/benchmark/dfg/md_grid/Loop0/md_grid_dfg_0.v', '/home/kelvin/FABulous_fork/myProject/PnR/synth.ys', '-o', '/home/kelvin/MachSuite/benchmark/dfg/md_grid/Loop0/md_grid_dfg_0.json']' returned non-zero exit status 1.
-16:15:28 | INFO | Running mapping for /home/kelvin/MachSuite/benchmark/dfg/nw_nw/
-16:15:28 | INFO | Running mapping for /home/kelvin/MachSuite/benchmark/dfg/nw_nw/Loop2/nw_nw_dfg_2.dot
-16:15:28 | INFO | II: 4
-16:15:28 | INFO | Number of unique memory: 4
-16:15:28 | INFO | Name of memory: {'%M', '%invariant.gep292', '%ptr', '%SEQA'}
-16:15:28 | INFO | Dot to Verilog
-16:15:28 | INFO | Start init mapping
-16:15:28 | INFO | Synthesising
-16:15:28 | INFO | yosys -q /home/kelvin/MachSuite/benchmark/dfg/nw_nw/Loop2/nw_nw_dfg_2.v /home/kelvin/FABulous_fork/myProject/PnR/synth.ys -o /home/kelvin/MachSuite/benchmark/dfg/nw_nw/Loop2/nw_nw_dfg_2.json
-16:15:28 | ERROR | An error has been caught in function 'mapstar', process 'ForkPoolWorker-2' (1099434), thread 'MainThread' (129958224818176):
-Traceback (most recent call last):
-
-  File "/home/kelvin/FABulous_fork/myProject/PnR/runExperiment.py", line 157, in <module>
-    with Pool(4) as p:
-         └ <bound method BaseContext.Pool of <multiprocessing.context.DefaultContext object at 0x7632408d78f0>>
-
-  File "/usr/lib/python3.12/multiprocessing/context.py", line 119, in Pool
-    return Pool(processes, initializer, initargs, maxtasksperchild,
-           │    │          │            │         └ None
-           │    │          │            └ ()
-           │    │          └ None
-           │    └ 4
-           └ <class 'multiprocessing.pool.Pool'>
-  File "/usr/lib/python3.12/multiprocessing/pool.py", line 215, in __init__
-    self._repopulate_pool()
-    │    └ <function Pool._repopulate_pool at 0x76323f6dfba0>
-    └ <multiprocessing.pool.Pool state=INIT pool_size=1>
-  File "/usr/lib/python3.12/multiprocessing/pool.py", line 306, in _repopulate_pool
-    return self._repopulate_pool_static(self._ctx, self.Process,
-           │    │                       │    │     │    └ <staticmethod(<function Pool.Process at 0x76323f6df740>)>
-           │    │                       │    │     └ <multiprocessing.pool.Pool state=INIT pool_size=1>
-           │    │                       │    └ <multiprocessing.context.ForkContext object at 0x7632408d78c0>
-           │    │                       └ <multiprocessing.pool.Pool state=INIT pool_size=1>
-           │    └ <staticmethod(<function Pool._repopulate_pool_static at 0x76323f6dfc40>)>
-           └ <multiprocessing.pool.Pool state=INIT pool_size=1>
-  File "/usr/lib/python3.12/multiprocessing/pool.py", line 329, in _repopulate_pool_static
-    w.start()
-    │ └ <function BaseProcess.start at 0x7632408e0b80>
-    └ <ForkProcess name='ForkPoolWorker-2' parent=1099397 started daemon>
-  File "/usr/lib/python3.12/multiprocessing/process.py", line 121, in start
-    self._popen = self._Popen(self)
-    │    │        │    │      └ <ForkProcess name='ForkPoolWorker-2' parent=1099397 started daemon>
-    │    │        │    └ <staticmethod(<function ForkProcess._Popen at 0x76324074f560>)>
-    │    │        └ <ForkProcess name='ForkPoolWorker-2' parent=1099397 started daemon>
-    │    └ None
-    └ <ForkProcess name='ForkPoolWorker-2' parent=1099397 started daemon>
-  File "/usr/lib/python3.12/multiprocessing/context.py", line 282, in _Popen
-    return Popen(process_obj)
-           │     └ <ForkProcess name='ForkPoolWorker-2' parent=1099397 started daemon>
-           └ <class 'multiprocessing.popen_fork.Popen'>
-  File "/usr/lib/python3.12/multiprocessing/popen_fork.py", line 19, in __init__
-    self._launch(process_obj)
-    │    │       └ <ForkProcess name='ForkPoolWorker-2' parent=1099397 started daemon>
-    │    └ <function Popen._launch at 0x76323f706520>
-    └ <multiprocessing.popen_fork.Popen object at 0x76323f6f9a90>
-  File "/usr/lib/python3.12/multiprocessing/popen_fork.py", line 71, in _launch
-    code = process_obj._bootstrap(parent_sentinel=child_r)
-           │           │                          └ 15
-           │           └ <function BaseProcess._bootstrap at 0x7632408e1580>
-           └ <ForkProcess name='ForkPoolWorker-2' parent=1099397 started daemon>
-  File "/usr/lib/python3.12/multiprocessing/process.py", line 314, in _bootstrap
-    self.run()
-    │    └ <function BaseProcess.run at 0x7632408e0ae0>
-    └ <ForkProcess name='ForkPoolWorker-2' parent=1099397 started daemon>
-  File "/usr/lib/python3.12/multiprocessing/process.py", line 108, in run
-    self._target(*self._args, **self._kwargs)
-    │    │        │    │        │    └ {}
-    │    │        │    │        └ <ForkProcess name='ForkPoolWorker-2' parent=1099397 started daemon>
-    │    │        │    └ (<multiprocessing.queues.SimpleQueue object at 0x7632400ad910>, <multiprocessing.queues.SimpleQueue object at 0x76323f6d3aa0>...
-    │    │        └ <ForkProcess name='ForkPoolWorker-2' parent=1099397 started daemon>
-    │    └ <function worker at 0x76323f6df240>
-    └ <ForkProcess name='ForkPoolWorker-2' parent=1099397 started daemon>
-  File "/usr/lib/python3.12/multiprocessing/pool.py", line 125, in worker
-    result = (True, func(*args, **kwds))
-                    │     │       └ {}
-                    │     └ ((functools.partial(<function runMapping at 0x76323f6de700>, context=4, row=4, col=4), ('nw_nw', 'sort_merge')),)
-                    └ <function mapstar at 0x76323f6dede0>
-> File "/usr/lib/python3.12/multiprocessing/pool.py", line 48, in mapstar
-    return list(map(*args))
-                     └ (functools.partial(<function runMapping at 0x76323f6de700>, context=4, row=4, col=4), ('nw_nw', 'sort_merge'))
-
-  File "/home/kelvin/FABulous_fork/myProject/PnR/runExperiment.py", line 105, in runMapping
-    result = sp.run(cmd, check=True)
-             │  │   └ ['yosys', '-q', '/home/kelvin/MachSuite/benchmark/dfg/nw_nw/Loop2/nw_nw_dfg_2.v', '/home/kelvin/FABulous_fork/myProject/PnR/s...
-             │  └ <function run at 0x7632408ddc60>
-             └ <module 'subprocess' from '/usr/lib/python3.12/subprocess.py'>
-
-  File "/usr/lib/python3.12/subprocess.py", line 571, in run
-    raise CalledProcessError(retcode, process.args,
-          │                  │        │       └ ['yosys', '-q', '/home/kelvin/MachSuite/benchmark/dfg/nw_nw/Loop2/nw_nw_dfg_2.v', '/home/kelvin/FABulous_fork/myProject/PnR/s...
-          │                  │        └ <Popen: returncode: 1 args: ['yosys', '-q', '/home/kelvin/MachSuite/benchmar...>
-          │                  └ 1
-          └ <class 'subprocess.CalledProcessError'>
-
-subprocess.CalledProcessError: Command '['yosys', '-q', '/home/kelvin/MachSuite/benchmark/dfg/nw_nw/Loop2/nw_nw_dfg_2.v', '/home/kelvin/FABulous_fork/myProject/PnR/synth.ys', '-o', '/home/kelvin/MachSuite/benchmark/dfg/nw_nw/Loop2/nw_nw_dfg_2.json']' returned non-zero exit status 1.
-16:15:28 | INFO | Running mapping for /home/kelvin/MachSuite/benchmark/dfg/sort_merge/
-16:15:28 | INFO | Running mapping for /home/kelvin/MachSuite/benchmark/dfg/sort_merge/Loop2/sort_merge_dfg_1.dot
-16:15:28 | INFO | II: 4
-16:15:28 | INFO | Number of unique memory: 2
-16:15:28 | INFO | Name of memory: {'%temp.i33', '%a'}
-16:15:28 | INFO | Dot to Verilog
-16:15:28 | INFO | Start init mapping
-16:15:28 | INFO | Synthesising
-16:15:28 | INFO | yosys -q /home/kelvin/MachSuite/benchmark/dfg/sort_merge/Loop2/sort_merge_dfg_1.v /home/kelvin/FABulous_fork/myProject/PnR/synth.ys -o /home/kelvin/MachSuite/benchmark/dfg/sort_merge/Loop2/sort_merge_dfg_1.json
-16:15:28 | INFO | nextpnr-himbaechel -q --chipdb /home/kelvin/FABulous_fork/myProject/.FABulous/eFPGA.bit --device FABulous --json /home/kelvin/MachSuite/benchmark/dfg/sort_merge/Loop2/sort_merge_dfg_1.json --write /home/kelvin/MachSuite/benchmark/dfg/sort_merge/Loop2/sort_merge_dfg_1_routed.json -o minII=2 -o placeTrial=200 --placer-heap-export-init-placement /home/kelvin/MachSuite/benchmark/dfg/sort_merge/Loop2/sort_merge_dfg_1.csv
-16:15:29 | INFO | Running mapping for /home/kelvin/MachSuite/benchmark/dfg/fft_transpose/Loop4/fft_transpose_dfg_0.dot
-16:15:29 | INFO | II: 4
-16:15:29 | INFO | Number of unique memory: 2
-16:15:29 | INFO | Name of memory: {'%invariant.gep.i1845', '%data_y'}
-16:15:29 | INFO | Dot to Verilog
-16:15:29 | INFO | Start init mapping
-16:15:29 | INFO | Synthesising
-16:15:29 | INFO | yosys -q /home/kelvin/MachSuite/benchmark/dfg/fft_transpose/Loop4/fft_transpose_dfg_0.v /home/kelvin/FABulous_fork/myProject/PnR/synth.ys -o /home/kelvin/MachSuite/benchmark/dfg/fft_transpose/Loop4/fft_transpose_dfg_0.json
-16:15:29 | INFO | nextpnr-himbaechel -q --chipdb /home/kelvin/FABulous_fork/myProject/.FABulous/eFPGA.bit --device FABulous --json /home/kelvin/MachSuite/benchmark/dfg/fft_transpose/Loop4/fft_transpose_dfg_0.json --write /home/kelvin/MachSuite/benchmark/dfg/fft_transpose/Loop4/fft_transpose_dfg_0_routed.json -o minII=2 -o placeTrial=200 --placer-heap-export-init-placement /home/kelvin/MachSuite/benchmark/dfg/fft_transpose/Loop4/fft_transpose_dfg_0.csv
-16:15:29 | INFO | Running mapping for /home/kelvin/MachSuite/benchmark/dfg/fft_transpose/Loop1/fft_transpose_dfg_0.dot
-16:15:29 | INFO | II: 4
-16:15:29 | INFO | Number of unique memory: 4
-16:15:29 | INFO | Name of memory: {'%work_y', '%data_y', '%work_x', '%data_x'}
-16:15:29 | INFO | Dot to Verilog
-16:15:29 | ERROR | Invalid number of inputs
-16:15:29 | INFO | Running mapping for /home/kelvin/MachSuite/benchmark/dfg/fft_transpose/Loop0/fft_transpose_dfg_0.dot
-16:15:29 | INFO | II: 4
-16:15:29 | INFO | Number of unique memory: 3
-16:15:29 | INFO | Name of memory: {'@__const.fft.reversed', '%data_y', '%data_x'}
-16:15:29 | INFO | Dot to Verilog
-16:15:29 | INFO | Start init mapping
-16:15:29 | INFO | Synthesising
-16:15:29 | INFO | yosys -q /home/kelvin/MachSuite/benchmark/dfg/fft_transpose/Loop0/fft_transpose_dfg_0.v /home/kelvin/FABulous_fork/myProject/PnR/synth.ys -o /home/kelvin/MachSuite/benchmark/dfg/fft_transpose/Loop0/fft_transpose_dfg_0.json
-16:15:29 | ERROR | An error has been caught in function 'mapstar', process 'ForkPoolWorker-3' (1099435), thread 'MainThread' (129958224818176):
-Traceback (most recent call last):
-
-  File "/home/kelvin/FABulous_fork/myProject/PnR/runExperiment.py", line 157, in <module>
-    with Pool(4) as p:
-         └ <bound method BaseContext.Pool of <multiprocessing.context.DefaultContext object at 0x7632408d78f0>>
-
-  File "/usr/lib/python3.12/multiprocessing/context.py", line 119, in Pool
-    return Pool(processes, initializer, initargs, maxtasksperchild,
-           │    │          │            │         └ None
-           │    │          │            └ ()
-           │    │          └ None
-           │    └ 4
-           └ <class 'multiprocessing.pool.Pool'>
-  File "/usr/lib/python3.12/multiprocessing/pool.py", line 215, in __init__
-    self._repopulate_pool()
-    │    └ <function Pool._repopulate_pool at 0x76323f6dfba0>
-    └ <multiprocessing.pool.Pool state=INIT pool_size=2>
-  File "/usr/lib/python3.12/multiprocessing/pool.py", line 306, in _repopulate_pool
-    return self._repopulate_pool_static(self._ctx, self.Process,
-           │    │                       │    │     │    └ <staticmethod(<function Pool.Process at 0x76323f6df740>)>
-           │    │                       │    │     └ <multiprocessing.pool.Pool state=INIT pool_size=2>
-           │    │                       │    └ <multiprocessing.context.ForkContext object at 0x7632408d78c0>
-           │    │                       └ <multiprocessing.pool.Pool state=INIT pool_size=2>
-           │    └ <staticmethod(<function Pool._repopulate_pool_static at 0x76323f6dfc40>)>
-           └ <multiprocessing.pool.Pool state=INIT pool_size=2>
-  File "/usr/lib/python3.12/multiprocessing/pool.py", line 329, in _repopulate_pool_static
-    w.start()
-    │ └ <function BaseProcess.start at 0x7632408e0b80>
-    └ <ForkProcess name='ForkPoolWorker-3' parent=1099397 started daemon>
-  File "/usr/lib/python3.12/multiprocessing/process.py", line 121, in start
-    self._popen = self._Popen(self)
-    │    │        │    │      └ <ForkProcess name='ForkPoolWorker-3' parent=1099397 started daemon>
-    │    │        │    └ <staticmethod(<function ForkProcess._Popen at 0x76324074f560>)>
-    │    │        └ <ForkProcess name='ForkPoolWorker-3' parent=1099397 started daemon>
-    │    └ None
-    └ <ForkProcess name='ForkPoolWorker-3' parent=1099397 started daemon>
-  File "/usr/lib/python3.12/multiprocessing/context.py", line 282, in _Popen
-    return Popen(process_obj)
-           │     └ <ForkProcess name='ForkPoolWorker-3' parent=1099397 started daemon>
-           └ <class 'multiprocessing.popen_fork.Popen'>
-  File "/usr/lib/python3.12/multiprocessing/popen_fork.py", line 19, in __init__
-    self._launch(process_obj)
-    │    │       └ <ForkProcess name='ForkPoolWorker-3' parent=1099397 started daemon>
-    │    └ <function Popen._launch at 0x76323f706520>
-    └ <multiprocessing.popen_fork.Popen object at 0x76323f6f9b50>
-  File "/usr/lib/python3.12/multiprocessing/popen_fork.py", line 71, in _launch
-    code = process_obj._bootstrap(parent_sentinel=child_r)
-           │           │                          └ 17
-           │           └ <function BaseProcess._bootstrap at 0x7632408e1580>
-           └ <ForkProcess name='ForkPoolWorker-3' parent=1099397 started daemon>
-  File "/usr/lib/python3.12/multiprocessing/process.py", line 314, in _bootstrap
-    self.run()
-    │    └ <function BaseProcess.run at 0x7632408e0ae0>
-    └ <ForkProcess name='ForkPoolWorker-3' parent=1099397 started daemon>
-  File "/usr/lib/python3.12/multiprocessing/process.py", line 108, in run
-    self._target(*self._args, **self._kwargs)
-    │    │        │    │        │    └ {}
-    │    │        │    │        └ <ForkProcess name='ForkPoolWorker-3' parent=1099397 started daemon>
-    │    │        │    └ (<multiprocessing.queues.SimpleQueue object at 0x7632400ad910>, <multiprocessing.queues.SimpleQueue object at 0x76323f6d3aa0>...
-    │    │        └ <ForkProcess name='ForkPoolWorker-3' parent=1099397 started daemon>
-    │    └ <function worker at 0x76323f6df240>
-    └ <ForkProcess name='ForkPoolWorker-3' parent=1099397 started daemon>
-  File "/usr/lib/python3.12/multiprocessing/pool.py", line 125, in worker
-    result = (True, func(*args, **kwds))
-                    │     │       └ {}
-                    │     └ ((functools.partial(<function runMapping at 0x76323f6de700>, context=4, row=4, col=4), ('fft_transpose', 'gemm_ncubed')),)
-                    └ <function mapstar at 0x76323f6dede0>
-> File "/usr/lib/python3.12/multiprocessing/pool.py", line 48, in mapstar
-    return list(map(*args))
-                     └ (functools.partial(<function runMapping at 0x76323f6de700>, context=4, row=4, col=4), ('fft_transpose', 'gemm_ncubed'))
-
-  File "/home/kelvin/FABulous_fork/myProject/PnR/runExperiment.py", line 105, in runMapping
-    result = sp.run(cmd, check=True)
-             │  │   └ ['yosys', '-q', '/home/kelvin/MachSuite/benchmark/dfg/fft_transpose/Loop0/fft_transpose_dfg_0.v', '/home/kelvin/FABulous_fork...
-             │  └ <function run at 0x7632408ddc60>
-             └ <module 'subprocess' from '/usr/lib/python3.12/subprocess.py'>
-
-  File "/usr/lib/python3.12/subprocess.py", line 571, in run
-    raise CalledProcessError(retcode, process.args,
-          │                  │        │       └ ['yosys', '-q', '/home/kelvin/MachSuite/benchmark/dfg/fft_transpose/Loop0/fft_transpose_dfg_0.v', '/home/kelvin/FABulous_fork...
-          │                  │        └ <Popen: returncode: 1 args: ['yosys', '-q', '/home/kelvin/MachSuite/benchmar...>
-          │                  └ 1
-          └ <class 'subprocess.CalledProcessError'>
-
-subprocess.CalledProcessError: Command '['yosys', '-q', '/home/kelvin/MachSuite/benchmark/dfg/fft_transpose/Loop0/fft_transpose_dfg_0.v', '/home/kelvin/FABulous_fork/myProject/PnR/synth.ys', '-o', '/home/kelvin/MachSuite/benchmark/dfg/fft_transpose/Loop0/fft_transpose_dfg_0.json']' returned non-zero exit status 1.
-16:15:29 | INFO | Running mapping for /home/kelvin/MachSuite/benchmark/dfg/gemm_ncubed/
-16:15:29 | INFO | Running mapping for /home/kelvin/MachSuite/benchmark/dfg/gemm_ncubed/Loop0/gemm_ncubed_dfg_0.dot
-16:15:29 | INFO | II: 4
-16:15:29 | INFO | Number of unique memory: 2
-16:15:29 | INFO | Name of memory: {'%invariant.gep70.1', '%15'}
-16:15:29 | INFO | Dot to Verilog
-16:15:29 | INFO | Start init mapping
-16:15:29 | INFO | Synthesising
-16:15:29 | INFO | yosys -q /home/kelvin/MachSuite/benchmark/dfg/gemm_ncubed/Loop0/gemm_ncubed_dfg_0.v /home/kelvin/FABulous_fork/myProject/PnR/synth.ys -o /home/kelvin/MachSuite/benchmark/dfg/gemm_ncubed/Loop0/gemm_ncubed_dfg_0.json
-16:15:29 | INFO | nextpnr-himbaechel -q --chipdb /home/kelvin/FABulous_fork/myProject/.FABulous/eFPGA.bit --device FABulous --json /home/kelvin/MachSuite/benchmark/dfg/gemm_ncubed/Loop0/gemm_ncubed_dfg_0.json --write /home/kelvin/MachSuite/benchmark/dfg/gemm_ncubed/Loop0/gemm_ncubed_dfg_0_routed.json -o minII=2 -o placeTrial=200 --placer-heap-export-init-placement /home/kelvin/MachSuite/benchmark/dfg/gemm_ncubed/Loop0/gemm_ncubed_dfg_0.csv
-16:15:34 | ERROR | Init Mapping Fail
-16:15:34 | INFO | Running mapping for /home/kelvin/MachSuite/benchmark/dfg/aes_aes/Loop1/aes_aes_dfg_0.dot
-16:15:34 | INFO | II: 4
-16:15:34 | INFO | Number of unique memory: 2
-16:15:34 | INFO | Name of memory: {'%arrayidx21', '%buf'}
-16:15:34 | INFO | Dot to Verilog
-16:15:34 | INFO | Start init mapping
-16:15:34 | INFO | Synthesising
-16:15:34 | INFO | yosys -q /home/kelvin/MachSuite/benchmark/dfg/aes_aes/Loop1/aes_aes_dfg_0.v /home/kelvin/FABulous_fork/myProject/PnR/synth.ys -o /home/kelvin/MachSuite/benchmark/dfg/aes_aes/Loop1/aes_aes_dfg_0.json
-16:15:34 | INFO | nextpnr-himbaechel -q --chipdb /home/kelvin/FABulous_fork/myProject/.FABulous/eFPGA.bit --device FABulous --json /home/kelvin/MachSuite/benchmark/dfg/aes_aes/Loop1/aes_aes_dfg_0.json --write /home/kelvin/MachSuite/benchmark/dfg/aes_aes/Loop1/aes_aes_dfg_0_routed.json -o minII=2 -o placeTrial=200 --placer-heap-export-init-placement /home/kelvin/MachSuite/benchmark/dfg/aes_aes/Loop1/aes_aes_dfg_0.csv
-16:15:34 | INFO | Running mapping for /home/kelvin/MachSuite/benchmark/dfg/aes_aes/Loop0/aes_aes_dfg_0.dot
-16:15:34 | INFO | II: 4
-16:15:34 | INFO | Number of unique memory: 2
-16:15:34 | INFO | Name of memory: {'%ctx', '%buf'}
-16:15:34 | INFO | Dot to Verilog
-16:15:34 | INFO | Start init mapping
-16:15:34 | INFO | Synthesising
-16:15:34 | INFO | yosys -q /home/kelvin/MachSuite/benchmark/dfg/aes_aes/Loop0/aes_aes_dfg_0.v /home/kelvin/FABulous_fork/myProject/PnR/synth.ys -o /home/kelvin/MachSuite/benchmark/dfg/aes_aes/Loop0/aes_aes_dfg_0.json
-16:15:34 | INFO | nextpnr-himbaechel -q --chipdb /home/kelvin/FABulous_fork/myProject/.FABulous/eFPGA.bit --device FABulous --json /home/kelvin/MachSuite/benchmark/dfg/aes_aes/Loop0/aes_aes_dfg_0.json --write /home/kelvin/MachSuite/benchmark/dfg/aes_aes/Loop0/aes_aes_dfg_0_routed.json -o minII=2 -o placeTrial=200 --placer-heap-export-init-placement /home/kelvin/MachSuite/benchmark/dfg/aes_aes/Loop0/aes_aes_dfg_0.csv
-16:15:35 | INFO | Running mapping for /home/kelvin/MachSuite/benchmark/dfg/aes_aes/Loop3/aes_aes_dfg_0.dot
-16:15:35 | INFO | II: 4
-16:15:35 | INFO | Number of unique memory: 2
-16:15:35 | INFO | Name of memory: {'%scevgep26', '%arrayidx13.i66'}
-16:15:35 | INFO | Dot to Verilog
-16:15:35 | INFO | Start init mapping
-16:15:35 | INFO | Synthesising
-16:15:35 | INFO | yosys -q /home/kelvin/MachSuite/benchmark/dfg/aes_aes/Loop3/aes_aes_dfg_0.v /home/kelvin/FABulous_fork/myProject/PnR/synth.ys -o /home/kelvin/MachSuite/benchmark/dfg/aes_aes/Loop3/aes_aes_dfg_0.json
-16:15:35 | INFO | nextpnr-himbaechel -q --chipdb /home/kelvin/FABulous_fork/myProject/.FABulous/eFPGA.bit --device FABulous --json /home/kelvin/MachSuite/benchmark/dfg/aes_aes/Loop3/aes_aes_dfg_0.json --write /home/kelvin/MachSuite/benchmark/dfg/aes_aes/Loop3/aes_aes_dfg_0_routed.json -o minII=2 -o placeTrial=200 --placer-heap-export-init-placement /home/kelvin/MachSuite/benchmark/dfg/aes_aes/Loop3/aes_aes_dfg_0.csv
-16:15:41 | INFO | Running mapping for /home/kelvin/MachSuite/benchmark/dfg/aes_aes/Loop5/aes_aes_dfg_0.dot
-16:15:41 | INFO | II: 4
-16:15:41 | INFO | Number of unique memory: 2
-16:15:41 | INFO | Name of memory: {'@sbox', '%buf'}
-16:15:41 | INFO | Dot to Verilog
-16:15:41 | INFO | Start init mapping
-16:15:41 | INFO | Synthesising
-16:15:41 | INFO | yosys -q /home/kelvin/MachSuite/benchmark/dfg/aes_aes/Loop5/aes_aes_dfg_0.v /home/kelvin/FABulous_fork/myProject/PnR/synth.ys -o /home/kelvin/MachSuite/benchmark/dfg/aes_aes/Loop5/aes_aes_dfg_0.json
-16:15:41 | ERROR | An error has been caught in function 'mapstar', process 'ForkPoolWorker-1' (1099433), thread 'MainThread' (129958224818176):
-Traceback (most recent call last):
-
-  File "/home/kelvin/FABulous_fork/myProject/PnR/runExperiment.py", line 157, in <module>
-    with Pool(4) as p:
-         └ <bound method BaseContext.Pool of <multiprocessing.context.DefaultContext object at 0x7632408d78f0>>
-
-  File "/usr/lib/python3.12/multiprocessing/context.py", line 119, in Pool
-    return Pool(processes, initializer, initargs, maxtasksperchild,
-           │    │          │            │         └ None
-           │    │          │            └ ()
-           │    │          └ None
-           │    └ 4
-           └ <class 'multiprocessing.pool.Pool'>
-  File "/usr/lib/python3.12/multiprocessing/pool.py", line 215, in __init__
-    self._repopulate_pool()
-    │    └ <function Pool._repopulate_pool at 0x76323f6dfba0>
-    └ <multiprocessing.pool.Pool state=INIT pool_size=0>
-  File "/usr/lib/python3.12/multiprocessing/pool.py", line 306, in _repopulate_pool
-    return self._repopulate_pool_static(self._ctx, self.Process,
-           │    │                       │    │     │    └ <staticmethod(<function Pool.Process at 0x76323f6df740>)>
-           │    │                       │    │     └ <multiprocessing.pool.Pool state=INIT pool_size=0>
-           │    │                       │    └ <multiprocessing.context.ForkContext object at 0x7632408d78c0>
-           │    │                       └ <multiprocessing.pool.Pool state=INIT pool_size=0>
-           │    └ <staticmethod(<function Pool._repopulate_pool_static at 0x76323f6dfc40>)>
-           └ <multiprocessing.pool.Pool state=INIT pool_size=0>
-  File "/usr/lib/python3.12/multiprocessing/pool.py", line 329, in _repopulate_pool_static
-    w.start()
-    │ └ <function BaseProcess.start at 0x7632408e0b80>
-    └ <ForkProcess name='ForkPoolWorker-1' parent=1099397 started daemon>
-  File "/usr/lib/python3.12/multiprocessing/process.py", line 121, in start
-    self._popen = self._Popen(self)
-    │    │        │    │      └ <ForkProcess name='ForkPoolWorker-1' parent=1099397 started daemon>
-    │    │        │    └ <staticmethod(<function ForkProcess._Popen at 0x76324074f560>)>
-    │    │        └ <ForkProcess name='ForkPoolWorker-1' parent=1099397 started daemon>
-    │    └ None
-    └ <ForkProcess name='ForkPoolWorker-1' parent=1099397 started daemon>
-  File "/usr/lib/python3.12/multiprocessing/context.py", line 282, in _Popen
-    return Popen(process_obj)
-           │     └ <ForkProcess name='ForkPoolWorker-1' parent=1099397 started daemon>
-           └ <class 'multiprocessing.popen_fork.Popen'>
-  File "/usr/lib/python3.12/multiprocessing/popen_fork.py", line 19, in __init__
-    self._launch(process_obj)
-    │    │       └ <ForkProcess name='ForkPoolWorker-1' parent=1099397 started daemon>
-    │    └ <function Popen._launch at 0x76323f706520>
-    └ <multiprocessing.popen_fork.Popen object at 0x76323f6f95e0>
-  File "/usr/lib/python3.12/multiprocessing/popen_fork.py", line 71, in _launch
-    code = process_obj._bootstrap(parent_sentinel=child_r)
-           │           │                          └ 13
-           │           └ <function BaseProcess._bootstrap at 0x7632408e1580>
-           └ <ForkProcess name='ForkPoolWorker-1' parent=1099397 started daemon>
-  File "/usr/lib/python3.12/multiprocessing/process.py", line 314, in _bootstrap
-    self.run()
-    │    └ <function BaseProcess.run at 0x7632408e0ae0>
-    └ <ForkProcess name='ForkPoolWorker-1' parent=1099397 started daemon>
-  File "/usr/lib/python3.12/multiprocessing/process.py", line 108, in run
-    self._target(*self._args, **self._kwargs)
-    │    │        │    │        │    └ {}
-    │    │        │    │        └ <ForkProcess name='ForkPoolWorker-1' parent=1099397 started daemon>
-    │    │        │    └ (<multiprocessing.queues.SimpleQueue object at 0x7632400ad910>, <multiprocessing.queues.SimpleQueue object at 0x76323f6d3aa0>...
-    │    │        └ <ForkProcess name='ForkPoolWorker-1' parent=1099397 started daemon>
-    │    └ <function worker at 0x76323f6df240>
-    └ <ForkProcess name='ForkPoolWorker-1' parent=1099397 started daemon>
-  File "/usr/lib/python3.12/multiprocessing/pool.py", line 125, in worker
-    result = (True, func(*args, **kwds))
-                    │     │       └ {}
-                    │     └ ((functools.partial(<function runMapping at 0x76323f6de700>, context=4, row=4, col=4), ('aes_aes', 'bfs_bulk')),)
-                    └ <function mapstar at 0x76323f6dede0>
-> File "/usr/lib/python3.12/multiprocessing/pool.py", line 48, in mapstar
-    return list(map(*args))
-                     └ (functools.partial(<function runMapping at 0x76323f6de700>, context=4, row=4, col=4), ('aes_aes', 'bfs_bulk'))
-
-  File "/home/kelvin/FABulous_fork/myProject/PnR/runExperiment.py", line 105, in runMapping
-    result = sp.run(cmd, check=True)
-             │  │   └ ['yosys', '-q', '/home/kelvin/MachSuite/benchmark/dfg/aes_aes/Loop5/aes_aes_dfg_0.v', '/home/kelvin/FABulous_fork/myProject/P...
-             │  └ <function run at 0x7632408ddc60>
-             └ <module 'subprocess' from '/usr/lib/python3.12/subprocess.py'>
-
-  File "/usr/lib/python3.12/subprocess.py", line 571, in run
-    raise CalledProcessError(retcode, process.args,
-          │                  │        │       └ ['yosys', '-q', '/home/kelvin/MachSuite/benchmark/dfg/aes_aes/Loop5/aes_aes_dfg_0.v', '/home/kelvin/FABulous_fork/myProject/P...
-          │                  │        └ <Popen: returncode: 1 args: ['yosys', '-q', '/home/kelvin/MachSuite/benchmar...>
-          │                  └ 1
-          └ <class 'subprocess.CalledProcessError'>
-
-subprocess.CalledProcessError: Command '['yosys', '-q', '/home/kelvin/MachSuite/benchmark/dfg/aes_aes/Loop5/aes_aes_dfg_0.v', '/home/kelvin/FABulous_fork/myProject/PnR/synth.ys', '-o', '/home/kelvin/MachSuite/benchmark/dfg/aes_aes/Loop5/aes_aes_dfg_0.json']' returned non-zero exit status 1.
-16:15:41 | INFO | Running mapping for /home/kelvin/MachSuite/benchmark/dfg/bfs_bulk/
-16:15:41 | INFO | Running mapping for /home/kelvin/MachSuite/benchmark/dfg/bfs_bulk/Loop0/bfs_bulk_dfg_0.dot
-16:15:41 | INFO | II: 4
-16:15:41 | INFO | Number of unique memory: 2
-16:15:41 | INFO | Name of memory: {'%edges', '%level'}
-16:15:41 | INFO | Dot to Verilog
-16:15:41 | INFO | Start init mapping
-16:15:41 | INFO | Synthesising
-16:15:41 | INFO | yosys -q /home/kelvin/MachSuite/benchmark/dfg/bfs_bulk/Loop0/bfs_bulk_dfg_0.v /home/kelvin/FABulous_fork/myProject/PnR/synth.ys -o /home/kelvin/MachSuite/benchmark/dfg/bfs_bulk/Loop0/bfs_bulk_dfg_0.json
-16:15:41 | INFO | nextpnr-himbaechel -q --chipdb /home/kelvin/FABulous_fork/myProject/.FABulous/eFPGA.bit --device FABulous --json /home/kelvin/MachSuite/benchmark/dfg/bfs_bulk/Loop0/bfs_bulk_dfg_0.json --write /home/kelvin/MachSuite/benchmark/dfg/bfs_bulk/Loop0/bfs_bulk_dfg_0_routed.json -o minII=2 -o placeTrial=200 --placer-heap-export-init-placement /home/kelvin/MachSuite/benchmark/dfg/bfs_bulk/Loop0/bfs_bulk_dfg_0.csv
-16:15:50 | ERROR | Init Mapping Fail
-16:15:50 | INFO | Running mapping for /home/kelvin/MachSuite/benchmark/dfg/sort_merge/Loop1/sort_merge_dfg_1.dot
-16:15:50 | INFO | II: 4
-16:15:50 | INFO | Number of unique memory: 2
-16:15:50 | INFO | Name of memory: {'%a', '%temp.i'}
-16:15:50 | INFO | Dot to Verilog
-16:15:50 | ERROR | Invalid number of inputs
-16:15:50 | INFO | Running mapping for /home/kelvin/MachSuite/benchmark/dfg/sort_merge/Loop0/sort_merge_dfg_1.dot
-16:15:50 | INFO | II: 4
-16:15:50 | INFO | Number of unique memory: 2
-16:15:50 | INFO | Name of memory: {'%a', '%temp.i'}
-16:15:50 | INFO | Dot to Verilog
-16:15:50 | INFO | Start init mapping
-16:15:50 | INFO | Synthesising
-16:15:50 | INFO | yosys -q /home/kelvin/MachSuite/benchmark/dfg/sort_merge/Loop0/sort_merge_dfg_1.v /home/kelvin/FABulous_fork/myProject/PnR/synth.ys -o /home/kelvin/MachSuite/benchmark/dfg/sort_merge/Loop0/sort_merge_dfg_1.json
-16:15:50 | INFO | nextpnr-himbaechel -q --chipdb /home/kelvin/FABulous_fork/myProject/.FABulous/eFPGA.bit --device FABulous --json /home/kelvin/MachSuite/benchmark/dfg/sort_merge/Loop0/sort_merge_dfg_1.json --write /home/kelvin/MachSuite/benchmark/dfg/sort_merge/Loop0/sort_merge_dfg_1_routed.json -o minII=2 -o placeTrial=200 --placer-heap-export-init-placement /home/kelvin/MachSuite/benchmark/dfg/sort_merge/Loop0/sort_merge_dfg_1.csv
-16:15:51 | INFO | Running mapping for /home/kelvin/MachSuite/benchmark/dfg/sort_radix/
-16:15:51 | INFO | Running mapping for /home/kelvin/MachSuite/benchmark/dfg/sort_radix/Loop2/sort_radix_dfg_1.dot
-16:15:51 | INFO | II: 4
-16:15:51 | INFO | Number of unique memory: 1
-16:15:51 | INFO | Name of memory: {'%invariant.gep97'}
-16:15:51 | INFO | Dot to Verilog
-16:15:51 | INFO | Start init mapping
-16:15:51 | INFO | Synthesising
-16:15:51 | INFO | yosys -q /home/kelvin/MachSuite/benchmark/dfg/sort_radix/Loop2/sort_radix_dfg_1.v /home/kelvin/FABulous_fork/myProject/PnR/synth.ys -o /home/kelvin/MachSuite/benchmark/dfg/sort_radix/Loop2/sort_radix_dfg_1.json
-16:15:51 | INFO | nextpnr-himbaechel -q --chipdb /home/kelvin/FABulous_fork/myProject/.FABulous/eFPGA.bit --device FABulous --json /home/kelvin/MachSuite/benchmark/dfg/sort_radix/Loop2/sort_radix_dfg_1.json --write /home/kelvin/MachSuite/benchmark/dfg/sort_radix/Loop2/sort_radix_dfg_1_routed.json -o minII=2 -o placeTrial=200 --placer-heap-export-init-placement /home/kelvin/MachSuite/benchmark/dfg/sort_radix/Loop2/sort_radix_dfg_1.csv
-16:15:53 | INFO | Running mapping for /home/kelvin/MachSuite/benchmark/dfg/sort_merge/Loop3/sort_merge_dfg_1.dot
-16:15:53 | INFO | II: 4
-16:15:53 | INFO | Number of unique memory: 2
-16:15:53 | INFO | Name of memory: {'%a', '%temp.i33'}
-16:15:53 | INFO | Dot to Verilog
-16:15:53 | ERROR | Invalid number of inputs
-16:15:53 | INFO | Running mapping for /home/kelvin/MachSuite/benchmark/dfg/spmv_ellpack/
-16:15:53 | INFO | Running mapping for /home/kelvin/MachSuite/benchmark/dfg/spmv_ellpack/Loop0/spmv_ellpack_dfg_1.dot
-16:15:53 | INFO | II: 4
-16:15:53 | INFO | Number of unique memory: 3
-16:15:53 | INFO | Name of memory: {'%vec', '%cols', '%nzval'}
-16:15:53 | INFO | Dot to Verilog
-16:15:53 | INFO | Start init mapping
-16:15:53 | INFO | Synthesising
-16:15:53 | INFO | yosys -q /home/kelvin/MachSuite/benchmark/dfg/spmv_ellpack/Loop0/spmv_ellpack_dfg_1.v /home/kelvin/FABulous_fork/myProject/PnR/synth.ys -o /home/kelvin/MachSuite/benchmark/dfg/spmv_ellpack/Loop0/spmv_ellpack_dfg_1.json
-16:15:53 | INFO | nextpnr-himbaechel -q --chipdb /home/kelvin/FABulous_fork/myProject/.FABulous/eFPGA.bit --device FABulous --json /home/kelvin/MachSuite/benchmark/dfg/spmv_ellpack/Loop0/spmv_ellpack_dfg_1.json --write /home/kelvin/MachSuite/benchmark/dfg/spmv_ellpack/Loop0/spmv_ellpack_dfg_1_routed.json -o minII=2 -o placeTrial=200 --placer-heap-export-init-placement /home/kelvin/MachSuite/benchmark/dfg/spmv_ellpack/Loop0/spmv_ellpack_dfg_1.csv
-16:15:53 | INFO | Running mapping for /home/kelvin/MachSuite/benchmark/dfg/stencil_stencil2d/
-16:15:53 | INFO | Running mapping for /home/kelvin/MachSuite/benchmark/dfg/stencil_stencil2d/Loop0/stencil_stencil2d_dfg_0.dot
-16:15:53 | INFO | II: 4
-16:15:53 | INFO | Number of unique memory: 2
-16:15:53 | INFO | Name of memory: {'%gep69', '%invariant.gep'}
-16:15:53 | INFO | Dot to Verilog
-16:15:53 | INFO | Start init mapping
-16:15:53 | INFO | Synthesising
-16:15:53 | INFO | yosys -q /home/kelvin/MachSuite/benchmark/dfg/stencil_stencil2d/Loop0/stencil_stencil2d_dfg_0.v /home/kelvin/FABulous_fork/myProject/PnR/synth.ys -o /home/kelvin/MachSuite/benchmark/dfg/stencil_stencil2d/Loop0/stencil_stencil2d_dfg_0.json
-16:15:53 | INFO | nextpnr-himbaechel -q --chipdb /home/kelvin/FABulous_fork/myProject/.FABulous/eFPGA.bit --device FABulous --json /home/kelvin/MachSuite/benchmark/dfg/stencil_stencil2d/Loop0/stencil_stencil2d_dfg_0.json --write /home/kelvin/MachSuite/benchmark/dfg/stencil_stencil2d/Loop0/stencil_stencil2d_dfg_0_routed.json -o minII=2 -o placeTrial=200 --placer-heap-export-init-placement /home/kelvin/MachSuite/benchmark/dfg/stencil_stencil2d/Loop0/stencil_stencil2d_dfg_0.csv
-16:15:54 | INFO | Running mapping for /home/kelvin/MachSuite/benchmark/dfg/sort_radix/Loop4/sort_radix_dfg_1.dot
-16:15:54 | INFO | II: 4
-16:15:54 | INFO | Number of unique memory: 2
-16:15:54 | INFO | Name of memory: {'%invariant.gep.i24.reg2mem.0.invariant.gep.i24.reload154', '%invariant.gep93'}
-16:15:54 | INFO | Dot to Verilog
-16:15:54 | INFO | Start init mapping
-16:15:54 | INFO | Synthesising
-16:15:54 | INFO | yosys -q /home/kelvin/MachSuite/benchmark/dfg/sort_radix/Loop4/sort_radix_dfg_1.v /home/kelvin/FABulous_fork/myProject/PnR/synth.ys -o /home/kelvin/MachSuite/benchmark/dfg/sort_radix/Loop4/sort_radix_dfg_1.json
-16:15:54 | INFO | nextpnr-himbaechel -q --chipdb /home/kelvin/FABulous_fork/myProject/.FABulous/eFPGA.bit --device FABulous --json /home/kelvin/MachSuite/benchmark/dfg/sort_radix/Loop4/sort_radix_dfg_1.json --write /home/kelvin/MachSuite/benchmark/dfg/sort_radix/Loop4/sort_radix_dfg_1_routed.json -o minII=2 -o placeTrial=200 --placer-heap-export-init-placement /home/kelvin/MachSuite/benchmark/dfg/sort_radix/Loop4/sort_radix_dfg_1.csv
-16:15:54 | ERROR | Init Mapping Fail
-16:15:54 | INFO | Running mapping for /home/kelvin/MachSuite/benchmark/dfg/stencil_stencil3d/
-16:15:54 | INFO | Running mapping for /home/kelvin/MachSuite/benchmark/dfg/stencil_stencil3d/Loop1/stencil_stencil3d_dfg_1.dot
-16:15:54 | INFO | II: 4
-16:15:54 | INFO | Number of unique memory: 8
-16:15:54 | INFO | Name of memory: {'%scevgep56', '%scevgep38', '%scevgep23', '%scevgep48', '%scevgep28', '%scevgep43', '%scevgep19', '%scevgep33'}
-16:15:54 | INFO | Dot to Verilog
-16:15:54 | INFO | Start init mapping
-16:15:54 | INFO | Synthesising
-16:15:54 | INFO | yosys -q /home/kelvin/MachSuite/benchmark/dfg/stencil_stencil3d/Loop1/stencil_stencil3d_dfg_1.v /home/kelvin/FABulous_fork/myProject/PnR/synth.ys -o /home/kelvin/MachSuite/benchmark/dfg/stencil_stencil3d/Loop1/stencil_stencil3d_dfg_1.json
-16:15:54 | INFO | nextpnr-himbaechel -q --chipdb /home/kelvin/FABulous_fork/myProject/.FABulous/eFPGA.bit --device FABulous --json /home/kelvin/MachSuite/benchmark/dfg/stencil_stencil3d/Loop1/stencil_stencil3d_dfg_1.json --write /home/kelvin/MachSuite/benchmark/dfg/stencil_stencil3d/Loop1/stencil_stencil3d_dfg_1_routed.json -o minII=2 -o placeTrial=200 --placer-heap-export-init-placement /home/kelvin/MachSuite/benchmark/dfg/stencil_stencil3d/Loop1/stencil_stencil3d_dfg_1.csv
-16:16:11 | ERROR | Init Mapping Fail
-16:16:11 | INFO | Running mapping for /home/kelvin/MachSuite/benchmark/dfg/sort_radix/Loop1/sort_radix_dfg_1.dot
-16:16:11 | INFO | II: 4
-16:16:11 | INFO | Number of unique memory: 3
-16:16:11 | INFO | Name of memory: {'%a', '%bucket', '%invariant.gep99'}
-16:16:11 | INFO | Dot to Verilog
-16:16:12 | INFO | Start init mapping
-16:16:12 | INFO | Synthesising
-16:16:12 | INFO | yosys -q /home/kelvin/MachSuite/benchmark/dfg/sort_radix/Loop1/sort_radix_dfg_1.v /home/kelvin/FABulous_fork/myProject/PnR/synth.ys -o /home/kelvin/MachSuite/benchmark/dfg/sort_radix/Loop1/sort_radix_dfg_1.json
-16:16:12 | INFO | nextpnr-himbaechel -q --chipdb /home/kelvin/FABulous_fork/myProject/.FABulous/eFPGA.bit --device FABulous --json /home/kelvin/MachSuite/benchmark/dfg/sort_radix/Loop1/sort_radix_dfg_1.json --write /home/kelvin/MachSuite/benchmark/dfg/sort_radix/Loop1/sort_radix_dfg_1_routed.json -o minII=2 -o placeTrial=200 --placer-heap-export-init-placement /home/kelvin/MachSuite/benchmark/dfg/sort_radix/Loop1/sort_radix_dfg_1.csv
-16:16:28 | ERROR | Timeout
-16:16:28 | ERROR | Init Mapping Fail
-16:16:28 | INFO | Running mapping for /home/kelvin/MachSuite/benchmark/dfg/kmp_kmp/
-16:16:28 | INFO | Running mapping for /home/kelvin/MachSuite/benchmark/dfg/kmp_kmp/Loop1/kmp_kmp_dfg_1.dot
-16:16:28 | INFO | II: 4
-16:16:28 | INFO | Number of unique memory: 2
-16:16:28 | INFO | Name of memory: {'%pattern', '%kmpNext'}
-16:16:28 | INFO | Dot to Verilog
-16:16:28 | INFO | Start init mapping
-16:16:28 | INFO | Synthesising
-16:16:28 | INFO | yosys -q /home/kelvin/MachSuite/benchmark/dfg/kmp_kmp/Loop1/kmp_kmp_dfg_1.v /home/kelvin/FABulous_fork/myProject/PnR/synth.ys -o /home/kelvin/MachSuite/benchmark/dfg/kmp_kmp/Loop1/kmp_kmp_dfg_1.json
-16:16:28 | INFO | nextpnr-himbaechel -q --chipdb /home/kelvin/FABulous_fork/myProject/.FABulous/eFPGA.bit --device FABulous --json /home/kelvin/MachSuite/benchmark/dfg/kmp_kmp/Loop1/kmp_kmp_dfg_1.json --write /home/kelvin/MachSuite/benchmark/dfg/kmp_kmp/Loop1/kmp_kmp_dfg_1_routed.json -o minII=2 -o placeTrial=200 --placer-heap-export-init-placement /home/kelvin/MachSuite/benchmark/dfg/kmp_kmp/Loop1/kmp_kmp_dfg_1.csv
-16:16:28 | INFO | Running mapping for /home/kelvin/MachSuite/benchmark/dfg/kmp_kmp/Loop0/kmp_kmp_dfg_1.dot
-16:16:28 | INFO | II: 4
-16:16:28 | INFO | Number of unique memory: 1
-16:16:28 | INFO | Name of memory: {'%pattern'}
-16:16:28 | INFO | Dot to Verilog
-16:16:28 | INFO | Start init mapping
-16:16:28 | INFO | Synthesising
-16:16:28 | INFO | yosys -q /home/kelvin/MachSuite/benchmark/dfg/kmp_kmp/Loop0/kmp_kmp_dfg_1.v /home/kelvin/FABulous_fork/myProject/PnR/synth.ys -o /home/kelvin/MachSuite/benchmark/dfg/kmp_kmp/Loop0/kmp_kmp_dfg_1.json
-16:16:28 | INFO | nextpnr-himbaechel -q --chipdb /home/kelvin/FABulous_fork/myProject/.FABulous/eFPGA.bit --device FABulous --json /home/kelvin/MachSuite/benchmark/dfg/kmp_kmp/Loop0/kmp_kmp_dfg_1.json --write /home/kelvin/MachSuite/benchmark/dfg/kmp_kmp/Loop0/kmp_kmp_dfg_1_routed.json -o minII=2 -o placeTrial=200 --placer-heap-export-init-placement /home/kelvin/MachSuite/benchmark/dfg/kmp_kmp/Loop0/kmp_kmp_dfg_1.csv
-16:16:36 | ERROR | Init Mapping Fail
-16:16:36 | INFO | Running mapping for /home/kelvin/MachSuite/benchmark/dfg/sort_radix/Loop0/sort_radix_dfg_1.dot
-16:16:36 | INFO | II: 4
-16:16:36 | INFO | Number of unique memory: 3
-16:16:36 | INFO | Name of memory: {'%b', '%invariant.gep101', '%bucket'}
-16:16:36 | INFO | Dot to Verilog
-16:16:36 | INFO | Start init mapping
-16:16:36 | INFO | Synthesising
-16:16:36 | INFO | yosys -q /home/kelvin/MachSuite/benchmark/dfg/sort_radix/Loop0/sort_radix_dfg_1.v /home/kelvin/FABulous_fork/myProject/PnR/synth.ys -o /home/kelvin/MachSuite/benchmark/dfg/sort_radix/Loop0/sort_radix_dfg_1.json
-16:16:36 | INFO | nextpnr-himbaechel -q --chipdb /home/kelvin/FABulous_fork/myProject/.FABulous/eFPGA.bit --device FABulous --json /home/kelvin/MachSuite/benchmark/dfg/sort_radix/Loop0/sort_radix_dfg_1.json --write /home/kelvin/MachSuite/benchmark/dfg/sort_radix/Loop0/sort_radix_dfg_1_routed.json -o minII=2 -o placeTrial=200 --placer-heap-export-init-placement /home/kelvin/MachSuite/benchmark/dfg/sort_radix/Loop0/sort_radix_dfg_1.csv
-16:16:54 | ERROR | Timeout
-16:16:54 | ERROR | Init Mapping Fail
-16:16:54 | INFO | Running mapping for /home/kelvin/MachSuite/benchmark/dfg/stencil_stencil3d/Loop0/stencil_stencil3d_dfg_1.dot
-16:16:54 | INFO | II: 4
-16:16:54 | INFO | Number of unique memory: 8
-16:16:54 | INFO | Name of memory: {'%invariant.gep328', '%orig', '%sol', '%invariant.gep', '%gep331', '%invariant.gep326', '%invariant.gep322', '%invariant.gep324'}
-16:16:54 | INFO | Dot to Verilog
-16:16:54 | INFO | Start init mapping
-16:16:54 | INFO | Synthesising
-16:16:54 | INFO | yosys -q /home/kelvin/MachSuite/benchmark/dfg/stencil_stencil3d/Loop0/stencil_stencil3d_dfg_1.v /home/kelvin/FABulous_fork/myProject/PnR/synth.ys -o /home/kelvin/MachSuite/benchmark/dfg/stencil_stencil3d/Loop0/stencil_stencil3d_dfg_1.json
-16:16:54 | INFO | nextpnr-himbaechel -q --chipdb /home/kelvin/FABulous_fork/myProject/.FABulous/eFPGA.bit --device FABulous --json /home/kelvin/MachSuite/benchmark/dfg/stencil_stencil3d/Loop0/stencil_stencil3d_dfg_1.json --write /home/kelvin/MachSuite/benchmark/dfg/stencil_stencil3d/Loop0/stencil_stencil3d_dfg_1_routed.json -o minII=2 -o placeTrial=200 --placer-heap-export-init-placement /home/kelvin/MachSuite/benchmark/dfg/stencil_stencil3d/Loop0/stencil_stencil3d_dfg_1.csv
-16:16:54 | ERROR | Init Mapping Fail
-16:16:54 | INFO | Running mapping for /home/kelvin/MachSuite/benchmark/dfg/viterbi_viterbi/
-16:16:54 | INFO | Running mapping for /home/kelvin/MachSuite/benchmark/dfg/viterbi_viterbi/Loop2/viterbi_viterbi_dfg_1.dot
-16:16:54 | INFO | II: 4
-16:16:54 | INFO | Number of unique memory: 2
-16:16:54 | INFO | Name of memory: {'%invariant.gep44.1', '%scevgep33'}
-16:16:54 | INFO | Dot to Verilog
-16:16:54 | INFO | Start init mapping
-16:16:54 | INFO | Synthesising
-16:16:54 | INFO | yosys -q /home/kelvin/MachSuite/benchmark/dfg/viterbi_viterbi/Loop2/viterbi_viterbi_dfg_1.v /home/kelvin/FABulous_fork/myProject/PnR/synth.ys -o /home/kelvin/MachSuite/benchmark/dfg/viterbi_viterbi/Loop2/viterbi_viterbi_dfg_1.json
-16:16:54 | ERROR | An error has been caught in function 'mapstar', process 'ForkPoolWorker-3' (1099435), thread 'MainThread' (129958224818176):
-Traceback (most recent call last):
-
-  File "/home/kelvin/FABulous_fork/myProject/PnR/runExperiment.py", line 157, in <module>
-    with Pool(4) as p:
-         └ <bound method BaseContext.Pool of <multiprocessing.context.DefaultContext object at 0x7632408d78f0>>
-
-  File "/usr/lib/python3.12/multiprocessing/context.py", line 119, in Pool
-    return Pool(processes, initializer, initargs, maxtasksperchild,
-           │    │          │            │         └ None
-           │    │          │            └ ()
-           │    │          └ None
-           │    └ 4
-           └ <class 'multiprocessing.pool.Pool'>
-  File "/usr/lib/python3.12/multiprocessing/pool.py", line 215, in __init__
-    self._repopulate_pool()
-    │    └ <function Pool._repopulate_pool at 0x76323f6dfba0>
-    └ <multiprocessing.pool.Pool state=INIT pool_size=2>
-  File "/usr/lib/python3.12/multiprocessing/pool.py", line 306, in _repopulate_pool
-    return self._repopulate_pool_static(self._ctx, self.Process,
-           │    │                       │    │     │    └ <staticmethod(<function Pool.Process at 0x76323f6df740>)>
-           │    │                       │    │     └ <multiprocessing.pool.Pool state=INIT pool_size=2>
-           │    │                       │    └ <multiprocessing.context.ForkContext object at 0x7632408d78c0>
-           │    │                       └ <multiprocessing.pool.Pool state=INIT pool_size=2>
-           │    └ <staticmethod(<function Pool._repopulate_pool_static at 0x76323f6dfc40>)>
-           └ <multiprocessing.pool.Pool state=INIT pool_size=2>
-  File "/usr/lib/python3.12/multiprocessing/pool.py", line 329, in _repopulate_pool_static
-    w.start()
-    │ └ <function BaseProcess.start at 0x7632408e0b80>
-    └ <ForkProcess name='ForkPoolWorker-3' parent=1099397 started daemon>
-  File "/usr/lib/python3.12/multiprocessing/process.py", line 121, in start
-    self._popen = self._Popen(self)
-    │    │        │    │      └ <ForkProcess name='ForkPoolWorker-3' parent=1099397 started daemon>
-    │    │        │    └ <staticmethod(<function ForkProcess._Popen at 0x76324074f560>)>
-    │    │        └ <ForkProcess name='ForkPoolWorker-3' parent=1099397 started daemon>
-    │    └ None
-    └ <ForkProcess name='ForkPoolWorker-3' parent=1099397 started daemon>
-  File "/usr/lib/python3.12/multiprocessing/context.py", line 282, in _Popen
-    return Popen(process_obj)
-           │     └ <ForkProcess name='ForkPoolWorker-3' parent=1099397 started daemon>
-           └ <class 'multiprocessing.popen_fork.Popen'>
-  File "/usr/lib/python3.12/multiprocessing/popen_fork.py", line 19, in __init__
-    self._launch(process_obj)
-    │    │       └ <ForkProcess name='ForkPoolWorker-3' parent=1099397 started daemon>
-    │    └ <function Popen._launch at 0x76323f706520>
-    └ <multiprocessing.popen_fork.Popen object at 0x76323f6f9b50>
-  File "/usr/lib/python3.12/multiprocessing/popen_fork.py", line 71, in _launch
-    code = process_obj._bootstrap(parent_sentinel=child_r)
-           │           │                          └ 17
-           │           └ <function BaseProcess._bootstrap at 0x7632408e1580>
-           └ <ForkProcess name='ForkPoolWorker-3' parent=1099397 started daemon>
-  File "/usr/lib/python3.12/multiprocessing/process.py", line 314, in _bootstrap
-    self.run()
-    │    └ <function BaseProcess.run at 0x7632408e0ae0>
-    └ <ForkProcess name='ForkPoolWorker-3' parent=1099397 started daemon>
-  File "/usr/lib/python3.12/multiprocessing/process.py", line 108, in run
-    self._target(*self._args, **self._kwargs)
-    │    │        │    │        │    └ {}
-    │    │        │    │        └ <ForkProcess name='ForkPoolWorker-3' parent=1099397 started daemon>
-    │    │        │    └ (<multiprocessing.queues.SimpleQueue object at 0x7632400ad910>, <multiprocessing.queues.SimpleQueue object at 0x76323f6d3aa0>...
-    │    │        └ <ForkProcess name='ForkPoolWorker-3' parent=1099397 started daemon>
-    │    └ <function worker at 0x76323f6df240>
-    └ <ForkProcess name='ForkPoolWorker-3' parent=1099397 started daemon>
-  File "/usr/lib/python3.12/multiprocessing/pool.py", line 125, in worker
-    result = (True, func(*args, **kwds))
-                    │     │       └ {}
-                    │     └ ((functools.partial(<function runMapping at 0x76323f6de700>, context=4, row=4, col=4), ('stencil_stencil3d', 'viterbi_viterbi...
-                    └ <function mapstar at 0x76323f6dede0>
-> File "/usr/lib/python3.12/multiprocessing/pool.py", line 48, in mapstar
-    return list(map(*args))
-                     └ (functools.partial(<function runMapping at 0x76323f6de700>, context=4, row=4, col=4), ('stencil_stencil3d', 'viterbi_viterbi'))
-
-  File "/home/kelvin/FABulous_fork/myProject/PnR/runExperiment.py", line 105, in runMapping
-    result = sp.run(cmd, check=True)
-             │  │   └ ['yosys', '-q', '/home/kelvin/MachSuite/benchmark/dfg/viterbi_viterbi/Loop2/viterbi_viterbi_dfg_1.v', '/home/kelvin/FABulous_...
-             │  └ <function run at 0x7632408ddc60>
-             └ <module 'subprocess' from '/usr/lib/python3.12/subprocess.py'>
-
-  File "/usr/lib/python3.12/subprocess.py", line 571, in run
-    raise CalledProcessError(retcode, process.args,
-          │                  │        │       └ ['yosys', '-q', '/home/kelvin/MachSuite/benchmark/dfg/viterbi_viterbi/Loop2/viterbi_viterbi_dfg_1.v', '/home/kelvin/FABulous_...
-          │                  │        └ <Popen: returncode: 1 args: ['yosys', '-q', '/home/kelvin/MachSuite/benchmar...>
-          │                  └ 1
-          └ <class 'subprocess.CalledProcessError'>
-
-subprocess.CalledProcessError: Command '['yosys', '-q', '/home/kelvin/MachSuite/benchmark/dfg/viterbi_viterbi/Loop2/viterbi_viterbi_dfg_1.v', '/home/kelvin/FABulous_fork/myProject/PnR/synth.ys', '-o', '/home/kelvin/MachSuite/benchmark/dfg/viterbi_viterbi/Loop2/viterbi_viterbi_dfg_1.json']' returned non-zero exit status 1.
-16:17:00 | ERROR | Init Mapping Fail
-16:17:00 | INFO | Running mapping for /home/kelvin/MachSuite/benchmark/dfg/sort_radix/Loop3/sort_radix_dfg_1.dot
-16:17:00 | INFO | II: 4
-16:17:00 | INFO | Number of unique memory: 1
-16:17:00 | INFO | Name of memory: {'%scevgep'}
-16:17:00 | INFO | Dot to Verilog
-16:17:00 | INFO | Start init mapping
-16:17:00 | INFO | Synthesising
-16:17:00 | INFO | yosys -q /home/kelvin/MachSuite/benchmark/dfg/sort_radix/Loop3/sort_radix_dfg_1.v /home/kelvin/FABulous_fork/myProject/PnR/synth.ys -o /home/kelvin/MachSuite/benchmark/dfg/sort_radix/Loop3/sort_radix_dfg_1.json
-16:17:00 | INFO | nextpnr-himbaechel -q --chipdb /home/kelvin/FABulous_fork/myProject/.FABulous/eFPGA.bit --device FABulous --json /home/kelvin/MachSuite/benchmark/dfg/sort_radix/Loop3/sort_radix_dfg_1.json --write /home/kelvin/MachSuite/benchmark/dfg/sort_radix/Loop3/sort_radix_dfg_1_routed.json -o minII=2 -o placeTrial=200 --placer-heap-export-init-placement /home/kelvin/MachSuite/benchmark/dfg/sort_radix/Loop3/sort_radix_dfg_1.csv
-16:17:01 | INFO | Running mapping for /home/kelvin/MachSuite/benchmark/dfg/sort_radix/Loop5/sort_radix_dfg_1.dot
-16:17:01 | INFO | II: 4
-16:17:01 | INFO | Number of unique memory: 2
-16:17:01 | INFO | Name of memory: {'%invariant.gep.i24.reg2mem.0.invariant.gep.i24.reload153', '%invariant.gep'}
-16:17:01 | INFO | Dot to Verilog
-16:17:01 | INFO | Start init mapping
-16:17:01 | INFO | Synthesising
-16:17:01 | INFO | yosys -q /home/kelvin/MachSuite/benchmark/dfg/sort_radix/Loop5/sort_radix_dfg_1.v /home/kelvin/FABulous_fork/myProject/PnR/synth.ys -o /home/kelvin/MachSuite/benchmark/dfg/sort_radix/Loop5/sort_radix_dfg_1.json
-16:17:01 | INFO | nextpnr-himbaechel -q --chipdb /home/kelvin/FABulous_fork/myProject/.FABulous/eFPGA.bit --device FABulous --json /home/kelvin/MachSuite/benchmark/dfg/sort_radix/Loop5/sort_radix_dfg_1.json --write /home/kelvin/MachSuite/benchmark/dfg/sort_radix/Loop5/sort_radix_dfg_1_routed.json -o minII=2 -o placeTrial=200 --placer-heap-export-init-placement /home/kelvin/MachSuite/benchmark/dfg/sort_radix/Loop5/sort_radix_dfg_1.csv
-16:17:18 | ERROR | Init Mapping Fail
-16:17:18 | INFO | Running mapping for /home/kelvin/MachSuite/benchmark/dfg/spmv_crs/
-16:17:18 | INFO | Running mapping for /home/kelvin/MachSuite/benchmark/dfg/spmv_crs/Loop0/spmv_crs_dfg_0.dot
-16:17:18 | INFO | II: 4
-16:17:18 | INFO | Number of unique memory: 3
-16:17:18 | INFO | Name of memory: {'%vec', '%val', '%cols'}
-16:17:18 | INFO | Dot to Verilog
-16:17:18 | INFO | Start init mapping
-16:17:18 | INFO | Synthesising
-16:17:18 | INFO | yosys -q /home/kelvin/MachSuite/benchmark/dfg/spmv_crs/Loop0/spmv_crs_dfg_0.v /home/kelvin/FABulous_fork/myProject/PnR/synth.ys -o /home/kelvin/MachSuite/benchmark/dfg/spmv_crs/Loop0/spmv_crs_dfg_0.json
-16:17:18 | INFO | nextpnr-himbaechel -q --chipdb /home/kelvin/FABulous_fork/myProject/.FABulous/eFPGA.bit --device FABulous --json /home/kelvin/MachSuite/benchmark/dfg/spmv_crs/Loop0/spmv_crs_dfg_0.json --write /home/kelvin/MachSuite/benchmark/dfg/spmv_crs/Loop0/spmv_crs_dfg_0_routed.json -o minII=2 -o placeTrial=200 --placer-heap-export-init-placement /home/kelvin/MachSuite/benchmark/dfg/spmv_crs/Loop0/spmv_crs_dfg_0.csv
+X0Y1.c0.out1__31.c0.out1_internal__31
+X0Y1.c0.out1_internal__31.c0.W_to_fabric__31
+X0Y1.c0.out1__30.c0.out1_internal__30
+X0Y1.c0.out1_internal__30.c0.W_to_fabric__30
+X0Y1.c0.out1__29.c0.out1_internal__29
+X0Y1.c0.out1_internal__29.c0.W_to_fabric__29
+X0Y1.c0.out1__28.c0.out1_internal__28
+X0Y1.c0.out1_internal__28.c0.W_to_fabric__28
+X0Y1.c0.out1__27.c0.out1_internal__27
+X0Y1.c0.out1_internal__27.c0.W_to_fabric__27
+X0Y1.c0.out1__26.c0.out1_internal__26
+X0Y1.c0.out1_internal__26.c0.W_to_fabric__26
+X0Y1.c0.out1__25.c0.out1_internal__25
+X0Y1.c0.out1_internal__25.c0.W_to_fabric__25
+X0Y1.c0.out1__24.c0.out1_internal__24
+X0Y1.c0.out1_internal__24.c0.W_to_fabric__24
+X0Y1.c0.out1__23.c0.out1_internal__23
+X0Y1.c0.out1_internal__23.c0.W_to_fabric__23
+X0Y1.c0.out1__22.c0.out1_internal__22
+X0Y1.c0.out1_internal__22.c0.W_to_fabric__22
+X0Y1.c0.out1__21.c0.out1_internal__21
+X0Y1.c0.out1_internal__21.c0.W_to_fabric__21
+X0Y1.c0.out1__20.c0.out1_internal__20
+X0Y1.c0.out1_internal__20.c0.W_to_fabric__20
+X0Y1.c0.out1__19.c0.out1_internal__19
+X0Y1.c0.out1_internal__19.c0.W_to_fabric__19
+X0Y1.c0.out1__18.c0.out1_internal__18
+X0Y1.c0.out1_internal__18.c0.W_to_fabric__18
+X0Y1.c0.out1__17.c0.out1_internal__17
+X0Y1.c0.out1_internal__17.c0.W_to_fabric__17
+X0Y1.c0.out1__16.c0.out1_internal__16
+X0Y1.c0.out1_internal__16.c0.W_to_fabric__16
+X0Y1.c0.out1__15.c0.out1_internal__15
+X0Y1.c0.out1_internal__15.c0.W_to_fabric__15
+X0Y1.c0.out1__14.c0.out1_internal__14
+X0Y1.c0.out1_internal__14.c0.W_to_fabric__14
+X0Y1.c0.out1__13.c0.out1_internal__13
+X0Y1.c0.out1_internal__13.c0.W_to_fabric__13
+X0Y1.c0.out1__12.c0.out1_internal__12
+X0Y1.c0.out1_internal__12.c0.W_to_fabric__12
+X0Y1.c0.out1__11.c0.out1_internal__11
+X0Y1.c0.out1_internal__11.c0.W_to_fabric__11
+X0Y1.c0.out1__10.c0.out1_internal__10
+X0Y1.c0.out1_internal__10.c0.W_to_fabric__10
+X0Y1.c0.out1__9.c0.out1_internal__9
+X0Y1.c0.out1_internal__9.c0.W_to_fabric__9
+X0Y1.c0.out1__8.c0.out1_internal__8
+X0Y1.c0.out1_internal__8.c0.W_to_fabric__8
+X0Y1.c0.out1__7.c0.out1_internal__7
+X0Y1.c0.out1_internal__7.c0.W_to_fabric__7
+X0Y1.c0.out1__6.c0.out1_internal__6
+X0Y1.c0.out1_internal__6.c0.W_to_fabric__6
+X0Y1.c0.out1__5.c0.out1_internal__5
+X0Y1.c0.out1_internal__5.c0.W_to_fabric__5
+X0Y1.c0.out1__4.c0.out1_internal__4
+X0Y1.c0.out1_internal__4.c0.W_to_fabric__4
+X0Y1.c0.out1__3.c0.out1_internal__3
+X0Y1.c0.out1_internal__3.c0.W_to_fabric__3
+X0Y1.c0.out1__2.c0.out1_internal__2
+X0Y1.c0.out1_internal__2.c0.W_to_fabric__2
+X0Y1.c0.out1__1.c0.out1_internal__1
+X0Y1.c0.out1_internal__1.c0.W_to_fabric__1
+X0Y1.c0.out1__0.c0.out1_internal__0
+X0Y1.c0.out1_internal__0.c0.W_to_fabric__0
+X1Y0.c0.out0__31.c0.out0_internal__31
+X1Y0.c0.out0_internal__31.c0.S_to_fabric__31
+X1Y0.c0.out0__30.c0.out0_internal__30
+X1Y0.c0.out0_internal__30.c0.S_to_fabric__30
+X1Y0.c0.out0__29.c0.out0_internal__29
+X1Y0.c0.out0_internal__29.c0.S_to_fabric__29
+X1Y0.c0.out0__28.c0.out0_internal__28
+X1Y0.c0.out0_internal__28.c0.S_to_fabric__28
+X1Y0.c0.out0__27.c0.out0_internal__27
+X1Y0.c0.out0_internal__27.c0.S_to_fabric__27
+X1Y0.c0.out0__26.c0.out0_internal__26
+X1Y0.c0.out0_internal__26.c0.S_to_fabric__26
+X1Y0.c0.out0__25.c0.out0_internal__25
+X1Y0.c0.out0_internal__25.c0.S_to_fabric__25
+X1Y0.c0.out0__24.c0.out0_internal__24
+X1Y0.c0.out0_internal__24.c0.S_to_fabric__24
+X1Y0.c0.out0__23.c0.out0_internal__23
+X1Y0.c0.out0_internal__23.c0.S_to_fabric__23
+X1Y0.c0.out0__22.c0.out0_internal__22
+X1Y0.c0.out0_internal__22.c0.S_to_fabric__22
+X1Y0.c0.out0__21.c0.out0_internal__21
+X1Y0.c0.out0_internal__21.c0.S_to_fabric__21
+X1Y0.c0.out0__20.c0.out0_internal__20
+X1Y0.c0.out0_internal__20.c0.S_to_fabric__20
+X1Y0.c0.out0__19.c0.out0_internal__19
+X1Y0.c0.out0_internal__19.c0.S_to_fabric__19
+X1Y0.c0.out0__18.c0.out0_internal__18
+X1Y0.c0.out0_internal__18.c0.S_to_fabric__18
+X1Y0.c0.out0__17.c0.out0_internal__17
+X1Y0.c0.out0_internal__17.c0.S_to_fabric__17
+X1Y0.c0.out0__16.c0.out0_internal__16
+X1Y0.c0.out0_internal__16.c0.S_to_fabric__16
+X1Y0.c0.out0__15.c0.out0_internal__15
+X1Y0.c0.out0_internal__15.c0.S_to_fabric__15
+X1Y0.c0.out0__14.c0.out0_internal__14
+X1Y0.c0.out0_internal__14.c0.S_to_fabric__14
+X1Y0.c0.out0__13.c0.out0_internal__13
+X1Y0.c0.out0_internal__13.c0.S_to_fabric__13
+X1Y0.c0.out0__12.c0.out0_internal__12
+X1Y0.c0.out0_internal__12.c0.S_to_fabric__12
+X1Y0.c0.out0__11.c0.out0_internal__11
+X1Y0.c0.out0_internal__11.c0.S_to_fabric__11
+X1Y0.c0.out0__10.c0.out0_internal__10
+X1Y0.c0.out0_internal__10.c0.S_to_fabric__10
+X1Y0.c0.out0__9.c0.out0_internal__9
+X1Y0.c0.out0_internal__9.c0.S_to_fabric__9
+X1Y0.c0.out0__8.c0.out0_internal__8
+X1Y0.c0.out0_internal__8.c0.S_to_fabric__8
+X1Y0.c0.out0__7.c0.out0_internal__7
+X1Y0.c0.out0_internal__7.c0.S_to_fabric__7
+X1Y0.c0.out0__6.c0.out0_internal__6
+X1Y0.c0.out0_internal__6.c0.S_to_fabric__6
+X1Y0.c0.out0__5.c0.out0_internal__5
+X1Y0.c0.out0_internal__5.c0.S_to_fabric__5
+X1Y0.c0.out0__4.c0.out0_internal__4
+X1Y0.c0.out0_internal__4.c0.S_to_fabric__4
+X1Y0.c0.out0__3.c0.out0_internal__3
+X1Y0.c0.out0_internal__3.c0.S_to_fabric__3
+X1Y0.c0.out0__2.c0.out0_internal__2
+X1Y0.c0.out0_internal__2.c0.S_to_fabric__2
+X1Y0.c0.out0__1.c0.out0_internal__1
+X1Y0.c0.out0_internal__1.c0.S_to_fabric__1
+X1Y0.c0.out0__0.c0.out0_internal__0
+X1Y0.c0.out0_internal__0.c0.S_to_fabric__0
+X2Y1.c0.out1__31.c0.out1_internal__31
+X2Y1.c0.out1_internal__31.c0.data_out__31
+X2Y1.c0.out1__30.c0.out1_internal__30
+X2Y1.c0.out1_internal__30.c0.data_out__30
+X2Y1.c0.out1__29.c0.out1_internal__29
+X2Y1.c0.out1_internal__29.c0.data_out__29
+X2Y1.c0.out1__28.c0.out1_internal__28
+X2Y1.c0.out1_internal__28.c0.data_out__28
+X2Y1.c0.out1__27.c0.out1_internal__27
+X2Y1.c0.out1_internal__27.c0.data_out__27
+X2Y1.c0.out1__26.c0.out1_internal__26
+X2Y1.c0.out1_internal__26.c0.data_out__26
+X2Y1.c0.out1__25.c0.out1_internal__25
+X2Y1.c0.out1_internal__25.c0.data_out__25
+X2Y1.c0.out1__24.c0.out1_internal__24
+X2Y1.c0.out1_internal__24.c0.data_out__24
+X2Y1.c0.out1__23.c0.out1_internal__23
+X2Y1.c0.out1_internal__23.c0.data_out__23
+X2Y1.c0.out1__22.c0.out1_internal__22
+X2Y1.c0.out1_internal__22.c0.data_out__22
+X2Y1.c0.out1__21.c0.out1_internal__21
+X2Y1.c0.out1_internal__21.c0.data_out__21
+X2Y1.c0.out1__20.c0.out1_internal__20
+X2Y1.c0.out1_internal__20.c0.data_out__20
+X2Y1.c0.out1__19.c0.out1_internal__19
+X2Y1.c0.out1_internal__19.c0.data_out__19
+X2Y1.c0.out1__18.c0.out1_internal__18
+X2Y1.c0.out1_internal__18.c0.data_out__18
+X2Y1.c0.out1__17.c0.out1_internal__17
+X2Y1.c0.out1_internal__17.c0.data_out__17
+X2Y1.c0.out1__16.c0.out1_internal__16
+X2Y1.c0.out1_internal__16.c0.data_out__16
+X2Y1.c0.out1__15.c0.out1_internal__15
+X2Y1.c0.out1_internal__15.c0.data_out__15
+X2Y1.c0.out1__14.c0.out1_internal__14
+X2Y1.c0.out1_internal__14.c0.data_out__14
+X2Y1.c0.out1__13.c0.out1_internal__13
+X2Y1.c0.out1_internal__13.c0.data_out__13
+X2Y1.c0.out1__12.c0.out1_internal__12
+X2Y1.c0.out1_internal__12.c0.data_out__12
+X2Y1.c0.out1__11.c0.out1_internal__11
+X2Y1.c0.out1_internal__11.c0.data_out__11
+X2Y1.c0.out1__10.c0.out1_internal__10
+X2Y1.c0.out1_internal__10.c0.data_out__10
+X2Y1.c0.out1__9.c0.out1_internal__9
+X2Y1.c0.out1_internal__9.c0.data_out__9
+X2Y1.c0.out1__8.c0.out1_internal__8
+X2Y1.c0.out1_internal__8.c0.data_out__8
+X2Y1.c0.out1__7.c0.out1_internal__7
+X2Y1.c0.out1_internal__7.c0.data_out__7
+X2Y1.c0.out1__6.c0.out1_internal__6
+X2Y1.c0.out1_internal__6.c0.data_out__6
+X2Y1.c0.out1__5.c0.out1_internal__5
+X2Y1.c0.out1_internal__5.c0.data_out__5
+X2Y1.c0.out1__4.c0.out1_internal__4
+X2Y1.c0.out1_internal__4.c0.data_out__4
+X2Y1.c0.out1__3.c0.out1_internal__3
+X2Y1.c0.out1_internal__3.c0.data_out__3
+X2Y1.c0.out1__2.c0.out1_internal__2
+X2Y1.c0.out1_internal__2.c0.data_out__2
+X2Y1.c0.out1__1.c0.out1_internal__1
+X2Y1.c0.out1_internal__1.c0.data_out__1
+X2Y1.c0.out1__0.c0.out1_internal__0
+X2Y1.c0.out1_internal__0.c0.data_out__0
+X1Y1.c0.out1__31.c0.out1_internal__31
+X1Y1.c0.out1_internal__31.c0.RES_reg_out__31
+X1Y1.c0.out1__30.c0.out1_internal__30
+X1Y1.c0.out1_internal__30.c0.RES_reg_out__30
+X1Y1.c0.out1__29.c0.out1_internal__29
+X1Y1.c0.out1_internal__29.c0.RES_reg_out__29
+X1Y1.c0.out1__28.c0.out1_internal__28
+X1Y1.c0.out1_internal__28.c0.RES_reg_out__28
+X1Y1.c0.out1__27.c0.out1_internal__27
+X1Y1.c0.out1_internal__27.c0.RES_reg_out__27
+X1Y1.c0.out1__26.c0.out1_internal__26
+X1Y1.c0.out1_internal__26.c0.RES_reg_out__26
+X1Y1.c0.out1__25.c0.out1_internal__25
+X1Y1.c0.out1_internal__25.c0.RES_reg_out__25
+X1Y1.c0.out1__24.c0.out1_internal__24
+X1Y1.c0.out1_internal__24.c0.RES_reg_out__24
+X1Y1.c0.out1__23.c0.out1_internal__23
+X1Y1.c0.out1_internal__23.c0.RES_reg_out__23
+X1Y1.c0.out1__22.c0.out1_internal__22
+X1Y1.c0.out1_internal__22.c0.RES_reg_out__22
+X1Y1.c0.out1__21.c0.out1_internal__21
+X1Y1.c0.out1_internal__21.c0.RES_reg_out__21
+X1Y1.c0.out1__20.c0.out1_internal__20
+X1Y1.c0.out1_internal__20.c0.RES_reg_out__20
+X1Y1.c0.out1__19.c0.out1_internal__19
+X1Y1.c0.out1_internal__19.c0.RES_reg_out__19
+X1Y1.c0.out1__18.c0.out1_internal__18
+X1Y1.c0.out1_internal__18.c0.RES_reg_out__18
+X1Y1.c0.out1__17.c0.out1_internal__17
+X1Y1.c0.out1_internal__17.c0.RES_reg_out__17
+X1Y1.c0.out1__16.c0.out1_internal__16
+X1Y1.c0.out1_internal__16.c0.RES_reg_out__16
+X1Y1.c0.out1__15.c0.out1_internal__15
+X1Y1.c0.out1_internal__15.c0.RES_reg_out__15
+X1Y1.c0.out1__14.c0.out1_internal__14
+X1Y1.c0.out1_internal__14.c0.RES_reg_out__14
+X1Y1.c0.out1__13.c0.out1_internal__13
+X1Y1.c0.out1_internal__13.c0.RES_reg_out__13
+X1Y1.c0.out1__12.c0.out1_internal__12
+X1Y1.c0.out1_internal__12.c0.RES_reg_out__12
+X1Y1.c0.out1__11.c0.out1_internal__11
+X1Y1.c0.out1_internal__11.c0.RES_reg_out__11
+X1Y1.c0.out1__10.c0.out1_internal__10
+X1Y1.c0.out1_internal__10.c0.RES_reg_out__10
+X1Y1.c0.out1__9.c0.out1_internal__9
+X1Y1.c0.out1_internal__9.c0.RES_reg_out__9
+X1Y1.c0.out1__8.c0.out1_internal__8
+X1Y1.c0.out1_internal__8.c0.RES_reg_out__8
+X1Y1.c0.out1__7.c0.out1_internal__7
+X1Y1.c0.out1_internal__7.c0.RES_reg_out__7
+X1Y1.c0.out1__6.c0.out1_internal__6
+X1Y1.c0.out1_internal__6.c0.RES_reg_out__6
+X1Y1.c0.out1__5.c0.out1_internal__5
+X1Y1.c0.out1_internal__5.c0.RES_reg_out__5
+X1Y1.c0.out1__4.c0.out1_internal__4
+X1Y1.c0.out1_internal__4.c0.RES_reg_out__4
+X1Y1.c0.out1__3.c0.out1_internal__3
+X1Y1.c0.out1_internal__3.c0.RES_reg_out__3
+X1Y1.c0.out1__2.c0.out1_internal__2
+X1Y1.c0.out1_internal__2.c0.RES_reg_out__2
+X1Y1.c0.out1__1.c0.out1_internal__1
+X1Y1.c0.out1_internal__1.c0.RES_reg_out__1
+X1Y1.c0.out1__0.c0.out1_internal__0
+X1Y1.c0.out1_internal__0.c0.RES_reg_out__0
+X0Y1.c0.W_IO.WIDTH
+X1Y1.c0.RES_reg_unit.CLK_DRV
+X1Y0.c0.S_IO.WIDTH
+X3Y1.c0.E_IO.WIDTH
+{FeatureValue(tileLoc=(1, 1), bitPosition=((0, 11),), value=1),
+ FeatureValue(tileLoc=(1, 1), bitPosition=((0, 12),), value=0),
+ FeatureValue(tileLoc=(1, 1), bitPosition=((0, 0), (0, 1), (0, 2)), value=0),
+ FeatureValue(tileLoc=(2, 1), bitPosition=((0, 0), (0, 1), (0, 2)), value=0),
+ FeatureValue(tileLoc=(2, 1),
+              bitPosition=((0, 3),
+                           (0, 4),
+                           (0, 5),
+                           (0, 6),
+                           (0, 7),
+                           (0, 8),
+                           (0, 9),
+                           (0, 10)),
+              value=7),
+ FeatureValue(tileLoc=(1, 1), bitPosition=((None, None),), value=0),
+ FeatureValue(tileLoc=(2, 1), bitPosition=((0, 25), (0, 26), (0, 27)), value=5),
+ FeatureValue(tileLoc=(2, 1), bitPosition=((0, 28), (0, 29), (0, 30)), value=5),
+ FeatureValue(tileLoc=(3, 1), bitPosition=((None, None),), value=0),
+ FeatureValue(tileLoc=(1, 1), bitPosition=((0, 25), (0, 26), (0, 27)), value=6),
+ FeatureValue(tileLoc=(1, 1), bitPosition=((0, 28), (0, 29), (0, 30)), value=6)}

@@ -5,10 +5,10 @@
       "attributes": {
         "dynports": 1,
         "cells_not_processed": 1,
-        "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/reg_unit.v:1.1-21.10"
+        "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/reg_unit.v:1.1-23.10"
       },
       "parameter_default_values": {
-        "NoConfigBits": 3,
+        "NoConfigBits": 2,
         "WIDTH": 32
       },
       "ports": {
@@ -31,10 +31,66 @@
         "reg_out": {
           "direction": "output",
           "bits": [ 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68 ]
+        },
+        "tide_en": {
+          "direction": "input",
+          "bits": [ 69 ]
+        },
+        "tide_rst": {
+          "direction": "input",
+          "bits": [ 70 ]
         }
       },
       "cells": {
-        "$procdff$7": {
+        "$and$/home/kelvin/FABulous_fork/myProject/Tile/PE/reg_unit.v:15$2": {
+          "hide_name": 1,
+          "type": "$and",
+          "parameters": {
+            "A_SIGNED": 0,
+            "A_WIDTH": 1,
+            "B_SIGNED": 0,
+            "B_WIDTH": 1,
+            "Y_WIDTH": 1
+          },
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/reg_unit.v:15.9-15.23"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 2 ],
+            "B": [ 70 ],
+            "Y": [ 71 ]
+          }
+        },
+        "$or$/home/kelvin/FABulous_fork/myProject/Tile/PE/reg_unit.v:18$3": {
+          "hide_name": 1,
+          "type": "$or",
+          "parameters": {
+            "A_SIGNED": 0,
+            "A_WIDTH": 1,
+            "B_SIGNED": 0,
+            "B_WIDTH": 1,
+            "Y_WIDTH": 1
+          },
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/reg_unit.v:18.14-18.26"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 3 ],
+            "B": [ 69 ],
+            "Y": [ 72 ]
+          }
+        },
+        "$procdff$9": {
           "hide_name": 1,
           "type": "$dff",
           "parameters": {
@@ -42,7 +98,7 @@
             "WIDTH": 32
           },
           "attributes": {
-            "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/reg_unit.v:12.1-19.4"
+            "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/reg_unit.v:14.1-21.4"
           },
           "port_directions": {
             "CLK": "input",
@@ -51,18 +107,18 @@
           },
           "connections": {
             "CLK": [ 4 ],
-            "D": [ 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100 ],
+            "D": [ 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104 ],
             "Q": [ 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68 ]
           }
         },
-        "$procmux$2": {
+        "$procmux$4": {
           "hide_name": 1,
           "type": "$mux",
           "parameters": {
             "WIDTH": 32
           },
           "attributes": {
-            "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/reg_unit.v:16.14-16.16|/home/kelvin/FABulous_fork/myProject/Tile/PE/reg_unit.v:16.10-18.8"
+            "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/reg_unit.v:18.14-18.26|/home/kelvin/FABulous_fork/myProject/Tile/PE/reg_unit.v:18.10-20.8"
           },
           "port_directions": {
             "A": "input",
@@ -73,11 +129,11 @@
           "connections": {
             "A": [ 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68 ],
             "B": [ 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36 ],
-            "S": [ 3 ],
-            "Y": [ 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132 ]
+            "S": [ 72 ],
+            "Y": [ 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136 ]
           }
         },
-        "$procmux$5": {
+        "$procmux$7": {
           "hide_name": 1,
           "type": "$mux",
           "parameters": {
@@ -85,7 +141,7 @@
           },
           "attributes": {
             "full_case": 1,
-            "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/reg_unit.v:13.9-13.12|/home/kelvin/FABulous_fork/myProject/Tile/PE/reg_unit.v:13.5-18.8"
+            "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/reg_unit.v:15.9-15.23|/home/kelvin/FABulous_fork/myProject/Tile/PE/reg_unit.v:15.5-20.8"
           },
           "port_directions": {
             "A": "input",
@@ -94,42 +150,56 @@
             "Y": "output"
           },
           "connections": {
-            "A": [ 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132 ],
+            "A": [ 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136 ],
             "B": [ "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
-            "S": [ 2 ],
-            "Y": [ 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100 ]
+            "S": [ 71 ],
+            "Y": [ 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104 ]
           }
         }
       },
       "netnames": {
         "$0\\reg_out[31:0]": {
           "hide_name": 1,
-          "bits": [ 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100 ],
+          "bits": [ 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104 ],
           "attributes": {
-            "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/reg_unit.v:12.1-19.4"
+            "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/reg_unit.v:14.1-21.4"
           }
         },
-        "$procmux$2_Y": {
+        "$and$/home/kelvin/FABulous_fork/myProject/Tile/PE/reg_unit.v:15$2_Y": {
           "hide_name": 1,
-          "bits": [ 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132 ],
+          "bits": [ 71 ],
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/reg_unit.v:15.9-15.23"
+          }
+        },
+        "$or$/home/kelvin/FABulous_fork/myProject/Tile/PE/reg_unit.v:18$3_Y": {
+          "hide_name": 1,
+          "bits": [ 72 ],
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/reg_unit.v:18.14-18.26"
+          }
+        },
+        "$procmux$4_Y": {
+          "hide_name": 1,
+          "bits": [ 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136 ],
           "attributes": {
           }
         },
-        "$procmux$3_CMP": {
+        "$procmux$5_CMP": {
           "hide_name": 1,
-          "bits": [ 3 ],
+          "bits": [ 72 ],
           "attributes": {
           }
         },
-        "$procmux$5_Y": {
+        "$procmux$7_Y": {
           "hide_name": 1,
-          "bits": [ 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100 ],
+          "bits": [ 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104 ],
           "attributes": {
           }
         },
-        "$procmux$6_CMP": {
+        "$procmux$8_CMP": {
           "hide_name": 1,
-          "bits": [ 2 ],
+          "bits": [ 71 ],
           "attributes": {
           }
         },
@@ -146,9 +216,7 @@
           "hide_name": 0,
           "bits": [ 3 ],
           "attributes": {
-            "CONTROL": 1,
-            "FABulous": 1,
-            "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/reg_unit.v:6.39-6.41"
+            "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/reg_unit.v:6.16-6.18"
           }
         },
         "reg_in": {
@@ -175,9 +243,27 @@
           "hide_name": 0,
           "bits": [ 2 ],
           "attributes": {
-            "CONTROL": 1,
+            "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/reg_unit.v:5.16-5.19"
+          }
+        },
+        "tide_en": {
+          "hide_name": 0,
+          "bits": [ 69 ],
+          "attributes": {
+            "CONFIG_BIT": 1,
             "FABulous": 1,
-            "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/reg_unit.v:5.39-5.42"
+            "FEATURE": "tide_en",
+            "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/reg_unit.v:10.62-10.69"
+          }
+        },
+        "tide_rst": {
+          "hide_name": 0,
+          "bits": [ 70 ],
+          "attributes": {
+            "CONFIG_BIT": 1,
+            "FABulous": 1,
+            "FEATURE": "tide_rst",
+            "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/reg_unit.v:11.63-11.71"
           }
         }
       }

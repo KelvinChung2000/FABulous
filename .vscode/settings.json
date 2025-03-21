@@ -7,7 +7,8 @@
     "exitcond",
     "INBUF",
     "libyosys",
-    "Techmaps"
+    "Techmaps",
+    "tofile"
   ],
   "esbonio.server.enabled": false,
   "C_Cpp_Runner.cCompilerPath": "gcc",

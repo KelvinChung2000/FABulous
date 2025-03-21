@@ -1,30 +1,32 @@
 module PE #(
-    parameter MaxFramesPerCol = 32,
-    parameter FrameBitsPerRow = 32,
-    parameter NoConfigBits = 34,
+    parameter MaxFramesPerCol = 8,
+    parameter FrameBitsPerRow = 8,
+    parameter NoConfigBits = 44,
     // Emulation Parameters
     parameter EMULATION_ENABLE = 0,
-    parameter EMULATION_CONFIG = 0
+    parameter EMULATION_CONFIG = 0,
+    parameter X_CORD = -1,
+    parameter Y_CORD = -1
 )
 (
     // NORTH
-    input [31:0] in0,
-    output [31:0] out0,
+    input wire[31:0] in0,
+    output reg[31:0] out0,
     // EAST
-    input [31:0] in1,
-    output [31:0] out1,
+    input wire[31:0] in1,
+    output reg[31:0] out1,
     // SOUTH
-    input [31:0] in2,
-    output [31:0] out2,
+    input wire[31:0] in2,
+    output reg[31:0] out2,
     // WEST
-    input [31:0] in3,
-    output [31:0] out3,
-    input UserCLK,
-    output UserCLKo,
-    input [FrameBitsPerRow - 1:0] FrameData,
-    output [FrameBitsPerRow - 1:0] FrameData_O,
-    input [MaxFramesPerCol - 1:0] FrameStrobe,
-    output [MaxFramesPerCol - 1:0] FrameStrobe_O
+    input wire[31:0] in3,
+    output reg[31:0] out3,
+    input wire UserCLK,
+    output reg UserCLK_o,
+    input wire[FrameBitsPerRow - 1:0] FrameData,
+    output reg[FrameBitsPerRow - 1:0] FrameData_o,
+    input wire[MaxFramesPerCol - 1:0] FrameStrobe,
+    output reg[MaxFramesPerCol - 1:0] FrameStrobe_o
 );
 
 // Signal Creation
@@ -73,7 +75,7 @@ my_buf_pack #(
     .WIDTH(FrameBitsPerRow)
 ) data_outbuf (
     .A(FrameData_internal),
-    .X(FrameData_O)
+    .X(FrameData_o)
 );
 
 // FrameStrobe Buffer
@@ -90,20 +92,22 @@ my_buf_pack #(
     .WIDTH(MaxFramesPerCol)
 ) strobe_outbuf (
     .A(FrameStrobe_internal),
-    .X(FrameStrobe_O)
+    .X(FrameStrobe_o)
 );
 
 // User Clock Buffer
 clk_buf #() inst_clk_buf (
     .A(UserCLK),
-    .X(UserCLKo)
+    .X(UserCLK_o)
 );
 
 // Init Configuration storage latches
 
 PE_ConfigMem #(
     .EMULATION_ENABLE(EMULATION_ENABLE),
-    .EMULATION_CONFIG(EMULATION_CONFIG)
+    .EMULATION_CONFIG(EMULATION_CONFIG),
+    .X_CORD(X_CORD),
+    .Y_CORD(Y_CORD)
 ) Inst_PE_ConfigMem (
     .FrameData(FrameData),
     .FrameStrobe(FrameStrobe),
@@ -132,7 +136,9 @@ reg_unit #() Inst_RES_reg_unit (
     .reg_in(RES_reg_in),
     .rst(RES_rst),
     .reg_out(RES_reg_out),
-    .clk(UserCLK)
+    .clk(UserCLK),
+    .tide_en(ConfigBits[11]),
+    .tide_rst(ConfigBits[12])
 );
 
 // Instantiate BEL N_reg_unit
@@ -141,7 +147,9 @@ reg_unit #() Inst_N_reg_unit (
     .reg_in(N_reg_in),
     .rst(N_rst),
     .reg_out(N_reg_out),
-    .clk(UserCLK)
+    .clk(UserCLK),
+    .tide_en(ConfigBits[13]),
+    .tide_rst(ConfigBits[14])
 );
 
 // Instantiate BEL E_reg_unit
@@ -150,7 +158,9 @@ reg_unit #() Inst_E_reg_unit (
     .reg_in(E_reg_in),
     .rst(E_rst),
     .reg_out(E_reg_out),
-    .clk(UserCLK)
+    .clk(UserCLK),
+    .tide_en(ConfigBits[15]),
+    .tide_rst(ConfigBits[16])
 );
 
 // Instantiate BEL S_reg_unit
@@ -159,7 +169,9 @@ reg_unit #() Inst_S_reg_unit (
     .reg_in(S_reg_in),
     .rst(S_rst),
     .reg_out(S_reg_out),
-    .clk(UserCLK)
+    .clk(UserCLK),
+    .tide_en(ConfigBits[17]),
+    .tide_rst(ConfigBits[18])
 );
 
 // Instantiate BEL W_reg_unit
@@ -168,7 +180,9 @@ reg_unit #() Inst_W_reg_unit (
     .reg_in(W_reg_in),
     .rst(W_rst),
     .reg_out(W_reg_out),
-    .clk(UserCLK)
+    .clk(UserCLK),
+    .tide_en(ConfigBits[19]),
+    .tide_rst(ConfigBits[20])
 );
 
 // Init Switch Matrix
@@ -196,8 +210,8 @@ PE_switch_matrix #() Inst_PE_switch_matrix (
     .S_reg_out(S_reg_out),
     .W_reg_out(W_reg_out),
     .const_out(const_out),
-    .ConfigBits(ConfigBits[33:11]),
-    .ConfigBits_N(ConfigBits_N[33:11])
+    .ConfigBits(ConfigBits[43:21]),
+    .ConfigBits_N(ConfigBits_N[43:21])
 );
 
 endmodule

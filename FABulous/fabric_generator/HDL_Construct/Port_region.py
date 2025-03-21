@@ -53,12 +53,16 @@ class PortRegion(Region):
 
         def __str__(self) -> str:
             if self.writer == WriterType.VERILOG:
+                sType = "wire"
+                if self.direction == IO.OUTPUT:
+                    sType = "reg"
+
                 if isinstance(self.width, int) and self.width == 1:
-                    return f"{self.direction} {self.name}"
+                    return f"{self.direction} {sType} {self.name}"
                 elif isinstance(self.width, int):
-                    return f"{self.direction} [{self.width - 1}:0] {self.name}"
+                    return f"{self.direction} {sType}[{self.width - 1}:0] {self.name}"
                 else:
-                    return f"{self.direction} [{self.width}:0] {self.name}"
+                    return f"{self.direction} {sType}[{self.width}:0] {self.name}"
             else:
                 io: str
                 if self.direction == IO.INPUT:

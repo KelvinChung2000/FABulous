@@ -31,8 +31,9 @@
           "attributes": {
             "CONFIG_BIT": 1,
             "FABulous": 1,
+            "FEATURE": "const_value",
             "INIT": 1,
-            "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/const_unit.v:7.50-7.60"
+            "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/const_unit.v:7.73-7.83"
           }
         },
         "const_out": {

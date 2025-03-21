@@ -1,5 +1,6 @@
 import csv
 from pathlib import Path
+from bitarray import bitarray
 
 from FABulous.fabric_definition.define import IO
 from FABulous.fabric_definition.Fabric import Fabric
@@ -24,7 +25,6 @@ def generateConfigMemInit(
     globalConfigBitsCounter : int
         The number of global config bits of the tile.
     """
-    bitsLeftToPackInFrames = totalConfigBits
 
     fieldName = [
         "frame_name",
@@ -37,43 +37,28 @@ def generateConfigMemInit(
     with open(dst, "w") as f:
         writer = csv.writer(f)
         writer.writerow(fieldName)
+        bits = bitarray(frameBitsPerRow * maxFramesPerCol)
+        bits[:totalConfigBits] = 1
+        count = 0
         for k in range(maxFramesPerCol):
-            entry = []
+            entry = {}
             # frame0, frame1, ...
-            entry.append(f"frame{k}")
+            entry["frame_name"] = f"frame{k}"
             # and the index (0, 1, 2, ...), in case we need
-            entry.append(str(k))
-            # size of the frame in bits
-            if bitsLeftToPackInFrames >= frameBitsPerRow:
-                entry.append(str(frameBitsPerRow))
-                # generate a string encoding a '1' for each flop used
-                frameBitsMask = f"{2**frameBitsPerRow-1:_b}"
-                entry.append(frameBitsMask)
-                entry.append(
-                    f"{bitsLeftToPackInFrames-1}:{bitsLeftToPackInFrames-frameBitsPerRow}"
-                )
-                bitsLeftToPackInFrames -= frameBitsPerRow
+            entry["frame_index"] = str(k)
+            slice = bits[count : count + frameBitsPerRow]
+            entry["bits_used_in_frame"] = slice.count(1)
+            entry["used_bits_mask"] = slice.to01()
+            if slice.count(1) == 0:
+                entry["ConfigBits_ranges"] = "# NULL"
             else:
-                entry.append(str(bitsLeftToPackInFrames))
-                # generate a string encoding a '1' for each flop used
-                # this will allow us to kick out flops in the middle (e.g. for alignment padding)
-                frameBitsMask = (2**frameBitsPerRow - 1) - (
-                    2 ** (frameBitsPerRow - bitsLeftToPackInFrames) - 1
+                entry["ConfigBits_ranges"] = (
+                    f"{totalConfigBits}:{max(totalConfigBits-frameBitsPerRow+1, 0)}"
                 )
-                frameBitsMask = f"{frameBitsMask:0{frameBitsPerRow+7}_b}"
-                entry.append(frameBitsMask)
-                if bitsLeftToPackInFrames > 0:
-                    entry.append(f"{bitsLeftToPackInFrames-1}:0")
-                else:
-                    entry.append("# NULL")
-                # will have to be 0 if already 0 or if we just allocate the last bits
-                bitsLeftToPackInFrames = 0
-            # The mapping into frames is described as a list of index ranges applied to the ConfigBits vector
-            # use '2' for a single bit; '5:0' for a downto range; multiple ranges can be specified in optional consecutive comma separated fields get concatenated)
-            # default is counting top down
+            count += frameBitsPerRow
+            totalConfigBits -= frameBitsPerRow
 
-            # write the entry to the file
-            writer.writerow(entry)
+            writer.writerow([entry[field] for field in fieldName])
 
 
 def generateConfigMem(codeGen: CodeGenerator, fabric: Fabric, tile: Tile):
@@ -82,46 +67,66 @@ def generateConfigMem(codeGen: CodeGenerator, fabric: Fabric, tile: Tile):
             if fabric.maxFramesPerCol > 0:
                 maxFramePerCol = pr.Parameter("MaxFramesPerCol", fabric.maxFramesPerCol)
             if fabric.frameBitsPerRow > 0:
-                framBitPerRow = pr.Parameter("FrameBitsPerRow", fabric.frameBitsPerRow)
+                frameBitPerRow = pr.Parameter("FrameBitsPerRow", fabric.frameBitsPerRow)
             noConfigBits = pr.Parameter("NoConfigBits", tile.configBits)
             pr.Comment("Emulation parameter")
             emuEn = pr.Parameter("EMULATION_ENABLE", 0)
             emuCfg = pr.Parameter("EMULATION_CONFIG", 0)
+            xCord = pr.Parameter("X_CORD", -1)
+            yCord = pr.Parameter("Y_CORD", -1)
 
         with module.PortRegion() as pr:
-            frameData = pr.Port("FrameData", IO.INPUT, framBitPerRow - 1)
+            frameData = pr.Port("FrameData", IO.INPUT, frameBitPerRow - 1)
             frameStrobe = pr.Port("FrameStrobe", IO.INPUT, maxFramePerCol - 1)
             configBits = pr.Port("ConfigBits", IO.OUTPUT, noConfigBits - 1)
             configBitsN = pr.Port("ConfigBits_N", IO.OUTPUT, noConfigBits - 1)
 
+        if tile.configBits == 0:
+            return
+
         totalCount = 0
         with module.LogicRegion() as lr:
+
+            lr.NewLine()
             with lr.Generate() as lrGen:
-                with lrGen.IfElse(emuEn.eq(0)) as ifElse:
+                with lrGen.IfElse(emuEn) as ifElse:
                     with ifElse.TrueRegion() as t:
-                        t.Comment("instantiate frame latches")
+                        cfg = lr.ReadMem(
+                            emuCfg,
+                            "cfg",
+                            fabric.frameBitsPerRow * fabric.maxFramesPerCol,
+                            fabric.numberOfRows * fabric.numberOfColumns,
+                        )
+                        t.Assign(
+                            configBits, cfg[yCord * fabric.numberOfColumns + xCord]
+                        )
+                        t.Assign(
+                            configBitsN, ~cfg[yCord * fabric.numberOfColumns + xCord]
+                        )
+                    with ifElse.FalseRegion() as f:
+                        f.Comment("instantiate frame latches")
                         for i in tile.configMems.configMemEntries:
                             counter = 0
                             for k in range(fabric.frameBitsPerRow):
                                 if i.usedBitMask[k] == "1":
-                                    t.InitModule(
+                                    f.InitModule(
                                         module="LHQD1",
                                         initName=f"Inst_{i.frameName}_bit{fabric.frameBitsPerRow-1-k}",
                                         ports=[
-                                            t.ConnectPair(
+                                            f.ConnectPair(
                                                 "D",
                                                 frameData[
                                                     fabric.frameBitsPerRow - 1 - k
                                                 ],
                                             ),
-                                            t.ConnectPair(
+                                            f.ConnectPair(
                                                 "E", frameStrobe[i.frameIndex]
                                             ),
-                                            t.ConnectPair(
+                                            f.ConnectPair(
                                                 "Q",
                                                 configBits[i.configBitRanges[counter]],
                                             ),
-                                            t.ConnectPair(
+                                            f.ConnectPair(
                                                 "QN",
                                                 configBitsN[i.configBitRanges[counter]],
                                             ),
@@ -129,8 +134,6 @@ def generateConfigMem(codeGen: CodeGenerator, fabric: Fabric, tile: Tile):
                                     )
                                     counter += 1
                                     totalCount += 1
-                    with ifElse.FalseRegion() as f:
-                        f.Assign(configBits, emuCfg)
-                        f.Assign(configBitsN, ~emuCfg)
-
-    assert totalCount == tile.configBits, "Not all config bits are assigned"
+    assert (
+        totalCount == tile.configBits
+    ), f"Not all config bits are assigned, {totalCount=}, {tile.configBits=}"

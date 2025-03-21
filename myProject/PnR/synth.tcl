@@ -23,7 +23,7 @@ yosys techmap -map $fabRoot/myProject/.FABulous/techmaps.v
 yosys read_rtlil -lib $fabRoot/myProject/Tile/PE/metadata/cell_const_unit.il
 yosys hilomap -wrap const_unit const_out ConfigBits
 
-yosys extract -map $fabRoot/myProject/Tile/PE/metadata/cell_reg_unit_en_1_rst_0.il
+yosys extract -map $fabRoot/myProject/Tile/PE/metadata/cell_reg_unit_tide_en_1_tide_rst_0.il
 yosys techmap -map $fabRoot/myProject/.FABulous/techmaps.v
 
 yosys iopadmap -widthparam WIDTH -outpad IO from_fabric:out -inpad IO to_fabric:in
@@ -31,6 +31,6 @@ yosys iopadmap -bits -outpad OUTBUF I:PAD -inpad INBUF O:PAD
 
 yosys opt;;;
 yosys clean -purge
-#syosys show -width
+# yosys show -widths
 
 yosys write_json $fabRoot/myProject/user_design/synth_test.json

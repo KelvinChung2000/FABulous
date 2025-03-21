@@ -1,30 +1,32 @@
 module S_IO #(
-    parameter MaxFramesPerCol = 32,
-    parameter FrameBitsPerRow = 32,
+    parameter MaxFramesPerCol = 8,
+    parameter FrameBitsPerRow = 8,
     // Emulation Parameters
     parameter EMULATION_ENABLE = 0,
-    parameter EMULATION_CONFIG = 0
+    parameter EMULATION_CONFIG = 0,
+    parameter X_CORD = -1,
+    parameter Y_CORD = -1
 )
 (
     // NORTH
-    input [31:0] in0,
-    output [31:0] out0,
+    input wire[31:0] in0,
+    output reg[31:0] out0,
     // EAST
     // SOUTH
     // WEST
-    input [31:0] in,
-    output [31:0] out,
-    input UserCLK,
-    output UserCLKo,
-    input [MaxFramesPerCol - 1:0] FrameStrobe,
-    output [MaxFramesPerCol - 1:0] FrameStrobe_O
+    input wire[31:0] S_in,
+    output reg[31:0] S_out,
+    input wire UserCLK,
+    output reg UserCLK_o,
+    input wire[FrameBitsPerRow - 1:0] FrameData,
+    output reg[FrameBitsPerRow - 1:0] FrameData_o,
+    input wire[MaxFramesPerCol - 1:0] FrameStrobe,
+    output reg[MaxFramesPerCol - 1:0] FrameStrobe_o
 );
 
 // Signal Creation
 reg [31:0] S_from_fabric;
 reg [31:0] S_to_fabric;
-reg [31:0] S_in;
-reg [31:0] S_out;
 
 // Buffering incoming and out outgoing wires
 // FrameStrobe Buffer
@@ -41,13 +43,13 @@ my_buf_pack #(
     .WIDTH(MaxFramesPerCol)
 ) strobe_outbuf (
     .A(FrameStrobe_internal),
-    .X(FrameStrobe_O)
+    .X(FrameStrobe_o)
 );
 
 // User Clock Buffer
 clk_buf #() inst_clk_buf (
     .A(UserCLK),
-    .X(UserCLKo)
+    .X(UserCLK_o)
 );
 
 // Instantiate BEL S_IO

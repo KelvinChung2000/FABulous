@@ -1,0 +1,8 @@
+<testsuites name="results">
+  <testsuite name="all" package="all">
+    <property name="random_seed" value="1742487626" />
+    <testcase name="adder_basic_test" classname="test_fabric" file="/home/kelvin/FABulous_fork/myProject/Test/test_fabric.py" lineno="19" time="0.00011491775512695312" sim_time_ns="0" ratio_time="0.0">
+      <failure message="Test failed with RANDOM_SEED=1742487626" />
+    </testcase>
+  </testsuite>
+</testsuites>

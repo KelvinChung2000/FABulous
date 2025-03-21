@@ -1209,7 +1209,7 @@ def parseConfigMem(
     # and 30th bit in the 1nd frame
     for i in configMemEntry:
         configBitRangeCopy = deepcopy(i.configBitRanges)
-        for bitIndex in range(31, -1, -1):
+        for bitIndex in range(frameBitsPerRow - 1, -1, -1):
             used_bit_mask_reversed = list(reversed(str(i.usedBitMask)))
             if used_bit_mask_reversed[bitIndex] == "1":
                 configMemMappings.append(

@@ -1,11 +1,11 @@
 digraph G {
+rankdir=TB;
 layout=dot;
 subgraph cluster_0_0 {
 label="tile_0_0_NULL";
 margin=15;
 style=rounded;
 rank=source;
-anchor_X0Y0 [style=invis];
 }
 subgraph cluster_0_1 {
 label="tile_0_1_W_IO";
@@ -38,10 +38,9 @@ label="c0.W_IO";
 "X0Y1.c0.W_to_fabric" -> "X0Y1.c0.out1_internal" [color=red];
 "X0Y1.c0.in1";
 "X0Y1.c0.in1" -> "X0Y1.c0.W_from_fabric";
-anchor_X0Y1 [style=invis];
 }
 "X1Y1.c0.in3" [color=red, style=filled, fillcolor=lightpink];
-"X0Y1.c0.out1" -> "X1Y1.c0.in3" [dir=none, color=blue, weight=10000];
+"X0Y1.c0.out1" -> "X1Y1.c0.in3" [dir=none, color=blue];
 subgraph cluster_0_2 {
 label="tile_0_2_W_IO";
 margin=15;
@@ -73,16 +72,14 @@ label="c0.W_IO";
 "X0Y2.c0.W_to_fabric" -> "X0Y2.c0.out1_internal";
 "X0Y2.c0.in1";
 "X0Y2.c0.in1" -> "X0Y2.c0.W_from_fabric";
-anchor_X0Y2 [style=invis];
 }
 "X1Y2.c0.in3";
-"X0Y2.c0.out1" -> "X1Y2.c0.in3" [dir=none, color=blue, weight=10000];
+"X0Y2.c0.out1" -> "X1Y2.c0.in3" [dir=none, color=blue];
 subgraph cluster_0_3 {
 label="tile_0_3_NULL";
 margin=15;
 style=rounded;
 rank=source;
-anchor_X0Y3 [style=invis];
 }
 subgraph cluster_1_0 {
 label="tile_1_0_S_IO";
@@ -115,10 +112,9 @@ label="c0.S_IO";
 "X1Y0.c0.S_to_fabric" -> "X1Y0.c0.out0_internal" [color=red];
 "X1Y0.c0.in0";
 "X1Y0.c0.in0" -> "X1Y0.c0.S_from_fabric";
-anchor_X1Y0 [style=invis];
 }
 "X1Y1.c0.in2" [color=red, style=filled, fillcolor=lightpink];
-"X1Y0.c0.out0" -> "X1Y1.c0.in2" [dir=none, color=blue, weight=10000];
+"X1Y0.c0.out0" -> "X1Y1.c0.in2" [dir=none, color=blue];
 subgraph cluster_1_1 {
 label="tile_1_1_PE";
 margin=15;
@@ -315,8 +311,8 @@ label="c0.W_reg_unit";
 "X1Y1.c0.in1" -> "X1Y1.c0.out3_internal";
 "X1Y1.c0.in0" -> "X1Y1.c0.data_in1";
 "X1Y1.c0.in1" -> "X1Y1.c0.data_in1";
-"X1Y1.c0.in2" -> "X1Y1.c0.data_in1" [color=red];
-"X1Y1.c0.in3" -> "X1Y1.c0.data_in1";
+"X1Y1.c0.in2" -> "X1Y1.c0.data_in1";
+"X1Y1.c0.in3" -> "X1Y1.c0.data_in1" [color=red];
 "X1Y1.c0.RES_reg_out" -> "X1Y1.c0.data_in1";
 "X1Y1.c0.N_reg_out" -> "X1Y1.c0.data_in1";
 "X1Y1.c0.E_reg_out" -> "X1Y1.c0.data_in1";
@@ -324,8 +320,8 @@ label="c0.W_reg_unit";
 "X1Y1.c0.W_reg_out" -> "X1Y1.c0.data_in1";
 "X1Y1.c0.in0" -> "X1Y1.c0.data_in2";
 "X1Y1.c0.in1" -> "X1Y1.c0.data_in2";
-"X1Y1.c0.in2" -> "X1Y1.c0.data_in2";
-"X1Y1.c0.in3" -> "X1Y1.c0.data_in2" [color=red];
+"X1Y1.c0.in2" -> "X1Y1.c0.data_in2" [color=red];
+"X1Y1.c0.in3" -> "X1Y1.c0.data_in2";
 "X1Y1.c0.const_out" -> "X1Y1.c0.data_in2";
 "X1Y1.c0.RES_reg_out" -> "X1Y1.c0.data_in2";
 "X1Y1.c0.N_reg_out" -> "X1Y1.c0.data_in2";
@@ -346,14 +342,13 @@ label="c0.W_reg_unit";
 "X1Y1.c0.S_reg_out" -> "X1Y1.c0.S_reg_in";
 "X1Y1.c0.in3" -> "X1Y1.c0.W_reg_in";
 "X1Y1.c0.W_reg_out" -> "X1Y1.c0.W_reg_in";
-anchor_X1Y1 [style=invis];
 }
 "X1Y2.c0.in2";
-"X1Y1.c0.out0" -> "X1Y2.c0.in2" [dir=none, color=blue, weight=10000];
+"X1Y1.c0.out0" -> "X1Y2.c0.in2" [dir=none, color=blue];
 "X2Y1.c0.in3" [color=red, style=filled, fillcolor=lightpink];
-"X1Y1.c0.out1" -> "X2Y1.c0.in3" [dir=none, color=blue, weight=10000];
-"X1Y1.c0.out2" -> "X1Y0.c0.in0" [dir=none, color=blue, weight=10000];
-"X1Y1.c0.out3" -> "X0Y1.c0.in1" [dir=none, color=blue, weight=10000];
+"X1Y1.c0.out1" -> "X2Y1.c0.in3" [dir=none, color=blue];
+"X1Y1.c0.out2" -> "X1Y0.c0.in0" [dir=none, color=blue];
+"X1Y1.c0.out3" -> "X0Y1.c0.in1" [dir=none, color=blue];
 subgraph cluster_1_2 {
 label="tile_1_2_PE";
 margin=15;
@@ -581,14 +576,13 @@ label="c0.W_reg_unit";
 "X1Y2.c0.S_reg_out" -> "X1Y2.c0.S_reg_in";
 "X1Y2.c0.in3" -> "X1Y2.c0.W_reg_in";
 "X1Y2.c0.W_reg_out" -> "X1Y2.c0.W_reg_in";
-anchor_X1Y2 [style=invis];
 }
 "X1Y3.c0.in2";
-"X1Y2.c0.out0" -> "X1Y3.c0.in2" [dir=none, color=blue, weight=10000];
+"X1Y2.c0.out0" -> "X1Y3.c0.in2" [dir=none, color=blue];
 "X2Y2.c0.in3";
-"X1Y2.c0.out1" -> "X2Y2.c0.in3" [dir=none, color=blue, weight=10000];
-"X1Y2.c0.out2" -> "X1Y1.c0.in0" [dir=none, color=blue, weight=10000];
-"X1Y2.c0.out3" -> "X0Y2.c0.in1" [dir=none, color=blue, weight=10000];
+"X1Y2.c0.out1" -> "X2Y2.c0.in3" [dir=none, color=blue];
+"X1Y2.c0.out2" -> "X1Y1.c0.in0" [dir=none, color=blue];
+"X1Y2.c0.out3" -> "X0Y2.c0.in1" [dir=none, color=blue];
 subgraph cluster_1_3 {
 label="tile_1_3_N_IO";
 margin=15;
@@ -620,9 +614,8 @@ label="c0.N_IO";
 "X1Y3.c0.N_to_fabric" -> "X1Y3.c0.out2_internal";
 "X1Y3.c0.in2";
 "X1Y3.c0.in2" -> "X1Y3.c0.N_from_fabric";
-anchor_X1Y3 [style=invis];
 }
-"X1Y3.c0.out2" -> "X1Y2.c0.in0" [dir=none, color=blue, weight=10000];
+"X1Y3.c0.out2" -> "X1Y2.c0.in0" [dir=none, color=blue];
 subgraph cluster_2_0 {
 label="tile_2_0_S_IO";
 margin=15;
@@ -632,7 +625,7 @@ subgraph "cluster_2_0_c0.S_IO" {
 label="c0.S_IO";
 "X2Y0.bel_c0.S_IO" [label="bel_c0.S_IO(z=0x0000)", shape=box];
 "X2Y0.c0.S_IO.from_fabric" [label="from_fabric", shape=hexagon];
-"X2Y0.c0.S_from_fabric";
+"X2Y0.c0.S_from_fabric" [color=red, style=filled, fillcolor=lightpink];
 "X2Y0.c0.S_from_fabric" -> "X2Y0.c0.S_IO.from_fabric";
 "X2Y0.c0.S_IO.from_fabric" -> "X2Y0.bel_c0.S_IO";
 "X2Y0.c0.S_IO.in" [label=in, shape=hexagon];
@@ -652,12 +645,11 @@ label="c0.S_IO";
 "X2Y0.c0.out0";
 "X2Y0.c0.out0_internal" -> "X2Y0.c0.out0";
 "X2Y0.c0.S_to_fabric" -> "X2Y0.c0.out0_internal";
-"X2Y0.c0.in0";
-"X2Y0.c0.in0" -> "X2Y0.c0.S_from_fabric";
-anchor_X2Y0 [style=invis];
+"X2Y0.c0.in0" [color=red, style=filled, fillcolor=lightpink];
+"X2Y0.c0.in0" -> "X2Y0.c0.S_from_fabric" [color=red];
 }
 "X2Y1.c0.in2";
-"X2Y0.c0.out0" -> "X2Y1.c0.in2" [dir=none, color=blue, weight=10000];
+"X2Y0.c0.out0" -> "X2Y1.c0.in2" [dir=none, color=blue];
 subgraph cluster_2_1 {
 label="tile_2_1_PE";
 margin=15;
@@ -827,12 +819,12 @@ label="c0.W_reg_unit";
 "X2Y1.c0.out0_internal";
 "X2Y1.c0.out0";
 "X2Y1.c0.out0_internal" -> "X2Y1.c0.out0";
-"X2Y1.c0.out1_internal" [color=red, style=filled, fillcolor=lightpink];
-"X2Y1.c0.out1" [color=red, style=filled, fillcolor=lightpink];
-"X2Y1.c0.out1_internal" -> "X2Y1.c0.out1" [color=red];
-"X2Y1.c0.out2_internal";
-"X2Y1.c0.out2";
-"X2Y1.c0.out2_internal" -> "X2Y1.c0.out2";
+"X2Y1.c0.out1_internal";
+"X2Y1.c0.out1";
+"X2Y1.c0.out1_internal" -> "X2Y1.c0.out1";
+"X2Y1.c0.out2_internal" [color=red, style=filled, fillcolor=lightpink];
+"X2Y1.c0.out2" [color=red, style=filled, fillcolor=lightpink];
+"X2Y1.c0.out2_internal" -> "X2Y1.c0.out2" [color=red];
 "X2Y1.c0.out3_internal";
 "X2Y1.c0.out3";
 "X2Y1.c0.out3_internal" -> "X2Y1.c0.out3";
@@ -840,11 +832,11 @@ label="c0.W_reg_unit";
 "X2Y1.c0.RES_reg_out" -> "X2Y1.c0.out0_internal";
 "X2Y1.c0.in2";
 "X2Y1.c0.in2" -> "X2Y1.c0.out0_internal";
-"X2Y1.c0.data_out" -> "X2Y1.c0.out1_internal" [color=red];
+"X2Y1.c0.data_out" -> "X2Y1.c0.out1_internal";
 "X2Y1.c0.RES_reg_out" -> "X2Y1.c0.out1_internal";
 "X2Y1.c0.in3";
 "X2Y1.c0.in3" -> "X2Y1.c0.out1_internal";
-"X2Y1.c0.data_out" -> "X2Y1.c0.out2_internal";
+"X2Y1.c0.data_out" -> "X2Y1.c0.out2_internal" [color=red];
 "X2Y1.c0.RES_reg_out" -> "X2Y1.c0.out2_internal";
 "X2Y1.c0.in0";
 "X2Y1.c0.in0" -> "X2Y1.c0.out2_internal";
@@ -885,14 +877,13 @@ label="c0.W_reg_unit";
 "X2Y1.c0.S_reg_out" -> "X2Y1.c0.S_reg_in";
 "X2Y1.c0.in3" -> "X2Y1.c0.W_reg_in";
 "X2Y1.c0.W_reg_out" -> "X2Y1.c0.W_reg_in";
-anchor_X2Y1 [style=invis];
 }
 "X2Y2.c0.in2";
-"X2Y1.c0.out0" -> "X2Y2.c0.in2" [dir=none, color=blue, weight=10000];
-"X3Y1.c0.in3" [color=red, style=filled, fillcolor=lightpink];
-"X2Y1.c0.out1" -> "X3Y1.c0.in3" [dir=none, color=blue, weight=10000];
-"X2Y1.c0.out2" -> "X2Y0.c0.in0" [dir=none, color=blue, weight=10000];
-"X2Y1.c0.out3" -> "X1Y1.c0.in1" [dir=none, color=blue, weight=10000];
+"X2Y1.c0.out0" -> "X2Y2.c0.in2" [dir=none, color=blue];
+"X3Y1.c0.in3";
+"X2Y1.c0.out1" -> "X3Y1.c0.in3" [dir=none, color=blue];
+"X2Y1.c0.out2" -> "X2Y0.c0.in0" [dir=none, color=blue];
+"X2Y1.c0.out3" -> "X1Y1.c0.in1" [dir=none, color=blue];
 subgraph cluster_2_2 {
 label="tile_2_2_PE";
 margin=15;
@@ -1120,14 +1111,13 @@ label="c0.W_reg_unit";
 "X2Y2.c0.S_reg_out" -> "X2Y2.c0.S_reg_in";
 "X2Y2.c0.in3" -> "X2Y2.c0.W_reg_in";
 "X2Y2.c0.W_reg_out" -> "X2Y2.c0.W_reg_in";
-anchor_X2Y2 [style=invis];
 }
 "X2Y3.c0.in2";
-"X2Y2.c0.out0" -> "X2Y3.c0.in2" [dir=none, color=blue, weight=10000];
+"X2Y2.c0.out0" -> "X2Y3.c0.in2" [dir=none, color=blue];
 "X3Y2.c0.in3";
-"X2Y2.c0.out1" -> "X3Y2.c0.in3" [dir=none, color=blue, weight=10000];
-"X2Y2.c0.out2" -> "X2Y1.c0.in0" [dir=none, color=blue, weight=10000];
-"X2Y2.c0.out3" -> "X1Y2.c0.in1" [dir=none, color=blue, weight=10000];
+"X2Y2.c0.out1" -> "X3Y2.c0.in3" [dir=none, color=blue];
+"X2Y2.c0.out2" -> "X2Y1.c0.in0" [dir=none, color=blue];
+"X2Y2.c0.out3" -> "X1Y2.c0.in1" [dir=none, color=blue];
 subgraph cluster_2_3 {
 label="tile_2_3_N_IO";
 margin=15;
@@ -1159,15 +1149,13 @@ label="c0.N_IO";
 "X2Y3.c0.N_to_fabric" -> "X2Y3.c0.out2_internal";
 "X2Y3.c0.in2";
 "X2Y3.c0.in2" -> "X2Y3.c0.N_from_fabric";
-anchor_X2Y3 [style=invis];
 }
-"X2Y3.c0.out2" -> "X2Y2.c0.in0" [dir=none, color=blue, weight=10000];
+"X2Y3.c0.out2" -> "X2Y2.c0.in0" [dir=none, color=blue];
 subgraph cluster_3_0 {
 label="tile_3_0_NULL";
 margin=15;
 style=rounded;
 rank=source;
-anchor_X3Y0 [style=invis];
 }
 subgraph cluster_3_1 {
 label="tile_3_1_E_IO";
@@ -1178,7 +1166,7 @@ subgraph "cluster_3_1_c0.E_IO" {
 label="c0.E_IO";
 "X3Y1.bel_c0.E_IO" [label="bel_c0.E_IO(z=0x0000)", shape=box];
 "X3Y1.c0.E_IO.from_fabric" [label="from_fabric", shape=hexagon];
-"X3Y1.c0.E_from_fabric" [color=red, style=filled, fillcolor=lightpink];
+"X3Y1.c0.E_from_fabric";
 "X3Y1.c0.E_from_fabric" -> "X3Y1.c0.E_IO.from_fabric";
 "X3Y1.c0.E_IO.from_fabric" -> "X3Y1.bel_c0.E_IO";
 "X3Y1.c0.E_IO.in" [label=in, shape=hexagon];
@@ -1199,10 +1187,9 @@ label="c0.E_IO";
 "X3Y1.c0.out3_internal" -> "X3Y1.c0.out3";
 "X3Y1.c0.E_to_fabric" -> "X3Y1.c0.out3_internal";
 "X3Y1.c0.in3";
-"X3Y1.c0.in3" -> "X3Y1.c0.E_from_fabric" [color=red];
-anchor_X3Y1 [style=invis];
+"X3Y1.c0.in3" -> "X3Y1.c0.E_from_fabric";
 }
-"X3Y1.c0.out3" -> "X2Y1.c0.in1" [dir=none, color=blue, weight=10000];
+"X3Y1.c0.out3" -> "X2Y1.c0.in1" [dir=none, color=blue];
 subgraph cluster_3_2 {
 label="tile_3_2_E_IO";
 margin=15;
@@ -1234,38 +1221,12 @@ label="c0.E_IO";
 "X3Y2.c0.E_to_fabric" -> "X3Y2.c0.out3_internal";
 "X3Y2.c0.in3";
 "X3Y2.c0.in3" -> "X3Y2.c0.E_from_fabric";
-anchor_X3Y2 [style=invis];
 }
-"X3Y2.c0.out3" -> "X2Y2.c0.in1" [dir=none, color=blue, weight=10000];
+"X3Y2.c0.out3" -> "X2Y2.c0.in1" [dir=none, color=blue];
 subgraph cluster_3_3 {
 label="tile_3_3_NULL";
 margin=15;
 style=rounded;
 rank=source;
-anchor_X3Y3 [style=invis];
 }
-anchor_X0Y0 -> anchor_X1Y0 [style=invis, weight=10000];
-anchor_X0Y1 -> anchor_X1Y1 [style=invis, weight=10000];
-anchor_X0Y2 -> anchor_X1Y2 [style=invis, weight=10000];
-anchor_X0Y3 -> anchor_X1Y3 [style=invis, weight=10000];
-anchor_X1Y0 -> anchor_X2Y0 [style=invis, weight=10000];
-anchor_X1Y1 -> anchor_X2Y1 [style=invis, weight=10000];
-anchor_X1Y2 -> anchor_X2Y2 [style=invis, weight=10000];
-anchor_X1Y3 -> anchor_X2Y3 [style=invis, weight=10000];
-anchor_X2Y0 -> anchor_X3Y0 [style=invis, weight=10000];
-anchor_X2Y1 -> anchor_X3Y1 [style=invis, weight=10000];
-anchor_X2Y2 -> anchor_X3Y2 [style=invis, weight=10000];
-anchor_X2Y3 -> anchor_X3Y3 [style=invis, weight=10000];
-anchor_X0Y0 -> anchor_X0Y1 [style=invis, rank=same, weight=10000];
-anchor_X1Y0 -> anchor_X1Y1 [style=invis, rank=same, weight=10000];
-anchor_X2Y0 -> anchor_X2Y1 [style=invis, rank=same, weight=10000];
-anchor_X3Y0 -> anchor_X3Y1 [style=invis, rank=same, weight=10000];
-anchor_X0Y1 -> anchor_X0Y2 [style=invis, rank=same, weight=10000];
-anchor_X1Y1 -> anchor_X1Y2 [style=invis, rank=same, weight=10000];
-anchor_X2Y1 -> anchor_X2Y2 [style=invis, rank=same, weight=10000];
-anchor_X3Y1 -> anchor_X3Y2 [style=invis, rank=same, weight=10000];
-anchor_X0Y2 -> anchor_X0Y3 [style=invis, rank=same, weight=10000];
-anchor_X1Y2 -> anchor_X1Y3 [style=invis, rank=same, weight=10000];
-anchor_X2Y2 -> anchor_X2Y3 [style=invis, rank=same, weight=10000];
-anchor_X3Y2 -> anchor_X3Y3 [style=invis, rank=same, weight=10000];
 }

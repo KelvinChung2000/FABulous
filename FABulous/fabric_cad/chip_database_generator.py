@@ -232,12 +232,12 @@ def genFabric(fabric: Fabric, chip: Chip, context=1):
                     node = [
                         NodeWire(
                             clipX(x),
-                            clipY(fabric.numberOfRows - y - 1),
+                            clipY(y),
                             f"c{c}.{wire.source.name}[{i}]",
                         ),
                         NodeWire(
                             clipX(x + wire.xOffset),
-                            clipY(fabric.numberOfRows - y - 1 - wire.yOffset),
+                            clipY(y - wire.yOffset),
                             f"c{c}.{wire.destination.name}[{i}]",
                         ),
                     ]

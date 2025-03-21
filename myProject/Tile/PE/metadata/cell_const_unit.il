@@ -9,6 +9,7 @@ module \const_unit
   parameter \WIDTH 32
   attribute \CONFIG_BIT 1
   attribute \FABulous 1
+  attribute \FEATURE "const_value"
   attribute \INIT 1
   wire width 8 input 2 \ConfigBits
   attribute \BUS 1

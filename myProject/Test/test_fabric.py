@@ -1,16 +1,16 @@
 import os
-from pprint import pprint
-import random
-import sys
 from pathlib import Path
+from typing import Mapping
 
 import cocotb
-from cocotb.triggers import Timer
+from bitarray import bitarray
+from bitarray.util import ba2hex, int2ba
 from cocotb.runner import get_runner
+from cocotb.triggers import Timer
 
-from FABulous.fabric_cad.bit_gen import Fabric
 from FABulous.fabric_cad.bitstreamSpec_generator import generateBitsStreamSpec
 from FABulous.fabric_cad.define import FASMFeature, FeatureValue
+from FABulous.fabric_definition.define import Loc
 from FABulous.fabric_generator.define import WriterType
 from FABulous.file_parser.file_parser_fasm import parseFASM
 from FABulous.file_parser.file_parser_yaml import parseFabricYAML
@@ -18,19 +18,23 @@ from FABulous.file_parser.file_parser_yaml import parseFabricYAML
 
 @cocotb.test
 async def adder_basic_test(dut):
-    """Test for 5 + 10"""
+    await Timer(1)
+    print(dut.EMULATION_ENABLE.value)
+    print(dut.EMULATION_CONFIG.value)
+    print(dut.PE_Tile_X1Y1.ConfigBits.value)
+    dut.Tile_X1Y0_S_in.value = 10
+    dut.Tile_X0Y1_W_in.value = 10
+    await Timer(1)
+    print(dut.Tile_X1Y1_out0.value)
+    print(dut.Tile_X1Y1_out1.value.integer)
+    print(dut.Tile_X1Y1_out2.value.integer)
+    print(dut.Tile_X1Y1_out3.value)
 
-    A = 5
-    B = 10
+    print(dut.Tile_X2Y1_out0.value)
+    print(dut.Tile_X2Y1_out1.value)
+    print(dut.Tile_X2Y1_out2.value)
+    print(dut.Tile_X2Y1_out3.value)
 
-    dut.A.value = A
-    dut.B.value = B
-
-    await Timer(2, units="ns")
-
-    assert dut.X.value == adder_model(
-        A, B
-    ), f"Adder result is incorrect: {dut.X.value} != 15"
 
 
 def test_tile_runner():
@@ -40,20 +44,21 @@ def test_tile_runner():
     """
     projectLang = WriterType[os.getenv("FAB_PROJ_LANG", "verilog").upper()]
     sim = os.getenv("SIMULATOR", "icarus")
-    projectPath = Path(os.getenv("my_FAB_PROJECT", ".")) / "myProject"
-
+    # projectPath = Path(os.getenv("my_FAB_PROJECT", ".")) / "myProject"
+    projectPath = Path("/home/kelvin/FABulous_fork/myProject")
     match projectLang:
         case WriterType.VERILOG:
-            sources = list(projectPath.glob("Tile/PE/*.v"))
+            sources = list(projectPath.glob("Tile/*/*.v"))
             sources.extend(list(projectPath.glob("Fabric/*.v")))
         case WriterType.VHDL:
-            sources = list(projectPath.glob("Tile/**/*.vhdl"))
+            sources = list(projectPath.glob("Tile/*/*.vhdl"))
             sources.extend(list(projectPath.glob("Fabric/*.vhdl")))
         case WriterType.SYSTEM_VERILOG:
-            sources = list(projectPath.glob("Tile/**/*.sv"))
+            sources = list(projectPath.glob("Tile/*/*.sv"))
             sources.extend(list(projectPath.glob("Fabric/*.sv")))
         case _:
             raise ValueError(f"Unknown project language: {projectLang}")
+    sources = list(set(sources))
     runner = get_runner(sim)
     fasm: list[FASMFeature] = parseFASM(
         Path("/home/kelvin/FABulous_fork/myProject/user_design/router_test.fasm")
@@ -67,7 +72,6 @@ def test_tile_runner():
         if f.feature is None:
             continue
         if f.feature not in spec:
-            print(f.feature)
             continue
         featVal = spec[f.feature]
         if featVal.value is None:
@@ -75,17 +79,60 @@ def test_tile_runner():
         else:
             featureSet.add(spec[f.feature])
 
-    pprint(featureSet)
+    bitStreamMap: Mapping[Loc, list[bitarray]] = {}
+    for (x, y), _ in fabric:
+        bitStreamMap[(x, y)] = [
+            bitarray(fabric.frameBitsPerRow) for _ in range(fabric.maxFramesPerCol)
+        ]
 
-    # runner.build(
-    #     sources=sources,
-    #     hdl_toplevel="hycube",
-    #     always=True,
-    #     build_dir=Path(os.getenv("my_FAB_PROJECT", ".")) / "myProject/Test",
-    # )
-    # runner.test(
-    #     hdl_toplevel="hycube", test_module="test_fabric"
-    # )
+    for f in featureSet:
+        value = int2ba(f.value, len(f.bitPosition))
+        for i in range(len(f.bitPosition)):
+            frameIdx, bitIdx = f.bitPosition[i]
+            if frameIdx is None or bitIdx is None:
+                continue
+            x = f.tileLoc[0]
+            y = fabric.numberOfRows - f.tileLoc[1] - 1
+            bitStreamMap[(x, y)][frameIdx][bitIdx] = value[i]
+
+    bitStreamLocMap = {}
+    for i in bitStreamMap:
+        tmp = bitarray()
+        for j in bitStreamMap[i]:
+            tmp += j
+        bitStreamLocMap[i] = tmp
+
+    bitstream = bitarray()
+    for x in range(fabric.numberOfRows):
+        for y in range(fabric.numberOfColumns):
+            bitstream += bitStreamLocMap[(x, y)]
+
+    # buildDir = Path(os.getenv("my_FAB_PROJECT", ".")) / "myProject/Test"
+    buildDir = projectPath / "Test"
+
+    with open(buildDir / "bitstream.hex", "w") as f:
+        for x in range(fabric.numberOfRows):
+            for y in range(fabric.numberOfColumns):
+                f.write(f"{ba2hex(bitStreamLocMap[(x, y)])} //X{x}Y{y}\n")
+
+    parameters = {
+        "EMULATION_ENABLE": 1,
+        "EMULATION_CONFIG": f"\"{str(buildDir / "bitstream.hex")}\"",
+    }
+
+    runner.build(
+        sources=sources,
+        hdl_toplevel="hycube",
+        always=True,
+        build_dir=buildDir,
+        parameters=parameters,
+    )
+    runner.test(
+        hdl_toplevel="hycube",
+        test_module="test_fabric",
+        parameters=parameters,
+    )
+
 
 if __name__ == "__main__":
     test_tile_runner()

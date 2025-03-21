@@ -6,11 +6,11 @@ module map_ALU_ALU_func_0 #(
     parameter _TECHMAP_CONSTVAL_data_out_ = 32'bx
 )
 (
-    input [2:0] ALU_func,
-    input [31:0] data_in1,
-    input [31:0] data_in2,
-    input [31:0] data_in3,
-    output [31:0] data_out
+    input wire[2:0] ALU_func,
+    input wire[31:0] data_in1,
+    input wire[31:0] data_in2,
+    input wire[31:0] data_in3,
+    output reg[31:0] data_out
 );
 
 generate
@@ -34,11 +34,11 @@ module map_ALU_ALU_func_1 #(
     parameter _TECHMAP_CONSTVAL_data_out_ = 32'bx
 )
 (
-    input [2:0] ALU_func,
-    input [31:0] data_in1,
-    input [31:0] data_in2,
-    input [31:0] data_in3,
-    output [31:0] data_out
+    input wire[2:0] ALU_func,
+    input wire[31:0] data_in1,
+    input wire[31:0] data_in2,
+    input wire[31:0] data_in3,
+    output reg[31:0] data_out
 );
 
 generate
@@ -62,11 +62,11 @@ module map_ALU_ALU_func_2 #(
     parameter _TECHMAP_CONSTVAL_data_out_ = 32'bx
 )
 (
-    input [2:0] ALU_func,
-    input [31:0] data_in1,
-    input [31:0] data_in2,
-    input [31:0] data_in3,
-    output [31:0] data_out
+    input wire[2:0] ALU_func,
+    input wire[31:0] data_in1,
+    input wire[31:0] data_in2,
+    input wire[31:0] data_in3,
+    output reg[31:0] data_out
 );
 
 generate
@@ -90,11 +90,11 @@ module map_ALU_ALU_func_3 #(
     parameter _TECHMAP_CONSTVAL_data_out_ = 32'bx
 )
 (
-    input [2:0] ALU_func,
-    input [31:0] data_in1,
-    input [31:0] data_in2,
-    input [31:0] data_in3,
-    output [31:0] data_out
+    input wire[2:0] ALU_func,
+    input wire[31:0] data_in1,
+    input wire[31:0] data_in2,
+    input wire[31:0] data_in3,
+    output reg[31:0] data_out
 );
 
 generate
@@ -118,11 +118,11 @@ module map_ALU_ALU_func_4 #(
     parameter _TECHMAP_CONSTVAL_data_out_ = 32'bx
 )
 (
-    input [2:0] ALU_func,
-    input [31:0] data_in1,
-    input [31:0] data_in2,
-    input [31:0] data_in3,
-    output [31:0] data_out
+    input wire[2:0] ALU_func,
+    input wire[31:0] data_in1,
+    input wire[31:0] data_in2,
+    input wire[31:0] data_in3,
+    output reg[31:0] data_out
 );
 
 generate
@@ -146,11 +146,11 @@ module map_ALU_ALU_func_5 #(
     parameter _TECHMAP_CONSTVAL_data_out_ = 32'bx
 )
 (
-    input [2:0] ALU_func,
-    input [31:0] data_in1,
-    input [31:0] data_in2,
-    input [31:0] data_in3,
-    output [31:0] data_out
+    input wire[2:0] ALU_func,
+    input wire[31:0] data_in1,
+    input wire[31:0] data_in2,
+    input wire[31:0] data_in3,
+    output reg[31:0] data_out
 );
 
 generate

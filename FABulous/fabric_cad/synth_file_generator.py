@@ -83,8 +83,9 @@ def genCellsAndMaps(bel: Bel):
     for wire in module.selected_wires():
         p = bel.findPortByName(wire.name.str()[1:])
         if isinstance(p, ConfigPort):
+            print(p.features)
             if len(p.features) == 1:
-                ranges.append(range(1))
+                ranges.append(range(2))
             else:
                 ranges.append(range(len(p.features)))
         else:
@@ -181,6 +182,10 @@ def genCellsAndMaps(bel: Bel):
                         portConnect,
                         paramConnect,
                     )
+
+
+def genSynthScript(fabric: Fabric, filename: Path):
+    pass
 
 
 if __name__ == "__main__":

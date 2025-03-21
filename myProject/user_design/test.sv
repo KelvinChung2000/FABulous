@@ -50,26 +50,26 @@ std_add #(
 ) adder1 (
     .left(A),
     .right(B),
-    .out(C_out)
+    .out(Y)
 );
 
-std_reg #(
-    .WIDTH(32)
-) regs (
-    .in(C_out),
-    .write_en(1),
-    .clk(clk),
-    .reset(0),
-    .out(reg_out),
-    .done()
-);
+// std_reg #(
+//     .WIDTH(32)
+// ) regs (
+//     .in(C_out),
+//     .write_en(1),
+//     .clk(clk),
+//     .reset(0),
+//     .out(reg_out),
+//     .done()
+// );
 
-std_add #(
-    .WIDTH(32)
-) adder2 (
-    .left (reg_out),
-    .right('d7),
-    .out  (Y)
-);
+// std_add #(
+//     .WIDTH(32)
+// ) adder2 (
+//     .left (reg_out),
+//     .right('d7),
+//     .out  (Y)
+// );
 
 endmodule

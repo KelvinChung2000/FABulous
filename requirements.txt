@@ -6,3 +6,4 @@ pyosys
 pyyaml
 jinja2
 ruamel.yaml
+bitarray

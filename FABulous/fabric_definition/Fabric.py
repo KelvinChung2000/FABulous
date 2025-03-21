@@ -148,14 +148,17 @@ class Fabric:
         for y, row in enumerate(self.tiles):
             for x, tile in enumerate(row):
                 if tile is not None:
-                    yield ((x, y), self.tileDict.get(tile, None))
+                    yield (
+                        (x, self.numberOfRows - y - 1),
+                        self.tileDict.get(tile, None),
+                    )
                 else:
                     yield ((x, y), None)
 
-    def getFlattenFabric(self) -> Generator[tuple[Loc, Tile | None], None, None]:
-        for y, row in enumerate(self.tiles):
-            for x, tile in enumerate(row):
-                if tile is not None:
-                    yield ((x, y), self.tileDict.get(tile, None))
-                else:
-                    yield ((x, y), None)
+    # def getFlattenFabric(self) -> Generator[tuple[Loc, Tile | None], None, None]:
+    #     for y, row in enumerate(self.tiles):
+    #         for x, tile in enumerate(row):
+    #             if tile is not None:
+    #                 yield ((x, y), self.tileDict.get(tile, None))
+    #             else:
+    #                 yield ((x, y), None)

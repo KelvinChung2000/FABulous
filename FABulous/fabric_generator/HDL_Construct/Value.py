@@ -66,7 +66,7 @@ class Value:
                     self.isSignal,
                 )
             else:
-                raise ValueError("Can only index port and signal type")
+                raise ValueError("Can only slice port and signal type")
         elif isinstance(key, Value):
             return Value(f"{self.value}[{key.value}]", self.bitWidth, self.isSignal)
         else:

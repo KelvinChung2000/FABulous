@@ -16,12 +16,144 @@ module PE_ConfigMem #(
 );
 
 
-reg [63:0] cfg [0:15];
-initial $readmemh(EMULATION_CONFIG, cfg);
 generate
 if(EMULATION_ENABLE) begin
-assign ConfigBits = cfg[Y_CORD * 4 + X_CORD];
-assign ConfigBits_N = ~cfg[Y_CORD * 4 + X_CORD];
+reg [63:0] cfg [0:15];
+initial $readmemh(EMULATION_CONFIG, cfg);
+reg [63:0] tileConf;
+assign tileConf = cfg[Y_CORD * 4 + X_CORD];
+// config bit 0 at frame 5 bit 4
+assign ConfigBits[0] = tileConf[20];
+assign ConfigBits_N[0] = ~tileConf[20];
+// config bit 1 at frame 5 bit 5
+assign ConfigBits[1] = tileConf[21];
+assign ConfigBits_N[1] = ~tileConf[21];
+// config bit 2 at frame 5 bit 6
+assign ConfigBits[2] = tileConf[22];
+assign ConfigBits_N[2] = ~tileConf[22];
+// config bit 3 at frame 5 bit 7
+assign ConfigBits[3] = tileConf[23];
+assign ConfigBits_N[3] = ~tileConf[23];
+// config bit 4 at frame 4 bit 0
+assign ConfigBits[4] = tileConf[24];
+assign ConfigBits_N[4] = ~tileConf[24];
+// config bit 5 at frame 4 bit 1
+assign ConfigBits[5] = tileConf[25];
+assign ConfigBits_N[5] = ~tileConf[25];
+// config bit 6 at frame 4 bit 2
+assign ConfigBits[6] = tileConf[26];
+assign ConfigBits_N[6] = ~tileConf[26];
+// config bit 7 at frame 4 bit 3
+assign ConfigBits[7] = tileConf[27];
+assign ConfigBits_N[7] = ~tileConf[27];
+// config bit 8 at frame 4 bit 4
+assign ConfigBits[8] = tileConf[28];
+assign ConfigBits_N[8] = ~tileConf[28];
+// config bit 9 at frame 4 bit 5
+assign ConfigBits[9] = tileConf[29];
+assign ConfigBits_N[9] = ~tileConf[29];
+// config bit 10 at frame 4 bit 6
+assign ConfigBits[10] = tileConf[30];
+assign ConfigBits_N[10] = ~tileConf[30];
+// config bit 11 at frame 4 bit 7
+assign ConfigBits[11] = tileConf[31];
+assign ConfigBits_N[11] = ~tileConf[31];
+// config bit 12 at frame 3 bit 0
+assign ConfigBits[12] = tileConf[32];
+assign ConfigBits_N[12] = ~tileConf[32];
+// config bit 13 at frame 3 bit 1
+assign ConfigBits[13] = tileConf[33];
+assign ConfigBits_N[13] = ~tileConf[33];
+// config bit 14 at frame 3 bit 2
+assign ConfigBits[14] = tileConf[34];
+assign ConfigBits_N[14] = ~tileConf[34];
+// config bit 15 at frame 3 bit 3
+assign ConfigBits[15] = tileConf[35];
+assign ConfigBits_N[15] = ~tileConf[35];
+// config bit 16 at frame 3 bit 4
+assign ConfigBits[16] = tileConf[36];
+assign ConfigBits_N[16] = ~tileConf[36];
+// config bit 17 at frame 3 bit 5
+assign ConfigBits[17] = tileConf[37];
+assign ConfigBits_N[17] = ~tileConf[37];
+// config bit 18 at frame 3 bit 6
+assign ConfigBits[18] = tileConf[38];
+assign ConfigBits_N[18] = ~tileConf[38];
+// config bit 19 at frame 3 bit 7
+assign ConfigBits[19] = tileConf[39];
+assign ConfigBits_N[19] = ~tileConf[39];
+// config bit 20 at frame 2 bit 0
+assign ConfigBits[20] = tileConf[40];
+assign ConfigBits_N[20] = ~tileConf[40];
+// config bit 21 at frame 2 bit 1
+assign ConfigBits[21] = tileConf[41];
+assign ConfigBits_N[21] = ~tileConf[41];
+// config bit 22 at frame 2 bit 2
+assign ConfigBits[22] = tileConf[42];
+assign ConfigBits_N[22] = ~tileConf[42];
+// config bit 23 at frame 2 bit 3
+assign ConfigBits[23] = tileConf[43];
+assign ConfigBits_N[23] = ~tileConf[43];
+// config bit 24 at frame 2 bit 4
+assign ConfigBits[24] = tileConf[44];
+assign ConfigBits_N[24] = ~tileConf[44];
+// config bit 25 at frame 2 bit 5
+assign ConfigBits[25] = tileConf[45];
+assign ConfigBits_N[25] = ~tileConf[45];
+// config bit 26 at frame 2 bit 6
+assign ConfigBits[26] = tileConf[46];
+assign ConfigBits_N[26] = ~tileConf[46];
+// config bit 27 at frame 2 bit 7
+assign ConfigBits[27] = tileConf[47];
+assign ConfigBits_N[27] = ~tileConf[47];
+// config bit 28 at frame 1 bit 0
+assign ConfigBits[28] = tileConf[48];
+assign ConfigBits_N[28] = ~tileConf[48];
+// config bit 29 at frame 1 bit 1
+assign ConfigBits[29] = tileConf[49];
+assign ConfigBits_N[29] = ~tileConf[49];
+// config bit 30 at frame 1 bit 2
+assign ConfigBits[30] = tileConf[50];
+assign ConfigBits_N[30] = ~tileConf[50];
+// config bit 31 at frame 1 bit 3
+assign ConfigBits[31] = tileConf[51];
+assign ConfigBits_N[31] = ~tileConf[51];
+// config bit 32 at frame 1 bit 4
+assign ConfigBits[32] = tileConf[52];
+assign ConfigBits_N[32] = ~tileConf[52];
+// config bit 33 at frame 1 bit 5
+assign ConfigBits[33] = tileConf[53];
+assign ConfigBits_N[33] = ~tileConf[53];
+// config bit 34 at frame 1 bit 6
+assign ConfigBits[34] = tileConf[54];
+assign ConfigBits_N[34] = ~tileConf[54];
+// config bit 35 at frame 1 bit 7
+assign ConfigBits[35] = tileConf[55];
+assign ConfigBits_N[35] = ~tileConf[55];
+// config bit 36 at frame 0 bit 0
+assign ConfigBits[36] = tileConf[56];
+assign ConfigBits_N[36] = ~tileConf[56];
+// config bit 37 at frame 0 bit 1
+assign ConfigBits[37] = tileConf[57];
+assign ConfigBits_N[37] = ~tileConf[57];
+// config bit 38 at frame 0 bit 2
+assign ConfigBits[38] = tileConf[58];
+assign ConfigBits_N[38] = ~tileConf[58];
+// config bit 39 at frame 0 bit 3
+assign ConfigBits[39] = tileConf[59];
+assign ConfigBits_N[39] = ~tileConf[59];
+// config bit 40 at frame 0 bit 4
+assign ConfigBits[40] = tileConf[60];
+assign ConfigBits_N[40] = ~tileConf[60];
+// config bit 41 at frame 0 bit 5
+assign ConfigBits[41] = tileConf[61];
+assign ConfigBits_N[41] = ~tileConf[61];
+// config bit 42 at frame 0 bit 6
+assign ConfigBits[42] = tileConf[62];
+assign ConfigBits_N[42] = ~tileConf[62];
+// config bit 43 at frame 0 bit 7
+assign ConfigBits[43] = tileConf[63];
+assign ConfigBits_N[43] = ~tileConf[63];
 end
 else begin
 // instantiate frame latches

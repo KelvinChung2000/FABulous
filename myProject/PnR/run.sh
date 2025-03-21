@@ -19,6 +19,6 @@ nextpnr-himbaechel --chipdb ../.FABulous/hycube.bit --device "FABulous" \
                    -o placeTrial=100 \
                    --debug-placer
 
-python /home/kelvin/FABulous_fork/myProject/Test/test_fabric.py
+python $my_FAB_ROOT/myProject/Test/test_fabric.py
 
 # /home/kelvin/FABulous_fork/.venv/bin/python /home/kelvin/FABulous_fork/FABulous/fabric_cad/graph_draw.py

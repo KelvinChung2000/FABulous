@@ -9,10 +9,10 @@ yosys opt -full
 yosys clean -purge
 
 yosys techmap -map $fabRoot/myProject/.FABulous/wrap_map.v
-yosys read_rtlil -lib $fabRoot/myProject/Tile/PE/metadata/cell_ALU_ALU_func_0.il
+yosys read_rtlil -lib $fabRoot/myProject/Tile/PE/metadata/cell_ALU_ALU_func_1.il
 yosys connwrappers -unsigned \$__add_wrapper Y Y_WIDTH ;;
 yosys design -push 
-yosys read_rtlil $fabRoot/myProject/Tile/PE/metadata/cell_ALU_ALU_func_0.il
+yosys read_rtlil $fabRoot/myProject/Tile/PE/metadata/cell_ALU_ALU_func_1.il
 yosys techmap -map $fabRoot/myProject/.FABulous/wrap_map.v
 yosys design -save __add_xmap
 yosys design -pop

@@ -1,11 +1,11 @@
-module std_add #(
+module std_sub #(
     parameter WIDTH = 32
 ) (
     input  logic [WIDTH-1:0] left,
     input  logic [WIDTH-1:0] right,
     output logic [WIDTH-1:0] out
 );
-  assign out = left + right;
+  assign out = left - right;
 endmodule
 
 
@@ -45,7 +45,7 @@ CLK_DRV clk_drv_i (
     .CLK_O(clk)
 );
 
-std_add #(
+std_sub #(
     .WIDTH(32)
 ) adder1 (
     .left(A),

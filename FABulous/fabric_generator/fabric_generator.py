@@ -1,8 +1,6 @@
 from collections import defaultdict
 from typing import Mapping
 
-from numpy import flip
-
 from FABulous.fabric_definition.define import IO, ConfigBitMode, Loc, Side
 from FABulous.fabric_definition.Fabric import Fabric
 from FABulous.fabric_definition.Port import BelPort

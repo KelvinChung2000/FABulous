@@ -1,5 +1,6 @@
 import os
 from pathlib import Path
+from pprint import pprint
 from typing import Mapping
 
 import cocotb
@@ -19,8 +20,8 @@ from FABulous.file_parser.file_parser_yaml import parseFabricYAML
 @cocotb.test
 async def adder_basic_test(dut):
     await Timer(1)
-    dut.Tile_X3Y1_E_in.value = 10
-    dut.Tile_X0Y1_W_in.value = 20
+    dut.Tile_X1Y0_S_in.value = 16
+    dut.Tile_X0Y1_W_in.value = 8
     await Timer(1)
     await Timer(1)
     print("X1Y1 data in")
@@ -37,14 +38,19 @@ async def adder_basic_test(dut):
     print(dut.PE_Tile_X1Y1.data_out.value)
     print()
     print("X1Y1 data out")
-    print(dut.Tile_X1Y1_out0.value)
-    print(dut.Tile_X1Y1_out1.value)
-    print(dut.Tile_X1Y1_out2.value)
-    print(dut.Tile_X1Y1_out3.value)
+    print(dut.PE_Tile_X1Y1.out0.value)
+    print(dut.PE_Tile_X1Y1.out1.value)
+    print(dut.PE_Tile_X1Y1.out2.value)
+    print(dut.PE_Tile_X1Y1.out3.value)
     print()
-    print("X1Y0 data out")
-    print(dut.Tile_X1Y0_S_out.value)
-
+    print(dut.PE_Tile_X1Y1.Inst_PE_switch_matrix.in2.value)
+    print(dut.PE_Tile_X1Y1.Inst_PE_switch_matrix.RES_reg_out.value)
+    print(dut.PE_Tile_X1Y1.Inst_PE_switch_matrix.data_out.value)
+    print(dut.PE_Tile_X1Y1.Inst_PE_switch_matrix.ConfigBits.value)
+    print(dut.PE_Tile_X1Y1.Inst_PE_switch_matrix.out0.value)
+    print()
+    print("X1Y3 data out")
+    print(dut.Tile_X1Y3_N_out.value)
 
 
 def test_tile_runner():
@@ -55,7 +61,7 @@ def test_tile_runner():
     projectLang = WriterType[os.getenv("FAB_PROJ_LANG", "verilog").upper()]
     sim = os.getenv("SIMULATOR", "icarus")
     # projectPath = Path(os.getenv("my_FAB_PROJECT", ".")) / "myProject"
-    projectPath = Path("/home/kelvin/FABulous_fork/myProject")
+    projectPath = Path(os.getenv("my_FAB_ROOT", ".")) / "myProject"
     match projectLang:
         case WriterType.VERILOG:
             sources = list(projectPath.glob("Tile/*/*.v"))
@@ -71,12 +77,13 @@ def test_tile_runner():
     sources = list(set(sources))
     runner = get_runner(sim)
     fasm: list[FASMFeature] = parseFASM(
-        Path("/home/kelvin/FABulous_fork/myProject/user_design/router_test.fasm")
+        projectPath / "user_design/router_test.fasm"
     )
 
-    fabric = parseFabricYAML(Path("/home/kelvin/FABulous_fork/myProject/fabric.yaml"))
+    fabric = parseFabricYAML(projectPath / "fabric.yaml")
     spec = generateBitsStreamSpec(fabric)
     featureSet = set()
+    # TODO Missing internal connection pip
     for f in fasm:
         if f.feature is None:
             continue
@@ -88,24 +95,27 @@ def test_tile_runner():
         else:
             featureSet.add(spec[f.feature])
 
-    bitStreamMap: Mapping[Loc, list[bitarray]] = {}
+    bitStreamFrameBitIdxMap: Mapping[Loc, list[bitarray]] = {}
     for (x, y), _ in fabric:
-        bitStreamMap[(x, y)] = [
+        bitStreamFrameBitIdxMap[(x, y)] = [
             bitarray(fabric.frameBitsPerRow) for _ in range(fabric.maxFramesPerCol)
         ]
 
     for f in featureSet:
         value = int2ba(f.value, len(f.bitPosition))
+        value.reverse()
+        print(f, value)
         for i in range(len(f.bitPosition)):
             frameIdx, bitIdx = f.bitPosition[i]
+            bitIdx = fabric.frameBitsPerRow - bitIdx - 1
             if frameIdx is None or bitIdx is None:
                 continue
-            bitStreamMap[f.tileLoc][frameIdx][bitIdx] = value[i]
-
+            bitStreamFrameBitIdxMap[f.tileLoc][frameIdx][bitIdx] = value[i]
+    pprint(bitStreamFrameBitIdxMap[(1,1)])
     bitStreamLocMap = {}
-    for i in bitStreamMap:
+    for i in bitStreamFrameBitIdxMap:
         tmp = bitarray()
-        for j in bitStreamMap[i]:
+        for j in bitStreamFrameBitIdxMap[i]:
             tmp += j
         bitStreamLocMap[i] = tmp
 

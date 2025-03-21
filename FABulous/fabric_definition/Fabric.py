@@ -153,7 +153,7 @@ class Fabric:
                         self.tileDict.get(tile, None),
                     )
                 else:
-                    yield ((x, y), None)
+                    yield ((x, self.numberOfRows - y - 1), None)
 
     # def getFlattenFabric(self) -> Generator[tuple[Loc, Tile | None], None, None]:
     #     for y, row in enumerate(self.tiles):

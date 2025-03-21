@@ -1,6 +1,7 @@
 import re
 from collections import defaultdict
 from pathlib import Path
+from typing import Generator
 
 import yaml
 from loguru import logger
@@ -111,83 +112,88 @@ def parseFabricYAML(fileName: Path) -> Fabric:
     height = len(fabricTiles)
     width = len(fabricTiles[0])
 
+    def tileIter() -> Generator[tuple[Loc, str], None, None]:
+        for y, row in enumerate(fabricTiles):
+            for x, tileName in enumerate(row):
+                if tileName is not None:
+                    yield (x, (height - y - 1)), tileName
+
     wireDict: dict[Loc, list[Wire]] = defaultdict(list)
-    for y, row in enumerate(fabricTiles):
-        for x, tileName in enumerate(row):
-            # TODO add empty tile that have contains crossing wires
-            if tileName is None:
+    for (x, y), tileName in tileIter():
+
+        # TODO add empty tile that have contains crossing wires
+        if tileName is None:
+            continue
+
+        for wireEntry in wireDictUnprocessed[tileName]:
+            tx = int(wireEntry["X-offset"])
+            ty = int(wireEntry["Y-offset"])
+
+            if tx == ty == 0:
                 continue
 
-            for wireEntry in wireDictUnprocessed[tileName]:
-                tx = int(wireEntry["X-offset"])
-                ty = int(wireEntry["Y-offset"])
+            sourcePort: TilePort = tileDict[tileName].findPortByName(
+                wireEntry["source_name"]
+            )
 
-                if tx == ty == 0:
-                    continue
+            xCord = max(0, min(x + tx, width - 1))
+            yCord = max(0, min(y + ty, height - 1))
+            targetTileName = fabricTiles[yCord][xCord]
+            if targetTileName is None:
+                continue
+            destinationPort: TilePort = tileDict[targetTileName].findPortByName(
+                wireEntry["destination_name"]
+            )
 
-                sourcePort: TilePort = tileDict[tileName].findPortByName(
-                    wireEntry["source_name"]
+            if tx != 0 and ty != 0 and tx != ty:
+                logger.error(
+                    f"Invalid wire offset detected: source port '{sourcePort.name}' to destination port '{destinationPort.name}' "
+                    f"has an offset of X={tx}, Y={ty}. The offset must be either only in the X direction, only in the Y direction, "
+                    "or both X and Y must be the same for diagonal."
                 )
-
-                xCord = max(0, min(x + tx, width - 1))
-                yCord = max(0, min(y + ty, height - 1))
-                targetTileName = fabricTiles[yCord][xCord]
-                if targetTileName is None:
-                    continue
-                destinationPort: TilePort = tileDict[targetTileName].findPortByName(
-                    wireEntry["destination_name"]
+                raise ValueError
+            if sourcePort.width != destinationPort.width:
+                logger.error(
+                    f"Port {sourcePort.name} and {destinationPort.name} must have the same wire count."
                 )
+                raise ValueError
 
-                if tx != 0 and ty != 0 and tx != ty:
-                    logger.error(
-                        f"Invalid wire offset detected: source port '{sourcePort.name}' to destination port '{destinationPort.name}' "
-                        f"has an offset of X={tx}, Y={ty}. The offset must be either only in the X direction, only in the Y direction, "
-                        "or both X and Y must be the same for diagonal."
-                    )
-                    raise ValueError
-                if sourcePort.width != destinationPort.width:
-                    logger.error(
-                        f"Port {sourcePort.name} and {destinationPort.name} must have the same wire count."
-                    )
-                    raise ValueError
-
+            spanning = 0
+            if abs(tx) + abs(ty) > 1 and tx != ty:
+                wireCount = sourcePort.width * (abs(tx) + abs(ty))
+                spanning = abs(tx) + abs(ty)
+            elif tx == ty:
+                wireCount = sourcePort.width * abs(tx)
+                spanning = abs(tx)
+            else:
+                wireCount = sourcePort.width
                 spanning = 0
-                if abs(tx) + abs(ty) > 1 and tx != ty:
-                    wireCount = sourcePort.width * (abs(tx) + abs(ty))
-                    spanning = abs(tx) + abs(ty)
-                elif tx == ty:
-                    wireCount = sourcePort.width * abs(tx)
-                    spanning = abs(tx)
-                else:
-                    wireCount = sourcePort.width
-                    spanning = 0
 
-                wireDict[(x, y)].append(
-                    Wire(
-                        source=sourcePort,
-                        xOffset=tx,
-                        yOffset=ty,
-                        destination=destinationPort,
-                        sourceTile=f"X{x}Y{y}",
-                        destinationTile=f"X{x + tx}Y{y + ty}",
-                        wireCount=wireCount,
-                    )
+            wireDict[(x, y)].append(
+                Wire(
+                    source=sourcePort,
+                    xOffset=tx,
+                    yOffset=ty,
+                    destination=destinationPort,
+                    sourceTile=f"X{x}Y{y}",
+                    destinationTile=f"X{x + tx}Y{y + ty}",
+                    wireCount=wireCount,
                 )
+            )
 
-                tileDict[tileName].addWireType(
-                    WireType(
-                        sourcePort=sourcePort,
-                        destinationPort=destinationPort,
-                        offsetX=tx,
-                        offsetY=ty,
-                        wireCount=sourcePort.width,
-                        cascadeWireCount=wireCount,
-                        spanning=spanning,
-                    )
+            tileDict[tileName].addWireType(
+                WireType(
+                    sourcePort=sourcePort,
+                    destinationPort=destinationPort,
+                    offsetX=tx,
+                    offsetY=ty,
+                    wireCount=sourcePort.width,
+                    cascadeWireCount=wireCount,
+                    spanning=spanning,
                 )
+            )
 
     logger.info("Fabric YAML parsed successfully.")
-
     return Fabric(
         name=name,
         fabricDir=fileName,

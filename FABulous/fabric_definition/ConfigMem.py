@@ -1,13 +1,14 @@
 from collections import namedtuple
 from dataclasses import dataclass, field
+from typing import Mapping
 
 ConfigBitMapping = namedtuple(
     "ConfigBitMapping", ["configBitNumber", "frameIndex", "frameBitIndex"]
 )
 
 
-@dataclass
-class ConfigMem:
+@dataclass(order=True)
+class ConfigMemFrame:
     """Data structure to store the information about a config memory. Each structure
     represents a row of entries in the config memory CSV file.
 
@@ -25,8 +26,8 @@ class ConfigMem:
         A list of config bit mapping values
     """
 
-    frameName: str
     frameIndex: int
+    frameName: str
     bitsUsedInFrame: int
     usedBitMask: str
     configBitRanges: list[int] = field(default_factory=list)
@@ -34,14 +35,17 @@ class ConfigMem:
 
 @dataclass
 class ConfigurationMemory:
-    configMappings: list[ConfigBitMapping] = field(default_factory=list)
-    configMemEntries: list[ConfigMem] = field(default_factory=list)
+    configMappings: Mapping[int, tuple[int, int]] = field(default_factory=dict)
+    configMemEntries: list[ConfigMemFrame] = field(default_factory=list)
 
-    def __getitems__(self, key) -> int:
-        if isinstance(key, tuple):
-            for i in self.configMappings:
-                if i.configBitNumber == key[0] and i.frameIndex == key[1]:
-                    return i.frameBitIndex
-            raise KeyError(f"Key {key} does not exist in the configuration memory")
+    def __post_init__(self):
+        self.configMemEntries.sort()
+
+    def __getitem__(self, key) -> tuple[int, int]:
+        if isinstance(key, int):
+            if key in self.configMappings:
+                return self.configMappings[key]
+            else:
+                raise KeyError(f"Key {key} does not exist in the configuration memory")
         else:
-            raise KeyError(f"Key {key} is not a tuple")
+            raise KeyError(f"Key {key} is not an int")

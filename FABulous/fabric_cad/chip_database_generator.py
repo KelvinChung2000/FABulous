@@ -332,18 +332,9 @@ def generateChipDatabase(
 
     for (x, y), tile in fabric:
         if tile is not None:
-            ch.set_tile_type(x, fabric.numberOfRows - y - 1, tile.name)
+            ch.set_tile_type(x, y, tile.name)
         else:
-            ch.set_tile_type(x, fabric.numberOfRows - y - 1, "NULL")
-
-    # for i in range(fabric.numberOfRows):
-    #     for j in range(fabric.numberOfColumns):
-    #         if fabric.tiles[i][j] is not None:
-    #             ch.set_tile_type(
-    #                 j, fabric.numberOfRows - i - 1, fabric.tiles[i][j].name
-    #             )
-    #         else:
-    #             ch.set_tile_type(j, fabric.numberOfRows - i - 1, "NULL")
+            ch.set_tile_type(x, y, "NULL")
 
     genFabric(fabric, ch, context=fabric.contextCount)
 

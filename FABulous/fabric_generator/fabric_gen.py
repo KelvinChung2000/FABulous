@@ -26,7 +26,7 @@ from typing import Dict, List, Tuple
 
 from loguru import logger
 
-from FABulous.fabric_definition.ConfigMem import ConfigMem
+from FABulous.fabric_definition.ConfigMem import ConfigMemFrame
 from FABulous.fabric_definition.define import (
     IO,
     ConfigBitMode,
@@ -330,7 +330,7 @@ class FabricGenerator:
 
         # test if we have a bitstream mapping file
         # if not, we will take the default, which was passed on from  GenerateConfigMemInit
-        configMemList: List[ConfigMem] = []
+        configMemList: List[ConfigMemFrame] = []
         if os.path.exists(configMemCsv):
             if tile.configBits <= 0:
                 logger.warning(
@@ -2501,7 +2501,7 @@ class FabricGenerator:
                     tileMap[f"X{x}Y{y}"] = "NULL"
 
         specData["TileMap"] = tileMap
-        configMemList: List[ConfigMem] = []
+        configMemList: List[ConfigMemFrame] = []
         for y, row in enumerate(self.fabric.tiles):
             for x, tile in enumerate(row):
                 if tile == None:

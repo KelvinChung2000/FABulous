@@ -25,312 +25,312 @@ assign ConfigBits_N = ~cfg[Y_CORD * 4 + X_CORD];
 end
 else begin
 // instantiate frame latches
-    LHQD1 #() Inst_frame0_bit7 (
-        .D(FrameData[7]),
-        .E(FrameStrobe[0]),
-        .Q(ConfigBits[44]),
-        .QN(ConfigBits_N[44])
-    );
-
-    LHQD1 #() Inst_frame0_bit6 (
-        .D(FrameData[6]),
-        .E(FrameStrobe[0]),
-        .Q(ConfigBits[43]),
-        .QN(ConfigBits_N[43])
-    );
-
-    LHQD1 #() Inst_frame0_bit5 (
-        .D(FrameData[5]),
-        .E(FrameStrobe[0]),
-        .Q(ConfigBits[42]),
-        .QN(ConfigBits_N[42])
-    );
-
-    LHQD1 #() Inst_frame0_bit4 (
+    LHQD1 #() Inst_frame5_bit4 (
         .D(FrameData[4]),
-        .E(FrameStrobe[0]),
-        .Q(ConfigBits[41]),
-        .QN(ConfigBits_N[41])
-    );
-
-    LHQD1 #() Inst_frame0_bit3 (
-        .D(FrameData[3]),
-        .E(FrameStrobe[0]),
-        .Q(ConfigBits[40]),
-        .QN(ConfigBits_N[40])
-    );
-
-    LHQD1 #() Inst_frame0_bit2 (
-        .D(FrameData[2]),
-        .E(FrameStrobe[0]),
-        .Q(ConfigBits[39]),
-        .QN(ConfigBits_N[39])
-    );
-
-    LHQD1 #() Inst_frame0_bit1 (
-        .D(FrameData[1]),
-        .E(FrameStrobe[0]),
-        .Q(ConfigBits[38]),
-        .QN(ConfigBits_N[38])
-    );
-
-    LHQD1 #() Inst_frame0_bit0 (
-        .D(FrameData[0]),
-        .E(FrameStrobe[0]),
-        .Q(ConfigBits[37]),
-        .QN(ConfigBits_N[37])
-    );
-
-    LHQD1 #() Inst_frame1_bit7 (
-        .D(FrameData[7]),
-        .E(FrameStrobe[1]),
-        .Q(ConfigBits[36]),
-        .QN(ConfigBits_N[36])
-    );
-
-    LHQD1 #() Inst_frame1_bit6 (
-        .D(FrameData[6]),
-        .E(FrameStrobe[1]),
-        .Q(ConfigBits[35]),
-        .QN(ConfigBits_N[35])
-    );
-
-    LHQD1 #() Inst_frame1_bit5 (
-        .D(FrameData[5]),
-        .E(FrameStrobe[1]),
-        .Q(ConfigBits[34]),
-        .QN(ConfigBits_N[34])
-    );
-
-    LHQD1 #() Inst_frame1_bit4 (
-        .D(FrameData[4]),
-        .E(FrameStrobe[1]),
-        .Q(ConfigBits[33]),
-        .QN(ConfigBits_N[33])
-    );
-
-    LHQD1 #() Inst_frame1_bit3 (
-        .D(FrameData[3]),
-        .E(FrameStrobe[1]),
-        .Q(ConfigBits[32]),
-        .QN(ConfigBits_N[32])
-    );
-
-    LHQD1 #() Inst_frame1_bit2 (
-        .D(FrameData[2]),
-        .E(FrameStrobe[1]),
-        .Q(ConfigBits[31]),
-        .QN(ConfigBits_N[31])
-    );
-
-    LHQD1 #() Inst_frame1_bit1 (
-        .D(FrameData[1]),
-        .E(FrameStrobe[1]),
-        .Q(ConfigBits[30]),
-        .QN(ConfigBits_N[30])
-    );
-
-    LHQD1 #() Inst_frame1_bit0 (
-        .D(FrameData[0]),
-        .E(FrameStrobe[1]),
-        .Q(ConfigBits[29]),
-        .QN(ConfigBits_N[29])
-    );
-
-    LHQD1 #() Inst_frame2_bit7 (
-        .D(FrameData[7]),
-        .E(FrameStrobe[2]),
-        .Q(ConfigBits[28]),
-        .QN(ConfigBits_N[28])
-    );
-
-    LHQD1 #() Inst_frame2_bit6 (
-        .D(FrameData[6]),
-        .E(FrameStrobe[2]),
-        .Q(ConfigBits[27]),
-        .QN(ConfigBits_N[27])
-    );
-
-    LHQD1 #() Inst_frame2_bit5 (
-        .D(FrameData[5]),
-        .E(FrameStrobe[2]),
-        .Q(ConfigBits[26]),
-        .QN(ConfigBits_N[26])
-    );
-
-    LHQD1 #() Inst_frame2_bit4 (
-        .D(FrameData[4]),
-        .E(FrameStrobe[2]),
-        .Q(ConfigBits[25]),
-        .QN(ConfigBits_N[25])
-    );
-
-    LHQD1 #() Inst_frame2_bit3 (
-        .D(FrameData[3]),
-        .E(FrameStrobe[2]),
-        .Q(ConfigBits[24]),
-        .QN(ConfigBits_N[24])
-    );
-
-    LHQD1 #() Inst_frame2_bit2 (
-        .D(FrameData[2]),
-        .E(FrameStrobe[2]),
-        .Q(ConfigBits[23]),
-        .QN(ConfigBits_N[23])
-    );
-
-    LHQD1 #() Inst_frame2_bit1 (
-        .D(FrameData[1]),
-        .E(FrameStrobe[2]),
-        .Q(ConfigBits[22]),
-        .QN(ConfigBits_N[22])
-    );
-
-    LHQD1 #() Inst_frame2_bit0 (
-        .D(FrameData[0]),
-        .E(FrameStrobe[2]),
-        .Q(ConfigBits[21]),
-        .QN(ConfigBits_N[21])
-    );
-
-    LHQD1 #() Inst_frame3_bit7 (
-        .D(FrameData[7]),
-        .E(FrameStrobe[3]),
-        .Q(ConfigBits[20]),
-        .QN(ConfigBits_N[20])
-    );
-
-    LHQD1 #() Inst_frame3_bit6 (
-        .D(FrameData[6]),
-        .E(FrameStrobe[3]),
-        .Q(ConfigBits[19]),
-        .QN(ConfigBits_N[19])
-    );
-
-    LHQD1 #() Inst_frame3_bit5 (
-        .D(FrameData[5]),
-        .E(FrameStrobe[3]),
-        .Q(ConfigBits[18]),
-        .QN(ConfigBits_N[18])
-    );
-
-    LHQD1 #() Inst_frame3_bit4 (
-        .D(FrameData[4]),
-        .E(FrameStrobe[3]),
-        .Q(ConfigBits[17]),
-        .QN(ConfigBits_N[17])
-    );
-
-    LHQD1 #() Inst_frame3_bit3 (
-        .D(FrameData[3]),
-        .E(FrameStrobe[3]),
-        .Q(ConfigBits[16]),
-        .QN(ConfigBits_N[16])
-    );
-
-    LHQD1 #() Inst_frame3_bit2 (
-        .D(FrameData[2]),
-        .E(FrameStrobe[3]),
-        .Q(ConfigBits[15]),
-        .QN(ConfigBits_N[15])
-    );
-
-    LHQD1 #() Inst_frame3_bit1 (
-        .D(FrameData[1]),
-        .E(FrameStrobe[3]),
-        .Q(ConfigBits[14]),
-        .QN(ConfigBits_N[14])
-    );
-
-    LHQD1 #() Inst_frame3_bit0 (
-        .D(FrameData[0]),
-        .E(FrameStrobe[3]),
-        .Q(ConfigBits[13]),
-        .QN(ConfigBits_N[13])
-    );
-
-    LHQD1 #() Inst_frame4_bit7 (
-        .D(FrameData[7]),
-        .E(FrameStrobe[4]),
-        .Q(ConfigBits[12]),
-        .QN(ConfigBits_N[12])
-    );
-
-    LHQD1 #() Inst_frame4_bit6 (
-        .D(FrameData[6]),
-        .E(FrameStrobe[4]),
-        .Q(ConfigBits[11]),
-        .QN(ConfigBits_N[11])
-    );
-
-    LHQD1 #() Inst_frame4_bit5 (
-        .D(FrameData[5]),
-        .E(FrameStrobe[4]),
-        .Q(ConfigBits[10]),
-        .QN(ConfigBits_N[10])
-    );
-
-    LHQD1 #() Inst_frame4_bit4 (
-        .D(FrameData[4]),
-        .E(FrameStrobe[4]),
-        .Q(ConfigBits[9]),
-        .QN(ConfigBits_N[9])
-    );
-
-    LHQD1 #() Inst_frame4_bit3 (
-        .D(FrameData[3]),
-        .E(FrameStrobe[4]),
-        .Q(ConfigBits[8]),
-        .QN(ConfigBits_N[8])
-    );
-
-    LHQD1 #() Inst_frame4_bit2 (
-        .D(FrameData[2]),
-        .E(FrameStrobe[4]),
-        .Q(ConfigBits[7]),
-        .QN(ConfigBits_N[7])
-    );
-
-    LHQD1 #() Inst_frame4_bit1 (
-        .D(FrameData[1]),
-        .E(FrameStrobe[4]),
-        .Q(ConfigBits[6]),
-        .QN(ConfigBits_N[6])
-    );
-
-    LHQD1 #() Inst_frame4_bit0 (
-        .D(FrameData[0]),
-        .E(FrameStrobe[4]),
-        .Q(ConfigBits[5]),
-        .QN(ConfigBits_N[5])
-    );
-
-    LHQD1 #() Inst_frame5_bit7 (
-        .D(FrameData[7]),
         .E(FrameStrobe[5]),
-        .Q(ConfigBits[4]),
-        .QN(ConfigBits_N[4])
-    );
-
-    LHQD1 #() Inst_frame5_bit6 (
-        .D(FrameData[6]),
-        .E(FrameStrobe[5]),
-        .Q(ConfigBits[3]),
-        .QN(ConfigBits_N[3])
+        .Q(ConfigBits[0]),
+        .QN(ConfigBits_N[0])
     );
 
     LHQD1 #() Inst_frame5_bit5 (
         .D(FrameData[5]),
         .E(FrameStrobe[5]),
+        .Q(ConfigBits[1]),
+        .QN(ConfigBits_N[1])
+    );
+
+    LHQD1 #() Inst_frame5_bit6 (
+        .D(FrameData[6]),
+        .E(FrameStrobe[5]),
         .Q(ConfigBits[2]),
         .QN(ConfigBits_N[2])
     );
 
-    LHQD1 #() Inst_frame5_bit4 (
-        .D(FrameData[4]),
+    LHQD1 #() Inst_frame5_bit7 (
+        .D(FrameData[7]),
         .E(FrameStrobe[5]),
-        .Q(ConfigBits[1]),
-        .QN(ConfigBits_N[1])
+        .Q(ConfigBits[3]),
+        .QN(ConfigBits_N[3])
+    );
+
+    LHQD1 #() Inst_frame4_bit0 (
+        .D(FrameData[0]),
+        .E(FrameStrobe[4]),
+        .Q(ConfigBits[4]),
+        .QN(ConfigBits_N[4])
+    );
+
+    LHQD1 #() Inst_frame4_bit1 (
+        .D(FrameData[1]),
+        .E(FrameStrobe[4]),
+        .Q(ConfigBits[5]),
+        .QN(ConfigBits_N[5])
+    );
+
+    LHQD1 #() Inst_frame4_bit2 (
+        .D(FrameData[2]),
+        .E(FrameStrobe[4]),
+        .Q(ConfigBits[6]),
+        .QN(ConfigBits_N[6])
+    );
+
+    LHQD1 #() Inst_frame4_bit3 (
+        .D(FrameData[3]),
+        .E(FrameStrobe[4]),
+        .Q(ConfigBits[7]),
+        .QN(ConfigBits_N[7])
+    );
+
+    LHQD1 #() Inst_frame4_bit4 (
+        .D(FrameData[4]),
+        .E(FrameStrobe[4]),
+        .Q(ConfigBits[8]),
+        .QN(ConfigBits_N[8])
+    );
+
+    LHQD1 #() Inst_frame4_bit5 (
+        .D(FrameData[5]),
+        .E(FrameStrobe[4]),
+        .Q(ConfigBits[9]),
+        .QN(ConfigBits_N[9])
+    );
+
+    LHQD1 #() Inst_frame4_bit6 (
+        .D(FrameData[6]),
+        .E(FrameStrobe[4]),
+        .Q(ConfigBits[10]),
+        .QN(ConfigBits_N[10])
+    );
+
+    LHQD1 #() Inst_frame4_bit7 (
+        .D(FrameData[7]),
+        .E(FrameStrobe[4]),
+        .Q(ConfigBits[11]),
+        .QN(ConfigBits_N[11])
+    );
+
+    LHQD1 #() Inst_frame3_bit0 (
+        .D(FrameData[0]),
+        .E(FrameStrobe[3]),
+        .Q(ConfigBits[12]),
+        .QN(ConfigBits_N[12])
+    );
+
+    LHQD1 #() Inst_frame3_bit1 (
+        .D(FrameData[1]),
+        .E(FrameStrobe[3]),
+        .Q(ConfigBits[13]),
+        .QN(ConfigBits_N[13])
+    );
+
+    LHQD1 #() Inst_frame3_bit2 (
+        .D(FrameData[2]),
+        .E(FrameStrobe[3]),
+        .Q(ConfigBits[14]),
+        .QN(ConfigBits_N[14])
+    );
+
+    LHQD1 #() Inst_frame3_bit3 (
+        .D(FrameData[3]),
+        .E(FrameStrobe[3]),
+        .Q(ConfigBits[15]),
+        .QN(ConfigBits_N[15])
+    );
+
+    LHQD1 #() Inst_frame3_bit4 (
+        .D(FrameData[4]),
+        .E(FrameStrobe[3]),
+        .Q(ConfigBits[16]),
+        .QN(ConfigBits_N[16])
+    );
+
+    LHQD1 #() Inst_frame3_bit5 (
+        .D(FrameData[5]),
+        .E(FrameStrobe[3]),
+        .Q(ConfigBits[17]),
+        .QN(ConfigBits_N[17])
+    );
+
+    LHQD1 #() Inst_frame3_bit6 (
+        .D(FrameData[6]),
+        .E(FrameStrobe[3]),
+        .Q(ConfigBits[18]),
+        .QN(ConfigBits_N[18])
+    );
+
+    LHQD1 #() Inst_frame3_bit7 (
+        .D(FrameData[7]),
+        .E(FrameStrobe[3]),
+        .Q(ConfigBits[19]),
+        .QN(ConfigBits_N[19])
+    );
+
+    LHQD1 #() Inst_frame2_bit0 (
+        .D(FrameData[0]),
+        .E(FrameStrobe[2]),
+        .Q(ConfigBits[20]),
+        .QN(ConfigBits_N[20])
+    );
+
+    LHQD1 #() Inst_frame2_bit1 (
+        .D(FrameData[1]),
+        .E(FrameStrobe[2]),
+        .Q(ConfigBits[21]),
+        .QN(ConfigBits_N[21])
+    );
+
+    LHQD1 #() Inst_frame2_bit2 (
+        .D(FrameData[2]),
+        .E(FrameStrobe[2]),
+        .Q(ConfigBits[22]),
+        .QN(ConfigBits_N[22])
+    );
+
+    LHQD1 #() Inst_frame2_bit3 (
+        .D(FrameData[3]),
+        .E(FrameStrobe[2]),
+        .Q(ConfigBits[23]),
+        .QN(ConfigBits_N[23])
+    );
+
+    LHQD1 #() Inst_frame2_bit4 (
+        .D(FrameData[4]),
+        .E(FrameStrobe[2]),
+        .Q(ConfigBits[24]),
+        .QN(ConfigBits_N[24])
+    );
+
+    LHQD1 #() Inst_frame2_bit5 (
+        .D(FrameData[5]),
+        .E(FrameStrobe[2]),
+        .Q(ConfigBits[25]),
+        .QN(ConfigBits_N[25])
+    );
+
+    LHQD1 #() Inst_frame2_bit6 (
+        .D(FrameData[6]),
+        .E(FrameStrobe[2]),
+        .Q(ConfigBits[26]),
+        .QN(ConfigBits_N[26])
+    );
+
+    LHQD1 #() Inst_frame2_bit7 (
+        .D(FrameData[7]),
+        .E(FrameStrobe[2]),
+        .Q(ConfigBits[27]),
+        .QN(ConfigBits_N[27])
+    );
+
+    LHQD1 #() Inst_frame1_bit0 (
+        .D(FrameData[0]),
+        .E(FrameStrobe[1]),
+        .Q(ConfigBits[28]),
+        .QN(ConfigBits_N[28])
+    );
+
+    LHQD1 #() Inst_frame1_bit1 (
+        .D(FrameData[1]),
+        .E(FrameStrobe[1]),
+        .Q(ConfigBits[29]),
+        .QN(ConfigBits_N[29])
+    );
+
+    LHQD1 #() Inst_frame1_bit2 (
+        .D(FrameData[2]),
+        .E(FrameStrobe[1]),
+        .Q(ConfigBits[30]),
+        .QN(ConfigBits_N[30])
+    );
+
+    LHQD1 #() Inst_frame1_bit3 (
+        .D(FrameData[3]),
+        .E(FrameStrobe[1]),
+        .Q(ConfigBits[31]),
+        .QN(ConfigBits_N[31])
+    );
+
+    LHQD1 #() Inst_frame1_bit4 (
+        .D(FrameData[4]),
+        .E(FrameStrobe[1]),
+        .Q(ConfigBits[32]),
+        .QN(ConfigBits_N[32])
+    );
+
+    LHQD1 #() Inst_frame1_bit5 (
+        .D(FrameData[5]),
+        .E(FrameStrobe[1]),
+        .Q(ConfigBits[33]),
+        .QN(ConfigBits_N[33])
+    );
+
+    LHQD1 #() Inst_frame1_bit6 (
+        .D(FrameData[6]),
+        .E(FrameStrobe[1]),
+        .Q(ConfigBits[34]),
+        .QN(ConfigBits_N[34])
+    );
+
+    LHQD1 #() Inst_frame1_bit7 (
+        .D(FrameData[7]),
+        .E(FrameStrobe[1]),
+        .Q(ConfigBits[35]),
+        .QN(ConfigBits_N[35])
+    );
+
+    LHQD1 #() Inst_frame0_bit0 (
+        .D(FrameData[0]),
+        .E(FrameStrobe[0]),
+        .Q(ConfigBits[36]),
+        .QN(ConfigBits_N[36])
+    );
+
+    LHQD1 #() Inst_frame0_bit1 (
+        .D(FrameData[1]),
+        .E(FrameStrobe[0]),
+        .Q(ConfigBits[37]),
+        .QN(ConfigBits_N[37])
+    );
+
+    LHQD1 #() Inst_frame0_bit2 (
+        .D(FrameData[2]),
+        .E(FrameStrobe[0]),
+        .Q(ConfigBits[38]),
+        .QN(ConfigBits_N[38])
+    );
+
+    LHQD1 #() Inst_frame0_bit3 (
+        .D(FrameData[3]),
+        .E(FrameStrobe[0]),
+        .Q(ConfigBits[39]),
+        .QN(ConfigBits_N[39])
+    );
+
+    LHQD1 #() Inst_frame0_bit4 (
+        .D(FrameData[4]),
+        .E(FrameStrobe[0]),
+        .Q(ConfigBits[40]),
+        .QN(ConfigBits_N[40])
+    );
+
+    LHQD1 #() Inst_frame0_bit5 (
+        .D(FrameData[5]),
+        .E(FrameStrobe[0]),
+        .Q(ConfigBits[41]),
+        .QN(ConfigBits_N[41])
+    );
+
+    LHQD1 #() Inst_frame0_bit6 (
+        .D(FrameData[6]),
+        .E(FrameStrobe[0]),
+        .Q(ConfigBits[42]),
+        .QN(ConfigBits_N[42])
+    );
+
+    LHQD1 #() Inst_frame0_bit7 (
+        .D(FrameData[7]),
+        .E(FrameStrobe[0]),
+        .Q(ConfigBits[43]),
+        .QN(ConfigBits_N[43])
     );
 
 end

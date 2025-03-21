@@ -1,15 +1,17 @@
 import csv
+from logging import config
 import re
 from collections import defaultdict
 from copy import deepcopy
 from pathlib import Path
+from typing import Mapping
 
 from loguru import logger
 
 from FABulous.fabric_definition.Bel import Bel
 from FABulous.fabric_definition.ConfigMem import (
     ConfigBitMapping,
-    ConfigMem,
+    ConfigMemFrame,
     ConfigurationMemory,
 )
 from FABulous.fabric_definition.define import (
@@ -1189,7 +1191,7 @@ def parseConfigMem(
             allConfigBitsOrder += configBitsOrder
 
             configMemEntry.append(
-                ConfigMem(
+                ConfigMemFrame(
                     frameName=entry["frame_name"],
                     frameIndex=int(entry["frame_index"]),
                     bitsUsedInFrame=entry["used_bits_mask"].count("1"),
@@ -1198,8 +1200,7 @@ def parseConfigMem(
                 )
             )
 
-    configMemMappings: list[ConfigBitMapping] = []
-
+    configMemMappings: Mapping[int, tuple[int, int]] = {}
     # mapping config bit to the location in the frame
     # If we only have 1 frame for example:
     # bit mask = 1111_1111_1110_0000_0000_0000_0000_0000
@@ -1212,11 +1213,7 @@ def parseConfigMem(
         for bitIndex in range(frameBitsPerRow - 1, -1, -1):
             used_bit_mask_reversed = list(reversed(str(i.usedBitMask)))
             if used_bit_mask_reversed[bitIndex] == "1":
-                configMemMappings.append(
-                    ConfigBitMapping(configBitRangeCopy.pop(0), i.frameIndex, bitIndex)
-                )
-            else:
-                configMemMappings.append(ConfigBitMapping(None, i.frameIndex, bitIndex))
+                configMemMappings[configBitRangeCopy.pop(0)] = (i.frameIndex, bitIndex)
 
     return ConfigurationMemory(
         configMappings=configMemMappings,

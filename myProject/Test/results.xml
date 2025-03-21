@@ -1,8 +1,6 @@
 <testsuites name="results">
   <testsuite name="all" package="all">
-    <property name="random_seed" value="1742514577" />
-    <testcase name="adder_basic_test" classname="test_fabric" file="/home/kelvin/FABulous_fork/myProject/Test/test_fabric.py" lineno="19" time="0.006234407424926758" sim_time_ns="3000000000" ratio_time="481200504799.4187">
-      <failure message="Test failed with RANDOM_SEED=1742514577" />
-    </testcase>
+    <property name="random_seed" value="1742560335" />
+    <testcase name="adder_basic_test" classname="test_fabric" file="/home/kelvin/FABulous_fork/myProject/Test/test_fabric.py" lineno="19" time="0.007320880889892578" sim_time_ns="4000000000" ratio_time="546382335699.8632" />
   </testsuite>
 </testsuites>

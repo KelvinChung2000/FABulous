@@ -6,31 +6,21 @@ from FABulous.fabric_definition.Port import BelPort
 
 
 def generateBitsStreamSpec(fabric: Fabric) -> FeatureMap:
-    """Generate the bitstream specification of the fabric. This is needed and will be
-    further parsed by the bit_gen.py.
-
-    Returns
-    -------
-    dict [str, dict]
-        The bits stream specification of the fabric.
-    """
-
     featureToBitString: Mapping[str, FeatureValue] = {}
     for (x, y), tile in fabric:
         if tile is None:
             continue
 
-        def frameIndexCounter() -> Generator[tuple[int, int], None, None]:
-            value: list[int] = [0, 0]
+        if tile.configBits == 0:
+            continue
+
+        def frameIndexGetter(tile) -> Generator[tuple[int, int], None, None]:
+            cfgNumber = 0
             while True:
-                yield (value[0], value[1])
-                value[1] += 1
-                if value[1] == fabric.frameBitsPerRow:
-                    value[1] = 0
-                    value[0] += 1
+                yield tile.configMems[cfgNumber]
+                cfgNumber += 1
 
-        indexCounter = frameIndexCounter()
-
+        indexCounter = frameIndexGetter(tile)
         for c in range(fabric.contextCount):
             for i, bel in enumerate(tile.bels):
                 for config in bel.configPort:
@@ -80,10 +70,7 @@ def generateBitsStreamSpec(fabric: Fabric) -> FeatureMap:
                         continue
 
                     multiBitIndex = tuple(
-                        [
-                            next(indexCounter)
-                            for _ in range(len(mux.inputs).bit_length() - 1)
-                        ]
+                        [next(indexCounter) for _ in range(mux.configBits)]
                     )
                     for i, input in enumerate(reversed(inputNames)):
                         featureToBitString[f"X{x}Y{y}.c{c}.{outputName}.{input}"] = (
@@ -99,10 +86,7 @@ def generateBitsStreamSpec(fabric: Fabric) -> FeatureMap:
                         continue
 
                     multiBitIndex = tuple(
-                        [
-                            next(indexCounter)
-                            for _ in range(len(mux.inputs).bit_length() - 1)
-                        ]
+                        [next(indexCounter) for _ in range(mux.configBits)]
                     )
                     for i, input in enumerate(reversed(inputNames)):
                         for w in range(mux.width):
@@ -115,5 +99,11 @@ def generateBitsStreamSpec(fabric: Fabric) -> FeatureMap:
                     featureToBitString[
                         f"X{x}Y{y}.c{c}.{wire.sourcePort.name}__{i}.{wire.destinationPort.name}__{i}"
                     ] = FeatureValue((x, y), ((None, None),), 0)
+
+    for key, i in featureToBitString.items():
+        if i.value is not None:
+            assert i.value < (
+                2 ** len(i.bitPosition)
+            ), f"feature {key} has value {i.value} which is larger than the bit position {i.bitPosition}"
 
     return featureToBitString

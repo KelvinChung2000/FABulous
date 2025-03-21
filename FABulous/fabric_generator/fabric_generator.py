@@ -121,12 +121,12 @@ def generateFabric(codeGen: CodeGenerator, fabric: Fabric):
                 for port in tile.getTileInputPorts():
                     match port.sideOfTile:
                         case Side.NORTH:
-                            if y - 1 < 0:
+                            if y + 1 >= fabric.numberOfRows:
                                 continue
-                            if fabric[(x, y - 1)] is None:
+                            if fabric[(x, y + 1)] is None:
                                 continue
                             inputOnSide[Side.NORTH].extend(
-                                tileToTileOutMapping[(x, y - 1)][Side.SOUTH]
+                                tileToTileOutMapping[(x, y + 1)][Side.SOUTH]
                             )
                         case Side.EAST:
                             if x + 1 >= fabric.numberOfColumns:
@@ -138,12 +138,12 @@ def generateFabric(codeGen: CodeGenerator, fabric: Fabric):
                             )
 
                         case Side.SOUTH:
-                            if y + 1 >= fabric.numberOfRows:
+                            if y - 1 > 0:
                                 continue
-                            if fabric[(x, y + 1)] is None:
+                            if fabric[(x, y - 1)] is None:
                                 continue
                             inputOnSide[Side.SOUTH].extend(
-                                tileToTileOutMapping[(x, y + 1)][Side.NORTH]
+                                tileToTileOutMapping[(x, y - 1)][Side.NORTH]
                             )
                         case Side.WEST:
                             if x - 1 < 0:

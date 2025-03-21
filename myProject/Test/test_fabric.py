@@ -19,21 +19,31 @@ from FABulous.file_parser.file_parser_yaml import parseFabricYAML
 @cocotb.test
 async def adder_basic_test(dut):
     await Timer(1)
-    print(dut.EMULATION_ENABLE.value)
-    print(dut.EMULATION_CONFIG.value)
-    print(dut.PE_Tile_X1Y1.ConfigBits.value)
-    dut.Tile_X1Y0_S_in.value = 10
-    dut.Tile_X0Y1_W_in.value = 10
+    dut.Tile_X3Y1_E_in.value = 10
+    dut.Tile_X0Y1_W_in.value = 20
     await Timer(1)
+    await Timer(1)
+    print("X1Y1 data in")
+    print(dut.PE_Tile_X1Y1.in0.value)
+    print(dut.PE_Tile_X1Y1.in1.value)
+    print(dut.PE_Tile_X1Y1.in2.value)
+    print(dut.PE_Tile_X1Y1.in3.value)
+    print()
+    print("X1Y1 config bits")
+    print(dut.PE_Tile_X1Y1.ConfigBits.value)
+    print("X1Y1 ALU")
+    print(dut.PE_Tile_X1Y1.data_in1.value)
+    print(dut.PE_Tile_X1Y1.data_in2.value)
+    print(dut.PE_Tile_X1Y1.data_out.value)
+    print()
+    print("X1Y1 data out")
     print(dut.Tile_X1Y1_out0.value)
-    print(dut.Tile_X1Y1_out1.value.integer)
-    print(dut.Tile_X1Y1_out2.value.integer)
+    print(dut.Tile_X1Y1_out1.value)
+    print(dut.Tile_X1Y1_out2.value)
     print(dut.Tile_X1Y1_out3.value)
-
-    print(dut.Tile_X2Y1_out0.value)
-    print(dut.Tile_X2Y1_out1.value)
-    print(dut.Tile_X2Y1_out2.value)
-    print(dut.Tile_X2Y1_out3.value)
+    print()
+    print("X1Y0 data out")
+    print(dut.Tile_X1Y0_S_out.value)
 
 
 
@@ -66,7 +76,6 @@ def test_tile_runner():
 
     fabric = parseFabricYAML(Path("/home/kelvin/FABulous_fork/myProject/fabric.yaml"))
     spec = generateBitsStreamSpec(fabric)
-
     featureSet = set()
     for f in fasm:
         if f.feature is None:
@@ -91,9 +100,7 @@ def test_tile_runner():
             frameIdx, bitIdx = f.bitPosition[i]
             if frameIdx is None or bitIdx is None:
                 continue
-            x = f.tileLoc[0]
-            y = fabric.numberOfRows - f.tileLoc[1] - 1
-            bitStreamMap[(x, y)][frameIdx][bitIdx] = value[i]
+            bitStreamMap[f.tileLoc][frameIdx][bitIdx] = value[i]
 
     bitStreamLocMap = {}
     for i in bitStreamMap:

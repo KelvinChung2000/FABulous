@@ -1,5 +1,6 @@
 import csv
 from pathlib import Path
+
 from bitarray import bitarray
 
 from FABulous.fabric_definition.define import IO
@@ -39,6 +40,7 @@ def generateConfigMemInit(
         writer.writerow(fieldName)
         bits = bitarray(frameBitsPerRow * maxFramesPerCol)
         bits[:totalConfigBits] = 1
+        totalConfigBits -= 1
         count = 0
         for k in range(maxFramesPerCol):
             entry = {}
@@ -83,10 +85,7 @@ def generateConfigMem(codeGen: CodeGenerator, fabric: Fabric, tile: Tile):
 
         if tile.configBits == 0:
             return
-
-        totalCount = 0
         with module.LogicRegion() as lr:
-
             lr.NewLine()
             with lr.Generate() as lrGen:
                 with lrGen.IfElse(emuEn) as ifElse:
@@ -105,35 +104,27 @@ def generateConfigMem(codeGen: CodeGenerator, fabric: Fabric, tile: Tile):
                         )
                     with ifElse.FalseRegion() as f:
                         f.Comment("instantiate frame latches")
-                        for i in tile.configMems.configMemEntries:
-                            counter = 0
-                            for k in range(fabric.frameBitsPerRow):
-                                if i.usedBitMask[k] == "1":
-                                    f.InitModule(
-                                        module="LHQD1",
-                                        initName=f"Inst_{i.frameName}_bit{fabric.frameBitsPerRow-1-k}",
-                                        ports=[
-                                            f.ConnectPair(
-                                                "D",
-                                                frameData[
-                                                    fabric.frameBitsPerRow - 1 - k
-                                                ],
-                                            ),
-                                            f.ConnectPair(
-                                                "E", frameStrobe[i.frameIndex]
-                                            ),
-                                            f.ConnectPair(
-                                                "Q",
-                                                configBits[i.configBitRanges[counter]],
-                                            ),
-                                            f.ConnectPair(
-                                                "QN",
-                                                configBitsN[i.configBitRanges[counter]],
-                                            ),
-                                        ],
-                                    )
-                                    counter += 1
-                                    totalCount += 1
-    assert (
-        totalCount == tile.configBits
-    ), f"Not all config bits are assigned, {totalCount=}, {tile.configBits=}"
+                        for i in range(tile.configBits):
+                            frameIdx, bitIdx = tile.configMems[i]
+                            frameName = tile.configMems.configMemEntries[
+                                frameIdx
+                            ].frameName
+                            f.InitModule(
+                                module="LHQD1",
+                                initName=f"Inst_{frameName}_bit{bitIdx}",
+                                ports=[
+                                    f.ConnectPair(
+                                        "D",
+                                        frameData[bitIdx],
+                                    ),
+                                    f.ConnectPair("E", frameStrobe[frameIdx]),
+                                    f.ConnectPair(
+                                        "Q",
+                                        configBits[i],
+                                    ),
+                                    f.ConnectPair(
+                                        "QN",
+                                        configBitsN[i],
+                                    ),
+                                ],
+                            )

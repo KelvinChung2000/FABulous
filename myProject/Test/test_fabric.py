@@ -82,12 +82,24 @@ def test_tile_runner():
 
     fabric = parseFabricYAML(projectPath / "fabric.yaml")
     spec = generateBitsStreamSpec(fabric)
+    with open(projectPath / ".FABulous/spec.txt", "w") as f:
+        # Write the bitstream specification in a human-readable format
+        for feature, featureValue in spec.items():
+            tileLoc = featureValue.tileLoc
+            bitPosition = featureValue.bitPosition
+            value = featureValue.value
+            f.write(f"Feature: {feature}\n")
+            f.write(f"  Location: X{tileLoc[0]}Y{tileLoc[1]}\n")
+            f.write(f"  Bit positions: {bitPosition}\n")
+            f.write(f"  Value: {value}\n")
+            f.write("\n")
     featureSet = set()
     # TODO Missing internal connection pip
     for f in fasm:
         if f.feature is None:
             continue
         if f.feature not in spec:
+            print(f"Feature {f.feature} not found in spec")
             continue
         featVal = spec[f.feature]
         if featVal.value is None:

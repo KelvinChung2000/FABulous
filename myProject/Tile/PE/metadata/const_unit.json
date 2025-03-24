@@ -1,12 +1,12 @@
 {
-  "creator": "Yosys 0.50+56 (git sha1 fa3b9428f, g++ 11.4.0-1ubuntu1~22.04 -fPIC -O3)",
+  "creator": "Yosys 0.51+17 (git sha1 0102361c7, c++ 16.0.0 -fPIC -O3)",
   "modules": {
     "const_unit": {
       "attributes": {
         "CELL": 1,
         "dynports": 1,
         "cells_not_processed": 1,
-        "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/const_unit.v:2.1-12.10"
+        "src": "/Users/kelvin/Documents/FABulous/myProject/Tile/PE/const_unit.v:2.1-12.10"
       },
       "parameter_default_values": {
         "NoConfigBits": 3,
@@ -33,7 +33,7 @@
             "FABulous": 1,
             "FEATURE": "const_value",
             "INIT": 1,
-            "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/const_unit.v:7.73-7.83"
+            "src": "/Users/kelvin/Documents/FABulous/myProject/Tile/PE/const_unit.v:7.73-7.83"
           }
         },
         "const_out": {
@@ -43,7 +43,7 @@
             "BUS": 1,
             "DATA": 1,
             "FABulous": 1,
-            "src": "/home/kelvin/FABulous_fork/myProject/Tile/PE/const_unit.v:6.55-6.64"
+            "src": "/Users/kelvin/Documents/FABulous/myProject/Tile/PE/const_unit.v:6.55-6.64"
           }
         }
       }

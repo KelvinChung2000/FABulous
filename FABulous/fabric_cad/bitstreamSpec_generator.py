@@ -3,6 +3,7 @@ from typing import Generator, Mapping
 from FABulous.fabric_cad.define import FeatureMap, FeatureValue
 from FABulous.fabric_definition.Fabric import Fabric
 from FABulous.fabric_definition.Port import BelPort
+from FABulous.fabric_definition.Tile import Tile
 
 
 def generateBitsStreamSpec(fabric: Fabric) -> FeatureMap:
@@ -14,7 +15,7 @@ def generateBitsStreamSpec(fabric: Fabric) -> FeatureMap:
         if tile.configBits == 0:
             continue
 
-        def frameIndexGetter(tile) -> Generator[tuple[int, int], None, None]:
+        def frameIndexGetter(tile: Tile) -> Generator[tuple[int, int], None, None]:
             cfgNumber = 0
             while True:
                 yield tile.configMems[cfgNumber]

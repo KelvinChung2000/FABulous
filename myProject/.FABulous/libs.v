@@ -14,16 +14,6 @@ module reg_unit #(
 endmodule
 
 (* blackbox *)
-module const_unit #(
-    parameter ConfigBits = 0
-)
-(
-    output reg[31:0] const_out
-);
-
-endmodule
-
-(* blackbox *)
 module ALU #(
     parameter ALU_func = 0
 )
@@ -44,6 +34,16 @@ module IO #(
     input wire[31:0] in,
     output reg[31:0] to_fabric,
     output reg[31:0] out
+);
+
+endmodule
+
+(* blackbox *)
+module const_unit #(
+    parameter ConfigBits = 0
+)
+(
+    output reg[31:0] const_out
 );
 
 endmodule

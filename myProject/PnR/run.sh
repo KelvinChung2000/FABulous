@@ -9,7 +9,7 @@
 # cd -
 
 FABulous --debug ../../myProject -p "load_fabric; gen_fabric; gen_FABulous_CAD_tool_files; synthesis_script -q -tcl synth.tcl"
-# FABulous --debug ../../myProject -p "load_fabric; gen_fabric"
+# FABulous --debug ../../myProject -p "load_fabric;"
 # xdot /home/kelvin/FABulous_fork/myProject/.FABulous/routing_graph.dot &
 nextpnr-himbaechel --chipdb ../.FABulous/hycube.bit --device "FABulous" \
                    --json $my_FAB_ROOT/myProject/user_design/synth_test.json \

@@ -1,6 +1,6 @@
 <testsuites name="results">
   <testsuite name="all" package="all">
-    <property name="random_seed" value="1742641433" />
-    <testcase name="adder_basic_test" classname="test_fabric" file="/home/kelvin/FABulous_fork/myProject/Test/test_fabric.py" lineno="20" time="0.0059697628021240234" sim_time_ns="4000000000" ratio_time="670043372339.1509" />
+    <property name="random_seed" value="1742832924" />
+    <testcase name="adder_basic_test" classname="test_fabric" file="/Users/kelvin/Documents/FABulous/myProject/Test/test_fabric.py" lineno="20" time="0.005291938781738281" sim_time_ns="4000000000" ratio_time="755866642638.3132" />
   </testsuite>
 </testsuites>

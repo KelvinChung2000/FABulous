@@ -21,6 +21,10 @@ CONTROL_GND_OFFSET = 0x2000
 CONTROL_VCC_OFFSET = 0x4000
 TILE_CLK = 0xFFFF
 
+NORMAL = 0
+PSEUDO_PIP_START = 1
+PSEUDO_PIP_MID = 2
+PSEUDO_PIP_END = 3
 
 def genSwitchMatrix(tile: Tile, tileType: TileType, context=1):
     if not isinstance(tile.switchMatrix, SwitchMatrix):
@@ -62,7 +66,8 @@ def genSwitchMatrix(tile: Tile, tileType: TileType, context=1):
                     tileType.create_wire(f"c{c}.{p.name}_internal[{wc}]", "dst", z=zOut)
                     tileType.create_wire(f"c{c}.{p.name}[{wc}]", "dst", z=zOut)
                     tileType.create_pip(
-                        f"c{c}.{p.name}_internal[{wc}]", f"c{c}.{p.name}[{wc}]"
+                        f"c{c}.{p.name}_internal[{wc}]", f"c{c}.{p.name}[{wc}]",
+                        flags=PSEUDO_PIP_END
                     )
                     outputMapping[f"c{c}.{p.name}[{wc}]"] = (
                         f"c{c}.{p.name}_internal[{wc}]"
@@ -85,11 +90,13 @@ def genSwitchMatrix(tile: Tile, tileType: TileType, context=1):
                         tileType.create_pip(
                             f"c{c}.{i.prefix}{i.name}[{wc}]",
                             outTarget,
+                            flags=NORMAL if "internal" not in outTarget else PSEUDO_PIP_START
                         )
                     else:
                         tileType.create_pip(
                             f"c{c}.{i.name}[{wc}]",
                             outTarget,
+                            flags=NORMAL if "internal" not in outTarget else PSEUDO_PIP_START
                         )
 
     zOut = 0
@@ -104,15 +111,18 @@ def genSwitchMatrix(tile: Tile, tileType: TileType, context=1):
     for c in range(context - 1):
         for mux in tile.switchMatrix.muxes:
             for wc in range(mux.output.width):
-                tileType.create_pip(
-                    outputMapping.get(
-                        f"c{c}.{mux.output.name}[{wc}]", f"c{c}.{mux.output.name}[{wc}]"
-                    ),
+                output = outputMapping.get(
+                    f"c{c}.{mux.output.name}[{wc}]", f"c{c}.{mux.output.name}[{wc}]"
+                )
+                tileType.create_pip(                    
+                    output,
                     f"{mux.output.name}_{c}_to_{c+1}_NextCycle[{wc}]",
+                    flags=PSEUDO_PIP_MID if "internal" not in output else PSEUDO_PIP_START
                 )
                 tileType.create_pip(
                     f"{mux.output.name}_{c}_to_{c+1}_NextCycle[{wc}]",
                     f"c{c+1}.{mux.output.name}[{wc}]",
+                    flags=PSEUDO_PIP_END
                 )
 
     for c in range(context - 2):
@@ -121,6 +131,7 @@ def genSwitchMatrix(tile: Tile, tileType: TileType, context=1):
                 tileType.create_pip(
                     f"{p.name}_{c}_to_{c+1}_NextCycle[{wc}]",
                     f"{p.name}_{c+1}_to_{c+2}_NextCycle[{wc}]",
+                    flags=PSEUDO_PIP_MID
                 )
 
 

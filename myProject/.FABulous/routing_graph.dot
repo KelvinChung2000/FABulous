@@ -7,6 +7,7 @@ margin=15;
 style=rounded;
 rank=source;
 }
+
 subgraph cluster_0_1 {
 label="tile_0_1_W_IO";
 margin=15;
@@ -32,14 +33,12 @@ label="c0.W_IO";
 "X0Y1.c0.W_out";
 "X0Y1.c0.W_IO.out" -> "X0Y1.c0.W_out";
 }
-"X0Y1.c0.out1_internal";
-"X0Y1.c0.out1";
+
 "X0Y1.c0.out1_internal" -> "X0Y1.c0.out1";
 "X0Y1.c0.W_to_fabric" -> "X0Y1.c0.out1_internal";
-"X0Y1.c0.in1";
 "X0Y1.c0.in1" -> "X0Y1.c0.W_from_fabric";
 }
-"X1Y1.c0.in3";
+
 "X0Y1.c0.out1" -> "X1Y1.c0.in3" [dir=none, color=blue];
 subgraph cluster_0_2 {
 label="tile_0_2_W_IO";
@@ -66,14 +65,12 @@ label="c0.W_IO";
 "X0Y2.c0.W_out";
 "X0Y2.c0.W_IO.out" -> "X0Y2.c0.W_out";
 }
-"X0Y2.c0.out1_internal";
-"X0Y2.c0.out1";
+
 "X0Y2.c0.out1_internal" -> "X0Y2.c0.out1";
 "X0Y2.c0.W_to_fabric" -> "X0Y2.c0.out1_internal";
-"X0Y2.c0.in1";
 "X0Y2.c0.in1" -> "X0Y2.c0.W_from_fabric";
 }
-"X1Y2.c0.in3";
+
 "X0Y2.c0.out1" -> "X1Y2.c0.in3" [dir=none, color=blue];
 subgraph cluster_0_3 {
 label="tile_0_3_NULL";
@@ -81,6 +78,7 @@ margin=15;
 style=rounded;
 rank=source;
 }
+
 subgraph cluster_1_0 {
 label="tile_1_0_S_IO";
 margin=15;
@@ -106,14 +104,12 @@ label="c0.S_IO";
 "X1Y0.c0.S_out";
 "X1Y0.c0.S_IO.out" -> "X1Y0.c0.S_out";
 }
-"X1Y0.c0.out0_internal";
-"X1Y0.c0.out0";
+
 "X1Y0.c0.out0_internal" -> "X1Y0.c0.out0";
 "X1Y0.c0.S_to_fabric" -> "X1Y0.c0.out0_internal";
-"X1Y0.c0.in0";
 "X1Y0.c0.in0" -> "X1Y0.c0.S_from_fabric";
 }
-"X1Y1.c0.in2";
+
 "X1Y0.c0.out0" -> "X1Y1.c0.in2" [dir=none, color=blue];
 subgraph cluster_1_1 {
 label="tile_1_1_PE";
@@ -128,6 +124,7 @@ label="CLK_DRV";
 "X1Y1.user_clk_o";
 "X1Y1.CLK_DRV.CLK_O" -> "X1Y1.user_clk_o";
 }
+
 subgraph "cluster_1_1_c0.ALU" {
 label="c0.ALU";
 "X1Y1.bel_c0.ALU" [label="bel_c0.ALU(z=0x0000)", shape=box];
@@ -148,6 +145,7 @@ label="c0.ALU";
 "X1Y1.c0.data_out";
 "X1Y1.c0.ALU.data_out" -> "X1Y1.c0.data_out";
 }
+
 subgraph "cluster_1_1_c0.const_unit" {
 label="c0.const_unit";
 "X1Y1.bel_c0.const_unit" [label="bel_c0.const_unit(z=0x0001)", shape=box];
@@ -156,6 +154,7 @@ label="c0.const_unit";
 "X1Y1.c0.const_out";
 "X1Y1.c0.const_unit.const_out" -> "X1Y1.c0.const_out";
 }
+
 subgraph "cluster_1_1_c0.RES_reg_unit" {
 label="c0.RES_reg_unit";
 "X1Y1.bel_c0.RES_reg_unit" [label="bel_c0.RES_reg_unit(z=0x0002)", shape=box];
@@ -180,6 +179,7 @@ label="c0.RES_reg_unit";
 "X1Y1.c0.RES_reg_unit_clk_i" -> "X1Y1.c0.RES_reg_unit.clk";
 "X1Y1.c0.RES_reg_unit.clk" -> "X1Y1.bel_c0.RES_reg_unit";
 }
+
 subgraph "cluster_1_1_c0.N_reg_unit" {
 label="c0.N_reg_unit";
 "X1Y1.bel_c0.N_reg_unit" [label="bel_c0.N_reg_unit(z=0x0003)", shape=box];
@@ -204,6 +204,7 @@ label="c0.N_reg_unit";
 "X1Y1.c0.N_reg_unit_clk_i" -> "X1Y1.c0.N_reg_unit.clk";
 "X1Y1.c0.N_reg_unit.clk" -> "X1Y1.bel_c0.N_reg_unit";
 }
+
 subgraph "cluster_1_1_c0.E_reg_unit" {
 label="c0.E_reg_unit";
 "X1Y1.bel_c0.E_reg_unit" [label="bel_c0.E_reg_unit(z=0x0004)", shape=box];
@@ -228,6 +229,7 @@ label="c0.E_reg_unit";
 "X1Y1.c0.E_reg_unit_clk_i" -> "X1Y1.c0.E_reg_unit.clk";
 "X1Y1.c0.E_reg_unit.clk" -> "X1Y1.bel_c0.E_reg_unit";
 }
+
 subgraph "cluster_1_1_c0.S_reg_unit" {
 label="c0.S_reg_unit";
 "X1Y1.bel_c0.S_reg_unit" [label="bel_c0.S_reg_unit(z=0x0005)", shape=box];
@@ -252,6 +254,7 @@ label="c0.S_reg_unit";
 "X1Y1.c0.S_reg_unit_clk_i" -> "X1Y1.c0.S_reg_unit.clk";
 "X1Y1.c0.S_reg_unit.clk" -> "X1Y1.bel_c0.S_reg_unit";
 }
+
 subgraph "cluster_1_1_c0.W_reg_unit" {
 label="c0.W_reg_unit";
 "X1Y1.bel_c0.W_reg_unit" [label="bel_c0.W_reg_unit(z=0x0006)", shape=box];
@@ -276,38 +279,27 @@ label="c0.W_reg_unit";
 "X1Y1.c0.W_reg_unit_clk_i" -> "X1Y1.c0.W_reg_unit.clk";
 "X1Y1.c0.W_reg_unit.clk" -> "X1Y1.bel_c0.W_reg_unit";
 }
+
 "X1Y1.user_clk_o" -> "X1Y1.c0.RES_reg_unit_clk_i";
 "X1Y1.user_clk_o" -> "X1Y1.c0.N_reg_unit_clk_i";
 "X1Y1.user_clk_o" -> "X1Y1.c0.E_reg_unit_clk_i";
 "X1Y1.user_clk_o" -> "X1Y1.c0.S_reg_unit_clk_i";
 "X1Y1.user_clk_o" -> "X1Y1.c0.W_reg_unit_clk_i";
-"X1Y1.c0.out0_internal";
-"X1Y1.c0.out0";
 "X1Y1.c0.out0_internal" -> "X1Y1.c0.out0";
-"X1Y1.c0.out1_internal";
-"X1Y1.c0.out1";
 "X1Y1.c0.out1_internal" -> "X1Y1.c0.out1";
-"X1Y1.c0.out2_internal";
-"X1Y1.c0.out2";
 "X1Y1.c0.out2_internal" -> "X1Y1.c0.out2";
-"X1Y1.c0.out3_internal";
-"X1Y1.c0.out3";
 "X1Y1.c0.out3_internal" -> "X1Y1.c0.out3";
 "X1Y1.c0.data_out" -> "X1Y1.c0.out0_internal";
 "X1Y1.c0.RES_reg_out" -> "X1Y1.c0.out0_internal";
-"X1Y1.c0.in2";
 "X1Y1.c0.in2" -> "X1Y1.c0.out0_internal";
 "X1Y1.c0.data_out" -> "X1Y1.c0.out1_internal";
 "X1Y1.c0.RES_reg_out" -> "X1Y1.c0.out1_internal";
-"X1Y1.c0.in3";
 "X1Y1.c0.in3" -> "X1Y1.c0.out1_internal";
 "X1Y1.c0.data_out" -> "X1Y1.c0.out2_internal";
 "X1Y1.c0.RES_reg_out" -> "X1Y1.c0.out2_internal";
-"X1Y1.c0.in0";
 "X1Y1.c0.in0" -> "X1Y1.c0.out2_internal";
 "X1Y1.c0.data_out" -> "X1Y1.c0.out3_internal";
 "X1Y1.c0.RES_reg_out" -> "X1Y1.c0.out3_internal";
-"X1Y1.c0.in1";
 "X1Y1.c0.in1" -> "X1Y1.c0.out3_internal";
 "X1Y1.c0.in0" -> "X1Y1.c0.data_in1";
 "X1Y1.c0.in1" -> "X1Y1.c0.data_in1";
@@ -343,9 +335,8 @@ label="c0.W_reg_unit";
 "X1Y1.c0.in3" -> "X1Y1.c0.W_reg_in";
 "X1Y1.c0.W_reg_out" -> "X1Y1.c0.W_reg_in";
 }
-"X1Y2.c0.in2";
+
 "X1Y1.c0.out0" -> "X1Y2.c0.in2" [dir=none, color=blue];
-"X2Y1.c0.in3";
 "X1Y1.c0.out1" -> "X2Y1.c0.in3" [dir=none, color=blue];
 "X1Y1.c0.out2" -> "X1Y0.c0.in0" [dir=none, color=blue];
 "X1Y1.c0.out3" -> "X0Y1.c0.in1" [dir=none, color=blue];
@@ -362,6 +353,7 @@ label="CLK_DRV";
 "X1Y2.user_clk_o";
 "X1Y2.CLK_DRV.CLK_O" -> "X1Y2.user_clk_o";
 }
+
 subgraph "cluster_1_2_c0.ALU" {
 label="c0.ALU";
 "X1Y2.bel_c0.ALU" [label="bel_c0.ALU(z=0x0000)", shape=box];
@@ -382,6 +374,7 @@ label="c0.ALU";
 "X1Y2.c0.data_out";
 "X1Y2.c0.ALU.data_out" -> "X1Y2.c0.data_out";
 }
+
 subgraph "cluster_1_2_c0.const_unit" {
 label="c0.const_unit";
 "X1Y2.bel_c0.const_unit" [label="bel_c0.const_unit(z=0x0001)", shape=box];
@@ -390,6 +383,7 @@ label="c0.const_unit";
 "X1Y2.c0.const_out";
 "X1Y2.c0.const_unit.const_out" -> "X1Y2.c0.const_out";
 }
+
 subgraph "cluster_1_2_c0.RES_reg_unit" {
 label="c0.RES_reg_unit";
 "X1Y2.bel_c0.RES_reg_unit" [label="bel_c0.RES_reg_unit(z=0x0002)", shape=box];
@@ -414,6 +408,7 @@ label="c0.RES_reg_unit";
 "X1Y2.c0.RES_reg_unit_clk_i" -> "X1Y2.c0.RES_reg_unit.clk";
 "X1Y2.c0.RES_reg_unit.clk" -> "X1Y2.bel_c0.RES_reg_unit";
 }
+
 subgraph "cluster_1_2_c0.N_reg_unit" {
 label="c0.N_reg_unit";
 "X1Y2.bel_c0.N_reg_unit" [label="bel_c0.N_reg_unit(z=0x0003)", shape=box];
@@ -438,6 +433,7 @@ label="c0.N_reg_unit";
 "X1Y2.c0.N_reg_unit_clk_i" -> "X1Y2.c0.N_reg_unit.clk";
 "X1Y2.c0.N_reg_unit.clk" -> "X1Y2.bel_c0.N_reg_unit";
 }
+
 subgraph "cluster_1_2_c0.E_reg_unit" {
 label="c0.E_reg_unit";
 "X1Y2.bel_c0.E_reg_unit" [label="bel_c0.E_reg_unit(z=0x0004)", shape=box];
@@ -462,6 +458,7 @@ label="c0.E_reg_unit";
 "X1Y2.c0.E_reg_unit_clk_i" -> "X1Y2.c0.E_reg_unit.clk";
 "X1Y2.c0.E_reg_unit.clk" -> "X1Y2.bel_c0.E_reg_unit";
 }
+
 subgraph "cluster_1_2_c0.S_reg_unit" {
 label="c0.S_reg_unit";
 "X1Y2.bel_c0.S_reg_unit" [label="bel_c0.S_reg_unit(z=0x0005)", shape=box];
@@ -486,6 +483,7 @@ label="c0.S_reg_unit";
 "X1Y2.c0.S_reg_unit_clk_i" -> "X1Y2.c0.S_reg_unit.clk";
 "X1Y2.c0.S_reg_unit.clk" -> "X1Y2.bel_c0.S_reg_unit";
 }
+
 subgraph "cluster_1_2_c0.W_reg_unit" {
 label="c0.W_reg_unit";
 "X1Y2.bel_c0.W_reg_unit" [label="bel_c0.W_reg_unit(z=0x0006)", shape=box];
@@ -510,38 +508,27 @@ label="c0.W_reg_unit";
 "X1Y2.c0.W_reg_unit_clk_i" -> "X1Y2.c0.W_reg_unit.clk";
 "X1Y2.c0.W_reg_unit.clk" -> "X1Y2.bel_c0.W_reg_unit";
 }
+
 "X1Y2.user_clk_o" -> "X1Y2.c0.RES_reg_unit_clk_i";
 "X1Y2.user_clk_o" -> "X1Y2.c0.N_reg_unit_clk_i";
 "X1Y2.user_clk_o" -> "X1Y2.c0.E_reg_unit_clk_i";
 "X1Y2.user_clk_o" -> "X1Y2.c0.S_reg_unit_clk_i";
 "X1Y2.user_clk_o" -> "X1Y2.c0.W_reg_unit_clk_i";
-"X1Y2.c0.out0_internal";
-"X1Y2.c0.out0";
 "X1Y2.c0.out0_internal" -> "X1Y2.c0.out0";
-"X1Y2.c0.out1_internal";
-"X1Y2.c0.out1";
 "X1Y2.c0.out1_internal" -> "X1Y2.c0.out1";
-"X1Y2.c0.out2_internal";
-"X1Y2.c0.out2";
 "X1Y2.c0.out2_internal" -> "X1Y2.c0.out2";
-"X1Y2.c0.out3_internal";
-"X1Y2.c0.out3";
 "X1Y2.c0.out3_internal" -> "X1Y2.c0.out3";
 "X1Y2.c0.data_out" -> "X1Y2.c0.out0_internal";
 "X1Y2.c0.RES_reg_out" -> "X1Y2.c0.out0_internal";
-"X1Y2.c0.in2";
 "X1Y2.c0.in2" -> "X1Y2.c0.out0_internal";
 "X1Y2.c0.data_out" -> "X1Y2.c0.out1_internal";
 "X1Y2.c0.RES_reg_out" -> "X1Y2.c0.out1_internal";
-"X1Y2.c0.in3";
 "X1Y2.c0.in3" -> "X1Y2.c0.out1_internal";
 "X1Y2.c0.data_out" -> "X1Y2.c0.out2_internal";
 "X1Y2.c0.RES_reg_out" -> "X1Y2.c0.out2_internal";
-"X1Y2.c0.in0";
 "X1Y2.c0.in0" -> "X1Y2.c0.out2_internal";
 "X1Y2.c0.data_out" -> "X1Y2.c0.out3_internal";
 "X1Y2.c0.RES_reg_out" -> "X1Y2.c0.out3_internal";
-"X1Y2.c0.in1";
 "X1Y2.c0.in1" -> "X1Y2.c0.out3_internal";
 "X1Y2.c0.in0" -> "X1Y2.c0.data_in1";
 "X1Y2.c0.in1" -> "X1Y2.c0.data_in1";
@@ -577,9 +564,8 @@ label="c0.W_reg_unit";
 "X1Y2.c0.in3" -> "X1Y2.c0.W_reg_in";
 "X1Y2.c0.W_reg_out" -> "X1Y2.c0.W_reg_in";
 }
-"X1Y3.c0.in2";
+
 "X1Y2.c0.out0" -> "X1Y3.c0.in2" [dir=none, color=blue];
-"X2Y2.c0.in3";
 "X1Y2.c0.out1" -> "X2Y2.c0.in3" [dir=none, color=blue];
 "X1Y2.c0.out2" -> "X1Y1.c0.in0" [dir=none, color=blue];
 "X1Y2.c0.out3" -> "X0Y2.c0.in1" [dir=none, color=blue];
@@ -608,13 +594,12 @@ label="c0.N_IO";
 "X1Y3.c0.N_out";
 "X1Y3.c0.N_IO.out" -> "X1Y3.c0.N_out";
 }
-"X1Y3.c0.out2_internal";
-"X1Y3.c0.out2";
+
 "X1Y3.c0.out2_internal" -> "X1Y3.c0.out2";
 "X1Y3.c0.N_to_fabric" -> "X1Y3.c0.out2_internal";
-"X1Y3.c0.in2";
 "X1Y3.c0.in2" -> "X1Y3.c0.N_from_fabric";
 }
+
 "X1Y3.c0.out2" -> "X1Y2.c0.in0" [dir=none, color=blue];
 subgraph cluster_2_0 {
 label="tile_2_0_S_IO";
@@ -641,14 +626,12 @@ label="c0.S_IO";
 "X2Y0.c0.S_out";
 "X2Y0.c0.S_IO.out" -> "X2Y0.c0.S_out";
 }
-"X2Y0.c0.out0_internal";
-"X2Y0.c0.out0";
+
 "X2Y0.c0.out0_internal" -> "X2Y0.c0.out0";
 "X2Y0.c0.S_to_fabric" -> "X2Y0.c0.out0_internal";
-"X2Y0.c0.in0";
 "X2Y0.c0.in0" -> "X2Y0.c0.S_from_fabric";
 }
-"X2Y1.c0.in2";
+
 "X2Y0.c0.out0" -> "X2Y1.c0.in2" [dir=none, color=blue];
 subgraph cluster_2_1 {
 label="tile_2_1_PE";
@@ -663,6 +646,7 @@ label="CLK_DRV";
 "X2Y1.user_clk_o";
 "X2Y1.CLK_DRV.CLK_O" -> "X2Y1.user_clk_o";
 }
+
 subgraph "cluster_2_1_c0.ALU" {
 label="c0.ALU";
 "X2Y1.bel_c0.ALU" [label="bel_c0.ALU(z=0x0000)", shape=box];
@@ -683,6 +667,7 @@ label="c0.ALU";
 "X2Y1.c0.data_out";
 "X2Y1.c0.ALU.data_out" -> "X2Y1.c0.data_out";
 }
+
 subgraph "cluster_2_1_c0.const_unit" {
 label="c0.const_unit";
 "X2Y1.bel_c0.const_unit" [label="bel_c0.const_unit(z=0x0001)", shape=box];
@@ -691,6 +676,7 @@ label="c0.const_unit";
 "X2Y1.c0.const_out";
 "X2Y1.c0.const_unit.const_out" -> "X2Y1.c0.const_out";
 }
+
 subgraph "cluster_2_1_c0.RES_reg_unit" {
 label="c0.RES_reg_unit";
 "X2Y1.bel_c0.RES_reg_unit" [label="bel_c0.RES_reg_unit(z=0x0002)", shape=box];
@@ -715,6 +701,7 @@ label="c0.RES_reg_unit";
 "X2Y1.c0.RES_reg_unit_clk_i" -> "X2Y1.c0.RES_reg_unit.clk";
 "X2Y1.c0.RES_reg_unit.clk" -> "X2Y1.bel_c0.RES_reg_unit";
 }
+
 subgraph "cluster_2_1_c0.N_reg_unit" {
 label="c0.N_reg_unit";
 "X2Y1.bel_c0.N_reg_unit" [label="bel_c0.N_reg_unit(z=0x0003)", shape=box];
@@ -739,6 +726,7 @@ label="c0.N_reg_unit";
 "X2Y1.c0.N_reg_unit_clk_i" -> "X2Y1.c0.N_reg_unit.clk";
 "X2Y1.c0.N_reg_unit.clk" -> "X2Y1.bel_c0.N_reg_unit";
 }
+
 subgraph "cluster_2_1_c0.E_reg_unit" {
 label="c0.E_reg_unit";
 "X2Y1.bel_c0.E_reg_unit" [label="bel_c0.E_reg_unit(z=0x0004)", shape=box];
@@ -763,6 +751,7 @@ label="c0.E_reg_unit";
 "X2Y1.c0.E_reg_unit_clk_i" -> "X2Y1.c0.E_reg_unit.clk";
 "X2Y1.c0.E_reg_unit.clk" -> "X2Y1.bel_c0.E_reg_unit";
 }
+
 subgraph "cluster_2_1_c0.S_reg_unit" {
 label="c0.S_reg_unit";
 "X2Y1.bel_c0.S_reg_unit" [label="bel_c0.S_reg_unit(z=0x0005)", shape=box];
@@ -787,6 +776,7 @@ label="c0.S_reg_unit";
 "X2Y1.c0.S_reg_unit_clk_i" -> "X2Y1.c0.S_reg_unit.clk";
 "X2Y1.c0.S_reg_unit.clk" -> "X2Y1.bel_c0.S_reg_unit";
 }
+
 subgraph "cluster_2_1_c0.W_reg_unit" {
 label="c0.W_reg_unit";
 "X2Y1.bel_c0.W_reg_unit" [label="bel_c0.W_reg_unit(z=0x0006)", shape=box];
@@ -811,38 +801,27 @@ label="c0.W_reg_unit";
 "X2Y1.c0.W_reg_unit_clk_i" -> "X2Y1.c0.W_reg_unit.clk";
 "X2Y1.c0.W_reg_unit.clk" -> "X2Y1.bel_c0.W_reg_unit";
 }
+
 "X2Y1.user_clk_o" -> "X2Y1.c0.RES_reg_unit_clk_i";
 "X2Y1.user_clk_o" -> "X2Y1.c0.N_reg_unit_clk_i";
 "X2Y1.user_clk_o" -> "X2Y1.c0.E_reg_unit_clk_i";
 "X2Y1.user_clk_o" -> "X2Y1.c0.S_reg_unit_clk_i";
 "X2Y1.user_clk_o" -> "X2Y1.c0.W_reg_unit_clk_i";
-"X2Y1.c0.out0_internal";
-"X2Y1.c0.out0";
 "X2Y1.c0.out0_internal" -> "X2Y1.c0.out0";
-"X2Y1.c0.out1_internal";
-"X2Y1.c0.out1";
 "X2Y1.c0.out1_internal" -> "X2Y1.c0.out1";
-"X2Y1.c0.out2_internal";
-"X2Y1.c0.out2";
 "X2Y1.c0.out2_internal" -> "X2Y1.c0.out2";
-"X2Y1.c0.out3_internal";
-"X2Y1.c0.out3";
 "X2Y1.c0.out3_internal" -> "X2Y1.c0.out3";
 "X2Y1.c0.data_out" -> "X2Y1.c0.out0_internal";
 "X2Y1.c0.RES_reg_out" -> "X2Y1.c0.out0_internal";
-"X2Y1.c0.in2";
 "X2Y1.c0.in2" -> "X2Y1.c0.out0_internal";
 "X2Y1.c0.data_out" -> "X2Y1.c0.out1_internal";
 "X2Y1.c0.RES_reg_out" -> "X2Y1.c0.out1_internal";
-"X2Y1.c0.in3";
 "X2Y1.c0.in3" -> "X2Y1.c0.out1_internal";
 "X2Y1.c0.data_out" -> "X2Y1.c0.out2_internal";
 "X2Y1.c0.RES_reg_out" -> "X2Y1.c0.out2_internal";
-"X2Y1.c0.in0";
 "X2Y1.c0.in0" -> "X2Y1.c0.out2_internal";
 "X2Y1.c0.data_out" -> "X2Y1.c0.out3_internal";
 "X2Y1.c0.RES_reg_out" -> "X2Y1.c0.out3_internal";
-"X2Y1.c0.in1";
 "X2Y1.c0.in1" -> "X2Y1.c0.out3_internal";
 "X2Y1.c0.in0" -> "X2Y1.c0.data_in1";
 "X2Y1.c0.in1" -> "X2Y1.c0.data_in1";
@@ -878,9 +857,8 @@ label="c0.W_reg_unit";
 "X2Y1.c0.in3" -> "X2Y1.c0.W_reg_in";
 "X2Y1.c0.W_reg_out" -> "X2Y1.c0.W_reg_in";
 }
-"X2Y2.c0.in2";
+
 "X2Y1.c0.out0" -> "X2Y2.c0.in2" [dir=none, color=blue];
-"X3Y1.c0.in3";
 "X2Y1.c0.out1" -> "X3Y1.c0.in3" [dir=none, color=blue];
 "X2Y1.c0.out2" -> "X2Y0.c0.in0" [dir=none, color=blue];
 "X2Y1.c0.out3" -> "X1Y1.c0.in1" [dir=none, color=blue];
@@ -897,6 +875,7 @@ label="CLK_DRV";
 "X2Y2.user_clk_o";
 "X2Y2.CLK_DRV.CLK_O" -> "X2Y2.user_clk_o";
 }
+
 subgraph "cluster_2_2_c0.ALU" {
 label="c0.ALU";
 "X2Y2.bel_c0.ALU" [label="bel_c0.ALU(z=0x0000)", shape=box];
@@ -917,6 +896,7 @@ label="c0.ALU";
 "X2Y2.c0.data_out";
 "X2Y2.c0.ALU.data_out" -> "X2Y2.c0.data_out";
 }
+
 subgraph "cluster_2_2_c0.const_unit" {
 label="c0.const_unit";
 "X2Y2.bel_c0.const_unit" [label="bel_c0.const_unit(z=0x0001)", shape=box];
@@ -925,6 +905,7 @@ label="c0.const_unit";
 "X2Y2.c0.const_out";
 "X2Y2.c0.const_unit.const_out" -> "X2Y2.c0.const_out";
 }
+
 subgraph "cluster_2_2_c0.RES_reg_unit" {
 label="c0.RES_reg_unit";
 "X2Y2.bel_c0.RES_reg_unit" [label="bel_c0.RES_reg_unit(z=0x0002)", shape=box];
@@ -949,6 +930,7 @@ label="c0.RES_reg_unit";
 "X2Y2.c0.RES_reg_unit_clk_i" -> "X2Y2.c0.RES_reg_unit.clk";
 "X2Y2.c0.RES_reg_unit.clk" -> "X2Y2.bel_c0.RES_reg_unit";
 }
+
 subgraph "cluster_2_2_c0.N_reg_unit" {
 label="c0.N_reg_unit";
 "X2Y2.bel_c0.N_reg_unit" [label="bel_c0.N_reg_unit(z=0x0003)", shape=box];
@@ -973,6 +955,7 @@ label="c0.N_reg_unit";
 "X2Y2.c0.N_reg_unit_clk_i" -> "X2Y2.c0.N_reg_unit.clk";
 "X2Y2.c0.N_reg_unit.clk" -> "X2Y2.bel_c0.N_reg_unit";
 }
+
 subgraph "cluster_2_2_c0.E_reg_unit" {
 label="c0.E_reg_unit";
 "X2Y2.bel_c0.E_reg_unit" [label="bel_c0.E_reg_unit(z=0x0004)", shape=box];
@@ -997,6 +980,7 @@ label="c0.E_reg_unit";
 "X2Y2.c0.E_reg_unit_clk_i" -> "X2Y2.c0.E_reg_unit.clk";
 "X2Y2.c0.E_reg_unit.clk" -> "X2Y2.bel_c0.E_reg_unit";
 }
+
 subgraph "cluster_2_2_c0.S_reg_unit" {
 label="c0.S_reg_unit";
 "X2Y2.bel_c0.S_reg_unit" [label="bel_c0.S_reg_unit(z=0x0005)", shape=box];
@@ -1021,6 +1005,7 @@ label="c0.S_reg_unit";
 "X2Y2.c0.S_reg_unit_clk_i" -> "X2Y2.c0.S_reg_unit.clk";
 "X2Y2.c0.S_reg_unit.clk" -> "X2Y2.bel_c0.S_reg_unit";
 }
+
 subgraph "cluster_2_2_c0.W_reg_unit" {
 label="c0.W_reg_unit";
 "X2Y2.bel_c0.W_reg_unit" [label="bel_c0.W_reg_unit(z=0x0006)", shape=box];
@@ -1045,38 +1030,27 @@ label="c0.W_reg_unit";
 "X2Y2.c0.W_reg_unit_clk_i" -> "X2Y2.c0.W_reg_unit.clk";
 "X2Y2.c0.W_reg_unit.clk" -> "X2Y2.bel_c0.W_reg_unit";
 }
+
 "X2Y2.user_clk_o" -> "X2Y2.c0.RES_reg_unit_clk_i";
 "X2Y2.user_clk_o" -> "X2Y2.c0.N_reg_unit_clk_i";
 "X2Y2.user_clk_o" -> "X2Y2.c0.E_reg_unit_clk_i";
 "X2Y2.user_clk_o" -> "X2Y2.c0.S_reg_unit_clk_i";
 "X2Y2.user_clk_o" -> "X2Y2.c0.W_reg_unit_clk_i";
-"X2Y2.c0.out0_internal";
-"X2Y2.c0.out0";
 "X2Y2.c0.out0_internal" -> "X2Y2.c0.out0";
-"X2Y2.c0.out1_internal";
-"X2Y2.c0.out1";
 "X2Y2.c0.out1_internal" -> "X2Y2.c0.out1";
-"X2Y2.c0.out2_internal";
-"X2Y2.c0.out2";
 "X2Y2.c0.out2_internal" -> "X2Y2.c0.out2";
-"X2Y2.c0.out3_internal";
-"X2Y2.c0.out3";
 "X2Y2.c0.out3_internal" -> "X2Y2.c0.out3";
 "X2Y2.c0.data_out" -> "X2Y2.c0.out0_internal";
 "X2Y2.c0.RES_reg_out" -> "X2Y2.c0.out0_internal";
-"X2Y2.c0.in2";
 "X2Y2.c0.in2" -> "X2Y2.c0.out0_internal";
 "X2Y2.c0.data_out" -> "X2Y2.c0.out1_internal";
 "X2Y2.c0.RES_reg_out" -> "X2Y2.c0.out1_internal";
-"X2Y2.c0.in3";
 "X2Y2.c0.in3" -> "X2Y2.c0.out1_internal";
 "X2Y2.c0.data_out" -> "X2Y2.c0.out2_internal";
 "X2Y2.c0.RES_reg_out" -> "X2Y2.c0.out2_internal";
-"X2Y2.c0.in0";
 "X2Y2.c0.in0" -> "X2Y2.c0.out2_internal";
 "X2Y2.c0.data_out" -> "X2Y2.c0.out3_internal";
 "X2Y2.c0.RES_reg_out" -> "X2Y2.c0.out3_internal";
-"X2Y2.c0.in1";
 "X2Y2.c0.in1" -> "X2Y2.c0.out3_internal";
 "X2Y2.c0.in0" -> "X2Y2.c0.data_in1";
 "X2Y2.c0.in1" -> "X2Y2.c0.data_in1";
@@ -1112,9 +1086,8 @@ label="c0.W_reg_unit";
 "X2Y2.c0.in3" -> "X2Y2.c0.W_reg_in";
 "X2Y2.c0.W_reg_out" -> "X2Y2.c0.W_reg_in";
 }
-"X2Y3.c0.in2";
+
 "X2Y2.c0.out0" -> "X2Y3.c0.in2" [dir=none, color=blue];
-"X3Y2.c0.in3";
 "X2Y2.c0.out1" -> "X3Y2.c0.in3" [dir=none, color=blue];
 "X2Y2.c0.out2" -> "X2Y1.c0.in0" [dir=none, color=blue];
 "X2Y2.c0.out3" -> "X1Y2.c0.in1" [dir=none, color=blue];
@@ -1143,13 +1116,12 @@ label="c0.N_IO";
 "X2Y3.c0.N_out";
 "X2Y3.c0.N_IO.out" -> "X2Y3.c0.N_out";
 }
-"X2Y3.c0.out2_internal";
-"X2Y3.c0.out2";
+
 "X2Y3.c0.out2_internal" -> "X2Y3.c0.out2";
 "X2Y3.c0.N_to_fabric" -> "X2Y3.c0.out2_internal";
-"X2Y3.c0.in2";
 "X2Y3.c0.in2" -> "X2Y3.c0.N_from_fabric";
 }
+
 "X2Y3.c0.out2" -> "X2Y2.c0.in0" [dir=none, color=blue];
 subgraph cluster_3_0 {
 label="tile_3_0_NULL";
@@ -1157,6 +1129,7 @@ margin=15;
 style=rounded;
 rank=source;
 }
+
 subgraph cluster_3_1 {
 label="tile_3_1_E_IO";
 margin=15;
@@ -1182,13 +1155,12 @@ label="c0.E_IO";
 "X3Y1.c0.E_out";
 "X3Y1.c0.E_IO.out" -> "X3Y1.c0.E_out";
 }
-"X3Y1.c0.out3_internal";
-"X3Y1.c0.out3";
+
 "X3Y1.c0.out3_internal" -> "X3Y1.c0.out3";
 "X3Y1.c0.E_to_fabric" -> "X3Y1.c0.out3_internal";
-"X3Y1.c0.in3";
 "X3Y1.c0.in3" -> "X3Y1.c0.E_from_fabric";
 }
+
 "X3Y1.c0.out3" -> "X2Y1.c0.in1" [dir=none, color=blue];
 subgraph cluster_3_2 {
 label="tile_3_2_E_IO";
@@ -1215,13 +1187,12 @@ label="c0.E_IO";
 "X3Y2.c0.E_out";
 "X3Y2.c0.E_IO.out" -> "X3Y2.c0.E_out";
 }
-"X3Y2.c0.out3_internal";
-"X3Y2.c0.out3";
+
 "X3Y2.c0.out3_internal" -> "X3Y2.c0.out3";
 "X3Y2.c0.E_to_fabric" -> "X3Y2.c0.out3_internal";
-"X3Y2.c0.in3";
 "X3Y2.c0.in3" -> "X3Y2.c0.E_from_fabric";
 }
+
 "X3Y2.c0.out3" -> "X2Y2.c0.in1" [dir=none, color=blue];
 subgraph cluster_3_3 {
 label="tile_3_3_NULL";
@@ -1229,4 +1200,5 @@ margin=15;
 style=rounded;
 rank=source;
 }
+
 }

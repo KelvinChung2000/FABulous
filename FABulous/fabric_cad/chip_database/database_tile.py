@@ -143,7 +143,7 @@ class TileType(BBAStruct):
         group_idx = self._group2idx[self.strs.id(group)]
         self.groups[group_idx].group_groups.append(sub_group.index)
 
-    def create_pip(self, src: str, dst: str, timing_class: str = ""):
+    def create_pip(self, src: str, dst: str, timing_class: str = "", flags: int = 0):
         # Create a pip between two tile wires in the tile type. Both wires should exist already.
         if self.strs.id(src) not in self._wire2idx:
             raise ValueError(f"Source wire {src} not found")
@@ -157,6 +157,7 @@ class TileType(BBAStruct):
             src_wire=src_idx,
             dst_wire=dst_idx,
             timing_idx=self.tmg.pip_class_idx(timing_class),
+            flags=flags,
         )
 
         if pip not in self.pips:

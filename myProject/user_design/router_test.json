@@ -34,11 +34,11 @@
         "slack_redist_iter": "00000000000000000000000000000000",
         "timing_driven": "00000000000000000000000000000001",
         "target_freq": "12000000.000000",
-        "constrain-pair": "/Users/kelvin/Documents/FABulous/myProject/.FABulous/hycube_constrain_pair.inc"
+        "constrain-pair": "/home/kelvin/FABulous_fork/myProject/.FABulous/hycube_constrain_pair.inc"
       },
       "attributes": {
         "top": "00000000000000000000000000000001",
-        "src": "/Users/kelvin/Documents/FABulous/myProject/user_design/test.sv:34.1-75.10"
+        "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:34.1-75.10"
       },
       "ports": {
         "Y": {
@@ -63,7 +63,7 @@
           },
           "attributes": {
             "BEL_STRENGTH": "00000000000000000000000000000001",
-            "NEXTPNR_BEL": "X1Y0/c0.S_IO",
+            "NEXTPNR_BEL": "X3Y1/c0.E_IO",
             "keep": "00000000000000000000000000000001"
           },
           "port_directions": {
@@ -104,7 +104,7 @@
           "attributes": {
             "BEL_STRENGTH": "00000000000000000000000000000001",
             "NEXTPNR_BEL": "X1Y1/c0.ALU",
-            "src": "/Users/kelvin/Documents/FABulous/myProject/.FABulous/techmaps.v:47.7-52.6",
+            "src": "/home/kelvin/FABulous_fork/myProject/.FABulous/techmaps.v:168.7-173.6",
             "module_not_derived": "00000000000000000000000000000001"
           },
           "port_directions": {
@@ -128,7 +128,7 @@
           },
           "attributes": {
             "BEL_STRENGTH": "00000000000000000000000000000001",
-            "NEXTPNR_BEL": "X1Y3/c0.N_IO",
+            "NEXTPNR_BEL": "X1Y0/c0.S_IO",
             "keep": "00000000000000000000000000000001"
           },
           "port_directions": {
@@ -147,7 +147,7 @@
           "bits": [ 2076 ] ,
           "attributes": {
             "ROUTING": " ",
-            "src": "/Users/kelvin/Documents/FABulous/myProject/user_design/test.sv:35.24-35.25"
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:35.24-35.25"
           }
         },
         "A[7]": {
@@ -155,7 +155,7 @@
           "bits": [ 2074 ] ,
           "attributes": {
             "ROUTING": " ",
-            "src": "/Users/kelvin/Documents/FABulous/myProject/user_design/test.sv:35.24-35.25"
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:35.24-35.25"
           }
         },
         "A[6]": {
@@ -163,7 +163,7 @@
           "bits": [ 2072 ] ,
           "attributes": {
             "ROUTING": " ",
-            "src": "/Users/kelvin/Documents/FABulous/myProject/user_design/test.sv:35.24-35.25"
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:35.24-35.25"
           }
         },
         "A[5]": {
@@ -171,7 +171,7 @@
           "bits": [ 2070 ] ,
           "attributes": {
             "ROUTING": " ",
-            "src": "/Users/kelvin/Documents/FABulous/myProject/user_design/test.sv:35.24-35.25"
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:35.24-35.25"
           }
         },
         "A[4]": {
@@ -179,7 +179,7 @@
           "bits": [ 2068 ] ,
           "attributes": {
             "ROUTING": " ",
-            "src": "/Users/kelvin/Documents/FABulous/myProject/user_design/test.sv:35.24-35.25"
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:35.24-35.25"
           }
         },
         "A[3]": {
@@ -187,7 +187,7 @@
           "bits": [ 2066 ] ,
           "attributes": {
             "ROUTING": " ",
-            "src": "/Users/kelvin/Documents/FABulous/myProject/user_design/test.sv:35.24-35.25"
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:35.24-35.25"
           }
         },
         "A[31]": {
@@ -195,7 +195,7 @@
           "bits": [ 2064 ] ,
           "attributes": {
             "ROUTING": " ",
-            "src": "/Users/kelvin/Documents/FABulous/myProject/user_design/test.sv:35.24-35.25"
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:35.24-35.25"
           }
         },
         "A[30]": {
@@ -203,7 +203,7 @@
           "bits": [ 2062 ] ,
           "attributes": {
             "ROUTING": " ",
-            "src": "/Users/kelvin/Documents/FABulous/myProject/user_design/test.sv:35.24-35.25"
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:35.24-35.25"
           }
         },
         "A[29]": {
@@ -211,7 +211,7 @@
           "bits": [ 2060 ] ,
           "attributes": {
             "ROUTING": " ",
-            "src": "/Users/kelvin/Documents/FABulous/myProject/user_design/test.sv:35.24-35.25"
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:35.24-35.25"
           }
         },
         "A[2]": {
@@ -219,7 +219,7 @@
           "bits": [ 2058 ] ,
           "attributes": {
             "ROUTING": " ",
-            "src": "/Users/kelvin/Documents/FABulous/myProject/user_design/test.sv:35.24-35.25"
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:35.24-35.25"
           }
         },
         "A[28]": {
@@ -227,7 +227,7 @@
           "bits": [ 2056 ] ,
           "attributes": {
             "ROUTING": " ",
-            "src": "/Users/kelvin/Documents/FABulous/myProject/user_design/test.sv:35.24-35.25"
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:35.24-35.25"
           }
         },
         "A[27]": {
@@ -235,7 +235,7 @@
           "bits": [ 2054 ] ,
           "attributes": {
             "ROUTING": " ",
-            "src": "/Users/kelvin/Documents/FABulous/myProject/user_design/test.sv:35.24-35.25"
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:35.24-35.25"
           }
         },
         "A[26]": {
@@ -243,7 +243,7 @@
           "bits": [ 2052 ] ,
           "attributes": {
             "ROUTING": " ",
-            "src": "/Users/kelvin/Documents/FABulous/myProject/user_design/test.sv:35.24-35.25"
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:35.24-35.25"
           }
         },
         "A[25]": {
@@ -251,7 +251,7 @@
           "bits": [ 2050 ] ,
           "attributes": {
             "ROUTING": " ",
-            "src": "/Users/kelvin/Documents/FABulous/myProject/user_design/test.sv:35.24-35.25"
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:35.24-35.25"
           }
         },
         "A[24]": {
@@ -259,7 +259,7 @@
           "bits": [ 2048 ] ,
           "attributes": {
             "ROUTING": " ",
-            "src": "/Users/kelvin/Documents/FABulous/myProject/user_design/test.sv:35.24-35.25"
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:35.24-35.25"
           }
         },
         "A[23]": {
@@ -267,7 +267,7 @@
           "bits": [ 2046 ] ,
           "attributes": {
             "ROUTING": " ",
-            "src": "/Users/kelvin/Documents/FABulous/myProject/user_design/test.sv:35.24-35.25"
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:35.24-35.25"
           }
         },
         "A[22]": {
@@ -275,7 +275,7 @@
           "bits": [ 2044 ] ,
           "attributes": {
             "ROUTING": " ",
-            "src": "/Users/kelvin/Documents/FABulous/myProject/user_design/test.sv:35.24-35.25"
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:35.24-35.25"
           }
         },
         "A[21]": {
@@ -283,7 +283,7 @@
           "bits": [ 2042 ] ,
           "attributes": {
             "ROUTING": " ",
-            "src": "/Users/kelvin/Documents/FABulous/myProject/user_design/test.sv:35.24-35.25"
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:35.24-35.25"
           }
         },
         "A[20]": {
@@ -291,7 +291,7 @@
           "bits": [ 2040 ] ,
           "attributes": {
             "ROUTING": " ",
-            "src": "/Users/kelvin/Documents/FABulous/myProject/user_design/test.sv:35.24-35.25"
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:35.24-35.25"
           }
         },
         "A[19]": {
@@ -299,7 +299,7 @@
           "bits": [ 2038 ] ,
           "attributes": {
             "ROUTING": " ",
-            "src": "/Users/kelvin/Documents/FABulous/myProject/user_design/test.sv:35.24-35.25"
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:35.24-35.25"
           }
         },
         "A[1]": {
@@ -307,7 +307,7 @@
           "bits": [ 2036 ] ,
           "attributes": {
             "ROUTING": " ",
-            "src": "/Users/kelvin/Documents/FABulous/myProject/user_design/test.sv:35.24-35.25"
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:35.24-35.25"
           }
         },
         "A[18]": {
@@ -315,7 +315,7 @@
           "bits": [ 2034 ] ,
           "attributes": {
             "ROUTING": " ",
-            "src": "/Users/kelvin/Documents/FABulous/myProject/user_design/test.sv:35.24-35.25"
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:35.24-35.25"
           }
         },
         "A[17]": {
@@ -323,7 +323,7 @@
           "bits": [ 2032 ] ,
           "attributes": {
             "ROUTING": " ",
-            "src": "/Users/kelvin/Documents/FABulous/myProject/user_design/test.sv:35.24-35.25"
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:35.24-35.25"
           }
         },
         "A[16]": {
@@ -331,7 +331,7 @@
           "bits": [ 2030 ] ,
           "attributes": {
             "ROUTING": " ",
-            "src": "/Users/kelvin/Documents/FABulous/myProject/user_design/test.sv:35.24-35.25"
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:35.24-35.25"
           }
         },
         "A[15]": {
@@ -339,7 +339,7 @@
           "bits": [ 2028 ] ,
           "attributes": {
             "ROUTING": " ",
-            "src": "/Users/kelvin/Documents/FABulous/myProject/user_design/test.sv:35.24-35.25"
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:35.24-35.25"
           }
         },
         "A[14]": {
@@ -347,7 +347,7 @@
           "bits": [ 2026 ] ,
           "attributes": {
             "ROUTING": " ",
-            "src": "/Users/kelvin/Documents/FABulous/myProject/user_design/test.sv:35.24-35.25"
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:35.24-35.25"
           }
         },
         "A[13]": {
@@ -355,7 +355,7 @@
           "bits": [ 2024 ] ,
           "attributes": {
             "ROUTING": " ",
-            "src": "/Users/kelvin/Documents/FABulous/myProject/user_design/test.sv:35.24-35.25"
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:35.24-35.25"
           }
         },
         "A[12]": {
@@ -363,7 +363,7 @@
           "bits": [ 2022 ] ,
           "attributes": {
             "ROUTING": " ",
-            "src": "/Users/kelvin/Documents/FABulous/myProject/user_design/test.sv:35.24-35.25"
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:35.24-35.25"
           }
         },
         "A[11]": {
@@ -371,7 +371,7 @@
           "bits": [ 2020 ] ,
           "attributes": {
             "ROUTING": " ",
-            "src": "/Users/kelvin/Documents/FABulous/myProject/user_design/test.sv:35.24-35.25"
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:35.24-35.25"
           }
         },
         "A[10]": {
@@ -379,7 +379,7 @@
           "bits": [ 2018 ] ,
           "attributes": {
             "ROUTING": " ",
-            "src": "/Users/kelvin/Documents/FABulous/myProject/user_design/test.sv:35.24-35.25"
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:35.24-35.25"
           }
         },
         "A[9]": {
@@ -387,7 +387,7 @@
           "bits": [ 2016 ] ,
           "attributes": {
             "ROUTING": " ",
-            "src": "/Users/kelvin/Documents/FABulous/myProject/user_design/test.sv:35.24-35.25"
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:35.24-35.25"
           }
         },
         "A[0]": {
@@ -395,7 +395,7 @@
           "bits": [ 2014 ] ,
           "attributes": {
             "ROUTING": " ",
-            "src": "/Users/kelvin/Documents/FABulous/myProject/user_design/test.sv:35.24-35.25"
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:35.24-35.25"
           }
         },
         "B[8]": {
@@ -403,7 +403,7 @@
           "bits": [ 2173 ] ,
           "attributes": {
             "ROUTING": " ",
-            "src": "/Users/kelvin/Documents/FABulous/myProject/user_design/test.sv:36.24-36.25"
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:36.24-36.25"
           }
         },
         "B[7]": {
@@ -411,7 +411,7 @@
           "bits": [ 2171 ] ,
           "attributes": {
             "ROUTING": " ",
-            "src": "/Users/kelvin/Documents/FABulous/myProject/user_design/test.sv:36.24-36.25"
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:36.24-36.25"
           }
         },
         "B[6]": {
@@ -419,7 +419,7 @@
           "bits": [ 2169 ] ,
           "attributes": {
             "ROUTING": " ",
-            "src": "/Users/kelvin/Documents/FABulous/myProject/user_design/test.sv:36.24-36.25"
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:36.24-36.25"
           }
         },
         "B[5]": {
@@ -427,7 +427,7 @@
           "bits": [ 2167 ] ,
           "attributes": {
             "ROUTING": " ",
-            "src": "/Users/kelvin/Documents/FABulous/myProject/user_design/test.sv:36.24-36.25"
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:36.24-36.25"
           }
         },
         "B[4]": {
@@ -435,7 +435,7 @@
           "bits": [ 2165 ] ,
           "attributes": {
             "ROUTING": " ",
-            "src": "/Users/kelvin/Documents/FABulous/myProject/user_design/test.sv:36.24-36.25"
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:36.24-36.25"
           }
         },
         "B[3]": {
@@ -443,7 +443,7 @@
           "bits": [ 2163 ] ,
           "attributes": {
             "ROUTING": " ",
-            "src": "/Users/kelvin/Documents/FABulous/myProject/user_design/test.sv:36.24-36.25"
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:36.24-36.25"
           }
         },
         "B[31]": {
@@ -451,7 +451,7 @@
           "bits": [ 2161 ] ,
           "attributes": {
             "ROUTING": " ",
-            "src": "/Users/kelvin/Documents/FABulous/myProject/user_design/test.sv:36.24-36.25"
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:36.24-36.25"
           }
         },
         "B[30]": {
@@ -459,7 +459,7 @@
           "bits": [ 2159 ] ,
           "attributes": {
             "ROUTING": " ",
-            "src": "/Users/kelvin/Documents/FABulous/myProject/user_design/test.sv:36.24-36.25"
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:36.24-36.25"
           }
         },
         "B[29]": {
@@ -467,7 +467,7 @@
           "bits": [ 2157 ] ,
           "attributes": {
             "ROUTING": " ",
-            "src": "/Users/kelvin/Documents/FABulous/myProject/user_design/test.sv:36.24-36.25"
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:36.24-36.25"
           }
         },
         "B[2]": {
@@ -475,7 +475,7 @@
           "bits": [ 2155 ] ,
           "attributes": {
             "ROUTING": " ",
-            "src": "/Users/kelvin/Documents/FABulous/myProject/user_design/test.sv:36.24-36.25"
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:36.24-36.25"
           }
         },
         "B[28]": {
@@ -483,7 +483,7 @@
           "bits": [ 2153 ] ,
           "attributes": {
             "ROUTING": " ",
-            "src": "/Users/kelvin/Documents/FABulous/myProject/user_design/test.sv:36.24-36.25"
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:36.24-36.25"
           }
         },
         "B[27]": {
@@ -491,7 +491,7 @@
           "bits": [ 2151 ] ,
           "attributes": {
             "ROUTING": " ",
-            "src": "/Users/kelvin/Documents/FABulous/myProject/user_design/test.sv:36.24-36.25"
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:36.24-36.25"
           }
         },
         "B[26]": {
@@ -499,7 +499,7 @@
           "bits": [ 2149 ] ,
           "attributes": {
             "ROUTING": " ",
-            "src": "/Users/kelvin/Documents/FABulous/myProject/user_design/test.sv:36.24-36.25"
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:36.24-36.25"
           }
         },
         "B[25]": {
@@ -507,7 +507,7 @@
           "bits": [ 2147 ] ,
           "attributes": {
             "ROUTING": " ",
-            "src": "/Users/kelvin/Documents/FABulous/myProject/user_design/test.sv:36.24-36.25"
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:36.24-36.25"
           }
         },
         "B[24]": {
@@ -515,7 +515,7 @@
           "bits": [ 2145 ] ,
           "attributes": {
             "ROUTING": " ",
-            "src": "/Users/kelvin/Documents/FABulous/myProject/user_design/test.sv:36.24-36.25"
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:36.24-36.25"
           }
         },
         "B[23]": {
@@ -523,7 +523,7 @@
           "bits": [ 2143 ] ,
           "attributes": {
             "ROUTING": " ",
-            "src": "/Users/kelvin/Documents/FABulous/myProject/user_design/test.sv:36.24-36.25"
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:36.24-36.25"
           }
         },
         "B[22]": {
@@ -531,7 +531,7 @@
           "bits": [ 2141 ] ,
           "attributes": {
             "ROUTING": " ",
-            "src": "/Users/kelvin/Documents/FABulous/myProject/user_design/test.sv:36.24-36.25"
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:36.24-36.25"
           }
         },
         "B[21]": {
@@ -539,7 +539,7 @@
           "bits": [ 2139 ] ,
           "attributes": {
             "ROUTING": " ",
-            "src": "/Users/kelvin/Documents/FABulous/myProject/user_design/test.sv:36.24-36.25"
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:36.24-36.25"
           }
         },
         "B[20]": {
@@ -547,7 +547,7 @@
           "bits": [ 2137 ] ,
           "attributes": {
             "ROUTING": " ",
-            "src": "/Users/kelvin/Documents/FABulous/myProject/user_design/test.sv:36.24-36.25"
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:36.24-36.25"
           }
         },
         "B[19]": {
@@ -555,7 +555,7 @@
           "bits": [ 2135 ] ,
           "attributes": {
             "ROUTING": " ",
-            "src": "/Users/kelvin/Documents/FABulous/myProject/user_design/test.sv:36.24-36.25"
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:36.24-36.25"
           }
         },
         "B[1]": {
@@ -563,7 +563,7 @@
           "bits": [ 2133 ] ,
           "attributes": {
             "ROUTING": " ",
-            "src": "/Users/kelvin/Documents/FABulous/myProject/user_design/test.sv:36.24-36.25"
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:36.24-36.25"
           }
         },
         "B[18]": {
@@ -571,7 +571,7 @@
           "bits": [ 2131 ] ,
           "attributes": {
             "ROUTING": " ",
-            "src": "/Users/kelvin/Documents/FABulous/myProject/user_design/test.sv:36.24-36.25"
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:36.24-36.25"
           }
         },
         "B[17]": {
@@ -579,7 +579,7 @@
           "bits": [ 2129 ] ,
           "attributes": {
             "ROUTING": " ",
-            "src": "/Users/kelvin/Documents/FABulous/myProject/user_design/test.sv:36.24-36.25"
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:36.24-36.25"
           }
         },
         "B[16]": {
@@ -587,7 +587,7 @@
           "bits": [ 2127 ] ,
           "attributes": {
             "ROUTING": " ",
-            "src": "/Users/kelvin/Documents/FABulous/myProject/user_design/test.sv:36.24-36.25"
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:36.24-36.25"
           }
         },
         "B[15]": {
@@ -595,7 +595,7 @@
           "bits": [ 2125 ] ,
           "attributes": {
             "ROUTING": " ",
-            "src": "/Users/kelvin/Documents/FABulous/myProject/user_design/test.sv:36.24-36.25"
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:36.24-36.25"
           }
         },
         "B[14]": {
@@ -603,7 +603,7 @@
           "bits": [ 2123 ] ,
           "attributes": {
             "ROUTING": " ",
-            "src": "/Users/kelvin/Documents/FABulous/myProject/user_design/test.sv:36.24-36.25"
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:36.24-36.25"
           }
         },
         "B[13]": {
@@ -611,7 +611,7 @@
           "bits": [ 2121 ] ,
           "attributes": {
             "ROUTING": " ",
-            "src": "/Users/kelvin/Documents/FABulous/myProject/user_design/test.sv:36.24-36.25"
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:36.24-36.25"
           }
         },
         "B[12]": {
@@ -619,7 +619,7 @@
           "bits": [ 2119 ] ,
           "attributes": {
             "ROUTING": " ",
-            "src": "/Users/kelvin/Documents/FABulous/myProject/user_design/test.sv:36.24-36.25"
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:36.24-36.25"
           }
         },
         "B[11]": {
@@ -627,7 +627,7 @@
           "bits": [ 2117 ] ,
           "attributes": {
             "ROUTING": " ",
-            "src": "/Users/kelvin/Documents/FABulous/myProject/user_design/test.sv:36.24-36.25"
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:36.24-36.25"
           }
         },
         "B[10]": {
@@ -635,7 +635,7 @@
           "bits": [ 2115 ] ,
           "attributes": {
             "ROUTING": " ",
-            "src": "/Users/kelvin/Documents/FABulous/myProject/user_design/test.sv:36.24-36.25"
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:36.24-36.25"
           }
         },
         "B[9]": {
@@ -643,7 +643,7 @@
           "bits": [ 2113 ] ,
           "attributes": {
             "ROUTING": " ",
-            "src": "/Users/kelvin/Documents/FABulous/myProject/user_design/test.sv:36.24-36.25"
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:36.24-36.25"
           }
         },
         "B[0]": {
@@ -651,455 +651,455 @@
           "bits": [ 2111 ] ,
           "attributes": {
             "ROUTING": " ",
-            "src": "/Users/kelvin/Documents/FABulous/myProject/user_design/test.sv:36.24-36.25"
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:36.24-36.25"
           }
         },
         "$iopadmap$Y[31]": {
           "hide_name": 1,
           "bits": [ 1973 ] ,
           "attributes": {
-            "ROUTING": "X1Y1/c0.data_out[31];;1;X1Y1/c0.out0_internal[31];X1Y1/c0.out0_internal[31]/c0.data_out[31];1;X1Y1/c0.out0[31];X1Y1/c0.out0[31]/c0.out0_internal[31];1;X1Y2/c0.out0_internal[31];X1Y2/c0.out0_internal[31]/c0.in2[31];1;X1Y2/c0.out0[31];X1Y2/c0.out0[31]/c0.out0_internal[31];1;X1Y3/c0.N_from_fabric[31];X1Y3/c0.N_from_fabric[31]/c0.in2[31];1"
+            "ROUTING": "X1Y1/c0.data_out[31];;1;X1Y1/c0.out2_internal[31];X1Y1/c0.out2_internal[31]/c0.data_out[31];1;X1Y1/c0.out2[31];X1Y1/c0.out2[31]/c0.out2_internal[31];1;X1Y0/c0.S_from_fabric[31];X1Y0/c0.S_from_fabric[31]/c0.in0[31];1"
           }
         },
         "$iopadmap$Y[30]": {
           "hide_name": 1,
           "bits": [ 1972 ] ,
           "attributes": {
-            "ROUTING": "X1Y1/c0.data_out[30];;1;X1Y1/c0.out0_internal[30];X1Y1/c0.out0_internal[30]/c0.data_out[30];1;X1Y1/c0.out0[30];X1Y1/c0.out0[30]/c0.out0_internal[30];1;X1Y2/c0.out0_internal[30];X1Y2/c0.out0_internal[30]/c0.in2[30];1;X1Y2/c0.out0[30];X1Y2/c0.out0[30]/c0.out0_internal[30];1;X1Y3/c0.N_from_fabric[30];X1Y3/c0.N_from_fabric[30]/c0.in2[30];1"
+            "ROUTING": "X1Y1/c0.data_out[30];;1;X1Y1/c0.out2_internal[30];X1Y1/c0.out2_internal[30]/c0.data_out[30];1;X1Y1/c0.out2[30];X1Y1/c0.out2[30]/c0.out2_internal[30];1;X1Y0/c0.S_from_fabric[30];X1Y0/c0.S_from_fabric[30]/c0.in0[30];1"
           }
         },
         "$iopadmap$Y[29]": {
           "hide_name": 1,
           "bits": [ 1971 ] ,
           "attributes": {
-            "ROUTING": "X1Y1/c0.data_out[29];;1;X1Y1/c0.out0_internal[29];X1Y1/c0.out0_internal[29]/c0.data_out[29];1;X1Y1/c0.out0[29];X1Y1/c0.out0[29]/c0.out0_internal[29];1;X1Y2/c0.out0_internal[29];X1Y2/c0.out0_internal[29]/c0.in2[29];1;X1Y2/c0.out0[29];X1Y2/c0.out0[29]/c0.out0_internal[29];1;X1Y3/c0.N_from_fabric[29];X1Y3/c0.N_from_fabric[29]/c0.in2[29];1"
+            "ROUTING": "X1Y1/c0.data_out[29];;1;X1Y1/c0.out2_internal[29];X1Y1/c0.out2_internal[29]/c0.data_out[29];1;X1Y1/c0.out2[29];X1Y1/c0.out2[29]/c0.out2_internal[29];1;X1Y0/c0.S_from_fabric[29];X1Y0/c0.S_from_fabric[29]/c0.in0[29];1"
           }
         },
         "$iopadmap$Y[28]": {
           "hide_name": 1,
           "bits": [ 1970 ] ,
           "attributes": {
-            "ROUTING": "X1Y1/c0.data_out[28];;1;X1Y1/c0.out0_internal[28];X1Y1/c0.out0_internal[28]/c0.data_out[28];1;X1Y1/c0.out0[28];X1Y1/c0.out0[28]/c0.out0_internal[28];1;X1Y2/c0.out0_internal[28];X1Y2/c0.out0_internal[28]/c0.in2[28];1;X1Y2/c0.out0[28];X1Y2/c0.out0[28]/c0.out0_internal[28];1;X1Y3/c0.N_from_fabric[28];X1Y3/c0.N_from_fabric[28]/c0.in2[28];1"
+            "ROUTING": "X1Y1/c0.data_out[28];;1;X1Y1/c0.out2_internal[28];X1Y1/c0.out2_internal[28]/c0.data_out[28];1;X1Y1/c0.out2[28];X1Y1/c0.out2[28]/c0.out2_internal[28];1;X1Y0/c0.S_from_fabric[28];X1Y0/c0.S_from_fabric[28]/c0.in0[28];1"
           }
         },
         "$iopadmap$Y[27]": {
           "hide_name": 1,
           "bits": [ 1969 ] ,
           "attributes": {
-            "ROUTING": "X1Y1/c0.data_out[27];;1;X1Y1/c0.out0_internal[27];X1Y1/c0.out0_internal[27]/c0.data_out[27];1;X1Y1/c0.out0[27];X1Y1/c0.out0[27]/c0.out0_internal[27];1;X1Y2/c0.out0_internal[27];X1Y2/c0.out0_internal[27]/c0.in2[27];1;X1Y2/c0.out0[27];X1Y2/c0.out0[27]/c0.out0_internal[27];1;X1Y3/c0.N_from_fabric[27];X1Y3/c0.N_from_fabric[27]/c0.in2[27];1"
+            "ROUTING": "X1Y1/c0.data_out[27];;1;X1Y1/c0.out2_internal[27];X1Y1/c0.out2_internal[27]/c0.data_out[27];1;X1Y1/c0.out2[27];X1Y1/c0.out2[27]/c0.out2_internal[27];1;X1Y0/c0.S_from_fabric[27];X1Y0/c0.S_from_fabric[27]/c0.in0[27];1"
           }
         },
         "$iopadmap$Y[26]": {
           "hide_name": 1,
           "bits": [ 1968 ] ,
           "attributes": {
-            "ROUTING": "X1Y1/c0.data_out[26];;1;X1Y1/c0.out0_internal[26];X1Y1/c0.out0_internal[26]/c0.data_out[26];1;X1Y1/c0.out0[26];X1Y1/c0.out0[26]/c0.out0_internal[26];1;X1Y2/c0.out0_internal[26];X1Y2/c0.out0_internal[26]/c0.in2[26];1;X1Y2/c0.out0[26];X1Y2/c0.out0[26]/c0.out0_internal[26];1;X1Y3/c0.N_from_fabric[26];X1Y3/c0.N_from_fabric[26]/c0.in2[26];1"
+            "ROUTING": "X1Y1/c0.data_out[26];;1;X1Y1/c0.out2_internal[26];X1Y1/c0.out2_internal[26]/c0.data_out[26];1;X1Y1/c0.out2[26];X1Y1/c0.out2[26]/c0.out2_internal[26];1;X1Y0/c0.S_from_fabric[26];X1Y0/c0.S_from_fabric[26]/c0.in0[26];1"
           }
         },
         "$iopadmap$Y[25]": {
           "hide_name": 1,
           "bits": [ 1967 ] ,
           "attributes": {
-            "ROUTING": "X1Y1/c0.data_out[25];;1;X1Y1/c0.out0_internal[25];X1Y1/c0.out0_internal[25]/c0.data_out[25];1;X1Y1/c0.out0[25];X1Y1/c0.out0[25]/c0.out0_internal[25];1;X1Y2/c0.out0_internal[25];X1Y2/c0.out0_internal[25]/c0.in2[25];1;X1Y2/c0.out0[25];X1Y2/c0.out0[25]/c0.out0_internal[25];1;X1Y3/c0.N_from_fabric[25];X1Y3/c0.N_from_fabric[25]/c0.in2[25];1"
+            "ROUTING": "X1Y1/c0.data_out[25];;1;X1Y1/c0.out2_internal[25];X1Y1/c0.out2_internal[25]/c0.data_out[25];1;X1Y1/c0.out2[25];X1Y1/c0.out2[25]/c0.out2_internal[25];1;X1Y0/c0.S_from_fabric[25];X1Y0/c0.S_from_fabric[25]/c0.in0[25];1"
           }
         },
         "$iopadmap$Y[24]": {
           "hide_name": 1,
           "bits": [ 1966 ] ,
           "attributes": {
-            "ROUTING": "X1Y1/c0.data_out[24];;1;X1Y1/c0.out0_internal[24];X1Y1/c0.out0_internal[24]/c0.data_out[24];1;X1Y1/c0.out0[24];X1Y1/c0.out0[24]/c0.out0_internal[24];1;X1Y2/c0.out0_internal[24];X1Y2/c0.out0_internal[24]/c0.in2[24];1;X1Y2/c0.out0[24];X1Y2/c0.out0[24]/c0.out0_internal[24];1;X1Y3/c0.N_from_fabric[24];X1Y3/c0.N_from_fabric[24]/c0.in2[24];1"
+            "ROUTING": "X1Y1/c0.data_out[24];;1;X1Y1/c0.out2_internal[24];X1Y1/c0.out2_internal[24]/c0.data_out[24];1;X1Y1/c0.out2[24];X1Y1/c0.out2[24]/c0.out2_internal[24];1;X1Y0/c0.S_from_fabric[24];X1Y0/c0.S_from_fabric[24]/c0.in0[24];1"
           }
         },
         "$iopadmap$Y[23]": {
           "hide_name": 1,
           "bits": [ 1965 ] ,
           "attributes": {
-            "ROUTING": "X1Y1/c0.data_out[23];;1;X1Y1/c0.out0_internal[23];X1Y1/c0.out0_internal[23]/c0.data_out[23];1;X1Y1/c0.out0[23];X1Y1/c0.out0[23]/c0.out0_internal[23];1;X1Y2/c0.out0_internal[23];X1Y2/c0.out0_internal[23]/c0.in2[23];1;X1Y2/c0.out0[23];X1Y2/c0.out0[23]/c0.out0_internal[23];1;X1Y3/c0.N_from_fabric[23];X1Y3/c0.N_from_fabric[23]/c0.in2[23];1"
+            "ROUTING": "X1Y1/c0.data_out[23];;1;X1Y1/c0.out2_internal[23];X1Y1/c0.out2_internal[23]/c0.data_out[23];1;X1Y1/c0.out2[23];X1Y1/c0.out2[23]/c0.out2_internal[23];1;X1Y0/c0.S_from_fabric[23];X1Y0/c0.S_from_fabric[23]/c0.in0[23];1"
           }
         },
         "$iopadmap$Y[22]": {
           "hide_name": 1,
           "bits": [ 1964 ] ,
           "attributes": {
-            "ROUTING": "X1Y1/c0.data_out[22];;1;X1Y1/c0.out0_internal[22];X1Y1/c0.out0_internal[22]/c0.data_out[22];1;X1Y1/c0.out0[22];X1Y1/c0.out0[22]/c0.out0_internal[22];1;X1Y2/c0.out0_internal[22];X1Y2/c0.out0_internal[22]/c0.in2[22];1;X1Y2/c0.out0[22];X1Y2/c0.out0[22]/c0.out0_internal[22];1;X1Y3/c0.N_from_fabric[22];X1Y3/c0.N_from_fabric[22]/c0.in2[22];1"
+            "ROUTING": "X1Y1/c0.data_out[22];;1;X1Y1/c0.out2_internal[22];X1Y1/c0.out2_internal[22]/c0.data_out[22];1;X1Y1/c0.out2[22];X1Y1/c0.out2[22]/c0.out2_internal[22];1;X1Y0/c0.S_from_fabric[22];X1Y0/c0.S_from_fabric[22]/c0.in0[22];1"
           }
         },
         "$iopadmap$Y[21]": {
           "hide_name": 1,
           "bits": [ 1963 ] ,
           "attributes": {
-            "ROUTING": "X1Y1/c0.data_out[21];;1;X1Y1/c0.out0_internal[21];X1Y1/c0.out0_internal[21]/c0.data_out[21];1;X1Y1/c0.out0[21];X1Y1/c0.out0[21]/c0.out0_internal[21];1;X1Y2/c0.out0_internal[21];X1Y2/c0.out0_internal[21]/c0.in2[21];1;X1Y2/c0.out0[21];X1Y2/c0.out0[21]/c0.out0_internal[21];1;X1Y3/c0.N_from_fabric[21];X1Y3/c0.N_from_fabric[21]/c0.in2[21];1"
+            "ROUTING": "X1Y1/c0.data_out[21];;1;X1Y1/c0.out2_internal[21];X1Y1/c0.out2_internal[21]/c0.data_out[21];1;X1Y1/c0.out2[21];X1Y1/c0.out2[21]/c0.out2_internal[21];1;X1Y0/c0.S_from_fabric[21];X1Y0/c0.S_from_fabric[21]/c0.in0[21];1"
           }
         },
         "$iopadmap$Y[20]": {
           "hide_name": 1,
           "bits": [ 1962 ] ,
           "attributes": {
-            "ROUTING": "X1Y1/c0.data_out[20];;1;X1Y1/c0.out0_internal[20];X1Y1/c0.out0_internal[20]/c0.data_out[20];1;X1Y1/c0.out0[20];X1Y1/c0.out0[20]/c0.out0_internal[20];1;X1Y2/c0.out0_internal[20];X1Y2/c0.out0_internal[20]/c0.in2[20];1;X1Y2/c0.out0[20];X1Y2/c0.out0[20]/c0.out0_internal[20];1;X1Y3/c0.N_from_fabric[20];X1Y3/c0.N_from_fabric[20]/c0.in2[20];1"
+            "ROUTING": "X1Y1/c0.data_out[20];;1;X1Y1/c0.out2_internal[20];X1Y1/c0.out2_internal[20]/c0.data_out[20];1;X1Y1/c0.out2[20];X1Y1/c0.out2[20]/c0.out2_internal[20];1;X1Y0/c0.S_from_fabric[20];X1Y0/c0.S_from_fabric[20]/c0.in0[20];1"
           }
         },
         "$iopadmap$Y[19]": {
           "hide_name": 1,
           "bits": [ 1961 ] ,
           "attributes": {
-            "ROUTING": "X1Y1/c0.data_out[19];;1;X1Y1/c0.out0_internal[19];X1Y1/c0.out0_internal[19]/c0.data_out[19];1;X1Y1/c0.out0[19];X1Y1/c0.out0[19]/c0.out0_internal[19];1;X1Y2/c0.out0_internal[19];X1Y2/c0.out0_internal[19]/c0.in2[19];1;X1Y2/c0.out0[19];X1Y2/c0.out0[19]/c0.out0_internal[19];1;X1Y3/c0.N_from_fabric[19];X1Y3/c0.N_from_fabric[19]/c0.in2[19];1"
+            "ROUTING": "X1Y1/c0.data_out[19];;1;X1Y1/c0.out2_internal[19];X1Y1/c0.out2_internal[19]/c0.data_out[19];1;X1Y1/c0.out2[19];X1Y1/c0.out2[19]/c0.out2_internal[19];1;X1Y0/c0.S_from_fabric[19];X1Y0/c0.S_from_fabric[19]/c0.in0[19];1"
           }
         },
         "$iopadmap$Y[18]": {
           "hide_name": 1,
           "bits": [ 1960 ] ,
           "attributes": {
-            "ROUTING": "X1Y1/c0.data_out[18];;1;X1Y1/c0.out0_internal[18];X1Y1/c0.out0_internal[18]/c0.data_out[18];1;X1Y1/c0.out0[18];X1Y1/c0.out0[18]/c0.out0_internal[18];1;X1Y2/c0.out0_internal[18];X1Y2/c0.out0_internal[18]/c0.in2[18];1;X1Y2/c0.out0[18];X1Y2/c0.out0[18]/c0.out0_internal[18];1;X1Y3/c0.N_from_fabric[18];X1Y3/c0.N_from_fabric[18]/c0.in2[18];1"
+            "ROUTING": "X1Y1/c0.data_out[18];;1;X1Y1/c0.out2_internal[18];X1Y1/c0.out2_internal[18]/c0.data_out[18];1;X1Y1/c0.out2[18];X1Y1/c0.out2[18]/c0.out2_internal[18];1;X1Y0/c0.S_from_fabric[18];X1Y0/c0.S_from_fabric[18]/c0.in0[18];1"
           }
         },
         "$iopadmap$Y[17]": {
           "hide_name": 1,
           "bits": [ 1959 ] ,
           "attributes": {
-            "ROUTING": "X1Y1/c0.data_out[17];;1;X1Y1/c0.out0_internal[17];X1Y1/c0.out0_internal[17]/c0.data_out[17];1;X1Y1/c0.out0[17];X1Y1/c0.out0[17]/c0.out0_internal[17];1;X1Y2/c0.out0_internal[17];X1Y2/c0.out0_internal[17]/c0.in2[17];1;X1Y2/c0.out0[17];X1Y2/c0.out0[17]/c0.out0_internal[17];1;X1Y3/c0.N_from_fabric[17];X1Y3/c0.N_from_fabric[17]/c0.in2[17];1"
+            "ROUTING": "X1Y1/c0.data_out[17];;1;X1Y1/c0.out2_internal[17];X1Y1/c0.out2_internal[17]/c0.data_out[17];1;X1Y1/c0.out2[17];X1Y1/c0.out2[17]/c0.out2_internal[17];1;X1Y0/c0.S_from_fabric[17];X1Y0/c0.S_from_fabric[17]/c0.in0[17];1"
           }
         },
         "$iopadmap$Y[16]": {
           "hide_name": 1,
           "bits": [ 1958 ] ,
           "attributes": {
-            "ROUTING": "X1Y1/c0.data_out[16];;1;X1Y1/c0.out0_internal[16];X1Y1/c0.out0_internal[16]/c0.data_out[16];1;X1Y1/c0.out0[16];X1Y1/c0.out0[16]/c0.out0_internal[16];1;X1Y2/c0.out0_internal[16];X1Y2/c0.out0_internal[16]/c0.in2[16];1;X1Y2/c0.out0[16];X1Y2/c0.out0[16]/c0.out0_internal[16];1;X1Y3/c0.N_from_fabric[16];X1Y3/c0.N_from_fabric[16]/c0.in2[16];1"
+            "ROUTING": "X1Y1/c0.data_out[16];;1;X1Y1/c0.out2_internal[16];X1Y1/c0.out2_internal[16]/c0.data_out[16];1;X1Y1/c0.out2[16];X1Y1/c0.out2[16]/c0.out2_internal[16];1;X1Y0/c0.S_from_fabric[16];X1Y0/c0.S_from_fabric[16]/c0.in0[16];1"
           }
         },
         "$iopadmap$Y[15]": {
           "hide_name": 1,
           "bits": [ 1957 ] ,
           "attributes": {
-            "ROUTING": "X1Y1/c0.data_out[15];;1;X1Y1/c0.out0_internal[15];X1Y1/c0.out0_internal[15]/c0.data_out[15];1;X1Y1/c0.out0[15];X1Y1/c0.out0[15]/c0.out0_internal[15];1;X1Y2/c0.out0_internal[15];X1Y2/c0.out0_internal[15]/c0.in2[15];1;X1Y2/c0.out0[15];X1Y2/c0.out0[15]/c0.out0_internal[15];1;X1Y3/c0.N_from_fabric[15];X1Y3/c0.N_from_fabric[15]/c0.in2[15];1"
+            "ROUTING": "X1Y1/c0.data_out[15];;1;X1Y1/c0.out2_internal[15];X1Y1/c0.out2_internal[15]/c0.data_out[15];1;X1Y1/c0.out2[15];X1Y1/c0.out2[15]/c0.out2_internal[15];1;X1Y0/c0.S_from_fabric[15];X1Y0/c0.S_from_fabric[15]/c0.in0[15];1"
           }
         },
         "$iopadmap$Y[14]": {
           "hide_name": 1,
           "bits": [ 1956 ] ,
           "attributes": {
-            "ROUTING": "X1Y1/c0.data_out[14];;1;X1Y1/c0.out0_internal[14];X1Y1/c0.out0_internal[14]/c0.data_out[14];1;X1Y1/c0.out0[14];X1Y1/c0.out0[14]/c0.out0_internal[14];1;X1Y2/c0.out0_internal[14];X1Y2/c0.out0_internal[14]/c0.in2[14];1;X1Y2/c0.out0[14];X1Y2/c0.out0[14]/c0.out0_internal[14];1;X1Y3/c0.N_from_fabric[14];X1Y3/c0.N_from_fabric[14]/c0.in2[14];1"
+            "ROUTING": "X1Y1/c0.data_out[14];;1;X1Y1/c0.out2_internal[14];X1Y1/c0.out2_internal[14]/c0.data_out[14];1;X1Y1/c0.out2[14];X1Y1/c0.out2[14]/c0.out2_internal[14];1;X1Y0/c0.S_from_fabric[14];X1Y0/c0.S_from_fabric[14]/c0.in0[14];1"
           }
         },
         "$iopadmap$Y[13]": {
           "hide_name": 1,
           "bits": [ 1955 ] ,
           "attributes": {
-            "ROUTING": "X1Y1/c0.data_out[13];;1;X1Y1/c0.out0_internal[13];X1Y1/c0.out0_internal[13]/c0.data_out[13];1;X1Y1/c0.out0[13];X1Y1/c0.out0[13]/c0.out0_internal[13];1;X1Y2/c0.out0_internal[13];X1Y2/c0.out0_internal[13]/c0.in2[13];1;X1Y2/c0.out0[13];X1Y2/c0.out0[13]/c0.out0_internal[13];1;X1Y3/c0.N_from_fabric[13];X1Y3/c0.N_from_fabric[13]/c0.in2[13];1"
+            "ROUTING": "X1Y1/c0.data_out[13];;1;X1Y1/c0.out2_internal[13];X1Y1/c0.out2_internal[13]/c0.data_out[13];1;X1Y1/c0.out2[13];X1Y1/c0.out2[13]/c0.out2_internal[13];1;X1Y0/c0.S_from_fabric[13];X1Y0/c0.S_from_fabric[13]/c0.in0[13];1"
           }
         },
         "$iopadmap$Y[12]": {
           "hide_name": 1,
           "bits": [ 1954 ] ,
           "attributes": {
-            "ROUTING": "X1Y1/c0.data_out[12];;1;X1Y1/c0.out0_internal[12];X1Y1/c0.out0_internal[12]/c0.data_out[12];1;X1Y1/c0.out0[12];X1Y1/c0.out0[12]/c0.out0_internal[12];1;X1Y2/c0.out0_internal[12];X1Y2/c0.out0_internal[12]/c0.in2[12];1;X1Y2/c0.out0[12];X1Y2/c0.out0[12]/c0.out0_internal[12];1;X1Y3/c0.N_from_fabric[12];X1Y3/c0.N_from_fabric[12]/c0.in2[12];1"
+            "ROUTING": "X1Y1/c0.data_out[12];;1;X1Y1/c0.out2_internal[12];X1Y1/c0.out2_internal[12]/c0.data_out[12];1;X1Y1/c0.out2[12];X1Y1/c0.out2[12]/c0.out2_internal[12];1;X1Y0/c0.S_from_fabric[12];X1Y0/c0.S_from_fabric[12]/c0.in0[12];1"
           }
         },
         "$iopadmap$Y[11]": {
           "hide_name": 1,
           "bits": [ 1953 ] ,
           "attributes": {
-            "ROUTING": "X1Y1/c0.data_out[11];;1;X1Y1/c0.out0_internal[11];X1Y1/c0.out0_internal[11]/c0.data_out[11];1;X1Y1/c0.out0[11];X1Y1/c0.out0[11]/c0.out0_internal[11];1;X1Y2/c0.out0_internal[11];X1Y2/c0.out0_internal[11]/c0.in2[11];1;X1Y2/c0.out0[11];X1Y2/c0.out0[11]/c0.out0_internal[11];1;X1Y3/c0.N_from_fabric[11];X1Y3/c0.N_from_fabric[11]/c0.in2[11];1"
+            "ROUTING": "X1Y1/c0.data_out[11];;1;X1Y1/c0.out2_internal[11];X1Y1/c0.out2_internal[11]/c0.data_out[11];1;X1Y1/c0.out2[11];X1Y1/c0.out2[11]/c0.out2_internal[11];1;X1Y0/c0.S_from_fabric[11];X1Y0/c0.S_from_fabric[11]/c0.in0[11];1"
           }
         },
         "$iopadmap$Y[10]": {
           "hide_name": 1,
           "bits": [ 1952 ] ,
           "attributes": {
-            "ROUTING": "X1Y1/c0.data_out[10];;1;X1Y1/c0.out0_internal[10];X1Y1/c0.out0_internal[10]/c0.data_out[10];1;X1Y1/c0.out0[10];X1Y1/c0.out0[10]/c0.out0_internal[10];1;X1Y2/c0.out0_internal[10];X1Y2/c0.out0_internal[10]/c0.in2[10];1;X1Y2/c0.out0[10];X1Y2/c0.out0[10]/c0.out0_internal[10];1;X1Y3/c0.N_from_fabric[10];X1Y3/c0.N_from_fabric[10]/c0.in2[10];1"
+            "ROUTING": "X1Y1/c0.data_out[10];;1;X1Y1/c0.out2_internal[10];X1Y1/c0.out2_internal[10]/c0.data_out[10];1;X1Y1/c0.out2[10];X1Y1/c0.out2[10]/c0.out2_internal[10];1;X1Y0/c0.S_from_fabric[10];X1Y0/c0.S_from_fabric[10]/c0.in0[10];1"
           }
         },
         "$iopadmap$Y[9]": {
           "hide_name": 1,
           "bits": [ 1951 ] ,
           "attributes": {
-            "ROUTING": "X1Y1/c0.data_out[9];;1;X1Y1/c0.out0_internal[9];X1Y1/c0.out0_internal[9]/c0.data_out[9];1;X1Y1/c0.out0[9];X1Y1/c0.out0[9]/c0.out0_internal[9];1;X1Y2/c0.out0_internal[9];X1Y2/c0.out0_internal[9]/c0.in2[9];1;X1Y2/c0.out0[9];X1Y2/c0.out0[9]/c0.out0_internal[9];1;X1Y3/c0.N_from_fabric[9];X1Y3/c0.N_from_fabric[9]/c0.in2[9];1"
+            "ROUTING": "X1Y1/c0.data_out[9];;1;X1Y1/c0.out2_internal[9];X1Y1/c0.out2_internal[9]/c0.data_out[9];1;X1Y1/c0.out2[9];X1Y1/c0.out2[9]/c0.out2_internal[9];1;X1Y0/c0.S_from_fabric[9];X1Y0/c0.S_from_fabric[9]/c0.in0[9];1"
           }
         },
         "$iopadmap$Y[8]": {
           "hide_name": 1,
           "bits": [ 1950 ] ,
           "attributes": {
-            "ROUTING": "X1Y1/c0.data_out[8];;1;X1Y1/c0.out0_internal[8];X1Y1/c0.out0_internal[8]/c0.data_out[8];1;X1Y1/c0.out0[8];X1Y1/c0.out0[8]/c0.out0_internal[8];1;X1Y2/c0.out0_internal[8];X1Y2/c0.out0_internal[8]/c0.in2[8];1;X1Y2/c0.out0[8];X1Y2/c0.out0[8]/c0.out0_internal[8];1;X1Y3/c0.N_from_fabric[8];X1Y3/c0.N_from_fabric[8]/c0.in2[8];1"
+            "ROUTING": "X1Y1/c0.data_out[8];;1;X1Y1/c0.out2_internal[8];X1Y1/c0.out2_internal[8]/c0.data_out[8];1;X1Y1/c0.out2[8];X1Y1/c0.out2[8]/c0.out2_internal[8];1;X1Y0/c0.S_from_fabric[8];X1Y0/c0.S_from_fabric[8]/c0.in0[8];1"
           }
         },
         "$iopadmap$Y[7]": {
           "hide_name": 1,
           "bits": [ 1949 ] ,
           "attributes": {
-            "ROUTING": "X1Y1/c0.data_out[7];;1;X1Y1/c0.out0_internal[7];X1Y1/c0.out0_internal[7]/c0.data_out[7];1;X1Y1/c0.out0[7];X1Y1/c0.out0[7]/c0.out0_internal[7];1;X1Y2/c0.out0_internal[7];X1Y2/c0.out0_internal[7]/c0.in2[7];1;X1Y2/c0.out0[7];X1Y2/c0.out0[7]/c0.out0_internal[7];1;X1Y3/c0.N_from_fabric[7];X1Y3/c0.N_from_fabric[7]/c0.in2[7];1"
+            "ROUTING": "X1Y1/c0.data_out[7];;1;X1Y1/c0.out2_internal[7];X1Y1/c0.out2_internal[7]/c0.data_out[7];1;X1Y1/c0.out2[7];X1Y1/c0.out2[7]/c0.out2_internal[7];1;X1Y0/c0.S_from_fabric[7];X1Y0/c0.S_from_fabric[7]/c0.in0[7];1"
           }
         },
         "$iopadmap$Y[6]": {
           "hide_name": 1,
           "bits": [ 1948 ] ,
           "attributes": {
-            "ROUTING": "X1Y1/c0.data_out[6];;1;X1Y1/c0.out0_internal[6];X1Y1/c0.out0_internal[6]/c0.data_out[6];1;X1Y1/c0.out0[6];X1Y1/c0.out0[6]/c0.out0_internal[6];1;X1Y2/c0.out0_internal[6];X1Y2/c0.out0_internal[6]/c0.in2[6];1;X1Y2/c0.out0[6];X1Y2/c0.out0[6]/c0.out0_internal[6];1;X1Y3/c0.N_from_fabric[6];X1Y3/c0.N_from_fabric[6]/c0.in2[6];1"
+            "ROUTING": "X1Y1/c0.data_out[6];;1;X1Y1/c0.out2_internal[6];X1Y1/c0.out2_internal[6]/c0.data_out[6];1;X1Y1/c0.out2[6];X1Y1/c0.out2[6]/c0.out2_internal[6];1;X1Y0/c0.S_from_fabric[6];X1Y0/c0.S_from_fabric[6]/c0.in0[6];1"
           }
         },
         "$iopadmap$Y[5]": {
           "hide_name": 1,
           "bits": [ 1947 ] ,
           "attributes": {
-            "ROUTING": "X1Y1/c0.data_out[5];;1;X1Y1/c0.out0_internal[5];X1Y1/c0.out0_internal[5]/c0.data_out[5];1;X1Y1/c0.out0[5];X1Y1/c0.out0[5]/c0.out0_internal[5];1;X1Y2/c0.out0_internal[5];X1Y2/c0.out0_internal[5]/c0.in2[5];1;X1Y2/c0.out0[5];X1Y2/c0.out0[5]/c0.out0_internal[5];1;X1Y3/c0.N_from_fabric[5];X1Y3/c0.N_from_fabric[5]/c0.in2[5];1"
+            "ROUTING": "X1Y1/c0.data_out[5];;1;X1Y1/c0.out2_internal[5];X1Y1/c0.out2_internal[5]/c0.data_out[5];1;X1Y1/c0.out2[5];X1Y1/c0.out2[5]/c0.out2_internal[5];1;X1Y0/c0.S_from_fabric[5];X1Y0/c0.S_from_fabric[5]/c0.in0[5];1"
           }
         },
         "$iopadmap$Y[4]": {
           "hide_name": 1,
           "bits": [ 1946 ] ,
           "attributes": {
-            "ROUTING": "X1Y1/c0.data_out[4];;1;X1Y1/c0.out0_internal[4];X1Y1/c0.out0_internal[4]/c0.data_out[4];1;X1Y1/c0.out0[4];X1Y1/c0.out0[4]/c0.out0_internal[4];1;X1Y2/c0.out0_internal[4];X1Y2/c0.out0_internal[4]/c0.in2[4];1;X1Y2/c0.out0[4];X1Y2/c0.out0[4]/c0.out0_internal[4];1;X1Y3/c0.N_from_fabric[4];X1Y3/c0.N_from_fabric[4]/c0.in2[4];1"
+            "ROUTING": "X1Y1/c0.data_out[4];;1;X1Y1/c0.out2_internal[4];X1Y1/c0.out2_internal[4]/c0.data_out[4];1;X1Y1/c0.out2[4];X1Y1/c0.out2[4]/c0.out2_internal[4];1;X1Y0/c0.S_from_fabric[4];X1Y0/c0.S_from_fabric[4]/c0.in0[4];1"
           }
         },
         "$iopadmap$Y[3]": {
           "hide_name": 1,
           "bits": [ 1945 ] ,
           "attributes": {
-            "ROUTING": "X1Y1/c0.data_out[3];;1;X1Y1/c0.out0_internal[3];X1Y1/c0.out0_internal[3]/c0.data_out[3];1;X1Y1/c0.out0[3];X1Y1/c0.out0[3]/c0.out0_internal[3];1;X1Y2/c0.out0_internal[3];X1Y2/c0.out0_internal[3]/c0.in2[3];1;X1Y2/c0.out0[3];X1Y2/c0.out0[3]/c0.out0_internal[3];1;X1Y3/c0.N_from_fabric[3];X1Y3/c0.N_from_fabric[3]/c0.in2[3];1"
+            "ROUTING": "X1Y1/c0.data_out[3];;1;X1Y1/c0.out2_internal[3];X1Y1/c0.out2_internal[3]/c0.data_out[3];1;X1Y1/c0.out2[3];X1Y1/c0.out2[3]/c0.out2_internal[3];1;X1Y0/c0.S_from_fabric[3];X1Y0/c0.S_from_fabric[3]/c0.in0[3];1"
           }
         },
         "$iopadmap$Y[2]": {
           "hide_name": 1,
           "bits": [ 1944 ] ,
           "attributes": {
-            "ROUTING": "X1Y1/c0.data_out[2];;1;X1Y1/c0.out0_internal[2];X1Y1/c0.out0_internal[2]/c0.data_out[2];1;X1Y1/c0.out0[2];X1Y1/c0.out0[2]/c0.out0_internal[2];1;X1Y2/c0.out0_internal[2];X1Y2/c0.out0_internal[2]/c0.in2[2];1;X1Y2/c0.out0[2];X1Y2/c0.out0[2]/c0.out0_internal[2];1;X1Y3/c0.N_from_fabric[2];X1Y3/c0.N_from_fabric[2]/c0.in2[2];1"
+            "ROUTING": "X1Y1/c0.data_out[2];;1;X1Y1/c0.out2_internal[2];X1Y1/c0.out2_internal[2]/c0.data_out[2];1;X1Y1/c0.out2[2];X1Y1/c0.out2[2]/c0.out2_internal[2];1;X1Y0/c0.S_from_fabric[2];X1Y0/c0.S_from_fabric[2]/c0.in0[2];1"
           }
         },
         "$iopadmap$Y[1]": {
           "hide_name": 1,
           "bits": [ 1943 ] ,
           "attributes": {
-            "ROUTING": "X1Y1/c0.data_out[1];;1;X1Y1/c0.out0_internal[1];X1Y1/c0.out0_internal[1]/c0.data_out[1];1;X1Y1/c0.out0[1];X1Y1/c0.out0[1]/c0.out0_internal[1];1;X1Y2/c0.out0_internal[1];X1Y2/c0.out0_internal[1]/c0.in2[1];1;X1Y2/c0.out0[1];X1Y2/c0.out0[1]/c0.out0_internal[1];1;X1Y3/c0.N_from_fabric[1];X1Y3/c0.N_from_fabric[1]/c0.in2[1];1"
+            "ROUTING": "X1Y1/c0.data_out[1];;1;X1Y1/c0.out2_internal[1];X1Y1/c0.out2_internal[1]/c0.data_out[1];1;X1Y1/c0.out2[1];X1Y1/c0.out2[1]/c0.out2_internal[1];1;X1Y0/c0.S_from_fabric[1];X1Y0/c0.S_from_fabric[1]/c0.in0[1];1"
           }
         },
         "$iopadmap$Y[0]": {
           "hide_name": 1,
           "bits": [ 1942 ] ,
           "attributes": {
-            "ROUTING": "X1Y1/c0.data_out[0];;1;X1Y1/c0.out0_internal[0];X1Y1/c0.out0_internal[0]/c0.data_out[0];1;X1Y1/c0.out0[0];X1Y1/c0.out0[0]/c0.out0_internal[0];1;X1Y2/c0.out0_internal[0];X1Y2/c0.out0_internal[0]/c0.in2[0];1;X1Y2/c0.out0[0];X1Y2/c0.out0[0]/c0.out0_internal[0];1;X1Y3/c0.N_from_fabric[0];X1Y3/c0.N_from_fabric[0]/c0.in2[0];1"
+            "ROUTING": "X1Y1/c0.data_out[0];;1;X1Y1/c0.out2_internal[0];X1Y1/c0.out2_internal[0]/c0.data_out[0];1;X1Y1/c0.out2[0];X1Y1/c0.out2[0]/c0.out2_internal[0];1;X1Y0/c0.S_from_fabric[0];X1Y0/c0.S_from_fabric[0]/c0.in0[0];1"
           }
         },
         "$iopadmap$B[31]": {
           "hide_name": 1,
           "bits": [ 1941 ] ,
           "attributes": {
-            "ROUTING": "X1Y0/c0.S_to_fabric[31];;1;X1Y0/c0.out0_internal[31];X1Y0/c0.out0_internal[31]/c0.S_to_fabric[31];1;X1Y0/c0.out0[31];X1Y0/c0.out0[31]/c0.out0_internal[31];1;X1Y1/c0.data_in2[31];X1Y1/c0.data_in2[31]/c0.in2[31];1"
+            "ROUTING": "X3Y1/c0.E_to_fabric[31];;1;X3Y1/c0.out3_internal[31];X3Y1/c0.out3_internal[31]/c0.E_to_fabric[31];1;X3Y1/c0.out3[31];X3Y1/c0.out3[31]/c0.out3_internal[31];1;X2Y1/c0.out3_internal[31];X2Y1/c0.out3_internal[31]/c0.in1[31];1;X2Y1/c0.out3[31];X2Y1/c0.out3[31]/c0.out3_internal[31];1;X1Y1/c0.data_in2[31];X1Y1/c0.data_in2[31]/c0.in1[31];1"
           }
         },
         "$iopadmap$B[30]": {
           "hide_name": 1,
           "bits": [ 1940 ] ,
           "attributes": {
-            "ROUTING": "X1Y0/c0.S_to_fabric[30];;1;X1Y0/c0.out0_internal[30];X1Y0/c0.out0_internal[30]/c0.S_to_fabric[30];1;X1Y0/c0.out0[30];X1Y0/c0.out0[30]/c0.out0_internal[30];1;X1Y1/c0.data_in2[30];X1Y1/c0.data_in2[30]/c0.in2[30];1"
+            "ROUTING": "X3Y1/c0.E_to_fabric[30];;1;X3Y1/c0.out3_internal[30];X3Y1/c0.out3_internal[30]/c0.E_to_fabric[30];1;X3Y1/c0.out3[30];X3Y1/c0.out3[30]/c0.out3_internal[30];1;X2Y1/c0.out3_internal[30];X2Y1/c0.out3_internal[30]/c0.in1[30];1;X2Y1/c0.out3[30];X2Y1/c0.out3[30]/c0.out3_internal[30];1;X1Y1/c0.data_in2[30];X1Y1/c0.data_in2[30]/c0.in1[30];1"
           }
         },
         "$iopadmap$B[29]": {
           "hide_name": 1,
           "bits": [ 1939 ] ,
           "attributes": {
-            "ROUTING": "X1Y0/c0.S_to_fabric[29];;1;X1Y0/c0.out0_internal[29];X1Y0/c0.out0_internal[29]/c0.S_to_fabric[29];1;X1Y0/c0.out0[29];X1Y0/c0.out0[29]/c0.out0_internal[29];1;X1Y1/c0.data_in2[29];X1Y1/c0.data_in2[29]/c0.in2[29];1"
+            "ROUTING": "X3Y1/c0.E_to_fabric[29];;1;X3Y1/c0.out3_internal[29];X3Y1/c0.out3_internal[29]/c0.E_to_fabric[29];1;X3Y1/c0.out3[29];X3Y1/c0.out3[29]/c0.out3_internal[29];1;X2Y1/c0.out3_internal[29];X2Y1/c0.out3_internal[29]/c0.in1[29];1;X2Y1/c0.out3[29];X2Y1/c0.out3[29]/c0.out3_internal[29];1;X1Y1/c0.data_in2[29];X1Y1/c0.data_in2[29]/c0.in1[29];1"
           }
         },
         "$iopadmap$B[28]": {
           "hide_name": 1,
           "bits": [ 1938 ] ,
           "attributes": {
-            "ROUTING": "X1Y0/c0.S_to_fabric[28];;1;X1Y0/c0.out0_internal[28];X1Y0/c0.out0_internal[28]/c0.S_to_fabric[28];1;X1Y0/c0.out0[28];X1Y0/c0.out0[28]/c0.out0_internal[28];1;X1Y1/c0.data_in2[28];X1Y1/c0.data_in2[28]/c0.in2[28];1"
+            "ROUTING": "X3Y1/c0.E_to_fabric[28];;1;X3Y1/c0.out3_internal[28];X3Y1/c0.out3_internal[28]/c0.E_to_fabric[28];1;X3Y1/c0.out3[28];X3Y1/c0.out3[28]/c0.out3_internal[28];1;X2Y1/c0.out3_internal[28];X2Y1/c0.out3_internal[28]/c0.in1[28];1;X2Y1/c0.out3[28];X2Y1/c0.out3[28]/c0.out3_internal[28];1;X1Y1/c0.data_in2[28];X1Y1/c0.data_in2[28]/c0.in1[28];1"
           }
         },
         "$iopadmap$B[27]": {
           "hide_name": 1,
           "bits": [ 1937 ] ,
           "attributes": {
-            "ROUTING": "X1Y0/c0.S_to_fabric[27];;1;X1Y0/c0.out0_internal[27];X1Y0/c0.out0_internal[27]/c0.S_to_fabric[27];1;X1Y0/c0.out0[27];X1Y0/c0.out0[27]/c0.out0_internal[27];1;X1Y1/c0.data_in2[27];X1Y1/c0.data_in2[27]/c0.in2[27];1"
+            "ROUTING": "X3Y1/c0.E_to_fabric[27];;1;X3Y1/c0.out3_internal[27];X3Y1/c0.out3_internal[27]/c0.E_to_fabric[27];1;X3Y1/c0.out3[27];X3Y1/c0.out3[27]/c0.out3_internal[27];1;X2Y1/c0.out3_internal[27];X2Y1/c0.out3_internal[27]/c0.in1[27];1;X2Y1/c0.out3[27];X2Y1/c0.out3[27]/c0.out3_internal[27];1;X1Y1/c0.data_in2[27];X1Y1/c0.data_in2[27]/c0.in1[27];1"
           }
         },
         "$iopadmap$B[26]": {
           "hide_name": 1,
           "bits": [ 1936 ] ,
           "attributes": {
-            "ROUTING": "X1Y0/c0.S_to_fabric[26];;1;X1Y0/c0.out0_internal[26];X1Y0/c0.out0_internal[26]/c0.S_to_fabric[26];1;X1Y0/c0.out0[26];X1Y0/c0.out0[26]/c0.out0_internal[26];1;X1Y1/c0.data_in2[26];X1Y1/c0.data_in2[26]/c0.in2[26];1"
+            "ROUTING": "X3Y1/c0.E_to_fabric[26];;1;X3Y1/c0.out3_internal[26];X3Y1/c0.out3_internal[26]/c0.E_to_fabric[26];1;X3Y1/c0.out3[26];X3Y1/c0.out3[26]/c0.out3_internal[26];1;X2Y1/c0.out3_internal[26];X2Y1/c0.out3_internal[26]/c0.in1[26];1;X2Y1/c0.out3[26];X2Y1/c0.out3[26]/c0.out3_internal[26];1;X1Y1/c0.data_in2[26];X1Y1/c0.data_in2[26]/c0.in1[26];1"
           }
         },
         "$iopadmap$B[25]": {
           "hide_name": 1,
           "bits": [ 1935 ] ,
           "attributes": {
-            "ROUTING": "X1Y0/c0.S_to_fabric[25];;1;X1Y0/c0.out0_internal[25];X1Y0/c0.out0_internal[25]/c0.S_to_fabric[25];1;X1Y0/c0.out0[25];X1Y0/c0.out0[25]/c0.out0_internal[25];1;X1Y1/c0.data_in2[25];X1Y1/c0.data_in2[25]/c0.in2[25];1"
+            "ROUTING": "X3Y1/c0.E_to_fabric[25];;1;X3Y1/c0.out3_internal[25];X3Y1/c0.out3_internal[25]/c0.E_to_fabric[25];1;X3Y1/c0.out3[25];X3Y1/c0.out3[25]/c0.out3_internal[25];1;X2Y1/c0.out3_internal[25];X2Y1/c0.out3_internal[25]/c0.in1[25];1;X2Y1/c0.out3[25];X2Y1/c0.out3[25]/c0.out3_internal[25];1;X1Y1/c0.data_in2[25];X1Y1/c0.data_in2[25]/c0.in1[25];1"
           }
         },
         "$iopadmap$B[24]": {
           "hide_name": 1,
           "bits": [ 1934 ] ,
           "attributes": {
-            "ROUTING": "X1Y0/c0.S_to_fabric[24];;1;X1Y0/c0.out0_internal[24];X1Y0/c0.out0_internal[24]/c0.S_to_fabric[24];1;X1Y0/c0.out0[24];X1Y0/c0.out0[24]/c0.out0_internal[24];1;X1Y1/c0.data_in2[24];X1Y1/c0.data_in2[24]/c0.in2[24];1"
+            "ROUTING": "X3Y1/c0.E_to_fabric[24];;1;X3Y1/c0.out3_internal[24];X3Y1/c0.out3_internal[24]/c0.E_to_fabric[24];1;X3Y1/c0.out3[24];X3Y1/c0.out3[24]/c0.out3_internal[24];1;X2Y1/c0.out3_internal[24];X2Y1/c0.out3_internal[24]/c0.in1[24];1;X2Y1/c0.out3[24];X2Y1/c0.out3[24]/c0.out3_internal[24];1;X1Y1/c0.data_in2[24];X1Y1/c0.data_in2[24]/c0.in1[24];1"
           }
         },
         "$iopadmap$B[23]": {
           "hide_name": 1,
           "bits": [ 1933 ] ,
           "attributes": {
-            "ROUTING": "X1Y0/c0.S_to_fabric[23];;1;X1Y0/c0.out0_internal[23];X1Y0/c0.out0_internal[23]/c0.S_to_fabric[23];1;X1Y0/c0.out0[23];X1Y0/c0.out0[23]/c0.out0_internal[23];1;X1Y1/c0.data_in2[23];X1Y1/c0.data_in2[23]/c0.in2[23];1"
+            "ROUTING": "X3Y1/c0.E_to_fabric[23];;1;X3Y1/c0.out3_internal[23];X3Y1/c0.out3_internal[23]/c0.E_to_fabric[23];1;X3Y1/c0.out3[23];X3Y1/c0.out3[23]/c0.out3_internal[23];1;X2Y1/c0.out3_internal[23];X2Y1/c0.out3_internal[23]/c0.in1[23];1;X2Y1/c0.out3[23];X2Y1/c0.out3[23]/c0.out3_internal[23];1;X1Y1/c0.data_in2[23];X1Y1/c0.data_in2[23]/c0.in1[23];1"
           }
         },
         "$iopadmap$B[22]": {
           "hide_name": 1,
           "bits": [ 1932 ] ,
           "attributes": {
-            "ROUTING": "X1Y0/c0.S_to_fabric[22];;1;X1Y0/c0.out0_internal[22];X1Y0/c0.out0_internal[22]/c0.S_to_fabric[22];1;X1Y0/c0.out0[22];X1Y0/c0.out0[22]/c0.out0_internal[22];1;X1Y1/c0.data_in2[22];X1Y1/c0.data_in2[22]/c0.in2[22];1"
+            "ROUTING": "X3Y1/c0.E_to_fabric[22];;1;X3Y1/c0.out3_internal[22];X3Y1/c0.out3_internal[22]/c0.E_to_fabric[22];1;X3Y1/c0.out3[22];X3Y1/c0.out3[22]/c0.out3_internal[22];1;X2Y1/c0.out3_internal[22];X2Y1/c0.out3_internal[22]/c0.in1[22];1;X2Y1/c0.out3[22];X2Y1/c0.out3[22]/c0.out3_internal[22];1;X1Y1/c0.data_in2[22];X1Y1/c0.data_in2[22]/c0.in1[22];1"
           }
         },
         "$iopadmap$B[21]": {
           "hide_name": 1,
           "bits": [ 1931 ] ,
           "attributes": {
-            "ROUTING": "X1Y0/c0.S_to_fabric[21];;1;X1Y0/c0.out0_internal[21];X1Y0/c0.out0_internal[21]/c0.S_to_fabric[21];1;X1Y0/c0.out0[21];X1Y0/c0.out0[21]/c0.out0_internal[21];1;X1Y1/c0.data_in2[21];X1Y1/c0.data_in2[21]/c0.in2[21];1"
+            "ROUTING": "X3Y1/c0.E_to_fabric[21];;1;X3Y1/c0.out3_internal[21];X3Y1/c0.out3_internal[21]/c0.E_to_fabric[21];1;X3Y1/c0.out3[21];X3Y1/c0.out3[21]/c0.out3_internal[21];1;X2Y1/c0.out3_internal[21];X2Y1/c0.out3_internal[21]/c0.in1[21];1;X2Y1/c0.out3[21];X2Y1/c0.out3[21]/c0.out3_internal[21];1;X1Y1/c0.data_in2[21];X1Y1/c0.data_in2[21]/c0.in1[21];1"
           }
         },
         "$iopadmap$B[20]": {
           "hide_name": 1,
           "bits": [ 1930 ] ,
           "attributes": {
-            "ROUTING": "X1Y0/c0.S_to_fabric[20];;1;X1Y0/c0.out0_internal[20];X1Y0/c0.out0_internal[20]/c0.S_to_fabric[20];1;X1Y0/c0.out0[20];X1Y0/c0.out0[20]/c0.out0_internal[20];1;X1Y1/c0.data_in2[20];X1Y1/c0.data_in2[20]/c0.in2[20];1"
+            "ROUTING": "X3Y1/c0.E_to_fabric[20];;1;X3Y1/c0.out3_internal[20];X3Y1/c0.out3_internal[20]/c0.E_to_fabric[20];1;X3Y1/c0.out3[20];X3Y1/c0.out3[20]/c0.out3_internal[20];1;X2Y1/c0.out3_internal[20];X2Y1/c0.out3_internal[20]/c0.in1[20];1;X2Y1/c0.out3[20];X2Y1/c0.out3[20]/c0.out3_internal[20];1;X1Y1/c0.data_in2[20];X1Y1/c0.data_in2[20]/c0.in1[20];1"
           }
         },
         "$iopadmap$B[19]": {
           "hide_name": 1,
           "bits": [ 1929 ] ,
           "attributes": {
-            "ROUTING": "X1Y0/c0.S_to_fabric[19];;1;X1Y0/c0.out0_internal[19];X1Y0/c0.out0_internal[19]/c0.S_to_fabric[19];1;X1Y0/c0.out0[19];X1Y0/c0.out0[19]/c0.out0_internal[19];1;X1Y1/c0.data_in2[19];X1Y1/c0.data_in2[19]/c0.in2[19];1"
+            "ROUTING": "X3Y1/c0.E_to_fabric[19];;1;X3Y1/c0.out3_internal[19];X3Y1/c0.out3_internal[19]/c0.E_to_fabric[19];1;X3Y1/c0.out3[19];X3Y1/c0.out3[19]/c0.out3_internal[19];1;X2Y1/c0.out3_internal[19];X2Y1/c0.out3_internal[19]/c0.in1[19];1;X2Y1/c0.out3[19];X2Y1/c0.out3[19]/c0.out3_internal[19];1;X1Y1/c0.data_in2[19];X1Y1/c0.data_in2[19]/c0.in1[19];1"
           }
         },
         "$iopadmap$B[18]": {
           "hide_name": 1,
           "bits": [ 1928 ] ,
           "attributes": {
-            "ROUTING": "X1Y0/c0.S_to_fabric[18];;1;X1Y0/c0.out0_internal[18];X1Y0/c0.out0_internal[18]/c0.S_to_fabric[18];1;X1Y0/c0.out0[18];X1Y0/c0.out0[18]/c0.out0_internal[18];1;X1Y1/c0.data_in2[18];X1Y1/c0.data_in2[18]/c0.in2[18];1"
+            "ROUTING": "X3Y1/c0.E_to_fabric[18];;1;X3Y1/c0.out3_internal[18];X3Y1/c0.out3_internal[18]/c0.E_to_fabric[18];1;X3Y1/c0.out3[18];X3Y1/c0.out3[18]/c0.out3_internal[18];1;X2Y1/c0.out3_internal[18];X2Y1/c0.out3_internal[18]/c0.in1[18];1;X2Y1/c0.out3[18];X2Y1/c0.out3[18]/c0.out3_internal[18];1;X1Y1/c0.data_in2[18];X1Y1/c0.data_in2[18]/c0.in1[18];1"
           }
         },
         "$iopadmap$B[17]": {
           "hide_name": 1,
           "bits": [ 1927 ] ,
           "attributes": {
-            "ROUTING": "X1Y0/c0.S_to_fabric[17];;1;X1Y0/c0.out0_internal[17];X1Y0/c0.out0_internal[17]/c0.S_to_fabric[17];1;X1Y0/c0.out0[17];X1Y0/c0.out0[17]/c0.out0_internal[17];1;X1Y1/c0.data_in2[17];X1Y1/c0.data_in2[17]/c0.in2[17];1"
+            "ROUTING": "X3Y1/c0.E_to_fabric[17];;1;X3Y1/c0.out3_internal[17];X3Y1/c0.out3_internal[17]/c0.E_to_fabric[17];1;X3Y1/c0.out3[17];X3Y1/c0.out3[17]/c0.out3_internal[17];1;X2Y1/c0.out3_internal[17];X2Y1/c0.out3_internal[17]/c0.in1[17];1;X2Y1/c0.out3[17];X2Y1/c0.out3[17]/c0.out3_internal[17];1;X1Y1/c0.data_in2[17];X1Y1/c0.data_in2[17]/c0.in1[17];1"
           }
         },
         "$iopadmap$B[16]": {
           "hide_name": 1,
           "bits": [ 1926 ] ,
           "attributes": {
-            "ROUTING": "X1Y0/c0.S_to_fabric[16];;1;X1Y0/c0.out0_internal[16];X1Y0/c0.out0_internal[16]/c0.S_to_fabric[16];1;X1Y0/c0.out0[16];X1Y0/c0.out0[16]/c0.out0_internal[16];1;X1Y1/c0.data_in2[16];X1Y1/c0.data_in2[16]/c0.in2[16];1"
+            "ROUTING": "X3Y1/c0.E_to_fabric[16];;1;X3Y1/c0.out3_internal[16];X3Y1/c0.out3_internal[16]/c0.E_to_fabric[16];1;X3Y1/c0.out3[16];X3Y1/c0.out3[16]/c0.out3_internal[16];1;X2Y1/c0.out3_internal[16];X2Y1/c0.out3_internal[16]/c0.in1[16];1;X2Y1/c0.out3[16];X2Y1/c0.out3[16]/c0.out3_internal[16];1;X1Y1/c0.data_in2[16];X1Y1/c0.data_in2[16]/c0.in1[16];1"
           }
         },
         "$iopadmap$B[15]": {
           "hide_name": 1,
           "bits": [ 1925 ] ,
           "attributes": {
-            "ROUTING": "X1Y0/c0.S_to_fabric[15];;1;X1Y0/c0.out0_internal[15];X1Y0/c0.out0_internal[15]/c0.S_to_fabric[15];1;X1Y0/c0.out0[15];X1Y0/c0.out0[15]/c0.out0_internal[15];1;X1Y1/c0.data_in2[15];X1Y1/c0.data_in2[15]/c0.in2[15];1"
+            "ROUTING": "X3Y1/c0.E_to_fabric[15];;1;X3Y1/c0.out3_internal[15];X3Y1/c0.out3_internal[15]/c0.E_to_fabric[15];1;X3Y1/c0.out3[15];X3Y1/c0.out3[15]/c0.out3_internal[15];1;X2Y1/c0.out3_internal[15];X2Y1/c0.out3_internal[15]/c0.in1[15];1;X2Y1/c0.out3[15];X2Y1/c0.out3[15]/c0.out3_internal[15];1;X1Y1/c0.data_in2[15];X1Y1/c0.data_in2[15]/c0.in1[15];1"
           }
         },
         "$iopadmap$B[14]": {
           "hide_name": 1,
           "bits": [ 1924 ] ,
           "attributes": {
-            "ROUTING": "X1Y0/c0.S_to_fabric[14];;1;X1Y0/c0.out0_internal[14];X1Y0/c0.out0_internal[14]/c0.S_to_fabric[14];1;X1Y0/c0.out0[14];X1Y0/c0.out0[14]/c0.out0_internal[14];1;X1Y1/c0.data_in2[14];X1Y1/c0.data_in2[14]/c0.in2[14];1"
+            "ROUTING": "X3Y1/c0.E_to_fabric[14];;1;X3Y1/c0.out3_internal[14];X3Y1/c0.out3_internal[14]/c0.E_to_fabric[14];1;X3Y1/c0.out3[14];X3Y1/c0.out3[14]/c0.out3_internal[14];1;X2Y1/c0.out3_internal[14];X2Y1/c0.out3_internal[14]/c0.in1[14];1;X2Y1/c0.out3[14];X2Y1/c0.out3[14]/c0.out3_internal[14];1;X1Y1/c0.data_in2[14];X1Y1/c0.data_in2[14]/c0.in1[14];1"
           }
         },
         "$iopadmap$B[13]": {
           "hide_name": 1,
           "bits": [ 1923 ] ,
           "attributes": {
-            "ROUTING": "X1Y0/c0.S_to_fabric[13];;1;X1Y0/c0.out0_internal[13];X1Y0/c0.out0_internal[13]/c0.S_to_fabric[13];1;X1Y0/c0.out0[13];X1Y0/c0.out0[13]/c0.out0_internal[13];1;X1Y1/c0.data_in2[13];X1Y1/c0.data_in2[13]/c0.in2[13];1"
+            "ROUTING": "X3Y1/c0.E_to_fabric[13];;1;X3Y1/c0.out3_internal[13];X3Y1/c0.out3_internal[13]/c0.E_to_fabric[13];1;X3Y1/c0.out3[13];X3Y1/c0.out3[13]/c0.out3_internal[13];1;X2Y1/c0.out3_internal[13];X2Y1/c0.out3_internal[13]/c0.in1[13];1;X2Y1/c0.out3[13];X2Y1/c0.out3[13]/c0.out3_internal[13];1;X1Y1/c0.data_in2[13];X1Y1/c0.data_in2[13]/c0.in1[13];1"
           }
         },
         "$iopadmap$B[12]": {
           "hide_name": 1,
           "bits": [ 1922 ] ,
           "attributes": {
-            "ROUTING": "X1Y0/c0.S_to_fabric[12];;1;X1Y0/c0.out0_internal[12];X1Y0/c0.out0_internal[12]/c0.S_to_fabric[12];1;X1Y0/c0.out0[12];X1Y0/c0.out0[12]/c0.out0_internal[12];1;X1Y1/c0.data_in2[12];X1Y1/c0.data_in2[12]/c0.in2[12];1"
+            "ROUTING": "X3Y1/c0.E_to_fabric[12];;1;X3Y1/c0.out3_internal[12];X3Y1/c0.out3_internal[12]/c0.E_to_fabric[12];1;X3Y1/c0.out3[12];X3Y1/c0.out3[12]/c0.out3_internal[12];1;X2Y1/c0.out3_internal[12];X2Y1/c0.out3_internal[12]/c0.in1[12];1;X2Y1/c0.out3[12];X2Y1/c0.out3[12]/c0.out3_internal[12];1;X1Y1/c0.data_in2[12];X1Y1/c0.data_in2[12]/c0.in1[12];1"
           }
         },
         "$iopadmap$B[11]": {
           "hide_name": 1,
           "bits": [ 1921 ] ,
           "attributes": {
-            "ROUTING": "X1Y0/c0.S_to_fabric[11];;1;X1Y0/c0.out0_internal[11];X1Y0/c0.out0_internal[11]/c0.S_to_fabric[11];1;X1Y0/c0.out0[11];X1Y0/c0.out0[11]/c0.out0_internal[11];1;X1Y1/c0.data_in2[11];X1Y1/c0.data_in2[11]/c0.in2[11];1"
+            "ROUTING": "X3Y1/c0.E_to_fabric[11];;1;X3Y1/c0.out3_internal[11];X3Y1/c0.out3_internal[11]/c0.E_to_fabric[11];1;X3Y1/c0.out3[11];X3Y1/c0.out3[11]/c0.out3_internal[11];1;X2Y1/c0.out3_internal[11];X2Y1/c0.out3_internal[11]/c0.in1[11];1;X2Y1/c0.out3[11];X2Y1/c0.out3[11]/c0.out3_internal[11];1;X1Y1/c0.data_in2[11];X1Y1/c0.data_in2[11]/c0.in1[11];1"
           }
         },
         "$iopadmap$B[10]": {
           "hide_name": 1,
           "bits": [ 1920 ] ,
           "attributes": {
-            "ROUTING": "X1Y0/c0.S_to_fabric[10];;1;X1Y0/c0.out0_internal[10];X1Y0/c0.out0_internal[10]/c0.S_to_fabric[10];1;X1Y0/c0.out0[10];X1Y0/c0.out0[10]/c0.out0_internal[10];1;X1Y1/c0.data_in2[10];X1Y1/c0.data_in2[10]/c0.in2[10];1"
+            "ROUTING": "X3Y1/c0.E_to_fabric[10];;1;X3Y1/c0.out3_internal[10];X3Y1/c0.out3_internal[10]/c0.E_to_fabric[10];1;X3Y1/c0.out3[10];X3Y1/c0.out3[10]/c0.out3_internal[10];1;X2Y1/c0.out3_internal[10];X2Y1/c0.out3_internal[10]/c0.in1[10];1;X2Y1/c0.out3[10];X2Y1/c0.out3[10]/c0.out3_internal[10];1;X1Y1/c0.data_in2[10];X1Y1/c0.data_in2[10]/c0.in1[10];1"
           }
         },
         "$iopadmap$B[9]": {
           "hide_name": 1,
           "bits": [ 1919 ] ,
           "attributes": {
-            "ROUTING": "X1Y0/c0.S_to_fabric[9];;1;X1Y0/c0.out0_internal[9];X1Y0/c0.out0_internal[9]/c0.S_to_fabric[9];1;X1Y0/c0.out0[9];X1Y0/c0.out0[9]/c0.out0_internal[9];1;X1Y1/c0.data_in2[9];X1Y1/c0.data_in2[9]/c0.in2[9];1"
+            "ROUTING": "X3Y1/c0.E_to_fabric[9];;1;X3Y1/c0.out3_internal[9];X3Y1/c0.out3_internal[9]/c0.E_to_fabric[9];1;X3Y1/c0.out3[9];X3Y1/c0.out3[9]/c0.out3_internal[9];1;X2Y1/c0.out3_internal[9];X2Y1/c0.out3_internal[9]/c0.in1[9];1;X2Y1/c0.out3[9];X2Y1/c0.out3[9]/c0.out3_internal[9];1;X1Y1/c0.data_in2[9];X1Y1/c0.data_in2[9]/c0.in1[9];1"
           }
         },
         "$iopadmap$B[8]": {
           "hide_name": 1,
           "bits": [ 1918 ] ,
           "attributes": {
-            "ROUTING": "X1Y0/c0.S_to_fabric[8];;1;X1Y0/c0.out0_internal[8];X1Y0/c0.out0_internal[8]/c0.S_to_fabric[8];1;X1Y0/c0.out0[8];X1Y0/c0.out0[8]/c0.out0_internal[8];1;X1Y1/c0.data_in2[8];X1Y1/c0.data_in2[8]/c0.in2[8];1"
+            "ROUTING": "X3Y1/c0.E_to_fabric[8];;1;X3Y1/c0.out3_internal[8];X3Y1/c0.out3_internal[8]/c0.E_to_fabric[8];1;X3Y1/c0.out3[8];X3Y1/c0.out3[8]/c0.out3_internal[8];1;X2Y1/c0.out3_internal[8];X2Y1/c0.out3_internal[8]/c0.in1[8];1;X2Y1/c0.out3[8];X2Y1/c0.out3[8]/c0.out3_internal[8];1;X1Y1/c0.data_in2[8];X1Y1/c0.data_in2[8]/c0.in1[8];1"
           }
         },
         "$iopadmap$B[7]": {
           "hide_name": 1,
           "bits": [ 1917 ] ,
           "attributes": {
-            "ROUTING": "X1Y0/c0.S_to_fabric[7];;1;X1Y0/c0.out0_internal[7];X1Y0/c0.out0_internal[7]/c0.S_to_fabric[7];1;X1Y0/c0.out0[7];X1Y0/c0.out0[7]/c0.out0_internal[7];1;X1Y1/c0.data_in2[7];X1Y1/c0.data_in2[7]/c0.in2[7];1"
+            "ROUTING": "X3Y1/c0.E_to_fabric[7];;1;X3Y1/c0.out3_internal[7];X3Y1/c0.out3_internal[7]/c0.E_to_fabric[7];1;X3Y1/c0.out3[7];X3Y1/c0.out3[7]/c0.out3_internal[7];1;X2Y1/c0.out3_internal[7];X2Y1/c0.out3_internal[7]/c0.in1[7];1;X2Y1/c0.out3[7];X2Y1/c0.out3[7]/c0.out3_internal[7];1;X1Y1/c0.data_in2[7];X1Y1/c0.data_in2[7]/c0.in1[7];1"
           }
         },
         "$iopadmap$B[6]": {
           "hide_name": 1,
           "bits": [ 1916 ] ,
           "attributes": {
-            "ROUTING": "X1Y0/c0.S_to_fabric[6];;1;X1Y0/c0.out0_internal[6];X1Y0/c0.out0_internal[6]/c0.S_to_fabric[6];1;X1Y0/c0.out0[6];X1Y0/c0.out0[6]/c0.out0_internal[6];1;X1Y1/c0.data_in2[6];X1Y1/c0.data_in2[6]/c0.in2[6];1"
+            "ROUTING": "X3Y1/c0.E_to_fabric[6];;1;X3Y1/c0.out3_internal[6];X3Y1/c0.out3_internal[6]/c0.E_to_fabric[6];1;X3Y1/c0.out3[6];X3Y1/c0.out3[6]/c0.out3_internal[6];1;X2Y1/c0.out3_internal[6];X2Y1/c0.out3_internal[6]/c0.in1[6];1;X2Y1/c0.out3[6];X2Y1/c0.out3[6]/c0.out3_internal[6];1;X1Y1/c0.data_in2[6];X1Y1/c0.data_in2[6]/c0.in1[6];1"
           }
         },
         "$iopadmap$B[5]": {
           "hide_name": 1,
           "bits": [ 1915 ] ,
           "attributes": {
-            "ROUTING": "X1Y0/c0.S_to_fabric[5];;1;X1Y0/c0.out0_internal[5];X1Y0/c0.out0_internal[5]/c0.S_to_fabric[5];1;X1Y0/c0.out0[5];X1Y0/c0.out0[5]/c0.out0_internal[5];1;X1Y1/c0.data_in2[5];X1Y1/c0.data_in2[5]/c0.in2[5];1"
+            "ROUTING": "X3Y1/c0.E_to_fabric[5];;1;X3Y1/c0.out3_internal[5];X3Y1/c0.out3_internal[5]/c0.E_to_fabric[5];1;X3Y1/c0.out3[5];X3Y1/c0.out3[5]/c0.out3_internal[5];1;X2Y1/c0.out3_internal[5];X2Y1/c0.out3_internal[5]/c0.in1[5];1;X2Y1/c0.out3[5];X2Y1/c0.out3[5]/c0.out3_internal[5];1;X1Y1/c0.data_in2[5];X1Y1/c0.data_in2[5]/c0.in1[5];1"
           }
         },
         "$iopadmap$B[4]": {
           "hide_name": 1,
           "bits": [ 1914 ] ,
           "attributes": {
-            "ROUTING": "X1Y0/c0.S_to_fabric[4];;1;X1Y0/c0.out0_internal[4];X1Y0/c0.out0_internal[4]/c0.S_to_fabric[4];1;X1Y0/c0.out0[4];X1Y0/c0.out0[4]/c0.out0_internal[4];1;X1Y1/c0.data_in2[4];X1Y1/c0.data_in2[4]/c0.in2[4];1"
+            "ROUTING": "X3Y1/c0.E_to_fabric[4];;1;X3Y1/c0.out3_internal[4];X3Y1/c0.out3_internal[4]/c0.E_to_fabric[4];1;X3Y1/c0.out3[4];X3Y1/c0.out3[4]/c0.out3_internal[4];1;X2Y1/c0.out3_internal[4];X2Y1/c0.out3_internal[4]/c0.in1[4];1;X2Y1/c0.out3[4];X2Y1/c0.out3[4]/c0.out3_internal[4];1;X1Y1/c0.data_in2[4];X1Y1/c0.data_in2[4]/c0.in1[4];1"
           }
         },
         "$iopadmap$B[3]": {
           "hide_name": 1,
           "bits": [ 1913 ] ,
           "attributes": {
-            "ROUTING": "X1Y0/c0.S_to_fabric[3];;1;X1Y0/c0.out0_internal[3];X1Y0/c0.out0_internal[3]/c0.S_to_fabric[3];1;X1Y0/c0.out0[3];X1Y0/c0.out0[3]/c0.out0_internal[3];1;X1Y1/c0.data_in2[3];X1Y1/c0.data_in2[3]/c0.in2[3];1"
+            "ROUTING": "X3Y1/c0.E_to_fabric[3];;1;X3Y1/c0.out3_internal[3];X3Y1/c0.out3_internal[3]/c0.E_to_fabric[3];1;X3Y1/c0.out3[3];X3Y1/c0.out3[3]/c0.out3_internal[3];1;X2Y1/c0.out3_internal[3];X2Y1/c0.out3_internal[3]/c0.in1[3];1;X2Y1/c0.out3[3];X2Y1/c0.out3[3]/c0.out3_internal[3];1;X1Y1/c0.data_in2[3];X1Y1/c0.data_in2[3]/c0.in1[3];1"
           }
         },
         "$iopadmap$B[2]": {
           "hide_name": 1,
           "bits": [ 1912 ] ,
           "attributes": {
-            "ROUTING": "X1Y0/c0.S_to_fabric[2];;1;X1Y0/c0.out0_internal[2];X1Y0/c0.out0_internal[2]/c0.S_to_fabric[2];1;X1Y0/c0.out0[2];X1Y0/c0.out0[2]/c0.out0_internal[2];1;X1Y1/c0.data_in2[2];X1Y1/c0.data_in2[2]/c0.in2[2];1"
+            "ROUTING": "X3Y1/c0.E_to_fabric[2];;1;X3Y1/c0.out3_internal[2];X3Y1/c0.out3_internal[2]/c0.E_to_fabric[2];1;X3Y1/c0.out3[2];X3Y1/c0.out3[2]/c0.out3_internal[2];1;X2Y1/c0.out3_internal[2];X2Y1/c0.out3_internal[2]/c0.in1[2];1;X2Y1/c0.out3[2];X2Y1/c0.out3[2]/c0.out3_internal[2];1;X1Y1/c0.data_in2[2];X1Y1/c0.data_in2[2]/c0.in1[2];1"
           }
         },
         "$iopadmap$B[1]": {
           "hide_name": 1,
           "bits": [ 1911 ] ,
           "attributes": {
-            "ROUTING": "X1Y0/c0.S_to_fabric[1];;1;X1Y0/c0.out0_internal[1];X1Y0/c0.out0_internal[1]/c0.S_to_fabric[1];1;X1Y0/c0.out0[1];X1Y0/c0.out0[1]/c0.out0_internal[1];1;X1Y1/c0.data_in2[1];X1Y1/c0.data_in2[1]/c0.in2[1];1"
+            "ROUTING": "X3Y1/c0.E_to_fabric[1];;1;X3Y1/c0.out3_internal[1];X3Y1/c0.out3_internal[1]/c0.E_to_fabric[1];1;X3Y1/c0.out3[1];X3Y1/c0.out3[1]/c0.out3_internal[1];1;X2Y1/c0.out3_internal[1];X2Y1/c0.out3_internal[1]/c0.in1[1];1;X2Y1/c0.out3[1];X2Y1/c0.out3[1]/c0.out3_internal[1];1;X1Y1/c0.data_in2[1];X1Y1/c0.data_in2[1]/c0.in1[1];1"
           }
         },
         "$iopadmap$B[0]": {
           "hide_name": 1,
           "bits": [ 1910 ] ,
           "attributes": {
-            "ROUTING": "X1Y0/c0.S_to_fabric[0];;1;X1Y0/c0.out0_internal[0];X1Y0/c0.out0_internal[0]/c0.S_to_fabric[0];1;X1Y0/c0.out0[0];X1Y0/c0.out0[0]/c0.out0_internal[0];1;X1Y1/c0.data_in2[0];X1Y1/c0.data_in2[0]/c0.in2[0];1"
+            "ROUTING": "X3Y1/c0.E_to_fabric[0];;1;X3Y1/c0.out3_internal[0];X3Y1/c0.out3_internal[0]/c0.E_to_fabric[0];1;X3Y1/c0.out3[0];X3Y1/c0.out3[0]/c0.out3_internal[0];1;X2Y1/c0.out3_internal[0];X2Y1/c0.out3_internal[0]/c0.in1[0];1;X2Y1/c0.out3[0];X2Y1/c0.out3[0]/c0.out3_internal[0];1;X1Y1/c0.data_in2[0];X1Y1/c0.data_in2[0]/c0.in1[0];1"
           }
         },
         "$iopadmap$A[31]": {
@@ -1331,7 +1331,7 @@
           "bits": [ 2272 ] ,
           "attributes": {
             "ROUTING": " ",
-            "src": "/Users/kelvin/Documents/FABulous/myProject/user_design/test.sv:37.25-37.26"
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:37.25-37.26"
           }
         },
         "Y[7]": {
@@ -1339,7 +1339,7 @@
           "bits": [ 2270 ] ,
           "attributes": {
             "ROUTING": " ",
-            "src": "/Users/kelvin/Documents/FABulous/myProject/user_design/test.sv:37.25-37.26"
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:37.25-37.26"
           }
         },
         "Y[6]": {
@@ -1347,7 +1347,7 @@
           "bits": [ 2268 ] ,
           "attributes": {
             "ROUTING": " ",
-            "src": "/Users/kelvin/Documents/FABulous/myProject/user_design/test.sv:37.25-37.26"
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:37.25-37.26"
           }
         },
         "Y[5]": {
@@ -1355,7 +1355,7 @@
           "bits": [ 2266 ] ,
           "attributes": {
             "ROUTING": " ",
-            "src": "/Users/kelvin/Documents/FABulous/myProject/user_design/test.sv:37.25-37.26"
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:37.25-37.26"
           }
         },
         "Y[4]": {
@@ -1363,7 +1363,7 @@
           "bits": [ 2264 ] ,
           "attributes": {
             "ROUTING": " ",
-            "src": "/Users/kelvin/Documents/FABulous/myProject/user_design/test.sv:37.25-37.26"
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:37.25-37.26"
           }
         },
         "Y[3]": {
@@ -1371,7 +1371,7 @@
           "bits": [ 2262 ] ,
           "attributes": {
             "ROUTING": " ",
-            "src": "/Users/kelvin/Documents/FABulous/myProject/user_design/test.sv:37.25-37.26"
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:37.25-37.26"
           }
         },
         "Y[31]": {
@@ -1379,7 +1379,7 @@
           "bits": [ 2260 ] ,
           "attributes": {
             "ROUTING": " ",
-            "src": "/Users/kelvin/Documents/FABulous/myProject/user_design/test.sv:37.25-37.26"
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:37.25-37.26"
           }
         },
         "Y[30]": {
@@ -1387,7 +1387,7 @@
           "bits": [ 2258 ] ,
           "attributes": {
             "ROUTING": " ",
-            "src": "/Users/kelvin/Documents/FABulous/myProject/user_design/test.sv:37.25-37.26"
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:37.25-37.26"
           }
         },
         "Y[29]": {
@@ -1395,7 +1395,7 @@
           "bits": [ 2256 ] ,
           "attributes": {
             "ROUTING": " ",
-            "src": "/Users/kelvin/Documents/FABulous/myProject/user_design/test.sv:37.25-37.26"
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:37.25-37.26"
           }
         },
         "Y[2]": {
@@ -1403,7 +1403,7 @@
           "bits": [ 2254 ] ,
           "attributes": {
             "ROUTING": " ",
-            "src": "/Users/kelvin/Documents/FABulous/myProject/user_design/test.sv:37.25-37.26"
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:37.25-37.26"
           }
         },
         "Y[28]": {
@@ -1411,7 +1411,7 @@
           "bits": [ 2252 ] ,
           "attributes": {
             "ROUTING": " ",
-            "src": "/Users/kelvin/Documents/FABulous/myProject/user_design/test.sv:37.25-37.26"
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:37.25-37.26"
           }
         },
         "Y[27]": {
@@ -1419,7 +1419,7 @@
           "bits": [ 2250 ] ,
           "attributes": {
             "ROUTING": " ",
-            "src": "/Users/kelvin/Documents/FABulous/myProject/user_design/test.sv:37.25-37.26"
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:37.25-37.26"
           }
         },
         "Y[26]": {
@@ -1427,7 +1427,7 @@
           "bits": [ 2248 ] ,
           "attributes": {
             "ROUTING": " ",
-            "src": "/Users/kelvin/Documents/FABulous/myProject/user_design/test.sv:37.25-37.26"
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:37.25-37.26"
           }
         },
         "Y[25]": {
@@ -1435,7 +1435,7 @@
           "bits": [ 2246 ] ,
           "attributes": {
             "ROUTING": " ",
-            "src": "/Users/kelvin/Documents/FABulous/myProject/user_design/test.sv:37.25-37.26"
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:37.25-37.26"
           }
         },
         "Y[24]": {
@@ -1443,7 +1443,7 @@
           "bits": [ 2244 ] ,
           "attributes": {
             "ROUTING": " ",
-            "src": "/Users/kelvin/Documents/FABulous/myProject/user_design/test.sv:37.25-37.26"
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:37.25-37.26"
           }
         },
         "Y[23]": {
@@ -1451,7 +1451,7 @@
           "bits": [ 2242 ] ,
           "attributes": {
             "ROUTING": " ",
-            "src": "/Users/kelvin/Documents/FABulous/myProject/user_design/test.sv:37.25-37.26"
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:37.25-37.26"
           }
         },
         "Y[22]": {
@@ -1459,7 +1459,7 @@
           "bits": [ 2240 ] ,
           "attributes": {
             "ROUTING": " ",
-            "src": "/Users/kelvin/Documents/FABulous/myProject/user_design/test.sv:37.25-37.26"
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:37.25-37.26"
           }
         },
         "Y[21]": {
@@ -1467,7 +1467,7 @@
           "bits": [ 2238 ] ,
           "attributes": {
             "ROUTING": " ",
-            "src": "/Users/kelvin/Documents/FABulous/myProject/user_design/test.sv:37.25-37.26"
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:37.25-37.26"
           }
         },
         "Y[20]": {
@@ -1475,7 +1475,7 @@
           "bits": [ 2236 ] ,
           "attributes": {
             "ROUTING": " ",
-            "src": "/Users/kelvin/Documents/FABulous/myProject/user_design/test.sv:37.25-37.26"
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:37.25-37.26"
           }
         },
         "Y[19]": {
@@ -1483,7 +1483,7 @@
           "bits": [ 2234 ] ,
           "attributes": {
             "ROUTING": " ",
-            "src": "/Users/kelvin/Documents/FABulous/myProject/user_design/test.sv:37.25-37.26"
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:37.25-37.26"
           }
         },
         "Y[1]": {
@@ -1491,7 +1491,7 @@
           "bits": [ 2232 ] ,
           "attributes": {
             "ROUTING": " ",
-            "src": "/Users/kelvin/Documents/FABulous/myProject/user_design/test.sv:37.25-37.26"
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:37.25-37.26"
           }
         },
         "Y[18]": {
@@ -1499,7 +1499,7 @@
           "bits": [ 2230 ] ,
           "attributes": {
             "ROUTING": " ",
-            "src": "/Users/kelvin/Documents/FABulous/myProject/user_design/test.sv:37.25-37.26"
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:37.25-37.26"
           }
         },
         "Y[17]": {
@@ -1507,7 +1507,7 @@
           "bits": [ 2228 ] ,
           "attributes": {
             "ROUTING": " ",
-            "src": "/Users/kelvin/Documents/FABulous/myProject/user_design/test.sv:37.25-37.26"
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:37.25-37.26"
           }
         },
         "Y[16]": {
@@ -1515,7 +1515,7 @@
           "bits": [ 2226 ] ,
           "attributes": {
             "ROUTING": " ",
-            "src": "/Users/kelvin/Documents/FABulous/myProject/user_design/test.sv:37.25-37.26"
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:37.25-37.26"
           }
         },
         "Y[15]": {
@@ -1523,7 +1523,7 @@
           "bits": [ 2224 ] ,
           "attributes": {
             "ROUTING": " ",
-            "src": "/Users/kelvin/Documents/FABulous/myProject/user_design/test.sv:37.25-37.26"
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:37.25-37.26"
           }
         },
         "Y[14]": {
@@ -1531,7 +1531,7 @@
           "bits": [ 2222 ] ,
           "attributes": {
             "ROUTING": " ",
-            "src": "/Users/kelvin/Documents/FABulous/myProject/user_design/test.sv:37.25-37.26"
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:37.25-37.26"
           }
         },
         "Y[13]": {
@@ -1539,7 +1539,7 @@
           "bits": [ 2220 ] ,
           "attributes": {
             "ROUTING": " ",
-            "src": "/Users/kelvin/Documents/FABulous/myProject/user_design/test.sv:37.25-37.26"
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:37.25-37.26"
           }
         },
         "Y[12]": {
@@ -1547,7 +1547,7 @@
           "bits": [ 2218 ] ,
           "attributes": {
             "ROUTING": " ",
-            "src": "/Users/kelvin/Documents/FABulous/myProject/user_design/test.sv:37.25-37.26"
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:37.25-37.26"
           }
         },
         "Y[11]": {
@@ -1555,7 +1555,7 @@
           "bits": [ 2216 ] ,
           "attributes": {
             "ROUTING": " ",
-            "src": "/Users/kelvin/Documents/FABulous/myProject/user_design/test.sv:37.25-37.26"
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:37.25-37.26"
           }
         },
         "Y[10]": {
@@ -1563,7 +1563,7 @@
           "bits": [ 2214 ] ,
           "attributes": {
             "ROUTING": " ",
-            "src": "/Users/kelvin/Documents/FABulous/myProject/user_design/test.sv:37.25-37.26"
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:37.25-37.26"
           }
         },
         "Y[9]": {
@@ -1571,7 +1571,7 @@
           "bits": [ 2212 ] ,
           "attributes": {
             "ROUTING": " ",
-            "src": "/Users/kelvin/Documents/FABulous/myProject/user_design/test.sv:37.25-37.26"
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:37.25-37.26"
           }
         },
         "Y[0]": {
@@ -1579,7 +1579,7 @@
           "bits": [ 2210 ] ,
           "attributes": {
             "ROUTING": " ",
-            "src": "/Users/kelvin/Documents/FABulous/myProject/user_design/test.sv:37.25-37.26"
+            "src": "/home/kelvin/FABulous_fork/myProject/user_design/test.sv:37.25-37.26"
           }
         }
       }

@@ -127,388 +127,388 @@
 # routing for net 'B[0]'
 
 # routing for net '$iopadmap$Y[31]'
-X1Y1.c0.out0__31.c0.out0_internal__31
-X1Y1.c0.out0_internal__31.c0.data_out__31
-X1Y2.c0.out0__31.c0.out0_internal__31
-X1Y2.c0.out0_internal__31.c0.in2__31
-X1Y3.c0.N_from_fabric__31.c0.in2__31
+X1Y0.c0.S_from_fabric__31.c0.in0__31
+X1Y1.c0.out2__31.c0.out2_internal__31
+X1Y1.c0.out2_internal__31.c0.data_out__31
 
 # routing for net '$iopadmap$Y[30]'
-X1Y1.c0.out0__30.c0.out0_internal__30
-X1Y1.c0.out0_internal__30.c0.data_out__30
-X1Y2.c0.out0__30.c0.out0_internal__30
-X1Y2.c0.out0_internal__30.c0.in2__30
-X1Y3.c0.N_from_fabric__30.c0.in2__30
+X1Y0.c0.S_from_fabric__30.c0.in0__30
+X1Y1.c0.out2__30.c0.out2_internal__30
+X1Y1.c0.out2_internal__30.c0.data_out__30
 
 # routing for net '$iopadmap$Y[29]'
-X1Y1.c0.out0__29.c0.out0_internal__29
-X1Y1.c0.out0_internal__29.c0.data_out__29
-X1Y2.c0.out0__29.c0.out0_internal__29
-X1Y2.c0.out0_internal__29.c0.in2__29
-X1Y3.c0.N_from_fabric__29.c0.in2__29
+X1Y0.c0.S_from_fabric__29.c0.in0__29
+X1Y1.c0.out2__29.c0.out2_internal__29
+X1Y1.c0.out2_internal__29.c0.data_out__29
 
 # routing for net '$iopadmap$Y[28]'
-X1Y1.c0.out0__28.c0.out0_internal__28
-X1Y1.c0.out0_internal__28.c0.data_out__28
-X1Y2.c0.out0__28.c0.out0_internal__28
-X1Y2.c0.out0_internal__28.c0.in2__28
-X1Y3.c0.N_from_fabric__28.c0.in2__28
+X1Y0.c0.S_from_fabric__28.c0.in0__28
+X1Y1.c0.out2__28.c0.out2_internal__28
+X1Y1.c0.out2_internal__28.c0.data_out__28
 
 # routing for net '$iopadmap$Y[27]'
-X1Y1.c0.out0__27.c0.out0_internal__27
-X1Y1.c0.out0_internal__27.c0.data_out__27
-X1Y2.c0.out0__27.c0.out0_internal__27
-X1Y2.c0.out0_internal__27.c0.in2__27
-X1Y3.c0.N_from_fabric__27.c0.in2__27
+X1Y0.c0.S_from_fabric__27.c0.in0__27
+X1Y1.c0.out2__27.c0.out2_internal__27
+X1Y1.c0.out2_internal__27.c0.data_out__27
 
 # routing for net '$iopadmap$Y[26]'
-X1Y1.c0.out0__26.c0.out0_internal__26
-X1Y1.c0.out0_internal__26.c0.data_out__26
-X1Y2.c0.out0__26.c0.out0_internal__26
-X1Y2.c0.out0_internal__26.c0.in2__26
-X1Y3.c0.N_from_fabric__26.c0.in2__26
+X1Y0.c0.S_from_fabric__26.c0.in0__26
+X1Y1.c0.out2__26.c0.out2_internal__26
+X1Y1.c0.out2_internal__26.c0.data_out__26
 
 # routing for net '$iopadmap$Y[25]'
-X1Y1.c0.out0__25.c0.out0_internal__25
-X1Y1.c0.out0_internal__25.c0.data_out__25
-X1Y2.c0.out0__25.c0.out0_internal__25
-X1Y2.c0.out0_internal__25.c0.in2__25
-X1Y3.c0.N_from_fabric__25.c0.in2__25
+X1Y0.c0.S_from_fabric__25.c0.in0__25
+X1Y1.c0.out2__25.c0.out2_internal__25
+X1Y1.c0.out2_internal__25.c0.data_out__25
 
 # routing for net '$iopadmap$Y[24]'
-X1Y1.c0.out0__24.c0.out0_internal__24
-X1Y1.c0.out0_internal__24.c0.data_out__24
-X1Y2.c0.out0__24.c0.out0_internal__24
-X1Y2.c0.out0_internal__24.c0.in2__24
-X1Y3.c0.N_from_fabric__24.c0.in2__24
+X1Y0.c0.S_from_fabric__24.c0.in0__24
+X1Y1.c0.out2__24.c0.out2_internal__24
+X1Y1.c0.out2_internal__24.c0.data_out__24
 
 # routing for net '$iopadmap$Y[23]'
-X1Y1.c0.out0__23.c0.out0_internal__23
-X1Y1.c0.out0_internal__23.c0.data_out__23
-X1Y2.c0.out0__23.c0.out0_internal__23
-X1Y2.c0.out0_internal__23.c0.in2__23
-X1Y3.c0.N_from_fabric__23.c0.in2__23
+X1Y0.c0.S_from_fabric__23.c0.in0__23
+X1Y1.c0.out2__23.c0.out2_internal__23
+X1Y1.c0.out2_internal__23.c0.data_out__23
 
 # routing for net '$iopadmap$Y[22]'
-X1Y1.c0.out0__22.c0.out0_internal__22
-X1Y1.c0.out0_internal__22.c0.data_out__22
-X1Y2.c0.out0__22.c0.out0_internal__22
-X1Y2.c0.out0_internal__22.c0.in2__22
-X1Y3.c0.N_from_fabric__22.c0.in2__22
+X1Y0.c0.S_from_fabric__22.c0.in0__22
+X1Y1.c0.out2__22.c0.out2_internal__22
+X1Y1.c0.out2_internal__22.c0.data_out__22
 
 # routing for net '$iopadmap$Y[21]'
-X1Y1.c0.out0__21.c0.out0_internal__21
-X1Y1.c0.out0_internal__21.c0.data_out__21
-X1Y2.c0.out0__21.c0.out0_internal__21
-X1Y2.c0.out0_internal__21.c0.in2__21
-X1Y3.c0.N_from_fabric__21.c0.in2__21
+X1Y0.c0.S_from_fabric__21.c0.in0__21
+X1Y1.c0.out2__21.c0.out2_internal__21
+X1Y1.c0.out2_internal__21.c0.data_out__21
 
 # routing for net '$iopadmap$Y[20]'
-X1Y1.c0.out0__20.c0.out0_internal__20
-X1Y1.c0.out0_internal__20.c0.data_out__20
-X1Y2.c0.out0__20.c0.out0_internal__20
-X1Y2.c0.out0_internal__20.c0.in2__20
-X1Y3.c0.N_from_fabric__20.c0.in2__20
+X1Y0.c0.S_from_fabric__20.c0.in0__20
+X1Y1.c0.out2__20.c0.out2_internal__20
+X1Y1.c0.out2_internal__20.c0.data_out__20
 
 # routing for net '$iopadmap$Y[19]'
-X1Y1.c0.out0__19.c0.out0_internal__19
-X1Y1.c0.out0_internal__19.c0.data_out__19
-X1Y2.c0.out0__19.c0.out0_internal__19
-X1Y2.c0.out0_internal__19.c0.in2__19
-X1Y3.c0.N_from_fabric__19.c0.in2__19
+X1Y0.c0.S_from_fabric__19.c0.in0__19
+X1Y1.c0.out2__19.c0.out2_internal__19
+X1Y1.c0.out2_internal__19.c0.data_out__19
 
 # routing for net '$iopadmap$Y[18]'
-X1Y1.c0.out0__18.c0.out0_internal__18
-X1Y1.c0.out0_internal__18.c0.data_out__18
-X1Y2.c0.out0__18.c0.out0_internal__18
-X1Y2.c0.out0_internal__18.c0.in2__18
-X1Y3.c0.N_from_fabric__18.c0.in2__18
+X1Y0.c0.S_from_fabric__18.c0.in0__18
+X1Y1.c0.out2__18.c0.out2_internal__18
+X1Y1.c0.out2_internal__18.c0.data_out__18
 
 # routing for net '$iopadmap$Y[17]'
-X1Y1.c0.out0__17.c0.out0_internal__17
-X1Y1.c0.out0_internal__17.c0.data_out__17
-X1Y2.c0.out0__17.c0.out0_internal__17
-X1Y2.c0.out0_internal__17.c0.in2__17
-X1Y3.c0.N_from_fabric__17.c0.in2__17
+X1Y0.c0.S_from_fabric__17.c0.in0__17
+X1Y1.c0.out2__17.c0.out2_internal__17
+X1Y1.c0.out2_internal__17.c0.data_out__17
 
 # routing for net '$iopadmap$Y[16]'
-X1Y1.c0.out0__16.c0.out0_internal__16
-X1Y1.c0.out0_internal__16.c0.data_out__16
-X1Y2.c0.out0__16.c0.out0_internal__16
-X1Y2.c0.out0_internal__16.c0.in2__16
-X1Y3.c0.N_from_fabric__16.c0.in2__16
+X1Y0.c0.S_from_fabric__16.c0.in0__16
+X1Y1.c0.out2__16.c0.out2_internal__16
+X1Y1.c0.out2_internal__16.c0.data_out__16
 
 # routing for net '$iopadmap$Y[15]'
-X1Y1.c0.out0__15.c0.out0_internal__15
-X1Y1.c0.out0_internal__15.c0.data_out__15
-X1Y2.c0.out0__15.c0.out0_internal__15
-X1Y2.c0.out0_internal__15.c0.in2__15
-X1Y3.c0.N_from_fabric__15.c0.in2__15
+X1Y0.c0.S_from_fabric__15.c0.in0__15
+X1Y1.c0.out2__15.c0.out2_internal__15
+X1Y1.c0.out2_internal__15.c0.data_out__15
 
 # routing for net '$iopadmap$Y[14]'
-X1Y1.c0.out0__14.c0.out0_internal__14
-X1Y1.c0.out0_internal__14.c0.data_out__14
-X1Y2.c0.out0__14.c0.out0_internal__14
-X1Y2.c0.out0_internal__14.c0.in2__14
-X1Y3.c0.N_from_fabric__14.c0.in2__14
+X1Y0.c0.S_from_fabric__14.c0.in0__14
+X1Y1.c0.out2__14.c0.out2_internal__14
+X1Y1.c0.out2_internal__14.c0.data_out__14
 
 # routing for net '$iopadmap$Y[13]'
-X1Y1.c0.out0__13.c0.out0_internal__13
-X1Y1.c0.out0_internal__13.c0.data_out__13
-X1Y2.c0.out0__13.c0.out0_internal__13
-X1Y2.c0.out0_internal__13.c0.in2__13
-X1Y3.c0.N_from_fabric__13.c0.in2__13
+X1Y0.c0.S_from_fabric__13.c0.in0__13
+X1Y1.c0.out2__13.c0.out2_internal__13
+X1Y1.c0.out2_internal__13.c0.data_out__13
 
 # routing for net '$iopadmap$Y[12]'
-X1Y1.c0.out0__12.c0.out0_internal__12
-X1Y1.c0.out0_internal__12.c0.data_out__12
-X1Y2.c0.out0__12.c0.out0_internal__12
-X1Y2.c0.out0_internal__12.c0.in2__12
-X1Y3.c0.N_from_fabric__12.c0.in2__12
+X1Y0.c0.S_from_fabric__12.c0.in0__12
+X1Y1.c0.out2__12.c0.out2_internal__12
+X1Y1.c0.out2_internal__12.c0.data_out__12
 
 # routing for net '$iopadmap$Y[11]'
-X1Y1.c0.out0__11.c0.out0_internal__11
-X1Y1.c0.out0_internal__11.c0.data_out__11
-X1Y2.c0.out0__11.c0.out0_internal__11
-X1Y2.c0.out0_internal__11.c0.in2__11
-X1Y3.c0.N_from_fabric__11.c0.in2__11
+X1Y0.c0.S_from_fabric__11.c0.in0__11
+X1Y1.c0.out2__11.c0.out2_internal__11
+X1Y1.c0.out2_internal__11.c0.data_out__11
 
 # routing for net '$iopadmap$Y[10]'
-X1Y1.c0.out0__10.c0.out0_internal__10
-X1Y1.c0.out0_internal__10.c0.data_out__10
-X1Y2.c0.out0__10.c0.out0_internal__10
-X1Y2.c0.out0_internal__10.c0.in2__10
-X1Y3.c0.N_from_fabric__10.c0.in2__10
+X1Y0.c0.S_from_fabric__10.c0.in0__10
+X1Y1.c0.out2__10.c0.out2_internal__10
+X1Y1.c0.out2_internal__10.c0.data_out__10
 
 # routing for net '$iopadmap$Y[9]'
-X1Y1.c0.out0__9.c0.out0_internal__9
-X1Y1.c0.out0_internal__9.c0.data_out__9
-X1Y2.c0.out0__9.c0.out0_internal__9
-X1Y2.c0.out0_internal__9.c0.in2__9
-X1Y3.c0.N_from_fabric__9.c0.in2__9
+X1Y0.c0.S_from_fabric__9.c0.in0__9
+X1Y1.c0.out2__9.c0.out2_internal__9
+X1Y1.c0.out2_internal__9.c0.data_out__9
 
 # routing for net '$iopadmap$Y[8]'
-X1Y1.c0.out0__8.c0.out0_internal__8
-X1Y1.c0.out0_internal__8.c0.data_out__8
-X1Y2.c0.out0__8.c0.out0_internal__8
-X1Y2.c0.out0_internal__8.c0.in2__8
-X1Y3.c0.N_from_fabric__8.c0.in2__8
+X1Y0.c0.S_from_fabric__8.c0.in0__8
+X1Y1.c0.out2__8.c0.out2_internal__8
+X1Y1.c0.out2_internal__8.c0.data_out__8
 
 # routing for net '$iopadmap$Y[7]'
-X1Y1.c0.out0__7.c0.out0_internal__7
-X1Y1.c0.out0_internal__7.c0.data_out__7
-X1Y2.c0.out0__7.c0.out0_internal__7
-X1Y2.c0.out0_internal__7.c0.in2__7
-X1Y3.c0.N_from_fabric__7.c0.in2__7
+X1Y0.c0.S_from_fabric__7.c0.in0__7
+X1Y1.c0.out2__7.c0.out2_internal__7
+X1Y1.c0.out2_internal__7.c0.data_out__7
 
 # routing for net '$iopadmap$Y[6]'
-X1Y1.c0.out0__6.c0.out0_internal__6
-X1Y1.c0.out0_internal__6.c0.data_out__6
-X1Y2.c0.out0__6.c0.out0_internal__6
-X1Y2.c0.out0_internal__6.c0.in2__6
-X1Y3.c0.N_from_fabric__6.c0.in2__6
+X1Y0.c0.S_from_fabric__6.c0.in0__6
+X1Y1.c0.out2__6.c0.out2_internal__6
+X1Y1.c0.out2_internal__6.c0.data_out__6
 
 # routing for net '$iopadmap$Y[5]'
-X1Y1.c0.out0__5.c0.out0_internal__5
-X1Y1.c0.out0_internal__5.c0.data_out__5
-X1Y2.c0.out0__5.c0.out0_internal__5
-X1Y2.c0.out0_internal__5.c0.in2__5
-X1Y3.c0.N_from_fabric__5.c0.in2__5
+X1Y0.c0.S_from_fabric__5.c0.in0__5
+X1Y1.c0.out2__5.c0.out2_internal__5
+X1Y1.c0.out2_internal__5.c0.data_out__5
 
 # routing for net '$iopadmap$Y[4]'
-X1Y1.c0.out0__4.c0.out0_internal__4
-X1Y1.c0.out0_internal__4.c0.data_out__4
-X1Y2.c0.out0__4.c0.out0_internal__4
-X1Y2.c0.out0_internal__4.c0.in2__4
-X1Y3.c0.N_from_fabric__4.c0.in2__4
+X1Y0.c0.S_from_fabric__4.c0.in0__4
+X1Y1.c0.out2__4.c0.out2_internal__4
+X1Y1.c0.out2_internal__4.c0.data_out__4
 
 # routing for net '$iopadmap$Y[3]'
-X1Y1.c0.out0__3.c0.out0_internal__3
-X1Y1.c0.out0_internal__3.c0.data_out__3
-X1Y2.c0.out0__3.c0.out0_internal__3
-X1Y2.c0.out0_internal__3.c0.in2__3
-X1Y3.c0.N_from_fabric__3.c0.in2__3
+X1Y0.c0.S_from_fabric__3.c0.in0__3
+X1Y1.c0.out2__3.c0.out2_internal__3
+X1Y1.c0.out2_internal__3.c0.data_out__3
 
 # routing for net '$iopadmap$Y[2]'
-X1Y1.c0.out0__2.c0.out0_internal__2
-X1Y1.c0.out0_internal__2.c0.data_out__2
-X1Y2.c0.out0__2.c0.out0_internal__2
-X1Y2.c0.out0_internal__2.c0.in2__2
-X1Y3.c0.N_from_fabric__2.c0.in2__2
+X1Y0.c0.S_from_fabric__2.c0.in0__2
+X1Y1.c0.out2__2.c0.out2_internal__2
+X1Y1.c0.out2_internal__2.c0.data_out__2
 
 # routing for net '$iopadmap$Y[1]'
-X1Y1.c0.out0__1.c0.out0_internal__1
-X1Y1.c0.out0_internal__1.c0.data_out__1
-X1Y2.c0.out0__1.c0.out0_internal__1
-X1Y2.c0.out0_internal__1.c0.in2__1
-X1Y3.c0.N_from_fabric__1.c0.in2__1
+X1Y0.c0.S_from_fabric__1.c0.in0__1
+X1Y1.c0.out2__1.c0.out2_internal__1
+X1Y1.c0.out2_internal__1.c0.data_out__1
 
 # routing for net '$iopadmap$Y[0]'
-X1Y1.c0.out0__0.c0.out0_internal__0
-X1Y1.c0.out0_internal__0.c0.data_out__0
-X1Y2.c0.out0__0.c0.out0_internal__0
-X1Y2.c0.out0_internal__0.c0.in2__0
-X1Y3.c0.N_from_fabric__0.c0.in2__0
+X1Y0.c0.S_from_fabric__0.c0.in0__0
+X1Y1.c0.out2__0.c0.out2_internal__0
+X1Y1.c0.out2_internal__0.c0.data_out__0
 
 # routing for net '$iopadmap$B[31]'
-X1Y0.c0.out0__31.c0.out0_internal__31
-X1Y0.c0.out0_internal__31.c0.S_to_fabric__31
-X1Y1.c0.data_in2__31.c0.in2__31
+X1Y1.c0.data_in2__31.c0.in1__31
+X2Y1.c0.out3__31.c0.out3_internal__31
+X2Y1.c0.out3_internal__31.c0.in1__31
+X3Y1.c0.out3__31.c0.out3_internal__31
+X3Y1.c0.out3_internal__31.c0.E_to_fabric__31
 
 # routing for net '$iopadmap$B[30]'
-X1Y0.c0.out0__30.c0.out0_internal__30
-X1Y0.c0.out0_internal__30.c0.S_to_fabric__30
-X1Y1.c0.data_in2__30.c0.in2__30
+X1Y1.c0.data_in2__30.c0.in1__30
+X2Y1.c0.out3__30.c0.out3_internal__30
+X2Y1.c0.out3_internal__30.c0.in1__30
+X3Y1.c0.out3__30.c0.out3_internal__30
+X3Y1.c0.out3_internal__30.c0.E_to_fabric__30
 
 # routing for net '$iopadmap$B[29]'
-X1Y0.c0.out0__29.c0.out0_internal__29
-X1Y0.c0.out0_internal__29.c0.S_to_fabric__29
-X1Y1.c0.data_in2__29.c0.in2__29
+X1Y1.c0.data_in2__29.c0.in1__29
+X2Y1.c0.out3__29.c0.out3_internal__29
+X2Y1.c0.out3_internal__29.c0.in1__29
+X3Y1.c0.out3__29.c0.out3_internal__29
+X3Y1.c0.out3_internal__29.c0.E_to_fabric__29
 
 # routing for net '$iopadmap$B[28]'
-X1Y0.c0.out0__28.c0.out0_internal__28
-X1Y0.c0.out0_internal__28.c0.S_to_fabric__28
-X1Y1.c0.data_in2__28.c0.in2__28
+X1Y1.c0.data_in2__28.c0.in1__28
+X2Y1.c0.out3__28.c0.out3_internal__28
+X2Y1.c0.out3_internal__28.c0.in1__28
+X3Y1.c0.out3__28.c0.out3_internal__28
+X3Y1.c0.out3_internal__28.c0.E_to_fabric__28
 
 # routing for net '$iopadmap$B[27]'
-X1Y0.c0.out0__27.c0.out0_internal__27
-X1Y0.c0.out0_internal__27.c0.S_to_fabric__27
-X1Y1.c0.data_in2__27.c0.in2__27
+X1Y1.c0.data_in2__27.c0.in1__27
+X2Y1.c0.out3__27.c0.out3_internal__27
+X2Y1.c0.out3_internal__27.c0.in1__27
+X3Y1.c0.out3__27.c0.out3_internal__27
+X3Y1.c0.out3_internal__27.c0.E_to_fabric__27
 
 # routing for net '$iopadmap$B[26]'
-X1Y0.c0.out0__26.c0.out0_internal__26
-X1Y0.c0.out0_internal__26.c0.S_to_fabric__26
-X1Y1.c0.data_in2__26.c0.in2__26
+X1Y1.c0.data_in2__26.c0.in1__26
+X2Y1.c0.out3__26.c0.out3_internal__26
+X2Y1.c0.out3_internal__26.c0.in1__26
+X3Y1.c0.out3__26.c0.out3_internal__26
+X3Y1.c0.out3_internal__26.c0.E_to_fabric__26
 
 # routing for net '$iopadmap$B[25]'
-X1Y0.c0.out0__25.c0.out0_internal__25
-X1Y0.c0.out0_internal__25.c0.S_to_fabric__25
-X1Y1.c0.data_in2__25.c0.in2__25
+X1Y1.c0.data_in2__25.c0.in1__25
+X2Y1.c0.out3__25.c0.out3_internal__25
+X2Y1.c0.out3_internal__25.c0.in1__25
+X3Y1.c0.out3__25.c0.out3_internal__25
+X3Y1.c0.out3_internal__25.c0.E_to_fabric__25
 
 # routing for net '$iopadmap$B[24]'
-X1Y0.c0.out0__24.c0.out0_internal__24
-X1Y0.c0.out0_internal__24.c0.S_to_fabric__24
-X1Y1.c0.data_in2__24.c0.in2__24
+X1Y1.c0.data_in2__24.c0.in1__24
+X2Y1.c0.out3__24.c0.out3_internal__24
+X2Y1.c0.out3_internal__24.c0.in1__24
+X3Y1.c0.out3__24.c0.out3_internal__24
+X3Y1.c0.out3_internal__24.c0.E_to_fabric__24
 
 # routing for net '$iopadmap$B[23]'
-X1Y0.c0.out0__23.c0.out0_internal__23
-X1Y0.c0.out0_internal__23.c0.S_to_fabric__23
-X1Y1.c0.data_in2__23.c0.in2__23
+X1Y1.c0.data_in2__23.c0.in1__23
+X2Y1.c0.out3__23.c0.out3_internal__23
+X2Y1.c0.out3_internal__23.c0.in1__23
+X3Y1.c0.out3__23.c0.out3_internal__23
+X3Y1.c0.out3_internal__23.c0.E_to_fabric__23
 
 # routing for net '$iopadmap$B[22]'
-X1Y0.c0.out0__22.c0.out0_internal__22
-X1Y0.c0.out0_internal__22.c0.S_to_fabric__22
-X1Y1.c0.data_in2__22.c0.in2__22
+X1Y1.c0.data_in2__22.c0.in1__22
+X2Y1.c0.out3__22.c0.out3_internal__22
+X2Y1.c0.out3_internal__22.c0.in1__22
+X3Y1.c0.out3__22.c0.out3_internal__22
+X3Y1.c0.out3_internal__22.c0.E_to_fabric__22
 
 # routing for net '$iopadmap$B[21]'
-X1Y0.c0.out0__21.c0.out0_internal__21
-X1Y0.c0.out0_internal__21.c0.S_to_fabric__21
-X1Y1.c0.data_in2__21.c0.in2__21
+X1Y1.c0.data_in2__21.c0.in1__21
+X2Y1.c0.out3__21.c0.out3_internal__21
+X2Y1.c0.out3_internal__21.c0.in1__21
+X3Y1.c0.out3__21.c0.out3_internal__21
+X3Y1.c0.out3_internal__21.c0.E_to_fabric__21
 
 # routing for net '$iopadmap$B[20]'
-X1Y0.c0.out0__20.c0.out0_internal__20
-X1Y0.c0.out0_internal__20.c0.S_to_fabric__20
-X1Y1.c0.data_in2__20.c0.in2__20
+X1Y1.c0.data_in2__20.c0.in1__20
+X2Y1.c0.out3__20.c0.out3_internal__20
+X2Y1.c0.out3_internal__20.c0.in1__20
+X3Y1.c0.out3__20.c0.out3_internal__20
+X3Y1.c0.out3_internal__20.c0.E_to_fabric__20
 
 # routing for net '$iopadmap$B[19]'
-X1Y0.c0.out0__19.c0.out0_internal__19
-X1Y0.c0.out0_internal__19.c0.S_to_fabric__19
-X1Y1.c0.data_in2__19.c0.in2__19
+X1Y1.c0.data_in2__19.c0.in1__19
+X2Y1.c0.out3__19.c0.out3_internal__19
+X2Y1.c0.out3_internal__19.c0.in1__19
+X3Y1.c0.out3__19.c0.out3_internal__19
+X3Y1.c0.out3_internal__19.c0.E_to_fabric__19
 
 # routing for net '$iopadmap$B[18]'
-X1Y0.c0.out0__18.c0.out0_internal__18
-X1Y0.c0.out0_internal__18.c0.S_to_fabric__18
-X1Y1.c0.data_in2__18.c0.in2__18
+X1Y1.c0.data_in2__18.c0.in1__18
+X2Y1.c0.out3__18.c0.out3_internal__18
+X2Y1.c0.out3_internal__18.c0.in1__18
+X3Y1.c0.out3__18.c0.out3_internal__18
+X3Y1.c0.out3_internal__18.c0.E_to_fabric__18
 
 # routing for net '$iopadmap$B[17]'
-X1Y0.c0.out0__17.c0.out0_internal__17
-X1Y0.c0.out0_internal__17.c0.S_to_fabric__17
-X1Y1.c0.data_in2__17.c0.in2__17
+X1Y1.c0.data_in2__17.c0.in1__17
+X2Y1.c0.out3__17.c0.out3_internal__17
+X2Y1.c0.out3_internal__17.c0.in1__17
+X3Y1.c0.out3__17.c0.out3_internal__17
+X3Y1.c0.out3_internal__17.c0.E_to_fabric__17
 
 # routing for net '$iopadmap$B[16]'
-X1Y0.c0.out0__16.c0.out0_internal__16
-X1Y0.c0.out0_internal__16.c0.S_to_fabric__16
-X1Y1.c0.data_in2__16.c0.in2__16
+X1Y1.c0.data_in2__16.c0.in1__16
+X2Y1.c0.out3__16.c0.out3_internal__16
+X2Y1.c0.out3_internal__16.c0.in1__16
+X3Y1.c0.out3__16.c0.out3_internal__16
+X3Y1.c0.out3_internal__16.c0.E_to_fabric__16
 
 # routing for net '$iopadmap$B[15]'
-X1Y0.c0.out0__15.c0.out0_internal__15
-X1Y0.c0.out0_internal__15.c0.S_to_fabric__15
-X1Y1.c0.data_in2__15.c0.in2__15
+X1Y1.c0.data_in2__15.c0.in1__15
+X2Y1.c0.out3__15.c0.out3_internal__15
+X2Y1.c0.out3_internal__15.c0.in1__15
+X3Y1.c0.out3__15.c0.out3_internal__15
+X3Y1.c0.out3_internal__15.c0.E_to_fabric__15
 
 # routing for net '$iopadmap$B[14]'
-X1Y0.c0.out0__14.c0.out0_internal__14
-X1Y0.c0.out0_internal__14.c0.S_to_fabric__14
-X1Y1.c0.data_in2__14.c0.in2__14
+X1Y1.c0.data_in2__14.c0.in1__14
+X2Y1.c0.out3__14.c0.out3_internal__14
+X2Y1.c0.out3_internal__14.c0.in1__14
+X3Y1.c0.out3__14.c0.out3_internal__14
+X3Y1.c0.out3_internal__14.c0.E_to_fabric__14
 
 # routing for net '$iopadmap$B[13]'
-X1Y0.c0.out0__13.c0.out0_internal__13
-X1Y0.c0.out0_internal__13.c0.S_to_fabric__13
-X1Y1.c0.data_in2__13.c0.in2__13
+X1Y1.c0.data_in2__13.c0.in1__13
+X2Y1.c0.out3__13.c0.out3_internal__13
+X2Y1.c0.out3_internal__13.c0.in1__13
+X3Y1.c0.out3__13.c0.out3_internal__13
+X3Y1.c0.out3_internal__13.c0.E_to_fabric__13
 
 # routing for net '$iopadmap$B[12]'
-X1Y0.c0.out0__12.c0.out0_internal__12
-X1Y0.c0.out0_internal__12.c0.S_to_fabric__12
-X1Y1.c0.data_in2__12.c0.in2__12
+X1Y1.c0.data_in2__12.c0.in1__12
+X2Y1.c0.out3__12.c0.out3_internal__12
+X2Y1.c0.out3_internal__12.c0.in1__12
+X3Y1.c0.out3__12.c0.out3_internal__12
+X3Y1.c0.out3_internal__12.c0.E_to_fabric__12
 
 # routing for net '$iopadmap$B[11]'
-X1Y0.c0.out0__11.c0.out0_internal__11
-X1Y0.c0.out0_internal__11.c0.S_to_fabric__11
-X1Y1.c0.data_in2__11.c0.in2__11
+X1Y1.c0.data_in2__11.c0.in1__11
+X2Y1.c0.out3__11.c0.out3_internal__11
+X2Y1.c0.out3_internal__11.c0.in1__11
+X3Y1.c0.out3__11.c0.out3_internal__11
+X3Y1.c0.out3_internal__11.c0.E_to_fabric__11
 
 # routing for net '$iopadmap$B[10]'
-X1Y0.c0.out0__10.c0.out0_internal__10
-X1Y0.c0.out0_internal__10.c0.S_to_fabric__10
-X1Y1.c0.data_in2__10.c0.in2__10
+X1Y1.c0.data_in2__10.c0.in1__10
+X2Y1.c0.out3__10.c0.out3_internal__10
+X2Y1.c0.out3_internal__10.c0.in1__10
+X3Y1.c0.out3__10.c0.out3_internal__10
+X3Y1.c0.out3_internal__10.c0.E_to_fabric__10
 
 # routing for net '$iopadmap$B[9]'
-X1Y0.c0.out0__9.c0.out0_internal__9
-X1Y0.c0.out0_internal__9.c0.S_to_fabric__9
-X1Y1.c0.data_in2__9.c0.in2__9
+X1Y1.c0.data_in2__9.c0.in1__9
+X2Y1.c0.out3__9.c0.out3_internal__9
+X2Y1.c0.out3_internal__9.c0.in1__9
+X3Y1.c0.out3__9.c0.out3_internal__9
+X3Y1.c0.out3_internal__9.c0.E_to_fabric__9
 
 # routing for net '$iopadmap$B[8]'
-X1Y0.c0.out0__8.c0.out0_internal__8
-X1Y0.c0.out0_internal__8.c0.S_to_fabric__8
-X1Y1.c0.data_in2__8.c0.in2__8
+X1Y1.c0.data_in2__8.c0.in1__8
+X2Y1.c0.out3__8.c0.out3_internal__8
+X2Y1.c0.out3_internal__8.c0.in1__8
+X3Y1.c0.out3__8.c0.out3_internal__8
+X3Y1.c0.out3_internal__8.c0.E_to_fabric__8
 
 # routing for net '$iopadmap$B[7]'
-X1Y0.c0.out0__7.c0.out0_internal__7
-X1Y0.c0.out0_internal__7.c0.S_to_fabric__7
-X1Y1.c0.data_in2__7.c0.in2__7
+X1Y1.c0.data_in2__7.c0.in1__7
+X2Y1.c0.out3__7.c0.out3_internal__7
+X2Y1.c0.out3_internal__7.c0.in1__7
+X3Y1.c0.out3__7.c0.out3_internal__7
+X3Y1.c0.out3_internal__7.c0.E_to_fabric__7
 
 # routing for net '$iopadmap$B[6]'
-X1Y0.c0.out0__6.c0.out0_internal__6
-X1Y0.c0.out0_internal__6.c0.S_to_fabric__6
-X1Y1.c0.data_in2__6.c0.in2__6
+X1Y1.c0.data_in2__6.c0.in1__6
+X2Y1.c0.out3__6.c0.out3_internal__6
+X2Y1.c0.out3_internal__6.c0.in1__6
+X3Y1.c0.out3__6.c0.out3_internal__6
+X3Y1.c0.out3_internal__6.c0.E_to_fabric__6
 
 # routing for net '$iopadmap$B[5]'
-X1Y0.c0.out0__5.c0.out0_internal__5
-X1Y0.c0.out0_internal__5.c0.S_to_fabric__5
-X1Y1.c0.data_in2__5.c0.in2__5
+X1Y1.c0.data_in2__5.c0.in1__5
+X2Y1.c0.out3__5.c0.out3_internal__5
+X2Y1.c0.out3_internal__5.c0.in1__5
+X3Y1.c0.out3__5.c0.out3_internal__5
+X3Y1.c0.out3_internal__5.c0.E_to_fabric__5
 
 # routing for net '$iopadmap$B[4]'
-X1Y0.c0.out0__4.c0.out0_internal__4
-X1Y0.c0.out0_internal__4.c0.S_to_fabric__4
-X1Y1.c0.data_in2__4.c0.in2__4
+X1Y1.c0.data_in2__4.c0.in1__4
+X2Y1.c0.out3__4.c0.out3_internal__4
+X2Y1.c0.out3_internal__4.c0.in1__4
+X3Y1.c0.out3__4.c0.out3_internal__4
+X3Y1.c0.out3_internal__4.c0.E_to_fabric__4
 
 # routing for net '$iopadmap$B[3]'
-X1Y0.c0.out0__3.c0.out0_internal__3
-X1Y0.c0.out0_internal__3.c0.S_to_fabric__3
-X1Y1.c0.data_in2__3.c0.in2__3
+X1Y1.c0.data_in2__3.c0.in1__3
+X2Y1.c0.out3__3.c0.out3_internal__3
+X2Y1.c0.out3_internal__3.c0.in1__3
+X3Y1.c0.out3__3.c0.out3_internal__3
+X3Y1.c0.out3_internal__3.c0.E_to_fabric__3
 
 # routing for net '$iopadmap$B[2]'
-X1Y0.c0.out0__2.c0.out0_internal__2
-X1Y0.c0.out0_internal__2.c0.S_to_fabric__2
-X1Y1.c0.data_in2__2.c0.in2__2
+X1Y1.c0.data_in2__2.c0.in1__2
+X2Y1.c0.out3__2.c0.out3_internal__2
+X2Y1.c0.out3_internal__2.c0.in1__2
+X3Y1.c0.out3__2.c0.out3_internal__2
+X3Y1.c0.out3_internal__2.c0.E_to_fabric__2
 
 # routing for net '$iopadmap$B[1]'
-X1Y0.c0.out0__1.c0.out0_internal__1
-X1Y0.c0.out0_internal__1.c0.S_to_fabric__1
-X1Y1.c0.data_in2__1.c0.in2__1
+X1Y1.c0.data_in2__1.c0.in1__1
+X2Y1.c0.out3__1.c0.out3_internal__1
+X2Y1.c0.out3_internal__1.c0.in1__1
+X3Y1.c0.out3__1.c0.out3_internal__1
+X3Y1.c0.out3_internal__1.c0.E_to_fabric__1
 
 # routing for net '$iopadmap$B[0]'
-X1Y0.c0.out0__0.c0.out0_internal__0
-X1Y0.c0.out0_internal__0.c0.S_to_fabric__0
-X1Y1.c0.data_in2__0.c0.in2__0
+X1Y1.c0.data_in2__0.c0.in1__0
+X2Y1.c0.out3__0.c0.out3_internal__0
+X2Y1.c0.out3_internal__0.c0.in1__0
+X3Y1.c0.out3__0.c0.out3_internal__0
+X3Y1.c0.out3_internal__0.c0.E_to_fabric__0
 
 # routing for net '$iopadmap$A[31]'
 X0Y1.c0.out1__31.c0.out1_internal__31
@@ -735,7 +735,7 @@ X1Y1.c0.data_in1__0.c0.in3__0
 # routing for net 'Y[0]'
 
 # config for cell '$iopadmap$test.B'
-X1Y0.c0.S_IO.WIDTH = 32'b00000000000000000000000000100000
+X3Y1.c0.E_IO.WIDTH = 32'b00000000000000000000000000100000
 
 # config for cell '$iopadmap$test.A'
 X0Y1.c0.W_IO.WIDTH = 32'b00000000000000000000000000100000
@@ -744,5 +744,5 @@ X0Y1.c0.W_IO.WIDTH = 32'b00000000000000000000000000100000
 X1Y1.c0.ALU.ALU_func = 1'b1
 
 # config for cell '$iopadmap$test.Y'
-X1Y3.c0.N_IO.WIDTH = 32'b00000000000000000000000000100000
+X1Y0.c0.S_IO.WIDTH = 32'b00000000000000000000000000100000
 

@@ -1,5 +1,5 @@
-(* techmap_celltype = "$add" *)
-module add_wrap (
+(* techmap_celltype = "$sub" *)
+module wrap (
     A,
     B,
     Y

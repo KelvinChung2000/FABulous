@@ -1,12 +1,12 @@
 {
-  "creator": "Yosys 0.51+17 (git sha1 0102361c7, c++ 16.0.0 -fPIC -O3)",
+  "creator": "Yosys 0.50+56 (git sha1 fa3b9428f, g++ 11.4.0-1ubuntu1~22.04 -fPIC -O3)",
   "modules": {
     "IO": {
       "attributes": {
         "CELL": 1,
         "dynports": 1,
         "cells_not_processed": 1,
-        "src": "/Users/kelvin/Documents/FABulous/myProject/Tile/W_IO/../include/IO.v:2.1-14.10"
+        "src": "../../myProject/Tile/W_IO/../include/IO.v:2.1-14.10"
       },
       "parameter_default_values": {
         "WIDTH": 32
@@ -39,7 +39,7 @@
             "BUS": 1,
             "DATA": 1,
             "FABulous": 1,
-            "src": "/Users/kelvin/Documents/FABulous/myProject/Tile/W_IO/../include/IO.v:5.49-5.60"
+            "src": "../../myProject/Tile/W_IO/../include/IO.v:5.49-5.60"
           }
         },
         "in": {
@@ -49,7 +49,7 @@
             "BUS": 1,
             "EXTERNAL": 1,
             "FABulous": 1,
-            "src": "/Users/kelvin/Documents/FABulous/myProject/Tile/W_IO/../include/IO.v:7.53-7.55"
+            "src": "../../myProject/Tile/W_IO/../include/IO.v:7.53-7.55"
           }
         },
         "out": {
@@ -59,7 +59,7 @@
             "BUS": 1,
             "EXTERNAL": 1,
             "FABulous": 1,
-            "src": "/Users/kelvin/Documents/FABulous/myProject/Tile/W_IO/../include/IO.v:8.54-8.57"
+            "src": "../../myProject/Tile/W_IO/../include/IO.v:8.54-8.57"
           }
         },
         "to_fabric": {
@@ -69,7 +69,7 @@
             "BUS": 1,
             "DATA": 1,
             "FABulous": 1,
-            "src": "/Users/kelvin/Documents/FABulous/myProject/Tile/W_IO/../include/IO.v:6.50-6.59"
+            "src": "../../myProject/Tile/W_IO/../include/IO.v:6.50-6.59"
           }
         }
       }

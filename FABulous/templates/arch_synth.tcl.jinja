@@ -1,0 +1,56 @@
+set project_root $env(FAB_PROJECT_DIR)
+
+yosys read_verilog -sv $project_root/user_design/test.sv
+
+yosys read_verilog -lib $project_root/.FABulous/libs.v
+yosys read_rtlil -lib $project_root/.FABulous/cells.li
+yosys read_verilog -lib $project_root/.FABulous/IO_buf.v
+yosys prep -auto-top -flatten
+yosys opt -full
+yosys clean -purge
+
+
+proc extract {cell wrapperPath} {
+    # wrapping for mapping
+    yosys design -push
+    yosys read_rtlil $cell
+    yosys techmap -map $wrapperPath
+    yosys design -save xmap
+    yosys design -pop
+
+    # extracting cell
+    yosys extract -constports -ignore_parameters -map %xmap
+    yosys design -delete xmap
+}
+
+{% for wrapperPath, unWrapperPath, wrapperNames, cells in wrappers %}
+# wrapping base design
+yosys techmap -map {{ wrapperPath }}
+{% for wrapperName in wrapperNames -%}
+yosys connwrappers -unsigned {{ wrapperName }} Y Y_WIDTH
+{% endfor %}
+# extract cells
+{%- for cell in cells %}
+extract "{{ cell }}" \
+        "{{ wrapperPath }}"
+{%- endfor %}
+# unwrapping
+yosys techmap -map {{ unWrapperPath }}
+{% endfor %}
+
+# cell techmapping
+yosys techmap -map $project_root/.FABulous/techmaps.v
+
+# const unit mapping
+yosys read_rtlil -lib $project_root/Tile/PE/metadata/cell_const_unit.il
+yosys hilomap -wrap const_unit const_out ConfigBits
+
+# io mapping
+yosys iopadmap -widthparam WIDTH -outpad IO from_fabric:out -inpad IO to_fabric:in
+yosys iopadmap -bits -outpad OUTBUF I:PAD -inpad INBUF O:PAD
+
+# final optimization
+yosys opt;;;
+yosys clean -purge
+
+yosys write_json $project_root/user_design/synth_test.json

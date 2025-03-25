@@ -20,7 +20,7 @@ from FABulous.file_parser.file_parser_yaml import parseFabricYAML
 @cocotb.test
 async def adder_basic_test(dut):
     await Timer(1)
-    dut.Tile_X1Y0_S_in.value = 16
+    dut.Tile_X3Y1_E_in.value = 16
     dut.Tile_X0Y1_W_in.value = 8
     await Timer(1)
     await Timer(1)
@@ -50,7 +50,7 @@ async def adder_basic_test(dut):
     print(dut.PE_Tile_X1Y1.Inst_PE_switch_matrix.out0.value)
     print()
     print("X1Y3 data out")
-    print(dut.Tile_X1Y3_N_out.value)
+    print(dut.Tile_X1Y0_S_out.value)
 
 
 def test_tile_runner():
@@ -99,7 +99,6 @@ def test_tile_runner():
         if f.feature is None:
             continue
         if f.feature not in spec:
-            print(f"Feature {f.feature} not found in spec")
             continue
         featVal = spec[f.feature]
         if featVal.value is None:

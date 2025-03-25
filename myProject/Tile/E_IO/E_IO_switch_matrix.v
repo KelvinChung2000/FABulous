@@ -16,3 +16,4 @@ assign out3 = E_to_fabric;
 // switch matrix multiplexer E_from_fabric MUX-1
 assign E_from_fabric = in3;
 endmodule
+

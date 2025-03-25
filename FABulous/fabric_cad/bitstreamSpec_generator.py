@@ -54,7 +54,6 @@ def generateBitsStreamSpec(fabric: Fabric) -> FeatureMap:
                     outputName = f"c{c}.{mux.output.prefix}{mux.output.name}"
                 else:
                     outputName = f"c{c}.{mux.output.name}"
-
                 inputNames = []
                 for i in mux.inputs:
                     if isinstance(i, BelPort):
@@ -62,14 +61,9 @@ def generateBitsStreamSpec(fabric: Fabric) -> FeatureMap:
                     else:
                         inputNames.append(f"c{c}.{i.name}")
 
+                if len(mux.inputs) == 1:
+                    continue
                 if mux.width == 1:
-                    if len(mux.inputs) == 1:
-                        # This is a wire
-                        featureToBitString[
-                            f"X{x}Y{y}.{outputName}.{mux.inputs[0].name}"
-                        ] = FeatureValue((x, y), ((None, None),), 0)
-                        continue
-
                     multiBitIndex = tuple(
                         [next(indexCounter) for _ in range(mux.configBits)]
                     )
@@ -78,14 +72,6 @@ def generateBitsStreamSpec(fabric: Fabric) -> FeatureMap:
                             FeatureValue((x, y), multiBitIndex, i)
                         )
                 else:
-                    if len(mux.inputs) == 1:
-                        # This is a wire
-                        for w in range(mux.width):
-                            featureToBitString[
-                                f"X{x}Y{y}.{outputName}__{w}.{inputNames[0]}__{w}"
-                            ] = FeatureValue((x, y), ((None, None),), 0)
-                        continue
-
                     multiBitIndex = tuple(
                         [next(indexCounter) for _ in range(mux.configBits)]
                     )

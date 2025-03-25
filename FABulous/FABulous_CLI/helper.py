@@ -101,7 +101,10 @@ def setup_project_env_vars(args: argparse.Namespace) -> None:
         Command line arguments
     """
     # Load the .env file and make env variables available globally
-    fabDir = Path(os.getenv("FAB_PROJ_DIR")).joinpath(".FABulous")
+    if d := os.getenv("FAB_PROJ_DIR", None):
+        fabDir = Path(d).joinpath(".FABulous")
+    else:
+        raise Exception("FAB_PROJ_DIR environment variable not set!")
     if args.projectDotEnv:
         pde = Path(args.projectDotEnv)
         if pde.exists() and pde.is_file():
@@ -152,6 +155,8 @@ def create_project(project_dir: Path, type: WriterType = WriterType.VERILOG):
     if not type:
         type = WriterType.VERILOG
 
+    project_dir = project_dir.absolute()
+
     Path(project_dir / ".FABulous").mkdir()
     Path(project_dir / "Tile").mkdir()
     Path(project_dir / "user_design").mkdir()
@@ -166,6 +171,7 @@ def create_project(project_dir: Path, type: WriterType = WriterType.VERILOG):
 
     with open(project_dir / ".FABulous/.env", "w") as env_file:
         env_file.write(f"version={version('FABulous-FPGA')}\n")
+        env_file.write(f"FAB_PROJECT_DIR={project_dir}\n")
         env_file.write(f"FAB_PROJ_LANG={type}\n")
         if type == WriterType.VERILOG:
             env_file.write("SIMULATOR=icarus\n")

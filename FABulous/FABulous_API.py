@@ -6,7 +6,11 @@ import FABulous.fabric_cad.model_generation_npnr as model_gen_npnr
 from FABulous.fabric_cad.bitstreamSpec_generator import generateBitsStreamSpec
 from FABulous.fabric_cad.chip_database_generator import generateChipDatabase
 from FABulous.fabric_cad.helper import mergeFiles
-from FABulous.fabric_cad.synth_file_generator import genCellsAndMaps, prims_gen
+from FABulous.fabric_cad.synth_file_generator import (
+    genCellsAndMaps,
+    genPrims,
+    genSynthScript,
+)
 
 # Importing Modules from FABulous Framework.
 from FABulous.fabric_definition.Bel import Bel
@@ -340,16 +344,20 @@ class FABulous_API:
         for i in self.fabric.tileDict.values():
             setupPortData(i.name, i.tileDir, i.ports, i.bels)
 
-    def gen_cellsAndTechmaps(self, dest: Path):
+    def gen_synthFile(self, dest: Path):
         cells = set()
         maps = set()
         libs = set()
 
+        genSynthScript(self.fabric, Path(f"{dest}/arch_synth.tcl"))
+
         for b in self.fabric.getAllUniqueBels():
+            destPath = Path(f"{b.src.parent}/metadata")
+            genPrims(b, destPath / f"prim_{b.name}{b.src.suffix}")
             genCellsAndMaps(b)
             cells.update(Path(f"{b.src.parent}/metadata").glob("cell_*.li"))
             maps.update(Path(f"{b.src.parent}/metadata").glob("map_*.v"))
-            libs.update(Path(f"{b.src.parent}/metadata").glob("lib_*.v"))
+            libs.update(Path(f"{b.src.parent}/metadata").glob("prim_*.v"))
 
         mergeFiles(cells, Path(f"{dest}/cells.li"))
         mergeFiles(maps, Path(f"{dest}/techmaps.v"))

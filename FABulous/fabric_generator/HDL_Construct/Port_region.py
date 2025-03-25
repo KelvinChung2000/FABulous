@@ -50,6 +50,7 @@ class PortRegion(Region):
         direction: IO
         width: int | Value
         writer: WriterType
+        attribute: list | None = None
 
         def __str__(self) -> str:
             if self.writer == WriterType.VERILOG:
@@ -57,12 +58,17 @@ class PortRegion(Region):
                 if self.direction == IO.OUTPUT:
                     sType = "reg"
 
-                if isinstance(self.width, int) and self.width == 1:
-                    return f"{self.direction} {sType} {self.name}"
-                elif isinstance(self.width, int):
-                    return f"{self.direction} {sType}[{self.width - 1}:0] {self.name}"
+                if self.attribute:
+                    attr = f"(* {', '.join([str(i) for i in self.attribute])} *) "
                 else:
-                    return f"{self.direction} {sType}[{self.width}:0] {self.name}"
+                    attr = ""
+
+                if isinstance(self.width, int) and self.width == 1:
+                    return f"{attr}{self.direction} {sType} {self.name}"
+                elif isinstance(self.width, int):
+                    return f"{attr}{self.direction} {sType}[{self.width - 1}:0] {self.name}"
+                else:
+                    return f"{attr}{self.direction} {sType}[{self.width}:0] {self.name}"
             else:
                 io: str
                 if self.direction == IO.INPUT:
@@ -79,7 +85,13 @@ class PortRegion(Region):
                 else:
                     return f"{self.name}: {io} std_logic_vector({self.width} downto 0)"
 
-    def Port(self, name: str, direction: IO, width: int | Value = 1):
-        _o = self._Port(name, direction, width, self._writer)
+    def Port(
+        self,
+        name: str,
+        direction: IO,
+        width: int | Value = 1,
+        attribute: list | None = None,
+    ) -> Value:
+        _o = self._Port(name, direction, width, self._writer, attribute)
         self.container.append(_o)
         return Value(name, width, isSignal=True)

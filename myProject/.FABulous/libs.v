@@ -1,4 +1,15 @@
 (* blackbox *)
+module const_unit #(
+    parameter ConfigBits = 0
+)
+(
+    output reg[31:0] const_out
+);
+
+endmodule
+
+
+(* blackbox *)
 module reg_unit #(
     parameter tide_en = 0,
     parameter tide_rst = 0
@@ -13,6 +24,7 @@ module reg_unit #(
 
 endmodule
 
+
 (* blackbox *)
 module ALU #(
     parameter ALU_func = 0
@@ -26,6 +38,7 @@ module ALU #(
 
 endmodule
 
+
 (* blackbox *)
 module IO #(
 )
@@ -38,13 +51,4 @@ module IO #(
 
 endmodule
 
-(* blackbox *)
-module const_unit #(
-    parameter ConfigBits = 0
-)
-(
-    output reg[31:0] const_out
-);
-
-endmodule
 

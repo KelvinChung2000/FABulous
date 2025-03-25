@@ -16,3 +16,4 @@ assign out2 = N_to_fabric;
 // switch matrix multiplexer N_from_fabric MUX-1
 assign N_from_fabric = in2;
 endmodule
+

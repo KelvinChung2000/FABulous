@@ -8,20 +8,25 @@ yosys prep -auto-top -flatten
 yosys opt -full
 yosys clean -purge
 
+yosys read_rtlil -lib $fabRoot/myProject/Tile/PE/metadata/cell_const_unit.il
+yosys hilomap -wrap const_unit const_out ConfigBits
+
 yosys techmap -map $fabRoot/myProject/.FABulous/wrap_map.v
-yosys read_rtlil -lib $fabRoot/myProject/Tile/PE/metadata/cell_ALU_ALU_func_1.il
 yosys connwrappers -unsigned \$__add_wrapper Y Y_WIDTH ;;
 yosys design -push 
+
 yosys read_rtlil $fabRoot/myProject/Tile/PE/metadata/cell_ALU_ALU_func_1.il
 yosys techmap -map $fabRoot/myProject/.FABulous/wrap_map.v
 yosys design -save __add_xmap
 yosys design -pop
+
 yosys extract -constports -ignore_parameters -map %__add_xmap -swap "\$__add_wrapper" A,B;;
 yosys techmap -map $fabRoot/myProject/.FABulous/unwrap_map.v
+
+
+yosys extract -map $fabRoot/myProject/Tile/PE/metadata/cell_ALU_ALU_func_1.il
 yosys techmap -map $fabRoot/myProject/.FABulous/techmaps.v
 
-yosys read_rtlil -lib $fabRoot/myProject/Tile/PE/metadata/cell_const_unit.il
-yosys hilomap -wrap const_unit const_out ConfigBits
 
 yosys extract -map $fabRoot/myProject/Tile/PE/metadata/cell_reg_unit_tide_en_1_tide_rst_0.il
 yosys techmap -map $fabRoot/myProject/.FABulous/techmaps.v
@@ -31,6 +36,6 @@ yosys iopadmap -bits -outpad OUTBUF I:PAD -inpad INBUF O:PAD
 
 yosys opt;;;
 yosys clean -purge
-# yosys show -widths
+yosys show -width
 
 yosys write_json $fabRoot/myProject/user_design/synth_test.json

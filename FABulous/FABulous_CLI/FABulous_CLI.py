@@ -635,9 +635,7 @@ class FABulous_CLI(Cmd):
     def do_gen_cells_and_techmaps(self, *ignored):
         """Generates techmaps by calling 'genTechmaps'."""
         logger.info("Generating techmaps")
-        self.fabulousAPI.gen_cellsAndTechmaps(
-            Path(f"{self.projectDir}/{META_DATA_DIR}")
-        )
+        self.fabulousAPI.gen_synthFile(Path(f"{self.projectDir}/{META_DATA_DIR}"))
         logger.info("Generated techmaps")
 
     do_synthesis = cmd_synthesis.do_synthesis

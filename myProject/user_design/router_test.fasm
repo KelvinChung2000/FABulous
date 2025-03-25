@@ -1,3 +1,1085 @@
+# routing for net 'B[5]'
+
+# routing for net 'B[4]'
+
+# routing for net 'B[3]'
+
+# routing for net 'B[31]'
+
+# routing for net 'B[30]'
+
+# routing for net 'B[29]'
+
+# routing for net 'B[2]'
+
+# routing for net 'B[28]'
+
+# routing for net 'B[27]'
+
+# routing for net 'B[26]'
+
+# routing for net 'B[25]'
+
+# routing for net 'B[24]'
+
+# routing for net 'B[23]'
+
+# routing for net 'B[22]'
+
+# routing for net 'B[21]'
+
+# routing for net 'B[20]'
+
+# routing for net 'B[19]'
+
+# routing for net 'B[1]'
+
+# routing for net 'B[18]'
+
+# routing for net 'B[17]'
+
+# routing for net 'B[16]'
+
+# routing for net 'B[15]'
+
+# routing for net 'B[14]'
+
+# routing for net 'B[13]'
+
+# routing for net 'B[12]'
+
+# routing for net 'B[11]'
+
+# routing for net 'B[10]'
+
+# routing for net 'B[9]'
+
+# routing for net 'B[0]'
+
+# routing for net 'Y[8]'
+
+# routing for net 'regs.in[31]'
+X1Y1.c0.RES_reg_in__31.c0.data_out__31
+
+# routing for net 'regs.in[30]'
+X1Y1.c0.RES_reg_in__30.c0.data_out__30
+
+# routing for net 'regs.in[29]'
+X1Y1.c0.RES_reg_in__29.c0.data_out__29
+
+# routing for net 'regs.in[28]'
+X1Y1.c0.RES_reg_in__28.c0.data_out__28
+
+# routing for net 'regs.in[27]'
+X1Y1.c0.RES_reg_in__27.c0.data_out__27
+
+# routing for net 'regs.in[26]'
+X1Y1.c0.RES_reg_in__26.c0.data_out__26
+
+# routing for net 'regs.in[25]'
+X1Y1.c0.RES_reg_in__25.c0.data_out__25
+
+# routing for net 'regs.in[24]'
+X1Y1.c0.RES_reg_in__24.c0.data_out__24
+
+# routing for net 'regs.in[23]'
+X1Y1.c0.RES_reg_in__23.c0.data_out__23
+
+# routing for net 'regs.in[22]'
+X1Y1.c0.RES_reg_in__22.c0.data_out__22
+
+# routing for net 'regs.in[21]'
+X1Y1.c0.RES_reg_in__21.c0.data_out__21
+
+# routing for net 'regs.in[20]'
+X1Y1.c0.RES_reg_in__20.c0.data_out__20
+
+# routing for net 'regs.in[19]'
+X1Y1.c0.RES_reg_in__19.c0.data_out__19
+
+# routing for net 'regs.in[18]'
+X1Y1.c0.RES_reg_in__18.c0.data_out__18
+
+# routing for net 'regs.in[17]'
+X1Y1.c0.RES_reg_in__17.c0.data_out__17
+
+# routing for net 'regs.in[16]'
+X1Y1.c0.RES_reg_in__16.c0.data_out__16
+
+# routing for net 'regs.in[15]'
+X1Y1.c0.RES_reg_in__15.c0.data_out__15
+
+# routing for net 'regs.in[14]'
+X1Y1.c0.RES_reg_in__14.c0.data_out__14
+
+# routing for net 'regs.in[13]'
+X1Y1.c0.RES_reg_in__13.c0.data_out__13
+
+# routing for net 'regs.in[12]'
+X1Y1.c0.RES_reg_in__12.c0.data_out__12
+
+# routing for net 'regs.in[11]'
+X1Y1.c0.RES_reg_in__11.c0.data_out__11
+
+# routing for net 'regs.in[10]'
+X1Y1.c0.RES_reg_in__10.c0.data_out__10
+
+# routing for net 'regs.in[9]'
+X1Y1.c0.RES_reg_in__9.c0.data_out__9
+
+# routing for net 'regs.in[8]'
+X1Y1.c0.RES_reg_in__8.c0.data_out__8
+
+# routing for net 'regs.in[7]'
+X1Y1.c0.RES_reg_in__7.c0.data_out__7
+
+# routing for net 'regs.in[6]'
+X1Y1.c0.RES_reg_in__6.c0.data_out__6
+
+# routing for net 'regs.in[5]'
+X1Y1.c0.RES_reg_in__5.c0.data_out__5
+
+# routing for net 'regs.in[4]'
+X1Y1.c0.RES_reg_in__4.c0.data_out__4
+
+# routing for net 'regs.in[3]'
+X1Y1.c0.RES_reg_in__3.c0.data_out__3
+
+# routing for net 'regs.in[2]'
+X1Y1.c0.RES_reg_in__2.c0.data_out__2
+
+# routing for net 'regs.in[1]'
+X1Y1.c0.RES_reg_in__1.c0.data_out__1
+
+# routing for net 'regs.in[0]'
+X1Y1.c0.RES_reg_in__0.c0.data_out__0
+
+# routing for net '$iopadmap$B[31]'
+# pip end: X0Y1.c0.out1__31.c0.out1_internal__31'
+# pip start: X0Y1.c0.out1_internal__31.c0.W_to_fabric__31
+X0Y1.c0.out1__31.c0.W_to_fabric__31
+X1Y1.c0.data_in2__31.c0.in3__31
+
+# routing for net '$iopadmap$B[30]'
+# pip end: X0Y1.c0.out1__30.c0.out1_internal__30'
+# pip start: X0Y1.c0.out1_internal__30.c0.W_to_fabric__30
+X0Y1.c0.out1__30.c0.W_to_fabric__30
+X1Y1.c0.data_in2__30.c0.in3__30
+
+# routing for net '$iopadmap$B[29]'
+# pip end: X0Y1.c0.out1__29.c0.out1_internal__29'
+# pip start: X0Y1.c0.out1_internal__29.c0.W_to_fabric__29
+X0Y1.c0.out1__29.c0.W_to_fabric__29
+X1Y1.c0.data_in2__29.c0.in3__29
+
+# routing for net '$iopadmap$B[28]'
+# pip end: X0Y1.c0.out1__28.c0.out1_internal__28'
+# pip start: X0Y1.c0.out1_internal__28.c0.W_to_fabric__28
+X0Y1.c0.out1__28.c0.W_to_fabric__28
+X1Y1.c0.data_in2__28.c0.in3__28
+
+# routing for net '$iopadmap$B[27]'
+# pip end: X0Y1.c0.out1__27.c0.out1_internal__27'
+# pip start: X0Y1.c0.out1_internal__27.c0.W_to_fabric__27
+X0Y1.c0.out1__27.c0.W_to_fabric__27
+X1Y1.c0.data_in2__27.c0.in3__27
+
+# routing for net '$iopadmap$B[26]'
+# pip end: X0Y1.c0.out1__26.c0.out1_internal__26'
+# pip start: X0Y1.c0.out1_internal__26.c0.W_to_fabric__26
+X0Y1.c0.out1__26.c0.W_to_fabric__26
+X1Y1.c0.data_in2__26.c0.in3__26
+
+# routing for net '$iopadmap$B[25]'
+# pip end: X0Y1.c0.out1__25.c0.out1_internal__25'
+# pip start: X0Y1.c0.out1_internal__25.c0.W_to_fabric__25
+X0Y1.c0.out1__25.c0.W_to_fabric__25
+X1Y1.c0.data_in2__25.c0.in3__25
+
+# routing for net '$iopadmap$B[24]'
+# pip end: X0Y1.c0.out1__24.c0.out1_internal__24'
+# pip start: X0Y1.c0.out1_internal__24.c0.W_to_fabric__24
+X0Y1.c0.out1__24.c0.W_to_fabric__24
+X1Y1.c0.data_in2__24.c0.in3__24
+
+# routing for net '$iopadmap$B[23]'
+# pip end: X0Y1.c0.out1__23.c0.out1_internal__23'
+# pip start: X0Y1.c0.out1_internal__23.c0.W_to_fabric__23
+X0Y1.c0.out1__23.c0.W_to_fabric__23
+X1Y1.c0.data_in2__23.c0.in3__23
+
+# routing for net '$iopadmap$B[22]'
+# pip end: X0Y1.c0.out1__22.c0.out1_internal__22'
+# pip start: X0Y1.c0.out1_internal__22.c0.W_to_fabric__22
+X0Y1.c0.out1__22.c0.W_to_fabric__22
+X1Y1.c0.data_in2__22.c0.in3__22
+
+# routing for net '$iopadmap$B[21]'
+# pip end: X0Y1.c0.out1__21.c0.out1_internal__21'
+# pip start: X0Y1.c0.out1_internal__21.c0.W_to_fabric__21
+X0Y1.c0.out1__21.c0.W_to_fabric__21
+X1Y1.c0.data_in2__21.c0.in3__21
+
+# routing for net '$iopadmap$B[20]'
+# pip end: X0Y1.c0.out1__20.c0.out1_internal__20'
+# pip start: X0Y1.c0.out1_internal__20.c0.W_to_fabric__20
+X0Y1.c0.out1__20.c0.W_to_fabric__20
+X1Y1.c0.data_in2__20.c0.in3__20
+
+# routing for net '$iopadmap$B[19]'
+# pip end: X0Y1.c0.out1__19.c0.out1_internal__19'
+# pip start: X0Y1.c0.out1_internal__19.c0.W_to_fabric__19
+X0Y1.c0.out1__19.c0.W_to_fabric__19
+X1Y1.c0.data_in2__19.c0.in3__19
+
+# routing for net '$iopadmap$B[18]'
+# pip end: X0Y1.c0.out1__18.c0.out1_internal__18'
+# pip start: X0Y1.c0.out1_internal__18.c0.W_to_fabric__18
+X0Y1.c0.out1__18.c0.W_to_fabric__18
+X1Y1.c0.data_in2__18.c0.in3__18
+
+# routing for net '$iopadmap$B[17]'
+# pip end: X0Y1.c0.out1__17.c0.out1_internal__17'
+# pip start: X0Y1.c0.out1_internal__17.c0.W_to_fabric__17
+X0Y1.c0.out1__17.c0.W_to_fabric__17
+X1Y1.c0.data_in2__17.c0.in3__17
+
+# routing for net '$iopadmap$B[16]'
+# pip end: X0Y1.c0.out1__16.c0.out1_internal__16'
+# pip start: X0Y1.c0.out1_internal__16.c0.W_to_fabric__16
+X0Y1.c0.out1__16.c0.W_to_fabric__16
+X1Y1.c0.data_in2__16.c0.in3__16
+
+# routing for net '$iopadmap$B[15]'
+# pip end: X0Y1.c0.out1__15.c0.out1_internal__15'
+# pip start: X0Y1.c0.out1_internal__15.c0.W_to_fabric__15
+X0Y1.c0.out1__15.c0.W_to_fabric__15
+X1Y1.c0.data_in2__15.c0.in3__15
+
+# routing for net '$iopadmap$B[14]'
+# pip end: X0Y1.c0.out1__14.c0.out1_internal__14'
+# pip start: X0Y1.c0.out1_internal__14.c0.W_to_fabric__14
+X0Y1.c0.out1__14.c0.W_to_fabric__14
+X1Y1.c0.data_in2__14.c0.in3__14
+
+# routing for net '$iopadmap$B[13]'
+# pip end: X0Y1.c0.out1__13.c0.out1_internal__13'
+# pip start: X0Y1.c0.out1_internal__13.c0.W_to_fabric__13
+X0Y1.c0.out1__13.c0.W_to_fabric__13
+X1Y1.c0.data_in2__13.c0.in3__13
+
+# routing for net '$iopadmap$B[12]'
+# pip end: X0Y1.c0.out1__12.c0.out1_internal__12'
+# pip start: X0Y1.c0.out1_internal__12.c0.W_to_fabric__12
+X0Y1.c0.out1__12.c0.W_to_fabric__12
+X1Y1.c0.data_in2__12.c0.in3__12
+
+# routing for net '$iopadmap$B[11]'
+# pip end: X0Y1.c0.out1__11.c0.out1_internal__11'
+# pip start: X0Y1.c0.out1_internal__11.c0.W_to_fabric__11
+X0Y1.c0.out1__11.c0.W_to_fabric__11
+X1Y1.c0.data_in2__11.c0.in3__11
+
+# routing for net '$iopadmap$B[10]'
+# pip end: X0Y1.c0.out1__10.c0.out1_internal__10'
+# pip start: X0Y1.c0.out1_internal__10.c0.W_to_fabric__10
+X0Y1.c0.out1__10.c0.W_to_fabric__10
+X1Y1.c0.data_in2__10.c0.in3__10
+
+# routing for net '$iopadmap$B[9]'
+# pip end: X0Y1.c0.out1__9.c0.out1_internal__9'
+# pip start: X0Y1.c0.out1_internal__9.c0.W_to_fabric__9
+X0Y1.c0.out1__9.c0.W_to_fabric__9
+X1Y1.c0.data_in2__9.c0.in3__9
+
+# routing for net '$iopadmap$B[8]'
+# pip end: X0Y1.c0.out1__8.c0.out1_internal__8'
+# pip start: X0Y1.c0.out1_internal__8.c0.W_to_fabric__8
+X0Y1.c0.out1__8.c0.W_to_fabric__8
+X1Y1.c0.data_in2__8.c0.in3__8
+
+# routing for net '$iopadmap$B[7]'
+# pip end: X0Y1.c0.out1__7.c0.out1_internal__7'
+# pip start: X0Y1.c0.out1_internal__7.c0.W_to_fabric__7
+X0Y1.c0.out1__7.c0.W_to_fabric__7
+X1Y1.c0.data_in2__7.c0.in3__7
+
+# routing for net '$iopadmap$B[6]'
+# pip end: X0Y1.c0.out1__6.c0.out1_internal__6'
+# pip start: X0Y1.c0.out1_internal__6.c0.W_to_fabric__6
+X0Y1.c0.out1__6.c0.W_to_fabric__6
+X1Y1.c0.data_in2__6.c0.in3__6
+
+# routing for net '$iopadmap$B[5]'
+# pip end: X0Y1.c0.out1__5.c0.out1_internal__5'
+# pip start: X0Y1.c0.out1_internal__5.c0.W_to_fabric__5
+X0Y1.c0.out1__5.c0.W_to_fabric__5
+X1Y1.c0.data_in2__5.c0.in3__5
+
+# routing for net '$iopadmap$B[4]'
+# pip end: X0Y1.c0.out1__4.c0.out1_internal__4'
+# pip start: X0Y1.c0.out1_internal__4.c0.W_to_fabric__4
+X0Y1.c0.out1__4.c0.W_to_fabric__4
+X1Y1.c0.data_in2__4.c0.in3__4
+
+# routing for net '$iopadmap$B[3]'
+# pip end: X0Y1.c0.out1__3.c0.out1_internal__3'
+# pip start: X0Y1.c0.out1_internal__3.c0.W_to_fabric__3
+X0Y1.c0.out1__3.c0.W_to_fabric__3
+X1Y1.c0.data_in2__3.c0.in3__3
+
+# routing for net '$iopadmap$B[2]'
+# pip end: X0Y1.c0.out1__2.c0.out1_internal__2'
+# pip start: X0Y1.c0.out1_internal__2.c0.W_to_fabric__2
+X0Y1.c0.out1__2.c0.W_to_fabric__2
+X1Y1.c0.data_in2__2.c0.in3__2
+
+# routing for net '$iopadmap$B[1]'
+# pip end: X0Y1.c0.out1__1.c0.out1_internal__1'
+# pip start: X0Y1.c0.out1_internal__1.c0.W_to_fabric__1
+X0Y1.c0.out1__1.c0.W_to_fabric__1
+X1Y1.c0.data_in2__1.c0.in3__1
+
+# routing for net '$iopadmap$B[0]'
+# pip end: X0Y1.c0.out1__0.c0.out1_internal__0'
+# pip start: X0Y1.c0.out1_internal__0.c0.W_to_fabric__0
+X0Y1.c0.out1__0.c0.W_to_fabric__0
+X1Y1.c0.data_in2__0.c0.in3__0
+
+# routing for net '$iopadmap$A[31]'
+# pip end: X1Y0.c0.out0__31.c0.out0_internal__31'
+# pip start: X1Y0.c0.out0_internal__31.c0.S_to_fabric__31
+X1Y0.c0.out0__31.c0.S_to_fabric__31
+X1Y1.c0.data_in1__31.c0.in2__31
+
+# routing for net '$iopadmap$A[30]'
+# pip end: X1Y0.c0.out0__30.c0.out0_internal__30'
+# pip start: X1Y0.c0.out0_internal__30.c0.S_to_fabric__30
+X1Y0.c0.out0__30.c0.S_to_fabric__30
+X1Y1.c0.data_in1__30.c0.in2__30
+
+# routing for net '$iopadmap$A[29]'
+# pip end: X1Y0.c0.out0__29.c0.out0_internal__29'
+# pip start: X1Y0.c0.out0_internal__29.c0.S_to_fabric__29
+X1Y0.c0.out0__29.c0.S_to_fabric__29
+X1Y1.c0.data_in1__29.c0.in2__29
+
+# routing for net '$iopadmap$A[28]'
+# pip end: X1Y0.c0.out0__28.c0.out0_internal__28'
+# pip start: X1Y0.c0.out0_internal__28.c0.S_to_fabric__28
+X1Y0.c0.out0__28.c0.S_to_fabric__28
+X1Y1.c0.data_in1__28.c0.in2__28
+
+# routing for net '$iopadmap$A[27]'
+# pip end: X1Y0.c0.out0__27.c0.out0_internal__27'
+# pip start: X1Y0.c0.out0_internal__27.c0.S_to_fabric__27
+X1Y0.c0.out0__27.c0.S_to_fabric__27
+X1Y1.c0.data_in1__27.c0.in2__27
+
+# routing for net '$iopadmap$A[26]'
+# pip end: X1Y0.c0.out0__26.c0.out0_internal__26'
+# pip start: X1Y0.c0.out0_internal__26.c0.S_to_fabric__26
+X1Y0.c0.out0__26.c0.S_to_fabric__26
+X1Y1.c0.data_in1__26.c0.in2__26
+
+# routing for net '$iopadmap$A[25]'
+# pip end: X1Y0.c0.out0__25.c0.out0_internal__25'
+# pip start: X1Y0.c0.out0_internal__25.c0.S_to_fabric__25
+X1Y0.c0.out0__25.c0.S_to_fabric__25
+X1Y1.c0.data_in1__25.c0.in2__25
+
+# routing for net '$iopadmap$A[24]'
+# pip end: X1Y0.c0.out0__24.c0.out0_internal__24'
+# pip start: X1Y0.c0.out0_internal__24.c0.S_to_fabric__24
+X1Y0.c0.out0__24.c0.S_to_fabric__24
+X1Y1.c0.data_in1__24.c0.in2__24
+
+# routing for net '$iopadmap$A[23]'
+# pip end: X1Y0.c0.out0__23.c0.out0_internal__23'
+# pip start: X1Y0.c0.out0_internal__23.c0.S_to_fabric__23
+X1Y0.c0.out0__23.c0.S_to_fabric__23
+X1Y1.c0.data_in1__23.c0.in2__23
+
+# routing for net '$iopadmap$A[22]'
+# pip end: X1Y0.c0.out0__22.c0.out0_internal__22'
+# pip start: X1Y0.c0.out0_internal__22.c0.S_to_fabric__22
+X1Y0.c0.out0__22.c0.S_to_fabric__22
+X1Y1.c0.data_in1__22.c0.in2__22
+
+# routing for net '$iopadmap$A[21]'
+# pip end: X1Y0.c0.out0__21.c0.out0_internal__21'
+# pip start: X1Y0.c0.out0_internal__21.c0.S_to_fabric__21
+X1Y0.c0.out0__21.c0.S_to_fabric__21
+X1Y1.c0.data_in1__21.c0.in2__21
+
+# routing for net '$iopadmap$A[20]'
+# pip end: X1Y0.c0.out0__20.c0.out0_internal__20'
+# pip start: X1Y0.c0.out0_internal__20.c0.S_to_fabric__20
+X1Y0.c0.out0__20.c0.S_to_fabric__20
+X1Y1.c0.data_in1__20.c0.in2__20
+
+# routing for net '$iopadmap$A[19]'
+# pip end: X1Y0.c0.out0__19.c0.out0_internal__19'
+# pip start: X1Y0.c0.out0_internal__19.c0.S_to_fabric__19
+X1Y0.c0.out0__19.c0.S_to_fabric__19
+X1Y1.c0.data_in1__19.c0.in2__19
+
+# routing for net '$iopadmap$A[18]'
+# pip end: X1Y0.c0.out0__18.c0.out0_internal__18'
+# pip start: X1Y0.c0.out0_internal__18.c0.S_to_fabric__18
+X1Y0.c0.out0__18.c0.S_to_fabric__18
+X1Y1.c0.data_in1__18.c0.in2__18
+
+# routing for net '$iopadmap$A[17]'
+# pip end: X1Y0.c0.out0__17.c0.out0_internal__17'
+# pip start: X1Y0.c0.out0_internal__17.c0.S_to_fabric__17
+X1Y0.c0.out0__17.c0.S_to_fabric__17
+X1Y1.c0.data_in1__17.c0.in2__17
+
+# routing for net '$iopadmap$A[16]'
+# pip end: X1Y0.c0.out0__16.c0.out0_internal__16'
+# pip start: X1Y0.c0.out0_internal__16.c0.S_to_fabric__16
+X1Y0.c0.out0__16.c0.S_to_fabric__16
+X1Y1.c0.data_in1__16.c0.in2__16
+
+# routing for net '$iopadmap$A[15]'
+# pip end: X1Y0.c0.out0__15.c0.out0_internal__15'
+# pip start: X1Y0.c0.out0_internal__15.c0.S_to_fabric__15
+X1Y0.c0.out0__15.c0.S_to_fabric__15
+X1Y1.c0.data_in1__15.c0.in2__15
+
+# routing for net '$iopadmap$A[14]'
+# pip end: X1Y0.c0.out0__14.c0.out0_internal__14'
+# pip start: X1Y0.c0.out0_internal__14.c0.S_to_fabric__14
+X1Y0.c0.out0__14.c0.S_to_fabric__14
+X1Y1.c0.data_in1__14.c0.in2__14
+
+# routing for net '$iopadmap$A[13]'
+# pip end: X1Y0.c0.out0__13.c0.out0_internal__13'
+# pip start: X1Y0.c0.out0_internal__13.c0.S_to_fabric__13
+X1Y0.c0.out0__13.c0.S_to_fabric__13
+X1Y1.c0.data_in1__13.c0.in2__13
+
+# routing for net '$iopadmap$A[12]'
+# pip end: X1Y0.c0.out0__12.c0.out0_internal__12'
+# pip start: X1Y0.c0.out0_internal__12.c0.S_to_fabric__12
+X1Y0.c0.out0__12.c0.S_to_fabric__12
+X1Y1.c0.data_in1__12.c0.in2__12
+
+# routing for net '$iopadmap$A[11]'
+# pip end: X1Y0.c0.out0__11.c0.out0_internal__11'
+# pip start: X1Y0.c0.out0_internal__11.c0.S_to_fabric__11
+X1Y0.c0.out0__11.c0.S_to_fabric__11
+X1Y1.c0.data_in1__11.c0.in2__11
+
+# routing for net '$iopadmap$A[10]'
+# pip end: X1Y0.c0.out0__10.c0.out0_internal__10'
+# pip start: X1Y0.c0.out0_internal__10.c0.S_to_fabric__10
+X1Y0.c0.out0__10.c0.S_to_fabric__10
+X1Y1.c0.data_in1__10.c0.in2__10
+
+# routing for net '$iopadmap$A[9]'
+# pip end: X1Y0.c0.out0__9.c0.out0_internal__9'
+# pip start: X1Y0.c0.out0_internal__9.c0.S_to_fabric__9
+X1Y0.c0.out0__9.c0.S_to_fabric__9
+X1Y1.c0.data_in1__9.c0.in2__9
+
+# routing for net '$iopadmap$A[8]'
+# pip end: X1Y0.c0.out0__8.c0.out0_internal__8'
+# pip start: X1Y0.c0.out0_internal__8.c0.S_to_fabric__8
+X1Y0.c0.out0__8.c0.S_to_fabric__8
+X1Y1.c0.data_in1__8.c0.in2__8
+
+# routing for net '$iopadmap$A[7]'
+# pip end: X1Y0.c0.out0__7.c0.out0_internal__7'
+# pip start: X1Y0.c0.out0_internal__7.c0.S_to_fabric__7
+X1Y0.c0.out0__7.c0.S_to_fabric__7
+X1Y1.c0.data_in1__7.c0.in2__7
+
+# routing for net '$iopadmap$A[6]'
+# pip end: X1Y0.c0.out0__6.c0.out0_internal__6'
+# pip start: X1Y0.c0.out0_internal__6.c0.S_to_fabric__6
+X1Y0.c0.out0__6.c0.S_to_fabric__6
+X1Y1.c0.data_in1__6.c0.in2__6
+
+# routing for net '$iopadmap$A[5]'
+# pip end: X1Y0.c0.out0__5.c0.out0_internal__5'
+# pip start: X1Y0.c0.out0_internal__5.c0.S_to_fabric__5
+X1Y0.c0.out0__5.c0.S_to_fabric__5
+X1Y1.c0.data_in1__5.c0.in2__5
+
+# routing for net '$iopadmap$A[4]'
+# pip end: X1Y0.c0.out0__4.c0.out0_internal__4'
+# pip start: X1Y0.c0.out0_internal__4.c0.S_to_fabric__4
+X1Y0.c0.out0__4.c0.S_to_fabric__4
+X1Y1.c0.data_in1__4.c0.in2__4
+
+# routing for net '$iopadmap$A[3]'
+# pip end: X1Y0.c0.out0__3.c0.out0_internal__3'
+# pip start: X1Y0.c0.out0_internal__3.c0.S_to_fabric__3
+X1Y0.c0.out0__3.c0.S_to_fabric__3
+X1Y1.c0.data_in1__3.c0.in2__3
+
+# routing for net '$iopadmap$A[2]'
+# pip end: X1Y0.c0.out0__2.c0.out0_internal__2'
+# pip start: X1Y0.c0.out0_internal__2.c0.S_to_fabric__2
+X1Y0.c0.out0__2.c0.S_to_fabric__2
+X1Y1.c0.data_in1__2.c0.in2__2
+
+# routing for net '$iopadmap$A[1]'
+# pip end: X1Y0.c0.out0__1.c0.out0_internal__1'
+# pip start: X1Y0.c0.out0_internal__1.c0.S_to_fabric__1
+X1Y0.c0.out0__1.c0.S_to_fabric__1
+X1Y1.c0.data_in1__1.c0.in2__1
+
+# routing for net '$iopadmap$A[0]'
+# pip end: X1Y0.c0.out0__0.c0.out0_internal__0'
+# pip start: X1Y0.c0.out0_internal__0.c0.S_to_fabric__0
+X1Y0.c0.out0__0.c0.S_to_fabric__0
+X1Y1.c0.data_in1__0.c0.in2__0
+
+# routing for net '$iopadmap$Y[31]'
+X2Y0.c0.S_from_fabric__31.c0.in0__31
+# pip end: X2Y1.c0.out2__31.c0.out2_internal__31'
+# pip start: X2Y1.c0.out2_internal__31.c0.data_out__31
+X2Y1.c0.out2__31.c0.data_out__31
+
+# routing for net '$iopadmap$Y[30]'
+X2Y0.c0.S_from_fabric__30.c0.in0__30
+# pip end: X2Y1.c0.out2__30.c0.out2_internal__30'
+# pip start: X2Y1.c0.out2_internal__30.c0.data_out__30
+X2Y1.c0.out2__30.c0.data_out__30
+
+# routing for net '$iopadmap$Y[29]'
+X2Y0.c0.S_from_fabric__29.c0.in0__29
+# pip end: X2Y1.c0.out2__29.c0.out2_internal__29'
+# pip start: X2Y1.c0.out2_internal__29.c0.data_out__29
+X2Y1.c0.out2__29.c0.data_out__29
+
+# routing for net '$iopadmap$Y[28]'
+X2Y0.c0.S_from_fabric__28.c0.in0__28
+# pip end: X2Y1.c0.out2__28.c0.out2_internal__28'
+# pip start: X2Y1.c0.out2_internal__28.c0.data_out__28
+X2Y1.c0.out2__28.c0.data_out__28
+
+# routing for net '$iopadmap$Y[27]'
+X2Y0.c0.S_from_fabric__27.c0.in0__27
+# pip end: X2Y1.c0.out2__27.c0.out2_internal__27'
+# pip start: X2Y1.c0.out2_internal__27.c0.data_out__27
+X2Y1.c0.out2__27.c0.data_out__27
+
+# routing for net '$iopadmap$Y[26]'
+X2Y0.c0.S_from_fabric__26.c0.in0__26
+# pip end: X2Y1.c0.out2__26.c0.out2_internal__26'
+# pip start: X2Y1.c0.out2_internal__26.c0.data_out__26
+X2Y1.c0.out2__26.c0.data_out__26
+
+# routing for net '$iopadmap$Y[25]'
+X2Y0.c0.S_from_fabric__25.c0.in0__25
+# pip end: X2Y1.c0.out2__25.c0.out2_internal__25'
+# pip start: X2Y1.c0.out2_internal__25.c0.data_out__25
+X2Y1.c0.out2__25.c0.data_out__25
+
+# routing for net '$iopadmap$Y[24]'
+X2Y0.c0.S_from_fabric__24.c0.in0__24
+# pip end: X2Y1.c0.out2__24.c0.out2_internal__24'
+# pip start: X2Y1.c0.out2_internal__24.c0.data_out__24
+X2Y1.c0.out2__24.c0.data_out__24
+
+# routing for net '$iopadmap$Y[23]'
+X2Y0.c0.S_from_fabric__23.c0.in0__23
+# pip end: X2Y1.c0.out2__23.c0.out2_internal__23'
+# pip start: X2Y1.c0.out2_internal__23.c0.data_out__23
+X2Y1.c0.out2__23.c0.data_out__23
+
+# routing for net '$iopadmap$Y[22]'
+X2Y0.c0.S_from_fabric__22.c0.in0__22
+# pip end: X2Y1.c0.out2__22.c0.out2_internal__22'
+# pip start: X2Y1.c0.out2_internal__22.c0.data_out__22
+X2Y1.c0.out2__22.c0.data_out__22
+
+# routing for net '$iopadmap$Y[21]'
+X2Y0.c0.S_from_fabric__21.c0.in0__21
+# pip end: X2Y1.c0.out2__21.c0.out2_internal__21'
+# pip start: X2Y1.c0.out2_internal__21.c0.data_out__21
+X2Y1.c0.out2__21.c0.data_out__21
+
+# routing for net '$iopadmap$Y[20]'
+X2Y0.c0.S_from_fabric__20.c0.in0__20
+# pip end: X2Y1.c0.out2__20.c0.out2_internal__20'
+# pip start: X2Y1.c0.out2_internal__20.c0.data_out__20
+X2Y1.c0.out2__20.c0.data_out__20
+
+# routing for net '$iopadmap$Y[19]'
+X2Y0.c0.S_from_fabric__19.c0.in0__19
+# pip end: X2Y1.c0.out2__19.c0.out2_internal__19'
+# pip start: X2Y1.c0.out2_internal__19.c0.data_out__19
+X2Y1.c0.out2__19.c0.data_out__19
+
+# routing for net '$iopadmap$Y[18]'
+X2Y0.c0.S_from_fabric__18.c0.in0__18
+# pip end: X2Y1.c0.out2__18.c0.out2_internal__18'
+# pip start: X2Y1.c0.out2_internal__18.c0.data_out__18
+X2Y1.c0.out2__18.c0.data_out__18
+
+# routing for net '$iopadmap$Y[17]'
+X2Y0.c0.S_from_fabric__17.c0.in0__17
+# pip end: X2Y1.c0.out2__17.c0.out2_internal__17'
+# pip start: X2Y1.c0.out2_internal__17.c0.data_out__17
+X2Y1.c0.out2__17.c0.data_out__17
+
+# routing for net '$iopadmap$Y[16]'
+X2Y0.c0.S_from_fabric__16.c0.in0__16
+# pip end: X2Y1.c0.out2__16.c0.out2_internal__16'
+# pip start: X2Y1.c0.out2_internal__16.c0.data_out__16
+X2Y1.c0.out2__16.c0.data_out__16
+
+# routing for net '$iopadmap$Y[15]'
+X2Y0.c0.S_from_fabric__15.c0.in0__15
+# pip end: X2Y1.c0.out2__15.c0.out2_internal__15'
+# pip start: X2Y1.c0.out2_internal__15.c0.data_out__15
+X2Y1.c0.out2__15.c0.data_out__15
+
+# routing for net '$iopadmap$Y[14]'
+X2Y0.c0.S_from_fabric__14.c0.in0__14
+# pip end: X2Y1.c0.out2__14.c0.out2_internal__14'
+# pip start: X2Y1.c0.out2_internal__14.c0.data_out__14
+X2Y1.c0.out2__14.c0.data_out__14
+
+# routing for net '$iopadmap$Y[13]'
+X2Y0.c0.S_from_fabric__13.c0.in0__13
+# pip end: X2Y1.c0.out2__13.c0.out2_internal__13'
+# pip start: X2Y1.c0.out2_internal__13.c0.data_out__13
+X2Y1.c0.out2__13.c0.data_out__13
+
+# routing for net '$iopadmap$Y[12]'
+X2Y0.c0.S_from_fabric__12.c0.in0__12
+# pip end: X2Y1.c0.out2__12.c0.out2_internal__12'
+# pip start: X2Y1.c0.out2_internal__12.c0.data_out__12
+X2Y1.c0.out2__12.c0.data_out__12
+
+# routing for net '$iopadmap$Y[11]'
+X2Y0.c0.S_from_fabric__11.c0.in0__11
+# pip end: X2Y1.c0.out2__11.c0.out2_internal__11'
+# pip start: X2Y1.c0.out2_internal__11.c0.data_out__11
+X2Y1.c0.out2__11.c0.data_out__11
+
+# routing for net '$iopadmap$Y[10]'
+X2Y0.c0.S_from_fabric__10.c0.in0__10
+# pip end: X2Y1.c0.out2__10.c0.out2_internal__10'
+# pip start: X2Y1.c0.out2_internal__10.c0.data_out__10
+X2Y1.c0.out2__10.c0.data_out__10
+
+# routing for net '$iopadmap$Y[9]'
+X2Y0.c0.S_from_fabric__9.c0.in0__9
+# pip end: X2Y1.c0.out2__9.c0.out2_internal__9'
+# pip start: X2Y1.c0.out2_internal__9.c0.data_out__9
+X2Y1.c0.out2__9.c0.data_out__9
+
+# routing for net '$iopadmap$Y[8]'
+X2Y0.c0.S_from_fabric__8.c0.in0__8
+# pip end: X2Y1.c0.out2__8.c0.out2_internal__8'
+# pip start: X2Y1.c0.out2_internal__8.c0.data_out__8
+X2Y1.c0.out2__8.c0.data_out__8
+
+# routing for net '$iopadmap$Y[7]'
+X2Y0.c0.S_from_fabric__7.c0.in0__7
+# pip end: X2Y1.c0.out2__7.c0.out2_internal__7'
+# pip start: X2Y1.c0.out2_internal__7.c0.data_out__7
+X2Y1.c0.out2__7.c0.data_out__7
+
+# routing for net '$iopadmap$Y[6]'
+X2Y0.c0.S_from_fabric__6.c0.in0__6
+# pip end: X2Y1.c0.out2__6.c0.out2_internal__6'
+# pip start: X2Y1.c0.out2_internal__6.c0.data_out__6
+X2Y1.c0.out2__6.c0.data_out__6
+
+# routing for net '$iopadmap$Y[5]'
+X2Y0.c0.S_from_fabric__5.c0.in0__5
+# pip end: X2Y1.c0.out2__5.c0.out2_internal__5'
+# pip start: X2Y1.c0.out2_internal__5.c0.data_out__5
+X2Y1.c0.out2__5.c0.data_out__5
+
+# routing for net '$iopadmap$Y[4]'
+X2Y0.c0.S_from_fabric__4.c0.in0__4
+# pip end: X2Y1.c0.out2__4.c0.out2_internal__4'
+# pip start: X2Y1.c0.out2_internal__4.c0.data_out__4
+X2Y1.c0.out2__4.c0.data_out__4
+
+# routing for net '$iopadmap$Y[3]'
+X2Y0.c0.S_from_fabric__3.c0.in0__3
+# pip end: X2Y1.c0.out2__3.c0.out2_internal__3'
+# pip start: X2Y1.c0.out2_internal__3.c0.data_out__3
+X2Y1.c0.out2__3.c0.data_out__3
+
+# routing for net '$iopadmap$Y[2]'
+X2Y0.c0.S_from_fabric__2.c0.in0__2
+# pip end: X2Y1.c0.out2__2.c0.out2_internal__2'
+# pip start: X2Y1.c0.out2_internal__2.c0.data_out__2
+X2Y1.c0.out2__2.c0.data_out__2
+
+# routing for net '$iopadmap$Y[1]'
+X2Y0.c0.S_from_fabric__1.c0.in0__1
+# pip end: X2Y1.c0.out2__1.c0.out2_internal__1'
+# pip start: X2Y1.c0.out2_internal__1.c0.data_out__1
+X2Y1.c0.out2__1.c0.data_out__1
+
+# routing for net '$iopadmap$Y[0]'
+X2Y0.c0.S_from_fabric__0.c0.in0__0
+# pip end: X2Y1.c0.out2__0.c0.out2_internal__0'
+# pip start: X2Y1.c0.out2_internal__0.c0.data_out__0
+X2Y1.c0.out2__0.c0.data_out__0
+
+# routing for net 'regs.out[31]'
+# pip end: X1Y1.c0.out1__31.c0.out1_internal__31'
+# pip start: X1Y1.c0.out1_internal__31.c0.RES_reg_out__31
+X1Y1.c0.out1__31.c0.RES_reg_out__31
+X2Y1.c0.data_in1__31.c0.in3__31
+
+# routing for net 'regs.out[30]'
+# pip end: X1Y1.c0.out1__30.c0.out1_internal__30'
+# pip start: X1Y1.c0.out1_internal__30.c0.RES_reg_out__30
+X1Y1.c0.out1__30.c0.RES_reg_out__30
+X2Y1.c0.data_in1__30.c0.in3__30
+
+# routing for net 'regs.out[29]'
+# pip end: X1Y1.c0.out1__29.c0.out1_internal__29'
+# pip start: X1Y1.c0.out1_internal__29.c0.RES_reg_out__29
+X1Y1.c0.out1__29.c0.RES_reg_out__29
+X2Y1.c0.data_in1__29.c0.in3__29
+
+# routing for net 'regs.out[28]'
+# pip end: X1Y1.c0.out1__28.c0.out1_internal__28'
+# pip start: X1Y1.c0.out1_internal__28.c0.RES_reg_out__28
+X1Y1.c0.out1__28.c0.RES_reg_out__28
+X2Y1.c0.data_in1__28.c0.in3__28
+
+# routing for net 'regs.out[27]'
+# pip end: X1Y1.c0.out1__27.c0.out1_internal__27'
+# pip start: X1Y1.c0.out1_internal__27.c0.RES_reg_out__27
+X1Y1.c0.out1__27.c0.RES_reg_out__27
+X2Y1.c0.data_in1__27.c0.in3__27
+
+# routing for net 'regs.out[26]'
+# pip end: X1Y1.c0.out1__26.c0.out1_internal__26'
+# pip start: X1Y1.c0.out1_internal__26.c0.RES_reg_out__26
+X1Y1.c0.out1__26.c0.RES_reg_out__26
+X2Y1.c0.data_in1__26.c0.in3__26
+
+# routing for net 'regs.out[25]'
+# pip end: X1Y1.c0.out1__25.c0.out1_internal__25'
+# pip start: X1Y1.c0.out1_internal__25.c0.RES_reg_out__25
+X1Y1.c0.out1__25.c0.RES_reg_out__25
+X2Y1.c0.data_in1__25.c0.in3__25
+
+# routing for net 'regs.out[24]'
+# pip end: X1Y1.c0.out1__24.c0.out1_internal__24'
+# pip start: X1Y1.c0.out1_internal__24.c0.RES_reg_out__24
+X1Y1.c0.out1__24.c0.RES_reg_out__24
+X2Y1.c0.data_in1__24.c0.in3__24
+
+# routing for net 'regs.out[23]'
+# pip end: X1Y1.c0.out1__23.c0.out1_internal__23'
+# pip start: X1Y1.c0.out1_internal__23.c0.RES_reg_out__23
+X1Y1.c0.out1__23.c0.RES_reg_out__23
+X2Y1.c0.data_in1__23.c0.in3__23
+
+# routing for net 'regs.out[22]'
+# pip end: X1Y1.c0.out1__22.c0.out1_internal__22'
+# pip start: X1Y1.c0.out1_internal__22.c0.RES_reg_out__22
+X1Y1.c0.out1__22.c0.RES_reg_out__22
+X2Y1.c0.data_in1__22.c0.in3__22
+
+# routing for net 'regs.out[21]'
+# pip end: X1Y1.c0.out1__21.c0.out1_internal__21'
+# pip start: X1Y1.c0.out1_internal__21.c0.RES_reg_out__21
+X1Y1.c0.out1__21.c0.RES_reg_out__21
+X2Y1.c0.data_in1__21.c0.in3__21
+
+# routing for net 'regs.out[20]'
+# pip end: X1Y1.c0.out1__20.c0.out1_internal__20'
+# pip start: X1Y1.c0.out1_internal__20.c0.RES_reg_out__20
+X1Y1.c0.out1__20.c0.RES_reg_out__20
+X2Y1.c0.data_in1__20.c0.in3__20
+
+# routing for net 'regs.out[19]'
+# pip end: X1Y1.c0.out1__19.c0.out1_internal__19'
+# pip start: X1Y1.c0.out1_internal__19.c0.RES_reg_out__19
+X1Y1.c0.out1__19.c0.RES_reg_out__19
+X2Y1.c0.data_in1__19.c0.in3__19
+
+# routing for net 'regs.out[18]'
+# pip end: X1Y1.c0.out1__18.c0.out1_internal__18'
+# pip start: X1Y1.c0.out1_internal__18.c0.RES_reg_out__18
+X1Y1.c0.out1__18.c0.RES_reg_out__18
+X2Y1.c0.data_in1__18.c0.in3__18
+
+# routing for net 'regs.out[17]'
+# pip end: X1Y1.c0.out1__17.c0.out1_internal__17'
+# pip start: X1Y1.c0.out1_internal__17.c0.RES_reg_out__17
+X1Y1.c0.out1__17.c0.RES_reg_out__17
+X2Y1.c0.data_in1__17.c0.in3__17
+
+# routing for net 'regs.out[16]'
+# pip end: X1Y1.c0.out1__16.c0.out1_internal__16'
+# pip start: X1Y1.c0.out1_internal__16.c0.RES_reg_out__16
+X1Y1.c0.out1__16.c0.RES_reg_out__16
+X2Y1.c0.data_in1__16.c0.in3__16
+
+# routing for net 'regs.out[15]'
+# pip end: X1Y1.c0.out1__15.c0.out1_internal__15'
+# pip start: X1Y1.c0.out1_internal__15.c0.RES_reg_out__15
+X1Y1.c0.out1__15.c0.RES_reg_out__15
+X2Y1.c0.data_in1__15.c0.in3__15
+
+# routing for net 'regs.out[14]'
+# pip end: X1Y1.c0.out1__14.c0.out1_internal__14'
+# pip start: X1Y1.c0.out1_internal__14.c0.RES_reg_out__14
+X1Y1.c0.out1__14.c0.RES_reg_out__14
+X2Y1.c0.data_in1__14.c0.in3__14
+
+# routing for net 'regs.out[13]'
+# pip end: X1Y1.c0.out1__13.c0.out1_internal__13'
+# pip start: X1Y1.c0.out1_internal__13.c0.RES_reg_out__13
+X1Y1.c0.out1__13.c0.RES_reg_out__13
+X2Y1.c0.data_in1__13.c0.in3__13
+
+# routing for net 'regs.out[12]'
+# pip end: X1Y1.c0.out1__12.c0.out1_internal__12'
+# pip start: X1Y1.c0.out1_internal__12.c0.RES_reg_out__12
+X1Y1.c0.out1__12.c0.RES_reg_out__12
+X2Y1.c0.data_in1__12.c0.in3__12
+
+# routing for net 'regs.out[11]'
+# pip end: X1Y1.c0.out1__11.c0.out1_internal__11'
+# pip start: X1Y1.c0.out1_internal__11.c0.RES_reg_out__11
+X1Y1.c0.out1__11.c0.RES_reg_out__11
+X2Y1.c0.data_in1__11.c0.in3__11
+
+# routing for net 'regs.out[10]'
+# pip end: X1Y1.c0.out1__10.c0.out1_internal__10'
+# pip start: X1Y1.c0.out1_internal__10.c0.RES_reg_out__10
+X1Y1.c0.out1__10.c0.RES_reg_out__10
+X2Y1.c0.data_in1__10.c0.in3__10
+
+# routing for net 'regs.out[9]'
+# pip end: X1Y1.c0.out1__9.c0.out1_internal__9'
+# pip start: X1Y1.c0.out1_internal__9.c0.RES_reg_out__9
+X1Y1.c0.out1__9.c0.RES_reg_out__9
+X2Y1.c0.data_in1__9.c0.in3__9
+
+# routing for net 'regs.out[8]'
+# pip end: X1Y1.c0.out1__8.c0.out1_internal__8'
+# pip start: X1Y1.c0.out1_internal__8.c0.RES_reg_out__8
+X1Y1.c0.out1__8.c0.RES_reg_out__8
+X2Y1.c0.data_in1__8.c0.in3__8
+
+# routing for net 'regs.out[7]'
+# pip end: X1Y1.c0.out1__7.c0.out1_internal__7'
+# pip start: X1Y1.c0.out1_internal__7.c0.RES_reg_out__7
+X1Y1.c0.out1__7.c0.RES_reg_out__7
+X2Y1.c0.data_in1__7.c0.in3__7
+
+# routing for net 'regs.out[6]'
+# pip end: X1Y1.c0.out1__6.c0.out1_internal__6'
+# pip start: X1Y1.c0.out1_internal__6.c0.RES_reg_out__6
+X1Y1.c0.out1__6.c0.RES_reg_out__6
+X2Y1.c0.data_in1__6.c0.in3__6
+
+# routing for net 'regs.out[5]'
+# pip end: X1Y1.c0.out1__5.c0.out1_internal__5'
+# pip start: X1Y1.c0.out1_internal__5.c0.RES_reg_out__5
+X1Y1.c0.out1__5.c0.RES_reg_out__5
+X2Y1.c0.data_in1__5.c0.in3__5
+
+# routing for net 'regs.out[4]'
+# pip end: X1Y1.c0.out1__4.c0.out1_internal__4'
+# pip start: X1Y1.c0.out1_internal__4.c0.RES_reg_out__4
+X1Y1.c0.out1__4.c0.RES_reg_out__4
+X2Y1.c0.data_in1__4.c0.in3__4
+
+# routing for net 'regs.out[3]'
+# pip end: X1Y1.c0.out1__3.c0.out1_internal__3'
+# pip start: X1Y1.c0.out1_internal__3.c0.RES_reg_out__3
+X1Y1.c0.out1__3.c0.RES_reg_out__3
+X2Y1.c0.data_in1__3.c0.in3__3
+
+# routing for net 'regs.out[2]'
+# pip end: X1Y1.c0.out1__2.c0.out1_internal__2'
+# pip start: X1Y1.c0.out1_internal__2.c0.RES_reg_out__2
+X1Y1.c0.out1__2.c0.RES_reg_out__2
+X2Y1.c0.data_in1__2.c0.in3__2
+
+# routing for net 'regs.out[1]'
+# pip end: X1Y1.c0.out1__1.c0.out1_internal__1'
+# pip start: X1Y1.c0.out1_internal__1.c0.RES_reg_out__1
+X1Y1.c0.out1__1.c0.RES_reg_out__1
+X2Y1.c0.data_in1__1.c0.in3__1
+
+# routing for net 'regs.out[0]'
+# pip end: X1Y1.c0.out1__0.c0.out1_internal__0'
+# pip start: X1Y1.c0.out1_internal__0.c0.RES_reg_out__0
+X1Y1.c0.out1__0.c0.RES_reg_out__0
+X2Y1.c0.data_in1__0.c0.in3__0
+
+# routing for net '$auto$hilomap.cc:40:hilomap_worker$57[31]'
+X2Y1.c0.data_in2__31.c0.const_out__31
+
+# routing for net '$auto$hilomap.cc:40:hilomap_worker$57[30]'
+X2Y1.c0.data_in2__30.c0.const_out__30
+
+# routing for net '$auto$hilomap.cc:40:hilomap_worker$57[29]'
+X2Y1.c0.data_in2__29.c0.const_out__29
+
+# routing for net '$auto$hilomap.cc:40:hilomap_worker$57[28]'
+X2Y1.c0.data_in2__28.c0.const_out__28
+
+# routing for net '$auto$hilomap.cc:40:hilomap_worker$57[27]'
+X2Y1.c0.data_in2__27.c0.const_out__27
+
+# routing for net '$auto$hilomap.cc:40:hilomap_worker$57[26]'
+X2Y1.c0.data_in2__26.c0.const_out__26
+
+# routing for net '$auto$hilomap.cc:40:hilomap_worker$57[25]'
+X2Y1.c0.data_in2__25.c0.const_out__25
+
+# routing for net '$auto$hilomap.cc:40:hilomap_worker$57[24]'
+X2Y1.c0.data_in2__24.c0.const_out__24
+
+# routing for net '$auto$hilomap.cc:40:hilomap_worker$57[23]'
+X2Y1.c0.data_in2__23.c0.const_out__23
+
+# routing for net '$auto$hilomap.cc:40:hilomap_worker$57[22]'
+X2Y1.c0.data_in2__22.c0.const_out__22
+
+# routing for net '$auto$hilomap.cc:40:hilomap_worker$57[21]'
+X2Y1.c0.data_in2__21.c0.const_out__21
+
+# routing for net '$auto$hilomap.cc:40:hilomap_worker$57[20]'
+X2Y1.c0.data_in2__20.c0.const_out__20
+
+# routing for net '$auto$hilomap.cc:40:hilomap_worker$57[19]'
+X2Y1.c0.data_in2__19.c0.const_out__19
+
+# routing for net '$auto$hilomap.cc:40:hilomap_worker$57[18]'
+X2Y1.c0.data_in2__18.c0.const_out__18
+
+# routing for net '$auto$hilomap.cc:40:hilomap_worker$57[17]'
+X2Y1.c0.data_in2__17.c0.const_out__17
+
+# routing for net '$auto$hilomap.cc:40:hilomap_worker$57[16]'
+X2Y1.c0.data_in2__16.c0.const_out__16
+
+# routing for net '$auto$hilomap.cc:40:hilomap_worker$57[15]'
+X2Y1.c0.data_in2__15.c0.const_out__15
+
+# routing for net '$auto$hilomap.cc:40:hilomap_worker$57[14]'
+X2Y1.c0.data_in2__14.c0.const_out__14
+
+# routing for net '$auto$hilomap.cc:40:hilomap_worker$57[13]'
+X2Y1.c0.data_in2__13.c0.const_out__13
+
+# routing for net '$auto$hilomap.cc:40:hilomap_worker$57[12]'
+X2Y1.c0.data_in2__12.c0.const_out__12
+
+# routing for net '$auto$hilomap.cc:40:hilomap_worker$57[11]'
+X2Y1.c0.data_in2__11.c0.const_out__11
+
+# routing for net '$auto$hilomap.cc:40:hilomap_worker$57[10]'
+X2Y1.c0.data_in2__10.c0.const_out__10
+
+# routing for net '$auto$hilomap.cc:40:hilomap_worker$57[9]'
+X2Y1.c0.data_in2__9.c0.const_out__9
+
+# routing for net '$auto$hilomap.cc:40:hilomap_worker$57[8]'
+X2Y1.c0.data_in2__8.c0.const_out__8
+
+# routing for net '$auto$hilomap.cc:40:hilomap_worker$57[7]'
+X2Y1.c0.data_in2__7.c0.const_out__7
+
+# routing for net '$auto$hilomap.cc:40:hilomap_worker$57[6]'
+X2Y1.c0.data_in2__6.c0.const_out__6
+
+# routing for net '$auto$hilomap.cc:40:hilomap_worker$57[5]'
+X2Y1.c0.data_in2__5.c0.const_out__5
+
+# routing for net '$auto$hilomap.cc:40:hilomap_worker$57[4]'
+X2Y1.c0.data_in2__4.c0.const_out__4
+
+# routing for net '$auto$hilomap.cc:40:hilomap_worker$57[3]'
+X2Y1.c0.data_in2__3.c0.const_out__3
+
+# routing for net '$auto$hilomap.cc:40:hilomap_worker$57[2]'
+X2Y1.c0.data_in2__2.c0.const_out__2
+
+# routing for net '$auto$hilomap.cc:40:hilomap_worker$57[1]'
+X2Y1.c0.data_in2__1.c0.const_out__1
+
+# routing for net '$auto$hilomap.cc:40:hilomap_worker$57[0]'
+X2Y1.c0.data_in2__0.c0.const_out__0
+
+# routing for net 'Y[7]'
+
+# routing for net 'Y[6]'
+
+# routing for net 'Y[5]'
+
+# routing for net 'Y[4]'
+
+# routing for net 'Y[3]'
+
+# routing for net 'Y[31]'
+
+# routing for net 'Y[30]'
+
+# routing for net 'Y[29]'
+
+# routing for net 'Y[2]'
+
+# routing for net 'Y[28]'
+
+# routing for net 'Y[27]'
+
+# routing for net 'Y[26]'
+
+# routing for net 'Y[25]'
+
+# routing for net 'Y[24]'
+
+# routing for net 'Y[23]'
+
+# routing for net 'Y[22]'
+
+# routing for net 'Y[21]'
+
+# routing for net 'Y[20]'
+
+# routing for net 'Y[19]'
+
+# routing for net 'Y[1]'
+
+# routing for net 'Y[18]'
+
+# routing for net 'Y[17]'
+
+# routing for net 'Y[16]'
+
+# routing for net 'Y[15]'
+
+# routing for net 'Y[14]'
+
+# routing for net 'Y[13]'
+
+# routing for net 'Y[12]'
+
+# routing for net 'Y[11]'
+
+# routing for net 'Y[10]'
+
+# routing for net 'Y[9]'
+
+# routing for net 'Y[0]'
+
 # routing for net 'A[8]'
 
 # routing for net 'A[7]'
@@ -68,809 +1150,26 @@
 
 # routing for net 'B[6]'
 
-# routing for net 'B[5]'
-
-# routing for net 'B[4]'
-
-# routing for net 'B[3]'
-
-# routing for net 'B[31]'
-
-# routing for net 'B[30]'
-
-# routing for net 'B[29]'
-
-# routing for net 'B[2]'
-
-# routing for net 'B[28]'
-
-# routing for net 'B[27]'
-
-# routing for net 'B[26]'
-
-# routing for net 'B[25]'
-
-# routing for net 'B[24]'
-
-# routing for net 'B[23]'
-
-# routing for net 'B[22]'
-
-# routing for net 'B[21]'
-
-# routing for net 'B[20]'
-
-# routing for net 'B[19]'
-
-# routing for net 'B[1]'
-
-# routing for net 'B[18]'
-
-# routing for net 'B[17]'
-
-# routing for net 'B[16]'
-
-# routing for net 'B[15]'
-
-# routing for net 'B[14]'
-
-# routing for net 'B[13]'
-
-# routing for net 'B[12]'
-
-# routing for net 'B[11]'
-
-# routing for net 'B[10]'
-
-# routing for net 'B[9]'
-
-# routing for net 'B[0]'
-
-# routing for net '$iopadmap$Y[31]'
-# pip end: X1Y1.c0.out0__31.c0.out0_internal__31'
-# pip start: X1Y1.c0.out0_internal__31.c0.data_out__31
-X1Y1.c0.out0__31.c0.data_out__31
-# pip end: X1Y2.c0.out0__31.c0.out0_internal__31'
-# pip start: X1Y2.c0.out0_internal__31.c0.in2__31
-X1Y2.c0.out0__31.c0.in2__31
-X1Y3.c0.N_from_fabric__31.c0.in2__31
-
-# routing for net '$iopadmap$Y[30]'
-# pip end: X1Y1.c0.out0__30.c0.out0_internal__30'
-# pip start: X1Y1.c0.out0_internal__30.c0.data_out__30
-X1Y1.c0.out0__30.c0.data_out__30
-# pip end: X1Y2.c0.out0__30.c0.out0_internal__30'
-# pip start: X1Y2.c0.out0_internal__30.c0.in2__30
-X1Y2.c0.out0__30.c0.in2__30
-X1Y3.c0.N_from_fabric__30.c0.in2__30
-
-# routing for net '$iopadmap$Y[29]'
-# pip end: X1Y1.c0.out0__29.c0.out0_internal__29'
-# pip start: X1Y1.c0.out0_internal__29.c0.data_out__29
-X1Y1.c0.out0__29.c0.data_out__29
-# pip end: X1Y2.c0.out0__29.c0.out0_internal__29'
-# pip start: X1Y2.c0.out0_internal__29.c0.in2__29
-X1Y2.c0.out0__29.c0.in2__29
-X1Y3.c0.N_from_fabric__29.c0.in2__29
-
-# routing for net '$iopadmap$Y[28]'
-# pip end: X1Y1.c0.out0__28.c0.out0_internal__28'
-# pip start: X1Y1.c0.out0_internal__28.c0.data_out__28
-X1Y1.c0.out0__28.c0.data_out__28
-# pip end: X1Y2.c0.out0__28.c0.out0_internal__28'
-# pip start: X1Y2.c0.out0_internal__28.c0.in2__28
-X1Y2.c0.out0__28.c0.in2__28
-X1Y3.c0.N_from_fabric__28.c0.in2__28
-
-# routing for net '$iopadmap$Y[27]'
-# pip end: X1Y1.c0.out0__27.c0.out0_internal__27'
-# pip start: X1Y1.c0.out0_internal__27.c0.data_out__27
-X1Y1.c0.out0__27.c0.data_out__27
-# pip end: X1Y2.c0.out0__27.c0.out0_internal__27'
-# pip start: X1Y2.c0.out0_internal__27.c0.in2__27
-X1Y2.c0.out0__27.c0.in2__27
-X1Y3.c0.N_from_fabric__27.c0.in2__27
-
-# routing for net '$iopadmap$Y[26]'
-# pip end: X1Y1.c0.out0__26.c0.out0_internal__26'
-# pip start: X1Y1.c0.out0_internal__26.c0.data_out__26
-X1Y1.c0.out0__26.c0.data_out__26
-# pip end: X1Y2.c0.out0__26.c0.out0_internal__26'
-# pip start: X1Y2.c0.out0_internal__26.c0.in2__26
-X1Y2.c0.out0__26.c0.in2__26
-X1Y3.c0.N_from_fabric__26.c0.in2__26
-
-# routing for net '$iopadmap$Y[25]'
-# pip end: X1Y1.c0.out0__25.c0.out0_internal__25'
-# pip start: X1Y1.c0.out0_internal__25.c0.data_out__25
-X1Y1.c0.out0__25.c0.data_out__25
-# pip end: X1Y2.c0.out0__25.c0.out0_internal__25'
-# pip start: X1Y2.c0.out0_internal__25.c0.in2__25
-X1Y2.c0.out0__25.c0.in2__25
-X1Y3.c0.N_from_fabric__25.c0.in2__25
-
-# routing for net '$iopadmap$Y[24]'
-# pip end: X1Y1.c0.out0__24.c0.out0_internal__24'
-# pip start: X1Y1.c0.out0_internal__24.c0.data_out__24
-X1Y1.c0.out0__24.c0.data_out__24
-# pip end: X1Y2.c0.out0__24.c0.out0_internal__24'
-# pip start: X1Y2.c0.out0_internal__24.c0.in2__24
-X1Y2.c0.out0__24.c0.in2__24
-X1Y3.c0.N_from_fabric__24.c0.in2__24
-
-# routing for net '$iopadmap$Y[23]'
-# pip end: X1Y1.c0.out0__23.c0.out0_internal__23'
-# pip start: X1Y1.c0.out0_internal__23.c0.data_out__23
-X1Y1.c0.out0__23.c0.data_out__23
-# pip end: X1Y2.c0.out0__23.c0.out0_internal__23'
-# pip start: X1Y2.c0.out0_internal__23.c0.in2__23
-X1Y2.c0.out0__23.c0.in2__23
-X1Y3.c0.N_from_fabric__23.c0.in2__23
-
-# routing for net '$iopadmap$Y[22]'
-# pip end: X1Y1.c0.out0__22.c0.out0_internal__22'
-# pip start: X1Y1.c0.out0_internal__22.c0.data_out__22
-X1Y1.c0.out0__22.c0.data_out__22
-# pip end: X1Y2.c0.out0__22.c0.out0_internal__22'
-# pip start: X1Y2.c0.out0_internal__22.c0.in2__22
-X1Y2.c0.out0__22.c0.in2__22
-X1Y3.c0.N_from_fabric__22.c0.in2__22
-
-# routing for net '$iopadmap$Y[21]'
-# pip end: X1Y1.c0.out0__21.c0.out0_internal__21'
-# pip start: X1Y1.c0.out0_internal__21.c0.data_out__21
-X1Y1.c0.out0__21.c0.data_out__21
-# pip end: X1Y2.c0.out0__21.c0.out0_internal__21'
-# pip start: X1Y2.c0.out0_internal__21.c0.in2__21
-X1Y2.c0.out0__21.c0.in2__21
-X1Y3.c0.N_from_fabric__21.c0.in2__21
-
-# routing for net '$iopadmap$Y[20]'
-# pip end: X1Y1.c0.out0__20.c0.out0_internal__20'
-# pip start: X1Y1.c0.out0_internal__20.c0.data_out__20
-X1Y1.c0.out0__20.c0.data_out__20
-# pip end: X1Y2.c0.out0__20.c0.out0_internal__20'
-# pip start: X1Y2.c0.out0_internal__20.c0.in2__20
-X1Y2.c0.out0__20.c0.in2__20
-X1Y3.c0.N_from_fabric__20.c0.in2__20
-
-# routing for net '$iopadmap$Y[19]'
-# pip end: X1Y1.c0.out0__19.c0.out0_internal__19'
-# pip start: X1Y1.c0.out0_internal__19.c0.data_out__19
-X1Y1.c0.out0__19.c0.data_out__19
-# pip end: X1Y2.c0.out0__19.c0.out0_internal__19'
-# pip start: X1Y2.c0.out0_internal__19.c0.in2__19
-X1Y2.c0.out0__19.c0.in2__19
-X1Y3.c0.N_from_fabric__19.c0.in2__19
-
-# routing for net '$iopadmap$Y[18]'
-# pip end: X1Y1.c0.out0__18.c0.out0_internal__18'
-# pip start: X1Y1.c0.out0_internal__18.c0.data_out__18
-X1Y1.c0.out0__18.c0.data_out__18
-# pip end: X1Y2.c0.out0__18.c0.out0_internal__18'
-# pip start: X1Y2.c0.out0_internal__18.c0.in2__18
-X1Y2.c0.out0__18.c0.in2__18
-X1Y3.c0.N_from_fabric__18.c0.in2__18
-
-# routing for net '$iopadmap$Y[17]'
-# pip end: X1Y1.c0.out0__17.c0.out0_internal__17'
-# pip start: X1Y1.c0.out0_internal__17.c0.data_out__17
-X1Y1.c0.out0__17.c0.data_out__17
-# pip end: X1Y2.c0.out0__17.c0.out0_internal__17'
-# pip start: X1Y2.c0.out0_internal__17.c0.in2__17
-X1Y2.c0.out0__17.c0.in2__17
-X1Y3.c0.N_from_fabric__17.c0.in2__17
-
-# routing for net '$iopadmap$Y[16]'
-# pip end: X1Y1.c0.out0__16.c0.out0_internal__16'
-# pip start: X1Y1.c0.out0_internal__16.c0.data_out__16
-X1Y1.c0.out0__16.c0.data_out__16
-# pip end: X1Y2.c0.out0__16.c0.out0_internal__16'
-# pip start: X1Y2.c0.out0_internal__16.c0.in2__16
-X1Y2.c0.out0__16.c0.in2__16
-X1Y3.c0.N_from_fabric__16.c0.in2__16
-
-# routing for net '$iopadmap$Y[15]'
-# pip end: X1Y1.c0.out0__15.c0.out0_internal__15'
-# pip start: X1Y1.c0.out0_internal__15.c0.data_out__15
-X1Y1.c0.out0__15.c0.data_out__15
-# pip end: X1Y2.c0.out0__15.c0.out0_internal__15'
-# pip start: X1Y2.c0.out0_internal__15.c0.in2__15
-X1Y2.c0.out0__15.c0.in2__15
-X1Y3.c0.N_from_fabric__15.c0.in2__15
-
-# routing for net '$iopadmap$Y[14]'
-# pip end: X1Y1.c0.out0__14.c0.out0_internal__14'
-# pip start: X1Y1.c0.out0_internal__14.c0.data_out__14
-X1Y1.c0.out0__14.c0.data_out__14
-# pip end: X1Y2.c0.out0__14.c0.out0_internal__14'
-# pip start: X1Y2.c0.out0_internal__14.c0.in2__14
-X1Y2.c0.out0__14.c0.in2__14
-X1Y3.c0.N_from_fabric__14.c0.in2__14
-
-# routing for net '$iopadmap$Y[13]'
-# pip end: X1Y1.c0.out0__13.c0.out0_internal__13'
-# pip start: X1Y1.c0.out0_internal__13.c0.data_out__13
-X1Y1.c0.out0__13.c0.data_out__13
-# pip end: X1Y2.c0.out0__13.c0.out0_internal__13'
-# pip start: X1Y2.c0.out0_internal__13.c0.in2__13
-X1Y2.c0.out0__13.c0.in2__13
-X1Y3.c0.N_from_fabric__13.c0.in2__13
-
-# routing for net '$iopadmap$Y[12]'
-# pip end: X1Y1.c0.out0__12.c0.out0_internal__12'
-# pip start: X1Y1.c0.out0_internal__12.c0.data_out__12
-X1Y1.c0.out0__12.c0.data_out__12
-# pip end: X1Y2.c0.out0__12.c0.out0_internal__12'
-# pip start: X1Y2.c0.out0_internal__12.c0.in2__12
-X1Y2.c0.out0__12.c0.in2__12
-X1Y3.c0.N_from_fabric__12.c0.in2__12
-
-# routing for net '$iopadmap$Y[11]'
-# pip end: X1Y1.c0.out0__11.c0.out0_internal__11'
-# pip start: X1Y1.c0.out0_internal__11.c0.data_out__11
-X1Y1.c0.out0__11.c0.data_out__11
-# pip end: X1Y2.c0.out0__11.c0.out0_internal__11'
-# pip start: X1Y2.c0.out0_internal__11.c0.in2__11
-X1Y2.c0.out0__11.c0.in2__11
-X1Y3.c0.N_from_fabric__11.c0.in2__11
-
-# routing for net '$iopadmap$Y[10]'
-# pip end: X1Y1.c0.out0__10.c0.out0_internal__10'
-# pip start: X1Y1.c0.out0_internal__10.c0.data_out__10
-X1Y1.c0.out0__10.c0.data_out__10
-# pip end: X1Y2.c0.out0__10.c0.out0_internal__10'
-# pip start: X1Y2.c0.out0_internal__10.c0.in2__10
-X1Y2.c0.out0__10.c0.in2__10
-X1Y3.c0.N_from_fabric__10.c0.in2__10
-
-# routing for net '$iopadmap$Y[9]'
-# pip end: X1Y1.c0.out0__9.c0.out0_internal__9'
-# pip start: X1Y1.c0.out0_internal__9.c0.data_out__9
-X1Y1.c0.out0__9.c0.data_out__9
-# pip end: X1Y2.c0.out0__9.c0.out0_internal__9'
-# pip start: X1Y2.c0.out0_internal__9.c0.in2__9
-X1Y2.c0.out0__9.c0.in2__9
-X1Y3.c0.N_from_fabric__9.c0.in2__9
-
-# routing for net '$iopadmap$Y[8]'
-# pip end: X1Y1.c0.out0__8.c0.out0_internal__8'
-# pip start: X1Y1.c0.out0_internal__8.c0.data_out__8
-X1Y1.c0.out0__8.c0.data_out__8
-# pip end: X1Y2.c0.out0__8.c0.out0_internal__8'
-# pip start: X1Y2.c0.out0_internal__8.c0.in2__8
-X1Y2.c0.out0__8.c0.in2__8
-X1Y3.c0.N_from_fabric__8.c0.in2__8
-
-# routing for net '$iopadmap$Y[7]'
-# pip end: X1Y1.c0.out0__7.c0.out0_internal__7'
-# pip start: X1Y1.c0.out0_internal__7.c0.data_out__7
-X1Y1.c0.out0__7.c0.data_out__7
-# pip end: X1Y2.c0.out0__7.c0.out0_internal__7'
-# pip start: X1Y2.c0.out0_internal__7.c0.in2__7
-X1Y2.c0.out0__7.c0.in2__7
-X1Y3.c0.N_from_fabric__7.c0.in2__7
-
-# routing for net '$iopadmap$Y[6]'
-# pip end: X1Y1.c0.out0__6.c0.out0_internal__6'
-# pip start: X1Y1.c0.out0_internal__6.c0.data_out__6
-X1Y1.c0.out0__6.c0.data_out__6
-# pip end: X1Y2.c0.out0__6.c0.out0_internal__6'
-# pip start: X1Y2.c0.out0_internal__6.c0.in2__6
-X1Y2.c0.out0__6.c0.in2__6
-X1Y3.c0.N_from_fabric__6.c0.in2__6
-
-# routing for net '$iopadmap$Y[5]'
-# pip end: X1Y1.c0.out0__5.c0.out0_internal__5'
-# pip start: X1Y1.c0.out0_internal__5.c0.data_out__5
-X1Y1.c0.out0__5.c0.data_out__5
-# pip end: X1Y2.c0.out0__5.c0.out0_internal__5'
-# pip start: X1Y2.c0.out0_internal__5.c0.in2__5
-X1Y2.c0.out0__5.c0.in2__5
-X1Y3.c0.N_from_fabric__5.c0.in2__5
-
-# routing for net '$iopadmap$Y[4]'
-# pip end: X1Y1.c0.out0__4.c0.out0_internal__4'
-# pip start: X1Y1.c0.out0_internal__4.c0.data_out__4
-X1Y1.c0.out0__4.c0.data_out__4
-# pip end: X1Y2.c0.out0__4.c0.out0_internal__4'
-# pip start: X1Y2.c0.out0_internal__4.c0.in2__4
-X1Y2.c0.out0__4.c0.in2__4
-X1Y3.c0.N_from_fabric__4.c0.in2__4
-
-# routing for net '$iopadmap$Y[3]'
-# pip end: X1Y1.c0.out0__3.c0.out0_internal__3'
-# pip start: X1Y1.c0.out0_internal__3.c0.data_out__3
-X1Y1.c0.out0__3.c0.data_out__3
-# pip end: X1Y2.c0.out0__3.c0.out0_internal__3'
-# pip start: X1Y2.c0.out0_internal__3.c0.in2__3
-X1Y2.c0.out0__3.c0.in2__3
-X1Y3.c0.N_from_fabric__3.c0.in2__3
-
-# routing for net '$iopadmap$Y[2]'
-# pip end: X1Y1.c0.out0__2.c0.out0_internal__2'
-# pip start: X1Y1.c0.out0_internal__2.c0.data_out__2
-X1Y1.c0.out0__2.c0.data_out__2
-# pip end: X1Y2.c0.out0__2.c0.out0_internal__2'
-# pip start: X1Y2.c0.out0_internal__2.c0.in2__2
-X1Y2.c0.out0__2.c0.in2__2
-X1Y3.c0.N_from_fabric__2.c0.in2__2
-
-# routing for net '$iopadmap$Y[1]'
-# pip end: X1Y1.c0.out0__1.c0.out0_internal__1'
-# pip start: X1Y1.c0.out0_internal__1.c0.data_out__1
-X1Y1.c0.out0__1.c0.data_out__1
-# pip end: X1Y2.c0.out0__1.c0.out0_internal__1'
-# pip start: X1Y2.c0.out0_internal__1.c0.in2__1
-X1Y2.c0.out0__1.c0.in2__1
-X1Y3.c0.N_from_fabric__1.c0.in2__1
-
-# routing for net '$iopadmap$Y[0]'
-# pip end: X1Y1.c0.out0__0.c0.out0_internal__0'
-# pip start: X1Y1.c0.out0_internal__0.c0.data_out__0
-X1Y1.c0.out0__0.c0.data_out__0
-# pip end: X1Y2.c0.out0__0.c0.out0_internal__0'
-# pip start: X1Y2.c0.out0_internal__0.c0.in2__0
-X1Y2.c0.out0__0.c0.in2__0
-X1Y3.c0.N_from_fabric__0.c0.in2__0
-
-# routing for net '$iopadmap$B[31]'
-# pip end: X1Y0.c0.out0__31.c0.out0_internal__31'
-# pip start: X1Y0.c0.out0_internal__31.c0.S_to_fabric__31
-X1Y0.c0.out0__31.c0.S_to_fabric__31
-X1Y1.c0.data_in2__31.c0.in2__31
-
-# routing for net '$iopadmap$B[30]'
-# pip end: X1Y0.c0.out0__30.c0.out0_internal__30'
-# pip start: X1Y0.c0.out0_internal__30.c0.S_to_fabric__30
-X1Y0.c0.out0__30.c0.S_to_fabric__30
-X1Y1.c0.data_in2__30.c0.in2__30
-
-# routing for net '$iopadmap$B[29]'
-# pip end: X1Y0.c0.out0__29.c0.out0_internal__29'
-# pip start: X1Y0.c0.out0_internal__29.c0.S_to_fabric__29
-X1Y0.c0.out0__29.c0.S_to_fabric__29
-X1Y1.c0.data_in2__29.c0.in2__29
-
-# routing for net '$iopadmap$B[28]'
-# pip end: X1Y0.c0.out0__28.c0.out0_internal__28'
-# pip start: X1Y0.c0.out0_internal__28.c0.S_to_fabric__28
-X1Y0.c0.out0__28.c0.S_to_fabric__28
-X1Y1.c0.data_in2__28.c0.in2__28
-
-# routing for net '$iopadmap$B[27]'
-# pip end: X1Y0.c0.out0__27.c0.out0_internal__27'
-# pip start: X1Y0.c0.out0_internal__27.c0.S_to_fabric__27
-X1Y0.c0.out0__27.c0.S_to_fabric__27
-X1Y1.c0.data_in2__27.c0.in2__27
-
-# routing for net '$iopadmap$B[26]'
-# pip end: X1Y0.c0.out0__26.c0.out0_internal__26'
-# pip start: X1Y0.c0.out0_internal__26.c0.S_to_fabric__26
-X1Y0.c0.out0__26.c0.S_to_fabric__26
-X1Y1.c0.data_in2__26.c0.in2__26
-
-# routing for net '$iopadmap$B[25]'
-# pip end: X1Y0.c0.out0__25.c0.out0_internal__25'
-# pip start: X1Y0.c0.out0_internal__25.c0.S_to_fabric__25
-X1Y0.c0.out0__25.c0.S_to_fabric__25
-X1Y1.c0.data_in2__25.c0.in2__25
-
-# routing for net '$iopadmap$B[24]'
-# pip end: X1Y0.c0.out0__24.c0.out0_internal__24'
-# pip start: X1Y0.c0.out0_internal__24.c0.S_to_fabric__24
-X1Y0.c0.out0__24.c0.S_to_fabric__24
-X1Y1.c0.data_in2__24.c0.in2__24
-
-# routing for net '$iopadmap$B[23]'
-# pip end: X1Y0.c0.out0__23.c0.out0_internal__23'
-# pip start: X1Y0.c0.out0_internal__23.c0.S_to_fabric__23
-X1Y0.c0.out0__23.c0.S_to_fabric__23
-X1Y1.c0.data_in2__23.c0.in2__23
-
-# routing for net '$iopadmap$B[22]'
-# pip end: X1Y0.c0.out0__22.c0.out0_internal__22'
-# pip start: X1Y0.c0.out0_internal__22.c0.S_to_fabric__22
-X1Y0.c0.out0__22.c0.S_to_fabric__22
-X1Y1.c0.data_in2__22.c0.in2__22
-
-# routing for net '$iopadmap$B[21]'
-# pip end: X1Y0.c0.out0__21.c0.out0_internal__21'
-# pip start: X1Y0.c0.out0_internal__21.c0.S_to_fabric__21
-X1Y0.c0.out0__21.c0.S_to_fabric__21
-X1Y1.c0.data_in2__21.c0.in2__21
-
-# routing for net '$iopadmap$B[20]'
-# pip end: X1Y0.c0.out0__20.c0.out0_internal__20'
-# pip start: X1Y0.c0.out0_internal__20.c0.S_to_fabric__20
-X1Y0.c0.out0__20.c0.S_to_fabric__20
-X1Y1.c0.data_in2__20.c0.in2__20
-
-# routing for net '$iopadmap$B[19]'
-# pip end: X1Y0.c0.out0__19.c0.out0_internal__19'
-# pip start: X1Y0.c0.out0_internal__19.c0.S_to_fabric__19
-X1Y0.c0.out0__19.c0.S_to_fabric__19
-X1Y1.c0.data_in2__19.c0.in2__19
-
-# routing for net '$iopadmap$B[18]'
-# pip end: X1Y0.c0.out0__18.c0.out0_internal__18'
-# pip start: X1Y0.c0.out0_internal__18.c0.S_to_fabric__18
-X1Y0.c0.out0__18.c0.S_to_fabric__18
-X1Y1.c0.data_in2__18.c0.in2__18
-
-# routing for net '$iopadmap$B[17]'
-# pip end: X1Y0.c0.out0__17.c0.out0_internal__17'
-# pip start: X1Y0.c0.out0_internal__17.c0.S_to_fabric__17
-X1Y0.c0.out0__17.c0.S_to_fabric__17
-X1Y1.c0.data_in2__17.c0.in2__17
-
-# routing for net '$iopadmap$B[16]'
-# pip end: X1Y0.c0.out0__16.c0.out0_internal__16'
-# pip start: X1Y0.c0.out0_internal__16.c0.S_to_fabric__16
-X1Y0.c0.out0__16.c0.S_to_fabric__16
-X1Y1.c0.data_in2__16.c0.in2__16
-
-# routing for net '$iopadmap$B[15]'
-# pip end: X1Y0.c0.out0__15.c0.out0_internal__15'
-# pip start: X1Y0.c0.out0_internal__15.c0.S_to_fabric__15
-X1Y0.c0.out0__15.c0.S_to_fabric__15
-X1Y1.c0.data_in2__15.c0.in2__15
-
-# routing for net '$iopadmap$B[14]'
-# pip end: X1Y0.c0.out0__14.c0.out0_internal__14'
-# pip start: X1Y0.c0.out0_internal__14.c0.S_to_fabric__14
-X1Y0.c0.out0__14.c0.S_to_fabric__14
-X1Y1.c0.data_in2__14.c0.in2__14
-
-# routing for net '$iopadmap$B[13]'
-# pip end: X1Y0.c0.out0__13.c0.out0_internal__13'
-# pip start: X1Y0.c0.out0_internal__13.c0.S_to_fabric__13
-X1Y0.c0.out0__13.c0.S_to_fabric__13
-X1Y1.c0.data_in2__13.c0.in2__13
-
-# routing for net '$iopadmap$B[12]'
-# pip end: X1Y0.c0.out0__12.c0.out0_internal__12'
-# pip start: X1Y0.c0.out0_internal__12.c0.S_to_fabric__12
-X1Y0.c0.out0__12.c0.S_to_fabric__12
-X1Y1.c0.data_in2__12.c0.in2__12
-
-# routing for net '$iopadmap$B[11]'
-# pip end: X1Y0.c0.out0__11.c0.out0_internal__11'
-# pip start: X1Y0.c0.out0_internal__11.c0.S_to_fabric__11
-X1Y0.c0.out0__11.c0.S_to_fabric__11
-X1Y1.c0.data_in2__11.c0.in2__11
-
-# routing for net '$iopadmap$B[10]'
-# pip end: X1Y0.c0.out0__10.c0.out0_internal__10'
-# pip start: X1Y0.c0.out0_internal__10.c0.S_to_fabric__10
-X1Y0.c0.out0__10.c0.S_to_fabric__10
-X1Y1.c0.data_in2__10.c0.in2__10
-
-# routing for net '$iopadmap$B[9]'
-# pip end: X1Y0.c0.out0__9.c0.out0_internal__9'
-# pip start: X1Y0.c0.out0_internal__9.c0.S_to_fabric__9
-X1Y0.c0.out0__9.c0.S_to_fabric__9
-X1Y1.c0.data_in2__9.c0.in2__9
-
-# routing for net '$iopadmap$B[8]'
-# pip end: X1Y0.c0.out0__8.c0.out0_internal__8'
-# pip start: X1Y0.c0.out0_internal__8.c0.S_to_fabric__8
-X1Y0.c0.out0__8.c0.S_to_fabric__8
-X1Y1.c0.data_in2__8.c0.in2__8
-
-# routing for net '$iopadmap$B[7]'
-# pip end: X1Y0.c0.out0__7.c0.out0_internal__7'
-# pip start: X1Y0.c0.out0_internal__7.c0.S_to_fabric__7
-X1Y0.c0.out0__7.c0.S_to_fabric__7
-X1Y1.c0.data_in2__7.c0.in2__7
-
-# routing for net '$iopadmap$B[6]'
-# pip end: X1Y0.c0.out0__6.c0.out0_internal__6'
-# pip start: X1Y0.c0.out0_internal__6.c0.S_to_fabric__6
-X1Y0.c0.out0__6.c0.S_to_fabric__6
-X1Y1.c0.data_in2__6.c0.in2__6
-
-# routing for net '$iopadmap$B[5]'
-# pip end: X1Y0.c0.out0__5.c0.out0_internal__5'
-# pip start: X1Y0.c0.out0_internal__5.c0.S_to_fabric__5
-X1Y0.c0.out0__5.c0.S_to_fabric__5
-X1Y1.c0.data_in2__5.c0.in2__5
-
-# routing for net '$iopadmap$B[4]'
-# pip end: X1Y0.c0.out0__4.c0.out0_internal__4'
-# pip start: X1Y0.c0.out0_internal__4.c0.S_to_fabric__4
-X1Y0.c0.out0__4.c0.S_to_fabric__4
-X1Y1.c0.data_in2__4.c0.in2__4
-
-# routing for net '$iopadmap$B[3]'
-# pip end: X1Y0.c0.out0__3.c0.out0_internal__3'
-# pip start: X1Y0.c0.out0_internal__3.c0.S_to_fabric__3
-X1Y0.c0.out0__3.c0.S_to_fabric__3
-X1Y1.c0.data_in2__3.c0.in2__3
-
-# routing for net '$iopadmap$B[2]'
-# pip end: X1Y0.c0.out0__2.c0.out0_internal__2'
-# pip start: X1Y0.c0.out0_internal__2.c0.S_to_fabric__2
-X1Y0.c0.out0__2.c0.S_to_fabric__2
-X1Y1.c0.data_in2__2.c0.in2__2
-
-# routing for net '$iopadmap$B[1]'
-# pip end: X1Y0.c0.out0__1.c0.out0_internal__1'
-# pip start: X1Y0.c0.out0_internal__1.c0.S_to_fabric__1
-X1Y0.c0.out0__1.c0.S_to_fabric__1
-X1Y1.c0.data_in2__1.c0.in2__1
-
-# routing for net '$iopadmap$B[0]'
-# pip end: X1Y0.c0.out0__0.c0.out0_internal__0'
-# pip start: X1Y0.c0.out0_internal__0.c0.S_to_fabric__0
-X1Y0.c0.out0__0.c0.S_to_fabric__0
-X1Y1.c0.data_in2__0.c0.in2__0
-
-# routing for net '$iopadmap$A[31]'
-# pip end: X0Y1.c0.out1__31.c0.out1_internal__31'
-# pip start: X0Y1.c0.out1_internal__31.c0.W_to_fabric__31
-X0Y1.c0.out1__31.c0.W_to_fabric__31
-X1Y1.c0.data_in1__31.c0.in3__31
-
-# routing for net '$iopadmap$A[30]'
-# pip end: X0Y1.c0.out1__30.c0.out1_internal__30'
-# pip start: X0Y1.c0.out1_internal__30.c0.W_to_fabric__30
-X0Y1.c0.out1__30.c0.W_to_fabric__30
-X1Y1.c0.data_in1__30.c0.in3__30
-
-# routing for net '$iopadmap$A[29]'
-# pip end: X0Y1.c0.out1__29.c0.out1_internal__29'
-# pip start: X0Y1.c0.out1_internal__29.c0.W_to_fabric__29
-X0Y1.c0.out1__29.c0.W_to_fabric__29
-X1Y1.c0.data_in1__29.c0.in3__29
-
-# routing for net '$iopadmap$A[28]'
-# pip end: X0Y1.c0.out1__28.c0.out1_internal__28'
-# pip start: X0Y1.c0.out1_internal__28.c0.W_to_fabric__28
-X0Y1.c0.out1__28.c0.W_to_fabric__28
-X1Y1.c0.data_in1__28.c0.in3__28
-
-# routing for net '$iopadmap$A[27]'
-# pip end: X0Y1.c0.out1__27.c0.out1_internal__27'
-# pip start: X0Y1.c0.out1_internal__27.c0.W_to_fabric__27
-X0Y1.c0.out1__27.c0.W_to_fabric__27
-X1Y1.c0.data_in1__27.c0.in3__27
-
-# routing for net '$iopadmap$A[26]'
-# pip end: X0Y1.c0.out1__26.c0.out1_internal__26'
-# pip start: X0Y1.c0.out1_internal__26.c0.W_to_fabric__26
-X0Y1.c0.out1__26.c0.W_to_fabric__26
-X1Y1.c0.data_in1__26.c0.in3__26
-
-# routing for net '$iopadmap$A[25]'
-# pip end: X0Y1.c0.out1__25.c0.out1_internal__25'
-# pip start: X0Y1.c0.out1_internal__25.c0.W_to_fabric__25
-X0Y1.c0.out1__25.c0.W_to_fabric__25
-X1Y1.c0.data_in1__25.c0.in3__25
-
-# routing for net '$iopadmap$A[24]'
-# pip end: X0Y1.c0.out1__24.c0.out1_internal__24'
-# pip start: X0Y1.c0.out1_internal__24.c0.W_to_fabric__24
-X0Y1.c0.out1__24.c0.W_to_fabric__24
-X1Y1.c0.data_in1__24.c0.in3__24
-
-# routing for net '$iopadmap$A[23]'
-# pip end: X0Y1.c0.out1__23.c0.out1_internal__23'
-# pip start: X0Y1.c0.out1_internal__23.c0.W_to_fabric__23
-X0Y1.c0.out1__23.c0.W_to_fabric__23
-X1Y1.c0.data_in1__23.c0.in3__23
-
-# routing for net '$iopadmap$A[22]'
-# pip end: X0Y1.c0.out1__22.c0.out1_internal__22'
-# pip start: X0Y1.c0.out1_internal__22.c0.W_to_fabric__22
-X0Y1.c0.out1__22.c0.W_to_fabric__22
-X1Y1.c0.data_in1__22.c0.in3__22
-
-# routing for net '$iopadmap$A[21]'
-# pip end: X0Y1.c0.out1__21.c0.out1_internal__21'
-# pip start: X0Y1.c0.out1_internal__21.c0.W_to_fabric__21
-X0Y1.c0.out1__21.c0.W_to_fabric__21
-X1Y1.c0.data_in1__21.c0.in3__21
-
-# routing for net '$iopadmap$A[20]'
-# pip end: X0Y1.c0.out1__20.c0.out1_internal__20'
-# pip start: X0Y1.c0.out1_internal__20.c0.W_to_fabric__20
-X0Y1.c0.out1__20.c0.W_to_fabric__20
-X1Y1.c0.data_in1__20.c0.in3__20
-
-# routing for net '$iopadmap$A[19]'
-# pip end: X0Y1.c0.out1__19.c0.out1_internal__19'
-# pip start: X0Y1.c0.out1_internal__19.c0.W_to_fabric__19
-X0Y1.c0.out1__19.c0.W_to_fabric__19
-X1Y1.c0.data_in1__19.c0.in3__19
-
-# routing for net '$iopadmap$A[18]'
-# pip end: X0Y1.c0.out1__18.c0.out1_internal__18'
-# pip start: X0Y1.c0.out1_internal__18.c0.W_to_fabric__18
-X0Y1.c0.out1__18.c0.W_to_fabric__18
-X1Y1.c0.data_in1__18.c0.in3__18
-
-# routing for net '$iopadmap$A[17]'
-# pip end: X0Y1.c0.out1__17.c0.out1_internal__17'
-# pip start: X0Y1.c0.out1_internal__17.c0.W_to_fabric__17
-X0Y1.c0.out1__17.c0.W_to_fabric__17
-X1Y1.c0.data_in1__17.c0.in3__17
-
-# routing for net '$iopadmap$A[16]'
-# pip end: X0Y1.c0.out1__16.c0.out1_internal__16'
-# pip start: X0Y1.c0.out1_internal__16.c0.W_to_fabric__16
-X0Y1.c0.out1__16.c0.W_to_fabric__16
-X1Y1.c0.data_in1__16.c0.in3__16
-
-# routing for net '$iopadmap$A[15]'
-# pip end: X0Y1.c0.out1__15.c0.out1_internal__15'
-# pip start: X0Y1.c0.out1_internal__15.c0.W_to_fabric__15
-X0Y1.c0.out1__15.c0.W_to_fabric__15
-X1Y1.c0.data_in1__15.c0.in3__15
-
-# routing for net '$iopadmap$A[14]'
-# pip end: X0Y1.c0.out1__14.c0.out1_internal__14'
-# pip start: X0Y1.c0.out1_internal__14.c0.W_to_fabric__14
-X0Y1.c0.out1__14.c0.W_to_fabric__14
-X1Y1.c0.data_in1__14.c0.in3__14
-
-# routing for net '$iopadmap$A[13]'
-# pip end: X0Y1.c0.out1__13.c0.out1_internal__13'
-# pip start: X0Y1.c0.out1_internal__13.c0.W_to_fabric__13
-X0Y1.c0.out1__13.c0.W_to_fabric__13
-X1Y1.c0.data_in1__13.c0.in3__13
-
-# routing for net '$iopadmap$A[12]'
-# pip end: X0Y1.c0.out1__12.c0.out1_internal__12'
-# pip start: X0Y1.c0.out1_internal__12.c0.W_to_fabric__12
-X0Y1.c0.out1__12.c0.W_to_fabric__12
-X1Y1.c0.data_in1__12.c0.in3__12
-
-# routing for net '$iopadmap$A[11]'
-# pip end: X0Y1.c0.out1__11.c0.out1_internal__11'
-# pip start: X0Y1.c0.out1_internal__11.c0.W_to_fabric__11
-X0Y1.c0.out1__11.c0.W_to_fabric__11
-X1Y1.c0.data_in1__11.c0.in3__11
-
-# routing for net '$iopadmap$A[10]'
-# pip end: X0Y1.c0.out1__10.c0.out1_internal__10'
-# pip start: X0Y1.c0.out1_internal__10.c0.W_to_fabric__10
-X0Y1.c0.out1__10.c0.W_to_fabric__10
-X1Y1.c0.data_in1__10.c0.in3__10
-
-# routing for net '$iopadmap$A[9]'
-# pip end: X0Y1.c0.out1__9.c0.out1_internal__9'
-# pip start: X0Y1.c0.out1_internal__9.c0.W_to_fabric__9
-X0Y1.c0.out1__9.c0.W_to_fabric__9
-X1Y1.c0.data_in1__9.c0.in3__9
-
-# routing for net '$iopadmap$A[8]'
-# pip end: X0Y1.c0.out1__8.c0.out1_internal__8'
-# pip start: X0Y1.c0.out1_internal__8.c0.W_to_fabric__8
-X0Y1.c0.out1__8.c0.W_to_fabric__8
-X1Y1.c0.data_in1__8.c0.in3__8
-
-# routing for net '$iopadmap$A[7]'
-# pip end: X0Y1.c0.out1__7.c0.out1_internal__7'
-# pip start: X0Y1.c0.out1_internal__7.c0.W_to_fabric__7
-X0Y1.c0.out1__7.c0.W_to_fabric__7
-X1Y1.c0.data_in1__7.c0.in3__7
-
-# routing for net '$iopadmap$A[6]'
-# pip end: X0Y1.c0.out1__6.c0.out1_internal__6'
-# pip start: X0Y1.c0.out1_internal__6.c0.W_to_fabric__6
-X0Y1.c0.out1__6.c0.W_to_fabric__6
-X1Y1.c0.data_in1__6.c0.in3__6
-
-# routing for net '$iopadmap$A[5]'
-# pip end: X0Y1.c0.out1__5.c0.out1_internal__5'
-# pip start: X0Y1.c0.out1_internal__5.c0.W_to_fabric__5
-X0Y1.c0.out1__5.c0.W_to_fabric__5
-X1Y1.c0.data_in1__5.c0.in3__5
-
-# routing for net '$iopadmap$A[4]'
-# pip end: X0Y1.c0.out1__4.c0.out1_internal__4'
-# pip start: X0Y1.c0.out1_internal__4.c0.W_to_fabric__4
-X0Y1.c0.out1__4.c0.W_to_fabric__4
-X1Y1.c0.data_in1__4.c0.in3__4
-
-# routing for net '$iopadmap$A[3]'
-# pip end: X0Y1.c0.out1__3.c0.out1_internal__3'
-# pip start: X0Y1.c0.out1_internal__3.c0.W_to_fabric__3
-X0Y1.c0.out1__3.c0.W_to_fabric__3
-X1Y1.c0.data_in1__3.c0.in3__3
-
-# routing for net '$iopadmap$A[2]'
-# pip end: X0Y1.c0.out1__2.c0.out1_internal__2'
-# pip start: X0Y1.c0.out1_internal__2.c0.W_to_fabric__2
-X0Y1.c0.out1__2.c0.W_to_fabric__2
-X1Y1.c0.data_in1__2.c0.in3__2
-
-# routing for net '$iopadmap$A[1]'
-# pip end: X0Y1.c0.out1__1.c0.out1_internal__1'
-# pip start: X0Y1.c0.out1_internal__1.c0.W_to_fabric__1
-X0Y1.c0.out1__1.c0.W_to_fabric__1
-X1Y1.c0.data_in1__1.c0.in3__1
-
-# routing for net '$iopadmap$A[0]'
-# pip end: X0Y1.c0.out1__0.c0.out1_internal__0'
-# pip start: X0Y1.c0.out1_internal__0.c0.W_to_fabric__0
-X0Y1.c0.out1__0.c0.W_to_fabric__0
-X1Y1.c0.data_in1__0.c0.in3__0
-
-# routing for net 'Y[8]'
-
-# routing for net 'Y[7]'
-
-# routing for net 'Y[6]'
-
-# routing for net 'Y[5]'
-
-# routing for net 'Y[4]'
-
-# routing for net 'Y[3]'
-
-# routing for net 'Y[31]'
-
-# routing for net 'Y[30]'
-
-# routing for net 'Y[29]'
-
-# routing for net 'Y[2]'
-
-# routing for net 'Y[28]'
-
-# routing for net 'Y[27]'
-
-# routing for net 'Y[26]'
-
-# routing for net 'Y[25]'
-
-# routing for net 'Y[24]'
-
-# routing for net 'Y[23]'
-
-# routing for net 'Y[22]'
-
-# routing for net 'Y[21]'
-
-# routing for net 'Y[20]'
-
-# routing for net 'Y[19]'
-
-# routing for net 'Y[1]'
-
-# routing for net 'Y[18]'
-
-# routing for net 'Y[17]'
-
-# routing for net 'Y[16]'
-
-# routing for net 'Y[15]'
-
-# routing for net 'Y[14]'
-
-# routing for net 'Y[13]'
-
-# routing for net 'Y[12]'
-
-# routing for net 'Y[11]'
-
-# routing for net 'Y[10]'
-
-# routing for net 'Y[9]'
-
-# routing for net 'Y[0]'
-
-# config for cell '$iopadmap$test.B'
-X1Y0.c0.S_IO.WIDTH = 32'b00000000000000000000000000100000
-
-# config for cell '$iopadmap$test.A'
-X0Y1.c0.W_IO.WIDTH = 32'b00000000000000000000000000100000
-
-# config for cell '$extract$\ALU_ALU_func_1$18'
+# config for cell '$extract$\ALU_ALU_func_1$39'
 X1Y1.c0.ALU.ALU_func = 1'b1
 
+# config for cell '$extract$\ALU_ALU_func_1$38'
+X2Y1.c0.ALU.ALU_func = 1'b1
+
+# config for cell '$auto$hilomap.cc:41:hilomap_worker$58'
+X2Y1.c0.const_unit.ConfigBits = 32'b00000000000000000000000000000111
+
 # config for cell '$iopadmap$test.Y'
-X1Y3.c0.N_IO.WIDTH = 32'b00000000000000000000000000100000
+X2Y0.c0.S_IO.WIDTH = 32'b00000000000000000000000000100000
+
+# config for cell '$iopadmap$test.B'
+X0Y1.c0.W_IO.WIDTH = 32'b00000000000000000000000000100000
+
+# config for cell '$iopadmap$test.A'
+X1Y0.c0.S_IO.WIDTH = 32'b00000000000000000000000000100000
+
+# config for cell '$extract$\reg_unit_tide_en_1_tide_rst_0$45'
+X1Y1.c0.RES_reg_unit.CLK_DRV = 1'b1
+X1Y1.c0.RES_reg_unit.tide_rst = 1'b0
+X1Y1.c0.RES_reg_unit.tide_en = 1'b1
 

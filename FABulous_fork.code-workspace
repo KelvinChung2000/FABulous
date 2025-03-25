@@ -113,6 +113,11 @@
         ],
         "cmake.sourceDirectory": "${workspaceFolder}/../nextpnr",
         "cmake.ctestPath": "${workspaceFolder}/../nextpnr",
-        "cmake.buildDirectory": "${workspaceFolder}/../nextpnr/build"
+        "cmake.buildDirectory": "${workspaceFolder}/../nextpnr/build",
+        "cSpell.words": [
+            "SHIFTX",
+            "xnor",
+            "XNOR"
+        ]
     }
 }

@@ -4,12 +4,11 @@ module ALU #(
 ) (
     // (* FABulous, USER_CLK *) input wire clk,
     // (* FABulous, CONTROL *)input wire en,
-    (* FABulous, BUS, DATA *) input wire [WIDTH-1:0] data_in1,
-    (* FABulous, BUS, DATA *) input wire [WIDTH-1:0] data_in2,
-    (* FABulous, BUS, DATA *) input wire [WIDTH-1:0] data_in3,
-    (* FABulous, BUS, DATA *) output reg [WIDTH-1:0] data_out,
-    (* FABulous, CONFIG_BIT, FEATURE="ADD;SUB;AND;OR;XOR;MUL",
-    FEATURE_MAP="std_add(left=>data_in1, right=>data_in2, out=>data_out);"*)
+    (* FABulous, BUS *) input wire [WIDTH-1:0] data_in1,
+    (* FABulous, BUS *) input wire [WIDTH-1:0] data_in2,
+    (* FABulous, BUS *) input wire [WIDTH-1:0] data_in3,
+    (* FABulous, BUS *) output reg [WIDTH-1:0] data_out,
+    (* FABulous, CONFIG_BIT, FEATURE="ADD;SUB;AND;OR;XOR;MUL;MUL_ADD"*)
     input [2:0] ALU_func
 );
   // Define operation codes
@@ -19,6 +18,7 @@ module ALU #(
   localparam OR = 3'b011;
   localparam XOR = 3'b100;
   localparam MUL = 3'b101;
+  localparam MUL_ADD = 3'b110;
 
   // wire [WIDTH - 1:0] data2;
 
@@ -32,13 +32,9 @@ module ALU #(
       OR: data_out = data_in1 | data_in2;
       XOR: data_out = data_in1 ^ data_in2;
       MUL: data_out = data_in1 * data_in2;
+      MUL_ADD: data_out = data_in1 * data_in2 + data_in3;
       default: data_out = {WIDTH{1'b0}};
     endcase
-    // if (en) begin
-    // end
-    // else begin
-    //   data_out = 8'b0;
-    // end
   end
 
 endmodule

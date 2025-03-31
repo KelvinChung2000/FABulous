@@ -64,7 +64,7 @@
           "attributes": {
             "BEL_STRENGTH": "00000000000000000000000000000001",
             "NEXTPNR_BEL": "X1Y1/c0.ALU",
-            "src": "/home/kelvin/FABulous_fork/myProject/.FABulous/techmaps.v:40.7-45.6",
+            "src": "/home/kelvin/FABulous_fork/myProject/.FABulous/techmaps.v:165.7-170.6",
             "module_not_derived": "00000000000000000000000000000001"
           },
           "port_directions": {
@@ -89,7 +89,7 @@
           "attributes": {
             "BEL_STRENGTH": "00000000000000000000000000000001",
             "NEXTPNR_BEL": "X2Y1/c0.ALU",
-            "src": "/home/kelvin/FABulous_fork/myProject/.FABulous/techmaps.v:40.7-45.6",
+            "src": "/home/kelvin/FABulous_fork/myProject/.FABulous/techmaps.v:165.7-170.6",
             "module_not_derived": "00000000000000000000000000000001"
           },
           "port_directions": {
@@ -193,7 +193,7 @@
           "attributes": {
             "BEL_STRENGTH": "00000000000000000000000000000001",
             "NEXTPNR_BEL": "X1Y1/c0.RES_reg_unit",
-            "src": "/home/kelvin/FABulous_fork/myProject/.FABulous/techmaps.v:258.7-264.6",
+            "src": "/home/kelvin/FABulous_fork/myProject/.FABulous/techmaps.v:82.7-88.6",
             "module_not_derived": "00000000000000000000000000000001"
           },
           "port_directions": {

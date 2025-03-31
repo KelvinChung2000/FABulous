@@ -1309,7 +1309,7 @@ module std_reg #(
    (* write_together=1, interval=1, go=1 *) input wire logic write_en,
    (* clk=1 *) input wire logic clk,
    (* reset=1 *) input wire logic reset,
-   (* stable=1, data=1 *) output wire logic [WIDTH-1:0] out,
+   (* stable=1 *) output wire logic [WIDTH-1:0] out,
    (* done=1 *) output wire logic done
 );
 always_ff @(posedge clk) begin
@@ -1341,183 +1341,6 @@ always_ff @(posedge clk) begin
       out <= in;
       done <= 1'd1;
     end else done <= 1'd0;
-  end
-endmodule
-
-
-module fsm_main_def (
-  input logic clk,
-  input logic reset,
-  output logic fsm_done_in,
-  output logic gemm_instance_arg_mem_0_done,
-  output logic gemm_instance_arg_mem_0_read_data,
-  output logic gemm_instance_arg_mem_1_done,
-  output logic gemm_instance_arg_mem_1_read_data,
-  output logic gemm_instance_arg_mem_3_done,
-  output logic gemm_instance_arg_mem_3_read_data,
-  output logic gemm_instance_go,
-  output logic gemm_instance_in0,
-  output logic gemm_instance_in1,
-  output logic gemm_instance_reset,
-  output logic mem_0_content_en,
-  output logic mem_0_write_en,
-  output logic mem_1_content_en,
-  output logic mem_1_write_en,
-  output logic mem_3_content_en,
-  output logic mem_3_write_en,
-  input logic mem_0_done,
-  input logic mem_0_read_data,
-  input logic mem_1_done,
-  input logic mem_1_read_data,
-  input logic mem_3_done,
-  input logic mem_3_read_data,
-  input logic in0,
-  input logic in1,
-  input logic gemm_instance_arg_mem_0_content_en,
-  input logic gemm_instance_arg_mem_0_write_en,
-  input logic gemm_instance_arg_mem_1_content_en,
-  input logic gemm_instance_arg_mem_1_write_en,
-  input logic gemm_instance_arg_mem_3_content_en,
-  input logic gemm_instance_arg_mem_3_write_en,
-  input logic fsm_start_out,
-  input logic gemm_instance_done
-);
-
-  localparam logic[1:0] S0 = 2'd0;
-  localparam logic[1:0] S1 = 2'd1;
-  localparam logic[1:0] S2 = 2'd2;
-  localparam logic[1:0] S3 = 2'd3;
-
-  logic [1:0] current_state;
-  logic [1:0] next_state;
-
-  always @(posedge clk) begin
-    if (reset) begin
-      current_state <= S0;
-    end
-    else begin
-      current_state <= next_state;
-    end
-  end
-
-  always_comb begin
-    case ( current_state )
-        S0: begin
-          fsm_done_in = 'b0;
-          gemm_instance_arg_mem_0_done = 'b0;
-          gemm_instance_arg_mem_0_read_data = 'b0;
-          gemm_instance_arg_mem_1_done = 'b0;
-          gemm_instance_arg_mem_1_read_data = 'b0;
-          gemm_instance_arg_mem_3_done = 'b0;
-          gemm_instance_arg_mem_3_read_data = 'b0;
-          gemm_instance_go = 'b0;
-          gemm_instance_in0 = 'b0;
-          gemm_instance_in1 = 'b0;
-          gemm_instance_reset = 'b0;
-          mem_0_content_en = 'b0;
-          mem_0_write_en = 'b0;
-          mem_1_content_en = 'b0;
-          mem_1_write_en = 'b0;
-          mem_3_content_en = 'b0;
-          mem_3_write_en = 'b0;
-          if (fsm_start_out) begin
-            next_state = S1;
-          end
-          else begin
-            next_state = S0;
-          end
-        end
-        S1: begin
-          fsm_done_in = 'b0;
-          gemm_instance_arg_mem_0_done = 'b0;
-          gemm_instance_arg_mem_0_read_data = 'b0;
-          gemm_instance_arg_mem_1_done = 'b0;
-          gemm_instance_arg_mem_1_read_data = 'b0;
-          gemm_instance_arg_mem_3_done = 'b0;
-          gemm_instance_arg_mem_3_read_data = 'b0;
-          gemm_instance_go = 1'd1;
-          gemm_instance_in0 = 'b0;
-          gemm_instance_in1 = 'b0;
-          gemm_instance_reset = 1'd1;
-          mem_0_content_en = 'b0;
-          mem_0_write_en = 'b0;
-          mem_1_content_en = 'b0;
-          mem_1_write_en = 'b0;
-          mem_3_content_en = 'b0;
-          mem_3_write_en = 'b0;
-          if (gemm_instance_done) begin
-            next_state = S2;
-          end
-          else begin
-            next_state = S1;
-          end
-        end
-        S2: begin
-          fsm_done_in = 'b0;
-          gemm_instance_arg_mem_0_done = mem_0_done;
-          gemm_instance_arg_mem_0_read_data = mem_0_read_data;
-          gemm_instance_arg_mem_1_done = mem_1_done;
-          gemm_instance_arg_mem_1_read_data = mem_1_read_data;
-          gemm_instance_arg_mem_3_done = mem_3_done;
-          gemm_instance_arg_mem_3_read_data = mem_3_read_data;
-          gemm_instance_go = 1'd1;
-          gemm_instance_in0 = in0;
-          gemm_instance_in1 = in1;
-          gemm_instance_reset = 'b0;
-          mem_0_content_en = gemm_instance_arg_mem_0_content_en;
-          mem_0_write_en = gemm_instance_arg_mem_0_write_en;
-          mem_1_content_en = gemm_instance_arg_mem_1_content_en;
-          mem_1_write_en = gemm_instance_arg_mem_1_write_en;
-          mem_3_content_en = gemm_instance_arg_mem_3_content_en;
-          mem_3_write_en = gemm_instance_arg_mem_3_write_en;
-          if (gemm_instance_done) begin
-            next_state = S3;
-          end
-          else begin
-            next_state = S2;
-          end
-        end
-        S3: begin
-          fsm_done_in = 1'd1;
-          gemm_instance_arg_mem_0_done = 'b0;
-          gemm_instance_arg_mem_0_read_data = 'b0;
-          gemm_instance_arg_mem_1_done = 'b0;
-          gemm_instance_arg_mem_1_read_data = 'b0;
-          gemm_instance_arg_mem_3_done = 'b0;
-          gemm_instance_arg_mem_3_read_data = 'b0;
-          gemm_instance_go = 'b0;
-          gemm_instance_in0 = 'b0;
-          gemm_instance_in1 = 'b0;
-          gemm_instance_reset = 'b0;
-          mem_0_content_en = 'b0;
-          mem_0_write_en = 'b0;
-          mem_1_content_en = 'b0;
-          mem_1_write_en = 'b0;
-          mem_3_content_en = 'b0;
-          mem_3_write_en = 'b0;
-          next_state = S0;
-        end
-      default begin
-          fsm_done_in = 'b0;
-          gemm_instance_arg_mem_0_done = 'b0;
-          gemm_instance_arg_mem_0_read_data = 'b0;
-          gemm_instance_arg_mem_1_done = 'b0;
-          gemm_instance_arg_mem_1_read_data = 'b0;
-          gemm_instance_arg_mem_3_done = 'b0;
-          gemm_instance_arg_mem_3_read_data = 'b0;
-          gemm_instance_go = 'b0;
-          gemm_instance_in0 = 'b0;
-          gemm_instance_in1 = 'b0;
-          gemm_instance_reset = 'b0;
-          mem_0_content_en = 'b0;
-          mem_0_write_en = 'b0;
-          mem_1_content_en = 'b0;
-          mem_1_write_en = 'b0;
-          mem_3_content_en = 'b0;
-          mem_3_write_en = 'b0;
-          next_state = S0;
-      end
-    endcase
   end
 endmodule
 
@@ -1592,10 +1415,10 @@ logic gemm_instance_arg_mem_2_write_en;
 logic [31:0] gemm_instance_arg_mem_2_write_data;
 logic [9:0] gemm_instance_arg_mem_1_addr0;
 logic gemm_instance_arg_mem_1_content_en;
-logic fsm_start_in;
-logic fsm_start_out;
-logic fsm_done_in;
-logic fsm_done_out;
+logic invoke0_go_in;
+logic invoke0_go_out;
+logic invoke0_done_in;
+logic invoke0_done_out;
 (* external=1, data=1 *)
 seq_mem_d1 # (
     .IDX_SIZE(10),
@@ -1660,7 +1483,7 @@ seq_mem_d1 # (
     .write_en(mem_0_write_en)
 );
 
-(* data=1, control=1 *)
+(* data=1 *)
 gemm gemm_instance (
     .arg_mem_0_addr0(gemm_instance_arg_mem_0_addr0),
     .arg_mem_0_content_en(gemm_instance_arg_mem_0_content_en),
@@ -1697,96 +1520,108 @@ gemm gemm_instance (
 (* generated=1 *)
 std_wire # (
     .WIDTH(1)
-) fsm_start (
-    .in(fsm_start_in),
-    .out(fsm_start_out)
+) invoke0_go (
+    .in(invoke0_go_in),
+    .out(invoke0_go_out)
 );
 
 (* generated=1 *)
 std_wire # (
     .WIDTH(1)
-) fsm_done (
-    .in(fsm_done_in),
-    .out(fsm_done_out)
+) invoke0_done (
+    .in(invoke0_done_in),
+    .out(invoke0_done_out)
 );
 
-fsm_main_def fsm (
-  .clk(clk),
-  .reset(reset),
-  // dst ports
-  // input ports
-  .fsm_done_in(fsm_done_in),
-  .gemm_instance_arg_mem_0_done(gemm_instance_arg_mem_0_done),
-  .gemm_instance_arg_mem_0_read_data(gemm_instance_arg_mem_0_read_data),
-  .gemm_instance_arg_mem_1_done(gemm_instance_arg_mem_1_done),
-  .gemm_instance_arg_mem_1_read_data(gemm_instance_arg_mem_1_read_data),
-  .gemm_instance_arg_mem_3_done(gemm_instance_arg_mem_3_done),
-  .gemm_instance_arg_mem_3_read_data(gemm_instance_arg_mem_3_read_data),
-  .gemm_instance_go(gemm_instance_go),
-  .gemm_instance_in0(gemm_instance_in0),
-  .gemm_instance_in1(gemm_instance_in1),
-  .gemm_instance_reset(gemm_instance_reset),
-  .mem_0_content_en(mem_0_content_en),
-  .mem_0_write_en(mem_0_write_en),
-  .mem_1_content_en(mem_1_content_en),
-  .mem_1_write_en(mem_1_write_en),
-  .mem_3_content_en(mem_3_content_en),
-  .mem_3_write_en(mem_3_write_en),
-  .mem_0_done(mem_0_done),
-  .mem_0_read_data(mem_0_read_data),
-  .mem_1_done(mem_1_done),
-  .mem_1_read_data(mem_1_read_data),
-  .mem_3_done(mem_3_done),
-  .mem_3_read_data(mem_3_read_data),
-  .in0(in0),
-  .in1(in1),
-  .gemm_instance_arg_mem_0_content_en(gemm_instance_arg_mem_0_content_en),
-  .gemm_instance_arg_mem_0_write_en(gemm_instance_arg_mem_0_write_en),
-  .gemm_instance_arg_mem_1_content_en(gemm_instance_arg_mem_1_content_en),
-  .gemm_instance_arg_mem_1_write_en(gemm_instance_arg_mem_1_write_en),
-  .gemm_instance_arg_mem_3_content_en(gemm_instance_arg_mem_3_content_en),
-  .gemm_instance_arg_mem_3_write_en(gemm_instance_arg_mem_3_write_en),
-  .fsm_start_out(fsm_start_out),
-  .gemm_instance_done(gemm_instance_done)
-);
-
-assign mem_1_addr0 = gemm_instance_arg_mem_1_addr0;
-assign mem_0_addr0 = gemm_instance_arg_mem_0_addr0;
-assign mem_3_write_data = gemm_instance_arg_mem_3_write_data;
-assign mem_3_addr0 = gemm_instance_arg_mem_3_addr0;
-assign done = fsm_done_out;
+assign done = invoke0_done_out;
 assign mem_2_write_en = 1'd0;
 assign mem_2_clk = clk;
 assign mem_2_content_en = 1'd0;
 assign mem_2_reset = reset;
+assign invoke0_go_in = go;
+assign mem_1_write_en =
+ invoke0_go_out ? gemm_instance_arg_mem_1_write_en : 1'd0;
 assign mem_1_clk = clk;
+assign mem_1_addr0 = gemm_instance_arg_mem_1_addr0;
+assign mem_1_content_en =
+ invoke0_go_out ? gemm_instance_arg_mem_1_content_en : 1'd0;
 assign mem_1_reset = reset;
+assign invoke0_done_in = gemm_instance_done;
+assign mem_0_write_en =
+ invoke0_go_out ? gemm_instance_arg_mem_0_write_en : 1'd0;
 assign mem_0_clk = clk;
+assign mem_0_addr0 = gemm_instance_arg_mem_0_addr0;
+assign mem_0_content_en =
+ invoke0_go_out ? gemm_instance_arg_mem_0_content_en : 1'd0;
 assign mem_0_reset = reset;
+assign mem_3_write_en =
+ invoke0_go_out ? gemm_instance_arg_mem_3_write_en : 1'd0;
 assign mem_3_clk = clk;
+assign mem_3_addr0 = gemm_instance_arg_mem_3_addr0;
+assign mem_3_content_en =
+ invoke0_go_out ? gemm_instance_arg_mem_3_content_en : 1'd0;
 assign mem_3_reset = reset;
-assign fsm_start_in = go;
+assign mem_3_write_data = gemm_instance_arg_mem_3_write_data;
+assign gemm_instance_arg_mem_0_read_data =
+ invoke0_go_out ? mem_0_read_data : 32'd0;
+assign gemm_instance_arg_mem_0_done =
+ invoke0_go_out ? mem_0_done : 1'd0;
+assign gemm_instance_arg_mem_3_read_data =
+ invoke0_go_out ? mem_3_read_data : 32'd0;
+assign gemm_instance_in1 =
+ invoke0_go_out ? in1 : 32'd0;
+assign gemm_instance_arg_mem_1_read_data =
+ invoke0_go_out ? mem_1_read_data : 32'd0;
 assign gemm_instance_clk = clk;
+assign gemm_instance_arg_mem_3_done =
+ invoke0_go_out ? mem_3_done : 1'd0;
+assign gemm_instance_reset = reset;
+assign gemm_instance_go = invoke0_go_out;
+assign gemm_instance_arg_mem_1_done =
+ invoke0_go_out ? mem_1_done : 1'd0;
+assign gemm_instance_in0 =
+ invoke0_go_out ? in0 : 32'd0;
 // COMPONENT END: main
 endmodule
 
 module fsm_gemm_def (
   input logic clk,
   input logic reset,
+  output logic adder0_left,
+  output logic adder0_right,
+  output logic adder1_left,
+  output logic adder1_right,
+  output logic adder_left,
+  output logic adder_right,
   output logic arg_mem_0_content_en,
   output logic arg_mem_0_write_en,
   output logic arg_mem_1_content_en,
   output logic arg_mem_1_write_en,
   output logic arg_mem_3_content_en,
   output logic arg_mem_3_write_en,
-  output logic comb_reg0_in,
-  output logic comb_reg0_write_en,
-  output logic comb_reg1_in,
-  output logic comb_reg1_write_en,
-  output logic comb_reg_in,
-  output logic comb_reg_write_en,
+  output logic cond_reg0_in,
+  output logic cond_reg0_write_en,
+  output logic cond_reg1_in,
+  output logic cond_reg1_write_en,
+  output logic cond_reg_in,
+  output logic cond_reg_write_en,
+  output logic for_0_induction_var_reg_write_en,
+  output logic for_1_induction_var_reg_write_en,
+  output logic for_2_induction_var_reg_write_en,
   output logic fsm_done_in,
+  output logic idx0_in,
+  output logic idx0_write_en,
+  output logic idx1_in,
+  output logic idx1_write_en,
+  output logic idx_in,
+  output logic idx_write_en,
   output logic load_0_reg_write_en,
+  output logic lt0_left,
+  output logic lt0_right,
+  output logic lt1_left,
+  output logic lt1_right,
+  output logic lt_left,
+  output logic lt_right,
   output logic muli_0_reg_write_en,
   output logic muli_1_reg_write_en,
   output logic muli_2_reg_write_en,
@@ -1795,32 +1630,55 @@ module fsm_gemm_def (
   output logic std_mult_pipe_1_go,
   output logic std_mult_pipe_2_go,
   output logic std_mult_pipe_3_go,
-  output logic std_slt_0_left,
-  output logic std_slt_0_right,
-  output logic std_slt_1_left,
-  output logic std_slt_1_right,
-  output logic std_slt_2_left,
-  output logic std_slt_2_right,
-  output logic while_0_arg0_reg_write_en,
-  output logic while_1_arg0_reg_write_en,
-  output logic while_2_arg0_reg_write_en,
-  input logic std_slt_1_out,
-  input logic std_slt_2_out,
-  input logic std_slt_0_out,
-  input logic while_2_arg0_reg_out,
-  input logic while_1_arg0_reg_out,
-  input logic while_0_arg0_reg_out,
+  input logic idx0_out,
+  input logic idx1_out,
+  input logic idx_out,
+  input logic lt0_out,
+  input logic lt1_out,
+  input logic lt_out,
+  input logic adder0_out,
+  input logic adder1_out,
+  input logic adder_out,
   input logic fsm_start_out,
-  input logic while_2_arg0_reg_done,
-  input logic comb_reg_out,
-  input logic comb_reg0_out,
-  input logic while_0_arg0_reg_done,
-  input logic comb_reg1_out,
-  input logic arg_mem_0_done,
-  input logic arg_mem_1_done,
-  input logic arg_mem_3_done,
-  input logic load_0_reg_done,
-  input logic while_1_arg0_reg_done
+  input logic cond_reg1_done,
+  input logic idx1_done,
+  input logic cond_reg1_out,
+  input logic cond_reg0_done,
+  input logic idx0_done,
+  input logic cond_reg0_out,
+  input logic cond_reg_done,
+  input logic idx_done,
+  input logic cond_reg_out,
+  output logic fsm_s0_out,
+  output logic fsm_s1_out,
+  output logic fsm_s2_out,
+  output logic fsm_s3_out,
+  output logic fsm_s4_out,
+  output logic fsm_s5_out,
+  output logic fsm_s6_out,
+  output logic fsm_s7_out,
+  output logic fsm_s8_out,
+  output logic fsm_s9_out,
+  output logic fsm_s10_out,
+  output logic fsm_s11_out,
+  output logic fsm_s12_out,
+  output logic fsm_s13_out,
+  output logic fsm_s14_out,
+  output logic fsm_s15_out,
+  output logic fsm_s16_out,
+  output logic fsm_s17_out,
+  output logic fsm_s18_out,
+  output logic fsm_s19_out,
+  output logic fsm_s20_out,
+  output logic fsm_s21_out,
+  output logic fsm_s22_out,
+  output logic fsm_s23_out,
+  output logic fsm_s24_out,
+  output logic fsm_s25_out,
+  output logic fsm_s26_out,
+  output logic fsm_s27_out,
+  output logic fsm_s28_out,
+  output logic fsm_s29_out
 );
 
   localparam logic[4:0] S0 = 5'd0;
@@ -1869,20 +1727,41 @@ module fsm_gemm_def (
   always_comb begin
     case ( current_state )
         S0: begin
+          adder0_left = 'b0;
+          adder0_right = 'b0;
+          adder1_left = 'b0;
+          adder1_right = 'b0;
+          adder_left = 'b0;
+          adder_right = 'b0;
           arg_mem_0_content_en = 'b0;
           arg_mem_0_write_en = 'b0;
           arg_mem_1_content_en = 'b0;
           arg_mem_1_write_en = 'b0;
           arg_mem_3_content_en = 'b0;
           arg_mem_3_write_en = 'b0;
-          comb_reg0_in = 'b0;
-          comb_reg0_write_en = 'b0;
-          comb_reg1_in = 'b0;
-          comb_reg1_write_en = 'b0;
-          comb_reg_in = 'b0;
-          comb_reg_write_en = 'b0;
+          cond_reg0_in = 'b0;
+          cond_reg0_write_en = 'b0;
+          cond_reg1_in = 'b0;
+          cond_reg1_write_en = 'b0;
+          cond_reg_in = 'b0;
+          cond_reg_write_en = 'b0;
+          for_0_induction_var_reg_write_en = 'b0;
+          for_1_induction_var_reg_write_en = 'b0;
+          for_2_induction_var_reg_write_en = 'b0;
           fsm_done_in = 'b0;
+          idx0_in = 'b0;
+          idx0_write_en = 'b0;
+          idx1_in = 'b0;
+          idx1_write_en = 'b0;
+          idx_in = 'b0;
+          idx_write_en = 'b0;
           load_0_reg_write_en = 'b0;
+          lt0_left = 'b0;
+          lt0_right = 'b0;
+          lt1_left = 'b0;
+          lt1_right = 'b0;
+          lt_left = 'b0;
+          lt_right = 'b0;
           muli_0_reg_write_en = 'b0;
           muli_1_reg_write_en = 'b0;
           muli_2_reg_write_en = 'b0;
@@ -1891,15 +1770,36 @@ module fsm_gemm_def (
           std_mult_pipe_1_go = 'b0;
           std_mult_pipe_2_go = 'b0;
           std_mult_pipe_3_go = 'b0;
-          std_slt_0_left = 'b0;
-          std_slt_0_right = 'b0;
-          std_slt_1_left = 'b0;
-          std_slt_1_right = 'b0;
-          std_slt_2_left = 'b0;
-          std_slt_2_right = 'b0;
-          while_0_arg0_reg_write_en = 'b0;
-          while_1_arg0_reg_write_en = 'b0;
-          while_2_arg0_reg_write_en = 'b0;
+          fsm_s0_out = 1'b1;
+          fsm_s1_out = 1'b0;
+          fsm_s2_out = 1'b0;
+          fsm_s3_out = 1'b0;
+          fsm_s4_out = 1'b0;
+          fsm_s5_out = 1'b0;
+          fsm_s6_out = 1'b0;
+          fsm_s7_out = 1'b0;
+          fsm_s8_out = 1'b0;
+          fsm_s9_out = 1'b0;
+          fsm_s10_out = 1'b0;
+          fsm_s11_out = 1'b0;
+          fsm_s12_out = 1'b0;
+          fsm_s13_out = 1'b0;
+          fsm_s14_out = 1'b0;
+          fsm_s15_out = 1'b0;
+          fsm_s16_out = 1'b0;
+          fsm_s17_out = 1'b0;
+          fsm_s18_out = 1'b0;
+          fsm_s19_out = 1'b0;
+          fsm_s20_out = 1'b0;
+          fsm_s21_out = 1'b0;
+          fsm_s22_out = 1'b0;
+          fsm_s23_out = 1'b0;
+          fsm_s24_out = 1'b0;
+          fsm_s25_out = 1'b0;
+          fsm_s26_out = 1'b0;
+          fsm_s27_out = 1'b0;
+          fsm_s28_out = 1'b0;
+          fsm_s29_out = 1'b0;
           if (fsm_start_out) begin
             next_state = S1;
           end
@@ -1908,20 +1808,41 @@ module fsm_gemm_def (
           end
         end
         S1: begin
+          adder0_left = 'b0;
+          adder0_right = 'b0;
+          adder1_left = 'b0;
+          adder1_right = 'b0;
+          adder_left = 'b0;
+          adder_right = 'b0;
           arg_mem_0_content_en = 'b0;
           arg_mem_0_write_en = 'b0;
           arg_mem_1_content_en = 'b0;
           arg_mem_1_write_en = 'b0;
           arg_mem_3_content_en = 'b0;
           arg_mem_3_write_en = 'b0;
-          comb_reg0_in = 'b0;
-          comb_reg0_write_en = 'b0;
-          comb_reg1_in = 'b0;
-          comb_reg1_write_en = 'b0;
-          comb_reg_in = 'b0;
-          comb_reg_write_en = 'b0;
+          cond_reg0_in = 'b0;
+          cond_reg0_write_en = 'b0;
+          cond_reg1_in = 'b0;
+          cond_reg1_write_en = 'b0;
+          cond_reg_in = 'b0;
+          cond_reg_write_en = 'b0;
+          for_0_induction_var_reg_write_en = 'b0;
+          for_1_induction_var_reg_write_en = 'b0;
+          for_2_induction_var_reg_write_en = 1'd1;
           fsm_done_in = 'b0;
+          idx0_in = 'b0;
+          idx0_write_en = 'b0;
+          idx1_in = 'b0;
+          idx1_write_en = 'b0;
+          idx_in = 'b0;
+          idx_write_en = 'b0;
           load_0_reg_write_en = 'b0;
+          lt0_left = 'b0;
+          lt0_right = 'b0;
+          lt1_left = 'b0;
+          lt1_right = 'b0;
+          lt_left = 'b0;
+          lt_right = 'b0;
           muli_0_reg_write_en = 'b0;
           muli_1_reg_write_en = 'b0;
           muli_2_reg_write_en = 'b0;
@@ -1930,37 +1851,74 @@ module fsm_gemm_def (
           std_mult_pipe_1_go = 'b0;
           std_mult_pipe_2_go = 'b0;
           std_mult_pipe_3_go = 'b0;
-          std_slt_0_left = 'b0;
-          std_slt_0_right = 'b0;
-          std_slt_1_left = 'b0;
-          std_slt_1_right = 'b0;
-          std_slt_2_left = 'b0;
-          std_slt_2_right = 'b0;
-          while_0_arg0_reg_write_en = 'b0;
-          while_1_arg0_reg_write_en = 'b0;
-          while_2_arg0_reg_write_en = 1'd1;
-          if (while_2_arg0_reg_done) begin
-            next_state = S2;
-          end
-          else begin
-            next_state = S1;
-          end
+          fsm_s0_out = 1'b0;
+          fsm_s1_out = 1'b1;
+          fsm_s2_out = 1'b0;
+          fsm_s3_out = 1'b0;
+          fsm_s4_out = 1'b0;
+          fsm_s5_out = 1'b0;
+          fsm_s6_out = 1'b0;
+          fsm_s7_out = 1'b0;
+          fsm_s8_out = 1'b0;
+          fsm_s9_out = 1'b0;
+          fsm_s10_out = 1'b0;
+          fsm_s11_out = 1'b0;
+          fsm_s12_out = 1'b0;
+          fsm_s13_out = 1'b0;
+          fsm_s14_out = 1'b0;
+          fsm_s15_out = 1'b0;
+          fsm_s16_out = 1'b0;
+          fsm_s17_out = 1'b0;
+          fsm_s18_out = 1'b0;
+          fsm_s19_out = 1'b0;
+          fsm_s20_out = 1'b0;
+          fsm_s21_out = 1'b0;
+          fsm_s22_out = 1'b0;
+          fsm_s23_out = 1'b0;
+          fsm_s24_out = 1'b0;
+          fsm_s25_out = 1'b0;
+          fsm_s26_out = 1'b0;
+          fsm_s27_out = 1'b0;
+          fsm_s28_out = 1'b0;
+          fsm_s29_out = 1'b0;
+          next_state = S2;
         end
         S2: begin
+          adder0_left = 'b0;
+          adder0_right = 'b0;
+          adder1_left = 'b0;
+          adder1_right = 'b0;
+          adder_left = 'b0;
+          adder_right = 'b0;
           arg_mem_0_content_en = 'b0;
           arg_mem_0_write_en = 'b0;
           arg_mem_1_content_en = 'b0;
           arg_mem_1_write_en = 'b0;
           arg_mem_3_content_en = 'b0;
           arg_mem_3_write_en = 'b0;
-          comb_reg0_in = 'b0;
-          comb_reg0_write_en = 'b0;
-          comb_reg1_in = 'b0;
-          comb_reg1_write_en = 'b0;
-          comb_reg_in = std_slt_0_out;
-          comb_reg_write_en = 1'd1;
+          cond_reg0_in = 'b0;
+          cond_reg0_write_en = 'b0;
+          cond_reg1_in = 1'd1;
+          cond_reg1_write_en = 1'd1;
+          cond_reg_in = 'b0;
+          cond_reg_write_en = 'b0;
+          for_0_induction_var_reg_write_en = 'b0;
+          for_1_induction_var_reg_write_en = 'b0;
+          for_2_induction_var_reg_write_en = 'b0;
           fsm_done_in = 'b0;
+          idx0_in = 'b0;
+          idx0_write_en = 'b0;
+          idx1_in = 5'd0;
+          idx1_write_en = 1'd1;
+          idx_in = 'b0;
+          idx_write_en = 'b0;
           load_0_reg_write_en = 'b0;
+          lt0_left = 'b0;
+          lt0_right = 'b0;
+          lt1_left = 'b0;
+          lt1_right = 'b0;
+          lt_left = 'b0;
+          lt_right = 'b0;
           muli_0_reg_write_en = 'b0;
           muli_1_reg_write_en = 'b0;
           muli_2_reg_write_en = 'b0;
@@ -1969,19 +1927,40 @@ module fsm_gemm_def (
           std_mult_pipe_1_go = 'b0;
           std_mult_pipe_2_go = 'b0;
           std_mult_pipe_3_go = 'b0;
-          std_slt_0_left = while_2_arg0_reg_out;
-          std_slt_0_right = 32'd20;
-          std_slt_1_left = 'b0;
-          std_slt_1_right = 'b0;
-          std_slt_2_left = 'b0;
-          std_slt_2_right = 'b0;
-          while_0_arg0_reg_write_en = 'b0;
-          while_1_arg0_reg_write_en = 'b0;
-          while_2_arg0_reg_write_en = 'b0;
-          if (comb_reg_out) begin
+          fsm_s0_out = 1'b0;
+          fsm_s1_out = 1'b0;
+          fsm_s2_out = 1'b1;
+          fsm_s3_out = 1'b0;
+          fsm_s4_out = 1'b0;
+          fsm_s5_out = 1'b0;
+          fsm_s6_out = 1'b0;
+          fsm_s7_out = 1'b0;
+          fsm_s8_out = 1'b0;
+          fsm_s9_out = 1'b0;
+          fsm_s10_out = 1'b0;
+          fsm_s11_out = 1'b0;
+          fsm_s12_out = 1'b0;
+          fsm_s13_out = 1'b0;
+          fsm_s14_out = 1'b0;
+          fsm_s15_out = 1'b0;
+          fsm_s16_out = 1'b0;
+          fsm_s17_out = 1'b0;
+          fsm_s18_out = 1'b0;
+          fsm_s19_out = 1'b0;
+          fsm_s20_out = 1'b0;
+          fsm_s21_out = 1'b0;
+          fsm_s22_out = 1'b0;
+          fsm_s23_out = 1'b0;
+          fsm_s24_out = 1'b0;
+          fsm_s25_out = 1'b0;
+          fsm_s26_out = 1'b0;
+          fsm_s27_out = 1'b0;
+          fsm_s28_out = 1'b0;
+          fsm_s29_out = 1'b0;
+          if (((cond_reg1_done) & (idx1_done)) & (cond_reg1_out)) begin
             next_state = S3;
           end
-          else if (~(comb_reg_out)) begin
+          else if (((cond_reg1_done) & (idx1_done)) & (~(cond_reg1_out))) begin
             next_state = S29;
           end
           else begin
@@ -1989,20 +1968,41 @@ module fsm_gemm_def (
           end
         end
         S3: begin
+          adder0_left = 'b0;
+          adder0_right = 'b0;
+          adder1_left = 'b0;
+          adder1_right = 'b0;
+          adder_left = 'b0;
+          adder_right = 'b0;
           arg_mem_0_content_en = 'b0;
           arg_mem_0_write_en = 'b0;
           arg_mem_1_content_en = 'b0;
           arg_mem_1_write_en = 'b0;
           arg_mem_3_content_en = 'b0;
           arg_mem_3_write_en = 'b0;
-          comb_reg0_in = 'b0;
-          comb_reg0_write_en = 'b0;
-          comb_reg1_in = 'b0;
-          comb_reg1_write_en = 'b0;
-          comb_reg_in = 'b0;
-          comb_reg_write_en = 'b0;
+          cond_reg0_in = 'b0;
+          cond_reg0_write_en = 'b0;
+          cond_reg1_in = 'b0;
+          cond_reg1_write_en = 'b0;
+          cond_reg_in = 'b0;
+          cond_reg_write_en = 'b0;
+          for_0_induction_var_reg_write_en = 'b0;
+          for_1_induction_var_reg_write_en = 1'd1;
+          for_2_induction_var_reg_write_en = 'b0;
           fsm_done_in = 'b0;
+          idx0_in = 'b0;
+          idx0_write_en = 'b0;
+          idx1_in = 'b0;
+          idx1_write_en = 'b0;
+          idx_in = 'b0;
+          idx_write_en = 'b0;
           load_0_reg_write_en = 'b0;
+          lt0_left = 'b0;
+          lt0_right = 'b0;
+          lt1_left = 'b0;
+          lt1_right = 'b0;
+          lt_left = 'b0;
+          lt_right = 'b0;
           muli_0_reg_write_en = 'b0;
           muli_1_reg_write_en = 'b0;
           muli_2_reg_write_en = 'b0;
@@ -2011,32 +2011,74 @@ module fsm_gemm_def (
           std_mult_pipe_1_go = 'b0;
           std_mult_pipe_2_go = 'b0;
           std_mult_pipe_3_go = 'b0;
-          std_slt_0_left = 'b0;
-          std_slt_0_right = 'b0;
-          std_slt_1_left = 'b0;
-          std_slt_1_right = 'b0;
-          std_slt_2_left = 'b0;
-          std_slt_2_right = 'b0;
-          while_0_arg0_reg_write_en = 'b0;
-          while_1_arg0_reg_write_en = 1'd1;
-          while_2_arg0_reg_write_en = 'b0;
+          fsm_s0_out = 1'b0;
+          fsm_s1_out = 1'b0;
+          fsm_s2_out = 1'b0;
+          fsm_s3_out = 1'b1;
+          fsm_s4_out = 1'b0;
+          fsm_s5_out = 1'b0;
+          fsm_s6_out = 1'b0;
+          fsm_s7_out = 1'b0;
+          fsm_s8_out = 1'b0;
+          fsm_s9_out = 1'b0;
+          fsm_s10_out = 1'b0;
+          fsm_s11_out = 1'b0;
+          fsm_s12_out = 1'b0;
+          fsm_s13_out = 1'b0;
+          fsm_s14_out = 1'b0;
+          fsm_s15_out = 1'b0;
+          fsm_s16_out = 1'b0;
+          fsm_s17_out = 1'b0;
+          fsm_s18_out = 1'b0;
+          fsm_s19_out = 1'b0;
+          fsm_s20_out = 1'b0;
+          fsm_s21_out = 1'b0;
+          fsm_s22_out = 1'b0;
+          fsm_s23_out = 1'b0;
+          fsm_s24_out = 1'b0;
+          fsm_s25_out = 1'b0;
+          fsm_s26_out = 1'b0;
+          fsm_s27_out = 1'b0;
+          fsm_s28_out = 1'b0;
+          fsm_s29_out = 1'b0;
           next_state = S4;
         end
         S4: begin
+          adder0_left = 'b0;
+          adder0_right = 'b0;
+          adder1_left = 'b0;
+          adder1_right = 'b0;
+          adder_left = 'b0;
+          adder_right = 'b0;
           arg_mem_0_content_en = 'b0;
           arg_mem_0_write_en = 'b0;
           arg_mem_1_content_en = 'b0;
           arg_mem_1_write_en = 'b0;
           arg_mem_3_content_en = 'b0;
           arg_mem_3_write_en = 'b0;
-          comb_reg0_in = 'b0;
-          comb_reg0_write_en = 'b0;
-          comb_reg1_in = 'b0;
-          comb_reg1_write_en = 'b0;
-          comb_reg_in = 'b0;
-          comb_reg_write_en = 'b0;
+          cond_reg0_in = 'b0;
+          cond_reg0_write_en = 'b0;
+          cond_reg1_in = 'b0;
+          cond_reg1_write_en = 'b0;
+          cond_reg_in = 'b0;
+          cond_reg_write_en = 'b0;
+          for_0_induction_var_reg_write_en = 'b0;
+          for_1_induction_var_reg_write_en = 'b0;
+          for_2_induction_var_reg_write_en = 'b0;
           fsm_done_in = 'b0;
+          idx0_in = 'b0;
+          idx0_write_en = 'b0;
+          idx1_in = 'b0;
+          idx1_write_en = 'b0;
+          idx_in = 'b0;
+          idx_write_en = 'b0;
           load_0_reg_write_en = 'b0;
+          lt0_left = 'b0;
+          lt0_right = 'b0;
+          lt1_left = 'b0;
+          lt1_right = 'b0;
+          lt_left = 'b0;
+          lt_right = 'b0;
           muli_0_reg_write_en = 'b0;
           muli_1_reg_write_en = 'b0;
           muli_2_reg_write_en = 'b0;
@@ -2045,32 +2087,74 @@ module fsm_gemm_def (
           std_mult_pipe_1_go = 'b0;
           std_mult_pipe_2_go = 'b0;
           std_mult_pipe_3_go = 'b0;
-          std_slt_0_left = 'b0;
-          std_slt_0_right = 'b0;
-          std_slt_1_left = 'b0;
-          std_slt_1_right = 'b0;
-          std_slt_2_left = 'b0;
-          std_slt_2_right = 'b0;
-          while_0_arg0_reg_write_en = 'b0;
-          while_1_arg0_reg_write_en = 'b0;
-          while_2_arg0_reg_write_en = 'b0;
+          fsm_s0_out = 1'b0;
+          fsm_s1_out = 1'b0;
+          fsm_s2_out = 1'b0;
+          fsm_s3_out = 1'b0;
+          fsm_s4_out = 1'b1;
+          fsm_s5_out = 1'b0;
+          fsm_s6_out = 1'b0;
+          fsm_s7_out = 1'b0;
+          fsm_s8_out = 1'b0;
+          fsm_s9_out = 1'b0;
+          fsm_s10_out = 1'b0;
+          fsm_s11_out = 1'b0;
+          fsm_s12_out = 1'b0;
+          fsm_s13_out = 1'b0;
+          fsm_s14_out = 1'b0;
+          fsm_s15_out = 1'b0;
+          fsm_s16_out = 1'b0;
+          fsm_s17_out = 1'b0;
+          fsm_s18_out = 1'b0;
+          fsm_s19_out = 1'b0;
+          fsm_s20_out = 1'b0;
+          fsm_s21_out = 1'b0;
+          fsm_s22_out = 1'b0;
+          fsm_s23_out = 1'b0;
+          fsm_s24_out = 1'b0;
+          fsm_s25_out = 1'b0;
+          fsm_s26_out = 1'b0;
+          fsm_s27_out = 1'b0;
+          fsm_s28_out = 1'b0;
+          fsm_s29_out = 1'b0;
           next_state = S5;
         end
         S5: begin
+          adder0_left = 'b0;
+          adder0_right = 'b0;
+          adder1_left = 'b0;
+          adder1_right = 'b0;
+          adder_left = 'b0;
+          adder_right = 'b0;
           arg_mem_0_content_en = 'b0;
           arg_mem_0_write_en = 'b0;
           arg_mem_1_content_en = 'b0;
           arg_mem_1_write_en = 'b0;
           arg_mem_3_content_en = 'b0;
           arg_mem_3_write_en = 'b0;
-          comb_reg0_in = 'b0;
-          comb_reg0_write_en = 'b0;
-          comb_reg1_in = 'b0;
-          comb_reg1_write_en = 'b0;
-          comb_reg_in = 'b0;
-          comb_reg_write_en = 'b0;
+          cond_reg0_in = 'b0;
+          cond_reg0_write_en = 'b0;
+          cond_reg1_in = 'b0;
+          cond_reg1_write_en = 'b0;
+          cond_reg_in = 'b0;
+          cond_reg_write_en = 'b0;
+          for_0_induction_var_reg_write_en = 'b0;
+          for_1_induction_var_reg_write_en = 'b0;
+          for_2_induction_var_reg_write_en = 'b0;
           fsm_done_in = 'b0;
+          idx0_in = 'b0;
+          idx0_write_en = 'b0;
+          idx1_in = 'b0;
+          idx1_write_en = 'b0;
+          idx_in = 'b0;
+          idx_write_en = 'b0;
           load_0_reg_write_en = 'b0;
+          lt0_left = 'b0;
+          lt0_right = 'b0;
+          lt1_left = 'b0;
+          lt1_right = 'b0;
+          lt_left = 'b0;
+          lt_right = 'b0;
           muli_0_reg_write_en = 'b0;
           muli_1_reg_write_en = 'b0;
           muli_2_reg_write_en = 'b0;
@@ -2079,32 +2163,74 @@ module fsm_gemm_def (
           std_mult_pipe_1_go = 'b0;
           std_mult_pipe_2_go = 'b0;
           std_mult_pipe_3_go = 'b0;
-          std_slt_0_left = 'b0;
-          std_slt_0_right = 'b0;
-          std_slt_1_left = 'b0;
-          std_slt_1_right = 'b0;
-          std_slt_2_left = 'b0;
-          std_slt_2_right = 'b0;
-          while_0_arg0_reg_write_en = 'b0;
-          while_1_arg0_reg_write_en = 'b0;
-          while_2_arg0_reg_write_en = 'b0;
+          fsm_s0_out = 1'b0;
+          fsm_s1_out = 1'b0;
+          fsm_s2_out = 1'b0;
+          fsm_s3_out = 1'b0;
+          fsm_s4_out = 1'b0;
+          fsm_s5_out = 1'b1;
+          fsm_s6_out = 1'b0;
+          fsm_s7_out = 1'b0;
+          fsm_s8_out = 1'b0;
+          fsm_s9_out = 1'b0;
+          fsm_s10_out = 1'b0;
+          fsm_s11_out = 1'b0;
+          fsm_s12_out = 1'b0;
+          fsm_s13_out = 1'b0;
+          fsm_s14_out = 1'b0;
+          fsm_s15_out = 1'b0;
+          fsm_s16_out = 1'b0;
+          fsm_s17_out = 1'b0;
+          fsm_s18_out = 1'b0;
+          fsm_s19_out = 1'b0;
+          fsm_s20_out = 1'b0;
+          fsm_s21_out = 1'b0;
+          fsm_s22_out = 1'b0;
+          fsm_s23_out = 1'b0;
+          fsm_s24_out = 1'b0;
+          fsm_s25_out = 1'b0;
+          fsm_s26_out = 1'b0;
+          fsm_s27_out = 1'b0;
+          fsm_s28_out = 1'b0;
+          fsm_s29_out = 1'b0;
           next_state = S6;
         end
         S6: begin
+          adder0_left = 'b0;
+          adder0_right = 'b0;
+          adder1_left = 'b0;
+          adder1_right = 'b0;
+          adder_left = 'b0;
+          adder_right = 'b0;
           arg_mem_0_content_en = 'b0;
           arg_mem_0_write_en = 'b0;
           arg_mem_1_content_en = 'b0;
           arg_mem_1_write_en = 'b0;
           arg_mem_3_content_en = 'b0;
           arg_mem_3_write_en = 'b0;
-          comb_reg0_in = 'b0;
-          comb_reg0_write_en = 'b0;
-          comb_reg1_in = 'b0;
-          comb_reg1_write_en = 'b0;
-          comb_reg_in = 'b0;
-          comb_reg_write_en = 'b0;
+          cond_reg0_in = 'b0;
+          cond_reg0_write_en = 'b0;
+          cond_reg1_in = 'b0;
+          cond_reg1_write_en = 'b0;
+          cond_reg_in = 'b0;
+          cond_reg_write_en = 'b0;
+          for_0_induction_var_reg_write_en = 'b0;
+          for_1_induction_var_reg_write_en = 'b0;
+          for_2_induction_var_reg_write_en = 'b0;
           fsm_done_in = 'b0;
+          idx0_in = 'b0;
+          idx0_write_en = 'b0;
+          idx1_in = 'b0;
+          idx1_write_en = 'b0;
+          idx_in = 'b0;
+          idx_write_en = 'b0;
           load_0_reg_write_en = 'b0;
+          lt0_left = 'b0;
+          lt0_right = 'b0;
+          lt1_left = 'b0;
+          lt1_right = 'b0;
+          lt_left = 'b0;
+          lt_right = 'b0;
           muli_0_reg_write_en = 1'd1;
           muli_1_reg_write_en = 'b0;
           muli_2_reg_write_en = 'b0;
@@ -2113,32 +2239,74 @@ module fsm_gemm_def (
           std_mult_pipe_1_go = 'b0;
           std_mult_pipe_2_go = 'b0;
           std_mult_pipe_3_go = 'b0;
-          std_slt_0_left = 'b0;
-          std_slt_0_right = 'b0;
-          std_slt_1_left = 'b0;
-          std_slt_1_right = 'b0;
-          std_slt_2_left = 'b0;
-          std_slt_2_right = 'b0;
-          while_0_arg0_reg_write_en = 'b0;
-          while_1_arg0_reg_write_en = 'b0;
-          while_2_arg0_reg_write_en = 'b0;
+          fsm_s0_out = 1'b0;
+          fsm_s1_out = 1'b0;
+          fsm_s2_out = 1'b0;
+          fsm_s3_out = 1'b0;
+          fsm_s4_out = 1'b0;
+          fsm_s5_out = 1'b0;
+          fsm_s6_out = 1'b1;
+          fsm_s7_out = 1'b0;
+          fsm_s8_out = 1'b0;
+          fsm_s9_out = 1'b0;
+          fsm_s10_out = 1'b0;
+          fsm_s11_out = 1'b0;
+          fsm_s12_out = 1'b0;
+          fsm_s13_out = 1'b0;
+          fsm_s14_out = 1'b0;
+          fsm_s15_out = 1'b0;
+          fsm_s16_out = 1'b0;
+          fsm_s17_out = 1'b0;
+          fsm_s18_out = 1'b0;
+          fsm_s19_out = 1'b0;
+          fsm_s20_out = 1'b0;
+          fsm_s21_out = 1'b0;
+          fsm_s22_out = 1'b0;
+          fsm_s23_out = 1'b0;
+          fsm_s24_out = 1'b0;
+          fsm_s25_out = 1'b0;
+          fsm_s26_out = 1'b0;
+          fsm_s27_out = 1'b0;
+          fsm_s28_out = 1'b0;
+          fsm_s29_out = 1'b0;
           next_state = S7;
         end
         S7: begin
+          adder0_left = 'b0;
+          adder0_right = 'b0;
+          adder1_left = 'b0;
+          adder1_right = 'b0;
+          adder_left = 'b0;
+          adder_right = 'b0;
           arg_mem_0_content_en = 'b0;
           arg_mem_0_write_en = 'b0;
           arg_mem_1_content_en = 'b0;
           arg_mem_1_write_en = 'b0;
           arg_mem_3_content_en = 'b0;
           arg_mem_3_write_en = 'b0;
-          comb_reg0_in = std_slt_1_out;
-          comb_reg0_write_en = 1'd1;
-          comb_reg1_in = 'b0;
-          comb_reg1_write_en = 'b0;
-          comb_reg_in = 'b0;
-          comb_reg_write_en = 'b0;
+          cond_reg0_in = 1'd1;
+          cond_reg0_write_en = 1'd1;
+          cond_reg1_in = 'b0;
+          cond_reg1_write_en = 'b0;
+          cond_reg_in = 'b0;
+          cond_reg_write_en = 'b0;
+          for_0_induction_var_reg_write_en = 'b0;
+          for_1_induction_var_reg_write_en = 'b0;
+          for_2_induction_var_reg_write_en = 'b0;
           fsm_done_in = 'b0;
+          idx0_in = 5'd0;
+          idx0_write_en = 1'd1;
+          idx1_in = 'b0;
+          idx1_write_en = 'b0;
+          idx_in = 'b0;
+          idx_write_en = 'b0;
           load_0_reg_write_en = 'b0;
+          lt0_left = 'b0;
+          lt0_right = 'b0;
+          lt1_left = 'b0;
+          lt1_right = 'b0;
+          lt_left = 'b0;
+          lt_right = 'b0;
           muli_0_reg_write_en = 'b0;
           muli_1_reg_write_en = 'b0;
           muli_2_reg_write_en = 'b0;
@@ -2147,19 +2315,40 @@ module fsm_gemm_def (
           std_mult_pipe_1_go = 'b0;
           std_mult_pipe_2_go = 'b0;
           std_mult_pipe_3_go = 'b0;
-          std_slt_0_left = 'b0;
-          std_slt_0_right = 'b0;
-          std_slt_1_left = while_1_arg0_reg_out;
-          std_slt_1_right = 32'd20;
-          std_slt_2_left = 'b0;
-          std_slt_2_right = 'b0;
-          while_0_arg0_reg_write_en = 'b0;
-          while_1_arg0_reg_write_en = 'b0;
-          while_2_arg0_reg_write_en = 'b0;
-          if (comb_reg0_out) begin
+          fsm_s0_out = 1'b0;
+          fsm_s1_out = 1'b0;
+          fsm_s2_out = 1'b0;
+          fsm_s3_out = 1'b0;
+          fsm_s4_out = 1'b0;
+          fsm_s5_out = 1'b0;
+          fsm_s6_out = 1'b0;
+          fsm_s7_out = 1'b1;
+          fsm_s8_out = 1'b0;
+          fsm_s9_out = 1'b0;
+          fsm_s10_out = 1'b0;
+          fsm_s11_out = 1'b0;
+          fsm_s12_out = 1'b0;
+          fsm_s13_out = 1'b0;
+          fsm_s14_out = 1'b0;
+          fsm_s15_out = 1'b0;
+          fsm_s16_out = 1'b0;
+          fsm_s17_out = 1'b0;
+          fsm_s18_out = 1'b0;
+          fsm_s19_out = 1'b0;
+          fsm_s20_out = 1'b0;
+          fsm_s21_out = 1'b0;
+          fsm_s22_out = 1'b0;
+          fsm_s23_out = 1'b0;
+          fsm_s24_out = 1'b0;
+          fsm_s25_out = 1'b0;
+          fsm_s26_out = 1'b0;
+          fsm_s27_out = 1'b0;
+          fsm_s28_out = 1'b0;
+          fsm_s29_out = 1'b0;
+          if (((cond_reg0_done) & (idx0_done)) & (cond_reg0_out)) begin
             next_state = S8;
           end
-          else if (~(comb_reg0_out)) begin
+          else if (((cond_reg0_done) & (idx0_done)) & (~(cond_reg0_out))) begin
             next_state = S27;
           end
           else begin
@@ -2167,20 +2356,41 @@ module fsm_gemm_def (
           end
         end
         S8: begin
+          adder0_left = 'b0;
+          adder0_right = 'b0;
+          adder1_left = 'b0;
+          adder1_right = 'b0;
+          adder_left = 'b0;
+          adder_right = 'b0;
           arg_mem_0_content_en = 'b0;
           arg_mem_0_write_en = 'b0;
           arg_mem_1_content_en = 'b0;
           arg_mem_1_write_en = 'b0;
           arg_mem_3_content_en = 'b0;
           arg_mem_3_write_en = 'b0;
-          comb_reg0_in = 'b0;
-          comb_reg0_write_en = 'b0;
-          comb_reg1_in = 'b0;
-          comb_reg1_write_en = 'b0;
-          comb_reg_in = 'b0;
-          comb_reg_write_en = 'b0;
+          cond_reg0_in = 'b0;
+          cond_reg0_write_en = 'b0;
+          cond_reg1_in = 'b0;
+          cond_reg1_write_en = 'b0;
+          cond_reg_in = 'b0;
+          cond_reg_write_en = 'b0;
+          for_0_induction_var_reg_write_en = 1'd1;
+          for_1_induction_var_reg_write_en = 'b0;
+          for_2_induction_var_reg_write_en = 'b0;
           fsm_done_in = 'b0;
+          idx0_in = 'b0;
+          idx0_write_en = 'b0;
+          idx1_in = 'b0;
+          idx1_write_en = 'b0;
+          idx_in = 'b0;
+          idx_write_en = 'b0;
           load_0_reg_write_en = 'b0;
+          lt0_left = 'b0;
+          lt0_right = 'b0;
+          lt1_left = 'b0;
+          lt1_right = 'b0;
+          lt_left = 'b0;
+          lt_right = 'b0;
           muli_0_reg_write_en = 'b0;
           muli_1_reg_write_en = 'b0;
           muli_2_reg_write_en = 'b0;
@@ -2189,37 +2399,74 @@ module fsm_gemm_def (
           std_mult_pipe_1_go = 'b0;
           std_mult_pipe_2_go = 'b0;
           std_mult_pipe_3_go = 'b0;
-          std_slt_0_left = 'b0;
-          std_slt_0_right = 'b0;
-          std_slt_1_left = 'b0;
-          std_slt_1_right = 'b0;
-          std_slt_2_left = 'b0;
-          std_slt_2_right = 'b0;
-          while_0_arg0_reg_write_en = 1'd1;
-          while_1_arg0_reg_write_en = 'b0;
-          while_2_arg0_reg_write_en = 'b0;
-          if (while_0_arg0_reg_done) begin
-            next_state = S9;
-          end
-          else begin
-            next_state = S8;
-          end
+          fsm_s0_out = 1'b0;
+          fsm_s1_out = 1'b0;
+          fsm_s2_out = 1'b0;
+          fsm_s3_out = 1'b0;
+          fsm_s4_out = 1'b0;
+          fsm_s5_out = 1'b0;
+          fsm_s6_out = 1'b0;
+          fsm_s7_out = 1'b0;
+          fsm_s8_out = 1'b1;
+          fsm_s9_out = 1'b0;
+          fsm_s10_out = 1'b0;
+          fsm_s11_out = 1'b0;
+          fsm_s12_out = 1'b0;
+          fsm_s13_out = 1'b0;
+          fsm_s14_out = 1'b0;
+          fsm_s15_out = 1'b0;
+          fsm_s16_out = 1'b0;
+          fsm_s17_out = 1'b0;
+          fsm_s18_out = 1'b0;
+          fsm_s19_out = 1'b0;
+          fsm_s20_out = 1'b0;
+          fsm_s21_out = 1'b0;
+          fsm_s22_out = 1'b0;
+          fsm_s23_out = 1'b0;
+          fsm_s24_out = 1'b0;
+          fsm_s25_out = 1'b0;
+          fsm_s26_out = 1'b0;
+          fsm_s27_out = 1'b0;
+          fsm_s28_out = 1'b0;
+          fsm_s29_out = 1'b0;
+          next_state = S9;
         end
         S9: begin
+          adder0_left = 'b0;
+          adder0_right = 'b0;
+          adder1_left = 'b0;
+          adder1_right = 'b0;
+          adder_left = 'b0;
+          adder_right = 'b0;
           arg_mem_0_content_en = 'b0;
           arg_mem_0_write_en = 'b0;
           arg_mem_1_content_en = 'b0;
           arg_mem_1_write_en = 'b0;
           arg_mem_3_content_en = 'b0;
           arg_mem_3_write_en = 'b0;
-          comb_reg0_in = 'b0;
-          comb_reg0_write_en = 'b0;
-          comb_reg1_in = std_slt_2_out;
-          comb_reg1_write_en = 1'd1;
-          comb_reg_in = 'b0;
-          comb_reg_write_en = 'b0;
+          cond_reg0_in = 'b0;
+          cond_reg0_write_en = 'b0;
+          cond_reg1_in = 'b0;
+          cond_reg1_write_en = 'b0;
+          cond_reg_in = 1'd1;
+          cond_reg_write_en = 1'd1;
+          for_0_induction_var_reg_write_en = 'b0;
+          for_1_induction_var_reg_write_en = 'b0;
+          for_2_induction_var_reg_write_en = 'b0;
           fsm_done_in = 'b0;
+          idx0_in = 'b0;
+          idx0_write_en = 'b0;
+          idx1_in = 'b0;
+          idx1_write_en = 'b0;
+          idx_in = 5'd0;
+          idx_write_en = 1'd1;
           load_0_reg_write_en = 'b0;
+          lt0_left = 'b0;
+          lt0_right = 'b0;
+          lt1_left = 'b0;
+          lt1_right = 'b0;
+          lt_left = 'b0;
+          lt_right = 'b0;
           muli_0_reg_write_en = 'b0;
           muli_1_reg_write_en = 'b0;
           muli_2_reg_write_en = 'b0;
@@ -2228,19 +2475,40 @@ module fsm_gemm_def (
           std_mult_pipe_1_go = 'b0;
           std_mult_pipe_2_go = 'b0;
           std_mult_pipe_3_go = 'b0;
-          std_slt_0_left = 'b0;
-          std_slt_0_right = 'b0;
-          std_slt_1_left = 'b0;
-          std_slt_1_right = 'b0;
-          std_slt_2_left = while_0_arg0_reg_out;
-          std_slt_2_right = 32'd20;
-          while_0_arg0_reg_write_en = 'b0;
-          while_1_arg0_reg_write_en = 'b0;
-          while_2_arg0_reg_write_en = 'b0;
-          if (comb_reg1_out) begin
+          fsm_s0_out = 1'b0;
+          fsm_s1_out = 1'b0;
+          fsm_s2_out = 1'b0;
+          fsm_s3_out = 1'b0;
+          fsm_s4_out = 1'b0;
+          fsm_s5_out = 1'b0;
+          fsm_s6_out = 1'b0;
+          fsm_s7_out = 1'b0;
+          fsm_s8_out = 1'b0;
+          fsm_s9_out = 1'b1;
+          fsm_s10_out = 1'b0;
+          fsm_s11_out = 1'b0;
+          fsm_s12_out = 1'b0;
+          fsm_s13_out = 1'b0;
+          fsm_s14_out = 1'b0;
+          fsm_s15_out = 1'b0;
+          fsm_s16_out = 1'b0;
+          fsm_s17_out = 1'b0;
+          fsm_s18_out = 1'b0;
+          fsm_s19_out = 1'b0;
+          fsm_s20_out = 1'b0;
+          fsm_s21_out = 1'b0;
+          fsm_s22_out = 1'b0;
+          fsm_s23_out = 1'b0;
+          fsm_s24_out = 1'b0;
+          fsm_s25_out = 1'b0;
+          fsm_s26_out = 1'b0;
+          fsm_s27_out = 1'b0;
+          fsm_s28_out = 1'b0;
+          fsm_s29_out = 1'b0;
+          if (((cond_reg_done) & (idx_done)) & (cond_reg_out)) begin
             next_state = S10;
           end
-          else if (~(comb_reg1_out)) begin
+          else if (((cond_reg_done) & (idx_done)) & (~(cond_reg_out))) begin
             next_state = S25;
           end
           else begin
@@ -2248,20 +2516,41 @@ module fsm_gemm_def (
           end
         end
         S10: begin
+          adder0_left = 'b0;
+          adder0_right = 'b0;
+          adder1_left = 'b0;
+          adder1_right = 'b0;
+          adder_left = 'b0;
+          adder_right = 'b0;
           arg_mem_0_content_en = 1'd1;
           arg_mem_0_write_en = 1'd0;
           arg_mem_1_content_en = 'b0;
           arg_mem_1_write_en = 'b0;
           arg_mem_3_content_en = 'b0;
           arg_mem_3_write_en = 'b0;
-          comb_reg0_in = 'b0;
-          comb_reg0_write_en = 'b0;
-          comb_reg1_in = 'b0;
-          comb_reg1_write_en = 'b0;
-          comb_reg_in = 'b0;
-          comb_reg_write_en = 'b0;
+          cond_reg0_in = 'b0;
+          cond_reg0_write_en = 'b0;
+          cond_reg1_in = 'b0;
+          cond_reg1_write_en = 'b0;
+          cond_reg_in = 'b0;
+          cond_reg_write_en = 'b0;
+          for_0_induction_var_reg_write_en = 'b0;
+          for_1_induction_var_reg_write_en = 'b0;
+          for_2_induction_var_reg_write_en = 'b0;
           fsm_done_in = 'b0;
+          idx0_in = 'b0;
+          idx0_write_en = 'b0;
+          idx1_in = 'b0;
+          idx1_write_en = 'b0;
+          idx_in = 'b0;
+          idx_write_en = 'b0;
           load_0_reg_write_en = 'b0;
+          lt0_left = 'b0;
+          lt0_right = 'b0;
+          lt1_left = 'b0;
+          lt1_right = 'b0;
+          lt_left = 'b0;
+          lt_right = 'b0;
           muli_0_reg_write_en = 'b0;
           muli_1_reg_write_en = 'b0;
           muli_2_reg_write_en = 'b0;
@@ -2270,37 +2559,74 @@ module fsm_gemm_def (
           std_mult_pipe_1_go = 'b0;
           std_mult_pipe_2_go = 'b0;
           std_mult_pipe_3_go = 'b0;
-          std_slt_0_left = 'b0;
-          std_slt_0_right = 'b0;
-          std_slt_1_left = 'b0;
-          std_slt_1_right = 'b0;
-          std_slt_2_left = 'b0;
-          std_slt_2_right = 'b0;
-          while_0_arg0_reg_write_en = 'b0;
-          while_1_arg0_reg_write_en = 'b0;
-          while_2_arg0_reg_write_en = 'b0;
-          if (arg_mem_0_done) begin
-            next_state = S11;
-          end
-          else begin
-            next_state = S10;
-          end
+          fsm_s0_out = 1'b0;
+          fsm_s1_out = 1'b0;
+          fsm_s2_out = 1'b0;
+          fsm_s3_out = 1'b0;
+          fsm_s4_out = 1'b0;
+          fsm_s5_out = 1'b0;
+          fsm_s6_out = 1'b0;
+          fsm_s7_out = 1'b0;
+          fsm_s8_out = 1'b0;
+          fsm_s9_out = 1'b0;
+          fsm_s10_out = 1'b1;
+          fsm_s11_out = 1'b0;
+          fsm_s12_out = 1'b0;
+          fsm_s13_out = 1'b0;
+          fsm_s14_out = 1'b0;
+          fsm_s15_out = 1'b0;
+          fsm_s16_out = 1'b0;
+          fsm_s17_out = 1'b0;
+          fsm_s18_out = 1'b0;
+          fsm_s19_out = 1'b0;
+          fsm_s20_out = 1'b0;
+          fsm_s21_out = 1'b0;
+          fsm_s22_out = 1'b0;
+          fsm_s23_out = 1'b0;
+          fsm_s24_out = 1'b0;
+          fsm_s25_out = 1'b0;
+          fsm_s26_out = 1'b0;
+          fsm_s27_out = 1'b0;
+          fsm_s28_out = 1'b0;
+          fsm_s29_out = 1'b0;
+          next_state = S11;
         end
         S11: begin
+          adder0_left = 'b0;
+          adder0_right = 'b0;
+          adder1_left = 'b0;
+          adder1_right = 'b0;
+          adder_left = 'b0;
+          adder_right = 'b0;
           arg_mem_0_content_en = 'b0;
           arg_mem_0_write_en = 'b0;
           arg_mem_1_content_en = 'b0;
           arg_mem_1_write_en = 'b0;
           arg_mem_3_content_en = 'b0;
           arg_mem_3_write_en = 'b0;
-          comb_reg0_in = 'b0;
-          comb_reg0_write_en = 'b0;
-          comb_reg1_in = 'b0;
-          comb_reg1_write_en = 'b0;
-          comb_reg_in = 'b0;
-          comb_reg_write_en = 'b0;
+          cond_reg0_in = 'b0;
+          cond_reg0_write_en = 'b0;
+          cond_reg1_in = 'b0;
+          cond_reg1_write_en = 'b0;
+          cond_reg_in = 'b0;
+          cond_reg_write_en = 'b0;
+          for_0_induction_var_reg_write_en = 'b0;
+          for_1_induction_var_reg_write_en = 'b0;
+          for_2_induction_var_reg_write_en = 'b0;
           fsm_done_in = 'b0;
+          idx0_in = 'b0;
+          idx0_write_en = 'b0;
+          idx1_in = 'b0;
+          idx1_write_en = 'b0;
+          idx_in = 'b0;
+          idx_write_en = 'b0;
           load_0_reg_write_en = 'b0;
+          lt0_left = 'b0;
+          lt0_right = 'b0;
+          lt1_left = 'b0;
+          lt1_right = 'b0;
+          lt_left = 'b0;
+          lt_right = 'b0;
           muli_0_reg_write_en = 'b0;
           muli_1_reg_write_en = 'b0;
           muli_2_reg_write_en = 'b0;
@@ -2309,32 +2635,74 @@ module fsm_gemm_def (
           std_mult_pipe_1_go = 1'd1;
           std_mult_pipe_2_go = 1'd1;
           std_mult_pipe_3_go = 'b0;
-          std_slt_0_left = 'b0;
-          std_slt_0_right = 'b0;
-          std_slt_1_left = 'b0;
-          std_slt_1_right = 'b0;
-          std_slt_2_left = 'b0;
-          std_slt_2_right = 'b0;
-          while_0_arg0_reg_write_en = 'b0;
-          while_1_arg0_reg_write_en = 'b0;
-          while_2_arg0_reg_write_en = 'b0;
+          fsm_s0_out = 1'b0;
+          fsm_s1_out = 1'b0;
+          fsm_s2_out = 1'b0;
+          fsm_s3_out = 1'b0;
+          fsm_s4_out = 1'b0;
+          fsm_s5_out = 1'b0;
+          fsm_s6_out = 1'b0;
+          fsm_s7_out = 1'b0;
+          fsm_s8_out = 1'b0;
+          fsm_s9_out = 1'b0;
+          fsm_s10_out = 1'b0;
+          fsm_s11_out = 1'b1;
+          fsm_s12_out = 1'b0;
+          fsm_s13_out = 1'b0;
+          fsm_s14_out = 1'b0;
+          fsm_s15_out = 1'b0;
+          fsm_s16_out = 1'b0;
+          fsm_s17_out = 1'b0;
+          fsm_s18_out = 1'b0;
+          fsm_s19_out = 1'b0;
+          fsm_s20_out = 1'b0;
+          fsm_s21_out = 1'b0;
+          fsm_s22_out = 1'b0;
+          fsm_s23_out = 1'b0;
+          fsm_s24_out = 1'b0;
+          fsm_s25_out = 1'b0;
+          fsm_s26_out = 1'b0;
+          fsm_s27_out = 1'b0;
+          fsm_s28_out = 1'b0;
+          fsm_s29_out = 1'b0;
           next_state = S12;
         end
         S12: begin
+          adder0_left = 'b0;
+          adder0_right = 'b0;
+          adder1_left = 'b0;
+          adder1_right = 'b0;
+          adder_left = 'b0;
+          adder_right = 'b0;
           arg_mem_0_content_en = 'b0;
           arg_mem_0_write_en = 'b0;
           arg_mem_1_content_en = 'b0;
           arg_mem_1_write_en = 'b0;
           arg_mem_3_content_en = 'b0;
           arg_mem_3_write_en = 'b0;
-          comb_reg0_in = 'b0;
-          comb_reg0_write_en = 'b0;
-          comb_reg1_in = 'b0;
-          comb_reg1_write_en = 'b0;
-          comb_reg_in = 'b0;
-          comb_reg_write_en = 'b0;
+          cond_reg0_in = 'b0;
+          cond_reg0_write_en = 'b0;
+          cond_reg1_in = 'b0;
+          cond_reg1_write_en = 'b0;
+          cond_reg_in = 'b0;
+          cond_reg_write_en = 'b0;
+          for_0_induction_var_reg_write_en = 'b0;
+          for_1_induction_var_reg_write_en = 'b0;
+          for_2_induction_var_reg_write_en = 'b0;
           fsm_done_in = 'b0;
+          idx0_in = 'b0;
+          idx0_write_en = 'b0;
+          idx1_in = 'b0;
+          idx1_write_en = 'b0;
+          idx_in = 'b0;
+          idx_write_en = 'b0;
           load_0_reg_write_en = 'b0;
+          lt0_left = 'b0;
+          lt0_right = 'b0;
+          lt1_left = 'b0;
+          lt1_right = 'b0;
+          lt_left = 'b0;
+          lt_right = 'b0;
           muli_0_reg_write_en = 'b0;
           muli_1_reg_write_en = 'b0;
           muli_2_reg_write_en = 'b0;
@@ -2343,32 +2711,74 @@ module fsm_gemm_def (
           std_mult_pipe_1_go = 1'd1;
           std_mult_pipe_2_go = 1'd1;
           std_mult_pipe_3_go = 'b0;
-          std_slt_0_left = 'b0;
-          std_slt_0_right = 'b0;
-          std_slt_1_left = 'b0;
-          std_slt_1_right = 'b0;
-          std_slt_2_left = 'b0;
-          std_slt_2_right = 'b0;
-          while_0_arg0_reg_write_en = 'b0;
-          while_1_arg0_reg_write_en = 'b0;
-          while_2_arg0_reg_write_en = 'b0;
+          fsm_s0_out = 1'b0;
+          fsm_s1_out = 1'b0;
+          fsm_s2_out = 1'b0;
+          fsm_s3_out = 1'b0;
+          fsm_s4_out = 1'b0;
+          fsm_s5_out = 1'b0;
+          fsm_s6_out = 1'b0;
+          fsm_s7_out = 1'b0;
+          fsm_s8_out = 1'b0;
+          fsm_s9_out = 1'b0;
+          fsm_s10_out = 1'b0;
+          fsm_s11_out = 1'b0;
+          fsm_s12_out = 1'b1;
+          fsm_s13_out = 1'b0;
+          fsm_s14_out = 1'b0;
+          fsm_s15_out = 1'b0;
+          fsm_s16_out = 1'b0;
+          fsm_s17_out = 1'b0;
+          fsm_s18_out = 1'b0;
+          fsm_s19_out = 1'b0;
+          fsm_s20_out = 1'b0;
+          fsm_s21_out = 1'b0;
+          fsm_s22_out = 1'b0;
+          fsm_s23_out = 1'b0;
+          fsm_s24_out = 1'b0;
+          fsm_s25_out = 1'b0;
+          fsm_s26_out = 1'b0;
+          fsm_s27_out = 1'b0;
+          fsm_s28_out = 1'b0;
+          fsm_s29_out = 1'b0;
           next_state = S13;
         end
         S13: begin
+          adder0_left = 'b0;
+          adder0_right = 'b0;
+          adder1_left = 'b0;
+          adder1_right = 'b0;
+          adder_left = 'b0;
+          adder_right = 'b0;
           arg_mem_0_content_en = 'b0;
           arg_mem_0_write_en = 'b0;
           arg_mem_1_content_en = 'b0;
           arg_mem_1_write_en = 'b0;
           arg_mem_3_content_en = 'b0;
           arg_mem_3_write_en = 'b0;
-          comb_reg0_in = 'b0;
-          comb_reg0_write_en = 'b0;
-          comb_reg1_in = 'b0;
-          comb_reg1_write_en = 'b0;
-          comb_reg_in = 'b0;
-          comb_reg_write_en = 'b0;
+          cond_reg0_in = 'b0;
+          cond_reg0_write_en = 'b0;
+          cond_reg1_in = 'b0;
+          cond_reg1_write_en = 'b0;
+          cond_reg_in = 'b0;
+          cond_reg_write_en = 'b0;
+          for_0_induction_var_reg_write_en = 'b0;
+          for_1_induction_var_reg_write_en = 'b0;
+          for_2_induction_var_reg_write_en = 'b0;
           fsm_done_in = 'b0;
+          idx0_in = 'b0;
+          idx0_write_en = 'b0;
+          idx1_in = 'b0;
+          idx1_write_en = 'b0;
+          idx_in = 'b0;
+          idx_write_en = 'b0;
           load_0_reg_write_en = 'b0;
+          lt0_left = 'b0;
+          lt0_right = 'b0;
+          lt1_left = 'b0;
+          lt1_right = 'b0;
+          lt_left = 'b0;
+          lt_right = 'b0;
           muli_0_reg_write_en = 'b0;
           muli_1_reg_write_en = 'b0;
           muli_2_reg_write_en = 'b0;
@@ -2377,32 +2787,74 @@ module fsm_gemm_def (
           std_mult_pipe_1_go = 1'd1;
           std_mult_pipe_2_go = 1'd1;
           std_mult_pipe_3_go = 'b0;
-          std_slt_0_left = 'b0;
-          std_slt_0_right = 'b0;
-          std_slt_1_left = 'b0;
-          std_slt_1_right = 'b0;
-          std_slt_2_left = 'b0;
-          std_slt_2_right = 'b0;
-          while_0_arg0_reg_write_en = 'b0;
-          while_1_arg0_reg_write_en = 'b0;
-          while_2_arg0_reg_write_en = 'b0;
+          fsm_s0_out = 1'b0;
+          fsm_s1_out = 1'b0;
+          fsm_s2_out = 1'b0;
+          fsm_s3_out = 1'b0;
+          fsm_s4_out = 1'b0;
+          fsm_s5_out = 1'b0;
+          fsm_s6_out = 1'b0;
+          fsm_s7_out = 1'b0;
+          fsm_s8_out = 1'b0;
+          fsm_s9_out = 1'b0;
+          fsm_s10_out = 1'b0;
+          fsm_s11_out = 1'b0;
+          fsm_s12_out = 1'b0;
+          fsm_s13_out = 1'b1;
+          fsm_s14_out = 1'b0;
+          fsm_s15_out = 1'b0;
+          fsm_s16_out = 1'b0;
+          fsm_s17_out = 1'b0;
+          fsm_s18_out = 1'b0;
+          fsm_s19_out = 1'b0;
+          fsm_s20_out = 1'b0;
+          fsm_s21_out = 1'b0;
+          fsm_s22_out = 1'b0;
+          fsm_s23_out = 1'b0;
+          fsm_s24_out = 1'b0;
+          fsm_s25_out = 1'b0;
+          fsm_s26_out = 1'b0;
+          fsm_s27_out = 1'b0;
+          fsm_s28_out = 1'b0;
+          fsm_s29_out = 1'b0;
           next_state = S14;
         end
         S14: begin
+          adder0_left = 'b0;
+          adder0_right = 'b0;
+          adder1_left = 'b0;
+          adder1_right = 'b0;
+          adder_left = 'b0;
+          adder_right = 'b0;
           arg_mem_0_content_en = 'b0;
           arg_mem_0_write_en = 'b0;
           arg_mem_1_content_en = 'b0;
           arg_mem_1_write_en = 'b0;
           arg_mem_3_content_en = 'b0;
           arg_mem_3_write_en = 'b0;
-          comb_reg0_in = 'b0;
-          comb_reg0_write_en = 'b0;
-          comb_reg1_in = 'b0;
-          comb_reg1_write_en = 'b0;
-          comb_reg_in = 'b0;
-          comb_reg_write_en = 'b0;
+          cond_reg0_in = 'b0;
+          cond_reg0_write_en = 'b0;
+          cond_reg1_in = 'b0;
+          cond_reg1_write_en = 'b0;
+          cond_reg_in = 'b0;
+          cond_reg_write_en = 'b0;
+          for_0_induction_var_reg_write_en = 'b0;
+          for_1_induction_var_reg_write_en = 'b0;
+          for_2_induction_var_reg_write_en = 'b0;
           fsm_done_in = 'b0;
+          idx0_in = 'b0;
+          idx0_write_en = 'b0;
+          idx1_in = 'b0;
+          idx1_write_en = 'b0;
+          idx_in = 'b0;
+          idx_write_en = 'b0;
           load_0_reg_write_en = 'b0;
+          lt0_left = 'b0;
+          lt0_right = 'b0;
+          lt1_left = 'b0;
+          lt1_right = 'b0;
+          lt_left = 'b0;
+          lt_right = 'b0;
           muli_0_reg_write_en = 'b0;
           muli_1_reg_write_en = 1'd1;
           muli_2_reg_write_en = 1'd1;
@@ -2411,32 +2863,74 @@ module fsm_gemm_def (
           std_mult_pipe_1_go = 'b0;
           std_mult_pipe_2_go = 'b0;
           std_mult_pipe_3_go = 'b0;
-          std_slt_0_left = 'b0;
-          std_slt_0_right = 'b0;
-          std_slt_1_left = 'b0;
-          std_slt_1_right = 'b0;
-          std_slt_2_left = 'b0;
-          std_slt_2_right = 'b0;
-          while_0_arg0_reg_write_en = 'b0;
-          while_1_arg0_reg_write_en = 'b0;
-          while_2_arg0_reg_write_en = 'b0;
+          fsm_s0_out = 1'b0;
+          fsm_s1_out = 1'b0;
+          fsm_s2_out = 1'b0;
+          fsm_s3_out = 1'b0;
+          fsm_s4_out = 1'b0;
+          fsm_s5_out = 1'b0;
+          fsm_s6_out = 1'b0;
+          fsm_s7_out = 1'b0;
+          fsm_s8_out = 1'b0;
+          fsm_s9_out = 1'b0;
+          fsm_s10_out = 1'b0;
+          fsm_s11_out = 1'b0;
+          fsm_s12_out = 1'b0;
+          fsm_s13_out = 1'b0;
+          fsm_s14_out = 1'b1;
+          fsm_s15_out = 1'b0;
+          fsm_s16_out = 1'b0;
+          fsm_s17_out = 1'b0;
+          fsm_s18_out = 1'b0;
+          fsm_s19_out = 1'b0;
+          fsm_s20_out = 1'b0;
+          fsm_s21_out = 1'b0;
+          fsm_s22_out = 1'b0;
+          fsm_s23_out = 1'b0;
+          fsm_s24_out = 1'b0;
+          fsm_s25_out = 1'b0;
+          fsm_s26_out = 1'b0;
+          fsm_s27_out = 1'b0;
+          fsm_s28_out = 1'b0;
+          fsm_s29_out = 1'b0;
           next_state = S15;
         end
         S15: begin
+          adder0_left = 'b0;
+          adder0_right = 'b0;
+          adder1_left = 'b0;
+          adder1_right = 'b0;
+          adder_left = 'b0;
+          adder_right = 'b0;
           arg_mem_0_content_en = 'b0;
           arg_mem_0_write_en = 'b0;
           arg_mem_1_content_en = 1'd1;
           arg_mem_1_write_en = 1'd0;
           arg_mem_3_content_en = 'b0;
           arg_mem_3_write_en = 'b0;
-          comb_reg0_in = 'b0;
-          comb_reg0_write_en = 'b0;
-          comb_reg1_in = 'b0;
-          comb_reg1_write_en = 'b0;
-          comb_reg_in = 'b0;
-          comb_reg_write_en = 'b0;
+          cond_reg0_in = 'b0;
+          cond_reg0_write_en = 'b0;
+          cond_reg1_in = 'b0;
+          cond_reg1_write_en = 'b0;
+          cond_reg_in = 'b0;
+          cond_reg_write_en = 'b0;
+          for_0_induction_var_reg_write_en = 'b0;
+          for_1_induction_var_reg_write_en = 'b0;
+          for_2_induction_var_reg_write_en = 'b0;
           fsm_done_in = 'b0;
+          idx0_in = 'b0;
+          idx0_write_en = 'b0;
+          idx1_in = 'b0;
+          idx1_write_en = 'b0;
+          idx_in = 'b0;
+          idx_write_en = 'b0;
           load_0_reg_write_en = 'b0;
+          lt0_left = 'b0;
+          lt0_right = 'b0;
+          lt1_left = 'b0;
+          lt1_right = 'b0;
+          lt_left = 'b0;
+          lt_right = 'b0;
           muli_0_reg_write_en = 'b0;
           muli_1_reg_write_en = 'b0;
           muli_2_reg_write_en = 'b0;
@@ -2445,37 +2939,74 @@ module fsm_gemm_def (
           std_mult_pipe_1_go = 'b0;
           std_mult_pipe_2_go = 'b0;
           std_mult_pipe_3_go = 'b0;
-          std_slt_0_left = 'b0;
-          std_slt_0_right = 'b0;
-          std_slt_1_left = 'b0;
-          std_slt_1_right = 'b0;
-          std_slt_2_left = 'b0;
-          std_slt_2_right = 'b0;
-          while_0_arg0_reg_write_en = 'b0;
-          while_1_arg0_reg_write_en = 'b0;
-          while_2_arg0_reg_write_en = 'b0;
-          if (arg_mem_1_done) begin
-            next_state = S16;
-          end
-          else begin
-            next_state = S15;
-          end
+          fsm_s0_out = 1'b0;
+          fsm_s1_out = 1'b0;
+          fsm_s2_out = 1'b0;
+          fsm_s3_out = 1'b0;
+          fsm_s4_out = 1'b0;
+          fsm_s5_out = 1'b0;
+          fsm_s6_out = 1'b0;
+          fsm_s7_out = 1'b0;
+          fsm_s8_out = 1'b0;
+          fsm_s9_out = 1'b0;
+          fsm_s10_out = 1'b0;
+          fsm_s11_out = 1'b0;
+          fsm_s12_out = 1'b0;
+          fsm_s13_out = 1'b0;
+          fsm_s14_out = 1'b0;
+          fsm_s15_out = 1'b1;
+          fsm_s16_out = 1'b0;
+          fsm_s17_out = 1'b0;
+          fsm_s18_out = 1'b0;
+          fsm_s19_out = 1'b0;
+          fsm_s20_out = 1'b0;
+          fsm_s21_out = 1'b0;
+          fsm_s22_out = 1'b0;
+          fsm_s23_out = 1'b0;
+          fsm_s24_out = 1'b0;
+          fsm_s25_out = 1'b0;
+          fsm_s26_out = 1'b0;
+          fsm_s27_out = 1'b0;
+          fsm_s28_out = 1'b0;
+          fsm_s29_out = 1'b0;
+          next_state = S16;
         end
         S16: begin
+          adder0_left = 'b0;
+          adder0_right = 'b0;
+          adder1_left = 'b0;
+          adder1_right = 'b0;
+          adder_left = 'b0;
+          adder_right = 'b0;
           arg_mem_0_content_en = 'b0;
           arg_mem_0_write_en = 'b0;
           arg_mem_1_content_en = 'b0;
           arg_mem_1_write_en = 'b0;
           arg_mem_3_content_en = 'b0;
           arg_mem_3_write_en = 'b0;
-          comb_reg0_in = 'b0;
-          comb_reg0_write_en = 'b0;
-          comb_reg1_in = 'b0;
-          comb_reg1_write_en = 'b0;
-          comb_reg_in = 'b0;
-          comb_reg_write_en = 'b0;
+          cond_reg0_in = 'b0;
+          cond_reg0_write_en = 'b0;
+          cond_reg1_in = 'b0;
+          cond_reg1_write_en = 'b0;
+          cond_reg_in = 'b0;
+          cond_reg_write_en = 'b0;
+          for_0_induction_var_reg_write_en = 'b0;
+          for_1_induction_var_reg_write_en = 'b0;
+          for_2_induction_var_reg_write_en = 'b0;
           fsm_done_in = 'b0;
+          idx0_in = 'b0;
+          idx0_write_en = 'b0;
+          idx1_in = 'b0;
+          idx1_write_en = 'b0;
+          idx_in = 'b0;
+          idx_write_en = 'b0;
           load_0_reg_write_en = 'b0;
+          lt0_left = 'b0;
+          lt0_right = 'b0;
+          lt1_left = 'b0;
+          lt1_right = 'b0;
+          lt_left = 'b0;
+          lt_right = 'b0;
           muli_0_reg_write_en = 'b0;
           muli_1_reg_write_en = 'b0;
           muli_2_reg_write_en = 'b0;
@@ -2484,32 +3015,74 @@ module fsm_gemm_def (
           std_mult_pipe_1_go = 'b0;
           std_mult_pipe_2_go = 'b0;
           std_mult_pipe_3_go = 1'd1;
-          std_slt_0_left = 'b0;
-          std_slt_0_right = 'b0;
-          std_slt_1_left = 'b0;
-          std_slt_1_right = 'b0;
-          std_slt_2_left = 'b0;
-          std_slt_2_right = 'b0;
-          while_0_arg0_reg_write_en = 'b0;
-          while_1_arg0_reg_write_en = 'b0;
-          while_2_arg0_reg_write_en = 'b0;
+          fsm_s0_out = 1'b0;
+          fsm_s1_out = 1'b0;
+          fsm_s2_out = 1'b0;
+          fsm_s3_out = 1'b0;
+          fsm_s4_out = 1'b0;
+          fsm_s5_out = 1'b0;
+          fsm_s6_out = 1'b0;
+          fsm_s7_out = 1'b0;
+          fsm_s8_out = 1'b0;
+          fsm_s9_out = 1'b0;
+          fsm_s10_out = 1'b0;
+          fsm_s11_out = 1'b0;
+          fsm_s12_out = 1'b0;
+          fsm_s13_out = 1'b0;
+          fsm_s14_out = 1'b0;
+          fsm_s15_out = 1'b0;
+          fsm_s16_out = 1'b1;
+          fsm_s17_out = 1'b0;
+          fsm_s18_out = 1'b0;
+          fsm_s19_out = 1'b0;
+          fsm_s20_out = 1'b0;
+          fsm_s21_out = 1'b0;
+          fsm_s22_out = 1'b0;
+          fsm_s23_out = 1'b0;
+          fsm_s24_out = 1'b0;
+          fsm_s25_out = 1'b0;
+          fsm_s26_out = 1'b0;
+          fsm_s27_out = 1'b0;
+          fsm_s28_out = 1'b0;
+          fsm_s29_out = 1'b0;
           next_state = S17;
         end
         S17: begin
+          adder0_left = 'b0;
+          adder0_right = 'b0;
+          adder1_left = 'b0;
+          adder1_right = 'b0;
+          adder_left = 'b0;
+          adder_right = 'b0;
           arg_mem_0_content_en = 'b0;
           arg_mem_0_write_en = 'b0;
           arg_mem_1_content_en = 'b0;
           arg_mem_1_write_en = 'b0;
           arg_mem_3_content_en = 'b0;
           arg_mem_3_write_en = 'b0;
-          comb_reg0_in = 'b0;
-          comb_reg0_write_en = 'b0;
-          comb_reg1_in = 'b0;
-          comb_reg1_write_en = 'b0;
-          comb_reg_in = 'b0;
-          comb_reg_write_en = 'b0;
+          cond_reg0_in = 'b0;
+          cond_reg0_write_en = 'b0;
+          cond_reg1_in = 'b0;
+          cond_reg1_write_en = 'b0;
+          cond_reg_in = 'b0;
+          cond_reg_write_en = 'b0;
+          for_0_induction_var_reg_write_en = 'b0;
+          for_1_induction_var_reg_write_en = 'b0;
+          for_2_induction_var_reg_write_en = 'b0;
           fsm_done_in = 'b0;
+          idx0_in = 'b0;
+          idx0_write_en = 'b0;
+          idx1_in = 'b0;
+          idx1_write_en = 'b0;
+          idx_in = 'b0;
+          idx_write_en = 'b0;
           load_0_reg_write_en = 'b0;
+          lt0_left = 'b0;
+          lt0_right = 'b0;
+          lt1_left = 'b0;
+          lt1_right = 'b0;
+          lt_left = 'b0;
+          lt_right = 'b0;
           muli_0_reg_write_en = 'b0;
           muli_1_reg_write_en = 'b0;
           muli_2_reg_write_en = 'b0;
@@ -2518,32 +3091,74 @@ module fsm_gemm_def (
           std_mult_pipe_1_go = 'b0;
           std_mult_pipe_2_go = 'b0;
           std_mult_pipe_3_go = 1'd1;
-          std_slt_0_left = 'b0;
-          std_slt_0_right = 'b0;
-          std_slt_1_left = 'b0;
-          std_slt_1_right = 'b0;
-          std_slt_2_left = 'b0;
-          std_slt_2_right = 'b0;
-          while_0_arg0_reg_write_en = 'b0;
-          while_1_arg0_reg_write_en = 'b0;
-          while_2_arg0_reg_write_en = 'b0;
+          fsm_s0_out = 1'b0;
+          fsm_s1_out = 1'b0;
+          fsm_s2_out = 1'b0;
+          fsm_s3_out = 1'b0;
+          fsm_s4_out = 1'b0;
+          fsm_s5_out = 1'b0;
+          fsm_s6_out = 1'b0;
+          fsm_s7_out = 1'b0;
+          fsm_s8_out = 1'b0;
+          fsm_s9_out = 1'b0;
+          fsm_s10_out = 1'b0;
+          fsm_s11_out = 1'b0;
+          fsm_s12_out = 1'b0;
+          fsm_s13_out = 1'b0;
+          fsm_s14_out = 1'b0;
+          fsm_s15_out = 1'b0;
+          fsm_s16_out = 1'b0;
+          fsm_s17_out = 1'b1;
+          fsm_s18_out = 1'b0;
+          fsm_s19_out = 1'b0;
+          fsm_s20_out = 1'b0;
+          fsm_s21_out = 1'b0;
+          fsm_s22_out = 1'b0;
+          fsm_s23_out = 1'b0;
+          fsm_s24_out = 1'b0;
+          fsm_s25_out = 1'b0;
+          fsm_s26_out = 1'b0;
+          fsm_s27_out = 1'b0;
+          fsm_s28_out = 1'b0;
+          fsm_s29_out = 1'b0;
           next_state = S18;
         end
         S18: begin
+          adder0_left = 'b0;
+          adder0_right = 'b0;
+          adder1_left = 'b0;
+          adder1_right = 'b0;
+          adder_left = 'b0;
+          adder_right = 'b0;
           arg_mem_0_content_en = 'b0;
           arg_mem_0_write_en = 'b0;
           arg_mem_1_content_en = 'b0;
           arg_mem_1_write_en = 'b0;
           arg_mem_3_content_en = 'b0;
           arg_mem_3_write_en = 'b0;
-          comb_reg0_in = 'b0;
-          comb_reg0_write_en = 'b0;
-          comb_reg1_in = 'b0;
-          comb_reg1_write_en = 'b0;
-          comb_reg_in = 'b0;
-          comb_reg_write_en = 'b0;
+          cond_reg0_in = 'b0;
+          cond_reg0_write_en = 'b0;
+          cond_reg1_in = 'b0;
+          cond_reg1_write_en = 'b0;
+          cond_reg_in = 'b0;
+          cond_reg_write_en = 'b0;
+          for_0_induction_var_reg_write_en = 'b0;
+          for_1_induction_var_reg_write_en = 'b0;
+          for_2_induction_var_reg_write_en = 'b0;
           fsm_done_in = 'b0;
+          idx0_in = 'b0;
+          idx0_write_en = 'b0;
+          idx1_in = 'b0;
+          idx1_write_en = 'b0;
+          idx_in = 'b0;
+          idx_write_en = 'b0;
           load_0_reg_write_en = 'b0;
+          lt0_left = 'b0;
+          lt0_right = 'b0;
+          lt1_left = 'b0;
+          lt1_right = 'b0;
+          lt_left = 'b0;
+          lt_right = 'b0;
           muli_0_reg_write_en = 'b0;
           muli_1_reg_write_en = 'b0;
           muli_2_reg_write_en = 'b0;
@@ -2552,32 +3167,74 @@ module fsm_gemm_def (
           std_mult_pipe_1_go = 'b0;
           std_mult_pipe_2_go = 'b0;
           std_mult_pipe_3_go = 1'd1;
-          std_slt_0_left = 'b0;
-          std_slt_0_right = 'b0;
-          std_slt_1_left = 'b0;
-          std_slt_1_right = 'b0;
-          std_slt_2_left = 'b0;
-          std_slt_2_right = 'b0;
-          while_0_arg0_reg_write_en = 'b0;
-          while_1_arg0_reg_write_en = 'b0;
-          while_2_arg0_reg_write_en = 'b0;
+          fsm_s0_out = 1'b0;
+          fsm_s1_out = 1'b0;
+          fsm_s2_out = 1'b0;
+          fsm_s3_out = 1'b0;
+          fsm_s4_out = 1'b0;
+          fsm_s5_out = 1'b0;
+          fsm_s6_out = 1'b0;
+          fsm_s7_out = 1'b0;
+          fsm_s8_out = 1'b0;
+          fsm_s9_out = 1'b0;
+          fsm_s10_out = 1'b0;
+          fsm_s11_out = 1'b0;
+          fsm_s12_out = 1'b0;
+          fsm_s13_out = 1'b0;
+          fsm_s14_out = 1'b0;
+          fsm_s15_out = 1'b0;
+          fsm_s16_out = 1'b0;
+          fsm_s17_out = 1'b0;
+          fsm_s18_out = 1'b1;
+          fsm_s19_out = 1'b0;
+          fsm_s20_out = 1'b0;
+          fsm_s21_out = 1'b0;
+          fsm_s22_out = 1'b0;
+          fsm_s23_out = 1'b0;
+          fsm_s24_out = 1'b0;
+          fsm_s25_out = 1'b0;
+          fsm_s26_out = 1'b0;
+          fsm_s27_out = 1'b0;
+          fsm_s28_out = 1'b0;
+          fsm_s29_out = 1'b0;
           next_state = S19;
         end
         S19: begin
+          adder0_left = 'b0;
+          adder0_right = 'b0;
+          adder1_left = 'b0;
+          adder1_right = 'b0;
+          adder_left = 'b0;
+          adder_right = 'b0;
           arg_mem_0_content_en = 'b0;
           arg_mem_0_write_en = 'b0;
           arg_mem_1_content_en = 'b0;
           arg_mem_1_write_en = 'b0;
           arg_mem_3_content_en = 'b0;
           arg_mem_3_write_en = 'b0;
-          comb_reg0_in = 'b0;
-          comb_reg0_write_en = 'b0;
-          comb_reg1_in = 'b0;
-          comb_reg1_write_en = 'b0;
-          comb_reg_in = 'b0;
-          comb_reg_write_en = 'b0;
+          cond_reg0_in = 'b0;
+          cond_reg0_write_en = 'b0;
+          cond_reg1_in = 'b0;
+          cond_reg1_write_en = 'b0;
+          cond_reg_in = 'b0;
+          cond_reg_write_en = 'b0;
+          for_0_induction_var_reg_write_en = 'b0;
+          for_1_induction_var_reg_write_en = 'b0;
+          for_2_induction_var_reg_write_en = 'b0;
           fsm_done_in = 'b0;
+          idx0_in = 'b0;
+          idx0_write_en = 'b0;
+          idx1_in = 'b0;
+          idx1_write_en = 'b0;
+          idx_in = 'b0;
+          idx_write_en = 'b0;
           load_0_reg_write_en = 'b0;
+          lt0_left = 'b0;
+          lt0_right = 'b0;
+          lt1_left = 'b0;
+          lt1_right = 'b0;
+          lt_left = 'b0;
+          lt_right = 'b0;
           muli_0_reg_write_en = 'b0;
           muli_1_reg_write_en = 'b0;
           muli_2_reg_write_en = 'b0;
@@ -2586,32 +3243,74 @@ module fsm_gemm_def (
           std_mult_pipe_1_go = 'b0;
           std_mult_pipe_2_go = 'b0;
           std_mult_pipe_3_go = 'b0;
-          std_slt_0_left = 'b0;
-          std_slt_0_right = 'b0;
-          std_slt_1_left = 'b0;
-          std_slt_1_right = 'b0;
-          std_slt_2_left = 'b0;
-          std_slt_2_right = 'b0;
-          while_0_arg0_reg_write_en = 'b0;
-          while_1_arg0_reg_write_en = 'b0;
-          while_2_arg0_reg_write_en = 'b0;
+          fsm_s0_out = 1'b0;
+          fsm_s1_out = 1'b0;
+          fsm_s2_out = 1'b0;
+          fsm_s3_out = 1'b0;
+          fsm_s4_out = 1'b0;
+          fsm_s5_out = 1'b0;
+          fsm_s6_out = 1'b0;
+          fsm_s7_out = 1'b0;
+          fsm_s8_out = 1'b0;
+          fsm_s9_out = 1'b0;
+          fsm_s10_out = 1'b0;
+          fsm_s11_out = 1'b0;
+          fsm_s12_out = 1'b0;
+          fsm_s13_out = 1'b0;
+          fsm_s14_out = 1'b0;
+          fsm_s15_out = 1'b0;
+          fsm_s16_out = 1'b0;
+          fsm_s17_out = 1'b0;
+          fsm_s18_out = 1'b0;
+          fsm_s19_out = 1'b1;
+          fsm_s20_out = 1'b0;
+          fsm_s21_out = 1'b0;
+          fsm_s22_out = 1'b0;
+          fsm_s23_out = 1'b0;
+          fsm_s24_out = 1'b0;
+          fsm_s25_out = 1'b0;
+          fsm_s26_out = 1'b0;
+          fsm_s27_out = 1'b0;
+          fsm_s28_out = 1'b0;
+          fsm_s29_out = 1'b0;
           next_state = S20;
         end
         S20: begin
+          adder0_left = 'b0;
+          adder0_right = 'b0;
+          adder1_left = 'b0;
+          adder1_right = 'b0;
+          adder_left = 'b0;
+          adder_right = 'b0;
           arg_mem_0_content_en = 'b0;
           arg_mem_0_write_en = 'b0;
           arg_mem_1_content_en = 'b0;
           arg_mem_1_write_en = 'b0;
           arg_mem_3_content_en = 1'd1;
           arg_mem_3_write_en = 1'd0;
-          comb_reg0_in = 'b0;
-          comb_reg0_write_en = 'b0;
-          comb_reg1_in = 'b0;
-          comb_reg1_write_en = 'b0;
-          comb_reg_in = 'b0;
-          comb_reg_write_en = 'b0;
+          cond_reg0_in = 'b0;
+          cond_reg0_write_en = 'b0;
+          cond_reg1_in = 'b0;
+          cond_reg1_write_en = 'b0;
+          cond_reg_in = 'b0;
+          cond_reg_write_en = 'b0;
+          for_0_induction_var_reg_write_en = 'b0;
+          for_1_induction_var_reg_write_en = 'b0;
+          for_2_induction_var_reg_write_en = 'b0;
           fsm_done_in = 'b0;
+          idx0_in = 'b0;
+          idx0_write_en = 'b0;
+          idx1_in = 'b0;
+          idx1_write_en = 'b0;
+          idx_in = 'b0;
+          idx_write_en = 'b0;
           load_0_reg_write_en = 'b0;
+          lt0_left = 'b0;
+          lt0_right = 'b0;
+          lt1_left = 'b0;
+          lt1_right = 'b0;
+          lt_left = 'b0;
+          lt_right = 'b0;
           muli_0_reg_write_en = 'b0;
           muli_1_reg_write_en = 'b0;
           muli_2_reg_write_en = 'b0;
@@ -2620,37 +3319,74 @@ module fsm_gemm_def (
           std_mult_pipe_1_go = 'b0;
           std_mult_pipe_2_go = 'b0;
           std_mult_pipe_3_go = 'b0;
-          std_slt_0_left = 'b0;
-          std_slt_0_right = 'b0;
-          std_slt_1_left = 'b0;
-          std_slt_1_right = 'b0;
-          std_slt_2_left = 'b0;
-          std_slt_2_right = 'b0;
-          while_0_arg0_reg_write_en = 'b0;
-          while_1_arg0_reg_write_en = 'b0;
-          while_2_arg0_reg_write_en = 'b0;
-          if (arg_mem_3_done) begin
-            next_state = S21;
-          end
-          else begin
-            next_state = S20;
-          end
+          fsm_s0_out = 1'b0;
+          fsm_s1_out = 1'b0;
+          fsm_s2_out = 1'b0;
+          fsm_s3_out = 1'b0;
+          fsm_s4_out = 1'b0;
+          fsm_s5_out = 1'b0;
+          fsm_s6_out = 1'b0;
+          fsm_s7_out = 1'b0;
+          fsm_s8_out = 1'b0;
+          fsm_s9_out = 1'b0;
+          fsm_s10_out = 1'b0;
+          fsm_s11_out = 1'b0;
+          fsm_s12_out = 1'b0;
+          fsm_s13_out = 1'b0;
+          fsm_s14_out = 1'b0;
+          fsm_s15_out = 1'b0;
+          fsm_s16_out = 1'b0;
+          fsm_s17_out = 1'b0;
+          fsm_s18_out = 1'b0;
+          fsm_s19_out = 1'b0;
+          fsm_s20_out = 1'b1;
+          fsm_s21_out = 1'b0;
+          fsm_s22_out = 1'b0;
+          fsm_s23_out = 1'b0;
+          fsm_s24_out = 1'b0;
+          fsm_s25_out = 1'b0;
+          fsm_s26_out = 1'b0;
+          fsm_s27_out = 1'b0;
+          fsm_s28_out = 1'b0;
+          fsm_s29_out = 1'b0;
+          next_state = S21;
         end
         S21: begin
+          adder0_left = 'b0;
+          adder0_right = 'b0;
+          adder1_left = 'b0;
+          adder1_right = 'b0;
+          adder_left = 'b0;
+          adder_right = 'b0;
           arg_mem_0_content_en = 'b0;
           arg_mem_0_write_en = 'b0;
           arg_mem_1_content_en = 'b0;
           arg_mem_1_write_en = 'b0;
           arg_mem_3_content_en = 'b0;
           arg_mem_3_write_en = 'b0;
-          comb_reg0_in = 'b0;
-          comb_reg0_write_en = 'b0;
-          comb_reg1_in = 'b0;
-          comb_reg1_write_en = 'b0;
-          comb_reg_in = 'b0;
-          comb_reg_write_en = 'b0;
+          cond_reg0_in = 'b0;
+          cond_reg0_write_en = 'b0;
+          cond_reg1_in = 'b0;
+          cond_reg1_write_en = 'b0;
+          cond_reg_in = 'b0;
+          cond_reg_write_en = 'b0;
+          for_0_induction_var_reg_write_en = 'b0;
+          for_1_induction_var_reg_write_en = 'b0;
+          for_2_induction_var_reg_write_en = 'b0;
           fsm_done_in = 'b0;
+          idx0_in = 'b0;
+          idx0_write_en = 'b0;
+          idx1_in = 'b0;
+          idx1_write_en = 'b0;
+          idx_in = 'b0;
+          idx_write_en = 'b0;
           load_0_reg_write_en = 1'd1;
+          lt0_left = 'b0;
+          lt0_right = 'b0;
+          lt1_left = 'b0;
+          lt1_right = 'b0;
+          lt_left = 'b0;
+          lt_right = 'b0;
           muli_0_reg_write_en = 'b0;
           muli_1_reg_write_en = 'b0;
           muli_2_reg_write_en = 'b0;
@@ -2659,37 +3395,74 @@ module fsm_gemm_def (
           std_mult_pipe_1_go = 'b0;
           std_mult_pipe_2_go = 'b0;
           std_mult_pipe_3_go = 'b0;
-          std_slt_0_left = 'b0;
-          std_slt_0_right = 'b0;
-          std_slt_1_left = 'b0;
-          std_slt_1_right = 'b0;
-          std_slt_2_left = 'b0;
-          std_slt_2_right = 'b0;
-          while_0_arg0_reg_write_en = 'b0;
-          while_1_arg0_reg_write_en = 'b0;
-          while_2_arg0_reg_write_en = 'b0;
-          if (load_0_reg_done) begin
-            next_state = S22;
-          end
-          else begin
-            next_state = S21;
-          end
+          fsm_s0_out = 1'b0;
+          fsm_s1_out = 1'b0;
+          fsm_s2_out = 1'b0;
+          fsm_s3_out = 1'b0;
+          fsm_s4_out = 1'b0;
+          fsm_s5_out = 1'b0;
+          fsm_s6_out = 1'b0;
+          fsm_s7_out = 1'b0;
+          fsm_s8_out = 1'b0;
+          fsm_s9_out = 1'b0;
+          fsm_s10_out = 1'b0;
+          fsm_s11_out = 1'b0;
+          fsm_s12_out = 1'b0;
+          fsm_s13_out = 1'b0;
+          fsm_s14_out = 1'b0;
+          fsm_s15_out = 1'b0;
+          fsm_s16_out = 1'b0;
+          fsm_s17_out = 1'b0;
+          fsm_s18_out = 1'b0;
+          fsm_s19_out = 1'b0;
+          fsm_s20_out = 1'b0;
+          fsm_s21_out = 1'b1;
+          fsm_s22_out = 1'b0;
+          fsm_s23_out = 1'b0;
+          fsm_s24_out = 1'b0;
+          fsm_s25_out = 1'b0;
+          fsm_s26_out = 1'b0;
+          fsm_s27_out = 1'b0;
+          fsm_s28_out = 1'b0;
+          fsm_s29_out = 1'b0;
+          next_state = S22;
         end
         S22: begin
+          adder0_left = 'b0;
+          adder0_right = 'b0;
+          adder1_left = 'b0;
+          adder1_right = 'b0;
+          adder_left = 'b0;
+          adder_right = 'b0;
           arg_mem_0_content_en = 'b0;
           arg_mem_0_write_en = 'b0;
           arg_mem_1_content_en = 'b0;
           arg_mem_1_write_en = 'b0;
           arg_mem_3_content_en = 1'd1;
           arg_mem_3_write_en = 1'd1;
-          comb_reg0_in = 'b0;
-          comb_reg0_write_en = 'b0;
-          comb_reg1_in = 'b0;
-          comb_reg1_write_en = 'b0;
-          comb_reg_in = 'b0;
-          comb_reg_write_en = 'b0;
+          cond_reg0_in = 'b0;
+          cond_reg0_write_en = 'b0;
+          cond_reg1_in = 'b0;
+          cond_reg1_write_en = 'b0;
+          cond_reg_in = 'b0;
+          cond_reg_write_en = 'b0;
+          for_0_induction_var_reg_write_en = 'b0;
+          for_1_induction_var_reg_write_en = 'b0;
+          for_2_induction_var_reg_write_en = 'b0;
           fsm_done_in = 'b0;
+          idx0_in = 'b0;
+          idx0_write_en = 'b0;
+          idx1_in = 'b0;
+          idx1_write_en = 'b0;
+          idx_in = 'b0;
+          idx_write_en = 'b0;
           load_0_reg_write_en = 'b0;
+          lt0_left = 'b0;
+          lt0_right = 'b0;
+          lt1_left = 'b0;
+          lt1_right = 'b0;
+          lt_left = 'b0;
+          lt_right = 'b0;
           muli_0_reg_write_en = 'b0;
           muli_1_reg_write_en = 'b0;
           muli_2_reg_write_en = 'b0;
@@ -2698,37 +3471,74 @@ module fsm_gemm_def (
           std_mult_pipe_1_go = 'b0;
           std_mult_pipe_2_go = 'b0;
           std_mult_pipe_3_go = 'b0;
-          std_slt_0_left = 'b0;
-          std_slt_0_right = 'b0;
-          std_slt_1_left = 'b0;
-          std_slt_1_right = 'b0;
-          std_slt_2_left = 'b0;
-          std_slt_2_right = 'b0;
-          while_0_arg0_reg_write_en = 'b0;
-          while_1_arg0_reg_write_en = 'b0;
-          while_2_arg0_reg_write_en = 'b0;
-          if (arg_mem_3_done) begin
-            next_state = S23;
-          end
-          else begin
-            next_state = S22;
-          end
+          fsm_s0_out = 1'b0;
+          fsm_s1_out = 1'b0;
+          fsm_s2_out = 1'b0;
+          fsm_s3_out = 1'b0;
+          fsm_s4_out = 1'b0;
+          fsm_s5_out = 1'b0;
+          fsm_s6_out = 1'b0;
+          fsm_s7_out = 1'b0;
+          fsm_s8_out = 1'b0;
+          fsm_s9_out = 1'b0;
+          fsm_s10_out = 1'b0;
+          fsm_s11_out = 1'b0;
+          fsm_s12_out = 1'b0;
+          fsm_s13_out = 1'b0;
+          fsm_s14_out = 1'b0;
+          fsm_s15_out = 1'b0;
+          fsm_s16_out = 1'b0;
+          fsm_s17_out = 1'b0;
+          fsm_s18_out = 1'b0;
+          fsm_s19_out = 1'b0;
+          fsm_s20_out = 1'b0;
+          fsm_s21_out = 1'b0;
+          fsm_s22_out = 1'b1;
+          fsm_s23_out = 1'b0;
+          fsm_s24_out = 1'b0;
+          fsm_s25_out = 1'b0;
+          fsm_s26_out = 1'b0;
+          fsm_s27_out = 1'b0;
+          fsm_s28_out = 1'b0;
+          fsm_s29_out = 1'b0;
+          next_state = S23;
         end
         S23: begin
+          adder0_left = 'b0;
+          adder0_right = 'b0;
+          adder1_left = 'b0;
+          adder1_right = 'b0;
+          adder_left = 'b0;
+          adder_right = 'b0;
           arg_mem_0_content_en = 'b0;
           arg_mem_0_write_en = 'b0;
           arg_mem_1_content_en = 'b0;
           arg_mem_1_write_en = 'b0;
           arg_mem_3_content_en = 'b0;
           arg_mem_3_write_en = 'b0;
-          comb_reg0_in = 'b0;
-          comb_reg0_write_en = 'b0;
-          comb_reg1_in = 'b0;
-          comb_reg1_write_en = 'b0;
-          comb_reg_in = 'b0;
-          comb_reg_write_en = 'b0;
+          cond_reg0_in = 'b0;
+          cond_reg0_write_en = 'b0;
+          cond_reg1_in = 'b0;
+          cond_reg1_write_en = 'b0;
+          cond_reg_in = 'b0;
+          cond_reg_write_en = 'b0;
+          for_0_induction_var_reg_write_en = 1'd1;
+          for_1_induction_var_reg_write_en = 'b0;
+          for_2_induction_var_reg_write_en = 'b0;
           fsm_done_in = 'b0;
+          idx0_in = 'b0;
+          idx0_write_en = 'b0;
+          idx1_in = 'b0;
+          idx1_write_en = 'b0;
+          idx_in = 'b0;
+          idx_write_en = 'b0;
           load_0_reg_write_en = 'b0;
+          lt0_left = 'b0;
+          lt0_right = 'b0;
+          lt1_left = 'b0;
+          lt1_right = 'b0;
+          lt_left = 'b0;
+          lt_right = 'b0;
           muli_0_reg_write_en = 'b0;
           muli_1_reg_write_en = 'b0;
           muli_2_reg_write_en = 'b0;
@@ -2737,37 +3547,74 @@ module fsm_gemm_def (
           std_mult_pipe_1_go = 'b0;
           std_mult_pipe_2_go = 'b0;
           std_mult_pipe_3_go = 'b0;
-          std_slt_0_left = 'b0;
-          std_slt_0_right = 'b0;
-          std_slt_1_left = 'b0;
-          std_slt_1_right = 'b0;
-          std_slt_2_left = 'b0;
-          std_slt_2_right = 'b0;
-          while_0_arg0_reg_write_en = 1'd1;
-          while_1_arg0_reg_write_en = 'b0;
-          while_2_arg0_reg_write_en = 'b0;
-          if (while_0_arg0_reg_done) begin
-            next_state = S24;
-          end
-          else begin
-            next_state = S23;
-          end
+          fsm_s0_out = 1'b0;
+          fsm_s1_out = 1'b0;
+          fsm_s2_out = 1'b0;
+          fsm_s3_out = 1'b0;
+          fsm_s4_out = 1'b0;
+          fsm_s5_out = 1'b0;
+          fsm_s6_out = 1'b0;
+          fsm_s7_out = 1'b0;
+          fsm_s8_out = 1'b0;
+          fsm_s9_out = 1'b0;
+          fsm_s10_out = 1'b0;
+          fsm_s11_out = 1'b0;
+          fsm_s12_out = 1'b0;
+          fsm_s13_out = 1'b0;
+          fsm_s14_out = 1'b0;
+          fsm_s15_out = 1'b0;
+          fsm_s16_out = 1'b0;
+          fsm_s17_out = 1'b0;
+          fsm_s18_out = 1'b0;
+          fsm_s19_out = 1'b0;
+          fsm_s20_out = 1'b0;
+          fsm_s21_out = 1'b0;
+          fsm_s22_out = 1'b0;
+          fsm_s23_out = 1'b1;
+          fsm_s24_out = 1'b0;
+          fsm_s25_out = 1'b0;
+          fsm_s26_out = 1'b0;
+          fsm_s27_out = 1'b0;
+          fsm_s28_out = 1'b0;
+          fsm_s29_out = 1'b0;
+          next_state = S24;
         end
         S24: begin
+          adder0_left = 'b0;
+          adder0_right = 'b0;
+          adder1_left = 'b0;
+          adder1_right = 'b0;
+          adder_left = idx_out;
+          adder_right = 5'd1;
           arg_mem_0_content_en = 'b0;
           arg_mem_0_write_en = 'b0;
           arg_mem_1_content_en = 'b0;
           arg_mem_1_write_en = 'b0;
           arg_mem_3_content_en = 'b0;
           arg_mem_3_write_en = 'b0;
-          comb_reg0_in = 'b0;
-          comb_reg0_write_en = 'b0;
-          comb_reg1_in = std_slt_2_out;
-          comb_reg1_write_en = 1'd1;
-          comb_reg_in = 'b0;
-          comb_reg_write_en = 'b0;
+          cond_reg0_in = 'b0;
+          cond_reg0_write_en = 'b0;
+          cond_reg1_in = 'b0;
+          cond_reg1_write_en = 'b0;
+          cond_reg_in = lt_out;
+          cond_reg_write_en = 1'd1;
+          for_0_induction_var_reg_write_en = 'b0;
+          for_1_induction_var_reg_write_en = 'b0;
+          for_2_induction_var_reg_write_en = 'b0;
           fsm_done_in = 'b0;
+          idx0_in = 'b0;
+          idx0_write_en = 'b0;
+          idx1_in = 'b0;
+          idx1_write_en = 'b0;
+          idx_in = adder_out;
+          idx_write_en = 1'd1;
           load_0_reg_write_en = 'b0;
+          lt0_left = 'b0;
+          lt0_right = 'b0;
+          lt1_left = 'b0;
+          lt1_right = 'b0;
+          lt_left = adder_out;
+          lt_right = 5'd20;
           muli_0_reg_write_en = 'b0;
           muli_1_reg_write_en = 'b0;
           muli_2_reg_write_en = 'b0;
@@ -2776,19 +3623,40 @@ module fsm_gemm_def (
           std_mult_pipe_1_go = 'b0;
           std_mult_pipe_2_go = 'b0;
           std_mult_pipe_3_go = 'b0;
-          std_slt_0_left = 'b0;
-          std_slt_0_right = 'b0;
-          std_slt_1_left = 'b0;
-          std_slt_1_right = 'b0;
-          std_slt_2_left = while_0_arg0_reg_out;
-          std_slt_2_right = 32'd20;
-          while_0_arg0_reg_write_en = 'b0;
-          while_1_arg0_reg_write_en = 'b0;
-          while_2_arg0_reg_write_en = 'b0;
-          if (comb_reg1_out) begin
+          fsm_s0_out = 1'b0;
+          fsm_s1_out = 1'b0;
+          fsm_s2_out = 1'b0;
+          fsm_s3_out = 1'b0;
+          fsm_s4_out = 1'b0;
+          fsm_s5_out = 1'b0;
+          fsm_s6_out = 1'b0;
+          fsm_s7_out = 1'b0;
+          fsm_s8_out = 1'b0;
+          fsm_s9_out = 1'b0;
+          fsm_s10_out = 1'b0;
+          fsm_s11_out = 1'b0;
+          fsm_s12_out = 1'b0;
+          fsm_s13_out = 1'b0;
+          fsm_s14_out = 1'b0;
+          fsm_s15_out = 1'b0;
+          fsm_s16_out = 1'b0;
+          fsm_s17_out = 1'b0;
+          fsm_s18_out = 1'b0;
+          fsm_s19_out = 1'b0;
+          fsm_s20_out = 1'b0;
+          fsm_s21_out = 1'b0;
+          fsm_s22_out = 1'b0;
+          fsm_s23_out = 1'b0;
+          fsm_s24_out = 1'b1;
+          fsm_s25_out = 1'b0;
+          fsm_s26_out = 1'b0;
+          fsm_s27_out = 1'b0;
+          fsm_s28_out = 1'b0;
+          fsm_s29_out = 1'b0;
+          if (((cond_reg_done) & (idx_done)) & (cond_reg_out)) begin
             next_state = S10;
           end
-          else if (~(comb_reg1_out)) begin
+          else if (((cond_reg_done) & (idx_done)) & (~(cond_reg_out))) begin
             next_state = S25;
           end
           else begin
@@ -2796,20 +3664,41 @@ module fsm_gemm_def (
           end
         end
         S25: begin
+          adder0_left = 'b0;
+          adder0_right = 'b0;
+          adder1_left = 'b0;
+          adder1_right = 'b0;
+          adder_left = 'b0;
+          adder_right = 'b0;
           arg_mem_0_content_en = 'b0;
           arg_mem_0_write_en = 'b0;
           arg_mem_1_content_en = 'b0;
           arg_mem_1_write_en = 'b0;
           arg_mem_3_content_en = 'b0;
           arg_mem_3_write_en = 'b0;
-          comb_reg0_in = 'b0;
-          comb_reg0_write_en = 'b0;
-          comb_reg1_in = 'b0;
-          comb_reg1_write_en = 'b0;
-          comb_reg_in = 'b0;
-          comb_reg_write_en = 'b0;
+          cond_reg0_in = 'b0;
+          cond_reg0_write_en = 'b0;
+          cond_reg1_in = 'b0;
+          cond_reg1_write_en = 'b0;
+          cond_reg_in = 'b0;
+          cond_reg_write_en = 'b0;
+          for_0_induction_var_reg_write_en = 'b0;
+          for_1_induction_var_reg_write_en = 1'd1;
+          for_2_induction_var_reg_write_en = 'b0;
           fsm_done_in = 'b0;
+          idx0_in = 'b0;
+          idx0_write_en = 'b0;
+          idx1_in = 'b0;
+          idx1_write_en = 'b0;
+          idx_in = 'b0;
+          idx_write_en = 'b0;
           load_0_reg_write_en = 'b0;
+          lt0_left = 'b0;
+          lt0_right = 'b0;
+          lt1_left = 'b0;
+          lt1_right = 'b0;
+          lt_left = 'b0;
+          lt_right = 'b0;
           muli_0_reg_write_en = 'b0;
           muli_1_reg_write_en = 'b0;
           muli_2_reg_write_en = 'b0;
@@ -2818,37 +3707,74 @@ module fsm_gemm_def (
           std_mult_pipe_1_go = 'b0;
           std_mult_pipe_2_go = 'b0;
           std_mult_pipe_3_go = 'b0;
-          std_slt_0_left = 'b0;
-          std_slt_0_right = 'b0;
-          std_slt_1_left = 'b0;
-          std_slt_1_right = 'b0;
-          std_slt_2_left = 'b0;
-          std_slt_2_right = 'b0;
-          while_0_arg0_reg_write_en = 'b0;
-          while_1_arg0_reg_write_en = 1'd1;
-          while_2_arg0_reg_write_en = 'b0;
-          if (while_1_arg0_reg_done) begin
-            next_state = S26;
-          end
-          else begin
-            next_state = S25;
-          end
+          fsm_s0_out = 1'b0;
+          fsm_s1_out = 1'b0;
+          fsm_s2_out = 1'b0;
+          fsm_s3_out = 1'b0;
+          fsm_s4_out = 1'b0;
+          fsm_s5_out = 1'b0;
+          fsm_s6_out = 1'b0;
+          fsm_s7_out = 1'b0;
+          fsm_s8_out = 1'b0;
+          fsm_s9_out = 1'b0;
+          fsm_s10_out = 1'b0;
+          fsm_s11_out = 1'b0;
+          fsm_s12_out = 1'b0;
+          fsm_s13_out = 1'b0;
+          fsm_s14_out = 1'b0;
+          fsm_s15_out = 1'b0;
+          fsm_s16_out = 1'b0;
+          fsm_s17_out = 1'b0;
+          fsm_s18_out = 1'b0;
+          fsm_s19_out = 1'b0;
+          fsm_s20_out = 1'b0;
+          fsm_s21_out = 1'b0;
+          fsm_s22_out = 1'b0;
+          fsm_s23_out = 1'b0;
+          fsm_s24_out = 1'b0;
+          fsm_s25_out = 1'b1;
+          fsm_s26_out = 1'b0;
+          fsm_s27_out = 1'b0;
+          fsm_s28_out = 1'b0;
+          fsm_s29_out = 1'b0;
+          next_state = S26;
         end
         S26: begin
+          adder0_left = idx0_out;
+          adder0_right = 5'd1;
+          adder1_left = 'b0;
+          adder1_right = 'b0;
+          adder_left = 'b0;
+          adder_right = 'b0;
           arg_mem_0_content_en = 'b0;
           arg_mem_0_write_en = 'b0;
           arg_mem_1_content_en = 'b0;
           arg_mem_1_write_en = 'b0;
           arg_mem_3_content_en = 'b0;
           arg_mem_3_write_en = 'b0;
-          comb_reg0_in = std_slt_1_out;
-          comb_reg0_write_en = 1'd1;
-          comb_reg1_in = 'b0;
-          comb_reg1_write_en = 'b0;
-          comb_reg_in = 'b0;
-          comb_reg_write_en = 'b0;
+          cond_reg0_in = lt0_out;
+          cond_reg0_write_en = 1'd1;
+          cond_reg1_in = 'b0;
+          cond_reg1_write_en = 'b0;
+          cond_reg_in = 'b0;
+          cond_reg_write_en = 'b0;
+          for_0_induction_var_reg_write_en = 'b0;
+          for_1_induction_var_reg_write_en = 'b0;
+          for_2_induction_var_reg_write_en = 'b0;
           fsm_done_in = 'b0;
+          idx0_in = adder0_out;
+          idx0_write_en = 1'd1;
+          idx1_in = 'b0;
+          idx1_write_en = 'b0;
+          idx_in = 'b0;
+          idx_write_en = 'b0;
           load_0_reg_write_en = 'b0;
+          lt0_left = adder0_out;
+          lt0_right = 5'd20;
+          lt1_left = 'b0;
+          lt1_right = 'b0;
+          lt_left = 'b0;
+          lt_right = 'b0;
           muli_0_reg_write_en = 'b0;
           muli_1_reg_write_en = 'b0;
           muli_2_reg_write_en = 'b0;
@@ -2857,19 +3783,40 @@ module fsm_gemm_def (
           std_mult_pipe_1_go = 'b0;
           std_mult_pipe_2_go = 'b0;
           std_mult_pipe_3_go = 'b0;
-          std_slt_0_left = 'b0;
-          std_slt_0_right = 'b0;
-          std_slt_1_left = while_1_arg0_reg_out;
-          std_slt_1_right = 32'd20;
-          std_slt_2_left = 'b0;
-          std_slt_2_right = 'b0;
-          while_0_arg0_reg_write_en = 'b0;
-          while_1_arg0_reg_write_en = 'b0;
-          while_2_arg0_reg_write_en = 'b0;
-          if (comb_reg0_out) begin
+          fsm_s0_out = 1'b0;
+          fsm_s1_out = 1'b0;
+          fsm_s2_out = 1'b0;
+          fsm_s3_out = 1'b0;
+          fsm_s4_out = 1'b0;
+          fsm_s5_out = 1'b0;
+          fsm_s6_out = 1'b0;
+          fsm_s7_out = 1'b0;
+          fsm_s8_out = 1'b0;
+          fsm_s9_out = 1'b0;
+          fsm_s10_out = 1'b0;
+          fsm_s11_out = 1'b0;
+          fsm_s12_out = 1'b0;
+          fsm_s13_out = 1'b0;
+          fsm_s14_out = 1'b0;
+          fsm_s15_out = 1'b0;
+          fsm_s16_out = 1'b0;
+          fsm_s17_out = 1'b0;
+          fsm_s18_out = 1'b0;
+          fsm_s19_out = 1'b0;
+          fsm_s20_out = 1'b0;
+          fsm_s21_out = 1'b0;
+          fsm_s22_out = 1'b0;
+          fsm_s23_out = 1'b0;
+          fsm_s24_out = 1'b0;
+          fsm_s25_out = 1'b0;
+          fsm_s26_out = 1'b1;
+          fsm_s27_out = 1'b0;
+          fsm_s28_out = 1'b0;
+          fsm_s29_out = 1'b0;
+          if (((cond_reg0_done) & (idx0_done)) & (cond_reg0_out)) begin
             next_state = S8;
           end
-          else if (~(comb_reg0_out)) begin
+          else if (((cond_reg0_done) & (idx0_done)) & (~(cond_reg0_out))) begin
             next_state = S27;
           end
           else begin
@@ -2877,20 +3824,41 @@ module fsm_gemm_def (
           end
         end
         S27: begin
+          adder0_left = 'b0;
+          adder0_right = 'b0;
+          adder1_left = 'b0;
+          adder1_right = 'b0;
+          adder_left = 'b0;
+          adder_right = 'b0;
           arg_mem_0_content_en = 'b0;
           arg_mem_0_write_en = 'b0;
           arg_mem_1_content_en = 'b0;
           arg_mem_1_write_en = 'b0;
           arg_mem_3_content_en = 'b0;
           arg_mem_3_write_en = 'b0;
-          comb_reg0_in = 'b0;
-          comb_reg0_write_en = 'b0;
-          comb_reg1_in = 'b0;
-          comb_reg1_write_en = 'b0;
-          comb_reg_in = 'b0;
-          comb_reg_write_en = 'b0;
+          cond_reg0_in = 'b0;
+          cond_reg0_write_en = 'b0;
+          cond_reg1_in = 'b0;
+          cond_reg1_write_en = 'b0;
+          cond_reg_in = 'b0;
+          cond_reg_write_en = 'b0;
+          for_0_induction_var_reg_write_en = 'b0;
+          for_1_induction_var_reg_write_en = 'b0;
+          for_2_induction_var_reg_write_en = 1'd1;
           fsm_done_in = 'b0;
+          idx0_in = 'b0;
+          idx0_write_en = 'b0;
+          idx1_in = 'b0;
+          idx1_write_en = 'b0;
+          idx_in = 'b0;
+          idx_write_en = 'b0;
           load_0_reg_write_en = 'b0;
+          lt0_left = 'b0;
+          lt0_right = 'b0;
+          lt1_left = 'b0;
+          lt1_right = 'b0;
+          lt_left = 'b0;
+          lt_right = 'b0;
           muli_0_reg_write_en = 'b0;
           muli_1_reg_write_en = 'b0;
           muli_2_reg_write_en = 'b0;
@@ -2899,37 +3867,74 @@ module fsm_gemm_def (
           std_mult_pipe_1_go = 'b0;
           std_mult_pipe_2_go = 'b0;
           std_mult_pipe_3_go = 'b0;
-          std_slt_0_left = 'b0;
-          std_slt_0_right = 'b0;
-          std_slt_1_left = 'b0;
-          std_slt_1_right = 'b0;
-          std_slt_2_left = 'b0;
-          std_slt_2_right = 'b0;
-          while_0_arg0_reg_write_en = 'b0;
-          while_1_arg0_reg_write_en = 'b0;
-          while_2_arg0_reg_write_en = 1'd1;
-          if (while_2_arg0_reg_done) begin
-            next_state = S28;
-          end
-          else begin
-            next_state = S27;
-          end
+          fsm_s0_out = 1'b0;
+          fsm_s1_out = 1'b0;
+          fsm_s2_out = 1'b0;
+          fsm_s3_out = 1'b0;
+          fsm_s4_out = 1'b0;
+          fsm_s5_out = 1'b0;
+          fsm_s6_out = 1'b0;
+          fsm_s7_out = 1'b0;
+          fsm_s8_out = 1'b0;
+          fsm_s9_out = 1'b0;
+          fsm_s10_out = 1'b0;
+          fsm_s11_out = 1'b0;
+          fsm_s12_out = 1'b0;
+          fsm_s13_out = 1'b0;
+          fsm_s14_out = 1'b0;
+          fsm_s15_out = 1'b0;
+          fsm_s16_out = 1'b0;
+          fsm_s17_out = 1'b0;
+          fsm_s18_out = 1'b0;
+          fsm_s19_out = 1'b0;
+          fsm_s20_out = 1'b0;
+          fsm_s21_out = 1'b0;
+          fsm_s22_out = 1'b0;
+          fsm_s23_out = 1'b0;
+          fsm_s24_out = 1'b0;
+          fsm_s25_out = 1'b0;
+          fsm_s26_out = 1'b0;
+          fsm_s27_out = 1'b1;
+          fsm_s28_out = 1'b0;
+          fsm_s29_out = 1'b0;
+          next_state = S28;
         end
         S28: begin
+          adder0_left = 'b0;
+          adder0_right = 'b0;
+          adder1_left = idx1_out;
+          adder1_right = 5'd1;
+          adder_left = 'b0;
+          adder_right = 'b0;
           arg_mem_0_content_en = 'b0;
           arg_mem_0_write_en = 'b0;
           arg_mem_1_content_en = 'b0;
           arg_mem_1_write_en = 'b0;
           arg_mem_3_content_en = 'b0;
           arg_mem_3_write_en = 'b0;
-          comb_reg0_in = 'b0;
-          comb_reg0_write_en = 'b0;
-          comb_reg1_in = 'b0;
-          comb_reg1_write_en = 'b0;
-          comb_reg_in = std_slt_0_out;
-          comb_reg_write_en = 1'd1;
+          cond_reg0_in = 'b0;
+          cond_reg0_write_en = 'b0;
+          cond_reg1_in = lt1_out;
+          cond_reg1_write_en = 1'd1;
+          cond_reg_in = 'b0;
+          cond_reg_write_en = 'b0;
+          for_0_induction_var_reg_write_en = 'b0;
+          for_1_induction_var_reg_write_en = 'b0;
+          for_2_induction_var_reg_write_en = 'b0;
           fsm_done_in = 'b0;
+          idx0_in = 'b0;
+          idx0_write_en = 'b0;
+          idx1_in = adder1_out;
+          idx1_write_en = 1'd1;
+          idx_in = 'b0;
+          idx_write_en = 'b0;
           load_0_reg_write_en = 'b0;
+          lt0_left = 'b0;
+          lt0_right = 'b0;
+          lt1_left = adder1_out;
+          lt1_right = 5'd20;
+          lt_left = 'b0;
+          lt_right = 'b0;
           muli_0_reg_write_en = 'b0;
           muli_1_reg_write_en = 'b0;
           muli_2_reg_write_en = 'b0;
@@ -2938,19 +3943,40 @@ module fsm_gemm_def (
           std_mult_pipe_1_go = 'b0;
           std_mult_pipe_2_go = 'b0;
           std_mult_pipe_3_go = 'b0;
-          std_slt_0_left = while_2_arg0_reg_out;
-          std_slt_0_right = 32'd20;
-          std_slt_1_left = 'b0;
-          std_slt_1_right = 'b0;
-          std_slt_2_left = 'b0;
-          std_slt_2_right = 'b0;
-          while_0_arg0_reg_write_en = 'b0;
-          while_1_arg0_reg_write_en = 'b0;
-          while_2_arg0_reg_write_en = 'b0;
-          if (comb_reg_out) begin
+          fsm_s0_out = 1'b0;
+          fsm_s1_out = 1'b0;
+          fsm_s2_out = 1'b0;
+          fsm_s3_out = 1'b0;
+          fsm_s4_out = 1'b0;
+          fsm_s5_out = 1'b0;
+          fsm_s6_out = 1'b0;
+          fsm_s7_out = 1'b0;
+          fsm_s8_out = 1'b0;
+          fsm_s9_out = 1'b0;
+          fsm_s10_out = 1'b0;
+          fsm_s11_out = 1'b0;
+          fsm_s12_out = 1'b0;
+          fsm_s13_out = 1'b0;
+          fsm_s14_out = 1'b0;
+          fsm_s15_out = 1'b0;
+          fsm_s16_out = 1'b0;
+          fsm_s17_out = 1'b0;
+          fsm_s18_out = 1'b0;
+          fsm_s19_out = 1'b0;
+          fsm_s20_out = 1'b0;
+          fsm_s21_out = 1'b0;
+          fsm_s22_out = 1'b0;
+          fsm_s23_out = 1'b0;
+          fsm_s24_out = 1'b0;
+          fsm_s25_out = 1'b0;
+          fsm_s26_out = 1'b0;
+          fsm_s27_out = 1'b0;
+          fsm_s28_out = 1'b1;
+          fsm_s29_out = 1'b0;
+          if (((cond_reg1_done) & (idx1_done)) & (cond_reg1_out)) begin
             next_state = S3;
           end
-          else if (~(comb_reg_out)) begin
+          else if (((cond_reg1_done) & (idx1_done)) & (~(cond_reg1_out))) begin
             next_state = S29;
           end
           else begin
@@ -2958,20 +3984,41 @@ module fsm_gemm_def (
           end
         end
         S29: begin
+          adder0_left = 'b0;
+          adder0_right = 'b0;
+          adder1_left = 'b0;
+          adder1_right = 'b0;
+          adder_left = 'b0;
+          adder_right = 'b0;
           arg_mem_0_content_en = 'b0;
           arg_mem_0_write_en = 'b0;
           arg_mem_1_content_en = 'b0;
           arg_mem_1_write_en = 'b0;
           arg_mem_3_content_en = 'b0;
           arg_mem_3_write_en = 'b0;
-          comb_reg0_in = 'b0;
-          comb_reg0_write_en = 'b0;
-          comb_reg1_in = 'b0;
-          comb_reg1_write_en = 'b0;
-          comb_reg_in = 'b0;
-          comb_reg_write_en = 'b0;
+          cond_reg0_in = 'b0;
+          cond_reg0_write_en = 'b0;
+          cond_reg1_in = 'b0;
+          cond_reg1_write_en = 'b0;
+          cond_reg_in = 'b0;
+          cond_reg_write_en = 'b0;
+          for_0_induction_var_reg_write_en = 'b0;
+          for_1_induction_var_reg_write_en = 'b0;
+          for_2_induction_var_reg_write_en = 'b0;
           fsm_done_in = 1'd1;
+          idx0_in = 'b0;
+          idx0_write_en = 'b0;
+          idx1_in = 'b0;
+          idx1_write_en = 'b0;
+          idx_in = 'b0;
+          idx_write_en = 'b0;
           load_0_reg_write_en = 'b0;
+          lt0_left = 'b0;
+          lt0_right = 'b0;
+          lt1_left = 'b0;
+          lt1_right = 'b0;
+          lt_left = 'b0;
+          lt_right = 'b0;
           muli_0_reg_write_en = 'b0;
           muli_1_reg_write_en = 'b0;
           muli_2_reg_write_en = 'b0;
@@ -2980,32 +4027,74 @@ module fsm_gemm_def (
           std_mult_pipe_1_go = 'b0;
           std_mult_pipe_2_go = 'b0;
           std_mult_pipe_3_go = 'b0;
-          std_slt_0_left = 'b0;
-          std_slt_0_right = 'b0;
-          std_slt_1_left = 'b0;
-          std_slt_1_right = 'b0;
-          std_slt_2_left = 'b0;
-          std_slt_2_right = 'b0;
-          while_0_arg0_reg_write_en = 'b0;
-          while_1_arg0_reg_write_en = 'b0;
-          while_2_arg0_reg_write_en = 'b0;
+          fsm_s0_out = 1'b0;
+          fsm_s1_out = 1'b0;
+          fsm_s2_out = 1'b0;
+          fsm_s3_out = 1'b0;
+          fsm_s4_out = 1'b0;
+          fsm_s5_out = 1'b0;
+          fsm_s6_out = 1'b0;
+          fsm_s7_out = 1'b0;
+          fsm_s8_out = 1'b0;
+          fsm_s9_out = 1'b0;
+          fsm_s10_out = 1'b0;
+          fsm_s11_out = 1'b0;
+          fsm_s12_out = 1'b0;
+          fsm_s13_out = 1'b0;
+          fsm_s14_out = 1'b0;
+          fsm_s15_out = 1'b0;
+          fsm_s16_out = 1'b0;
+          fsm_s17_out = 1'b0;
+          fsm_s18_out = 1'b0;
+          fsm_s19_out = 1'b0;
+          fsm_s20_out = 1'b0;
+          fsm_s21_out = 1'b0;
+          fsm_s22_out = 1'b0;
+          fsm_s23_out = 1'b0;
+          fsm_s24_out = 1'b0;
+          fsm_s25_out = 1'b0;
+          fsm_s26_out = 1'b0;
+          fsm_s27_out = 1'b0;
+          fsm_s28_out = 1'b0;
+          fsm_s29_out = 1'b1;
           next_state = S0;
         end
       default begin
+          adder0_left = 'b0;
+          adder0_right = 'b0;
+          adder1_left = 'b0;
+          adder1_right = 'b0;
+          adder_left = 'b0;
+          adder_right = 'b0;
           arg_mem_0_content_en = 'b0;
           arg_mem_0_write_en = 'b0;
           arg_mem_1_content_en = 'b0;
           arg_mem_1_write_en = 'b0;
           arg_mem_3_content_en = 'b0;
           arg_mem_3_write_en = 'b0;
-          comb_reg0_in = 'b0;
-          comb_reg0_write_en = 'b0;
-          comb_reg1_in = 'b0;
-          comb_reg1_write_en = 'b0;
-          comb_reg_in = 'b0;
-          comb_reg_write_en = 'b0;
+          cond_reg0_in = 'b0;
+          cond_reg0_write_en = 'b0;
+          cond_reg1_in = 'b0;
+          cond_reg1_write_en = 'b0;
+          cond_reg_in = 'b0;
+          cond_reg_write_en = 'b0;
+          for_0_induction_var_reg_write_en = 'b0;
+          for_1_induction_var_reg_write_en = 'b0;
+          for_2_induction_var_reg_write_en = 'b0;
           fsm_done_in = 'b0;
+          idx0_in = 'b0;
+          idx0_write_en = 'b0;
+          idx1_in = 'b0;
+          idx1_write_en = 'b0;
+          idx_in = 'b0;
+          idx_write_en = 'b0;
           load_0_reg_write_en = 'b0;
+          lt0_left = 'b0;
+          lt0_right = 'b0;
+          lt1_left = 'b0;
+          lt1_right = 'b0;
+          lt_left = 'b0;
+          lt_right = 'b0;
           muli_0_reg_write_en = 'b0;
           muli_1_reg_write_en = 'b0;
           muli_2_reg_write_en = 'b0;
@@ -3014,15 +4103,6 @@ module fsm_gemm_def (
           std_mult_pipe_1_go = 'b0;
           std_mult_pipe_2_go = 'b0;
           std_mult_pipe_3_go = 'b0;
-          std_slt_0_left = 'b0;
-          std_slt_0_right = 'b0;
-          std_slt_1_left = 'b0;
-          std_slt_1_right = 'b0;
-          std_slt_2_left = 'b0;
-          std_slt_2_right = 'b0;
-          while_0_arg0_reg_write_en = 'b0;
-          while_1_arg0_reg_write_en = 'b0;
-          while_2_arg0_reg_write_en = 'b0;
           next_state = S0;
       end
     endcase
@@ -3073,6 +4153,15 @@ logic [9:0] std_slice_0_out;
 logic [31:0] std_add_6_left;
 logic [31:0] std_add_6_right;
 logic [31:0] std_add_6_out;
+logic [31:0] std_add_5_left;
+logic [31:0] std_add_5_right;
+logic [31:0] std_add_5_out;
+logic [31:0] std_add_4_left;
+logic [31:0] std_add_4_right;
+logic [31:0] std_add_4_out;
+logic [31:0] std_add_3_left;
+logic [31:0] std_add_3_right;
+logic [31:0] std_add_3_out;
 logic [31:0] load_0_reg_in;
 logic load_0_reg_write_en;
 logic load_0_reg_clk;
@@ -3092,9 +4181,9 @@ logic [31:0] std_mult_pipe_3_left;
 logic [31:0] std_mult_pipe_3_right;
 logic [31:0] std_mult_pipe_3_out;
 logic std_mult_pipe_3_done;
-logic [31:0] std_add_5_left;
-logic [31:0] std_add_5_right;
-logic [31:0] std_add_5_out;
+logic [31:0] std_add_2_left;
+logic [31:0] std_add_2_right;
+logic [31:0] std_add_2_out;
 logic [31:0] muli_2_reg_in;
 logic muli_2_reg_write_en;
 logic muli_2_reg_clk;
@@ -3121,24 +4210,12 @@ logic [31:0] std_mult_pipe_1_left;
 logic [31:0] std_mult_pipe_1_right;
 logic [31:0] std_mult_pipe_1_out;
 logic std_mult_pipe_1_done;
-logic [31:0] std_add_4_left;
-logic [31:0] std_add_4_right;
-logic [31:0] std_add_4_out;
-logic [31:0] std_add_3_left;
-logic [31:0] std_add_3_right;
-logic [31:0] std_add_3_out;
-logic [31:0] std_slt_2_left;
-logic [31:0] std_slt_2_right;
-logic std_slt_2_out;
-logic [31:0] std_add_2_left;
-logic [31:0] std_add_2_right;
-logic [31:0] std_add_2_out;
 logic [31:0] std_add_1_left;
 logic [31:0] std_add_1_right;
 logic [31:0] std_add_1_out;
-logic [31:0] std_slt_1_left;
-logic [31:0] std_slt_1_right;
-logic std_slt_1_out;
+logic [31:0] std_add_0_left;
+logic [31:0] std_add_0_right;
+logic [31:0] std_add_0_out;
 logic [31:0] muli_0_reg_in;
 logic muli_0_reg_write_en;
 logic muli_0_reg_clk;
@@ -3152,48 +4229,78 @@ logic [31:0] std_mult_pipe_0_left;
 logic [31:0] std_mult_pipe_0_right;
 logic [31:0] std_mult_pipe_0_out;
 logic std_mult_pipe_0_done;
-logic [31:0] std_add_0_left;
-logic [31:0] std_add_0_right;
-logic [31:0] std_add_0_out;
-logic [31:0] std_slt_0_left;
-logic [31:0] std_slt_0_right;
-logic std_slt_0_out;
-logic [31:0] while_2_arg0_reg_in;
-logic while_2_arg0_reg_write_en;
-logic while_2_arg0_reg_clk;
-logic while_2_arg0_reg_reset;
-logic [31:0] while_2_arg0_reg_out;
-logic while_2_arg0_reg_done;
-logic [31:0] while_1_arg0_reg_in;
-logic while_1_arg0_reg_write_en;
-logic while_1_arg0_reg_clk;
-logic while_1_arg0_reg_reset;
-logic [31:0] while_1_arg0_reg_out;
-logic while_1_arg0_reg_done;
-logic [31:0] while_0_arg0_reg_in;
-logic while_0_arg0_reg_write_en;
-logic while_0_arg0_reg_clk;
-logic while_0_arg0_reg_reset;
-logic [31:0] while_0_arg0_reg_out;
-logic while_0_arg0_reg_done;
-logic comb_reg_in;
-logic comb_reg_write_en;
-logic comb_reg_clk;
-logic comb_reg_reset;
-logic comb_reg_out;
-logic comb_reg_done;
-logic comb_reg0_in;
-logic comb_reg0_write_en;
-logic comb_reg0_clk;
-logic comb_reg0_reset;
-logic comb_reg0_out;
-logic comb_reg0_done;
-logic comb_reg1_in;
-logic comb_reg1_write_en;
-logic comb_reg1_clk;
-logic comb_reg1_reset;
-logic comb_reg1_out;
-logic comb_reg1_done;
+logic [31:0] for_2_induction_var_reg_in;
+logic for_2_induction_var_reg_write_en;
+logic for_2_induction_var_reg_clk;
+logic for_2_induction_var_reg_reset;
+logic [31:0] for_2_induction_var_reg_out;
+logic for_2_induction_var_reg_done;
+logic [31:0] for_1_induction_var_reg_in;
+logic for_1_induction_var_reg_write_en;
+logic for_1_induction_var_reg_clk;
+logic for_1_induction_var_reg_reset;
+logic [31:0] for_1_induction_var_reg_out;
+logic for_1_induction_var_reg_done;
+logic [31:0] for_0_induction_var_reg_in;
+logic for_0_induction_var_reg_write_en;
+logic for_0_induction_var_reg_clk;
+logic for_0_induction_var_reg_reset;
+logic [31:0] for_0_induction_var_reg_out;
+logic for_0_induction_var_reg_done;
+logic [4:0] idx_in;
+logic idx_write_en;
+logic idx_clk;
+logic idx_reset;
+logic [4:0] idx_out;
+logic idx_done;
+logic cond_reg_in;
+logic cond_reg_write_en;
+logic cond_reg_clk;
+logic cond_reg_reset;
+logic cond_reg_out;
+logic cond_reg_done;
+logic [4:0] adder_left;
+logic [4:0] adder_right;
+logic [4:0] adder_out;
+logic [4:0] lt_left;
+logic [4:0] lt_right;
+logic lt_out;
+logic [4:0] idx0_in;
+logic idx0_write_en;
+logic idx0_clk;
+logic idx0_reset;
+logic [4:0] idx0_out;
+logic idx0_done;
+logic cond_reg0_in;
+logic cond_reg0_write_en;
+logic cond_reg0_clk;
+logic cond_reg0_reset;
+logic cond_reg0_out;
+logic cond_reg0_done;
+logic [4:0] adder0_left;
+logic [4:0] adder0_right;
+logic [4:0] adder0_out;
+logic [4:0] lt0_left;
+logic [4:0] lt0_right;
+logic lt0_out;
+logic [4:0] idx1_in;
+logic idx1_write_en;
+logic idx1_clk;
+logic idx1_reset;
+logic [4:0] idx1_out;
+logic idx1_done;
+logic cond_reg1_in;
+logic cond_reg1_write_en;
+logic cond_reg1_clk;
+logic cond_reg1_reset;
+logic cond_reg1_out;
+logic cond_reg1_done;
+logic [4:0] adder1_left;
+logic [4:0] adder1_right;
+logic [4:0] adder1_out;
+logic [4:0] lt1_left;
+logic [4:0] lt1_right;
+logic lt1_out;
 logic fsm_start_in;
 logic fsm_start_out;
 logic fsm_done_in;
@@ -3244,6 +4351,33 @@ std_add # (
 );
 
 (* data=1 *)
+std_add # (
+    .WIDTH(32)
+) std_add_5 (
+    .left(std_add_5_left),
+    .out(std_add_5_out),
+    .right(std_add_5_right)
+);
+
+(* data=1 *)
+std_add # (
+    .WIDTH(32)
+) std_add_4 (
+    .left(std_add_4_left),
+    .out(std_add_4_out),
+    .right(std_add_4_right)
+);
+
+(* data=1 *)
+std_add # (
+    .WIDTH(32)
+) std_add_3 (
+    .left(std_add_3_left),
+    .out(std_add_3_out),
+    .right(std_add_3_right)
+);
+
+(* data=1 *)
 std_reg # (
     .WIDTH(32)
 ) load_0_reg (
@@ -3283,10 +4417,10 @@ std_mult_pipe # (
 (* data=1 *)
 std_add # (
     .WIDTH(32)
-) std_add_5 (
-    .left(std_add_5_left),
-    .out(std_add_5_out),
-    .right(std_add_5_right)
+) std_add_2 (
+    .left(std_add_2_left),
+    .out(std_add_2_out),
+    .right(std_add_2_right)
 );
 
 (* data=1 *)
@@ -3342,55 +4476,19 @@ std_mult_pipe # (
 (* data=1 *)
 std_add # (
     .WIDTH(32)
-) std_add_4 (
-    .left(std_add_4_left),
-    .out(std_add_4_out),
-    .right(std_add_4_right)
-);
-
-(* data=1, control=1 *)
-std_add # (
-    .WIDTH(32)
-) std_add_3 (
-    .left(std_add_3_left),
-    .out(std_add_3_out),
-    .right(std_add_3_right)
-);
-
-(* control=1 *)
-std_slt # (
-    .WIDTH(32)
-) std_slt_2 (
-    .left(std_slt_2_left),
-    .out(std_slt_2_out),
-    .right(std_slt_2_right)
-);
-
-(* data=1 *)
-std_add # (
-    .WIDTH(32)
-) std_add_2 (
-    .left(std_add_2_left),
-    .out(std_add_2_out),
-    .right(std_add_2_right)
-);
-
-(* data=1, control=1 *)
-std_add # (
-    .WIDTH(32)
 ) std_add_1 (
     .left(std_add_1_left),
     .out(std_add_1_out),
     .right(std_add_1_right)
 );
 
-(* control=1 *)
-std_slt # (
+(* data=1 *)
+std_add # (
     .WIDTH(32)
-) std_slt_1 (
-    .left(std_slt_1_left),
-    .out(std_slt_1_out),
-    .right(std_slt_1_right)
+) std_add_0 (
+    .left(std_add_0_left),
+    .out(std_add_0_out),
+    .right(std_add_0_right)
 );
 
 (* data=1 *)
@@ -3418,94 +4516,166 @@ std_mult_pipe # (
     .right(std_mult_pipe_0_right)
 );
 
-(* data=1, control=1 *)
+(* data=1 *)
+std_reg # (
+    .WIDTH(32)
+) for_2_induction_var_reg (
+    .clk(for_2_induction_var_reg_clk),
+    .done(for_2_induction_var_reg_done),
+    .in(for_2_induction_var_reg_in),
+    .out(for_2_induction_var_reg_out),
+    .reset(for_2_induction_var_reg_reset),
+    .write_en(for_2_induction_var_reg_write_en)
+);
+
+(* data=1 *)
+std_reg # (
+    .WIDTH(32)
+) for_1_induction_var_reg (
+    .clk(for_1_induction_var_reg_clk),
+    .done(for_1_induction_var_reg_done),
+    .in(for_1_induction_var_reg_in),
+    .out(for_1_induction_var_reg_out),
+    .reset(for_1_induction_var_reg_reset),
+    .write_en(for_1_induction_var_reg_write_en)
+);
+
+(* data=1 *)
+std_reg # (
+    .WIDTH(32)
+) for_0_induction_var_reg (
+    .clk(for_0_induction_var_reg_clk),
+    .done(for_0_induction_var_reg_done),
+    .in(for_0_induction_var_reg_in),
+    .out(for_0_induction_var_reg_out),
+    .reset(for_0_induction_var_reg_reset),
+    .write_en(for_0_induction_var_reg_write_en)
+);
+
+(* generated=1 *)
+std_reg # (
+    .WIDTH(5)
+) idx (
+    .clk(idx_clk),
+    .done(idx_done),
+    .in(idx_in),
+    .out(idx_out),
+    .reset(idx_reset),
+    .write_en(idx_write_en)
+);
+
+(* generated=1 *)
+std_reg # (
+    .WIDTH(1)
+) cond_reg (
+    .clk(cond_reg_clk),
+    .done(cond_reg_done),
+    .in(cond_reg_in),
+    .out(cond_reg_out),
+    .reset(cond_reg_reset),
+    .write_en(cond_reg_write_en)
+);
+
+(* generated=1 *)
 std_add # (
-    .WIDTH(32)
-) std_add_0 (
-    .left(std_add_0_left),
-    .out(std_add_0_out),
-    .right(std_add_0_right)
+    .WIDTH(5)
+) adder (
+    .left(adder_left),
+    .out(adder_out),
+    .right(adder_right)
 );
 
-(* control=1 *)
-std_slt # (
-    .WIDTH(32)
-) std_slt_0 (
-    .left(std_slt_0_left),
-    .out(std_slt_0_out),
-    .right(std_slt_0_right)
+(* generated=1 *)
+std_lt # (
+    .WIDTH(5)
+) lt (
+    .left(lt_left),
+    .out(lt_out),
+    .right(lt_right)
 );
 
-(* data=1 *)
+(* generated=1 *)
 std_reg # (
-    .WIDTH(32)
-) while_2_arg0_reg (
-    .clk(while_2_arg0_reg_clk),
-    .done(while_2_arg0_reg_done),
-    .in(while_2_arg0_reg_in),
-    .out(while_2_arg0_reg_out),
-    .reset(while_2_arg0_reg_reset),
-    .write_en(while_2_arg0_reg_write_en)
+    .WIDTH(5)
+) idx0 (
+    .clk(idx0_clk),
+    .done(idx0_done),
+    .in(idx0_in),
+    .out(idx0_out),
+    .reset(idx0_reset),
+    .write_en(idx0_write_en)
 );
 
-(* data=1 *)
-std_reg # (
-    .WIDTH(32)
-) while_1_arg0_reg (
-    .clk(while_1_arg0_reg_clk),
-    .done(while_1_arg0_reg_done),
-    .in(while_1_arg0_reg_in),
-    .out(while_1_arg0_reg_out),
-    .reset(while_1_arg0_reg_reset),
-    .write_en(while_1_arg0_reg_write_en)
-);
-
-(* data=1 *)
-std_reg # (
-    .WIDTH(32)
-) while_0_arg0_reg (
-    .clk(while_0_arg0_reg_clk),
-    .done(while_0_arg0_reg_done),
-    .in(while_0_arg0_reg_in),
-    .out(while_0_arg0_reg_out),
-    .reset(while_0_arg0_reg_reset),
-    .write_en(while_0_arg0_reg_write_en)
-);
-
-(* control=1, generated=1 *)
+(* generated=1 *)
 std_reg # (
     .WIDTH(1)
-) comb_reg (
-    .clk(comb_reg_clk),
-    .done(comb_reg_done),
-    .in(comb_reg_in),
-    .out(comb_reg_out),
-    .reset(comb_reg_reset),
-    .write_en(comb_reg_write_en)
+) cond_reg0 (
+    .clk(cond_reg0_clk),
+    .done(cond_reg0_done),
+    .in(cond_reg0_in),
+    .out(cond_reg0_out),
+    .reset(cond_reg0_reset),
+    .write_en(cond_reg0_write_en)
 );
 
-(* control=1, generated=1 *)
-std_reg # (
-    .WIDTH(1)
-) comb_reg0 (
-    .clk(comb_reg0_clk),
-    .done(comb_reg0_done),
-    .in(comb_reg0_in),
-    .out(comb_reg0_out),
-    .reset(comb_reg0_reset),
-    .write_en(comb_reg0_write_en)
+(* generated=1 *)
+std_add # (
+    .WIDTH(5)
+) adder0 (
+    .left(adder0_left),
+    .out(adder0_out),
+    .right(adder0_right)
 );
 
-(* control=1, generated=1 *)
+(* generated=1 *)
+std_lt # (
+    .WIDTH(5)
+) lt0 (
+    .left(lt0_left),
+    .out(lt0_out),
+    .right(lt0_right)
+);
+
+(* generated=1 *)
+std_reg # (
+    .WIDTH(5)
+) idx1 (
+    .clk(idx1_clk),
+    .done(idx1_done),
+    .in(idx1_in),
+    .out(idx1_out),
+    .reset(idx1_reset),
+    .write_en(idx1_write_en)
+);
+
+(* generated=1 *)
 std_reg # (
     .WIDTH(1)
-) comb_reg1 (
-    .clk(comb_reg1_clk),
-    .done(comb_reg1_done),
-    .in(comb_reg1_in),
-    .out(comb_reg1_out),
-    .reset(comb_reg1_reset),
-    .write_en(comb_reg1_write_en)
+) cond_reg1 (
+    .clk(cond_reg1_clk),
+    .done(cond_reg1_done),
+    .in(cond_reg1_in),
+    .out(cond_reg1_out),
+    .reset(cond_reg1_reset),
+    .write_en(cond_reg1_write_en)
+);
+
+(* generated=1 *)
+std_add # (
+    .WIDTH(5)
+) adder1 (
+    .left(adder1_left),
+    .out(adder1_out),
+    .right(adder1_right)
+);
+
+(* generated=1 *)
+std_lt # (
+    .WIDTH(5)
+) lt1 (
+    .left(lt1_left),
+    .out(lt1_out),
+    .right(lt1_right)
 );
 
 (* generated=1 *)
@@ -3524,25 +4694,74 @@ std_wire # (
     .out(fsm_done_out)
 );
 
+logic fsm_s0_out;
+logic fsm_s1_out;
+logic fsm_s2_out;
+logic fsm_s3_out;
+logic fsm_s4_out;
+logic fsm_s5_out;
+logic fsm_s6_out;
+logic fsm_s7_out;
+logic fsm_s8_out;
+logic fsm_s9_out;
+logic fsm_s10_out;
+logic fsm_s11_out;
+logic fsm_s12_out;
+logic fsm_s13_out;
+logic fsm_s14_out;
+logic fsm_s15_out;
+logic fsm_s16_out;
+logic fsm_s17_out;
+logic fsm_s18_out;
+logic fsm_s19_out;
+logic fsm_s20_out;
+logic fsm_s21_out;
+logic fsm_s22_out;
+logic fsm_s23_out;
+logic fsm_s24_out;
+logic fsm_s25_out;
+logic fsm_s26_out;
+logic fsm_s27_out;
+logic fsm_s28_out;
+logic fsm_s29_out;
 fsm_gemm_def fsm (
   .clk(clk),
   .reset(reset),
-  // dst ports
-  // input ports
+  .adder0_left(adder0_left),
+  .adder0_right(adder0_right),
+  .adder1_left(adder1_left),
+  .adder1_right(adder1_right),
+  .adder_left(adder_left),
+  .adder_right(adder_right),
   .arg_mem_0_content_en(arg_mem_0_content_en),
   .arg_mem_0_write_en(arg_mem_0_write_en),
   .arg_mem_1_content_en(arg_mem_1_content_en),
   .arg_mem_1_write_en(arg_mem_1_write_en),
   .arg_mem_3_content_en(arg_mem_3_content_en),
   .arg_mem_3_write_en(arg_mem_3_write_en),
-  .comb_reg0_in(comb_reg0_in),
-  .comb_reg0_write_en(comb_reg0_write_en),
-  .comb_reg1_in(comb_reg1_in),
-  .comb_reg1_write_en(comb_reg1_write_en),
-  .comb_reg_in(comb_reg_in),
-  .comb_reg_write_en(comb_reg_write_en),
+  .cond_reg0_in(cond_reg0_in),
+  .cond_reg0_write_en(cond_reg0_write_en),
+  .cond_reg1_in(cond_reg1_in),
+  .cond_reg1_write_en(cond_reg1_write_en),
+  .cond_reg_in(cond_reg_in),
+  .cond_reg_write_en(cond_reg_write_en),
+  .for_0_induction_var_reg_write_en(for_0_induction_var_reg_write_en),
+  .for_1_induction_var_reg_write_en(for_1_induction_var_reg_write_en),
+  .for_2_induction_var_reg_write_en(for_2_induction_var_reg_write_en),
   .fsm_done_in(fsm_done_in),
+  .idx0_in(idx0_in),
+  .idx0_write_en(idx0_write_en),
+  .idx1_in(idx1_in),
+  .idx1_write_en(idx1_write_en),
+  .idx_in(idx_in),
+  .idx_write_en(idx_write_en),
   .load_0_reg_write_en(load_0_reg_write_en),
+  .lt0_left(lt0_left),
+  .lt0_right(lt0_right),
+  .lt1_left(lt1_left),
+  .lt1_right(lt1_right),
+  .lt_left(lt_left),
+  .lt_right(lt_right),
   .muli_0_reg_write_en(muli_0_reg_write_en),
   .muli_1_reg_write_en(muli_1_reg_write_en),
   .muli_2_reg_write_en(muli_2_reg_write_en),
@@ -3551,115 +4770,150 @@ fsm_gemm_def fsm (
   .std_mult_pipe_1_go(std_mult_pipe_1_go),
   .std_mult_pipe_2_go(std_mult_pipe_2_go),
   .std_mult_pipe_3_go(std_mult_pipe_3_go),
-  .std_slt_0_left(std_slt_0_left),
-  .std_slt_0_right(std_slt_0_right),
-  .std_slt_1_left(std_slt_1_left),
-  .std_slt_1_right(std_slt_1_right),
-  .std_slt_2_left(std_slt_2_left),
-  .std_slt_2_right(std_slt_2_right),
-  .while_0_arg0_reg_write_en(while_0_arg0_reg_write_en),
-  .while_1_arg0_reg_write_en(while_1_arg0_reg_write_en),
-  .while_2_arg0_reg_write_en(while_2_arg0_reg_write_en),
-  .std_slt_1_out(std_slt_1_out),
-  .std_slt_2_out(std_slt_2_out),
-  .std_slt_0_out(std_slt_0_out),
-  .while_2_arg0_reg_out(while_2_arg0_reg_out),
-  .while_1_arg0_reg_out(while_1_arg0_reg_out),
-  .while_0_arg0_reg_out(while_0_arg0_reg_out),
+  .idx0_out(idx0_out),
+  .idx1_out(idx1_out),
+  .idx_out(idx_out),
+  .lt0_out(lt0_out),
+  .lt1_out(lt1_out),
+  .lt_out(lt_out),
+  .adder0_out(adder0_out),
+  .adder1_out(adder1_out),
+  .adder_out(adder_out),
   .fsm_start_out(fsm_start_out),
-  .while_2_arg0_reg_done(while_2_arg0_reg_done),
-  .comb_reg_out(comb_reg_out),
-  .comb_reg0_out(comb_reg0_out),
-  .while_0_arg0_reg_done(while_0_arg0_reg_done),
-  .comb_reg1_out(comb_reg1_out),
-  .arg_mem_0_done(arg_mem_0_done),
-  .arg_mem_1_done(arg_mem_1_done),
-  .arg_mem_3_done(arg_mem_3_done),
-  .load_0_reg_done(load_0_reg_done),
-  .while_1_arg0_reg_done(while_1_arg0_reg_done)
+  .cond_reg1_done(cond_reg1_done),
+  .idx1_done(idx1_done),
+  .cond_reg1_out(cond_reg1_out),
+  .cond_reg0_done(cond_reg0_done),
+  .idx0_done(idx0_done),
+  .cond_reg0_out(cond_reg0_out),
+  .cond_reg_done(cond_reg_done),
+  .idx_done(idx_done),
+  .cond_reg_out(cond_reg_out),
+  .fsm_s0_out(fsm_s0_out),
+  .fsm_s1_out(fsm_s1_out),
+  .fsm_s2_out(fsm_s2_out),
+  .fsm_s3_out(fsm_s3_out),
+  .fsm_s4_out(fsm_s4_out),
+  .fsm_s5_out(fsm_s5_out),
+  .fsm_s6_out(fsm_s6_out),
+  .fsm_s7_out(fsm_s7_out),
+  .fsm_s8_out(fsm_s8_out),
+  .fsm_s9_out(fsm_s9_out),
+  .fsm_s10_out(fsm_s10_out),
+  .fsm_s11_out(fsm_s11_out),
+  .fsm_s12_out(fsm_s12_out),
+  .fsm_s13_out(fsm_s13_out),
+  .fsm_s14_out(fsm_s14_out),
+  .fsm_s15_out(fsm_s15_out),
+  .fsm_s16_out(fsm_s16_out),
+  .fsm_s17_out(fsm_s17_out),
+  .fsm_s18_out(fsm_s18_out),
+  .fsm_s19_out(fsm_s19_out),
+  .fsm_s20_out(fsm_s20_out),
+  .fsm_s21_out(fsm_s21_out),
+  .fsm_s22_out(fsm_s22_out),
+  .fsm_s23_out(fsm_s23_out),
+  .fsm_s24_out(fsm_s24_out),
+  .fsm_s25_out(fsm_s25_out),
+  .fsm_s26_out(fsm_s26_out),
+  .fsm_s27_out(fsm_s27_out),
+  .fsm_s28_out(fsm_s28_out),
+  .fsm_s29_out(fsm_s29_out)
 );
 
-assign while_2_arg0_reg_in =
+assign for_2_induction_var_reg_in =
        fsm_s1_out ? 32'd0 :
-       fsm_s27_out ? std_add_0_out :
+       fsm_s27_out ? std_add_6_out :
        'dx;
-assign while_1_arg0_reg_in =
-       fsm_s3_out ? 32'd0 :
-       fsm_s25_out ? std_add_1_out :
-       'dx;
-assign std_mult_pipe_0_left = while_2_arg0_reg_out;
 assign std_mult_pipe_0_right = 32'd30;
-assign muli_0_reg_in = std_mult_pipe_0_out;
-assign while_0_arg0_reg_in =
-       fsm_s8_out ? 32'd0 :
-       fsm_s23_out ? std_add_3_out :
+assign std_mult_pipe_0_left = for_2_induction_var_reg_out;
+assign for_1_induction_var_reg_in =
+       fsm_s3_out ? 32'd0 :
+       fsm_s25_out ? std_add_5_out :
        'dx;
-assign std_add_4_right = while_0_arg0_reg_out;
-assign std_add_4_left = muli_0_reg_out;
+assign muli_0_reg_in = std_mult_pipe_0_out;
+assign for_0_induction_var_reg_in =
+       fsm_s8_out ? 32'd0 :
+       fsm_s23_out ? std_add_4_out :
+       'dx;
+assign std_slice_3_in = std_add_1_out;
 assign arg_mem_0_addr0 = std_slice_3_out;
-assign std_slice_3_in = std_add_4_out;
-assign std_mult_pipe_2_right = 32'd30;
-assign std_mult_pipe_2_left = while_0_arg0_reg_out;
-assign std_mult_pipe_1_left = in0;
+assign std_add_1_left = muli_0_reg_out;
+assign std_add_1_right = for_0_induction_var_reg_out;
+assign std_mult_pipe_2_left = for_0_induction_var_reg_out;
 assign std_mult_pipe_1_right = arg_mem_0_read_data;
+assign std_mult_pipe_1_left = in0;
+assign std_mult_pipe_2_right = 32'd30;
 assign muli_2_reg_in = std_mult_pipe_2_out;
 assign muli_1_reg_in = std_mult_pipe_1_out;
-assign std_add_5_right = while_1_arg0_reg_out;
-assign std_slice_2_in = std_add_5_out;
+assign std_slice_2_in = std_add_2_out;
+assign std_add_2_right = for_1_induction_var_reg_out;
+assign std_add_2_left = muli_2_reg_out;
 assign arg_mem_1_addr0 = std_slice_2_out;
-assign std_add_5_left = muli_2_reg_out;
 assign std_mult_pipe_3_left = muli_1_reg_out;
 assign std_mult_pipe_3_right = arg_mem_1_read_data;
 assign muli_3_reg_in = std_mult_pipe_3_out;
+assign std_add_0_left = muli_0_reg_out;
+assign std_slice_1_in = std_add_0_out;
 assign arg_mem_3_addr0 =
        fsm_s20_out ? std_slice_1_out :
        fsm_s22_out ? std_slice_0_out :
        'dx;
-assign std_add_2_left = muli_0_reg_out;
-assign std_slice_1_in = std_add_2_out;
-assign std_add_2_right = while_1_arg0_reg_out;
+assign std_add_0_right = for_1_induction_var_reg_out;
 assign load_0_reg_in = arg_mem_3_read_data;
-assign std_slice_0_in = std_add_2_out;
-assign std_add_6_left = load_0_reg_out;
-assign arg_mem_3_write_data = std_add_6_out;
-assign std_add_6_right = muli_3_reg_out;
-assign std_add_3_right = 32'd1;
-assign std_add_3_left = while_0_arg0_reg_out;
-assign std_add_1_left = while_1_arg0_reg_out;
-assign std_add_1_right = 32'd1;
-assign std_add_0_left = while_2_arg0_reg_out;
-assign std_add_0_right = 32'd1;
+assign std_add_3_left = load_0_reg_out;
+assign arg_mem_3_write_data = std_add_3_out;
+assign std_add_3_right = muli_3_reg_out;
+assign std_slice_0_in = std_add_0_out;
+assign std_add_4_left = for_0_induction_var_reg_out;
+assign std_add_4_right = 32'd1;
+assign std_add_5_right = 32'd1;
+assign std_add_5_left = for_1_induction_var_reg_out;
+assign std_add_6_right = 32'd1;
+assign std_add_6_left = for_2_induction_var_reg_out;
+assign cond_reg1_clk = clk;
+assign cond_reg1_reset = reset;
 assign done = fsm_done_out;
+assign arg_mem_1_write_data = 32'd0;
+assign arg_mem_2_addr0 = 10'd0;
+assign arg_mem_2_content_en = 1'd0;
+assign arg_mem_0_write_data = 32'd0;
+assign arg_mem_2_write_en = 1'd0;
+assign arg_mem_2_write_data = 32'd0;
 assign muli_3_reg_clk = clk;
 assign muli_3_reg_reset = reset;
+assign idx1_clk = clk;
+assign idx1_reset = reset;
 assign load_0_reg_clk = clk;
 assign load_0_reg_reset = reset;
-assign while_1_arg0_reg_clk = clk;
-assign while_1_arg0_reg_reset = reset;
-assign comb_reg_clk = clk;
-assign comb_reg_reset = reset;
+assign cond_reg0_clk = clk;
+assign cond_reg0_reset = reset;
+assign for_0_induction_var_reg_clk = clk;
+assign for_0_induction_var_reg_reset = reset;
 assign std_mult_pipe_3_clk = clk;
 assign std_mult_pipe_3_reset = reset;
 assign std_mult_pipe_2_clk = clk;
 assign std_mult_pipe_2_reset = reset;
-assign while_0_arg0_reg_clk = clk;
-assign while_0_arg0_reg_reset = reset;
-assign comb_reg1_clk = clk;
-assign comb_reg1_reset = reset;
+assign idx0_clk = clk;
+assign idx0_reset = reset;
 assign muli_1_reg_clk = clk;
 assign muli_1_reg_reset = reset;
 assign muli_0_reg_clk = clk;
 assign muli_0_reg_reset = reset;
-assign comb_reg0_clk = clk;
-assign comb_reg0_reset = reset;
-assign while_2_arg0_reg_clk = clk;
-assign while_2_arg0_reg_reset = reset;
+assign idx_clk = clk;
+assign idx_reset = reset;
 assign muli_2_reg_clk = clk;
 assign muli_2_reg_reset = reset;
 assign std_mult_pipe_0_clk = clk;
 assign std_mult_pipe_0_reset = reset;
+assign for_2_induction_var_reg_clk = clk;
+assign for_2_induction_var_reg_reset = reset;
 assign std_mult_pipe_1_clk = clk;
 assign std_mult_pipe_1_reset = reset;
+assign for_1_induction_var_reg_clk = clk;
+assign for_1_induction_var_reg_reset = reset;
 assign fsm_start_in = go;
+assign cond_reg_clk = clk;
+assign cond_reg_reset = reset;
 // COMPONENT END: gemm
 endmodule

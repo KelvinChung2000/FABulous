@@ -355,10 +355,10 @@ class FABulous_API:
             destPath = Path(f"{b.src.parent}/metadata")
             genPrims(b, destPath / f"prim_{b.name}{b.src.suffix}")
             genCellsAndMaps(b)
-            cells.update(Path(f"{b.src.parent}/metadata").glob("cell_*.li"))
+            cells.update(Path(f"{b.src.parent}/metadata").glob("cell_*.il"))
             maps.update(Path(f"{b.src.parent}/metadata").glob("map_*.v"))
             libs.update(Path(f"{b.src.parent}/metadata").glob("prim_*.v"))
 
-        mergeFiles(cells, Path(f"{dest}/cells.li"))
+        mergeFiles(cells, Path(f"{dest}/cells.il"))
         mergeFiles(maps, Path(f"{dest}/techmaps.v"))
         mergeFiles(libs, Path(f"{dest}/libs.v"))

@@ -1,0 +1,166 @@
+import "primitives/memories/seq.futil";
+import "primitives/core.futil";
+import "primitives/compile.futil";
+import "primitives/binary_operators.futil";
+component main<"toplevel"=1,>(in0: 32, in1: 32, @clk clk: 1, @reset reset: 1, @go go: 1) -> (@done done: 1) {
+  cells {
+    @external(1) mem_3 = seq_mem_d1(32, 900, 10);
+    @external(1) mem_2 = seq_mem_d1(32, 900, 10);
+    @external(1) mem_1 = seq_mem_d1(32, 900, 10);
+    @external(1) mem_0 = seq_mem_d1(32, 900, 10);
+    gemm_instance = gemm();
+  }
+  wires {
+    group init_gemm_instance {
+      gemm_instance.reset = 1'd1;
+      gemm_instance.go = 1'd1;
+      init_gemm_instance[done] = gemm_instance.done;
+    }
+  }
+  control {
+    seq {
+      seq {
+        init_gemm_instance;
+        invoke gemm_instance[arg_mem_0 = mem_0, arg_mem_1 = mem_1, arg_mem_2 = mem_2, arg_mem_3 = mem_3](in0 = in0, in1 = in1)();
+      }
+    }
+  }
+}
+
+component gemm(in0: 32, in1: 32, @clk clk: 1, @reset reset: 1, @go go: 1) -> (@done done: 1) {
+  cells {
+    std_slice_3 = std_slice(32, 10);
+    std_slice_2 = std_slice(32, 10);
+    std_slice_1 = std_slice(32, 10);
+    std_slice_0 = std_slice(32, 10);
+    std_add_6 = std_add(32);
+    load_0_reg = std_reg(32);
+    muli_3_reg = std_reg(32);
+    std_mult_pipe_3 = std_mult_pipe(32);
+    std_add_5 = std_add(32);
+    muli_2_reg = std_reg(32);
+    std_mult_pipe_2 = std_mult_pipe(32);
+    muli_1_reg = std_reg(32);
+    std_mult_pipe_1 = std_mult_pipe(32);
+    std_add_4 = std_add(32);
+    std_add_3 = std_add(32);
+    std_slt_2 = std_slt(32);
+    std_add_2 = std_add(32);
+    std_add_1 = std_add(32);
+    std_slt_1 = std_slt(32);
+    muli_0_reg = std_reg(32);
+    std_mult_pipe_0 = std_mult_pipe(32);
+    std_add_0 = std_add(32);
+    std_slt_0 = std_slt(32);
+    while_2_arg0_reg = std_reg(32);
+    while_1_arg0_reg = std_reg(32);
+    while_0_arg0_reg = std_reg(32);
+    ref arg_mem_3 = seq_mem_d1(32, 900, 10);
+    ref arg_mem_2 = seq_mem_d1(32, 900, 10);
+    ref arg_mem_1 = seq_mem_d1(32, 900, 10);
+    ref arg_mem_0 = seq_mem_d1(32, 900, 10);
+  }
+  wires {
+
+    group assign_while_0_init_0 {
+      while_0_arg0_reg.in = 32'd0;
+      while_0_arg0_reg.write_en = 1'd1;
+      assign_while_0_init_0[done] = while_0_arg0_reg.done;
+    }
+
+    comb group bb0_6 {
+      std_slt_2.left = while_0_arg0_reg.out;
+      std_slt_2.right = 32'd20;
+    }
+    group bb0_9 {
+      std_slice_3.in = std_add_4.out;
+      arg_mem_0.addr0 = std_slice_3.out;
+      arg_mem_0.content_en = 1'd1;
+      arg_mem_0.write_en = 1'd0;
+      std_add_4.left = muli_0_reg.out;
+      std_add_4.right = while_0_arg0_reg.out;
+      bb0_9[done] = arg_mem_0.done;
+    }
+    group bb0_10 {
+      std_mult_pipe_1.left = in0;
+      std_mult_pipe_1.right = arg_mem_0.read_data;
+      muli_1_reg.in = std_mult_pipe_1.out;
+      muli_1_reg.write_en = std_mult_pipe_1.done;
+      std_mult_pipe_1.go = !std_mult_pipe_1.done ? 1'd1;
+      bb0_10[done] = muli_1_reg.done;
+    }
+    group bb0_11 {
+      std_mult_pipe_2.left = while_0_arg0_reg.out;
+      std_mult_pipe_2.right = 32'd30;
+      muli_2_reg.in = std_mult_pipe_2.out;
+      muli_2_reg.write_en = std_mult_pipe_2.done;
+      std_mult_pipe_2.go = !std_mult_pipe_2.done ? 1'd1;
+      bb0_11[done] = muli_2_reg.done;
+    }
+    group bb0_13 {
+      std_slice_2.in = std_add_5.out;
+      arg_mem_1.addr0 = std_slice_2.out;
+      arg_mem_1.content_en = 1'd1;
+      arg_mem_1.write_en = 1'd0;
+      std_add_5.left = muli_2_reg.out;
+      std_add_5.right = while_1_arg0_reg.out;
+      bb0_13[done] = arg_mem_1.done;
+    }
+    group bb0_14 {
+      std_mult_pipe_3.left = muli_1_reg.out;
+      std_mult_pipe_3.right = arg_mem_1.read_data;
+      muli_3_reg.in = std_mult_pipe_3.out;
+      muli_3_reg.write_en = std_mult_pipe_3.done;
+      std_mult_pipe_3.go = !std_mult_pipe_3.done ? 1'd1;
+      bb0_14[done] = muli_3_reg.done;
+    }
+    group bb0_15 {
+      std_slice_1.in = std_add_2.out;
+      arg_mem_3.addr0 = std_slice_1.out;
+      arg_mem_3.content_en = 1'd1;
+      arg_mem_3.write_en = 1'd0;
+      load_0_reg.in = arg_mem_3.read_data;
+      load_0_reg.write_en = arg_mem_3.done;
+      std_add_2.left = muli_0_reg.out;
+      std_add_2.right = while_1_arg0_reg.out;
+      bb0_15[done] = load_0_reg.done;
+    }
+    group bb0_17 {
+      std_slice_0.in = std_add_2.out;
+      arg_mem_3.addr0 = std_slice_0.out;
+      arg_mem_3.write_data = std_add_6.out;
+      arg_mem_3.write_en = 1'd1;
+      arg_mem_3.content_en = 1'd1;
+      std_add_2.left = muli_0_reg.out;
+      std_add_2.right = while_1_arg0_reg.out;
+      std_add_6.left = load_0_reg.out;
+      std_add_6.right = muli_3_reg.out;
+      bb0_17[done] = arg_mem_3.done;
+    }
+    group assign_while_0_latch {
+      while_0_arg0_reg.in = std_add_3.out;
+      while_0_arg0_reg.write_en = 1'd1;
+      std_add_3.left = while_0_arg0_reg.out;
+      std_add_3.right = 32'd1;
+      assign_while_0_latch[done] = while_0_arg0_reg.done;
+    }
+
+  }
+  control {
+    assign_while_0_init_0;
+    while std_slt_2.out with bb0_6 {
+        seq {
+        seq {
+            bb0_9;
+            bb0_10;
+            bb0_11;
+            bb0_13;
+            bb0_14;
+            bb0_15;
+            bb0_17;
+        }
+        assign_while_0_latch;
+        }
+    }
+  }
+}

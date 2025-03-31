@@ -18,10 +18,10 @@ module PE_ConfigMem #(
 
 generate
 if(EMULATION_ENABLE) begin
-reg [63:0] cfg [0:15];
+reg [63:0] cfg [0:35];
 initial $readmemh(EMULATION_CONFIG, cfg);
 reg [63:0] tileConf;
-assign tileConf = cfg[Y_CORD * 4 + X_CORD];
+assign tileConf = cfg[Y_CORD * 6 + X_CORD];
 // config bit 0 at frame 5 bit 4
 assign ConfigBits[0] = tileConf[20];
 assign ConfigBits_N[0] = ~tileConf[20];

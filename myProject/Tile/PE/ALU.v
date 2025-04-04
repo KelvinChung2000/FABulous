@@ -18,7 +18,7 @@ module ALU #(
   localparam OR = 3'b011;
   localparam XOR = 3'b100;
   localparam MUL = 3'b101;
-  localparam MUL_ADD = 3'b110;
+  localparam SEL = 3'b110;
 
   // wire [WIDTH - 1:0] data2;
 
@@ -28,11 +28,11 @@ module ALU #(
     case (ALU_func)
       ADD: data_out = data_in1 + data_in2;
       SUB: data_out = data_in1 - data_in2;
-      AND: data_out = data_in1 & data_in2;
+      // AND: data_out = data_in1 & data_in2;
       OR: data_out = data_in1 | data_in2;
       XOR: data_out = data_in1 ^ data_in2;
       MUL: data_out = data_in1 * data_in2;
-      MUL_ADD: data_out = data_in1 * data_in2 + data_in3;
+      SEL: data_out = data_in3[0] ? data_in1 : data_in2;
       default: data_out = {WIDTH{1'b0}};
     endcase
   end

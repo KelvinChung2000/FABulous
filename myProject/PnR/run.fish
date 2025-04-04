@@ -16,14 +16,15 @@ function check_status
     end
 end
 
-set source_futil /home/kelvin/FABulous_fork/myProject/PnR/gemm/gemm.futil 
-set source_hdl /home/kelvin/FABulous_fork/myProject/PnR/gemm/gemm.sv
-set ir /home/kelvin/FABulous_fork/myProject/PnR/gemm/ir.log
+set source_futil /home/kelvin/FABulous_fork/myProject/PnR/mac-pipelined/mac-pipelined.futil 
+set source_hdl /home/kelvin/FABulous_fork/myProject/PnR/mac-pipelined/mac-pipelined.sv
+set ir /home/kelvin/FABulous_fork/myProject/PnR/mac-pipelined/ir.log
 set my_FAB_ROOT /home/kelvin/FABulous_fork
 
-calyx --dump-ir -x dfsm:dump-dot=test.dot --synthesis --nested -b verilog -d papercut -d cell-share $source_futil -o $source_hdl > $ir
+calyx --dump-ir -p fsm-opt -p lower --synthesis --nested -b verilog -d papercut -d cell-share $source_futil -o $source_hdl > $ir
 check_status
 
+# FABulous --debug ../../myProject -p "load_fabric; gen_fabric; gen_FABulous_CAD_tool_files;"
 FABulous --debug ../../myProject -p "load_fabric; gen_fabric; gen_FABulous_CAD_tool_files; \
          synthesis_script $source_hdl -tcl $my_FAB_ROOT/myProject/.FABulous/arch_synth.tcl;"
 check_status

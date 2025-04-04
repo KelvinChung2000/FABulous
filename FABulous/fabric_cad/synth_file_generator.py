@@ -12,7 +12,11 @@ from FABulous.fabric_definition.define import IO
 from FABulous.fabric_definition.Fabric import Fabric
 from FABulous.fabric_definition.Port import ConfigPort
 from FABulous.fabric_generator.code_generator_2 import CodeGenerator
-from FABulous.fabric_generator.define import PossibleBinaryType, WriterType
+from FABulous.fabric_generator.define import (
+    PossibleBinaryType,
+    PossibleRegType,
+    WriterType,
+)
 from FABulous.fabric_generator.HDL_Construct.Value import Value
 
 
@@ -32,7 +36,73 @@ def genPrims(bel: Bel, filePath: Path):
                 pr.Port(bel.userCLK.name, IO.INPUT, 1)
 
 
-def genWrappingMap(bel: Bel, filename: Path) -> list[str]:
+def genBinaryOpMap(cell, filename, belName, wrapping=True):
+    cg = CodeGenerator(filename, WriterType.VERILOG, "a")
+    cellType = cell["type"].replace("$", "_")
+
+    if wrapping:
+        srcCell, targetCell = cell["type"], f"\\$_{cellType}_wrapper"
+    else:
+        srcCell, targetCell = f"\\$_{cellType}_wrapper", cell["type"]
+
+    with cg.Module(
+        f"wrap_{belName}_{cellType}" if wrapping else f"unwrap_{belName}_{cellType}",
+        [cg.Attribute("techmap_celltype", srcCell)],
+    ) as m:
+        with m.ParameterRegion() as pr:
+            aWidthParam = pr.Parameter("A_WIDTH", 1)
+            aSignedParam = pr.Parameter("A_SIGNED", 0)
+            bWidthParam = pr.Parameter("B_WIDTH", 1)
+            bSignedParam = pr.Parameter("B_SIGNED", 0)
+            yWidthParam = pr.Parameter("Y_WIDTH", 1)
+
+        with m.PortRegion() as pr:
+            portA = pr.Port("A", IO.INPUT, aWidthParam)
+            portB = pr.Port("B", IO.INPUT, bWidthParam)
+            portY = pr.Port("Y", IO.OUTPUT, yWidthParam)
+
+        with m.LogicRegion() as lr:
+            if wrapping:
+                sigA = lr.Signal(
+                    f"A_{cell["parameters"]["A_WIDTH"]}",
+                    cell["parameters"]["A_WIDTH"],
+                )
+                sigB = lr.Signal(
+                    f"B_{cell["parameters"]["B_WIDTH"]}",
+                    cell["parameters"]["B_WIDTH"],
+                )
+                sigY = lr.Signal(
+                    f"Y_{cell["parameters"]["Y_WIDTH"]}",
+                    cell["parameters"]["Y_WIDTH"],
+                )
+            else:
+                sigA = lr.Signal("A_ORIG", cell["parameters"]["A_WIDTH"])
+                sigB = lr.Signal("B_ORIG", cell["parameters"]["B_WIDTH"])
+                sigY = lr.Signal("Y_ORIG", cell["parameters"]["Y_WIDTH"])
+
+            lr.Assign(sigA, portA)
+            lr.Assign(sigB, portB)
+            lr.Assign(portY, sigY)
+
+            lr.InitModule(
+                targetCell,
+                "_TECHMAP_REPLACE_",
+                [
+                    lr.ConnectPair("A", sigA),
+                    lr.ConnectPair("B", sigB),
+                    lr.ConnectPair("Y", sigY),
+                ],
+                [
+                    lr.ConnectPair("A_WIDTH", aWidthParam),
+                    lr.ConnectPair("A_SIGNED", aSignedParam),
+                    lr.ConnectPair("B_WIDTH", bWidthParam),
+                    lr.ConnectPair("B_SIGNED", bSignedParam),
+                    lr.ConnectPair("Y_WIDTH", yWidthParam),
+                ],
+            )
+
+
+def genWrappingMapPair(bel: Bel, filePrefix: Path) -> list[str]:
     modulePath = bel.src.parent / "metadata" / f"{bel.name}.json"
 
     if not modulePath.exists():
@@ -55,7 +125,11 @@ def genWrappingMap(bel: Bel, filename: Path) -> list[str]:
         module = modules[moduleKey]
 
         # empty the file
-        with open(filename, "w"):
+        wrapFilename = filePrefix / f"wrap_map_{bel.name}.v"
+        unwrapFilename = filePrefix / f"unwrap_map_{bel.name}.v"
+        with open(wrapFilename, "w"):
+            pass
+        with open(unwrapFilename, "w"):
             pass
 
         wrapperNames = []
@@ -64,160 +138,27 @@ def genWrappingMap(bel: Bel, filename: Path) -> list[str]:
             if str(bel.src) not in cName:
                 continue
 
-            if cell["type"] not in PossibleBinaryType:
-                continue
+            if cell["type"] in PossibleBinaryType:
+                if (
+                    cell["parameters"]["A_WIDTH"] == 1
+                    and cell["parameters"]["B_WIDTH"] == 1
+                    and cell["parameters"]["Y_WIDTH"] == 1
+                ):
+                    continue
 
-            if (
-                cell["parameters"]["A_WIDTH"] == 1
-                and cell["parameters"]["B_WIDTH"] == 1
-                and cell["parameters"]["Y_WIDTH"] == 1
-            ):
-                continue
+                if cell["type"] in repeatSet:
+                    continue
+                cellType = cell["type"].replace("$", "_")
+                repeatSet.add(cellType)
 
-            cg = CodeGenerator(filename, WriterType.VERILOG, "a")
-            cellType = cell["type"].replace("$", "_")
-            if cellType in repeatSet:
-                continue
-            repeatSet.add(cellType)
-
-            with cg.Module(
-                f"wrap_{bel.name}_{cellType}",
-                [cg.Attribute("techmap_celltype", cell["type"])],
-            ) as m:
-                with m.ParameterRegion() as pr:
-                    aWidthParam = pr.Parameter("A_WIDTH", 1)
-                    aSignedParam = pr.Parameter("A_SIGNED", 0)
-                    bWidthParam = pr.Parameter("B_WIDTH", 1)
-                    bSignedParam = pr.Parameter("B_SIGNED", 0)
-                    yWidthParam = pr.Parameter("Y_WIDTH", 1)
-
-                with m.PortRegion() as pr:
-                    portA = pr.Port("A", IO.INPUT, aWidthParam)
-                    portB = pr.Port("B", IO.INPUT, bWidthParam)
-                    portY = pr.Port("Y", IO.OUTPUT, yWidthParam)
-
-                with m.LogicRegion() as lr:
-                    sigA = lr.Signal(
-                        f"A_{cell["parameters"]["A_WIDTH"]}",
-                        cell["parameters"]["A_WIDTH"],
-                    )
-                    sigB = lr.Signal(
-                        f"B_{cell["parameters"]["B_WIDTH"]}",
-                        cell["parameters"]["B_WIDTH"],
-                    )
-                    sigY = lr.Signal(
-                        f"Y_{cell["parameters"]["Y_WIDTH"]}",
-                        cell["parameters"]["Y_WIDTH"],
-                    )
-
-                    lr.Assign(sigA, portA)
-                    lr.Assign(sigB, portB)
-                    lr.Assign(portY, sigY)
-
-                    lr.InitModule(
-                        f"\\$_{cellType}_wrapper",
-                        "_TECHMAP_REPLACE_",
-                        [
-                            lr.ConnectPair("A", sigA),
-                            lr.ConnectPair("B", sigB),
-                            lr.ConnectPair("Y", sigY),
-                        ],
-                        [
-                            lr.ConnectPair("A_WIDTH", aWidthParam),
-                            lr.ConnectPair("A_SIGNED", aSignedParam),
-                            lr.ConnectPair("B_WIDTH", bWidthParam),
-                            lr.ConnectPair("B_SIGNED", bSignedParam),
-                            lr.ConnectPair("Y_WIDTH", yWidthParam),
-                        ],
-                    )
-
+                genBinaryOpMap(cell, wrapFilename, bel.name, True)
+                genBinaryOpMap(cell, unwrapFilename, bel.name, False)
                 wrapperNames.append(f"\\$_{cellType}_wrapper")
 
+            elif cell["type"] in PossibleRegType:
+                pass
+
     return wrapperNames
-
-
-def genUnwrappingMap(bel: Bel, filename: Path):
-    modulePath = bel.src.parent / "metadata" / f"{bel.name}.json"
-
-    if not modulePath.exists():
-        raise ValueError(f"File {modulePath} not found.")
-
-    # Parse the JSON to extract metadata
-    with open(modulePath, "r") as f:
-        jsonData = json.load(f)
-
-        if jsonData is None:
-            raise ValueError(f"File {modulePath} is empty.")
-
-        modules: dict = jsonData["modules"]
-        if len(modules) == 0:
-            raise ValueError(f"File {modulePath} is empty.")
-        if len(modules) > 1:
-            raise ValueError(f"File {modulePath} have multiple modules.")
-
-        moduleKey = next(iter(modules))
-        module = modules[moduleKey]
-
-        # empty the file
-        with open(filename, "w"):
-            pass
-
-        repeatSet = set()
-        for cName, cell in module["cells"].items():
-            if str(bel.src) not in cName:
-                continue
-
-            if cell["type"] not in PossibleBinaryType:
-                continue
-
-            cg = CodeGenerator(filename, WriterType.VERILOG, "a")
-            cellType = cell["type"].replace("$", "_")
-            if cellType in repeatSet:
-                continue
-
-            repeatSet.add(cellType)
-
-            with cg.Module(
-                f"wrap_{bel.name}_{cellType}",
-                [cg.Attribute("techmap_celltype", f"\\$_{cellType}_wrapper")],
-            ) as m:
-                with m.ParameterRegion() as pr:
-                    aWidthParam = pr.Parameter("A_WIDTH", 1)
-                    aSignedParam = pr.Parameter("A_SIGNED", 0)
-                    bWidthParam = pr.Parameter("B_WIDTH", 1)
-                    bSignedParam = pr.Parameter("B_SIGNED", 0)
-                    yWidthParam = pr.Parameter("Y_WIDTH", 1)
-
-                with m.PortRegion() as pr:
-                    portA = pr.Port("A", IO.INPUT, aWidthParam)
-                    portB = pr.Port("B", IO.INPUT, bWidthParam)
-                    portY = pr.Port("Y", IO.OUTPUT, yWidthParam)
-
-                with m.LogicRegion() as lr:
-                    sigA = lr.Signal("A_ORIG", cell["parameters"]["A_WIDTH"])
-                    sigB = lr.Signal("B_ORIG", cell["parameters"]["B_WIDTH"])
-                    sigY = lr.Signal("Y_ORIG", cell["parameters"]["Y_WIDTH"])
-
-                    lr.Assign(sigA, portA)
-                    lr.Assign(sigB, portB)
-                    lr.Assign(portY, sigY)
-
-                    lr.InitModule(
-                        f"\\${cellType}",
-                        "_TECHMAP_REPLACE_",
-                        [
-                            lr.ConnectPair("A", sigA),
-                            lr.ConnectPair("B", sigB),
-                            lr.ConnectPair("Y", sigY),
-                        ],
-                        [
-                            lr.ConnectPair("A_WIDTH", aWidthParam),
-                            lr.ConnectPair("A_SIGNED", aSignedParam),
-                            lr.ConnectPair("B_WIDTH", bWidthParam),
-                            lr.ConnectPair("B_SIGNED", bSignedParam),
-                            lr.ConnectPair("Y_WIDTH", yWidthParam),
-                        ],
-                    )
 
 
 def genSynthScript(fabric: Fabric, filename: Path):
@@ -229,8 +170,7 @@ def genSynthScript(fabric: Fabric, filename: Path):
             continue
         path = bel.src.parent / "metadata"
         cellsPath = list(path.glob(f"cell_{bel.name}*.il"))
-        wrapperNames = genWrappingMap(bel, path / f"wrap_map_{bel.name}.v")
-        genUnwrappingMap(bel, path / f"unwrap_map_{bel.name}.v")
+        wrapperNames = genWrappingMapPair(bel, path)
         wrappers.append(
             (
                 path / f"wrap_map_{bel.name}.v",

@@ -1,5 +1,4 @@
 from enum import StrEnum
-from pickle import REDUCE
 
 
 class WriterType(StrEnum):
@@ -31,8 +30,6 @@ class PossibleBinaryType(StrEnum):
     SSHR = "$sshr"
     LOGIC_AND = "$logic_and"
     LOGIC_OR = "$logic_or"
-    EQX = "$eqx"
-    NEX = "$nex"
     POW = "$pow"
     ADD = "$add"
     SUB = "$sub"
@@ -43,3 +40,26 @@ class PossibleBinaryType(StrEnum):
     SHIFTX = "$shiftx"
     DIVFLOOR = "$divfloor"
     MODFLOOR = "$modfloor"
+    LT = "$lt"
+    LE = "$le"
+    GT = "$gt"
+    GE = "$ge"
+    EQ = "$eq"
+    NE = "$ne"
+
+
+class PossibleRegType(StrEnum):
+    DFF = "$dff"
+    DFFE = "$dffe"
+    DFFSR = "$dffsr"
+    DFFSRE = "$dffsre"
+    DLATCH = "$dlatch"
+    DLATCHSR = "$dlatchsr"
+    SDFF = "$sdff"
+    SDFFE = "$sdffe"
+    SR = "$sr"
+    ADFF = "$adff"
+    ADFFE = "$adffe"
+    ADLATCH = "$adlatch"
+    ALDFF = "$aldff"
+    ALDFFE = "$aldffe"

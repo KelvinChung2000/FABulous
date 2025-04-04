@@ -216,9 +216,25 @@ label="c0.ALU";
 "X1Y1.c0.data_out";
 "X1Y1.c0.ALU.data_out" -> "X1Y1.c0.data_out";
 }
+subgraph "cluster_1_1_c0.compare" {
+label="c0.compare";
+"X1Y1.bel_c0.compare" [label="bel_c0.compare(z=0x0001)", shape=box];
+"X1Y1.c0.compare.A" [label=A, shape=hexagon];
+"X1Y1.c0.A";
+"X1Y1.c0.A" -> "X1Y1.c0.compare.A";
+"X1Y1.c0.compare.A" -> "X1Y1.bel_c0.compare";
+"X1Y1.c0.compare.B" [label=B, shape=hexagon];
+"X1Y1.c0.B";
+"X1Y1.c0.B" -> "X1Y1.c0.compare.B";
+"X1Y1.c0.compare.B" -> "X1Y1.bel_c0.compare";
+"X1Y1.c0.compare.Y" [label=Y, shape=hexagon];
+"X1Y1.bel_c0.compare" -> "X1Y1.c0.compare.Y";
+"X1Y1.c0.Y";
+"X1Y1.c0.compare.Y" -> "X1Y1.c0.Y";
+}
 subgraph "cluster_1_1_c0.const_unit" {
 label="c0.const_unit";
-"X1Y1.bel_c0.const_unit" [label="bel_c0.const_unit(z=0x0001)", shape=box];
+"X1Y1.bel_c0.const_unit" [label="bel_c0.const_unit(z=0x0002)", shape=box];
 "X1Y1.c0.const_unit.const_out" [label="const_out", shape=hexagon];
 "X1Y1.bel_c0.const_unit" -> "X1Y1.c0.const_unit.const_out";
 "X1Y1.c0.const_out";
@@ -226,7 +242,7 @@ label="c0.const_unit";
 }
 subgraph "cluster_1_1_c0.RES_reg_unit" {
 label="c0.RES_reg_unit";
-"X1Y1.bel_c0.RES_reg_unit" [label="bel_c0.RES_reg_unit(z=0x0002)", shape=box];
+"X1Y1.bel_c0.RES_reg_unit" [label="bel_c0.RES_reg_unit(z=0x0003)", shape=box];
 "X1Y1.c0.RES_reg_unit.en" [label=en, shape=hexagon];
 "X1Y1.c0.RES_en";
 "X1Y1.c0.RES_en" -> "X1Y1.c0.RES_reg_unit.en";
@@ -250,7 +266,7 @@ label="c0.RES_reg_unit";
 }
 subgraph "cluster_1_1_c0.N_reg_unit" {
 label="c0.N_reg_unit";
-"X1Y1.bel_c0.N_reg_unit" [label="bel_c0.N_reg_unit(z=0x0003)", shape=box];
+"X1Y1.bel_c0.N_reg_unit" [label="bel_c0.N_reg_unit(z=0x0004)", shape=box];
 "X1Y1.c0.N_reg_unit.en" [label=en, shape=hexagon];
 "X1Y1.c0.N_en";
 "X1Y1.c0.N_en" -> "X1Y1.c0.N_reg_unit.en";
@@ -274,7 +290,7 @@ label="c0.N_reg_unit";
 }
 subgraph "cluster_1_1_c0.E_reg_unit" {
 label="c0.E_reg_unit";
-"X1Y1.bel_c0.E_reg_unit" [label="bel_c0.E_reg_unit(z=0x0004)", shape=box];
+"X1Y1.bel_c0.E_reg_unit" [label="bel_c0.E_reg_unit(z=0x0005)", shape=box];
 "X1Y1.c0.E_reg_unit.en" [label=en, shape=hexagon];
 "X1Y1.c0.E_en";
 "X1Y1.c0.E_en" -> "X1Y1.c0.E_reg_unit.en";
@@ -298,7 +314,7 @@ label="c0.E_reg_unit";
 }
 subgraph "cluster_1_1_c0.S_reg_unit" {
 label="c0.S_reg_unit";
-"X1Y1.bel_c0.S_reg_unit" [label="bel_c0.S_reg_unit(z=0x0005)", shape=box];
+"X1Y1.bel_c0.S_reg_unit" [label="bel_c0.S_reg_unit(z=0x0006)", shape=box];
 "X1Y1.c0.S_reg_unit.en" [label=en, shape=hexagon];
 "X1Y1.c0.S_en";
 "X1Y1.c0.S_en" -> "X1Y1.c0.S_reg_unit.en";
@@ -322,7 +338,7 @@ label="c0.S_reg_unit";
 }
 subgraph "cluster_1_1_c0.W_reg_unit" {
 label="c0.W_reg_unit";
-"X1Y1.bel_c0.W_reg_unit" [label="bel_c0.W_reg_unit(z=0x0006)", shape=box];
+"X1Y1.bel_c0.W_reg_unit" [label="bel_c0.W_reg_unit(z=0x0007)", shape=box];
 "X1Y1.c0.W_reg_unit.en" [label=en, shape=hexagon];
 "X1Y1.c0.W_en";
 "X1Y1.c0.W_en" -> "X1Y1.c0.W_reg_unit.en";
@@ -401,6 +417,16 @@ label="c0.W_reg_unit";
 "X1Y1.c0.in2" -> "X1Y1.c0.data_in3";
 "X1Y1.c0.in3" -> "X1Y1.c0.data_in3";
 "X1Y1.c0.const_out" -> "X1Y1.c0.data_in3";
+"X1Y1.c0.Y" -> "X1Y1.c0.data_in3";
+"X1Y1.c0.in0" -> "X1Y1.c0.A";
+"X1Y1.c0.in1" -> "X1Y1.c0.A";
+"X1Y1.c0.in2" -> "X1Y1.c0.A";
+"X1Y1.c0.in3" -> "X1Y1.c0.A";
+"X1Y1.c0.in0" -> "X1Y1.c0.B";
+"X1Y1.c0.in1" -> "X1Y1.c0.B";
+"X1Y1.c0.in2" -> "X1Y1.c0.B";
+"X1Y1.c0.in3" -> "X1Y1.c0.B";
+"X1Y1.c0.const_out" -> "X1Y1.c0.B";
 "X1Y1.c0.data_out" -> "X1Y1.c0.RES_reg_in";
 "X1Y1.c0.in0" -> "X1Y1.c0.N_reg_in";
 "X1Y1.c0.N_reg_out" -> "X1Y1.c0.N_reg_in";
@@ -450,9 +476,25 @@ label="c0.ALU";
 "X1Y2.c0.data_out";
 "X1Y2.c0.ALU.data_out" -> "X1Y2.c0.data_out";
 }
+subgraph "cluster_1_2_c0.compare" {
+label="c0.compare";
+"X1Y2.bel_c0.compare" [label="bel_c0.compare(z=0x0001)", shape=box];
+"X1Y2.c0.compare.A" [label=A, shape=hexagon];
+"X1Y2.c0.A";
+"X1Y2.c0.A" -> "X1Y2.c0.compare.A";
+"X1Y2.c0.compare.A" -> "X1Y2.bel_c0.compare";
+"X1Y2.c0.compare.B" [label=B, shape=hexagon];
+"X1Y2.c0.B";
+"X1Y2.c0.B" -> "X1Y2.c0.compare.B";
+"X1Y2.c0.compare.B" -> "X1Y2.bel_c0.compare";
+"X1Y2.c0.compare.Y" [label=Y, shape=hexagon];
+"X1Y2.bel_c0.compare" -> "X1Y2.c0.compare.Y";
+"X1Y2.c0.Y";
+"X1Y2.c0.compare.Y" -> "X1Y2.c0.Y";
+}
 subgraph "cluster_1_2_c0.const_unit" {
 label="c0.const_unit";
-"X1Y2.bel_c0.const_unit" [label="bel_c0.const_unit(z=0x0001)", shape=box];
+"X1Y2.bel_c0.const_unit" [label="bel_c0.const_unit(z=0x0002)", shape=box];
 "X1Y2.c0.const_unit.const_out" [label="const_out", shape=hexagon];
 "X1Y2.bel_c0.const_unit" -> "X1Y2.c0.const_unit.const_out";
 "X1Y2.c0.const_out";
@@ -460,7 +502,7 @@ label="c0.const_unit";
 }
 subgraph "cluster_1_2_c0.RES_reg_unit" {
 label="c0.RES_reg_unit";
-"X1Y2.bel_c0.RES_reg_unit" [label="bel_c0.RES_reg_unit(z=0x0002)", shape=box];
+"X1Y2.bel_c0.RES_reg_unit" [label="bel_c0.RES_reg_unit(z=0x0003)", shape=box];
 "X1Y2.c0.RES_reg_unit.en" [label=en, shape=hexagon];
 "X1Y2.c0.RES_en";
 "X1Y2.c0.RES_en" -> "X1Y2.c0.RES_reg_unit.en";
@@ -484,7 +526,7 @@ label="c0.RES_reg_unit";
 }
 subgraph "cluster_1_2_c0.N_reg_unit" {
 label="c0.N_reg_unit";
-"X1Y2.bel_c0.N_reg_unit" [label="bel_c0.N_reg_unit(z=0x0003)", shape=box];
+"X1Y2.bel_c0.N_reg_unit" [label="bel_c0.N_reg_unit(z=0x0004)", shape=box];
 "X1Y2.c0.N_reg_unit.en" [label=en, shape=hexagon];
 "X1Y2.c0.N_en";
 "X1Y2.c0.N_en" -> "X1Y2.c0.N_reg_unit.en";
@@ -508,7 +550,7 @@ label="c0.N_reg_unit";
 }
 subgraph "cluster_1_2_c0.E_reg_unit" {
 label="c0.E_reg_unit";
-"X1Y2.bel_c0.E_reg_unit" [label="bel_c0.E_reg_unit(z=0x0004)", shape=box];
+"X1Y2.bel_c0.E_reg_unit" [label="bel_c0.E_reg_unit(z=0x0005)", shape=box];
 "X1Y2.c0.E_reg_unit.en" [label=en, shape=hexagon];
 "X1Y2.c0.E_en";
 "X1Y2.c0.E_en" -> "X1Y2.c0.E_reg_unit.en";
@@ -532,7 +574,7 @@ label="c0.E_reg_unit";
 }
 subgraph "cluster_1_2_c0.S_reg_unit" {
 label="c0.S_reg_unit";
-"X1Y2.bel_c0.S_reg_unit" [label="bel_c0.S_reg_unit(z=0x0005)", shape=box];
+"X1Y2.bel_c0.S_reg_unit" [label="bel_c0.S_reg_unit(z=0x0006)", shape=box];
 "X1Y2.c0.S_reg_unit.en" [label=en, shape=hexagon];
 "X1Y2.c0.S_en";
 "X1Y2.c0.S_en" -> "X1Y2.c0.S_reg_unit.en";
@@ -556,7 +598,7 @@ label="c0.S_reg_unit";
 }
 subgraph "cluster_1_2_c0.W_reg_unit" {
 label="c0.W_reg_unit";
-"X1Y2.bel_c0.W_reg_unit" [label="bel_c0.W_reg_unit(z=0x0006)", shape=box];
+"X1Y2.bel_c0.W_reg_unit" [label="bel_c0.W_reg_unit(z=0x0007)", shape=box];
 "X1Y2.c0.W_reg_unit.en" [label=en, shape=hexagon];
 "X1Y2.c0.W_en";
 "X1Y2.c0.W_en" -> "X1Y2.c0.W_reg_unit.en";
@@ -635,6 +677,16 @@ label="c0.W_reg_unit";
 "X1Y2.c0.in2" -> "X1Y2.c0.data_in3";
 "X1Y2.c0.in3" -> "X1Y2.c0.data_in3";
 "X1Y2.c0.const_out" -> "X1Y2.c0.data_in3";
+"X1Y2.c0.Y" -> "X1Y2.c0.data_in3";
+"X1Y2.c0.in0" -> "X1Y2.c0.A";
+"X1Y2.c0.in1" -> "X1Y2.c0.A";
+"X1Y2.c0.in2" -> "X1Y2.c0.A";
+"X1Y2.c0.in3" -> "X1Y2.c0.A";
+"X1Y2.c0.in0" -> "X1Y2.c0.B";
+"X1Y2.c0.in1" -> "X1Y2.c0.B";
+"X1Y2.c0.in2" -> "X1Y2.c0.B";
+"X1Y2.c0.in3" -> "X1Y2.c0.B";
+"X1Y2.c0.const_out" -> "X1Y2.c0.B";
 "X1Y2.c0.data_out" -> "X1Y2.c0.RES_reg_in";
 "X1Y2.c0.in0" -> "X1Y2.c0.N_reg_in";
 "X1Y2.c0.N_reg_out" -> "X1Y2.c0.N_reg_in";
@@ -684,9 +736,25 @@ label="c0.ALU";
 "X1Y3.c0.data_out";
 "X1Y3.c0.ALU.data_out" -> "X1Y3.c0.data_out";
 }
+subgraph "cluster_1_3_c0.compare" {
+label="c0.compare";
+"X1Y3.bel_c0.compare" [label="bel_c0.compare(z=0x0001)", shape=box];
+"X1Y3.c0.compare.A" [label=A, shape=hexagon];
+"X1Y3.c0.A";
+"X1Y3.c0.A" -> "X1Y3.c0.compare.A";
+"X1Y3.c0.compare.A" -> "X1Y3.bel_c0.compare";
+"X1Y3.c0.compare.B" [label=B, shape=hexagon];
+"X1Y3.c0.B";
+"X1Y3.c0.B" -> "X1Y3.c0.compare.B";
+"X1Y3.c0.compare.B" -> "X1Y3.bel_c0.compare";
+"X1Y3.c0.compare.Y" [label=Y, shape=hexagon];
+"X1Y3.bel_c0.compare" -> "X1Y3.c0.compare.Y";
+"X1Y3.c0.Y";
+"X1Y3.c0.compare.Y" -> "X1Y3.c0.Y";
+}
 subgraph "cluster_1_3_c0.const_unit" {
 label="c0.const_unit";
-"X1Y3.bel_c0.const_unit" [label="bel_c0.const_unit(z=0x0001)", shape=box];
+"X1Y3.bel_c0.const_unit" [label="bel_c0.const_unit(z=0x0002)", shape=box];
 "X1Y3.c0.const_unit.const_out" [label="const_out", shape=hexagon];
 "X1Y3.bel_c0.const_unit" -> "X1Y3.c0.const_unit.const_out";
 "X1Y3.c0.const_out";
@@ -694,7 +762,7 @@ label="c0.const_unit";
 }
 subgraph "cluster_1_3_c0.RES_reg_unit" {
 label="c0.RES_reg_unit";
-"X1Y3.bel_c0.RES_reg_unit" [label="bel_c0.RES_reg_unit(z=0x0002)", shape=box];
+"X1Y3.bel_c0.RES_reg_unit" [label="bel_c0.RES_reg_unit(z=0x0003)", shape=box];
 "X1Y3.c0.RES_reg_unit.en" [label=en, shape=hexagon];
 "X1Y3.c0.RES_en";
 "X1Y3.c0.RES_en" -> "X1Y3.c0.RES_reg_unit.en";
@@ -718,7 +786,7 @@ label="c0.RES_reg_unit";
 }
 subgraph "cluster_1_3_c0.N_reg_unit" {
 label="c0.N_reg_unit";
-"X1Y3.bel_c0.N_reg_unit" [label="bel_c0.N_reg_unit(z=0x0003)", shape=box];
+"X1Y3.bel_c0.N_reg_unit" [label="bel_c0.N_reg_unit(z=0x0004)", shape=box];
 "X1Y3.c0.N_reg_unit.en" [label=en, shape=hexagon];
 "X1Y3.c0.N_en";
 "X1Y3.c0.N_en" -> "X1Y3.c0.N_reg_unit.en";
@@ -742,7 +810,7 @@ label="c0.N_reg_unit";
 }
 subgraph "cluster_1_3_c0.E_reg_unit" {
 label="c0.E_reg_unit";
-"X1Y3.bel_c0.E_reg_unit" [label="bel_c0.E_reg_unit(z=0x0004)", shape=box];
+"X1Y3.bel_c0.E_reg_unit" [label="bel_c0.E_reg_unit(z=0x0005)", shape=box];
 "X1Y3.c0.E_reg_unit.en" [label=en, shape=hexagon];
 "X1Y3.c0.E_en";
 "X1Y3.c0.E_en" -> "X1Y3.c0.E_reg_unit.en";
@@ -766,7 +834,7 @@ label="c0.E_reg_unit";
 }
 subgraph "cluster_1_3_c0.S_reg_unit" {
 label="c0.S_reg_unit";
-"X1Y3.bel_c0.S_reg_unit" [label="bel_c0.S_reg_unit(z=0x0005)", shape=box];
+"X1Y3.bel_c0.S_reg_unit" [label="bel_c0.S_reg_unit(z=0x0006)", shape=box];
 "X1Y3.c0.S_reg_unit.en" [label=en, shape=hexagon];
 "X1Y3.c0.S_en";
 "X1Y3.c0.S_en" -> "X1Y3.c0.S_reg_unit.en";
@@ -790,7 +858,7 @@ label="c0.S_reg_unit";
 }
 subgraph "cluster_1_3_c0.W_reg_unit" {
 label="c0.W_reg_unit";
-"X1Y3.bel_c0.W_reg_unit" [label="bel_c0.W_reg_unit(z=0x0006)", shape=box];
+"X1Y3.bel_c0.W_reg_unit" [label="bel_c0.W_reg_unit(z=0x0007)", shape=box];
 "X1Y3.c0.W_reg_unit.en" [label=en, shape=hexagon];
 "X1Y3.c0.W_en";
 "X1Y3.c0.W_en" -> "X1Y3.c0.W_reg_unit.en";
@@ -869,6 +937,16 @@ label="c0.W_reg_unit";
 "X1Y3.c0.in2" -> "X1Y3.c0.data_in3";
 "X1Y3.c0.in3" -> "X1Y3.c0.data_in3";
 "X1Y3.c0.const_out" -> "X1Y3.c0.data_in3";
+"X1Y3.c0.Y" -> "X1Y3.c0.data_in3";
+"X1Y3.c0.in0" -> "X1Y3.c0.A";
+"X1Y3.c0.in1" -> "X1Y3.c0.A";
+"X1Y3.c0.in2" -> "X1Y3.c0.A";
+"X1Y3.c0.in3" -> "X1Y3.c0.A";
+"X1Y3.c0.in0" -> "X1Y3.c0.B";
+"X1Y3.c0.in1" -> "X1Y3.c0.B";
+"X1Y3.c0.in2" -> "X1Y3.c0.B";
+"X1Y3.c0.in3" -> "X1Y3.c0.B";
+"X1Y3.c0.const_out" -> "X1Y3.c0.B";
 "X1Y3.c0.data_out" -> "X1Y3.c0.RES_reg_in";
 "X1Y3.c0.in0" -> "X1Y3.c0.N_reg_in";
 "X1Y3.c0.N_reg_out" -> "X1Y3.c0.N_reg_in";
@@ -918,9 +996,25 @@ label="c0.ALU";
 "X1Y4.c0.data_out";
 "X1Y4.c0.ALU.data_out" -> "X1Y4.c0.data_out";
 }
+subgraph "cluster_1_4_c0.compare" {
+label="c0.compare";
+"X1Y4.bel_c0.compare" [label="bel_c0.compare(z=0x0001)", shape=box];
+"X1Y4.c0.compare.A" [label=A, shape=hexagon];
+"X1Y4.c0.A";
+"X1Y4.c0.A" -> "X1Y4.c0.compare.A";
+"X1Y4.c0.compare.A" -> "X1Y4.bel_c0.compare";
+"X1Y4.c0.compare.B" [label=B, shape=hexagon];
+"X1Y4.c0.B";
+"X1Y4.c0.B" -> "X1Y4.c0.compare.B";
+"X1Y4.c0.compare.B" -> "X1Y4.bel_c0.compare";
+"X1Y4.c0.compare.Y" [label=Y, shape=hexagon];
+"X1Y4.bel_c0.compare" -> "X1Y4.c0.compare.Y";
+"X1Y4.c0.Y";
+"X1Y4.c0.compare.Y" -> "X1Y4.c0.Y";
+}
 subgraph "cluster_1_4_c0.const_unit" {
 label="c0.const_unit";
-"X1Y4.bel_c0.const_unit" [label="bel_c0.const_unit(z=0x0001)", shape=box];
+"X1Y4.bel_c0.const_unit" [label="bel_c0.const_unit(z=0x0002)", shape=box];
 "X1Y4.c0.const_unit.const_out" [label="const_out", shape=hexagon];
 "X1Y4.bel_c0.const_unit" -> "X1Y4.c0.const_unit.const_out";
 "X1Y4.c0.const_out";
@@ -928,7 +1022,7 @@ label="c0.const_unit";
 }
 subgraph "cluster_1_4_c0.RES_reg_unit" {
 label="c0.RES_reg_unit";
-"X1Y4.bel_c0.RES_reg_unit" [label="bel_c0.RES_reg_unit(z=0x0002)", shape=box];
+"X1Y4.bel_c0.RES_reg_unit" [label="bel_c0.RES_reg_unit(z=0x0003)", shape=box];
 "X1Y4.c0.RES_reg_unit.en" [label=en, shape=hexagon];
 "X1Y4.c0.RES_en";
 "X1Y4.c0.RES_en" -> "X1Y4.c0.RES_reg_unit.en";
@@ -952,7 +1046,7 @@ label="c0.RES_reg_unit";
 }
 subgraph "cluster_1_4_c0.N_reg_unit" {
 label="c0.N_reg_unit";
-"X1Y4.bel_c0.N_reg_unit" [label="bel_c0.N_reg_unit(z=0x0003)", shape=box];
+"X1Y4.bel_c0.N_reg_unit" [label="bel_c0.N_reg_unit(z=0x0004)", shape=box];
 "X1Y4.c0.N_reg_unit.en" [label=en, shape=hexagon];
 "X1Y4.c0.N_en";
 "X1Y4.c0.N_en" -> "X1Y4.c0.N_reg_unit.en";
@@ -976,7 +1070,7 @@ label="c0.N_reg_unit";
 }
 subgraph "cluster_1_4_c0.E_reg_unit" {
 label="c0.E_reg_unit";
-"X1Y4.bel_c0.E_reg_unit" [label="bel_c0.E_reg_unit(z=0x0004)", shape=box];
+"X1Y4.bel_c0.E_reg_unit" [label="bel_c0.E_reg_unit(z=0x0005)", shape=box];
 "X1Y4.c0.E_reg_unit.en" [label=en, shape=hexagon];
 "X1Y4.c0.E_en";
 "X1Y4.c0.E_en" -> "X1Y4.c0.E_reg_unit.en";
@@ -1000,7 +1094,7 @@ label="c0.E_reg_unit";
 }
 subgraph "cluster_1_4_c0.S_reg_unit" {
 label="c0.S_reg_unit";
-"X1Y4.bel_c0.S_reg_unit" [label="bel_c0.S_reg_unit(z=0x0005)", shape=box];
+"X1Y4.bel_c0.S_reg_unit" [label="bel_c0.S_reg_unit(z=0x0006)", shape=box];
 "X1Y4.c0.S_reg_unit.en" [label=en, shape=hexagon];
 "X1Y4.c0.S_en";
 "X1Y4.c0.S_en" -> "X1Y4.c0.S_reg_unit.en";
@@ -1024,7 +1118,7 @@ label="c0.S_reg_unit";
 }
 subgraph "cluster_1_4_c0.W_reg_unit" {
 label="c0.W_reg_unit";
-"X1Y4.bel_c0.W_reg_unit" [label="bel_c0.W_reg_unit(z=0x0006)", shape=box];
+"X1Y4.bel_c0.W_reg_unit" [label="bel_c0.W_reg_unit(z=0x0007)", shape=box];
 "X1Y4.c0.W_reg_unit.en" [label=en, shape=hexagon];
 "X1Y4.c0.W_en";
 "X1Y4.c0.W_en" -> "X1Y4.c0.W_reg_unit.en";
@@ -1103,6 +1197,16 @@ label="c0.W_reg_unit";
 "X1Y4.c0.in2" -> "X1Y4.c0.data_in3";
 "X1Y4.c0.in3" -> "X1Y4.c0.data_in3";
 "X1Y4.c0.const_out" -> "X1Y4.c0.data_in3";
+"X1Y4.c0.Y" -> "X1Y4.c0.data_in3";
+"X1Y4.c0.in0" -> "X1Y4.c0.A";
+"X1Y4.c0.in1" -> "X1Y4.c0.A";
+"X1Y4.c0.in2" -> "X1Y4.c0.A";
+"X1Y4.c0.in3" -> "X1Y4.c0.A";
+"X1Y4.c0.in0" -> "X1Y4.c0.B";
+"X1Y4.c0.in1" -> "X1Y4.c0.B";
+"X1Y4.c0.in2" -> "X1Y4.c0.B";
+"X1Y4.c0.in3" -> "X1Y4.c0.B";
+"X1Y4.c0.const_out" -> "X1Y4.c0.B";
 "X1Y4.c0.data_out" -> "X1Y4.c0.RES_reg_in";
 "X1Y4.c0.in0" -> "X1Y4.c0.N_reg_in";
 "X1Y4.c0.N_reg_out" -> "X1Y4.c0.N_reg_in";
@@ -1219,9 +1323,25 @@ label="c0.ALU";
 "X2Y1.c0.data_out";
 "X2Y1.c0.ALU.data_out" -> "X2Y1.c0.data_out";
 }
+subgraph "cluster_2_1_c0.compare" {
+label="c0.compare";
+"X2Y1.bel_c0.compare" [label="bel_c0.compare(z=0x0001)", shape=box];
+"X2Y1.c0.compare.A" [label=A, shape=hexagon];
+"X2Y1.c0.A";
+"X2Y1.c0.A" -> "X2Y1.c0.compare.A";
+"X2Y1.c0.compare.A" -> "X2Y1.bel_c0.compare";
+"X2Y1.c0.compare.B" [label=B, shape=hexagon];
+"X2Y1.c0.B";
+"X2Y1.c0.B" -> "X2Y1.c0.compare.B";
+"X2Y1.c0.compare.B" -> "X2Y1.bel_c0.compare";
+"X2Y1.c0.compare.Y" [label=Y, shape=hexagon];
+"X2Y1.bel_c0.compare" -> "X2Y1.c0.compare.Y";
+"X2Y1.c0.Y";
+"X2Y1.c0.compare.Y" -> "X2Y1.c0.Y";
+}
 subgraph "cluster_2_1_c0.const_unit" {
 label="c0.const_unit";
-"X2Y1.bel_c0.const_unit" [label="bel_c0.const_unit(z=0x0001)", shape=box];
+"X2Y1.bel_c0.const_unit" [label="bel_c0.const_unit(z=0x0002)", shape=box];
 "X2Y1.c0.const_unit.const_out" [label="const_out", shape=hexagon];
 "X2Y1.bel_c0.const_unit" -> "X2Y1.c0.const_unit.const_out";
 "X2Y1.c0.const_out";
@@ -1229,7 +1349,7 @@ label="c0.const_unit";
 }
 subgraph "cluster_2_1_c0.RES_reg_unit" {
 label="c0.RES_reg_unit";
-"X2Y1.bel_c0.RES_reg_unit" [label="bel_c0.RES_reg_unit(z=0x0002)", shape=box];
+"X2Y1.bel_c0.RES_reg_unit" [label="bel_c0.RES_reg_unit(z=0x0003)", shape=box];
 "X2Y1.c0.RES_reg_unit.en" [label=en, shape=hexagon];
 "X2Y1.c0.RES_en";
 "X2Y1.c0.RES_en" -> "X2Y1.c0.RES_reg_unit.en";
@@ -1253,7 +1373,7 @@ label="c0.RES_reg_unit";
 }
 subgraph "cluster_2_1_c0.N_reg_unit" {
 label="c0.N_reg_unit";
-"X2Y1.bel_c0.N_reg_unit" [label="bel_c0.N_reg_unit(z=0x0003)", shape=box];
+"X2Y1.bel_c0.N_reg_unit" [label="bel_c0.N_reg_unit(z=0x0004)", shape=box];
 "X2Y1.c0.N_reg_unit.en" [label=en, shape=hexagon];
 "X2Y1.c0.N_en";
 "X2Y1.c0.N_en" -> "X2Y1.c0.N_reg_unit.en";
@@ -1277,7 +1397,7 @@ label="c0.N_reg_unit";
 }
 subgraph "cluster_2_1_c0.E_reg_unit" {
 label="c0.E_reg_unit";
-"X2Y1.bel_c0.E_reg_unit" [label="bel_c0.E_reg_unit(z=0x0004)", shape=box];
+"X2Y1.bel_c0.E_reg_unit" [label="bel_c0.E_reg_unit(z=0x0005)", shape=box];
 "X2Y1.c0.E_reg_unit.en" [label=en, shape=hexagon];
 "X2Y1.c0.E_en";
 "X2Y1.c0.E_en" -> "X2Y1.c0.E_reg_unit.en";
@@ -1301,7 +1421,7 @@ label="c0.E_reg_unit";
 }
 subgraph "cluster_2_1_c0.S_reg_unit" {
 label="c0.S_reg_unit";
-"X2Y1.bel_c0.S_reg_unit" [label="bel_c0.S_reg_unit(z=0x0005)", shape=box];
+"X2Y1.bel_c0.S_reg_unit" [label="bel_c0.S_reg_unit(z=0x0006)", shape=box];
 "X2Y1.c0.S_reg_unit.en" [label=en, shape=hexagon];
 "X2Y1.c0.S_en";
 "X2Y1.c0.S_en" -> "X2Y1.c0.S_reg_unit.en";
@@ -1325,7 +1445,7 @@ label="c0.S_reg_unit";
 }
 subgraph "cluster_2_1_c0.W_reg_unit" {
 label="c0.W_reg_unit";
-"X2Y1.bel_c0.W_reg_unit" [label="bel_c0.W_reg_unit(z=0x0006)", shape=box];
+"X2Y1.bel_c0.W_reg_unit" [label="bel_c0.W_reg_unit(z=0x0007)", shape=box];
 "X2Y1.c0.W_reg_unit.en" [label=en, shape=hexagon];
 "X2Y1.c0.W_en";
 "X2Y1.c0.W_en" -> "X2Y1.c0.W_reg_unit.en";
@@ -1404,6 +1524,16 @@ label="c0.W_reg_unit";
 "X2Y1.c0.in2" -> "X2Y1.c0.data_in3";
 "X2Y1.c0.in3" -> "X2Y1.c0.data_in3";
 "X2Y1.c0.const_out" -> "X2Y1.c0.data_in3";
+"X2Y1.c0.Y" -> "X2Y1.c0.data_in3";
+"X2Y1.c0.in0" -> "X2Y1.c0.A";
+"X2Y1.c0.in1" -> "X2Y1.c0.A";
+"X2Y1.c0.in2" -> "X2Y1.c0.A";
+"X2Y1.c0.in3" -> "X2Y1.c0.A";
+"X2Y1.c0.in0" -> "X2Y1.c0.B";
+"X2Y1.c0.in1" -> "X2Y1.c0.B";
+"X2Y1.c0.in2" -> "X2Y1.c0.B";
+"X2Y1.c0.in3" -> "X2Y1.c0.B";
+"X2Y1.c0.const_out" -> "X2Y1.c0.B";
 "X2Y1.c0.data_out" -> "X2Y1.c0.RES_reg_in";
 "X2Y1.c0.in0" -> "X2Y1.c0.N_reg_in";
 "X2Y1.c0.N_reg_out" -> "X2Y1.c0.N_reg_in";
@@ -1453,9 +1583,25 @@ label="c0.ALU";
 "X2Y2.c0.data_out";
 "X2Y2.c0.ALU.data_out" -> "X2Y2.c0.data_out";
 }
+subgraph "cluster_2_2_c0.compare" {
+label="c0.compare";
+"X2Y2.bel_c0.compare" [label="bel_c0.compare(z=0x0001)", shape=box];
+"X2Y2.c0.compare.A" [label=A, shape=hexagon];
+"X2Y2.c0.A";
+"X2Y2.c0.A" -> "X2Y2.c0.compare.A";
+"X2Y2.c0.compare.A" -> "X2Y2.bel_c0.compare";
+"X2Y2.c0.compare.B" [label=B, shape=hexagon];
+"X2Y2.c0.B";
+"X2Y2.c0.B" -> "X2Y2.c0.compare.B";
+"X2Y2.c0.compare.B" -> "X2Y2.bel_c0.compare";
+"X2Y2.c0.compare.Y" [label=Y, shape=hexagon];
+"X2Y2.bel_c0.compare" -> "X2Y2.c0.compare.Y";
+"X2Y2.c0.Y";
+"X2Y2.c0.compare.Y" -> "X2Y2.c0.Y";
+}
 subgraph "cluster_2_2_c0.const_unit" {
 label="c0.const_unit";
-"X2Y2.bel_c0.const_unit" [label="bel_c0.const_unit(z=0x0001)", shape=box];
+"X2Y2.bel_c0.const_unit" [label="bel_c0.const_unit(z=0x0002)", shape=box];
 "X2Y2.c0.const_unit.const_out" [label="const_out", shape=hexagon];
 "X2Y2.bel_c0.const_unit" -> "X2Y2.c0.const_unit.const_out";
 "X2Y2.c0.const_out";
@@ -1463,7 +1609,7 @@ label="c0.const_unit";
 }
 subgraph "cluster_2_2_c0.RES_reg_unit" {
 label="c0.RES_reg_unit";
-"X2Y2.bel_c0.RES_reg_unit" [label="bel_c0.RES_reg_unit(z=0x0002)", shape=box];
+"X2Y2.bel_c0.RES_reg_unit" [label="bel_c0.RES_reg_unit(z=0x0003)", shape=box];
 "X2Y2.c0.RES_reg_unit.en" [label=en, shape=hexagon];
 "X2Y2.c0.RES_en";
 "X2Y2.c0.RES_en" -> "X2Y2.c0.RES_reg_unit.en";
@@ -1487,7 +1633,7 @@ label="c0.RES_reg_unit";
 }
 subgraph "cluster_2_2_c0.N_reg_unit" {
 label="c0.N_reg_unit";
-"X2Y2.bel_c0.N_reg_unit" [label="bel_c0.N_reg_unit(z=0x0003)", shape=box];
+"X2Y2.bel_c0.N_reg_unit" [label="bel_c0.N_reg_unit(z=0x0004)", shape=box];
 "X2Y2.c0.N_reg_unit.en" [label=en, shape=hexagon];
 "X2Y2.c0.N_en";
 "X2Y2.c0.N_en" -> "X2Y2.c0.N_reg_unit.en";
@@ -1511,7 +1657,7 @@ label="c0.N_reg_unit";
 }
 subgraph "cluster_2_2_c0.E_reg_unit" {
 label="c0.E_reg_unit";
-"X2Y2.bel_c0.E_reg_unit" [label="bel_c0.E_reg_unit(z=0x0004)", shape=box];
+"X2Y2.bel_c0.E_reg_unit" [label="bel_c0.E_reg_unit(z=0x0005)", shape=box];
 "X2Y2.c0.E_reg_unit.en" [label=en, shape=hexagon];
 "X2Y2.c0.E_en";
 "X2Y2.c0.E_en" -> "X2Y2.c0.E_reg_unit.en";
@@ -1535,7 +1681,7 @@ label="c0.E_reg_unit";
 }
 subgraph "cluster_2_2_c0.S_reg_unit" {
 label="c0.S_reg_unit";
-"X2Y2.bel_c0.S_reg_unit" [label="bel_c0.S_reg_unit(z=0x0005)", shape=box];
+"X2Y2.bel_c0.S_reg_unit" [label="bel_c0.S_reg_unit(z=0x0006)", shape=box];
 "X2Y2.c0.S_reg_unit.en" [label=en, shape=hexagon];
 "X2Y2.c0.S_en";
 "X2Y2.c0.S_en" -> "X2Y2.c0.S_reg_unit.en";
@@ -1559,7 +1705,7 @@ label="c0.S_reg_unit";
 }
 subgraph "cluster_2_2_c0.W_reg_unit" {
 label="c0.W_reg_unit";
-"X2Y2.bel_c0.W_reg_unit" [label="bel_c0.W_reg_unit(z=0x0006)", shape=box];
+"X2Y2.bel_c0.W_reg_unit" [label="bel_c0.W_reg_unit(z=0x0007)", shape=box];
 "X2Y2.c0.W_reg_unit.en" [label=en, shape=hexagon];
 "X2Y2.c0.W_en";
 "X2Y2.c0.W_en" -> "X2Y2.c0.W_reg_unit.en";
@@ -1638,6 +1784,16 @@ label="c0.W_reg_unit";
 "X2Y2.c0.in2" -> "X2Y2.c0.data_in3";
 "X2Y2.c0.in3" -> "X2Y2.c0.data_in3";
 "X2Y2.c0.const_out" -> "X2Y2.c0.data_in3";
+"X2Y2.c0.Y" -> "X2Y2.c0.data_in3";
+"X2Y2.c0.in0" -> "X2Y2.c0.A";
+"X2Y2.c0.in1" -> "X2Y2.c0.A";
+"X2Y2.c0.in2" -> "X2Y2.c0.A";
+"X2Y2.c0.in3" -> "X2Y2.c0.A";
+"X2Y2.c0.in0" -> "X2Y2.c0.B";
+"X2Y2.c0.in1" -> "X2Y2.c0.B";
+"X2Y2.c0.in2" -> "X2Y2.c0.B";
+"X2Y2.c0.in3" -> "X2Y2.c0.B";
+"X2Y2.c0.const_out" -> "X2Y2.c0.B";
 "X2Y2.c0.data_out" -> "X2Y2.c0.RES_reg_in";
 "X2Y2.c0.in0" -> "X2Y2.c0.N_reg_in";
 "X2Y2.c0.N_reg_out" -> "X2Y2.c0.N_reg_in";
@@ -1687,9 +1843,25 @@ label="c0.ALU";
 "X2Y3.c0.data_out";
 "X2Y3.c0.ALU.data_out" -> "X2Y3.c0.data_out";
 }
+subgraph "cluster_2_3_c0.compare" {
+label="c0.compare";
+"X2Y3.bel_c0.compare" [label="bel_c0.compare(z=0x0001)", shape=box];
+"X2Y3.c0.compare.A" [label=A, shape=hexagon];
+"X2Y3.c0.A";
+"X2Y3.c0.A" -> "X2Y3.c0.compare.A";
+"X2Y3.c0.compare.A" -> "X2Y3.bel_c0.compare";
+"X2Y3.c0.compare.B" [label=B, shape=hexagon];
+"X2Y3.c0.B";
+"X2Y3.c0.B" -> "X2Y3.c0.compare.B";
+"X2Y3.c0.compare.B" -> "X2Y3.bel_c0.compare";
+"X2Y3.c0.compare.Y" [label=Y, shape=hexagon];
+"X2Y3.bel_c0.compare" -> "X2Y3.c0.compare.Y";
+"X2Y3.c0.Y";
+"X2Y3.c0.compare.Y" -> "X2Y3.c0.Y";
+}
 subgraph "cluster_2_3_c0.const_unit" {
 label="c0.const_unit";
-"X2Y3.bel_c0.const_unit" [label="bel_c0.const_unit(z=0x0001)", shape=box];
+"X2Y3.bel_c0.const_unit" [label="bel_c0.const_unit(z=0x0002)", shape=box];
 "X2Y3.c0.const_unit.const_out" [label="const_out", shape=hexagon];
 "X2Y3.bel_c0.const_unit" -> "X2Y3.c0.const_unit.const_out";
 "X2Y3.c0.const_out";
@@ -1697,7 +1869,7 @@ label="c0.const_unit";
 }
 subgraph "cluster_2_3_c0.RES_reg_unit" {
 label="c0.RES_reg_unit";
-"X2Y3.bel_c0.RES_reg_unit" [label="bel_c0.RES_reg_unit(z=0x0002)", shape=box];
+"X2Y3.bel_c0.RES_reg_unit" [label="bel_c0.RES_reg_unit(z=0x0003)", shape=box];
 "X2Y3.c0.RES_reg_unit.en" [label=en, shape=hexagon];
 "X2Y3.c0.RES_en";
 "X2Y3.c0.RES_en" -> "X2Y3.c0.RES_reg_unit.en";
@@ -1721,7 +1893,7 @@ label="c0.RES_reg_unit";
 }
 subgraph "cluster_2_3_c0.N_reg_unit" {
 label="c0.N_reg_unit";
-"X2Y3.bel_c0.N_reg_unit" [label="bel_c0.N_reg_unit(z=0x0003)", shape=box];
+"X2Y3.bel_c0.N_reg_unit" [label="bel_c0.N_reg_unit(z=0x0004)", shape=box];
 "X2Y3.c0.N_reg_unit.en" [label=en, shape=hexagon];
 "X2Y3.c0.N_en";
 "X2Y3.c0.N_en" -> "X2Y3.c0.N_reg_unit.en";
@@ -1745,7 +1917,7 @@ label="c0.N_reg_unit";
 }
 subgraph "cluster_2_3_c0.E_reg_unit" {
 label="c0.E_reg_unit";
-"X2Y3.bel_c0.E_reg_unit" [label="bel_c0.E_reg_unit(z=0x0004)", shape=box];
+"X2Y3.bel_c0.E_reg_unit" [label="bel_c0.E_reg_unit(z=0x0005)", shape=box];
 "X2Y3.c0.E_reg_unit.en" [label=en, shape=hexagon];
 "X2Y3.c0.E_en";
 "X2Y3.c0.E_en" -> "X2Y3.c0.E_reg_unit.en";
@@ -1769,7 +1941,7 @@ label="c0.E_reg_unit";
 }
 subgraph "cluster_2_3_c0.S_reg_unit" {
 label="c0.S_reg_unit";
-"X2Y3.bel_c0.S_reg_unit" [label="bel_c0.S_reg_unit(z=0x0005)", shape=box];
+"X2Y3.bel_c0.S_reg_unit" [label="bel_c0.S_reg_unit(z=0x0006)", shape=box];
 "X2Y3.c0.S_reg_unit.en" [label=en, shape=hexagon];
 "X2Y3.c0.S_en";
 "X2Y3.c0.S_en" -> "X2Y3.c0.S_reg_unit.en";
@@ -1793,7 +1965,7 @@ label="c0.S_reg_unit";
 }
 subgraph "cluster_2_3_c0.W_reg_unit" {
 label="c0.W_reg_unit";
-"X2Y3.bel_c0.W_reg_unit" [label="bel_c0.W_reg_unit(z=0x0006)", shape=box];
+"X2Y3.bel_c0.W_reg_unit" [label="bel_c0.W_reg_unit(z=0x0007)", shape=box];
 "X2Y3.c0.W_reg_unit.en" [label=en, shape=hexagon];
 "X2Y3.c0.W_en";
 "X2Y3.c0.W_en" -> "X2Y3.c0.W_reg_unit.en";
@@ -1872,6 +2044,16 @@ label="c0.W_reg_unit";
 "X2Y3.c0.in2" -> "X2Y3.c0.data_in3";
 "X2Y3.c0.in3" -> "X2Y3.c0.data_in3";
 "X2Y3.c0.const_out" -> "X2Y3.c0.data_in3";
+"X2Y3.c0.Y" -> "X2Y3.c0.data_in3";
+"X2Y3.c0.in0" -> "X2Y3.c0.A";
+"X2Y3.c0.in1" -> "X2Y3.c0.A";
+"X2Y3.c0.in2" -> "X2Y3.c0.A";
+"X2Y3.c0.in3" -> "X2Y3.c0.A";
+"X2Y3.c0.in0" -> "X2Y3.c0.B";
+"X2Y3.c0.in1" -> "X2Y3.c0.B";
+"X2Y3.c0.in2" -> "X2Y3.c0.B";
+"X2Y3.c0.in3" -> "X2Y3.c0.B";
+"X2Y3.c0.const_out" -> "X2Y3.c0.B";
 "X2Y3.c0.data_out" -> "X2Y3.c0.RES_reg_in";
 "X2Y3.c0.in0" -> "X2Y3.c0.N_reg_in";
 "X2Y3.c0.N_reg_out" -> "X2Y3.c0.N_reg_in";
@@ -1921,9 +2103,25 @@ label="c0.ALU";
 "X2Y4.c0.data_out";
 "X2Y4.c0.ALU.data_out" -> "X2Y4.c0.data_out";
 }
+subgraph "cluster_2_4_c0.compare" {
+label="c0.compare";
+"X2Y4.bel_c0.compare" [label="bel_c0.compare(z=0x0001)", shape=box];
+"X2Y4.c0.compare.A" [label=A, shape=hexagon];
+"X2Y4.c0.A";
+"X2Y4.c0.A" -> "X2Y4.c0.compare.A";
+"X2Y4.c0.compare.A" -> "X2Y4.bel_c0.compare";
+"X2Y4.c0.compare.B" [label=B, shape=hexagon];
+"X2Y4.c0.B";
+"X2Y4.c0.B" -> "X2Y4.c0.compare.B";
+"X2Y4.c0.compare.B" -> "X2Y4.bel_c0.compare";
+"X2Y4.c0.compare.Y" [label=Y, shape=hexagon];
+"X2Y4.bel_c0.compare" -> "X2Y4.c0.compare.Y";
+"X2Y4.c0.Y";
+"X2Y4.c0.compare.Y" -> "X2Y4.c0.Y";
+}
 subgraph "cluster_2_4_c0.const_unit" {
 label="c0.const_unit";
-"X2Y4.bel_c0.const_unit" [label="bel_c0.const_unit(z=0x0001)", shape=box];
+"X2Y4.bel_c0.const_unit" [label="bel_c0.const_unit(z=0x0002)", shape=box];
 "X2Y4.c0.const_unit.const_out" [label="const_out", shape=hexagon];
 "X2Y4.bel_c0.const_unit" -> "X2Y4.c0.const_unit.const_out";
 "X2Y4.c0.const_out";
@@ -1931,7 +2129,7 @@ label="c0.const_unit";
 }
 subgraph "cluster_2_4_c0.RES_reg_unit" {
 label="c0.RES_reg_unit";
-"X2Y4.bel_c0.RES_reg_unit" [label="bel_c0.RES_reg_unit(z=0x0002)", shape=box];
+"X2Y4.bel_c0.RES_reg_unit" [label="bel_c0.RES_reg_unit(z=0x0003)", shape=box];
 "X2Y4.c0.RES_reg_unit.en" [label=en, shape=hexagon];
 "X2Y4.c0.RES_en";
 "X2Y4.c0.RES_en" -> "X2Y4.c0.RES_reg_unit.en";
@@ -1955,7 +2153,7 @@ label="c0.RES_reg_unit";
 }
 subgraph "cluster_2_4_c0.N_reg_unit" {
 label="c0.N_reg_unit";
-"X2Y4.bel_c0.N_reg_unit" [label="bel_c0.N_reg_unit(z=0x0003)", shape=box];
+"X2Y4.bel_c0.N_reg_unit" [label="bel_c0.N_reg_unit(z=0x0004)", shape=box];
 "X2Y4.c0.N_reg_unit.en" [label=en, shape=hexagon];
 "X2Y4.c0.N_en";
 "X2Y4.c0.N_en" -> "X2Y4.c0.N_reg_unit.en";
@@ -1979,7 +2177,7 @@ label="c0.N_reg_unit";
 }
 subgraph "cluster_2_4_c0.E_reg_unit" {
 label="c0.E_reg_unit";
-"X2Y4.bel_c0.E_reg_unit" [label="bel_c0.E_reg_unit(z=0x0004)", shape=box];
+"X2Y4.bel_c0.E_reg_unit" [label="bel_c0.E_reg_unit(z=0x0005)", shape=box];
 "X2Y4.c0.E_reg_unit.en" [label=en, shape=hexagon];
 "X2Y4.c0.E_en";
 "X2Y4.c0.E_en" -> "X2Y4.c0.E_reg_unit.en";
@@ -2003,7 +2201,7 @@ label="c0.E_reg_unit";
 }
 subgraph "cluster_2_4_c0.S_reg_unit" {
 label="c0.S_reg_unit";
-"X2Y4.bel_c0.S_reg_unit" [label="bel_c0.S_reg_unit(z=0x0005)", shape=box];
+"X2Y4.bel_c0.S_reg_unit" [label="bel_c0.S_reg_unit(z=0x0006)", shape=box];
 "X2Y4.c0.S_reg_unit.en" [label=en, shape=hexagon];
 "X2Y4.c0.S_en";
 "X2Y4.c0.S_en" -> "X2Y4.c0.S_reg_unit.en";
@@ -2027,7 +2225,7 @@ label="c0.S_reg_unit";
 }
 subgraph "cluster_2_4_c0.W_reg_unit" {
 label="c0.W_reg_unit";
-"X2Y4.bel_c0.W_reg_unit" [label="bel_c0.W_reg_unit(z=0x0006)", shape=box];
+"X2Y4.bel_c0.W_reg_unit" [label="bel_c0.W_reg_unit(z=0x0007)", shape=box];
 "X2Y4.c0.W_reg_unit.en" [label=en, shape=hexagon];
 "X2Y4.c0.W_en";
 "X2Y4.c0.W_en" -> "X2Y4.c0.W_reg_unit.en";
@@ -2106,6 +2304,16 @@ label="c0.W_reg_unit";
 "X2Y4.c0.in2" -> "X2Y4.c0.data_in3";
 "X2Y4.c0.in3" -> "X2Y4.c0.data_in3";
 "X2Y4.c0.const_out" -> "X2Y4.c0.data_in3";
+"X2Y4.c0.Y" -> "X2Y4.c0.data_in3";
+"X2Y4.c0.in0" -> "X2Y4.c0.A";
+"X2Y4.c0.in1" -> "X2Y4.c0.A";
+"X2Y4.c0.in2" -> "X2Y4.c0.A";
+"X2Y4.c0.in3" -> "X2Y4.c0.A";
+"X2Y4.c0.in0" -> "X2Y4.c0.B";
+"X2Y4.c0.in1" -> "X2Y4.c0.B";
+"X2Y4.c0.in2" -> "X2Y4.c0.B";
+"X2Y4.c0.in3" -> "X2Y4.c0.B";
+"X2Y4.c0.const_out" -> "X2Y4.c0.B";
 "X2Y4.c0.data_out" -> "X2Y4.c0.RES_reg_in";
 "X2Y4.c0.in0" -> "X2Y4.c0.N_reg_in";
 "X2Y4.c0.N_reg_out" -> "X2Y4.c0.N_reg_in";
@@ -2222,9 +2430,25 @@ label="c0.ALU";
 "X3Y1.c0.data_out";
 "X3Y1.c0.ALU.data_out" -> "X3Y1.c0.data_out";
 }
+subgraph "cluster_3_1_c0.compare" {
+label="c0.compare";
+"X3Y1.bel_c0.compare" [label="bel_c0.compare(z=0x0001)", shape=box];
+"X3Y1.c0.compare.A" [label=A, shape=hexagon];
+"X3Y1.c0.A";
+"X3Y1.c0.A" -> "X3Y1.c0.compare.A";
+"X3Y1.c0.compare.A" -> "X3Y1.bel_c0.compare";
+"X3Y1.c0.compare.B" [label=B, shape=hexagon];
+"X3Y1.c0.B";
+"X3Y1.c0.B" -> "X3Y1.c0.compare.B";
+"X3Y1.c0.compare.B" -> "X3Y1.bel_c0.compare";
+"X3Y1.c0.compare.Y" [label=Y, shape=hexagon];
+"X3Y1.bel_c0.compare" -> "X3Y1.c0.compare.Y";
+"X3Y1.c0.Y";
+"X3Y1.c0.compare.Y" -> "X3Y1.c0.Y";
+}
 subgraph "cluster_3_1_c0.const_unit" {
 label="c0.const_unit";
-"X3Y1.bel_c0.const_unit" [label="bel_c0.const_unit(z=0x0001)", shape=box];
+"X3Y1.bel_c0.const_unit" [label="bel_c0.const_unit(z=0x0002)", shape=box];
 "X3Y1.c0.const_unit.const_out" [label="const_out", shape=hexagon];
 "X3Y1.bel_c0.const_unit" -> "X3Y1.c0.const_unit.const_out";
 "X3Y1.c0.const_out";
@@ -2232,7 +2456,7 @@ label="c0.const_unit";
 }
 subgraph "cluster_3_1_c0.RES_reg_unit" {
 label="c0.RES_reg_unit";
-"X3Y1.bel_c0.RES_reg_unit" [label="bel_c0.RES_reg_unit(z=0x0002)", shape=box];
+"X3Y1.bel_c0.RES_reg_unit" [label="bel_c0.RES_reg_unit(z=0x0003)", shape=box];
 "X3Y1.c0.RES_reg_unit.en" [label=en, shape=hexagon];
 "X3Y1.c0.RES_en";
 "X3Y1.c0.RES_en" -> "X3Y1.c0.RES_reg_unit.en";
@@ -2256,7 +2480,7 @@ label="c0.RES_reg_unit";
 }
 subgraph "cluster_3_1_c0.N_reg_unit" {
 label="c0.N_reg_unit";
-"X3Y1.bel_c0.N_reg_unit" [label="bel_c0.N_reg_unit(z=0x0003)", shape=box];
+"X3Y1.bel_c0.N_reg_unit" [label="bel_c0.N_reg_unit(z=0x0004)", shape=box];
 "X3Y1.c0.N_reg_unit.en" [label=en, shape=hexagon];
 "X3Y1.c0.N_en";
 "X3Y1.c0.N_en" -> "X3Y1.c0.N_reg_unit.en";
@@ -2280,7 +2504,7 @@ label="c0.N_reg_unit";
 }
 subgraph "cluster_3_1_c0.E_reg_unit" {
 label="c0.E_reg_unit";
-"X3Y1.bel_c0.E_reg_unit" [label="bel_c0.E_reg_unit(z=0x0004)", shape=box];
+"X3Y1.bel_c0.E_reg_unit" [label="bel_c0.E_reg_unit(z=0x0005)", shape=box];
 "X3Y1.c0.E_reg_unit.en" [label=en, shape=hexagon];
 "X3Y1.c0.E_en";
 "X3Y1.c0.E_en" -> "X3Y1.c0.E_reg_unit.en";
@@ -2304,7 +2528,7 @@ label="c0.E_reg_unit";
 }
 subgraph "cluster_3_1_c0.S_reg_unit" {
 label="c0.S_reg_unit";
-"X3Y1.bel_c0.S_reg_unit" [label="bel_c0.S_reg_unit(z=0x0005)", shape=box];
+"X3Y1.bel_c0.S_reg_unit" [label="bel_c0.S_reg_unit(z=0x0006)", shape=box];
 "X3Y1.c0.S_reg_unit.en" [label=en, shape=hexagon];
 "X3Y1.c0.S_en";
 "X3Y1.c0.S_en" -> "X3Y1.c0.S_reg_unit.en";
@@ -2328,7 +2552,7 @@ label="c0.S_reg_unit";
 }
 subgraph "cluster_3_1_c0.W_reg_unit" {
 label="c0.W_reg_unit";
-"X3Y1.bel_c0.W_reg_unit" [label="bel_c0.W_reg_unit(z=0x0006)", shape=box];
+"X3Y1.bel_c0.W_reg_unit" [label="bel_c0.W_reg_unit(z=0x0007)", shape=box];
 "X3Y1.c0.W_reg_unit.en" [label=en, shape=hexagon];
 "X3Y1.c0.W_en";
 "X3Y1.c0.W_en" -> "X3Y1.c0.W_reg_unit.en";
@@ -2407,6 +2631,16 @@ label="c0.W_reg_unit";
 "X3Y1.c0.in2" -> "X3Y1.c0.data_in3";
 "X3Y1.c0.in3" -> "X3Y1.c0.data_in3";
 "X3Y1.c0.const_out" -> "X3Y1.c0.data_in3";
+"X3Y1.c0.Y" -> "X3Y1.c0.data_in3";
+"X3Y1.c0.in0" -> "X3Y1.c0.A";
+"X3Y1.c0.in1" -> "X3Y1.c0.A";
+"X3Y1.c0.in2" -> "X3Y1.c0.A";
+"X3Y1.c0.in3" -> "X3Y1.c0.A";
+"X3Y1.c0.in0" -> "X3Y1.c0.B";
+"X3Y1.c0.in1" -> "X3Y1.c0.B";
+"X3Y1.c0.in2" -> "X3Y1.c0.B";
+"X3Y1.c0.in3" -> "X3Y1.c0.B";
+"X3Y1.c0.const_out" -> "X3Y1.c0.B";
 "X3Y1.c0.data_out" -> "X3Y1.c0.RES_reg_in";
 "X3Y1.c0.in0" -> "X3Y1.c0.N_reg_in";
 "X3Y1.c0.N_reg_out" -> "X3Y1.c0.N_reg_in";
@@ -2456,9 +2690,25 @@ label="c0.ALU";
 "X3Y2.c0.data_out";
 "X3Y2.c0.ALU.data_out" -> "X3Y2.c0.data_out";
 }
+subgraph "cluster_3_2_c0.compare" {
+label="c0.compare";
+"X3Y2.bel_c0.compare" [label="bel_c0.compare(z=0x0001)", shape=box];
+"X3Y2.c0.compare.A" [label=A, shape=hexagon];
+"X3Y2.c0.A";
+"X3Y2.c0.A" -> "X3Y2.c0.compare.A";
+"X3Y2.c0.compare.A" -> "X3Y2.bel_c0.compare";
+"X3Y2.c0.compare.B" [label=B, shape=hexagon];
+"X3Y2.c0.B";
+"X3Y2.c0.B" -> "X3Y2.c0.compare.B";
+"X3Y2.c0.compare.B" -> "X3Y2.bel_c0.compare";
+"X3Y2.c0.compare.Y" [label=Y, shape=hexagon];
+"X3Y2.bel_c0.compare" -> "X3Y2.c0.compare.Y";
+"X3Y2.c0.Y";
+"X3Y2.c0.compare.Y" -> "X3Y2.c0.Y";
+}
 subgraph "cluster_3_2_c0.const_unit" {
 label="c0.const_unit";
-"X3Y2.bel_c0.const_unit" [label="bel_c0.const_unit(z=0x0001)", shape=box];
+"X3Y2.bel_c0.const_unit" [label="bel_c0.const_unit(z=0x0002)", shape=box];
 "X3Y2.c0.const_unit.const_out" [label="const_out", shape=hexagon];
 "X3Y2.bel_c0.const_unit" -> "X3Y2.c0.const_unit.const_out";
 "X3Y2.c0.const_out";
@@ -2466,7 +2716,7 @@ label="c0.const_unit";
 }
 subgraph "cluster_3_2_c0.RES_reg_unit" {
 label="c0.RES_reg_unit";
-"X3Y2.bel_c0.RES_reg_unit" [label="bel_c0.RES_reg_unit(z=0x0002)", shape=box];
+"X3Y2.bel_c0.RES_reg_unit" [label="bel_c0.RES_reg_unit(z=0x0003)", shape=box];
 "X3Y2.c0.RES_reg_unit.en" [label=en, shape=hexagon];
 "X3Y2.c0.RES_en";
 "X3Y2.c0.RES_en" -> "X3Y2.c0.RES_reg_unit.en";
@@ -2490,7 +2740,7 @@ label="c0.RES_reg_unit";
 }
 subgraph "cluster_3_2_c0.N_reg_unit" {
 label="c0.N_reg_unit";
-"X3Y2.bel_c0.N_reg_unit" [label="bel_c0.N_reg_unit(z=0x0003)", shape=box];
+"X3Y2.bel_c0.N_reg_unit" [label="bel_c0.N_reg_unit(z=0x0004)", shape=box];
 "X3Y2.c0.N_reg_unit.en" [label=en, shape=hexagon];
 "X3Y2.c0.N_en";
 "X3Y2.c0.N_en" -> "X3Y2.c0.N_reg_unit.en";
@@ -2514,7 +2764,7 @@ label="c0.N_reg_unit";
 }
 subgraph "cluster_3_2_c0.E_reg_unit" {
 label="c0.E_reg_unit";
-"X3Y2.bel_c0.E_reg_unit" [label="bel_c0.E_reg_unit(z=0x0004)", shape=box];
+"X3Y2.bel_c0.E_reg_unit" [label="bel_c0.E_reg_unit(z=0x0005)", shape=box];
 "X3Y2.c0.E_reg_unit.en" [label=en, shape=hexagon];
 "X3Y2.c0.E_en";
 "X3Y2.c0.E_en" -> "X3Y2.c0.E_reg_unit.en";
@@ -2538,7 +2788,7 @@ label="c0.E_reg_unit";
 }
 subgraph "cluster_3_2_c0.S_reg_unit" {
 label="c0.S_reg_unit";
-"X3Y2.bel_c0.S_reg_unit" [label="bel_c0.S_reg_unit(z=0x0005)", shape=box];
+"X3Y2.bel_c0.S_reg_unit" [label="bel_c0.S_reg_unit(z=0x0006)", shape=box];
 "X3Y2.c0.S_reg_unit.en" [label=en, shape=hexagon];
 "X3Y2.c0.S_en";
 "X3Y2.c0.S_en" -> "X3Y2.c0.S_reg_unit.en";
@@ -2562,7 +2812,7 @@ label="c0.S_reg_unit";
 }
 subgraph "cluster_3_2_c0.W_reg_unit" {
 label="c0.W_reg_unit";
-"X3Y2.bel_c0.W_reg_unit" [label="bel_c0.W_reg_unit(z=0x0006)", shape=box];
+"X3Y2.bel_c0.W_reg_unit" [label="bel_c0.W_reg_unit(z=0x0007)", shape=box];
 "X3Y2.c0.W_reg_unit.en" [label=en, shape=hexagon];
 "X3Y2.c0.W_en";
 "X3Y2.c0.W_en" -> "X3Y2.c0.W_reg_unit.en";
@@ -2641,6 +2891,16 @@ label="c0.W_reg_unit";
 "X3Y2.c0.in2" -> "X3Y2.c0.data_in3";
 "X3Y2.c0.in3" -> "X3Y2.c0.data_in3";
 "X3Y2.c0.const_out" -> "X3Y2.c0.data_in3";
+"X3Y2.c0.Y" -> "X3Y2.c0.data_in3";
+"X3Y2.c0.in0" -> "X3Y2.c0.A";
+"X3Y2.c0.in1" -> "X3Y2.c0.A";
+"X3Y2.c0.in2" -> "X3Y2.c0.A";
+"X3Y2.c0.in3" -> "X3Y2.c0.A";
+"X3Y2.c0.in0" -> "X3Y2.c0.B";
+"X3Y2.c0.in1" -> "X3Y2.c0.B";
+"X3Y2.c0.in2" -> "X3Y2.c0.B";
+"X3Y2.c0.in3" -> "X3Y2.c0.B";
+"X3Y2.c0.const_out" -> "X3Y2.c0.B";
 "X3Y2.c0.data_out" -> "X3Y2.c0.RES_reg_in";
 "X3Y2.c0.in0" -> "X3Y2.c0.N_reg_in";
 "X3Y2.c0.N_reg_out" -> "X3Y2.c0.N_reg_in";
@@ -2690,9 +2950,25 @@ label="c0.ALU";
 "X3Y3.c0.data_out";
 "X3Y3.c0.ALU.data_out" -> "X3Y3.c0.data_out";
 }
+subgraph "cluster_3_3_c0.compare" {
+label="c0.compare";
+"X3Y3.bel_c0.compare" [label="bel_c0.compare(z=0x0001)", shape=box];
+"X3Y3.c0.compare.A" [label=A, shape=hexagon];
+"X3Y3.c0.A";
+"X3Y3.c0.A" -> "X3Y3.c0.compare.A";
+"X3Y3.c0.compare.A" -> "X3Y3.bel_c0.compare";
+"X3Y3.c0.compare.B" [label=B, shape=hexagon];
+"X3Y3.c0.B";
+"X3Y3.c0.B" -> "X3Y3.c0.compare.B";
+"X3Y3.c0.compare.B" -> "X3Y3.bel_c0.compare";
+"X3Y3.c0.compare.Y" [label=Y, shape=hexagon];
+"X3Y3.bel_c0.compare" -> "X3Y3.c0.compare.Y";
+"X3Y3.c0.Y";
+"X3Y3.c0.compare.Y" -> "X3Y3.c0.Y";
+}
 subgraph "cluster_3_3_c0.const_unit" {
 label="c0.const_unit";
-"X3Y3.bel_c0.const_unit" [label="bel_c0.const_unit(z=0x0001)", shape=box];
+"X3Y3.bel_c0.const_unit" [label="bel_c0.const_unit(z=0x0002)", shape=box];
 "X3Y3.c0.const_unit.const_out" [label="const_out", shape=hexagon];
 "X3Y3.bel_c0.const_unit" -> "X3Y3.c0.const_unit.const_out";
 "X3Y3.c0.const_out";
@@ -2700,7 +2976,7 @@ label="c0.const_unit";
 }
 subgraph "cluster_3_3_c0.RES_reg_unit" {
 label="c0.RES_reg_unit";
-"X3Y3.bel_c0.RES_reg_unit" [label="bel_c0.RES_reg_unit(z=0x0002)", shape=box];
+"X3Y3.bel_c0.RES_reg_unit" [label="bel_c0.RES_reg_unit(z=0x0003)", shape=box];
 "X3Y3.c0.RES_reg_unit.en" [label=en, shape=hexagon];
 "X3Y3.c0.RES_en";
 "X3Y3.c0.RES_en" -> "X3Y3.c0.RES_reg_unit.en";
@@ -2724,7 +3000,7 @@ label="c0.RES_reg_unit";
 }
 subgraph "cluster_3_3_c0.N_reg_unit" {
 label="c0.N_reg_unit";
-"X3Y3.bel_c0.N_reg_unit" [label="bel_c0.N_reg_unit(z=0x0003)", shape=box];
+"X3Y3.bel_c0.N_reg_unit" [label="bel_c0.N_reg_unit(z=0x0004)", shape=box];
 "X3Y3.c0.N_reg_unit.en" [label=en, shape=hexagon];
 "X3Y3.c0.N_en";
 "X3Y3.c0.N_en" -> "X3Y3.c0.N_reg_unit.en";
@@ -2748,7 +3024,7 @@ label="c0.N_reg_unit";
 }
 subgraph "cluster_3_3_c0.E_reg_unit" {
 label="c0.E_reg_unit";
-"X3Y3.bel_c0.E_reg_unit" [label="bel_c0.E_reg_unit(z=0x0004)", shape=box];
+"X3Y3.bel_c0.E_reg_unit" [label="bel_c0.E_reg_unit(z=0x0005)", shape=box];
 "X3Y3.c0.E_reg_unit.en" [label=en, shape=hexagon];
 "X3Y3.c0.E_en";
 "X3Y3.c0.E_en" -> "X3Y3.c0.E_reg_unit.en";
@@ -2772,7 +3048,7 @@ label="c0.E_reg_unit";
 }
 subgraph "cluster_3_3_c0.S_reg_unit" {
 label="c0.S_reg_unit";
-"X3Y3.bel_c0.S_reg_unit" [label="bel_c0.S_reg_unit(z=0x0005)", shape=box];
+"X3Y3.bel_c0.S_reg_unit" [label="bel_c0.S_reg_unit(z=0x0006)", shape=box];
 "X3Y3.c0.S_reg_unit.en" [label=en, shape=hexagon];
 "X3Y3.c0.S_en";
 "X3Y3.c0.S_en" -> "X3Y3.c0.S_reg_unit.en";
@@ -2796,7 +3072,7 @@ label="c0.S_reg_unit";
 }
 subgraph "cluster_3_3_c0.W_reg_unit" {
 label="c0.W_reg_unit";
-"X3Y3.bel_c0.W_reg_unit" [label="bel_c0.W_reg_unit(z=0x0006)", shape=box];
+"X3Y3.bel_c0.W_reg_unit" [label="bel_c0.W_reg_unit(z=0x0007)", shape=box];
 "X3Y3.c0.W_reg_unit.en" [label=en, shape=hexagon];
 "X3Y3.c0.W_en";
 "X3Y3.c0.W_en" -> "X3Y3.c0.W_reg_unit.en";
@@ -2875,6 +3151,16 @@ label="c0.W_reg_unit";
 "X3Y3.c0.in2" -> "X3Y3.c0.data_in3";
 "X3Y3.c0.in3" -> "X3Y3.c0.data_in3";
 "X3Y3.c0.const_out" -> "X3Y3.c0.data_in3";
+"X3Y3.c0.Y" -> "X3Y3.c0.data_in3";
+"X3Y3.c0.in0" -> "X3Y3.c0.A";
+"X3Y3.c0.in1" -> "X3Y3.c0.A";
+"X3Y3.c0.in2" -> "X3Y3.c0.A";
+"X3Y3.c0.in3" -> "X3Y3.c0.A";
+"X3Y3.c0.in0" -> "X3Y3.c0.B";
+"X3Y3.c0.in1" -> "X3Y3.c0.B";
+"X3Y3.c0.in2" -> "X3Y3.c0.B";
+"X3Y3.c0.in3" -> "X3Y3.c0.B";
+"X3Y3.c0.const_out" -> "X3Y3.c0.B";
 "X3Y3.c0.data_out" -> "X3Y3.c0.RES_reg_in";
 "X3Y3.c0.in0" -> "X3Y3.c0.N_reg_in";
 "X3Y3.c0.N_reg_out" -> "X3Y3.c0.N_reg_in";
@@ -2924,9 +3210,25 @@ label="c0.ALU";
 "X3Y4.c0.data_out";
 "X3Y4.c0.ALU.data_out" -> "X3Y4.c0.data_out";
 }
+subgraph "cluster_3_4_c0.compare" {
+label="c0.compare";
+"X3Y4.bel_c0.compare" [label="bel_c0.compare(z=0x0001)", shape=box];
+"X3Y4.c0.compare.A" [label=A, shape=hexagon];
+"X3Y4.c0.A";
+"X3Y4.c0.A" -> "X3Y4.c0.compare.A";
+"X3Y4.c0.compare.A" -> "X3Y4.bel_c0.compare";
+"X3Y4.c0.compare.B" [label=B, shape=hexagon];
+"X3Y4.c0.B";
+"X3Y4.c0.B" -> "X3Y4.c0.compare.B";
+"X3Y4.c0.compare.B" -> "X3Y4.bel_c0.compare";
+"X3Y4.c0.compare.Y" [label=Y, shape=hexagon];
+"X3Y4.bel_c0.compare" -> "X3Y4.c0.compare.Y";
+"X3Y4.c0.Y";
+"X3Y4.c0.compare.Y" -> "X3Y4.c0.Y";
+}
 subgraph "cluster_3_4_c0.const_unit" {
 label="c0.const_unit";
-"X3Y4.bel_c0.const_unit" [label="bel_c0.const_unit(z=0x0001)", shape=box];
+"X3Y4.bel_c0.const_unit" [label="bel_c0.const_unit(z=0x0002)", shape=box];
 "X3Y4.c0.const_unit.const_out" [label="const_out", shape=hexagon];
 "X3Y4.bel_c0.const_unit" -> "X3Y4.c0.const_unit.const_out";
 "X3Y4.c0.const_out";
@@ -2934,7 +3236,7 @@ label="c0.const_unit";
 }
 subgraph "cluster_3_4_c0.RES_reg_unit" {
 label="c0.RES_reg_unit";
-"X3Y4.bel_c0.RES_reg_unit" [label="bel_c0.RES_reg_unit(z=0x0002)", shape=box];
+"X3Y4.bel_c0.RES_reg_unit" [label="bel_c0.RES_reg_unit(z=0x0003)", shape=box];
 "X3Y4.c0.RES_reg_unit.en" [label=en, shape=hexagon];
 "X3Y4.c0.RES_en";
 "X3Y4.c0.RES_en" -> "X3Y4.c0.RES_reg_unit.en";
@@ -2958,7 +3260,7 @@ label="c0.RES_reg_unit";
 }
 subgraph "cluster_3_4_c0.N_reg_unit" {
 label="c0.N_reg_unit";
-"X3Y4.bel_c0.N_reg_unit" [label="bel_c0.N_reg_unit(z=0x0003)", shape=box];
+"X3Y4.bel_c0.N_reg_unit" [label="bel_c0.N_reg_unit(z=0x0004)", shape=box];
 "X3Y4.c0.N_reg_unit.en" [label=en, shape=hexagon];
 "X3Y4.c0.N_en";
 "X3Y4.c0.N_en" -> "X3Y4.c0.N_reg_unit.en";
@@ -2982,7 +3284,7 @@ label="c0.N_reg_unit";
 }
 subgraph "cluster_3_4_c0.E_reg_unit" {
 label="c0.E_reg_unit";
-"X3Y4.bel_c0.E_reg_unit" [label="bel_c0.E_reg_unit(z=0x0004)", shape=box];
+"X3Y4.bel_c0.E_reg_unit" [label="bel_c0.E_reg_unit(z=0x0005)", shape=box];
 "X3Y4.c0.E_reg_unit.en" [label=en, shape=hexagon];
 "X3Y4.c0.E_en";
 "X3Y4.c0.E_en" -> "X3Y4.c0.E_reg_unit.en";
@@ -3006,7 +3308,7 @@ label="c0.E_reg_unit";
 }
 subgraph "cluster_3_4_c0.S_reg_unit" {
 label="c0.S_reg_unit";
-"X3Y4.bel_c0.S_reg_unit" [label="bel_c0.S_reg_unit(z=0x0005)", shape=box];
+"X3Y4.bel_c0.S_reg_unit" [label="bel_c0.S_reg_unit(z=0x0006)", shape=box];
 "X3Y4.c0.S_reg_unit.en" [label=en, shape=hexagon];
 "X3Y4.c0.S_en";
 "X3Y4.c0.S_en" -> "X3Y4.c0.S_reg_unit.en";
@@ -3030,7 +3332,7 @@ label="c0.S_reg_unit";
 }
 subgraph "cluster_3_4_c0.W_reg_unit" {
 label="c0.W_reg_unit";
-"X3Y4.bel_c0.W_reg_unit" [label="bel_c0.W_reg_unit(z=0x0006)", shape=box];
+"X3Y4.bel_c0.W_reg_unit" [label="bel_c0.W_reg_unit(z=0x0007)", shape=box];
 "X3Y4.c0.W_reg_unit.en" [label=en, shape=hexagon];
 "X3Y4.c0.W_en";
 "X3Y4.c0.W_en" -> "X3Y4.c0.W_reg_unit.en";
@@ -3109,6 +3411,16 @@ label="c0.W_reg_unit";
 "X3Y4.c0.in2" -> "X3Y4.c0.data_in3";
 "X3Y4.c0.in3" -> "X3Y4.c0.data_in3";
 "X3Y4.c0.const_out" -> "X3Y4.c0.data_in3";
+"X3Y4.c0.Y" -> "X3Y4.c0.data_in3";
+"X3Y4.c0.in0" -> "X3Y4.c0.A";
+"X3Y4.c0.in1" -> "X3Y4.c0.A";
+"X3Y4.c0.in2" -> "X3Y4.c0.A";
+"X3Y4.c0.in3" -> "X3Y4.c0.A";
+"X3Y4.c0.in0" -> "X3Y4.c0.B";
+"X3Y4.c0.in1" -> "X3Y4.c0.B";
+"X3Y4.c0.in2" -> "X3Y4.c0.B";
+"X3Y4.c0.in3" -> "X3Y4.c0.B";
+"X3Y4.c0.const_out" -> "X3Y4.c0.B";
 "X3Y4.c0.data_out" -> "X3Y4.c0.RES_reg_in";
 "X3Y4.c0.in0" -> "X3Y4.c0.N_reg_in";
 "X3Y4.c0.N_reg_out" -> "X3Y4.c0.N_reg_in";
@@ -3225,9 +3537,25 @@ label="c0.ALU";
 "X4Y1.c0.data_out";
 "X4Y1.c0.ALU.data_out" -> "X4Y1.c0.data_out";
 }
+subgraph "cluster_4_1_c0.compare" {
+label="c0.compare";
+"X4Y1.bel_c0.compare" [label="bel_c0.compare(z=0x0001)", shape=box];
+"X4Y1.c0.compare.A" [label=A, shape=hexagon];
+"X4Y1.c0.A";
+"X4Y1.c0.A" -> "X4Y1.c0.compare.A";
+"X4Y1.c0.compare.A" -> "X4Y1.bel_c0.compare";
+"X4Y1.c0.compare.B" [label=B, shape=hexagon];
+"X4Y1.c0.B";
+"X4Y1.c0.B" -> "X4Y1.c0.compare.B";
+"X4Y1.c0.compare.B" -> "X4Y1.bel_c0.compare";
+"X4Y1.c0.compare.Y" [label=Y, shape=hexagon];
+"X4Y1.bel_c0.compare" -> "X4Y1.c0.compare.Y";
+"X4Y1.c0.Y";
+"X4Y1.c0.compare.Y" -> "X4Y1.c0.Y";
+}
 subgraph "cluster_4_1_c0.const_unit" {
 label="c0.const_unit";
-"X4Y1.bel_c0.const_unit" [label="bel_c0.const_unit(z=0x0001)", shape=box];
+"X4Y1.bel_c0.const_unit" [label="bel_c0.const_unit(z=0x0002)", shape=box];
 "X4Y1.c0.const_unit.const_out" [label="const_out", shape=hexagon];
 "X4Y1.bel_c0.const_unit" -> "X4Y1.c0.const_unit.const_out";
 "X4Y1.c0.const_out";
@@ -3235,7 +3563,7 @@ label="c0.const_unit";
 }
 subgraph "cluster_4_1_c0.RES_reg_unit" {
 label="c0.RES_reg_unit";
-"X4Y1.bel_c0.RES_reg_unit" [label="bel_c0.RES_reg_unit(z=0x0002)", shape=box];
+"X4Y1.bel_c0.RES_reg_unit" [label="bel_c0.RES_reg_unit(z=0x0003)", shape=box];
 "X4Y1.c0.RES_reg_unit.en" [label=en, shape=hexagon];
 "X4Y1.c0.RES_en";
 "X4Y1.c0.RES_en" -> "X4Y1.c0.RES_reg_unit.en";
@@ -3259,7 +3587,7 @@ label="c0.RES_reg_unit";
 }
 subgraph "cluster_4_1_c0.N_reg_unit" {
 label="c0.N_reg_unit";
-"X4Y1.bel_c0.N_reg_unit" [label="bel_c0.N_reg_unit(z=0x0003)", shape=box];
+"X4Y1.bel_c0.N_reg_unit" [label="bel_c0.N_reg_unit(z=0x0004)", shape=box];
 "X4Y1.c0.N_reg_unit.en" [label=en, shape=hexagon];
 "X4Y1.c0.N_en";
 "X4Y1.c0.N_en" -> "X4Y1.c0.N_reg_unit.en";
@@ -3283,7 +3611,7 @@ label="c0.N_reg_unit";
 }
 subgraph "cluster_4_1_c0.E_reg_unit" {
 label="c0.E_reg_unit";
-"X4Y1.bel_c0.E_reg_unit" [label="bel_c0.E_reg_unit(z=0x0004)", shape=box];
+"X4Y1.bel_c0.E_reg_unit" [label="bel_c0.E_reg_unit(z=0x0005)", shape=box];
 "X4Y1.c0.E_reg_unit.en" [label=en, shape=hexagon];
 "X4Y1.c0.E_en";
 "X4Y1.c0.E_en" -> "X4Y1.c0.E_reg_unit.en";
@@ -3307,7 +3635,7 @@ label="c0.E_reg_unit";
 }
 subgraph "cluster_4_1_c0.S_reg_unit" {
 label="c0.S_reg_unit";
-"X4Y1.bel_c0.S_reg_unit" [label="bel_c0.S_reg_unit(z=0x0005)", shape=box];
+"X4Y1.bel_c0.S_reg_unit" [label="bel_c0.S_reg_unit(z=0x0006)", shape=box];
 "X4Y1.c0.S_reg_unit.en" [label=en, shape=hexagon];
 "X4Y1.c0.S_en";
 "X4Y1.c0.S_en" -> "X4Y1.c0.S_reg_unit.en";
@@ -3331,7 +3659,7 @@ label="c0.S_reg_unit";
 }
 subgraph "cluster_4_1_c0.W_reg_unit" {
 label="c0.W_reg_unit";
-"X4Y1.bel_c0.W_reg_unit" [label="bel_c0.W_reg_unit(z=0x0006)", shape=box];
+"X4Y1.bel_c0.W_reg_unit" [label="bel_c0.W_reg_unit(z=0x0007)", shape=box];
 "X4Y1.c0.W_reg_unit.en" [label=en, shape=hexagon];
 "X4Y1.c0.W_en";
 "X4Y1.c0.W_en" -> "X4Y1.c0.W_reg_unit.en";
@@ -3410,6 +3738,16 @@ label="c0.W_reg_unit";
 "X4Y1.c0.in2" -> "X4Y1.c0.data_in3";
 "X4Y1.c0.in3" -> "X4Y1.c0.data_in3";
 "X4Y1.c0.const_out" -> "X4Y1.c0.data_in3";
+"X4Y1.c0.Y" -> "X4Y1.c0.data_in3";
+"X4Y1.c0.in0" -> "X4Y1.c0.A";
+"X4Y1.c0.in1" -> "X4Y1.c0.A";
+"X4Y1.c0.in2" -> "X4Y1.c0.A";
+"X4Y1.c0.in3" -> "X4Y1.c0.A";
+"X4Y1.c0.in0" -> "X4Y1.c0.B";
+"X4Y1.c0.in1" -> "X4Y1.c0.B";
+"X4Y1.c0.in2" -> "X4Y1.c0.B";
+"X4Y1.c0.in3" -> "X4Y1.c0.B";
+"X4Y1.c0.const_out" -> "X4Y1.c0.B";
 "X4Y1.c0.data_out" -> "X4Y1.c0.RES_reg_in";
 "X4Y1.c0.in0" -> "X4Y1.c0.N_reg_in";
 "X4Y1.c0.N_reg_out" -> "X4Y1.c0.N_reg_in";
@@ -3459,9 +3797,25 @@ label="c0.ALU";
 "X4Y2.c0.data_out";
 "X4Y2.c0.ALU.data_out" -> "X4Y2.c0.data_out";
 }
+subgraph "cluster_4_2_c0.compare" {
+label="c0.compare";
+"X4Y2.bel_c0.compare" [label="bel_c0.compare(z=0x0001)", shape=box];
+"X4Y2.c0.compare.A" [label=A, shape=hexagon];
+"X4Y2.c0.A";
+"X4Y2.c0.A" -> "X4Y2.c0.compare.A";
+"X4Y2.c0.compare.A" -> "X4Y2.bel_c0.compare";
+"X4Y2.c0.compare.B" [label=B, shape=hexagon];
+"X4Y2.c0.B";
+"X4Y2.c0.B" -> "X4Y2.c0.compare.B";
+"X4Y2.c0.compare.B" -> "X4Y2.bel_c0.compare";
+"X4Y2.c0.compare.Y" [label=Y, shape=hexagon];
+"X4Y2.bel_c0.compare" -> "X4Y2.c0.compare.Y";
+"X4Y2.c0.Y";
+"X4Y2.c0.compare.Y" -> "X4Y2.c0.Y";
+}
 subgraph "cluster_4_2_c0.const_unit" {
 label="c0.const_unit";
-"X4Y2.bel_c0.const_unit" [label="bel_c0.const_unit(z=0x0001)", shape=box];
+"X4Y2.bel_c0.const_unit" [label="bel_c0.const_unit(z=0x0002)", shape=box];
 "X4Y2.c0.const_unit.const_out" [label="const_out", shape=hexagon];
 "X4Y2.bel_c0.const_unit" -> "X4Y2.c0.const_unit.const_out";
 "X4Y2.c0.const_out";
@@ -3469,7 +3823,7 @@ label="c0.const_unit";
 }
 subgraph "cluster_4_2_c0.RES_reg_unit" {
 label="c0.RES_reg_unit";
-"X4Y2.bel_c0.RES_reg_unit" [label="bel_c0.RES_reg_unit(z=0x0002)", shape=box];
+"X4Y2.bel_c0.RES_reg_unit" [label="bel_c0.RES_reg_unit(z=0x0003)", shape=box];
 "X4Y2.c0.RES_reg_unit.en" [label=en, shape=hexagon];
 "X4Y2.c0.RES_en";
 "X4Y2.c0.RES_en" -> "X4Y2.c0.RES_reg_unit.en";
@@ -3493,7 +3847,7 @@ label="c0.RES_reg_unit";
 }
 subgraph "cluster_4_2_c0.N_reg_unit" {
 label="c0.N_reg_unit";
-"X4Y2.bel_c0.N_reg_unit" [label="bel_c0.N_reg_unit(z=0x0003)", shape=box];
+"X4Y2.bel_c0.N_reg_unit" [label="bel_c0.N_reg_unit(z=0x0004)", shape=box];
 "X4Y2.c0.N_reg_unit.en" [label=en, shape=hexagon];
 "X4Y2.c0.N_en";
 "X4Y2.c0.N_en" -> "X4Y2.c0.N_reg_unit.en";
@@ -3517,7 +3871,7 @@ label="c0.N_reg_unit";
 }
 subgraph "cluster_4_2_c0.E_reg_unit" {
 label="c0.E_reg_unit";
-"X4Y2.bel_c0.E_reg_unit" [label="bel_c0.E_reg_unit(z=0x0004)", shape=box];
+"X4Y2.bel_c0.E_reg_unit" [label="bel_c0.E_reg_unit(z=0x0005)", shape=box];
 "X4Y2.c0.E_reg_unit.en" [label=en, shape=hexagon];
 "X4Y2.c0.E_en";
 "X4Y2.c0.E_en" -> "X4Y2.c0.E_reg_unit.en";
@@ -3541,7 +3895,7 @@ label="c0.E_reg_unit";
 }
 subgraph "cluster_4_2_c0.S_reg_unit" {
 label="c0.S_reg_unit";
-"X4Y2.bel_c0.S_reg_unit" [label="bel_c0.S_reg_unit(z=0x0005)", shape=box];
+"X4Y2.bel_c0.S_reg_unit" [label="bel_c0.S_reg_unit(z=0x0006)", shape=box];
 "X4Y2.c0.S_reg_unit.en" [label=en, shape=hexagon];
 "X4Y2.c0.S_en";
 "X4Y2.c0.S_en" -> "X4Y2.c0.S_reg_unit.en";
@@ -3565,7 +3919,7 @@ label="c0.S_reg_unit";
 }
 subgraph "cluster_4_2_c0.W_reg_unit" {
 label="c0.W_reg_unit";
-"X4Y2.bel_c0.W_reg_unit" [label="bel_c0.W_reg_unit(z=0x0006)", shape=box];
+"X4Y2.bel_c0.W_reg_unit" [label="bel_c0.W_reg_unit(z=0x0007)", shape=box];
 "X4Y2.c0.W_reg_unit.en" [label=en, shape=hexagon];
 "X4Y2.c0.W_en";
 "X4Y2.c0.W_en" -> "X4Y2.c0.W_reg_unit.en";
@@ -3644,6 +3998,16 @@ label="c0.W_reg_unit";
 "X4Y2.c0.in2" -> "X4Y2.c0.data_in3";
 "X4Y2.c0.in3" -> "X4Y2.c0.data_in3";
 "X4Y2.c0.const_out" -> "X4Y2.c0.data_in3";
+"X4Y2.c0.Y" -> "X4Y2.c0.data_in3";
+"X4Y2.c0.in0" -> "X4Y2.c0.A";
+"X4Y2.c0.in1" -> "X4Y2.c0.A";
+"X4Y2.c0.in2" -> "X4Y2.c0.A";
+"X4Y2.c0.in3" -> "X4Y2.c0.A";
+"X4Y2.c0.in0" -> "X4Y2.c0.B";
+"X4Y2.c0.in1" -> "X4Y2.c0.B";
+"X4Y2.c0.in2" -> "X4Y2.c0.B";
+"X4Y2.c0.in3" -> "X4Y2.c0.B";
+"X4Y2.c0.const_out" -> "X4Y2.c0.B";
 "X4Y2.c0.data_out" -> "X4Y2.c0.RES_reg_in";
 "X4Y2.c0.in0" -> "X4Y2.c0.N_reg_in";
 "X4Y2.c0.N_reg_out" -> "X4Y2.c0.N_reg_in";
@@ -3693,9 +4057,25 @@ label="c0.ALU";
 "X4Y3.c0.data_out";
 "X4Y3.c0.ALU.data_out" -> "X4Y3.c0.data_out";
 }
+subgraph "cluster_4_3_c0.compare" {
+label="c0.compare";
+"X4Y3.bel_c0.compare" [label="bel_c0.compare(z=0x0001)", shape=box];
+"X4Y3.c0.compare.A" [label=A, shape=hexagon];
+"X4Y3.c0.A";
+"X4Y3.c0.A" -> "X4Y3.c0.compare.A";
+"X4Y3.c0.compare.A" -> "X4Y3.bel_c0.compare";
+"X4Y3.c0.compare.B" [label=B, shape=hexagon];
+"X4Y3.c0.B";
+"X4Y3.c0.B" -> "X4Y3.c0.compare.B";
+"X4Y3.c0.compare.B" -> "X4Y3.bel_c0.compare";
+"X4Y3.c0.compare.Y" [label=Y, shape=hexagon];
+"X4Y3.bel_c0.compare" -> "X4Y3.c0.compare.Y";
+"X4Y3.c0.Y";
+"X4Y3.c0.compare.Y" -> "X4Y3.c0.Y";
+}
 subgraph "cluster_4_3_c0.const_unit" {
 label="c0.const_unit";
-"X4Y3.bel_c0.const_unit" [label="bel_c0.const_unit(z=0x0001)", shape=box];
+"X4Y3.bel_c0.const_unit" [label="bel_c0.const_unit(z=0x0002)", shape=box];
 "X4Y3.c0.const_unit.const_out" [label="const_out", shape=hexagon];
 "X4Y3.bel_c0.const_unit" -> "X4Y3.c0.const_unit.const_out";
 "X4Y3.c0.const_out";
@@ -3703,7 +4083,7 @@ label="c0.const_unit";
 }
 subgraph "cluster_4_3_c0.RES_reg_unit" {
 label="c0.RES_reg_unit";
-"X4Y3.bel_c0.RES_reg_unit" [label="bel_c0.RES_reg_unit(z=0x0002)", shape=box];
+"X4Y3.bel_c0.RES_reg_unit" [label="bel_c0.RES_reg_unit(z=0x0003)", shape=box];
 "X4Y3.c0.RES_reg_unit.en" [label=en, shape=hexagon];
 "X4Y3.c0.RES_en";
 "X4Y3.c0.RES_en" -> "X4Y3.c0.RES_reg_unit.en";
@@ -3727,7 +4107,7 @@ label="c0.RES_reg_unit";
 }
 subgraph "cluster_4_3_c0.N_reg_unit" {
 label="c0.N_reg_unit";
-"X4Y3.bel_c0.N_reg_unit" [label="bel_c0.N_reg_unit(z=0x0003)", shape=box];
+"X4Y3.bel_c0.N_reg_unit" [label="bel_c0.N_reg_unit(z=0x0004)", shape=box];
 "X4Y3.c0.N_reg_unit.en" [label=en, shape=hexagon];
 "X4Y3.c0.N_en";
 "X4Y3.c0.N_en" -> "X4Y3.c0.N_reg_unit.en";
@@ -3751,7 +4131,7 @@ label="c0.N_reg_unit";
 }
 subgraph "cluster_4_3_c0.E_reg_unit" {
 label="c0.E_reg_unit";
-"X4Y3.bel_c0.E_reg_unit" [label="bel_c0.E_reg_unit(z=0x0004)", shape=box];
+"X4Y3.bel_c0.E_reg_unit" [label="bel_c0.E_reg_unit(z=0x0005)", shape=box];
 "X4Y3.c0.E_reg_unit.en" [label=en, shape=hexagon];
 "X4Y3.c0.E_en";
 "X4Y3.c0.E_en" -> "X4Y3.c0.E_reg_unit.en";
@@ -3775,7 +4155,7 @@ label="c0.E_reg_unit";
 }
 subgraph "cluster_4_3_c0.S_reg_unit" {
 label="c0.S_reg_unit";
-"X4Y3.bel_c0.S_reg_unit" [label="bel_c0.S_reg_unit(z=0x0005)", shape=box];
+"X4Y3.bel_c0.S_reg_unit" [label="bel_c0.S_reg_unit(z=0x0006)", shape=box];
 "X4Y3.c0.S_reg_unit.en" [label=en, shape=hexagon];
 "X4Y3.c0.S_en";
 "X4Y3.c0.S_en" -> "X4Y3.c0.S_reg_unit.en";
@@ -3799,7 +4179,7 @@ label="c0.S_reg_unit";
 }
 subgraph "cluster_4_3_c0.W_reg_unit" {
 label="c0.W_reg_unit";
-"X4Y3.bel_c0.W_reg_unit" [label="bel_c0.W_reg_unit(z=0x0006)", shape=box];
+"X4Y3.bel_c0.W_reg_unit" [label="bel_c0.W_reg_unit(z=0x0007)", shape=box];
 "X4Y3.c0.W_reg_unit.en" [label=en, shape=hexagon];
 "X4Y3.c0.W_en";
 "X4Y3.c0.W_en" -> "X4Y3.c0.W_reg_unit.en";
@@ -3878,6 +4258,16 @@ label="c0.W_reg_unit";
 "X4Y3.c0.in2" -> "X4Y3.c0.data_in3";
 "X4Y3.c0.in3" -> "X4Y3.c0.data_in3";
 "X4Y3.c0.const_out" -> "X4Y3.c0.data_in3";
+"X4Y3.c0.Y" -> "X4Y3.c0.data_in3";
+"X4Y3.c0.in0" -> "X4Y3.c0.A";
+"X4Y3.c0.in1" -> "X4Y3.c0.A";
+"X4Y3.c0.in2" -> "X4Y3.c0.A";
+"X4Y3.c0.in3" -> "X4Y3.c0.A";
+"X4Y3.c0.in0" -> "X4Y3.c0.B";
+"X4Y3.c0.in1" -> "X4Y3.c0.B";
+"X4Y3.c0.in2" -> "X4Y3.c0.B";
+"X4Y3.c0.in3" -> "X4Y3.c0.B";
+"X4Y3.c0.const_out" -> "X4Y3.c0.B";
 "X4Y3.c0.data_out" -> "X4Y3.c0.RES_reg_in";
 "X4Y3.c0.in0" -> "X4Y3.c0.N_reg_in";
 "X4Y3.c0.N_reg_out" -> "X4Y3.c0.N_reg_in";
@@ -3927,9 +4317,25 @@ label="c0.ALU";
 "X4Y4.c0.data_out";
 "X4Y4.c0.ALU.data_out" -> "X4Y4.c0.data_out";
 }
+subgraph "cluster_4_4_c0.compare" {
+label="c0.compare";
+"X4Y4.bel_c0.compare" [label="bel_c0.compare(z=0x0001)", shape=box];
+"X4Y4.c0.compare.A" [label=A, shape=hexagon];
+"X4Y4.c0.A";
+"X4Y4.c0.A" -> "X4Y4.c0.compare.A";
+"X4Y4.c0.compare.A" -> "X4Y4.bel_c0.compare";
+"X4Y4.c0.compare.B" [label=B, shape=hexagon];
+"X4Y4.c0.B";
+"X4Y4.c0.B" -> "X4Y4.c0.compare.B";
+"X4Y4.c0.compare.B" -> "X4Y4.bel_c0.compare";
+"X4Y4.c0.compare.Y" [label=Y, shape=hexagon];
+"X4Y4.bel_c0.compare" -> "X4Y4.c0.compare.Y";
+"X4Y4.c0.Y";
+"X4Y4.c0.compare.Y" -> "X4Y4.c0.Y";
+}
 subgraph "cluster_4_4_c0.const_unit" {
 label="c0.const_unit";
-"X4Y4.bel_c0.const_unit" [label="bel_c0.const_unit(z=0x0001)", shape=box];
+"X4Y4.bel_c0.const_unit" [label="bel_c0.const_unit(z=0x0002)", shape=box];
 "X4Y4.c0.const_unit.const_out" [label="const_out", shape=hexagon];
 "X4Y4.bel_c0.const_unit" -> "X4Y4.c0.const_unit.const_out";
 "X4Y4.c0.const_out";
@@ -3937,7 +4343,7 @@ label="c0.const_unit";
 }
 subgraph "cluster_4_4_c0.RES_reg_unit" {
 label="c0.RES_reg_unit";
-"X4Y4.bel_c0.RES_reg_unit" [label="bel_c0.RES_reg_unit(z=0x0002)", shape=box];
+"X4Y4.bel_c0.RES_reg_unit" [label="bel_c0.RES_reg_unit(z=0x0003)", shape=box];
 "X4Y4.c0.RES_reg_unit.en" [label=en, shape=hexagon];
 "X4Y4.c0.RES_en";
 "X4Y4.c0.RES_en" -> "X4Y4.c0.RES_reg_unit.en";
@@ -3961,7 +4367,7 @@ label="c0.RES_reg_unit";
 }
 subgraph "cluster_4_4_c0.N_reg_unit" {
 label="c0.N_reg_unit";
-"X4Y4.bel_c0.N_reg_unit" [label="bel_c0.N_reg_unit(z=0x0003)", shape=box];
+"X4Y4.bel_c0.N_reg_unit" [label="bel_c0.N_reg_unit(z=0x0004)", shape=box];
 "X4Y4.c0.N_reg_unit.en" [label=en, shape=hexagon];
 "X4Y4.c0.N_en";
 "X4Y4.c0.N_en" -> "X4Y4.c0.N_reg_unit.en";
@@ -3985,7 +4391,7 @@ label="c0.N_reg_unit";
 }
 subgraph "cluster_4_4_c0.E_reg_unit" {
 label="c0.E_reg_unit";
-"X4Y4.bel_c0.E_reg_unit" [label="bel_c0.E_reg_unit(z=0x0004)", shape=box];
+"X4Y4.bel_c0.E_reg_unit" [label="bel_c0.E_reg_unit(z=0x0005)", shape=box];
 "X4Y4.c0.E_reg_unit.en" [label=en, shape=hexagon];
 "X4Y4.c0.E_en";
 "X4Y4.c0.E_en" -> "X4Y4.c0.E_reg_unit.en";
@@ -4009,7 +4415,7 @@ label="c0.E_reg_unit";
 }
 subgraph "cluster_4_4_c0.S_reg_unit" {
 label="c0.S_reg_unit";
-"X4Y4.bel_c0.S_reg_unit" [label="bel_c0.S_reg_unit(z=0x0005)", shape=box];
+"X4Y4.bel_c0.S_reg_unit" [label="bel_c0.S_reg_unit(z=0x0006)", shape=box];
 "X4Y4.c0.S_reg_unit.en" [label=en, shape=hexagon];
 "X4Y4.c0.S_en";
 "X4Y4.c0.S_en" -> "X4Y4.c0.S_reg_unit.en";
@@ -4033,7 +4439,7 @@ label="c0.S_reg_unit";
 }
 subgraph "cluster_4_4_c0.W_reg_unit" {
 label="c0.W_reg_unit";
-"X4Y4.bel_c0.W_reg_unit" [label="bel_c0.W_reg_unit(z=0x0006)", shape=box];
+"X4Y4.bel_c0.W_reg_unit" [label="bel_c0.W_reg_unit(z=0x0007)", shape=box];
 "X4Y4.c0.W_reg_unit.en" [label=en, shape=hexagon];
 "X4Y4.c0.W_en";
 "X4Y4.c0.W_en" -> "X4Y4.c0.W_reg_unit.en";
@@ -4112,6 +4518,16 @@ label="c0.W_reg_unit";
 "X4Y4.c0.in2" -> "X4Y4.c0.data_in3";
 "X4Y4.c0.in3" -> "X4Y4.c0.data_in3";
 "X4Y4.c0.const_out" -> "X4Y4.c0.data_in3";
+"X4Y4.c0.Y" -> "X4Y4.c0.data_in3";
+"X4Y4.c0.in0" -> "X4Y4.c0.A";
+"X4Y4.c0.in1" -> "X4Y4.c0.A";
+"X4Y4.c0.in2" -> "X4Y4.c0.A";
+"X4Y4.c0.in3" -> "X4Y4.c0.A";
+"X4Y4.c0.in0" -> "X4Y4.c0.B";
+"X4Y4.c0.in1" -> "X4Y4.c0.B";
+"X4Y4.c0.in2" -> "X4Y4.c0.B";
+"X4Y4.c0.in3" -> "X4Y4.c0.B";
+"X4Y4.c0.const_out" -> "X4Y4.c0.B";
 "X4Y4.c0.data_out" -> "X4Y4.c0.RES_reg_in";
 "X4Y4.c0.in0" -> "X4Y4.c0.N_reg_in";
 "X4Y4.c0.N_reg_out" -> "X4Y4.c0.N_reg_in";

@@ -48,31 +48,6 @@ endgenerate
 
 endmodule
 
-(* techmap_celltype = "ALU_ALU_func_2" *)
-module map_ALU_ALU_func_2 #(
-)
-(
-    input wire[2:0] ALU_func,
-    input wire[31:0] data_in1,
-    input wire[31:0] data_in2,
-    input wire[31:0] data_in3,
-    output reg[31:0] data_out
-);
-
-generate
-    ALU #(
-        .ALU_func(2'd2)
-    ) _TECHMAP_REPLACE_ (
-        .data_in1(data_in1),
-        .data_in2(data_in2),
-        .data_in3(data_in3),
-        .data_out(data_out)
-    );
-
-endgenerate
-
-endmodule
-
 (* techmap_celltype = "ALU_ALU_func_3" *)
 module map_ALU_ALU_func_3 #(
 )

@@ -1,9 +1,9 @@
 frame_name,frame_index,bits_used_in_frame,used_bits_mask,ConfigBits_ranges
-frame0,0,8,11111111,43:36
-frame1,1,8,11111111,35:28
-frame2,2,8,11111111,27:20
-frame3,3,8,11111111,19:12
-frame4,4,8,11111111,11:4
-frame5,5,4,11110000,3:0
-frame6,6,0,00000000,# NULL
+frame0,0,8,11111111,50:43
+frame1,1,8,11111111,42:35
+frame2,2,8,11111111,34:27
+frame3,3,8,11111111,26:19
+frame4,4,8,11111111,18:11
+frame5,5,8,11111111,10:3
+frame6,6,3,11100000,2:0
 frame7,7,0,00000000,# NULL

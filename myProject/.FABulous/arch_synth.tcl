@@ -1,18 +1,26 @@
 set project_root $env(FAB_PROJECT_DIR)
 
-yosys hierarchy -auto-top 
-yosys check -assert
+yosys hierarchy -auto-top
 
 yosys read_verilog -lib $project_root/.FABulous/libs.v
 yosys read_rtlil -lib $project_root/.FABulous/cells.il
 yosys read_verilog -lib $project_root/.FABulous/IO_buf.v
-yosys blackbox std_* seq_mem_*
-yosys setattr -mod -unset blackbox std_wire std_slice
-yosys prep -auto-top -flatten
-yosys opt -nosdff -nodffe -fine -purge;
+yosys proc
+yosys flatten -noscopeinfo
+yosys opt_expr
+yosys opt_clean
+yosys check
+yosys opt -nodffe -nosdff
 yosys fsm -nomap
-yosys opt -full
-yosys clean -purge
+yosys opt
+yosys wreduce
+yosys peepopt
+yosys opt_clean
+yosys share
+yosys opt_expr
+yosys opt_clean
+yosys memory_dff -no-rw-check
+yosys memory_collect
 
 proc extract {cell wrapperPath} {
     # wrapping for mapping
@@ -31,7 +39,6 @@ proc extract {cell wrapperPath} {
 # wrapping base design
 yosys techmap -map ../../myProject/Tile/PE/metadata/wrap_map_ALU.v
 yosys connwrappers -unsigned \$__add_wrapper Y Y_WIDTH
-yosys connwrappers -unsigned \$__and_wrapper Y Y_WIDTH
 yosys connwrappers -unsigned \$__mul_wrapper Y Y_WIDTH
 yosys connwrappers -unsigned \$__or_wrapper Y Y_WIDTH
 yosys connwrappers -unsigned \$__sub_wrapper Y Y_WIDTH
@@ -54,6 +61,22 @@ extract "../../myProject/Tile/PE/metadata/cell_ALU_ALU_func_1.il" \
         "../../myProject/Tile/PE/metadata/wrap_map_ALU.v"
 # unwrapping
 yosys techmap -map ../../myProject/Tile/PE/metadata/unwrap_map_ALU.v
+
+# wrapping base design
+yosys techmap -map ../../myProject/Tile/PE/metadata/wrap_map_compare.v
+yosys connwrappers -unsigned \$__eq_wrapper Y Y_WIDTH
+yosys connwrappers -unsigned \$__le_wrapper Y Y_WIDTH
+yosys connwrappers -unsigned \$__lt_wrapper Y Y_WIDTH
+
+# extract cells
+extract "../../myProject/Tile/PE/metadata/cell_compare_conf_2.il" \
+        "../../myProject/Tile/PE/metadata/wrap_map_compare.v"
+extract "../../myProject/Tile/PE/metadata/cell_compare_conf_1.il" \
+        "../../myProject/Tile/PE/metadata/wrap_map_compare.v"
+extract "../../myProject/Tile/PE/metadata/cell_compare_conf_0.il" \
+        "../../myProject/Tile/PE/metadata/wrap_map_compare.v"
+# unwrapping
+yosys techmap -map ../../myProject/Tile/PE/metadata/unwrap_map_compare.v
 
 # wrapping base design
 yosys techmap -map ../../myProject/Tile/PE/metadata/wrap_map_reg_unit.v
@@ -93,5 +116,6 @@ yosys iopadmap -bits -outpad OUTBUF I:PAD -inpad INBUF O:PAD
 yosys opt;;;
 yosys clean -purge
 
+yosys show -width -format dot -prefix $project_root/.FABulous/design
 yosys write_json $project_root/user_design/synth_test.json
 yosys stat

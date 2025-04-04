@@ -1,5 +1,5 @@
 module PE_switch_matrix #(
-    parameter NoConfigBits = 23
+    parameter NoConfigBits = 28
 )
 (
     output reg[31:0] out0,
@@ -9,6 +9,8 @@ module PE_switch_matrix #(
     output reg[31:0] data_in1,
     output reg[31:0] data_in2,
     output reg[31:0] data_in3,
+    output reg[31:0] A,
+    output reg[31:0] B,
     output reg[31:0] RES_reg_in,
     output reg[31:0] N_reg_in,
     output reg[31:0] E_reg_in,
@@ -25,6 +27,7 @@ module PE_switch_matrix #(
     input wire[31:0] S_reg_out,
     input wire[31:0] W_reg_out,
     input wire[31:0] const_out,
+    input wire[31:0] Y,
     input wire[NoConfigBits - 1:0] ConfigBits,
     input wire[NoConfigBits - 1:0] ConfigBits_N
 );
@@ -154,16 +157,16 @@ cus_mux161_buf_pack #(
     .X(data_in2)
 );
 
-// switch matrix multiplexer data_in3 MUX-5
+// switch matrix multiplexer data_in3 MUX-6
 cus_mux81_buf_pack #(
     .WIDTH(6'd32)
 ) inst_cus_mux81_buf_pack_data_in3 (
-    .A0(const_out),
-    .A1(in3),
-    .A2(in2),
-    .A3(in1),
-    .A4(in0),
-    .A5(GND),
+    .A0(Y),
+    .A1(const_out),
+    .A2(in3),
+    .A3(in2),
+    .A4(in1),
+    .A5(in0),
     .A6(GND),
     .A7(GND),
     .S0(ConfigBits[16]),
@@ -175,6 +178,42 @@ cus_mux81_buf_pack #(
     .X(data_in3)
 );
 
+// switch matrix multiplexer A MUX-4
+cus_mux41_buf_pack #(
+    .WIDTH(6'd32)
+) inst_cus_mux41_buf_pack_A (
+    .A0(in3),
+    .A1(in2),
+    .A2(in1),
+    .A3(in0),
+    .S0(ConfigBits[19]),
+    .S0N(ConfigBits_N[19]),
+    .S1(ConfigBits[20]),
+    .S1N(ConfigBits_N[20]),
+    .X(A)
+);
+
+// switch matrix multiplexer B MUX-5
+cus_mux81_buf_pack #(
+    .WIDTH(6'd32)
+) inst_cus_mux81_buf_pack_B (
+    .A0(const_out),
+    .A1(in3),
+    .A2(in2),
+    .A3(in1),
+    .A4(in0),
+    .A5(GND),
+    .A6(GND),
+    .A7(GND),
+    .S0(ConfigBits[21]),
+    .S0N(ConfigBits_N[21]),
+    .S1(ConfigBits[22]),
+    .S1N(ConfigBits_N[22]),
+    .S2(ConfigBits[23]),
+    .S2N(ConfigBits_N[23]),
+    .X(B)
+);
+
 // switch matrix multiplexer RES_reg_in MUX-1
 assign RES_reg_in = data_out;
 // switch matrix multiplexer N_reg_in MUX-2
@@ -183,7 +222,7 @@ cus_mux21_pack #(
 ) inst_cus_mux21_pack_N_reg_in (
     .A0(N_reg_out),
     .A1(in0),
-    .S(ConfigBits[19]),
+    .S(ConfigBits[24]),
     .X(N_reg_in)
 );
 
@@ -193,7 +232,7 @@ cus_mux21_pack #(
 ) inst_cus_mux21_pack_E_reg_in (
     .A0(E_reg_out),
     .A1(in1),
-    .S(ConfigBits[20]),
+    .S(ConfigBits[25]),
     .X(E_reg_in)
 );
 
@@ -203,7 +242,7 @@ cus_mux21_pack #(
 ) inst_cus_mux21_pack_S_reg_in (
     .A0(S_reg_out),
     .A1(in2),
-    .S(ConfigBits[21]),
+    .S(ConfigBits[26]),
     .X(S_reg_in)
 );
 
@@ -213,7 +252,7 @@ cus_mux21_pack #(
 ) inst_cus_mux21_pack_W_reg_in (
     .A0(W_reg_out),
     .A1(in3),
-    .S(ConfigBits[22]),
+    .S(ConfigBits[27]),
     .X(W_reg_in)
 );
 

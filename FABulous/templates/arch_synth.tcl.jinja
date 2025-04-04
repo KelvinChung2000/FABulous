@@ -1,18 +1,26 @@
 set project_root $env(FAB_PROJECT_DIR)
 
 yosys hierarchy -auto-top
-yosys check -assert
 
 yosys read_verilog -lib $project_root/.FABulous/libs.v
 yosys read_rtlil -lib $project_root/.FABulous/cells.il
 yosys read_verilog -lib $project_root/.FABulous/IO_buf.v
-yosys blackbox std_* seq_mem_*
-yosys setattr -mod -unset blackbox std_wire std_slice
-yosys prep -auto-top -flatten
-yosys opt -nosdff -nodffe -fine -purge;
+yosys proc
+yosys flatten -noscopeinfo
+yosys opt_expr
+yosys opt_clean
+yosys check
+yosys opt -nodffe -nosdff
 yosys fsm -nomap
-yosys opt -full
-yosys clean -purge
+yosys opt
+yosys wreduce
+yosys peepopt
+yosys opt_clean
+yosys share
+yosys opt_expr
+yosys opt_clean
+yosys memory_dff -no-rw-check
+yosys memory_collect
 
 proc extract {cell wrapperPath} {
     # wrapping for mapping
@@ -57,5 +65,6 @@ yosys iopadmap -bits -outpad OUTBUF I:PAD -inpad INBUF O:PAD
 yosys opt;;;
 yosys clean -purge
 
+yosys show -width -format dot -prefix $project_root/.FABulous/design
 yosys write_json $project_root/user_design/synth_test.json
 yosys stat

@@ -1,7 +1,7 @@
 module PE #(
     parameter MaxFramesPerCol = 8,
     parameter FrameBitsPerRow = 8,
-    parameter NoConfigBits = 44,
+    parameter NoConfigBits = 51,
     // Emulation Parameters
     parameter EMULATION_ENABLE = 0,
     parameter EMULATION_CONFIG = 0,
@@ -34,6 +34,9 @@ reg [31:0] data_in1;
 reg [31:0] data_in2;
 reg [31:0] data_in3;
 reg [31:0] data_out;
+reg [31:0] A;
+reg [31:0] B;
+reg [31:0] Y;
 reg [31:0] const_out;
 reg RES_en;
 reg [31:0] RES_reg_in;
@@ -124,10 +127,18 @@ ALU #() Inst_ALU (
     .ALU_func(ConfigBits[2:0])
 );
 
+// Instantiate BEL compare
+compare #() Inst_compare (
+    .A(A),
+    .B(B),
+    .Y(Y),
+    .conf(ConfigBits[4:3])
+);
+
 // Instantiate BEL const_unit
 const_unit #() Inst_const_unit (
     .const_out(const_out),
-    .ConfigBits(ConfigBits[10:3])
+    .ConfigBits(ConfigBits[12:5])
 );
 
 // Instantiate BEL RES_reg_unit
@@ -137,8 +148,8 @@ reg_unit #() Inst_RES_reg_unit (
     .rst(RES_rst),
     .reg_out(RES_reg_out),
     .clk(UserCLK),
-    .tide_en(ConfigBits[11]),
-    .tide_rst(ConfigBits[12])
+    .tide_en(ConfigBits[13]),
+    .tide_rst(ConfigBits[14])
 );
 
 // Instantiate BEL N_reg_unit
@@ -148,8 +159,8 @@ reg_unit #() Inst_N_reg_unit (
     .rst(N_rst),
     .reg_out(N_reg_out),
     .clk(UserCLK),
-    .tide_en(ConfigBits[13]),
-    .tide_rst(ConfigBits[14])
+    .tide_en(ConfigBits[15]),
+    .tide_rst(ConfigBits[16])
 );
 
 // Instantiate BEL E_reg_unit
@@ -159,8 +170,8 @@ reg_unit #() Inst_E_reg_unit (
     .rst(E_rst),
     .reg_out(E_reg_out),
     .clk(UserCLK),
-    .tide_en(ConfigBits[15]),
-    .tide_rst(ConfigBits[16])
+    .tide_en(ConfigBits[17]),
+    .tide_rst(ConfigBits[18])
 );
 
 // Instantiate BEL S_reg_unit
@@ -170,8 +181,8 @@ reg_unit #() Inst_S_reg_unit (
     .rst(S_rst),
     .reg_out(S_reg_out),
     .clk(UserCLK),
-    .tide_en(ConfigBits[17]),
-    .tide_rst(ConfigBits[18])
+    .tide_en(ConfigBits[19]),
+    .tide_rst(ConfigBits[20])
 );
 
 // Instantiate BEL W_reg_unit
@@ -181,8 +192,8 @@ reg_unit #() Inst_W_reg_unit (
     .rst(W_rst),
     .reg_out(W_reg_out),
     .clk(UserCLK),
-    .tide_en(ConfigBits[19]),
-    .tide_rst(ConfigBits[20])
+    .tide_en(ConfigBits[21]),
+    .tide_rst(ConfigBits[22])
 );
 
 // Init Switch Matrix
@@ -194,6 +205,8 @@ PE_switch_matrix #() Inst_PE_switch_matrix (
     .data_in1(data_in1),
     .data_in2(data_in2),
     .data_in3(data_in3),
+    .A(A),
+    .B(B),
     .RES_reg_in(RES_reg_in),
     .N_reg_in(N_reg_in),
     .E_reg_in(E_reg_in),
@@ -210,8 +223,9 @@ PE_switch_matrix #() Inst_PE_switch_matrix (
     .S_reg_out(S_reg_out),
     .W_reg_out(W_reg_out),
     .const_out(const_out),
-    .ConfigBits(ConfigBits[43:21]),
-    .ConfigBits_N(ConfigBits_N[43:21])
+    .Y(Y),
+    .ConfigBits(ConfigBits[50:23]),
+    .ConfigBits_N(ConfigBits_N[50:23])
 );
 
 endmodule

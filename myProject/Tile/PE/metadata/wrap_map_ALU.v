@@ -1,72 +1,4 @@
-(* techmap_celltype = "$add" *)
-module wrap_ALU__add #(
-    parameter A_WIDTH = 1,
-    parameter A_SIGNED = 0,
-    parameter B_WIDTH = 1,
-    parameter B_SIGNED = 0,
-    parameter Y_WIDTH = 1
-)
-(
-    input wire[A_WIDTH:0] A,
-    input wire[B_WIDTH:0] B,
-    output reg[Y_WIDTH:0] Y
-);
-
-reg [31:0] A_32;
-reg [31:0] B_32;
-reg [31:0] Y_32;
-assign A_32 = A;
-assign B_32 = B;
-assign Y = Y_32;
-\$__add_wrapper #(
-    .A_WIDTH(A_WIDTH),
-    .A_SIGNED(A_SIGNED),
-    .B_WIDTH(B_WIDTH),
-    .B_SIGNED(B_SIGNED),
-    .Y_WIDTH(Y_WIDTH)
-) _TECHMAP_REPLACE_ (
-    .A(A_32),
-    .B(B_32),
-    .Y(Y_32)
-);
-
-endmodule
-
-(* techmap_celltype = "$mul" *)
-module wrap_ALU__mul #(
-    parameter A_WIDTH = 1,
-    parameter A_SIGNED = 0,
-    parameter B_WIDTH = 1,
-    parameter B_SIGNED = 0,
-    parameter Y_WIDTH = 1
-)
-(
-    input wire[A_WIDTH:0] A,
-    input wire[B_WIDTH:0] B,
-    output reg[Y_WIDTH:0] Y
-);
-
-reg [31:0] A_32;
-reg [31:0] B_32;
-reg [31:0] Y_32;
-assign A_32 = A;
-assign B_32 = B;
-assign Y = Y_32;
-\$__mul_wrapper #(
-    .A_WIDTH(A_WIDTH),
-    .A_SIGNED(A_SIGNED),
-    .B_WIDTH(B_WIDTH),
-    .B_SIGNED(B_SIGNED),
-    .Y_WIDTH(Y_WIDTH)
-) _TECHMAP_REPLACE_ (
-    .A(A_32),
-    .B(B_32),
-    .Y(Y_32)
-);
-
-endmodule
-
-(* techmap_celltype = "$or" *)
+(* techmap_celltype = "\$or" *)
 module wrap_ALU__or #(
     parameter A_WIDTH = 1,
     parameter A_SIGNED = 0,
@@ -80,12 +12,12 @@ module wrap_ALU__or #(
     output reg[Y_WIDTH:0] Y
 );
 
-reg [31:0] A_32;
-reg [31:0] B_32;
-reg [31:0] Y_32;
-assign A_32 = A;
-assign B_32 = B;
-assign Y = Y_32;
+reg [31:0] A_00000000000000000000000000100000;
+reg [31:0] B_00000000000000000000000000100000;
+reg [31:0] Y_00000000000000000000000000100000;
+assign A_00000000000000000000000000100000 = A;
+assign B_00000000000000000000000000100000 = B;
+assign Y = Y_00000000000000000000000000100000;
 \$__or_wrapper #(
     .A_WIDTH(A_WIDTH),
     .A_SIGNED(A_SIGNED),
@@ -93,48 +25,14 @@ assign Y = Y_32;
     .B_SIGNED(B_SIGNED),
     .Y_WIDTH(Y_WIDTH)
 ) _TECHMAP_REPLACE_ (
-    .A(A_32),
-    .B(B_32),
-    .Y(Y_32)
+    .A(A_00000000000000000000000000100000),
+    .B(B_00000000000000000000000000100000),
+    .Y(Y_00000000000000000000000000100000)
 );
 
 endmodule
 
-(* techmap_celltype = "$sub" *)
-module wrap_ALU__sub #(
-    parameter A_WIDTH = 1,
-    parameter A_SIGNED = 0,
-    parameter B_WIDTH = 1,
-    parameter B_SIGNED = 0,
-    parameter Y_WIDTH = 1
-)
-(
-    input wire[A_WIDTH:0] A,
-    input wire[B_WIDTH:0] B,
-    output reg[Y_WIDTH:0] Y
-);
-
-reg [31:0] A_32;
-reg [31:0] B_32;
-reg [31:0] Y_32;
-assign A_32 = A;
-assign B_32 = B;
-assign Y = Y_32;
-\$__sub_wrapper #(
-    .A_WIDTH(A_WIDTH),
-    .A_SIGNED(A_SIGNED),
-    .B_WIDTH(B_WIDTH),
-    .B_SIGNED(B_SIGNED),
-    .Y_WIDTH(Y_WIDTH)
-) _TECHMAP_REPLACE_ (
-    .A(A_32),
-    .B(B_32),
-    .Y(Y_32)
-);
-
-endmodule
-
-(* techmap_celltype = "$xor" *)
+(* techmap_celltype = "\$xor" *)
 module wrap_ALU__xor #(
     parameter A_WIDTH = 1,
     parameter A_SIGNED = 0,
@@ -148,12 +46,12 @@ module wrap_ALU__xor #(
     output reg[Y_WIDTH:0] Y
 );
 
-reg [31:0] A_32;
-reg [31:0] B_32;
-reg [31:0] Y_32;
-assign A_32 = A;
-assign B_32 = B;
-assign Y = Y_32;
+reg [31:0] A_00000000000000000000000000100000;
+reg [31:0] B_00000000000000000000000000100000;
+reg [31:0] Y_00000000000000000000000000100000;
+assign A_00000000000000000000000000100000 = A;
+assign B_00000000000000000000000000100000 = B;
+assign Y = Y_00000000000000000000000000100000;
 \$__xor_wrapper #(
     .A_WIDTH(A_WIDTH),
     .A_SIGNED(A_SIGNED),
@@ -161,9 +59,111 @@ assign Y = Y_32;
     .B_SIGNED(B_SIGNED),
     .Y_WIDTH(Y_WIDTH)
 ) _TECHMAP_REPLACE_ (
-    .A(A_32),
-    .B(B_32),
-    .Y(Y_32)
+    .A(A_00000000000000000000000000100000),
+    .B(B_00000000000000000000000000100000),
+    .Y(Y_00000000000000000000000000100000)
+);
+
+endmodule
+
+(* techmap_celltype = "\$mul" *)
+module wrap_ALU__mul #(
+    parameter A_WIDTH = 1,
+    parameter A_SIGNED = 0,
+    parameter B_WIDTH = 1,
+    parameter B_SIGNED = 0,
+    parameter Y_WIDTH = 1
+)
+(
+    input wire[A_WIDTH:0] A,
+    input wire[B_WIDTH:0] B,
+    output reg[Y_WIDTH:0] Y
+);
+
+reg [31:0] A_00000000000000000000000000100000;
+reg [31:0] B_00000000000000000000000000100000;
+reg [31:0] Y_00000000000000000000000000100000;
+assign A_00000000000000000000000000100000 = A;
+assign B_00000000000000000000000000100000 = B;
+assign Y = Y_00000000000000000000000000100000;
+\$__mul_wrapper #(
+    .A_WIDTH(A_WIDTH),
+    .A_SIGNED(A_SIGNED),
+    .B_WIDTH(B_WIDTH),
+    .B_SIGNED(B_SIGNED),
+    .Y_WIDTH(Y_WIDTH)
+) _TECHMAP_REPLACE_ (
+    .A(A_00000000000000000000000000100000),
+    .B(B_00000000000000000000000000100000),
+    .Y(Y_00000000000000000000000000100000)
+);
+
+endmodule
+
+(* techmap_celltype = "\$add" *)
+module wrap_ALU__add #(
+    parameter A_WIDTH = 1,
+    parameter A_SIGNED = 0,
+    parameter B_WIDTH = 1,
+    parameter B_SIGNED = 0,
+    parameter Y_WIDTH = 1
+)
+(
+    input wire[A_WIDTH:0] A,
+    input wire[B_WIDTH:0] B,
+    output reg[Y_WIDTH:0] Y
+);
+
+reg [31:0] A_00000000000000000000000000100000;
+reg [31:0] B_00000000000000000000000000100000;
+reg [31:0] Y_00000000000000000000000000100000;
+assign A_00000000000000000000000000100000 = A;
+assign B_00000000000000000000000000100000 = B;
+assign Y = Y_00000000000000000000000000100000;
+\$__add_wrapper #(
+    .A_WIDTH(A_WIDTH),
+    .A_SIGNED(A_SIGNED),
+    .B_WIDTH(B_WIDTH),
+    .B_SIGNED(B_SIGNED),
+    .Y_WIDTH(Y_WIDTH)
+) _TECHMAP_REPLACE_ (
+    .A(A_00000000000000000000000000100000),
+    .B(B_00000000000000000000000000100000),
+    .Y(Y_00000000000000000000000000100000)
+);
+
+endmodule
+
+(* techmap_celltype = "\$sub" *)
+module wrap_ALU__sub #(
+    parameter A_WIDTH = 1,
+    parameter A_SIGNED = 0,
+    parameter B_WIDTH = 1,
+    parameter B_SIGNED = 0,
+    parameter Y_WIDTH = 1
+)
+(
+    input wire[A_WIDTH:0] A,
+    input wire[B_WIDTH:0] B,
+    output reg[Y_WIDTH:0] Y
+);
+
+reg [31:0] A_00000000000000000000000000100000;
+reg [31:0] B_00000000000000000000000000100000;
+reg [31:0] Y_00000000000000000000000000100000;
+assign A_00000000000000000000000000100000 = A;
+assign B_00000000000000000000000000100000 = B;
+assign Y = Y_00000000000000000000000000100000;
+\$__sub_wrapper #(
+    .A_WIDTH(A_WIDTH),
+    .A_SIGNED(A_SIGNED),
+    .B_WIDTH(B_WIDTH),
+    .B_SIGNED(B_SIGNED),
+    .Y_WIDTH(Y_WIDTH)
+) _TECHMAP_REPLACE_ (
+    .A(A_00000000000000000000000000100000),
+    .B(B_00000000000000000000000000100000),
+    .Y(Y_00000000000000000000000000100000)
 );
 
 endmodule

@@ -1,5 +1,5 @@
-(* techmap_celltype = "\$__eq_wrapper" *)
-module unwrap_compare__eq #(
+(* techmap_celltype = "\$__lt_wrapper" *)
+module unwrap_compare__lt #(
     parameter A_WIDTH = 1,
     parameter A_SIGNED = 0,
     parameter B_WIDTH = 1,
@@ -18,7 +18,7 @@ reg [31:0] Y_ORIG;
 assign A_ORIG = A;
 assign B_ORIG = B;
 assign Y = Y_ORIG;
-$eq #(
+\$lt #(
     .A_WIDTH(A_WIDTH),
     .A_SIGNED(A_SIGNED),
     .B_WIDTH(B_WIDTH),
@@ -52,7 +52,7 @@ reg [31:0] Y_ORIG;
 assign A_ORIG = A;
 assign B_ORIG = B;
 assign Y = Y_ORIG;
-$le #(
+\$le #(
     .A_WIDTH(A_WIDTH),
     .A_SIGNED(A_SIGNED),
     .B_WIDTH(B_WIDTH),
@@ -66,8 +66,8 @@ $le #(
 
 endmodule
 
-(* techmap_celltype = "\$__lt_wrapper" *)
-module unwrap_compare__lt #(
+(* techmap_celltype = "\$__eq_wrapper" *)
+module unwrap_compare__eq #(
     parameter A_WIDTH = 1,
     parameter A_SIGNED = 0,
     parameter B_WIDTH = 1,
@@ -86,7 +86,7 @@ reg [31:0] Y_ORIG;
 assign A_ORIG = A;
 assign B_ORIG = B;
 assign Y = Y_ORIG;
-$lt #(
+\$eq #(
     .A_WIDTH(A_WIDTH),
     .A_SIGNED(A_SIGNED),
     .B_WIDTH(B_WIDTH),

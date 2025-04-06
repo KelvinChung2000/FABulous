@@ -49,17 +49,29 @@ class PossibleBinaryType(StrEnum):
 
 
 class PossibleRegType(StrEnum):
+    # asynchronous reset dff
+    ADFF = "$adff"
+    ADFFE = "$adffe"
+    # ADLATCH = "$adlatch"
+
+    # ALOAD DFF
+    # ALDFF = "$aldff"
+    # ALDFFE = "$aldffe"
+
+    # Normal DFF
     DFF = "$dff"
     DFFE = "$dffe"
     DFFSR = "$dffsr"
     DFFSRE = "$dffsre"
-    DLATCH = "$dlatch"
-    DLATCHSR = "$dlatchsr"
+
+    # Latch
+    # DLATCH = "$dlatch"
+    # DLATCHSR = "$dlatchsr"
+
+    # synchronous reset dff
     SDFF = "$sdff"
+    SDFFCE = "$sdffce"
     SDFFE = "$sdffe"
-    SR = "$sr"
-    ADFF = "$adff"
-    ADFFE = "$adffe"
-    ADLATCH = "$adlatch"
-    ALDFF = "$aldff"
-    ALDFFE = "$aldffe"
+
+    # SR latch
+    # SR = "$sr"

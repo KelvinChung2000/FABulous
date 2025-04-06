@@ -11,7 +11,7 @@ yosys opt_expr
 yosys opt_clean
 yosys check
 yosys opt -nodffe -nosdff
-yosys fsm -nomap
+yosys fsm -nomap -expand
 yosys opt
 yosys wreduce
 yosys peepopt
@@ -21,11 +21,12 @@ yosys opt_expr
 yosys opt_clean
 yosys memory_dff -no-rw-check
 yosys memory_collect
+yosys opt -full
 
 proc extract {cell wrapperPath} {
     # wrapping for mapping
     yosys design -push
-    yosys read_rtlil $cell
+    yosys read_json $cell
     yosys techmap -map $wrapperPath
     yosys design -save xmap
     yosys design -pop
@@ -38,8 +39,8 @@ proc extract {cell wrapperPath} {
 {% for wrapperPath, unWrapperPath, wrapperNames, cells in wrappers %}
 # wrapping base design
 yosys techmap -map {{ wrapperPath }}
-{% for wrapperName in wrapperNames -%}
-yosys connwrappers -unsigned {{ wrapperName }} Y Y_WIDTH
+{% for wrapperName, dest, value in wrapperNames -%}
+yosys connwrappers -unsigned {{ wrapperName }} {{ dest }} {{ value }}
 {% endfor %}
 # extract cells
 {%- for cell in cells %}
@@ -62,7 +63,8 @@ yosys iopadmap -widthparam WIDTH -outpad IO from_fabric:out -inpad IO to_fabric:
 yosys iopadmap -bits -outpad OUTBUF I:PAD -inpad INBUF O:PAD
 
 # final optimization
-yosys opt;;;
+{# yosys fsm -expand #}
+yosys opt -full
 yosys clean -purge
 
 yosys show -width -format dot -prefix $project_root/.FABulous/design

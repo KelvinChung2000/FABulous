@@ -116,8 +116,10 @@
         "cmake.buildDirectory": "${workspaceFolder}/../nextpnr/build",
         "cSpell.words": [
             "SHIFTX",
+            "SRST",
             "xnor",
             "XNOR"
-        ]
+        ],
+        "editor.defaultFormatter": "charliermarsh.ruff"
     }
 }

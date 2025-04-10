@@ -41,10 +41,10 @@ def generateFabric(codeGen: CodeGenerator, fabric: Fabric):
 
             if fabric.configBitMode == ConfigBitMode.FRAME_BASED:
                 frameData = pr.Port(
-                    "FrameData", IO.INPUT, frameBitsPerRow * fabric.numberOfRows - 1
+                    "FrameData", IO.INPUT, frameBitsPerRow * fabric.height - 1
                 )
                 frameStrobe = pr.Port(
-                    "FrameStrobe", IO.INPUT, maxFramePerCol * fabric.numberOfColumns - 1
+                    "FrameStrobe", IO.INPUT, maxFramePerCol * fabric.width - 1
                 )
 
             userClk = pr.Port("UserCLK", IO.INPUT)
@@ -54,7 +54,7 @@ def generateFabric(codeGen: CodeGenerator, fabric: Fabric):
             clkWireOutMapping: Mapping[Loc, Value] = {}
             lr.Comment("User Clock wire")
             for (x, y), tile in fabric:
-                if y == fabric.numberOfColumns - 1:
+                if y == fabric.width - 1:
                     clkWireInMapping[(x, y)] = userClk
                 else:
                     clkWireInMapping[(x, y)] = lr.Signal(f"Tile_X{x}Y{y + 1}_UserCLK")
@@ -84,8 +84,9 @@ def generateFabric(codeGen: CodeGenerator, fabric: Fabric):
                 frameStrobeOutMapping[(x, y)] = lr.Signal(
                     f"Tile_X{x}Y{y}_FrameStrobe", maxFramePerCol - 1
                 )
+
             for (x, y), tile in fabric:
-                if y == fabric.numberOfColumns - 1:
+                if y == fabric.height - 1:
                     frameStrobeInMapping[(x, y)] = lr.Signal(
                         f"Col{x}_FrameStrobe", maxFramePerCol - 1
                     )
@@ -119,7 +120,7 @@ def generateFabric(codeGen: CodeGenerator, fabric: Fabric):
                 for port in tile.getTileInputPorts():
                     match port.sideOfTile:
                         case Side.NORTH:
-                            if y + 1 >= fabric.numberOfRows:
+                            if y + 1 >= fabric.height:
                                 continue
                             if fabric[(x, y + 1)] is None:
                                 continue
@@ -127,7 +128,7 @@ def generateFabric(codeGen: CodeGenerator, fabric: Fabric):
                                 tileToTileOutMapping[(x, y + 1)][Side.SOUTH]
                             )
                         case Side.EAST:
-                            if x + 1 >= fabric.numberOfColumns:
+                            if x + 1 >= fabric.width:
                                 continue
                             if fabric[(x + 1, y)] is None:
                                 continue
@@ -167,7 +168,7 @@ def generateFabric(codeGen: CodeGenerator, fabric: Fabric):
             lr.NewLine()
             lr.Comment("Frame Strobe connection")
             for (x, y), tile in fabric:
-                if y == fabric.numberOfColumns - 1:
+                if y == fabric.width - 1:
                     lr.Assign(
                         frameStrobeInMapping[(x, y)],
                         frameStrobe[

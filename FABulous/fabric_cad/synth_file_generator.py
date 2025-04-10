@@ -2,7 +2,6 @@ import json
 from functools import partial
 from itertools import product
 from pathlib import Path
-from pprint import pprint
 from typing import Mapping
 
 from jinja2 import Environment, PackageLoader
@@ -37,7 +36,7 @@ def genPrims(bel: Bel, filePath: Path):
                 pr.Port(bel.userCLK.name, IO.INPUT, 1)
 
 
-def genBinaryWrapMap(cell, filename, belName, wrapping=True):
+def genWrapMap(cell, filename, belName, wrapping=True):
     cg = CodeGenerator(filename, WriterType.VERILOG, "a")
     cellType = cell["type"].replace("$", "_")
 
@@ -50,147 +49,60 @@ def genBinaryWrapMap(cell, filename, belName, wrapping=True):
         f"wrap_{belName}_{cellType}" if wrapping else f"unwrap_{belName}_{cellType}",
         [cg.Attribute("techmap_celltype", srcCell)],
     ) as m:
+
+        params: Mapping[str, Value] = {}
         with m.ParameterRegion() as pr:
-            aWidthParam = pr.Parameter("A_WIDTH", 1)
-            aSignedParam = pr.Parameter("A_SIGNED", 0)
-            bWidthParam = pr.Parameter("B_WIDTH", 1)
-            bSignedParam = pr.Parameter("B_SIGNED", 0)
-            yWidthParam = pr.Parameter("Y_WIDTH", 1)
+            for i in cell["parameters"]:
+                params[i] = pr.Parameter(i, 0)
 
+        ports: Mapping[str, Value] = {}
         with m.PortRegion() as pr:
-            portA = pr.Port("A", IO.INPUT, aWidthParam)
-            portB = pr.Port("B", IO.INPUT, bWidthParam)
-            portY = pr.Port("Y", IO.OUTPUT, yWidthParam)
+            for i, direction in cell["port_directions"].items():
+                width = len(cell["connections"][i])
+                if wrapping:
+                    ports[i] = pr.Port(
+                        i,
+                        IO[direction.upper()],
+                        params.get(f"{i}_WIDTH", params.get("WIDTH", width + 1)) - 1,
+                    )
+                else:
+                    ports[i] = pr.Port(i, IO[direction.upper()], width)
 
+        sigMapping: Mapping[str, Value] = {}
         with m.LogicRegion() as lr:
-            if wrapping:
-                sigA = lr.Signal(
-                    f"A_{int(cell["parameters"]["A_WIDTH"], 2)}",
-                    int(cell["parameters"]["A_WIDTH"], 2),
-                )
-                sigB = lr.Signal(
-                    f"B_{int(cell["parameters"]["B_WIDTH"], 2)}",
-                    int(cell["parameters"]["B_WIDTH"], 2),
-                )
-                sigY = lr.Signal(
-                    f"Y_{int(cell["parameters"]["Y_WIDTH"], 2)}",
-                    int(cell["parameters"]["Y_WIDTH"], 2),
-                )
-            else:
-                sigA = lr.Signal("A_ORIG", int(cell["parameters"]["A_WIDTH"], 2))
-                sigB = lr.Signal("B_ORIG", int(cell["parameters"]["B_WIDTH"], 2))
-                sigY = lr.Signal("Y_ORIG", int(cell["parameters"]["Y_WIDTH"], 2))
+            for i in cell["port_directions"]:
+                width = len(cell["connections"][i])
+                if wrapping:
+                    sigMapping[i] = lr.Signal(f"{i}_{width}", width)
+                else:
+                    sigMapping[i] = lr.Signal(
+                        f"{i}_orig",
+                        params.get(f"{i}_WIDTH", params.get("WIDTH", width + 1)) - 1,
+                    )
 
-            lr.Assign(sigA, portA)
-            lr.Assign(sigB, portB)
-            lr.Assign(portY, sigY)
+            for i, direction in cell["port_directions"].items():
+                if i not in sigMapping:
+                    continue
+                if IO[direction.upper()] == IO.INPUT:
+                    lr.Assign(sigMapping[i], ports[i])
+                else:
+                    lr.Assign(ports[i], sigMapping[i])
 
             lr.InitModule(
                 targetCell,
                 "_TECHMAP_REPLACE_",
                 [
-                    lr.ConnectPair("A", sigA),
-                    lr.ConnectPair("B", sigB),
-                    lr.ConnectPair("Y", sigY),
+                    lr.ConnectPair(i, sigMapping.get(i, ports[i]))
+                    for i in cell["port_directions"]
                 ],
-                [
-                    lr.ConnectPair("A_WIDTH", aWidthParam),
-                    lr.ConnectPair("A_SIGNED", aSignedParam),
-                    lr.ConnectPair("B_WIDTH", bWidthParam),
-                    lr.ConnectPair("B_SIGNED", bSignedParam),
-                    lr.ConnectPair("Y_WIDTH", yWidthParam),
-                ],
-            )
-
-
-def genRegWrapMap(cell, filename, belName, wrapping=True):
-    cg = CodeGenerator(filename, WriterType.VERILOG, "a")
-    cellType = cell["type"].replace("$", "_")
-
-    if wrapping:
-        srcCell, targetCell = f"\\{cell["type"]}", f"\\$_{cellType}_wrapper"
-    else:
-        srcCell, targetCell = f"\\$_{cellType}_wrapper", f"\\{cell["type"]}"
-
-    with cg.Module(
-        f"wrap_{belName}_{cellType}" if wrapping else f"unwrap_{belName}_{cellType}",
-        [cg.Attribute("techmap_celltype", srcCell)],
-    ) as m:
-        with m.ParameterRegion() as pr:
-            widthParam = pr.Parameter("WIDTH", 1)
-            clkPolarity = pr.Parameter("CLK_POLARITY", 1)
-            params: Mapping[str, Value] = {}
-
-            if cell["type"].startswith("$s"):
-                params["SRST_POLARITY"] = pr.Parameter("SRST_POLARITY", 1)
-                params["SRST_VALUE"] = pr.Parameter("SRST_VALUE", 0)
-
-            if cell["type"].startswith("$a"):
-                params["ARST_POLARITY"] = pr.Parameter("ARST_POLARITY", 1)
-                params["ARST_VALUE"] = pr.Parameter("ARST_VALUE", 0)
-
-            if cell["type"].endswith("e"):
-                params["EN_POLARITY"] = pr.Parameter("EN_POLARITY", 1)
-
-            if cell["type"].endswith("sr") or cell["type"].endswith("sre"):
-                params["SET_POLARITY"] = pr.Parameter("SET_POLARITY", 1)
-                params["CLR_POLARITY"] = pr.Parameter("CLR_POLARITY", 1)
-
-        with m.PortRegion() as pr:
-            portD = pr.Port("D", IO.INPUT, widthParam)
-            portCLK = pr.Port("CLK", IO.INPUT, 1)
-            portQ = pr.Port("Q", IO.OUTPUT, widthParam)
-
-            ports: Mapping[str, Value] = {}
-
-            if cell["type"].startswith("$s"):
-                ports["SRST"] = pr.Port("SRST", IO.INPUT, 1)
-
-            if cell["type"].startswith("$a"):
-                ports["ARST"] = pr.Port("ARST", IO.INPUT, 1)
-
-            if cell["type"].endswith("e"):
-                ports["EN"] = pr.Port("EN", IO.INPUT, 1)
-
-            if cell["type"].endswith("sr") or cell["type"].endswith("sre"):
-                ports["SET"] = pr.Port("SET", IO.INPUT, 1)
-                ports["CLR"] = pr.Port("CLR", IO.INPUT, 1)
-
-        with m.LogicRegion() as lr:
-            width = int(cell["parameters"]["WIDTH"], 2)
-            if wrapping:
-                sigD = lr.Signal(
-                    f"D_{width}",
-                    width,
-                )
-                sigQ = lr.Signal(f"Q_{width}", width)
-            else:
-                sigD = lr.Signal("D_ORIG", width)
-                sigQ = lr.Signal("Q_ORIG", width)
-
-            lr.Assign(sigD, portD)
-            lr.Assign(sigQ, portQ)
-
-            lr.InitModule(
-                targetCell,
-                "_TECHMAP_REPLACE_",
-                [
-                    lr.ConnectPair("D", sigD),
-                    lr.ConnectPair("Q", sigQ),
-                    lr.ConnectPair("CLK", portCLK),
-                ]
-                + [lr.ConnectPair(k, p) for k, p in ports.items()],
-                [
-                    lr.ConnectPair("WIDTH", widthParam),
-                    lr.ConnectPair("CLK_POLARITY", clkPolarity),
-                ]
-                + [lr.ConnectPair(k, p) for k, p in params.items()],
+                [lr.ConnectPair(i, params[i]) for i in cell["parameters"]],
             )
 
 
 def genWrappingMapPair(bel: Bel, filePrefix: Path) -> list[str]:
     metaPath = bel.src.parent / "metadata"
     wrapperInfos = []
+    repeatSet = set()
 
     # empty the file
     wrapFilename = filePrefix / f"wrap_map_{bel.name}.v"
@@ -214,28 +126,28 @@ def genWrappingMapPair(bel: Bel, filePrefix: Path) -> list[str]:
         moduleKey = next(iter(modules))
         module = modules[moduleKey]
 
-        repeatSet = set()
         for cName, cell in module["cells"].items():
-            if cell["type"] in repeatSet:
+            cellType = cell["type"].replace("$", "_")
+            if cellType in repeatSet:
                 continue
 
-            cellType = cell["type"].replace("$", "_")
-            if cell["type"] in PossibleBinaryType:
-                if int(cell["parameters"]["Y_WIDTH"], 2) == 1:
-                    continue
-                repeatSet.add(cellType)
+            outPort = []
+            for i, v in cell["port_directions"].items():
+                if v == "output":
+                    outPort.append(i)
 
-                genBinaryWrapMap(cell, wrapFilename, bel.name, True)
-                genBinaryWrapMap(cell, unwrapFilename, bel.name, False)
-                wrapperInfos.append((f"\\$_{cellType}_wrapper", "Y", "Y_WIDTH"))
+            outWidthPair = []
+            for i in outPort:
+                if f"{i}_WIDTH" in cell["parameters"]:
+                    outWidthPair.append((i, f"{i}_WIDTH"))
+                else:
+                    outWidthPair.append((i, "WIDTH"))
 
-            elif cell["type"] in PossibleRegType:
-                if int(cell["parameters"]["WIDTH"], 2) == 1:
-                    continue
-                repeatSet.add(cellType)
-                genRegWrapMap(cell, wrapFilename, bel.name, True)
-                genRegWrapMap(cell, unwrapFilename, bel.name, False)
-                wrapperInfos.append((f"\\$_{cellType}_wrapper", "D", "WIDTH"))
+            repeatSet.add(cellType)
+
+            genWrapMap(cell, wrapFilename, bel.name, True)
+            genWrapMap(cell, unwrapFilename, bel.name, False)
+            wrapperInfos.append((f"\\$_{cellType}_wrapper", outWidthPair))
 
     return wrapperInfos
 
@@ -277,8 +189,11 @@ def genCellsAndMaps(bel: Bel):
 
     runPass("read_verilog -sv " + str(bel.src))
     runPass("hierarchy -auto-top")
+    runPass("flatten")
     runPass("proc")
-    runPass("opt;;;")
+    runPass("memory -nomap")
+    runPass("opt")
+    # runPass("clean -purge")
     runPass("setattr -unset src")
     runPass("design -save base")
 

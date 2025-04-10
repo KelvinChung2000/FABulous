@@ -33,13 +33,13 @@ def setupPortData(
     )
     with open(tileDir.parent / f"metadata/{tileName}_ports.py", "w") as f:
         f.write(content)
-
     template = environment.get_template("listFile.py.jinja")
-    dirPath = str(tileDir.relative_to(tileDir.parent.parent).parent).replace("/", ".")
+    dirPath = str(tileDir.parent).replace("/", ".")
     content = template.render(
         title=tileName,
         path=dirPath,
     )
+
     if not (tileDir.parent / "list.py").exists():
         with open(tileDir.parent / "list.py", "w") as f:
             f.write(content)

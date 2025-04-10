@@ -1,5 +1,4 @@
 import csv
-from logging import config
 import re
 from collections import defaultdict
 from copy import deepcopy
@@ -9,11 +8,7 @@ from typing import Mapping
 from loguru import logger
 
 from FABulous.fabric_definition.Bel import Bel
-from FABulous.fabric_definition.ConfigMem import (
-    ConfigBitMapping,
-    ConfigMemFrame,
-    ConfigurationMemory,
-)
+from FABulous.fabric_definition.ConfigMem import ConfigMemFrame, ConfigurationMemory
 from FABulous.fabric_definition.define import (
     IO,
     ConfigBitMode,
@@ -269,8 +264,8 @@ def parseFabricCSV(fileName: Path) -> Fabric:
         name=name,
         fabricDir=fileName,
         tiles=fabricTiles,
-        numberOfColumns=width,
-        numberOfRows=height,
+        width=width,
+        height=height,
         configBitMode=configBitMode,
         frameBitsPerRow=frameBitsPerRow,
         maxFramesPerCol=maxFramesPerCol,

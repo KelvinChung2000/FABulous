@@ -4,11 +4,11 @@ import "primitives/binary_operators.futil";
 
 component pipelined_mac(
   data_valid: 1,
-  a: 32,
-  b: 32,
-  c: 32
+  @data a : 32,
+  @data b : 32,
+  @data c : 32
 ) -> (
-  out: 32,
+  @data out: 32,
   output_valid: 1
 ) {
   cells {
@@ -105,23 +105,23 @@ component main() -> () {
     @external out = comb_mem_d1(32, 1, 1);
 
     // Registers to save value at current memory index
-    read_a = std_reg(32);
-    read_b = std_reg(32);
-    read_c = std_reg(32);
+    @data read_a = std_reg(32);
+    @data read_b = std_reg(32);
+    @data read_c = std_reg(32);
 
     // Index into memories `a` & `b`.
-    idx0 = std_reg(4);
-    add0 = std_add(4);
+    @data idx0 = std_reg(4);
+    @data add0 = std_add(4);
     lt0 = std_lt(4);
 
     mac = pipelined_mac();
   }
   wires {
-    group init_all {
-      idx0.in = 4'd0;
-      idx0.write_en = 1'd1;
-      init_all[done] = idx0.done;
-    }
+    // group init_all {
+    //   idx0.in = 4'd0;
+    //   idx0.write_en = 1'd1;
+    //   init_all[done] = idx0.done;
+    // }
     group store_a {
       a.addr0 = idx0.out;
       read_a.write_en = 1'd1;
@@ -154,7 +154,7 @@ component main() -> () {
   }
   control {
     seq {
-      init_all;
+      // init_all;
       // Pipeline initialization: when idx0 == 0.
       // Perform the first multiplication w/o accumulate
       par { store_a; store_b; }

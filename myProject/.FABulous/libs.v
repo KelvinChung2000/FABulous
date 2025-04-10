@@ -1,9 +1,28 @@
 (* blackbox *)
-module const_unit #(
-    parameter ConfigBits = 0
+module compare #(
+    parameter conf = 0
 )
 (
-    output reg[31:0] const_out
+    input wire[31:0] A,
+    input wire[31:0] B,
+    output reg[31:0] Y
+);
+
+endmodule
+
+
+(* blackbox *)
+module Mem #(
+    parameter read_allow = 0,
+    parameter write_allow = 0
+)
+(
+    input wire[31:0] addr0,
+    input wire reset,
+    input wire[31:0] write_data,
+    input wire write_en,
+    output reg[31:0] read_data,
+    input wire clk
 );
 
 endmodule
@@ -17,6 +36,20 @@ module IO #(
     input wire[31:0] in,
     output reg[31:0] to_fabric,
     output reg[31:0] out
+);
+
+endmodule
+
+
+(* blackbox *)
+module ALU #(
+    parameter ALU_func = 0
+)
+(
+    input wire[31:0] data_in1,
+    input wire[31:0] data_in2,
+    input wire[31:0] data_in3,
+    output reg[31:0] data_out
 );
 
 endmodule
@@ -39,27 +72,11 @@ endmodule
 
 
 (* blackbox *)
-module compare #(
-    parameter conf = 0
+module const_unit #(
+    parameter ConfigBits = 0
 )
 (
-    input wire[31:0] A,
-    input wire[31:0] B,
-    output reg[31:0] Y
-);
-
-endmodule
-
-
-(* blackbox *)
-module ALU #(
-    parameter ALU_func = 0
-)
-(
-    input wire[31:0] data_in1,
-    input wire[31:0] data_in2,
-    input wire[31:0] data_in3,
-    output reg[31:0] data_out
+    output reg[31:0] const_out
 );
 
 endmodule

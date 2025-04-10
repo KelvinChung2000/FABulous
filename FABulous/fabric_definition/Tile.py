@@ -37,10 +37,10 @@ class Tile:
     bels: list[Bel]
     switchMatrix: SwitchMatrix
     configMems: ConfigurationMemory
+    tileMap: list[list[str]]
     wireTypes: list[WireType] = field(default_factory=list)
     withUserCLK: bool = False
     tileDir: Path = Path(".")
-    partOfSuperTile = False
 
     def __eq__(self, __o: Any) -> bool:
         if __o is None or not isinstance(__o, Tile):
@@ -219,3 +219,22 @@ class Tile:
             raise ValueError(
                 f"The given port {belPort} does not exist in tile {self.name}"
             )
+
+    def partOfTile(self, name: str) -> bool:
+        """Check if the given name is part of the tile.
+
+        Args:
+            name (str): The name to check.
+
+        Returns:
+            bool: True if the name is part of the tile, False otherwise.
+        """
+        return any(name in row for row in self.tileMap)
+
+    def getSubTiles(self) -> list[str]:
+        """Get the subtiles of the tile.
+
+        Returns:
+            list[str]: A list of subtiles.
+        """
+        return [name for row in self.tileMap for name in row if name is not None]

@@ -349,8 +349,6 @@ class FABulous_API:
         maps = set()
         libs = set()
 
-        genSynthScript(self.fabric, Path(f"{dest}/arch_synth.tcl"))
-
         for b in self.fabric.getAllUniqueBels():
             destPath = Path(f"{b.src.parent}/metadata")
             genPrims(b, destPath / f"prim_{b.name}{b.src.suffix}")
@@ -359,6 +357,7 @@ class FABulous_API:
             maps.update(Path(f"{b.src.parent}/metadata").glob("map_*.v"))
             libs.update(Path(f"{b.src.parent}/metadata").glob("prim_*.v"))
 
+        genSynthScript(self.fabric, Path(f"{dest}/arch_synth.tcl"))
         mergeFiles(cells, Path(f"{dest}/cells.il"))
         mergeFiles(maps, Path(f"{dest}/techmaps.v"))
         mergeFiles(libs, Path(f"{dest}/libs.v"))

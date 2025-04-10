@@ -6,8 +6,8 @@ def generateFabricTopWrapper(codeGen: CodeGenerator, fabric: Fabric):
     with codeGen.Module(f"{fabric.name}_wrapper") as module:
         with module.ParameterRegion() as pr:
             pr.Parameter("include_eFPGA", 1)
-            pr.Parameter("NumberOfCols", fabric.numberOfColumns)
-            pr.Parameter("NumberOfRows", fabric.numberOfRows)
+            pr.Parameter("NumberOfCols", fabric.width)
+            pr.Parameter("NumberOfRows", fabric.height)
             pr.Parameter("FrameBitsPerRow", fabric.frameBitsPerRow)
             pr.Parameter("MaxFramePerCol", fabric.maxFramesPerCol)
             pr.Parameter("FrameSelectWidth", fabric.frameSelectWidth)

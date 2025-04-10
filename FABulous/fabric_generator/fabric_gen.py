@@ -1638,14 +1638,14 @@ class FabricGenerator:
             self.writer.addPortVector(
                 "FrameData",
                 IO.INPUT,
-                f"(FrameBitsPerRow*{self.fabric.numberOfRows})-1",
+                f"(FrameBitsPerRow*{self.fabric.height})-1",
                 indentLevel=2,
             )
             self.writer.addComment("CONFIG_PORT", onNewLine=False)
             self.writer.addPortVector(
                 "FrameStrobe",
                 IO.INPUT,
-                f"(MaxFramesPerCol*{self.fabric.numberOfColumns})-1",
+                f"(MaxFramesPerCol*{self.fabric.width})-1",
                 indentLevel=2,
             )
             self.writer.addComment("CONFIG_PORT", onNewLine=False)
@@ -1698,24 +1698,24 @@ class FabricGenerator:
             # FrameStrobe      =>     Tile_X1_FrameStrobe
             # MaxFramesPerCol : integer := 20;
             # FrameBitsPerRow : integer := 32;
-            for y in range(self.fabric.numberOfRows):
+            for y in range(self.fabric.height):
                 self.writer.addConnectionVector(
                     f"Row_Y{y}_FrameData", "FrameBitsPerRow -1"
                 )
 
-            for x in range(self.fabric.numberOfColumns):
+            for x in range(self.fabric.width):
                 self.writer.addConnectionVector(
                     f"Column_X{x}_FrameStrobe", "MaxFramesPerCol - 1"
                 )
 
-            for y in range(self.fabric.numberOfRows):
-                for x in range(self.fabric.numberOfColumns):
+            for y in range(self.fabric.height):
+                for x in range(self.fabric.width):
                     self.writer.addConnectionVector(
                         f"Tile_X{x}Y{y}_FrameData_O", "FrameBitsPerRow - 1"
                     )
 
-            for y in range(self.fabric.numberOfRows + 1):
-                for x in range(self.fabric.numberOfColumns):
+            for y in range(self.fabric.height + 1):
+                for x in range(self.fabric.width):
                     self.writer.addConnectionVector(
                         f"Tile_X{x}Y{y}_FrameStrobe_O", "MaxFramesPerCol - 1"
                     )
@@ -1969,7 +1969,7 @@ class FabricGenerator:
                 if not superTile:
                     # for userCLK
                     if (
-                        y + 1 < self.fabric.numberOfRows
+                        y + 1 < self.fabric.height
                         and self.fabric.tiles[y + 1][x] != None
                     ):
                         portsPairs.append(("UserCLK", f"Tile_X{x}Y{y+1}_UserCLKo"))
@@ -1986,11 +1986,11 @@ class FabricGenerator:
                         else:
                             pre = ""
                         # UserCLK signal
-                        if y + 1 >= self.fabric.numberOfRows:
+                        if y + 1 >= self.fabric.height:
                             portsPairs.append((f"{pre}UserCLK", "UserCLK"))
 
                         elif (
-                            y + 1 < self.fabric.numberOfRows
+                            y + 1 < self.fabric.height
                             and self.fabric.tiles[y + 1][x] == None
                         ):
                             portsPairs.append((f"{pre}UserCLK", "UserCLK"))
@@ -2079,9 +2079,7 @@ class FabricGenerator:
                         # Get all y-positions to the south of this tile
                         # Note: the FrameStrobe signals come from the bottom of the
                         #       fabric, therefore count upwards
-                        for search_y in range(
-                            supertile_y + 1, self.fabric.numberOfRows
-                        ):
+                        for search_y in range(supertile_y + 1, self.fabric.height):
 
                             # Previous tile is part of the same supertile.
                             # FrameStrobe signals are connected internally.
@@ -2131,7 +2129,7 @@ class FabricGenerator:
                 if superTile:
                     name = superTile.name
                     for i, j in tileLocationOffset:
-                        if (y + j) not in (0, self.fabric.numberOfRows - 1):
+                        if (y + j) not in (0, self.fabric.height - 1):
                             emulateParamPairs.append(
                                 (
                                     f"Tile_X{i}Y{j}_Emulate_Bitstream",
@@ -2140,7 +2138,7 @@ class FabricGenerator:
                             )
                 else:
                     name = tile.name
-                    if y not in (0, self.fabric.numberOfRows - 1):
+                    if y not in (0, self.fabric.height - 1):
                         emulateParamPairs.append(
                             ("Emulate_Bitstream", f"`Tile_X{x}Y{y}_Emulate_Bitstream")
                         )
@@ -2219,14 +2217,14 @@ class FabricGenerator:
             g[1].sort(key=lambda x: split_port(x))
 
         # header
-        numberOfRows = self.fabric.numberOfRows - 2
-        numberOfColumns = self.fabric.numberOfColumns
+        numberOfRows = self.fabric.height - 2
+        numberOfColumns = self.fabric.width
         self.writer.addHeader(f"{self.fabric.name}_top")
         self.writer.addParameterStart(indentLevel=1)
         self.writer.addParameter("include_eFPGA", "integer", 1, indentLevel=2)
         self.writer.addParameter("NumberOfRows", "integer", numberOfRows, indentLevel=2)
         self.writer.addParameter(
-            "NumberOfCols", "integer", self.fabric.numberOfColumns, indentLevel=2
+            "NumberOfCols", "integer", self.fabric.width, indentLevel=2
         )
         self.writer.addParameter(
             "FrameBitsPerRow", "integer", self.fabric.frameBitsPerRow, indentLevel=2

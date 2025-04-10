@@ -7,7 +7,7 @@ PORTS: [
 
     {side: WEST, name: in3, inOut: input, wires: 32, terminal: false},
     {side: WEST, name: out3, inOut: output, wires: 32, terminal: false},
-  ]
+]
 WIRES: [
   {source_name: out3, X-offset:  -1, Y-offset: 0, destination_name: in1},
 ]

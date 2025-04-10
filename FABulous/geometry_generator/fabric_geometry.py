@@ -59,8 +59,8 @@ class FabricGeometry:
         # The distinction left/right and top/bottom is made, to
         # prevent generation of horizontal and vertical stair-like
         # wires respectively.
-        for i in range(self.fabric.numberOfRows):
-            for j in range(self.fabric.numberOfColumns):
+        for i in range(self.fabric.height):
+            for j in range(self.fabric.width):
                 tile = self.fabric.tiles[i][j]
 
                 if tile is not None:
@@ -70,8 +70,8 @@ class FabricGeometry:
                         self.tileGeomMap[tile.name] = TileGeometry()
 
                     tileGeom = self.tileGeomMap[tile.name]
-                    northSouth = i == 0 or i + 1 == self.fabric.numberOfRows
-                    eastWest = j == 0 or j + 1 == self.fabric.numberOfColumns
+                    northSouth = i == 0 or i + 1 == self.fabric.height
+                    eastWest = j == 0 or j + 1 == self.fabric.width
 
                     if northSouth and eastWest:
                         tileGeom.border = Border.CORNER
@@ -90,9 +90,9 @@ class FabricGeometry:
         # All tiles are resized to those dimensions
         # in order to form a regular grid.
         tileGeometries = []
-        for i in range(self.fabric.numberOfRows):
+        for i in range(self.fabric.height):
             tileGeometries.append([])
-            for j in range(self.fabric.numberOfColumns):
+            for j in range(self.fabric.width):
                 tile = self.fabric.tiles[i][j]
 
                 if tile is None:
@@ -103,11 +103,11 @@ class FabricGeometry:
         maxWidths = []
         maxSmRelXValues = []
         maxSmWidths = []
-        for j in range(self.fabric.numberOfColumns):
+        for j in range(self.fabric.width):
             maxWidth = 0
             maxSmRelX = 0
             maxSmWidth = 0
-            for i in range(self.fabric.numberOfColumns):
+            for i in range(self.fabric.width):
                 maxWidth = max(maxWidth, tileGeometries[i][j].width)
                 maxSmRelX = max(maxSmRelX, tileGeometries[i][j].smGeometry.relX)
                 maxSmWidth = max(maxSmWidth, tileGeometries[i][j].smGeometry.width)
@@ -117,10 +117,10 @@ class FabricGeometry:
 
         lowestSmYCoords = []
         maxHeights = []
-        for i in range(self.fabric.numberOfRows):
+        for i in range(self.fabric.height):
             lowestSmYCoord = 0
             maxHeight = 0
-            for j in range(self.fabric.numberOfColumns):
+            for j in range(self.fabric.width):
                 smRelY = tileGeometries[i][j].smGeometry.relY
                 smHeight = tileGeometries[i][j].smGeometry.height
                 lowestSmYCoord = max(lowestSmYCoord, smRelY + smHeight)
@@ -128,8 +128,8 @@ class FabricGeometry:
             lowestSmYCoords.append(lowestSmYCoord)
             maxHeights.append(maxHeight)
 
-        for i in range(self.fabric.numberOfRows):
-            for j in range(self.fabric.numberOfColumns):
+        for i in range(self.fabric.height):
+            for j in range(self.fabric.width):
                 tile = self.fabric.tiles[i][j]
 
                 if tile is not None:
@@ -146,9 +146,9 @@ class FabricGeometry:
                         maxSmRelXInColumn,
                     )
 
-        for i in range(self.fabric.numberOfRows):
+        for i in range(self.fabric.height):
             self.tileLocs.append([])
-            for j in range(self.fabric.numberOfColumns):
+            for j in range(self.fabric.width):
                 tile = self.fabric.tiles[i][j]
                 if tile is None:
                     self.tileLocs[i].append(None)
@@ -165,7 +165,7 @@ class FabricGeometry:
         # bottommost points of the fabric.
         rightMostX = 0
         bottomMostY = 0
-        for i in range(self.fabric.numberOfRows):
+        for i in range(self.fabric.height):
             tile = self.fabric.tiles[i][-1]
             if tile is not None:
                 tileGeom = self.tileGeomMap[tile.name]
@@ -173,7 +173,7 @@ class FabricGeometry:
                 tileRightmostX = tileLoc.x + tileGeom.width
                 rightMostX = max(rightMostX, tileRightmostX)
 
-        for j in range(self.fabric.numberOfColumns):
+        for j in range(self.fabric.width):
             tile = self.fabric.tiles[-1][j]
             if tile is not None:
                 tileGeom = self.tileGeomMap[tile.name]
@@ -189,8 +189,8 @@ class FabricGeometry:
         # all inter-tile wires line up correctly.
         adjustedTileNames = set()
 
-        for i in range(self.fabric.numberOfRows):
-            for j in range(self.fabric.numberOfColumns):
+        for i in range(self.fabric.height):
+            for j in range(self.fabric.width):
                 tile = self.fabric.tiles[i][j]
 
                 if tile is not None and tile.name not in adjustedTileNames:
@@ -228,8 +228,8 @@ class FabricGeometry:
                 [
                     ["PARAMS"],
                     ["Name"] + [self.fabric.name],
-                    ["Rows"] + [str(self.fabric.numberOfRows)],
-                    ["Columns"] + [str(self.fabric.numberOfColumns)],
+                    ["Rows"] + [str(self.fabric.height)],
+                    ["Columns"] + [str(self.fabric.width)],
                     ["Width"] + [str(self.width)],
                     ["Height"] + [str(self.height)],
                     [],
@@ -237,7 +237,7 @@ class FabricGeometry:
             )
 
             writer.writerow(["FABRIC_DEF"])
-            for i in range(self.fabric.numberOfRows):
+            for i in range(self.fabric.height):
                 writer.writerow(
                     [
                         tile.name if tile is not None else "Null"
@@ -247,7 +247,7 @@ class FabricGeometry:
             writer.writerow([])
 
             writer.writerow(["FABRIC_LOCS"])
-            for i in range(self.fabric.numberOfRows):
+            for i in range(self.fabric.height):
                 writer.writerow(
                     [loc if loc is not None else "Null" for loc in self.tileLocs[i]]
                 )
@@ -259,8 +259,8 @@ class FabricGeometry:
 
     def __repr__(self) -> str:
         geometry = "Respective dimensions of tiles: \n"
-        for i in range(self.fabric.numberOfRows):
-            for j in range(self.fabric.numberOfColumns):
+        for i in range(self.fabric.height):
+            for j in range(self.fabric.width):
                 tile = self.fabric.tiles[i][j]
 
                 if tile is None:
@@ -270,8 +270,8 @@ class FabricGeometry:
             geometry += "\n"
         geometry += "Respective locations of tiles: \n"
 
-        for i in range(self.fabric.numberOfRows):
-            for j in range(self.fabric.numberOfColumns):
+        for i in range(self.fabric.height):
+            for j in range(self.fabric.width):
                 loc = self.tileLocs[i][j]
                 if loc is None:
                     geometry += "Null".ljust(8) + "\t"

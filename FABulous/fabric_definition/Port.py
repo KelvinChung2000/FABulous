@@ -47,6 +47,7 @@ class TilePort(Port):
 
     sideOfTile: Side
     terminal: bool = False
+    tileType: str = ""
 
     __order = {Side.NORTH: 0, Side.EAST: 1, Side.SOUTH: 2, Side.WEST: 3, Side.ANY: 4}
     __io = {IO.OUTPUT: 0, IO.INPUT: 1, IO.INOUT: 2}

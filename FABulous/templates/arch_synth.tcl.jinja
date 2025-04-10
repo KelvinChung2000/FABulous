@@ -11,7 +11,7 @@ yosys opt_expr
 yosys opt_clean
 yosys check
 yosys opt -nodffe -nosdff
-yosys fsm -nomap -expand
+yosys fsm -nomap -expand -encfile $project_root/.FABulous/fsm_state_info.txt
 yosys opt
 yosys wreduce
 yosys peepopt
@@ -39,8 +39,8 @@ proc extract {cell wrapperPath} {
 {% for wrapperPath, unWrapperPath, wrapperNames, cells in wrappers %}
 # wrapping base design
 yosys techmap -map {{ wrapperPath }}
-{% for wrapperName, dest, value in wrapperNames -%}
-yosys connwrappers -unsigned {{ wrapperName }} {{ dest }} {{ value }}
+{% for wrapperName, outWidthPair in wrapperNames -%}
+yosys connwrappers {% for outPort, outParam in outWidthPair %}-unsigned {{ wrapperName }} {{ outPort }} {{ outParam }} {% endfor %}
 {% endfor %}
 # extract cells
 {%- for cell in cells %}
@@ -63,10 +63,11 @@ yosys iopadmap -widthparam WIDTH -outpad IO from_fabric:out -inpad IO to_fabric:
 yosys iopadmap -bits -outpad OUTBUF I:PAD -inpad INBUF O:PAD
 
 # final optimization
-{# yosys fsm -expand #}
+yosys fsm -expand
 yosys opt -full
 yosys clean -purge
 
-yosys show -width -format dot -prefix $project_root/.FABulous/design
+yosys show -enum -long -width -format dot -prefix $project_root/.FABulous/design
 yosys write_json $project_root/user_design/synth_test.json
+yosys fsm_info
 yosys stat

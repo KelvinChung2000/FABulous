@@ -1,37 +1,36 @@
 TILE: PE
 # {side: <>, source_name: <>, X-offset: <>, Y-offset: <>, destination_name: <>, wires: <>}
 INCLUDE:
-PORTS: [
-    {side: NORTH, name: in0, inOut: input, wires: 32, terminal: false},
-    {side: EAST, name: in1, inOut: input, wires: 32, terminal: false},
-    {side: SOUTH, name: in2, inOut: input, wires: 32, terminal: false},
-    {side: WEST, name: in3, inOut: input, wires: 32, terminal: false},
+PORTS:
+  - {side: NORTH, name: in0, inOut: input, wires: 32, terminal: false}
+  - {side: EAST, name: in1, inOut: input, wires: 32, terminal: false}
+  - {side: SOUTH, name: in2, inOut: input, wires: 32, terminal: false}
+  - {side: WEST, name: in3, inOut: input, wires: 32, terminal: false}
 
-    {side: NORTH, name: out0, inOut: output, wires: 32, terminal: false},
-    {side: EAST, name: out1, inOut: output, wires: 32, terminal: false},
-    {side: SOUTH, name: out2, inOut: output, wires: 32, terminal: false},
-    {side: WEST, name: out3, inOut: output, wires: 32, terminal: false},
+  - {side: NORTH, name: out0, inOut: output, wires: 32, terminal: false}
+  - {side: EAST, name: out1, inOut: output, wires: 32, terminal: false}
+  - {side: SOUTH, name: out2, inOut: output, wires: 32, terminal: false}
+  - {side: WEST, name: out3, inOut: output, wires: 32, terminal: false}
 
     # {side: EAST, name: spanIn, inOut: input, wires: 2, terminal: false},
     # {side: WEST, name: spanOut, inOut: output, wires: 2, terminal: false},
-  ]
-WIRES: [
-  {source_name: out0, X-offset:  0, Y-offset: -1, destination_name: in2},
-  {source_name: out1, X-offset:  1, Y-offset:  0, destination_name: in3},
-  {source_name: out2, X-offset:  0, Y-offset:  1, destination_name: in0},
-  {source_name: out3, X-offset: -1, Y-offset:  0, destination_name: in1},
-  # {source_name: spanOut, X-offset: 2, Y-offset:  0, destination_name: spanIn},
-]
-BELS: [
-  {BEL: ./ALU.v, prefix: },   
-  {BEL: ./compare.v, prefix: },
-  {BEL: ./const_unit.v, prefix: },
-  {BEL: ./reg_unit.v, prefix: RES_},
-  {BEL: ./reg_unit.v, prefix: N_},
-  {BEL: ./reg_unit.v, prefix: E_},
-  {BEL: ./reg_unit.v, prefix: S_},
-  {BEL: ./reg_unit.v, prefix: W_},
 
-]
+WIRES: 
+  - {source_name: out0, X-offset:  0, Y-offset: -1, destination_name: in2}
+  - {source_name: out1, X-offset:  1, Y-offset:  0, destination_name: in3}
+  - {source_name: out2, X-offset:  0, Y-offset:  1, destination_name: in0}
+  - {source_name: out3, X-offset: -1, Y-offset:  0, destination_name: in1}
+  # {source_name: spanOut, X-offset: 2, Y-offset:  0, destination_name: spanIn},
+
+BELS: 
+  - {BEL: ./ALU.v, prefix: } 
+  - {BEL: ./compare.v, prefix: }
+  - {BEL: ./const_unit.v, prefix: }
+  - {BEL: ./reg_unit.v, prefix: RES_}
+  - {BEL: ./reg_unit.v, prefix: N_}
+  - {BEL: ./reg_unit.v, prefix: E_}
+  - {BEL: ./reg_unit.v, prefix: S_}
+  - {BEL: ./reg_unit.v, prefix: W_}
+
 MATRIX: list.py
 # CONFIG_MEM: PE_ConfigMem.csv

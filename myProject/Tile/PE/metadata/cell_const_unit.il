@@ -3,7 +3,7 @@ autoidx 35
 attribute \CELL 1
 attribute \dynports 1
 attribute \top 1
-attribute \src "../../myProject/Tile/PE/const_unit.v:2.1-12.10"
+attribute \src "myProject/Tile/PE/const_unit.v:2.1-12.10"
 module \const_unit
   parameter \NoConfigBits 3
   parameter \WIDTH 32

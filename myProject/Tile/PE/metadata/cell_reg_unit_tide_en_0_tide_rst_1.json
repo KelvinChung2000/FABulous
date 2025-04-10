@@ -5,7 +5,7 @@
       "attributes": {
         "dynports": "00000000000000000000000000000001",
         "top": "00000000000000000000000000000001",
-        "src": "../../myProject/Tile/PE/reg_unit.v:1.1-23.10"
+        "src": "myProject/Tile/PE/reg_unit.v:1.1-23.10"
       },
       "parameter_default_values": {
         "NoConfigBits": "00000000000000000000000000000010",

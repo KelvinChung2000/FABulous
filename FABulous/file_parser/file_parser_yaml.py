@@ -1,5 +1,6 @@
 import re
 from collections import defaultdict
+from itertools import chain
 from pathlib import Path
 from typing import Generator
 
@@ -7,7 +8,6 @@ import yaml
 from loguru import logger
 
 from FABulous.fabric_definition.Bel import Bel
-from FABulous.fabric_definition.ConfigMem import ConfigurationMemory
 from FABulous.fabric_definition.define import (
     IO,
     ConfigBitMode,
@@ -72,11 +72,11 @@ def parseFabricYAML(fileName: Path) -> Fabric:
         newTile, wireInfo = parseTileYAML(
             filePath.joinpath(i), frameBitsPerRow, maxFramesPerCol
         )
-        tileDict[newTile.name] = newTile
-        wireDictUnprocessed[newTile.name] = wireInfo
+        for i in newTile.getSubTiles():
+            tileDict[i] = newTile
+            wireDictUnprocessed[i] = wireInfo
 
-    # TODO: parse supertiles
-    superTileDict = {}
+    # superTileDict = {}
     # new_supertiles = parseSupertiles(fName, tileDic)
     # for new_supertile in new_supertiles:
     #     superTileDic[new_supertile.name] = new_supertile
@@ -91,23 +91,12 @@ def parseFabricYAML(fileName: Path) -> Fabric:
                 usedTile.add(i)
             elif i == "Null" or i == "NULL" or i == "None":
                 fabricLine.append(None)
+            elif any([t.partOfTile(i) for t in tileDict.values()]):
+                fabricLine.append(i)
             else:
                 logger.error(f"Unknown tile {i}.")
                 raise ValueError
         fabricTiles.append(fabricLine)
-
-    for i in list(tileDict.keys()):
-        if i not in usedTile:
-            logger.info(
-                f"Tile {i} is not used in the fabric. Removing from tile dictionary."
-            )
-            del tileDict[i]
-    for i in list(superTileDict.keys()):
-        if any(j.name not in usedTile for j in superTileDict[i].tiles):
-            logger.info(
-                f"Supertile {i} is not used in the fabric. Removing from tile dictionary."
-            )
-            del superTileDict[i]
 
     height = len(fabricTiles)
     width = len(fabricTiles[0])
@@ -198,8 +187,8 @@ def parseFabricYAML(fileName: Path) -> Fabric:
         name=name,
         fabricDir=fileName,
         tiles=fabricTiles,
-        numberOfColumns=width,
-        numberOfRows=height,
+        width=width,
+        height=height,
         configBitMode=configBitMode,
         frameBitsPerRow=frameBitsPerRow,
         maxFramesPerCol=maxFramesPerCol,
@@ -212,7 +201,6 @@ def parseFabricYAML(fileName: Path) -> Fabric:
         numberOfBRAMs=int(height / 2),
         superTileEnable=superTileEnable,
         tileDict=tileDict,
-        superTileDict=superTileDict,
         wireDict=wireDict,
     )
 
@@ -270,12 +258,13 @@ def parseTileYAML(
         data = yaml.safe_load(f)
 
     tileName = data.get("TILE", None)
-    portsDict: dict[str, TilePort] = {}
+    portsDict: dict[str, dict[str, TilePort]] = {}
     bels: list[Bel] = []
     matrixDir: Path | None = None
     withUserCLK = False
     configBit = 0
     wires: WireInfo = []
+    superTile = data.get("SUPER_TILE", False)
 
     if p := data.get("INCLUDE", None):
         if isinstance(p, str):
@@ -285,20 +274,39 @@ def parseTileYAML(
                 filePathParent.joinpath(i), frameBitsPerRow, maxFramePerCol
             )
             for ports in iTile.ports:
-                portsDict[ports.name] = ports
+                portsDict[iTile.name][ports.name] = ports
             for bel in iTile.bels:
                 bels.append(bel)
             wires.extend(iWireInfo)
 
-    for portEntry in data.get("PORTS", []):
-        portsDict[f"{portEntry["name"]}"] = TilePort(
-            width=int(portEntry["wires"]),
-            name=portEntry["name"],
-            ioDirection=IO[portEntry["inOut"].upper()],
-            sideOfTile=Side[portEntry["side"].upper()],
-            isBus=portEntry.get("isBus", False),
-            terminal=portEntry.get("terminal", False),
-        )
+    if not superTile:
+        portsDict[tileName] = {}
+        for portEntry in data.get("PORTS", []):
+            tempDict = {}
+            tempDict[f"{portEntry["name"]}"] = TilePort(
+                width=int(portEntry["wires"]),
+                name=portEntry["name"],
+                ioDirection=IO[portEntry["inOut"].upper()],
+                sideOfTile=Side[portEntry["side"].upper()],
+                isBus=portEntry.get("isBus", False),
+                terminal=portEntry.get("terminal", False),
+                tileType=tileName,
+            )
+            portsDict[tileName].update(tempDict)
+    else:
+        for tName in data.get("PORTS", {}):
+            tempDict = {}
+            for portEntry in data.get("PORTS", {})[tName]:
+                tempDict[f"{portEntry['name']}"] = TilePort(
+                    width=int(portEntry["wires"]),
+                    name=f"{portEntry["name"]}",
+                    ioDirection=IO[portEntry["inOut"].upper()],
+                    sideOfTile=Side[portEntry["side"].upper()],
+                    isBus=portEntry.get("isBus", False),
+                    terminal=portEntry.get("terminal", False),
+                    tileType=tileName,
+                )
+            portsDict[tName] = tempDict
 
     bels = []
     for z, belEntry in enumerate(data.get("BELS", [])):
@@ -323,10 +331,11 @@ def parseTileYAML(
                     sm.addMux(mux)
                 configBit += sm.configBits
             case ".py":
-                setupPortData(tileName, matrixDir, list(portsDict.values()), bels)
-                sm = genSwitchMatrix(
-                    tileName, matrixDir, list(portsDict.values()), bels
+                allPorts = list(
+                    chain.from_iterable(ports.values() for ports in portsDict.values())
                 )
+                setupPortData(tileName, matrixDir, allPorts, bels)
+                sm = genSwitchMatrix(tileName, matrixDir, allPorts, bels)
                 configBit += sm.configBits
             case "_matrix.csv":
                 for _, v in parseMatrix(matrixDir, tileName).items():
@@ -370,16 +379,34 @@ def parseTileYAML(
             configBit=configBit,
         )
 
-    wires.extend(data.get("WIRES", {}))
+    tileMap: list[list[str]] = []
+    if not superTile:
+        tileMap.append([tileName])
+    else:
+        for i in data.get("SUB_TILE_MAP", []):
+            row = []
+            for j in i:
+                row.append(j)
+            tileMap.append(row)
+
+    if not superTile:
+        wires.extend(data.get("WIRES", {}))
+    else:
+        for i in data.get("WIRES", {}).values():
+            wires.extend(list(i))
+
     return (
         Tile(
             name=tileName,
-            ports=list(portsDict.values()),
+            ports=list(
+                chain.from_iterable(ports.values() for ports in portsDict.values())
+            ),
             bels=bels,
             switchMatrix=sm,
             configMems=configMems,
             withUserCLK=withUserCLK,
             tileDir=fileName,
+            tileMap=tileMap,
         ),
         wires,
     )

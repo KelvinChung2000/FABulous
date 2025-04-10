@@ -113,7 +113,7 @@ def parseBelFile(
         runCmd = [
             "yosys",
             "-qp",
-            f"read_verilog {filename}; proc -noopt; write_json -compat-int {json_file}",
+            f"read_verilog -sv {filename}; proc -noopt; write_json -compat-int {json_file}",
         ]
     elif filename.suffix == ".vhdl":
         runCmd = [

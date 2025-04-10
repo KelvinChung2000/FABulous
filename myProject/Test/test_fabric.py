@@ -76,9 +76,7 @@ def test_tile_runner():
             raise ValueError(f"Unknown project language: {projectLang}")
     sources = list(set(sources))
     runner = get_runner(sim)
-    fasm: list[FASMFeature] = parseFASM(
-        projectPath / "user_design/router_test.fasm"
-    )
+    fasm: list[FASMFeature] = parseFASM(projectPath / "user_design/router_test.fasm")
 
     fabric = parseFabricYAML(projectPath / "fabric.yaml")
     spec = generateBitsStreamSpec(fabric)
@@ -122,7 +120,7 @@ def test_tile_runner():
             if frameIdx is None or bitIdx is None:
                 continue
             bitStreamFrameBitIdxMap[f.tileLoc][frameIdx][bitIdx] = value[i]
-    pprint(bitStreamFrameBitIdxMap[(1,1)])
+    pprint(bitStreamFrameBitIdxMap[(1, 1)])
     bitStreamLocMap = {}
     for i in bitStreamFrameBitIdxMap:
         tmp = bitarray()
@@ -131,21 +129,21 @@ def test_tile_runner():
         bitStreamLocMap[i] = tmp
 
     bitstream = bitarray()
-    for x in range(fabric.numberOfRows):
-        for y in range(fabric.numberOfColumns):
+    for x in range(fabric.height):
+        for y in range(fabric.width):
             bitstream += bitStreamLocMap[(x, y)]
 
     # buildDir = Path(os.getenv("my_FAB_PROJECT", ".")) / "myProject/Test"
     buildDir = projectPath / "Test"
 
     with open(buildDir / "bitstream.hex", "w") as f:
-        for x in range(fabric.numberOfRows):
-            for y in range(fabric.numberOfColumns):
+        for x in range(fabric.height):
+            for y in range(fabric.width):
                 f.write(f"{ba2hex(bitStreamLocMap[(x, y)])} //X{x}Y{y}\n")
 
     parameters = {
         "EMULATION_ENABLE": 1,
-        "EMULATION_CONFIG": f"\"{str(buildDir / "bitstream.hex")}\"",
+        "EMULATION_CONFIG": f'"{str(buildDir / "bitstream.hex")}"',
     }
 
     runner.build(

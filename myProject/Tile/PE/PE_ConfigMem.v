@@ -18,7 +18,7 @@ module PE_ConfigMem #(
 
 generate
 if(EMULATION_ENABLE) begin
-reg [63:0] cfg [0:35];
+reg [63:0] cfg [0:47];
 initial $readmemh(EMULATION_CONFIG, cfg);
 reg [63:0] tileConf;
 assign tileConf = cfg[Y_CORD * 6 + X_CORD];

@@ -1,0 +1,16 @@
+read_verilog -sv /home/kelvin/FABulous_fork/myProject/PnR/mac-pipelined/mac-pipelined.sv
+hierarchy -auto-top; flatten; proc; memory_collect; opt -full; clean -purge;
+show
+
+#techmap -map /home/kelvin/FABulous_fork/myProject/Tile/E_Mem_bot/metadata/wrap_map_Mem.v
+#connwrappers -unsigned \$__mem_v2_wrapper RD_DATA WIDTH
+#connwrappers -unsigned \$__mux_wrapper Y WIDTH 
+design -push
+
+read_json /home/kelvin/FABulous_fork/myProject/Tile/E_Mem_bot/metadata/cell_Mem_read_allow_1_write_allow_1.json
+#techmap -map /home/kelvin/FABulous_fork/myProject/Tile/E_Mem_bot/metadata/wrap_map_Mem.v
+design -save xmap
+design -pop
+
+extract -constports -ignore_parameters -map %xmap
+stat

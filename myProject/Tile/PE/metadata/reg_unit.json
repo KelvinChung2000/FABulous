@@ -5,7 +5,7 @@
       "attributes": {
         "dynports": 1,
         "cells_not_processed": 1,
-        "src": "../../myProject/Tile/PE/reg_unit.v:1.1-23.10"
+        "src": "myProject/Tile/PE/reg_unit.v:1.1-23.10"
       },
       "parameter_default_values": {
         "NoConfigBits": 2,
@@ -42,7 +42,7 @@
         }
       },
       "cells": {
-        "$and$../../myProject/Tile/PE/reg_unit.v:15$2": {
+        "$and$myProject/Tile/PE/reg_unit.v:15$2": {
           "hide_name": 1,
           "type": "$and",
           "parameters": {
@@ -53,7 +53,7 @@
             "Y_WIDTH": 1
           },
           "attributes": {
-            "src": "../../myProject/Tile/PE/reg_unit.v:15.9-15.23"
+            "src": "myProject/Tile/PE/reg_unit.v:15.9-15.23"
           },
           "port_directions": {
             "A": "input",
@@ -66,7 +66,7 @@
             "Y": [ 71 ]
           }
         },
-        "$or$../../myProject/Tile/PE/reg_unit.v:18$3": {
+        "$or$myProject/Tile/PE/reg_unit.v:18$3": {
           "hide_name": 1,
           "type": "$or",
           "parameters": {
@@ -77,7 +77,7 @@
             "Y_WIDTH": 1
           },
           "attributes": {
-            "src": "../../myProject/Tile/PE/reg_unit.v:18.14-18.26"
+            "src": "myProject/Tile/PE/reg_unit.v:18.14-18.26"
           },
           "port_directions": {
             "A": "input",
@@ -98,7 +98,7 @@
             "WIDTH": 32
           },
           "attributes": {
-            "src": "../../myProject/Tile/PE/reg_unit.v:14.1-21.4"
+            "src": "myProject/Tile/PE/reg_unit.v:14.1-21.4"
           },
           "port_directions": {
             "CLK": "input",
@@ -118,7 +118,7 @@
             "WIDTH": 32
           },
           "attributes": {
-            "src": "../../myProject/Tile/PE/reg_unit.v:18.14-18.26|../../myProject/Tile/PE/reg_unit.v:18.10-20.8"
+            "src": "myProject/Tile/PE/reg_unit.v:18.14-18.26|myProject/Tile/PE/reg_unit.v:18.10-20.8"
           },
           "port_directions": {
             "A": "input",
@@ -141,7 +141,7 @@
           },
           "attributes": {
             "full_case": 1,
-            "src": "../../myProject/Tile/PE/reg_unit.v:15.9-15.23|../../myProject/Tile/PE/reg_unit.v:15.5-20.8"
+            "src": "myProject/Tile/PE/reg_unit.v:15.9-15.23|myProject/Tile/PE/reg_unit.v:15.5-20.8"
           },
           "port_directions": {
             "A": "input",
@@ -162,21 +162,21 @@
           "hide_name": 1,
           "bits": [ 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104 ],
           "attributes": {
-            "src": "../../myProject/Tile/PE/reg_unit.v:14.1-21.4"
+            "src": "myProject/Tile/PE/reg_unit.v:14.1-21.4"
           }
         },
-        "$and$../../myProject/Tile/PE/reg_unit.v:15$2_Y": {
+        "$and$myProject/Tile/PE/reg_unit.v:15$2_Y": {
           "hide_name": 1,
           "bits": [ 71 ],
           "attributes": {
-            "src": "../../myProject/Tile/PE/reg_unit.v:15.9-15.23"
+            "src": "myProject/Tile/PE/reg_unit.v:15.9-15.23"
           }
         },
-        "$or$../../myProject/Tile/PE/reg_unit.v:18$3_Y": {
+        "$or$myProject/Tile/PE/reg_unit.v:18$3_Y": {
           "hide_name": 1,
           "bits": [ 72 ],
           "attributes": {
-            "src": "../../myProject/Tile/PE/reg_unit.v:18.14-18.26"
+            "src": "myProject/Tile/PE/reg_unit.v:18.14-18.26"
           }
         },
         "$procmux$4_Y": {
@@ -209,14 +209,14 @@
           "attributes": {
             "FABulous": 1,
             "USER_CLK": 1,
-            "src": "../../myProject/Tile/PE/reg_unit.v:7.41-7.44"
+            "src": "myProject/Tile/PE/reg_unit.v:7.41-7.44"
           }
         },
         "en": {
           "hide_name": 0,
           "bits": [ 3 ],
           "attributes": {
-            "src": "../../myProject/Tile/PE/reg_unit.v:6.16-6.18"
+            "src": "myProject/Tile/PE/reg_unit.v:6.16-6.18"
           }
         },
         "reg_in": {
@@ -226,7 +226,7 @@
             "BUS": 1,
             "DATA": 1,
             "FABulous": 1,
-            "src": "../../myProject/Tile/PE/reg_unit.v:8.55-8.61"
+            "src": "myProject/Tile/PE/reg_unit.v:8.55-8.61"
           }
         },
         "reg_out": {
@@ -236,14 +236,14 @@
             "BUS": 1,
             "DATA": 1,
             "FABulous": 1,
-            "src": "../../myProject/Tile/PE/reg_unit.v:9.54-9.61"
+            "src": "myProject/Tile/PE/reg_unit.v:9.54-9.61"
           }
         },
         "rst": {
           "hide_name": 0,
           "bits": [ 2 ],
           "attributes": {
-            "src": "../../myProject/Tile/PE/reg_unit.v:5.16-5.19"
+            "src": "myProject/Tile/PE/reg_unit.v:5.16-5.19"
           }
         },
         "tide_en": {
@@ -253,7 +253,7 @@
             "CONFIG_BIT": 1,
             "FABulous": 1,
             "FEATURE": "tide_en",
-            "src": "../../myProject/Tile/PE/reg_unit.v:10.62-10.69"
+            "src": "myProject/Tile/PE/reg_unit.v:10.62-10.69"
           }
         },
         "tide_rst": {
@@ -263,7 +263,7 @@
             "CONFIG_BIT": 1,
             "FABulous": 1,
             "FEATURE": "tide_rst",
-            "src": "../../myProject/Tile/PE/reg_unit.v:11.63-11.71"
+            "src": "myProject/Tile/PE/reg_unit.v:11.63-11.71"
           }
         }
       }

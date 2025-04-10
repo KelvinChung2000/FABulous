@@ -3,7 +3,7 @@ autoidx 54
 attribute \CELL 1
 attribute \dynports 1
 attribute \top 1
-attribute \src "../../myProject/Tile/N_IO/../include/IO.v:2.1-14.10"
+attribute \src "myProject/Tile/N_IO/../include/IO.v:2.1-14.10"
 module \IO
   parameter \WIDTH 32
   attribute \BUS 1

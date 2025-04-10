@@ -95,7 +95,9 @@ class Mux:
     def __init__(self, name: str, inputs: list[GenericPort], output: GenericPort):
         for p in inputs:
             if p.width != output.width:
-                raise ValueError("All inputs and output must have the same width")
+                raise ValueError(
+                    f"All inputs {inputs} and output {output} must have the same width"
+                )
 
         self._name = name
         self._inputs = inputs

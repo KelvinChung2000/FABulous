@@ -90,26 +90,30 @@ def generateConfigMem(codeGen: CodeGenerator, fabric: Fabric, tile: Tile):
             with lr.Generate() as lrGen:
                 with lrGen.IfElse(emuEn) as ifElse:
                     with ifElse.TrueRegion() as t:
-                        totalBitAvailable = fabric.frameBitsPerRow * fabric.maxFramesPerCol
+                        totalBitAvailable = (
+                            fabric.frameBitsPerRow * fabric.maxFramesPerCol
+                        )
                         cfg = t.ReadMem(
                             emuCfg,
                             "cfg",
                             totalBitAvailable,
-                            fabric.numberOfRows * fabric.numberOfColumns,
+                            fabric.height * fabric.width,
                         )
                         tileConf = t.Signal("tileConf", totalBitAvailable)
-                        t.Assign(tileConf, cfg[yCord * fabric.numberOfColumns + xCord])
+                        t.Assign(tileConf, cfg[yCord * fabric.width + xCord])
                         for i in range(tile.configBits):
                             frameIdx, bitIdx = tile.configMems[i]
-                            t.Comment(f"config bit {i} at frame {frameIdx} bit {bitIdx}")
+                            t.Comment(
+                                f"config bit {i} at frame {frameIdx} bit {bitIdx}"
+                            )
                             bitIdx = fabric.frameBitsPerRow - bitIdx - 1
-                            addr = totalBitAvailable - (frameIdx*fabric.maxFramesPerCol + bitIdx) - 1
-                            t.Assign(
-                                configBits[i], tileConf[addr]
+                            addr = (
+                                totalBitAvailable
+                                - (frameIdx * fabric.maxFramesPerCol + bitIdx)
+                                - 1
                             )
-                            t.Assign(
-                                configBitsN[i], ~tileConf[addr]
-                            )
+                            t.Assign(configBits[i], tileConf[addr])
+                            t.Assign(configBitsN[i], ~tileConf[addr])
                     with ifElse.FalseRegion() as f:
                         f.Comment("instantiate frame latches")
                         for i in range(tile.configBits):

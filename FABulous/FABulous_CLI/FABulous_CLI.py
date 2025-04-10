@@ -35,6 +35,7 @@ from loguru import logger
 
 from FABulous.fabric_generator.define import WriterType
 from FABulous.FABulous_API import FABulous_API
+import traceback
 from FABulous.FABulous_CLI import (
     cmd_helper,
     cmd_pnr,
@@ -226,6 +227,16 @@ class FABulous_CLI(Cmd):
         if commands:
             self._startup_commands.extend(commands)
             self._startup_commands.append("exit")
+
+    def onecmd(self, *arg, **kwargs):
+        """Override the onecmd method to handle exceptions."""
+        try:
+            return super().onecmd(*arg, **kwargs)
+        except Exception as e:
+            logger.error(f"Error occurred: {type(e).__name__}: {e}")
+            logger.debug(traceback.format_exc())
+            self.exit_code = 1
+            return False
 
     def do_exit(self, *ignored):
         """Exits the FABulous shell and logs info message."""
@@ -591,6 +602,7 @@ class FABulous_CLI(Cmd):
             self.do_gen_chipdb()
         except Exception as e:
             logger.error(f"FABulous CAD tool files generation failed: {e}")
+            logger.error(f"Stack trace:\n{traceback.format_exc()}")
             self.exit_code = 1
             return True
 

@@ -1,0 +1,25 @@
+TILE: E_MEM
+# {side: <>, source_name: <>, X-offset: <>, Y-offset: <>, destination_name: <>, wires: <>}
+SUPER_TILE: true
+INCLUDE:
+PORTS:
+  E_MEM_TOP:
+    - {side: WEST, name: in3, inOut: input, wires: 32, terminal: false}
+    - {side: WEST, name: out3, inOut: output, wires: 32, terminal: false}
+  E_MEM_BOT:
+    - {side: WEST, name: in3, inOut: input, wires: 32, terminal: false}
+    - {side: WEST, name: out3, inOut: output, wires: 32, terminal: false}
+
+WIRES:
+  E_MEM_TOP:
+    - {source_name: out3, X-offset:  -1, Y-offset: 0, destination_name: in1}
+  E_MEM_BOT:
+    - {source_name: out3, X-offset:  -1, Y-offset: 0, destination_name: in1}
+
+BELS: 
+  - {BEL: ./Mem.v, prefix: }
+
+SUB_TILE_MAP: [
+  [E_MEM_TOP],
+  [E_MEM_BOT]
+]

@@ -1,0 +1,18 @@
+TILE: E_Mem_top
+# {side: <>, source_name: <>, X-offset: <>, Y-offset: <>, destination_name: <>, wires: <>}
+INCLUDE:
+PORTS: 
+    # {side: EAST, name: out1, inOut: output, wires: 32, terminal: true},
+    # {side: EAST, name: in1, inOut: input, wires: 32, terminal: true},
+
+    - {side: WEST, name: in3, inOut: input, wires: 32, terminal: false}
+    - {side: WEST, name: out3, inOut: output, wires: 32, terminal: false}
+    - {side: SOUTH, name: addr_o, inOut: output, wires: 32, terminal: false}
+
+WIRES:
+  - {source_name: out3, X-offset:  -1, Y-offset: 0, destination_name: in1}
+  # - {source_name: addr_o, X-offset:  0, Y-offset: 1, destination_name: addr_i}
+
+
+MATRIX: ./list.py
+# CONFIG_MEM: ./E_IO_ConfigMem.csv

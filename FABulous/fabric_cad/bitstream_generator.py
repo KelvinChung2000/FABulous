@@ -54,7 +54,7 @@ def genBitstream(fabric: Fabric, fasmFile: Path, featureMap: FeatureMap, dest: P
 
     # output the bitstream
     bitStr = bytes.fromhex("00AAFF01000000010000000000000000FAB0FAB1")
-    for i in range(fabric.numberOfColumns):
+    for i in range(fabric.width):
         for j in range(fabric.maxFramesPerCol):
             binTemp = f"{i:0{fabric.frameSelectWidth}b}"[::-1]
             frameSelect = ["0" for _ in range(fabric.frameBitsPerRow)]

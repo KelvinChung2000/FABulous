@@ -55,8 +55,8 @@ class Fabric:
 
     name: str
     fabricDir: Path
-    numberOfRows: int
-    numberOfColumns: int
+    height: int
+    width: int
     frameBitsPerRow: int
     maxFramesPerCol: int
     contextCount: int = 1
@@ -92,8 +92,8 @@ class Fabric:
 
     def __repr__(self) -> str:
         fabric = ""
-        for i in range(self.numberOfRows):
-            for j in range(self.numberOfColumns):
+        for i in range(self.height):
+            for j in range(self.width):
                 if self.tiles[i][j] is None:
                     fabric += "Null".ljust(15) + "\t"
                 else:
@@ -102,8 +102,8 @@ class Fabric:
 
         fabric += (
             "\n"
-            f"numberOfColumns: {self.numberOfColumns}\n"
-            f"numberOfRows: {self.numberOfRows}\n"
+            f"numberOfColumns: {self.width}\n"
+            f"numberOfRows: {self.height}\n"
             f"configBitMode: {self.configBitMode}\n"
             f"frameBitsPerRow: {self.frameBitsPerRow}\n"
             f"maxFramesPerCol: {self.maxFramesPerCol}\n"
@@ -149,11 +149,11 @@ class Fabric:
             for x, tile in enumerate(row):
                 if tile is not None:
                     yield (
-                        (x, self.numberOfRows - y - 1),
+                        (x, self.height - y - 1),
                         self.tileDict.get(tile, None),
                     )
                 else:
-                    yield ((x, self.numberOfRows - y - 1), None)
+                    yield ((x, self.height - y - 1), None)
 
     # def getFlattenFabric(self) -> Generator[tuple[Loc, Tile | None], None, None]:
     #     for y, row in enumerate(self.tiles):

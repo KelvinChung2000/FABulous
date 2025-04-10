@@ -1,10 +1,12 @@
 FABRIC: [
-    [None,  N_IO, N_IO, N_IO, N_IO, None  ],
-    [W_IO,  PE,   PE,   PE,   PE,   E_IO  ],
-    [W_IO,  PE,   PE,   PE,   PE,   E_IO  ],
-    [W_IO,  PE,   PE,   PE,   PE,   E_IO  ],
-    [W_IO,  PE,   PE,   PE,   PE,   E_IO  ],
-    [None,  S_IO, S_IO, S_IO, S_IO, None  ]
+    [None,  N_IO, N_IO, N_IO, N_IO, None       ],
+    [W_IO,  PE,   PE,   PE,   PE,   E_Mem_top  ],
+    [W_IO,  PE,   PE,   PE,   PE,   E_Mem_bot  ],
+    [W_IO,  PE,   PE,   PE,   PE,   E_Mem_top  ],
+    [W_IO,  PE,   PE,   PE,   PE,   E_Mem_bot  ],
+    [W_IO,  PE,   PE,   PE,   PE,   E_Mem_top  ],
+    [W_IO,  PE,   PE,   PE,   PE,   E_Mem_bot  ],    
+    [None,  S_IO, S_IO, S_IO, S_IO, None       ]
 
     # [None,  N_IO, N_IO, N_IO, None  ],
     # [W_IO,  PE,   PE,   PE,   E_IO  ],
@@ -37,14 +39,10 @@ PARAM: {
   ContextCount: 1
 }
 
-TILES: {
-  ./Tile/PE/PE.yaml,
-  ./Tile/N_IO/N_IO.yaml,
-  ./Tile/E_IO/E_IO.yaml,
-  ./Tile/S_IO/S_IO.yaml,
-  ./Tile/W_IO/W_IO.yaml,
-}
-
-SUPERTILE: {
-
-} 
+TILES: 
+  - ./Tile/PE/PE.yaml
+  - ./Tile/N_IO/N_IO.yaml
+  - ./Tile/E_Mem_top/E_Mem_top.yaml
+  - ./Tile/E_Mem_bot/E_Mem_bot.yaml
+  - ./Tile/S_IO/S_IO.yaml
+  - ./Tile/W_IO/W_IO.yaml

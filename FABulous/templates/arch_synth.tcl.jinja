@@ -19,8 +19,18 @@ yosys opt_clean
 yosys share
 yosys opt_expr
 yosys opt_clean
-yosys memory_dff -no-rw-check
+
+# memory opt
+yosys opt_mem_priority
+yosys opt_mem_feedback
+yosys memory_bmux2rom
+yosys memory_dff
+yosys opt_clean
+yosys memory_share
+yosys opt_mem_widen
+yosys opt_clean
 yosys memory_collect
+
 yosys opt -full
 
 proc extract {cell wrapperPath} {
@@ -49,6 +59,8 @@ extract "{{ cell }}" \
 {%- endfor %}
 # unwrapping
 yosys techmap -map {{ unWrapperPath }}
+yosys opt
+yosys clean -purge
 {% endfor %}
 
 # cell techmapping

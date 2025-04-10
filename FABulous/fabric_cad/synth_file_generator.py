@@ -12,11 +12,7 @@ from FABulous.fabric_definition.define import IO
 from FABulous.fabric_definition.Fabric import Fabric
 from FABulous.fabric_definition.Port import ConfigPort
 from FABulous.fabric_generator.code_generator_2 import CodeGenerator
-from FABulous.fabric_generator.define import (
-    PossibleBinaryType,
-    PossibleRegType,
-    WriterType,
-)
+from FABulous.fabric_generator.define import WriterType
 from FABulous.fabric_generator.HDL_Construct.Value import Value
 
 
@@ -200,7 +196,7 @@ def genCellsAndMaps(bel: Bel):
     runPass("select -none")
     runPass("select A:CELL")
     if len(design.selected_modules()) > 0:
-        runPass(f"write_rtlil {filePath / f"cell_{bel.prefix}{bel.name}.il"}")
+        runPass(f"write_json {filePath / f"cell_{bel.prefix}{bel.name}.json"}")
         return
 
     runPass("select -none")

@@ -3,9 +3,10 @@
   "modules": {
     "Mem": {
       "attributes": {
+        "CELL": 1,
         "dynports": 1,
         "cells_not_processed": 1,
-        "src": "myProject/Tile/E_Mem_bot/Mem.v:1.1-39.10"
+        "src": "myProject/Tile/E_Mem_bot/Mem.v:2.1-26.10"
       },
       "parameter_default_values": {
         "IDX_SIZE": 4,
@@ -36,42 +37,10 @@
         "read_data": {
           "direction": "output",
           "bits": [ 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100 ]
-        },
-        "read_allow": {
-          "direction": "input",
-          "bits": [ 101 ]
-        },
-        "write_allow": {
-          "direction": "input",
-          "bits": [ 102 ]
         }
       },
       "cells": {
-        "$and$myProject/Tile/E_Mem_bot/Mem.v:34$8": {
-          "hide_name": 1,
-          "type": "$and",
-          "parameters": {
-            "A_SIGNED": 0,
-            "A_WIDTH": 1,
-            "B_SIGNED": 0,
-            "B_WIDTH": 1,
-            "Y_WIDTH": 1
-          },
-          "attributes": {
-            "src": "myProject/Tile/E_Mem_bot/Mem.v:34.9-34.31"
-          },
-          "port_directions": {
-            "A": "input",
-            "B": "input",
-            "Y": "output"
-          },
-          "connections": {
-            "A": [ 66 ],
-            "B": [ 102 ],
-            "Y": [ 103 ]
-          }
-        },
-        "$auto$proc_memwr.cc:45:proc_memwr$27": {
+        "$auto$proc_memwr.cc:45:proc_memwr$22": {
           "hide_name": 1,
           "type": "$memwr_v2",
           "parameters": {
@@ -84,7 +53,7 @@
             "WIDTH": 32
           },
           "attributes": {
-            "src": "myProject/Tile/E_Mem_bot/Mem.v:35.7-35.45"
+            "src": "myProject/Tile/E_Mem_bot/Mem.v:23.7-23.45"
           },
           "port_directions": {
             "ADDR": "input",
@@ -93,13 +62,13 @@
             "EN": "input"
           },
           "connections": {
-            "ADDR": [ 104, 105, 106, 107 ],
+            "ADDR": [ 101, 102, 103, 104 ],
             "CLK": [ 67 ],
-            "DATA": [ 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139 ],
-            "EN": [ 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165, 166, 167, 168, 169, 170, 171 ]
+            "DATA": [ 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136 ],
+            "EN": [ 137, 138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165, 166, 167, 168 ]
           }
         },
-        "$memrd$\\mem$myProject/Tile/E_Mem_bot/Mem.v:27$3": {
+        "$memrd$\\mem$myProject/Tile/E_Mem_bot/Mem.v:19$2": {
           "hide_name": 1,
           "type": "$memrd",
           "parameters": {
@@ -111,7 +80,7 @@
             "WIDTH": 32
           },
           "attributes": {
-            "src": "myProject/Tile/E_Mem_bot/Mem.v:27.19-27.22"
+            "src": "myProject/Tile/E_Mem_bot/Mem.v:19.22-19.25"
           },
           "port_directions": {
             "ADDR": "input",
@@ -122,11 +91,11 @@
           "connections": {
             "ADDR": [ 2, 3, 4, 5 ],
             "CLK": [ "x" ],
-            "DATA": [ 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197, 198, 199, 200, 201, 202, 203 ],
+            "DATA": [ 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100 ],
             "EN": [ "x" ]
           }
         },
-        "$procdff$24": {
+        "$procdff$19": {
           "hide_name": 1,
           "type": "$dff",
           "parameters": {
@@ -135,7 +104,7 @@
           },
           "attributes": {
             "always_ff": 1,
-            "src": "myProject/Tile/E_Mem_bot/Mem.v:33.3-37.6"
+            "src": "myProject/Tile/E_Mem_bot/Mem.v:21.3-24.6"
           },
           "port_directions": {
             "CLK": "input",
@@ -144,11 +113,11 @@
           },
           "connections": {
             "CLK": [ 67 ],
-            "D": [ 104, 105, 106, 107 ],
-            "Q": [ 204, 205, 206, 207 ]
+            "D": [ 101, 102, 103, 104 ],
+            "Q": [ 169, 170, 171, 172 ]
           }
         },
-        "$procdff$25": {
+        "$procdff$20": {
           "hide_name": 1,
           "type": "$dff",
           "parameters": {
@@ -157,7 +126,7 @@
           },
           "attributes": {
             "always_ff": 1,
-            "src": "myProject/Tile/E_Mem_bot/Mem.v:33.3-37.6"
+            "src": "myProject/Tile/E_Mem_bot/Mem.v:21.3-24.6"
           },
           "port_directions": {
             "CLK": "input",
@@ -166,11 +135,11 @@
           },
           "connections": {
             "CLK": [ 67 ],
-            "D": [ 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139 ],
-            "Q": [ 208, 209, 210, 211, 212, 213, 214, 215, 216, 217, 218, 219, 220, 221, 222, 223, 224, 225, 226, 227, 228, 229, 230, 231, 232, 233, 234, 235, 236, 237, 238, 239 ]
+            "D": [ 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136 ],
+            "Q": [ 173, 174, 175, 176, 177, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197, 198, 199, 200, 201, 202, 203, 204 ]
           }
         },
-        "$procdff$26": {
+        "$procdff$21": {
           "hide_name": 1,
           "type": "$dff",
           "parameters": {
@@ -179,7 +148,7 @@
           },
           "attributes": {
             "always_ff": 1,
-            "src": "myProject/Tile/E_Mem_bot/Mem.v:33.3-37.6"
+            "src": "myProject/Tile/E_Mem_bot/Mem.v:21.3-24.6"
           },
           "port_directions": {
             "CLK": "input",
@@ -188,11 +157,11 @@
           },
           "connections": {
             "CLK": [ 67 ],
-            "D": [ 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165, 166, 167, 168, 169, 170, 171 ],
-            "Q": [ 240, 241, 242, 243, 244, 245, 246, 247, 248, 249, 250, 251, 252, 253, 254, 255, 256, 257, 258, 259, 260, 261, 262, 263, 264, 265, 266, 267, 268, 269, 270, 271 ]
+            "D": [ 137, 138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165, 166, 167, 168 ],
+            "Q": [ 205, 206, 207, 208, 209, 210, 211, 212, 213, 214, 215, 216, 217, 218, 219, 220, 221, 222, 223, 224, 225, 226, 227, 228, 229, 230, 231, 232, 233, 234, 235, 236 ]
           }
         },
-        "$procmux$13": {
+        "$procmux$11": {
           "hide_name": 1,
           "type": "$mux",
           "parameters": {
@@ -200,7 +169,7 @@
           },
           "attributes": {
             "full_case": 1,
-            "src": "myProject/Tile/E_Mem_bot/Mem.v:34.9-34.31|myProject/Tile/E_Mem_bot/Mem.v:34.5-36.8"
+            "src": "myProject/Tile/E_Mem_bot/Mem.v:22.9-22.17|myProject/Tile/E_Mem_bot/Mem.v:22.5-23.46"
           },
           "port_directions": {
             "A": "input",
@@ -211,11 +180,11 @@
           "connections": {
             "A": [ "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
             "B": [ "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1" ],
-            "S": [ 103 ],
-            "Y": [ 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165, 166, 167, 168, 169, 170, 171 ]
+            "S": [ 66 ],
+            "Y": [ 137, 138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165, 166, 167, 168 ]
           }
         },
-        "$procmux$16": {
+        "$procmux$14": {
           "hide_name": 1,
           "type": "$mux",
           "parameters": {
@@ -223,7 +192,7 @@
           },
           "attributes": {
             "full_case": 1,
-            "src": "myProject/Tile/E_Mem_bot/Mem.v:34.9-34.31|myProject/Tile/E_Mem_bot/Mem.v:34.5-36.8"
+            "src": "myProject/Tile/E_Mem_bot/Mem.v:22.9-22.17|myProject/Tile/E_Mem_bot/Mem.v:22.5-23.46"
           },
           "port_directions": {
             "A": "input",
@@ -234,11 +203,11 @@
           "connections": {
             "A": [ "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x" ],
             "B": [ 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65 ],
-            "S": [ 103 ],
-            "Y": [ 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139 ]
+            "S": [ 66 ],
+            "Y": [ 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136 ]
           }
         },
-        "$procmux$19": {
+        "$procmux$17": {
           "hide_name": 1,
           "type": "$mux",
           "parameters": {
@@ -246,7 +215,7 @@
           },
           "attributes": {
             "full_case": 1,
-            "src": "myProject/Tile/E_Mem_bot/Mem.v:34.9-34.31|myProject/Tile/E_Mem_bot/Mem.v:34.5-36.8"
+            "src": "myProject/Tile/E_Mem_bot/Mem.v:22.9-22.17|myProject/Tile/E_Mem_bot/Mem.v:22.5-23.46"
           },
           "port_directions": {
             "A": "input",
@@ -257,31 +226,8 @@
           "connections": {
             "A": [ "x", "x", "x", "x" ],
             "B": [ 2, 3, 4, 5 ],
-            "S": [ 103 ],
-            "Y": [ 104, 105, 106, 107 ]
-          }
-        },
-        "$procmux$22": {
-          "hide_name": 1,
-          "type": "$mux",
-          "parameters": {
-            "WIDTH": 32
-          },
-          "attributes": {
-            "full_case": 1,
-            "src": "myProject/Tile/E_Mem_bot/Mem.v:26.9-26.19|myProject/Tile/E_Mem_bot/Mem.v:26.5-30.8"
-          },
-          "port_directions": {
-            "A": "input",
-            "B": "input",
-            "S": "input",
-            "Y": "output"
-          },
-          "connections": {
-            "A": [ "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
-            "B": [ 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197, 198, 199, 200, 201, 202, 203 ],
-            "S": [ 101 ],
-            "Y": [ 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100 ]
+            "S": [ 66 ],
+            "Y": [ 101, 102, 103, 104 ]
           }
         }
       },
@@ -289,7 +235,7 @@
         "mem": {
           "hide_name": 0,
           "attributes": {
-            "src": "myProject/Tile/E_Mem_bot/Mem.v:22.21-22.24"
+            "src": "myProject/Tile/E_Mem_bot/Mem.v:18.21-18.24"
           },
           "width": 32,
           "start_offset": 0,
@@ -297,142 +243,109 @@
         }
       },
       "netnames": {
-        "$0$memwr$\\mem$myProject/Tile/E_Mem_bot/Mem.v:35$1_ADDR[3:0]$5": {
+        "$0$memwr$\\mem$myProject/Tile/E_Mem_bot/Mem.v:23$1_ADDR[3:0]$4": {
           "hide_name": 1,
-          "bits": [ 104, 105, 106, 107 ],
+          "bits": [ 101, 102, 103, 104 ],
           "attributes": {
-            "src": "myProject/Tile/E_Mem_bot/Mem.v:33.3-37.6"
+            "src": "myProject/Tile/E_Mem_bot/Mem.v:21.3-24.6"
           }
         },
-        "$0$memwr$\\mem$myProject/Tile/E_Mem_bot/Mem.v:35$1_DATA[31:0]$6": {
+        "$0$memwr$\\mem$myProject/Tile/E_Mem_bot/Mem.v:23$1_DATA[31:0]$5": {
           "hide_name": 1,
-          "bits": [ 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139 ],
+          "bits": [ 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136 ],
           "attributes": {
-            "src": "myProject/Tile/E_Mem_bot/Mem.v:33.3-37.6"
+            "src": "myProject/Tile/E_Mem_bot/Mem.v:21.3-24.6"
           }
         },
-        "$0$memwr$\\mem$myProject/Tile/E_Mem_bot/Mem.v:35$1_EN[31:0]$7": {
+        "$0$memwr$\\mem$myProject/Tile/E_Mem_bot/Mem.v:23$1_EN[31:0]$6": {
           "hide_name": 1,
-          "bits": [ 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165, 166, 167, 168, 169, 170, 171 ],
+          "bits": [ 137, 138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165, 166, 167, 168 ],
           "attributes": {
-            "src": "myProject/Tile/E_Mem_bot/Mem.v:33.3-37.6"
+            "src": "myProject/Tile/E_Mem_bot/Mem.v:21.3-24.6"
           }
         },
-        "$0\\read_data[31:0]": {
+        "$1$memwr$\\mem$myProject/Tile/E_Mem_bot/Mem.v:23$1_ADDR[3:0]$7": {
+          "hide_name": 1,
+          "bits": [ 101, 102, 103, 104 ],
+          "attributes": {
+            "src": "myProject/Tile/E_Mem_bot/Mem.v:21.3-24.6"
+          }
+        },
+        "$1$memwr$\\mem$myProject/Tile/E_Mem_bot/Mem.v:23$1_DATA[31:0]$8": {
+          "hide_name": 1,
+          "bits": [ 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136 ],
+          "attributes": {
+            "src": "myProject/Tile/E_Mem_bot/Mem.v:21.3-24.6"
+          }
+        },
+        "$1$memwr$\\mem$myProject/Tile/E_Mem_bot/Mem.v:23$1_EN[31:0]$9": {
+          "hide_name": 1,
+          "bits": [ 137, 138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165, 166, 167, 168 ],
+          "attributes": {
+            "src": "myProject/Tile/E_Mem_bot/Mem.v:21.3-24.6"
+          }
+        },
+        "$memrd$\\mem$myProject/Tile/E_Mem_bot/Mem.v:19$2_DATA": {
           "hide_name": 1,
           "bits": [ 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100 ],
           "attributes": {
-            "src": "myProject/Tile/E_Mem_bot/Mem.v:0.0-0.0"
+            "src": "myProject/Tile/E_Mem_bot/Mem.v:19.22-19.25"
           }
         },
-        "$1$memwr$\\mem$myProject/Tile/E_Mem_bot/Mem.v:35$1_ADDR[3:0]$9": {
+        "$memwr$\\mem$myProject/Tile/E_Mem_bot/Mem.v:23$1_ADDR": {
           "hide_name": 1,
-          "bits": [ 104, 105, 106, 107 ],
-          "attributes": {
-            "src": "myProject/Tile/E_Mem_bot/Mem.v:33.3-37.6"
-          }
-        },
-        "$1$memwr$\\mem$myProject/Tile/E_Mem_bot/Mem.v:35$1_DATA[31:0]$10": {
-          "hide_name": 1,
-          "bits": [ 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139 ],
-          "attributes": {
-            "src": "myProject/Tile/E_Mem_bot/Mem.v:33.3-37.6"
-          }
-        },
-        "$1$memwr$\\mem$myProject/Tile/E_Mem_bot/Mem.v:35$1_EN[31:0]$11": {
-          "hide_name": 1,
-          "bits": [ 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165, 166, 167, 168, 169, 170, 171 ],
-          "attributes": {
-            "src": "myProject/Tile/E_Mem_bot/Mem.v:33.3-37.6"
-          }
-        },
-        "$1\\read_data[31:0]": {
-          "hide_name": 1,
-          "bits": [ 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100 ],
+          "bits": [ 169, 170, 171, 172 ],
           "attributes": {
             "src": "myProject/Tile/E_Mem_bot/Mem.v:0.0-0.0"
           }
         },
-        "$and$myProject/Tile/E_Mem_bot/Mem.v:34$8_Y": {
+        "$memwr$\\mem$myProject/Tile/E_Mem_bot/Mem.v:23$1_DATA": {
           "hide_name": 1,
-          "bits": [ 103 ],
-          "attributes": {
-            "src": "myProject/Tile/E_Mem_bot/Mem.v:34.9-34.31"
-          }
-        },
-        "$memrd$\\mem$myProject/Tile/E_Mem_bot/Mem.v:27$3_DATA": {
-          "hide_name": 1,
-          "bits": [ 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197, 198, 199, 200, 201, 202, 203 ],
-          "attributes": {
-            "src": "myProject/Tile/E_Mem_bot/Mem.v:27.19-27.22"
-          }
-        },
-        "$memwr$\\mem$myProject/Tile/E_Mem_bot/Mem.v:35$1_ADDR": {
-          "hide_name": 1,
-          "bits": [ 204, 205, 206, 207 ],
+          "bits": [ 173, 174, 175, 176, 177, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197, 198, 199, 200, 201, 202, 203, 204 ],
           "attributes": {
             "src": "myProject/Tile/E_Mem_bot/Mem.v:0.0-0.0"
           }
         },
-        "$memwr$\\mem$myProject/Tile/E_Mem_bot/Mem.v:35$1_DATA": {
+        "$memwr$\\mem$myProject/Tile/E_Mem_bot/Mem.v:23$1_EN": {
           "hide_name": 1,
-          "bits": [ 208, 209, 210, 211, 212, 213, 214, 215, 216, 217, 218, 219, 220, 221, 222, 223, 224, 225, 226, 227, 228, 229, 230, 231, 232, 233, 234, 235, 236, 237, 238, 239 ],
+          "bits": [ 205, 206, 207, 208, 209, 210, 211, 212, 213, 214, 215, 216, 217, 218, 219, 220, 221, 222, 223, 224, 225, 226, 227, 228, 229, 230, 231, 232, 233, 234, 235, 236 ],
           "attributes": {
             "src": "myProject/Tile/E_Mem_bot/Mem.v:0.0-0.0"
           }
         },
-        "$memwr$\\mem$myProject/Tile/E_Mem_bot/Mem.v:35$1_EN": {
+        "$procmux$11_Y": {
           "hide_name": 1,
-          "bits": [ 240, 241, 242, 243, 244, 245, 246, 247, 248, 249, 250, 251, 252, 253, 254, 255, 256, 257, 258, 259, 260, 261, 262, 263, 264, 265, 266, 267, 268, 269, 270, 271 ],
-          "attributes": {
-            "src": "myProject/Tile/E_Mem_bot/Mem.v:0.0-0.0"
-          }
-        },
-        "$procmux$13_Y": {
-          "hide_name": 1,
-          "bits": [ 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165, 166, 167, 168, 169, 170, 171 ],
+          "bits": [ 137, 138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165, 166, 167, 168 ],
           "attributes": {
           }
         },
-        "$procmux$14_CMP": {
+        "$procmux$12_CMP": {
           "hide_name": 1,
-          "bits": [ 103 ],
+          "bits": [ 66 ],
           "attributes": {
           }
         },
-        "$procmux$16_Y": {
+        "$procmux$14_Y": {
           "hide_name": 1,
-          "bits": [ 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139 ],
+          "bits": [ 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136 ],
           "attributes": {
           }
         },
-        "$procmux$17_CMP": {
+        "$procmux$15_CMP": {
           "hide_name": 1,
-          "bits": [ 103 ],
+          "bits": [ 66 ],
           "attributes": {
           }
         },
-        "$procmux$19_Y": {
+        "$procmux$17_Y": {
           "hide_name": 1,
-          "bits": [ 104, 105, 106, 107 ],
+          "bits": [ 101, 102, 103, 104 ],
           "attributes": {
           }
         },
-        "$procmux$20_CMP": {
+        "$procmux$18_CMP": {
           "hide_name": 1,
-          "bits": [ 103 ],
-          "attributes": {
-          }
-        },
-        "$procmux$22_Y": {
-          "hide_name": 1,
-          "bits": [ 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100 ],
-          "attributes": {
-          }
-        },
-        "$procmux$23_CMP": {
-          "hide_name": 1,
-          "bits": [ 101 ],
+          "bits": [ 66 ],
           "attributes": {
           }
         },
@@ -440,7 +353,7 @@
           "hide_name": 0,
           "bits": [ 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33 ],
           "attributes": {
-            "src": "myProject/Tile/E_Mem_bot/Mem.v:6.28-6.33"
+            "src": "myProject/Tile/E_Mem_bot/Mem.v:7.28-7.33"
           }
         },
         "clk": {
@@ -449,55 +362,35 @@
           "attributes": {
             "FABulous": 1,
             "USER_CLK": 1,
-            "src": "myProject/Tile/E_Mem_bot/Mem.v:11.16-11.19"
-          }
-        },
-        "read_allow": {
-          "hide_name": 0,
-          "bits": [ 101 ],
-          "attributes": {
-            "CONFIG_BIT": 1,
-            "FABulous": 1,
-            "FEATURE": "READ_ALLOW",
-            "src": "myProject/Tile/E_Mem_bot/Mem.v:17.11-17.21"
+            "src": "myProject/Tile/E_Mem_bot/Mem.v:12.16-12.19"
           }
         },
         "read_data": {
           "hide_name": 0,
           "bits": [ 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100 ],
           "attributes": {
-            "src": "myProject/Tile/E_Mem_bot/Mem.v:14.28-14.37"
+            "src": "myProject/Tile/E_Mem_bot/Mem.v:15.28-15.37"
           }
         },
         "reset": {
           "hide_name": 0,
           "bits": [ 68 ],
           "attributes": {
-            "src": "myProject/Tile/E_Mem_bot/Mem.v:13.16-13.21"
-          }
-        },
-        "write_allow": {
-          "hide_name": 0,
-          "bits": [ 102 ],
-          "attributes": {
-            "CONFIG_BIT": 1,
-            "FABulous": 1,
-            "FEATURE": "WRITE_ALLOW",
-            "src": "myProject/Tile/E_Mem_bot/Mem.v:19.11-19.22"
+            "src": "myProject/Tile/E_Mem_bot/Mem.v:14.16-14.21"
           }
         },
         "write_data": {
           "hide_name": 0,
           "bits": [ 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65 ],
           "attributes": {
-            "src": "myProject/Tile/E_Mem_bot/Mem.v:7.28-7.38"
+            "src": "myProject/Tile/E_Mem_bot/Mem.v:8.28-8.38"
           }
         },
         "write_en": {
           "hide_name": 0,
           "bits": [ 66 ],
           "attributes": {
-            "src": "myProject/Tile/E_Mem_bot/Mem.v:8.16-8.24"
+            "src": "myProject/Tile/E_Mem_bot/Mem.v:9.16-9.24"
           }
         }
       }

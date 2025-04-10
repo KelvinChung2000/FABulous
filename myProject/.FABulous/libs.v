@@ -1,34 +1,4 @@
 (* blackbox *)
-module compare #(
-    parameter conf = 0
-)
-(
-    input wire[31:0] A,
-    input wire[31:0] B,
-    output reg[31:0] Y
-);
-
-endmodule
-
-
-(* blackbox *)
-module Mem #(
-    parameter read_allow = 0,
-    parameter write_allow = 0
-)
-(
-    input wire[31:0] addr0,
-    input wire reset,
-    input wire[31:0] write_data,
-    input wire write_en,
-    output reg[31:0] read_data,
-    input wire clk
-);
-
-endmodule
-
-
-(* blackbox *)
 module IO #(
 )
 (
@@ -65,6 +35,34 @@ module reg_unit #(
     input wire[31:0] reg_in,
     input wire rst,
     output reg[31:0] reg_out,
+    input wire clk
+);
+
+endmodule
+
+
+(* blackbox *)
+module compare #(
+    parameter conf = 0
+)
+(
+    input wire[31:0] A,
+    input wire[31:0] B,
+    output reg[31:0] Y
+);
+
+endmodule
+
+
+(* blackbox *)
+module Mem #(
+)
+(
+    input wire[31:0] addr0,
+    input wire reset,
+    input wire[31:0] write_data,
+    input wire write_en,
+    output reg[31:0] read_data,
     input wire clk
 );
 

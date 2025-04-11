@@ -1,4 +1,0 @@
-feature1.subfeature
-feature2.subfeature[3] = 1'b1
-feature3.subfeature[0:3] = 4'hF {test="value"}
-# This is a comment

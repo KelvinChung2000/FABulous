@@ -1,6 +1,5 @@
-read_verilog -sv /home/kelvin/FABulous_fork/myProject/user_design/test.sv
-prep -auto-top -flatten
-opt;;;
-hilomap -wrap Const O
-show -width
-dump
+read_verilog -sv example.sv
+hierarchy -auto-top; flatten; proc; opt -nodffe -nosdff; clean -purge
+fsm -expand
+opt -full
+stat

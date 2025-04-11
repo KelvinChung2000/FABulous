@@ -90,6 +90,12 @@ module MUX4PTv4 (IN1, IN2, IN3, IN4, S1, S2, O);
 
 endmodule
 
+module break_comb_loop (A, X);
+    input A;
+    output X;
+    assign X = A;
+endmodule
+
 module MUX16PTv2 (IN1, IN2, IN3, IN4, IN5, IN6, IN7, IN8, IN9, IN10, IN11, IN12, IN13, IN14, IN15, IN16, S1, S2, S3, S4, O);
     input IN1;
     input IN2;

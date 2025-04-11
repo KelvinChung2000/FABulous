@@ -181,7 +181,7 @@ module unwrap_ALU__mux #(
 
 reg [WIDTH - 1:0] A_orig;
 reg [WIDTH - 1:0] B_orig;
-reg [WIDTH - 1:0] S_orig;
+reg S_orig;
 reg [WIDTH - 1:0] Y_orig;
 assign A_orig = A;
 assign B_orig = B;

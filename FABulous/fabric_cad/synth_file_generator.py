@@ -4,6 +4,8 @@ from itertools import product
 from pathlib import Path
 from typing import Mapping
 
+from hdlgen.code_gen import CodeGenerator
+from hdlgen.HDL_Construct.Value import Value
 from jinja2 import Environment, PackageLoader
 from pyosys import libyosys as ys
 
@@ -11,9 +13,7 @@ from FABulous.fabric_definition.Bel import Bel
 from FABulous.fabric_definition.define import IO
 from FABulous.fabric_definition.Fabric import Fabric
 from FABulous.fabric_definition.Port import ConfigPort
-from FABulous.fabric_generator.code_generator_2 import CodeGenerator
 from FABulous.fabric_generator.define import WriterType
-from FABulous.fabric_generator.HDL_Construct.Value import Value
 
 
 def genPrims(bel: Bel, filePath: Path):

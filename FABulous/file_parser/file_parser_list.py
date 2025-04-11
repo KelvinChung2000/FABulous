@@ -2,21 +2,21 @@ from collections import namedtuple
 from pathlib import Path
 from typing import cast
 
+from hdlgen.HDL_Construct import Value
 from lark import Lark, Transformer, v_args
 
 from FABulous.fabric_definition.SwitchMatrix import Mux, SwitchMatrix
-from FABulous.fabric_generator.HDL_Construct.Value import Value
 
 muxGrammar = r"""
     start: (mux | COMMENT)+
     mux: value  ":" value [("," value)*]
     value: CNAME [slice | iter]
-    
+
     iter: "{" INT ".." INT [".." INT] "}"
-    slice: "[" INT "]" 
+    slice: "[" INT "]"
          | "[" INT ":" INT "]"
-    
-    COMMENT: C_COMMENT | SH_COMMENT | CPP_COMMENT 
+
+    COMMENT: C_COMMENT | SH_COMMENT | CPP_COMMENT
 
     %import common.CNAME
     %import common.INT

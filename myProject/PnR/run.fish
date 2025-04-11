@@ -21,12 +21,16 @@ set source_hdl /home/kelvin/FABulous_fork/myProject/PnR/mac-pipelined/mac-pipeli
 set ir /home/kelvin/FABulous_fork/myProject/PnR/mac-pipelined/ir.log
 set my_FAB_ROOT /home/kelvin/FABulous_fork
 
+cd /home/kelvin/calyx
+cargo build
+cd -
+
 calyx --dump-ir -p fsm-opt -p lower --synthesis --nested -b verilog -d papercut -d cell-share $source_futil -o $source_hdl > $ir
 check_status
 cd ../..
-# FABulous --debug myProject -p "load_fabric; gen_fabric;"
-FABulous --debug myProject -p "load_fabric; gen_fabric; gen_FABulous_CAD_tool_files; \
-         synthesis_script $source_hdl -tcl $my_FAB_ROOT/myProject/.FABulous/arch_synth.tcl;"
+FABulous --debug myProject -p "load_fabric; gen_fabric;"
+# FABulous --debug myProject -p "load_fabric; gen_fabric; gen_FABulous_CAD_tool_files; \
+#          synthesis_script $source_hdl -tcl $my_FAB_ROOT/myProject/.FABulous/arch_synth.tcl;"
 check_status
 cd -
 # # # FABulous --debug ../../myProject -p "load_fabric; gen_FABulous_CAD_tool_files;"

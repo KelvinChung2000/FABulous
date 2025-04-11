@@ -4,8 +4,8 @@ from FABulous.fabric_definition.define import IO, ConfigBitMode
 from FABulous.fabric_definition.Fabric import Fabric
 from FABulous.fabric_definition.Port import BelPort, Port, SlicedPort, TilePort
 from FABulous.fabric_definition.Tile import Tile
-from FABulous.fabric_generator.code_generator_2 import CodeGenerator
-from FABulous.fabric_generator.HDL_Construct.Value import Value
+from hdlgen.code_gen import CodeGenerator
+from hdlgen.HDL_Construct.Value import Value
 
 
 def generateTile(codeGen: CodeGenerator, fabric: Fabric, tile: Tile):
@@ -37,16 +37,16 @@ def generateTile(codeGen: CodeGenerator, fabric: Fabric, tile: Tile):
 
             for bel in tile.bels:
                 for p in bel.externalInputs:
-                    externalBelPortMapping[p] = pr.Port(
-                        f"{p.prefix}{p.name}", p.ioDirection, p.width
+                    externalBelPortMapping[p] = pr.InputPort(
+                        f"{p.prefix}{p.name}", p.width
                     )
                 for p in bel.externalOutputs:
-                    externalBelPortMapping[p] = pr.Port(
-                        f"{p.prefix}{p.name}", p.ioDirection, p.width
+                    externalBelPortMapping[p] = pr.OutputPort(
+                        f"{p.prefix}{p.name}", p.width
                     )
 
-            userClkIn = pr.Port("UserCLK", IO.INPUT)
-            userClkOut = pr.Port("UserCLK_o", IO.OUTPUT)
+            userClkIn = pr.InputPort("UserCLK")
+            userClkOut = pr.OutputPort("UserCLK_o")
 
             if fabric.configBitMode == ConfigBitMode.FRAME_BASED:
                 frameData = pr.Port("FrameData", IO.INPUT, frameBitsPerRow - 1)
@@ -55,10 +55,10 @@ def generateTile(codeGen: CodeGenerator, fabric: Fabric, tile: Tile):
                 frameStrobeOut = pr.Port("FrameStrobe_o", IO.OUTPUT, maxFramePerCol - 1)
 
             else:
-                pr.Port("MODE", IO.INPUT)
-                pr.Port("CONFin", IO.INPUT)
-                pr.Port("CONFout", IO.OUTPUT)
-                pr.Port("CLK", IO.INPUT)
+                pr.InputPort("MODE")
+                pr.InputPort("CONFin")
+                pr.OutputPort("CONFout")
+                pr.InputPort("CLK")
 
         with module.LogicRegion() as lr:
             lr.Comment("Signal Creation")

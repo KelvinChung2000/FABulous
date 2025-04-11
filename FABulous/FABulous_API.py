@@ -1,5 +1,6 @@
 from pathlib import Path
 
+from hdlgen.code_gen import CodeGenerator
 from loguru import logger
 
 import FABulous.fabric_cad.model_generation_npnr as model_gen_npnr
@@ -17,7 +18,6 @@ from FABulous.fabric_definition.Bel import Bel
 from FABulous.fabric_definition.Fabric import Fabric
 from FABulous.fabric_definition.SuperTile import SuperTile
 from FABulous.fabric_definition.Tile import Tile
-from FABulous.fabric_generator.code_generator_2 import CodeGenerator
 from FABulous.fabric_generator.ConfigMem_genenrator import generateConfigMem
 from FABulous.fabric_generator.define import WriterType
 from FABulous.fabric_generator.fabric_generator import generateFabric

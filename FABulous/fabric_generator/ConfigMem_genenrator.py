@@ -2,11 +2,11 @@ import csv
 from pathlib import Path
 
 from bitarray import bitarray
+from hdlgen.code_gen import CodeGenerator
 
 from FABulous.fabric_definition.define import IO
 from FABulous.fabric_definition.Fabric import Fabric
 from FABulous.fabric_definition.Tile import Tile
-from FABulous.fabric_generator.code_generator_2 import CodeGenerator
 
 
 def generateConfigMemInit(

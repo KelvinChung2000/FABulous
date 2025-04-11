@@ -11,7 +11,7 @@ yosys opt_expr
 yosys opt_clean
 yosys check
 yosys opt -nodffe -nosdff
-yosys fsm -nomap -expand -encfile $project_root/.FABulous/fsm_state_info.txt
+yosys fsm -nomap -encfile $project_root/.FABulous/fsm_state_info.txt
 yosys opt
 yosys wreduce
 yosys peepopt
@@ -57,81 +57,81 @@ yosys connwrappers -unsigned \$__sub_wrapper Y Y_WIDTH
 yosys connwrappers -unsigned \$__mux_wrapper Y WIDTH 
 
 # extract cells
-# extract "myProject/Tile/PE/metadata/cell_ALU_ALU_func_3.json" \
-#         "myProject/Tile/PE/metadata/wrap_map_ALU.v"
-# extract "myProject/Tile/PE/metadata/cell_ALU_ALU_func_4.json" \
-#         "myProject/Tile/PE/metadata/wrap_map_ALU.v"
-# extract "myProject/Tile/PE/metadata/cell_ALU_ALU_func_5.json" \
-#         "myProject/Tile/PE/metadata/wrap_map_ALU.v"
-# extract "myProject/Tile/PE/metadata/cell_ALU_ALU_func_0.json" \
-#         "myProject/Tile/PE/metadata/wrap_map_ALU.v"
-# extract "myProject/Tile/PE/metadata/cell_ALU_ALU_func_1.json" \
-#         "myProject/Tile/PE/metadata/wrap_map_ALU.v"
-# extract "myProject/Tile/PE/metadata/cell_ALU_ALU_func_6.json" \
-#         "myProject/Tile/PE/metadata/wrap_map_ALU.v"
-# # unwrapping
-yosys techmap -map myProject/Tile/PE/metadata/unwrap_map_ALU.v
+extract "myProject/Tile/PE/metadata/cell_ALU_ALU_func_3.json" \
+        "myProject/Tile/PE/metadata/wrap_map_ALU.v"
+extract "myProject/Tile/PE/metadata/cell_ALU_ALU_func_4.json" \
+        "myProject/Tile/PE/metadata/wrap_map_ALU.v"
+extract "myProject/Tile/PE/metadata/cell_ALU_ALU_func_5.json" \
+        "myProject/Tile/PE/metadata/wrap_map_ALU.v"
+extract "myProject/Tile/PE/metadata/cell_ALU_ALU_func_0.json" \
+        "myProject/Tile/PE/metadata/wrap_map_ALU.v"
+extract "myProject/Tile/PE/metadata/cell_ALU_ALU_func_1.json" \
+        "myProject/Tile/PE/metadata/wrap_map_ALU.v"
+extract "myProject/Tile/PE/metadata/cell_ALU_ALU_func_6.json" \
+        "myProject/Tile/PE/metadata/wrap_map_ALU.v"
+# unwrapping
+
 yosys opt
 yosys clean -purge
 
 # wrapping base design
-# yosys techmap -map myProject/Tile/PE/metadata/wrap_map_compare.v
-# yosys connwrappers -unsigned \$__lt_wrapper Y Y_WIDTH 
-# yosys connwrappers -unsigned \$__le_wrapper Y Y_WIDTH 
-# yosys connwrappers -unsigned \$__eq_wrapper Y Y_WIDTH 
+yosys techmap -map myProject/Tile/PE/metadata/wrap_map_compare.v
+yosys connwrappers -unsigned \$__lt_wrapper Y Y_WIDTH 
+yosys connwrappers -unsigned \$__le_wrapper Y Y_WIDTH 
+yosys connwrappers -unsigned \$__eq_wrapper Y Y_WIDTH 
 
-# # extract cells
-# extract "myProject/Tile/PE/metadata/cell_compare_conf_0.json" \
-#         "myProject/Tile/PE/metadata/wrap_map_compare.v"
-# extract "myProject/Tile/PE/metadata/cell_compare_conf_1.json" \
-#         "myProject/Tile/PE/metadata/wrap_map_compare.v"
-# extract "myProject/Tile/PE/metadata/cell_compare_conf_2.json" \
-#         "myProject/Tile/PE/metadata/wrap_map_compare.v"
-# # unwrapping
-# yosys techmap -map myProject/Tile/PE/metadata/unwrap_map_compare.v
-# yosys opt
-# yosys clean -purge
+# extract cells
+extract "myProject/Tile/PE/metadata/cell_compare_conf_0.json" \
+        "myProject/Tile/PE/metadata/wrap_map_compare.v"
+extract "myProject/Tile/PE/metadata/cell_compare_conf_1.json" \
+        "myProject/Tile/PE/metadata/wrap_map_compare.v"
+extract "myProject/Tile/PE/metadata/cell_compare_conf_2.json" \
+        "myProject/Tile/PE/metadata/wrap_map_compare.v"
+# unwrapping
 
-# # wrapping base design
-# yosys techmap -map myProject/Tile/PE/metadata/wrap_map_reg_unit.v
-# yosys connwrappers -unsigned \$__sdffe_wrapper Q WIDTH 
-# yosys connwrappers -unsigned \$__sdff_wrapper Q WIDTH 
-# yosys connwrappers -unsigned \$__dff_wrapper Q WIDTH 
-# yosys connwrappers -unsigned \$__dffe_wrapper Q WIDTH 
+yosys opt
+yosys clean -purge
 
-# # extract cells
-# extract "myProject/Tile/PE/metadata/cell_reg_unit_tide_en_0_tide_rst_1.json" \
-#         "myProject/Tile/PE/metadata/wrap_map_reg_unit.v"
-# extract "myProject/Tile/PE/metadata/cell_reg_unit_tide_en_1_tide_rst_1.json" \
-#         "myProject/Tile/PE/metadata/wrap_map_reg_unit.v"
-# extract "myProject/Tile/PE/metadata/cell_reg_unit_tide_en_1_tide_rst_0.json" \
-#         "myProject/Tile/PE/metadata/wrap_map_reg_unit.v"
-# extract "myProject/Tile/PE/metadata/cell_reg_unit_tide_en_0_tide_rst_0.json" \
-#         "myProject/Tile/PE/metadata/wrap_map_reg_unit.v"
-# # unwrapping
-# yosys techmap -map myProject/Tile/PE/metadata/unwrap_map_reg_unit.v
-# yosys opt
-# yosys clean -purge
+# wrapping base design
+yosys techmap -map myProject/Tile/PE/metadata/wrap_map_reg_unit.v
+yosys connwrappers -unsigned \$__sdffe_wrapper Q WIDTH 
+yosys connwrappers -unsigned \$__sdff_wrapper Q WIDTH 
+yosys connwrappers -unsigned \$__dff_wrapper Q WIDTH 
+yosys connwrappers -unsigned \$__dffe_wrapper Q WIDTH 
 
-# # wrapping base design
-# yosys techmap -map myProject/Tile/N_IO/../include/metadata/wrap_map_IO.v
+# extract cells
+extract "myProject/Tile/PE/metadata/cell_reg_unit_tide_en_0_tide_rst_1.json" \
+        "myProject/Tile/PE/metadata/wrap_map_reg_unit.v"
+extract "myProject/Tile/PE/metadata/cell_reg_unit_tide_en_1_tide_rst_1.json" \
+        "myProject/Tile/PE/metadata/wrap_map_reg_unit.v"
+extract "myProject/Tile/PE/metadata/cell_reg_unit_tide_en_1_tide_rst_0.json" \
+        "myProject/Tile/PE/metadata/wrap_map_reg_unit.v"
+extract "myProject/Tile/PE/metadata/cell_reg_unit_tide_en_0_tide_rst_0.json" \
+        "myProject/Tile/PE/metadata/wrap_map_reg_unit.v"
+# unwrapping
 
-# # extract cells
-# # unwrapping
-# yosys techmap -map myProject/Tile/N_IO/../include/metadata/unwrap_map_IO.v
-# yosys opt
-# yosys clean -purge
+yosys opt
+yosys clean -purge
 
-# # wrapping base design
-# yosys techmap -map myProject/Tile/E_Mem_bot/metadata/wrap_map_Mem.v
-# yosys connwrappers -unsigned \$__mux_wrapper Y WIDTH 
-# yosys connwrappers -unsigned \$__mem_v2_wrapper RD_DATA WIDTH 
+# wrapping base design
+yosys techmap -map myProject/Tile/N_IO/../include/metadata/wrap_map_IO.v
 
-# # extract cells
-# extract "myProject/Tile/E_Mem_bot/metadata/cell_Mem.json" \
-#         "myProject/Tile/E_Mem_bot/metadata/wrap_map_Mem.v"
-# # unwrapping
-# yosys techmap -map myProject/Tile/E_Mem_bot/metadata/unwrap_map_Mem.v
+# extract cells
+# unwrapping
+
+yosys opt
+yosys clean -purge
+
+# wrapping base design
+yosys techmap -map myProject/Tile/E_Mem_bot/metadata/wrap_map_Mem.v
+yosys connwrappers -unsigned \$__mux_wrapper Y WIDTH 
+yosys connwrappers -unsigned \$__mem_v2_wrapper RD_DATA WIDTH 
+
+# extract cells
+extract "myProject/Tile/E_Mem_bot/metadata/cell_Mem.json" \
+        "myProject/Tile/E_Mem_bot/metadata/wrap_map_Mem.v"
+# unwrapping
+
 yosys opt
 yosys clean -purge
 
@@ -148,7 +148,7 @@ yosys iopadmap -widthparam WIDTH -outpad IO from_fabric:out -inpad IO to_fabric:
 yosys iopadmap -bits -outpad OUTBUF I:PAD -inpad INBUF O:PAD
 
 # final optimization
-yosys fsm -expand
+yosys fsm -expand -nomap
 yosys opt -full
 yosys clean -purge
 

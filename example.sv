@@ -798,7 +798,7 @@ module comb_mem_d1 #(
                   output logic                     done
 );
 
-  (* keep *) logic [WIDTH-1:0] mem[SIZE-1:0];
+  logic [WIDTH-1:0] mem[SIZE-1:0];
 
   /* verilator lint_off WIDTH */
   assign read_data = mem[addr0];
@@ -1346,35 +1346,35 @@ endmodule
 module fsm_pipelined_mac_def (
     input logic clk,
     input logic reset,
-    output logic [0:0] fsm_data_valid_reg_in_in,
     output logic [0:0] fsm_data_valid_reg_write_en_in,
-    output logic [31:0] fsm_mult_pipe_right_in,
+    output logic [0:0] fsm_data_valid_reg_in_in,
     output logic [0:0] fsm_cond_wire0_in_in,
+    output logic [31:0] fsm_mult_pipe_right_in,
+    output logic [0:0] fsm_cond_write_en_in,
+    output logic [31:0] fsm_add_right_in,
+    output logic [0:0] fsm_pipe2_write_en_in,
     output logic [31:0] fsm_pipe2_in_in,
     output logic [0:0] fsm_mult_pipe_go_in,
-    output logic [0:0] fsm_pipe2_write_en_in,
-    output logic [0:0] fsm_cond_write_en_in,
     output logic [31:0] fsm_add_left_in,
-    output logic [31:0] fsm_mult_pipe_left_in,
     output logic [0:0] fsm_cond_in_in,
-    output logic [31:0] fsm_add_right_in,
+    output logic [31:0] fsm_mult_pipe_left_in,
     output logic [0:0] fsm_pipe1_write_en_in,
     output logic [31:0] fsm_pipe1_in_in,
-    output logic [0:0] fsm_stage2_valid_in_in,
     output logic [0:0] fsm_stage2_valid_write_en_in,
+    output logic [0:0] fsm_stage2_valid_in_in,
     output logic [0:0] fsm_out_valid_write_en_in,
     output logic [0:0] fsm_out_valid_in_in,
     output logic [0:0] fsm_done_in,
     input logic [0:0] data_valid,
     input logic [31:0] add_out,
     input logic stage2_valid_out,
-    input logic [31:0] pipe1_out,
-    input logic [0:0] data_valid_reg_out,
     input logic [31:0] c,
-    input logic [31:0] a,
+    input logic [0:0] data_valid_reg_out,
+    input logic [31:0] b,
     input logic cond_wire0_out,
     input logic [0:0] cond_out,
-    input logic [31:0] b,
+    input logic [31:0] a,
+    input logic [31:0] pipe1_out,
     input logic [31:0] mult_pipe_out,
     input logic fsm_start_out
 );
@@ -1388,7 +1388,7 @@ module fsm_pipelined_mac_def (
   localparam logic [2:0] S6 = 3'd6;
   localparam logic [2:0] S7 = 3'd7;
 
-  logic [2:0] current_state;
+  logic [2:0] current_state = S0;
   logic [2:0] next_state;
 
   always @(posedge clk) begin
@@ -1509,33 +1509,33 @@ module fsm_pipelined_mac_def (
   assign fsm_data_valid_reg_in_in = data_valid;
   assign fsm_add_left_in = pipe1_out;
   assign fsm_cond_in_in = data_valid_reg_out;
+  assign fsm_mult_pipe_left_in = a;
   assign fsm_cond_wire0_in_in = 
        current_state == S2 ? data_valid_reg_out :
        current_state == S3 ? cond_out :
        current_state == S4 ? cond_out :
        current_state == S5 ? cond_out :
        1'dx;
-  assign fsm_add_right_in = c;
   assign fsm_mult_pipe_right_in = b;
-  assign fsm_mult_pipe_left_in = a;
+  assign fsm_add_right_in = c;
   assign fsm_pipe2_in_in = add_out;
   assign fsm_pipe1_in_in = mult_pipe_out;
-  assign fsm_out_valid_in_in = 
-       ((current_state == S6) & (stage2_valid_out)) ? 1'd1 :
-       ((current_state == S6) & (~(stage2_valid_out))) ? 1'd0 :
-       1'dx;
   assign fsm_stage2_valid_in_in = 
        ((current_state == S6) & (data_valid_reg_out)) ? 1'd1 :
        ((current_state == S6) & (~(data_valid_reg_out))) ? 1'd0 :
+       1'dx;
+  assign fsm_out_valid_in_in = 
+       ((current_state == S6) & (stage2_valid_out)) ? 1'd1 :
+       ((current_state == S6) & (~(stage2_valid_out))) ? 1'd0 :
        1'dx;
 endmodule
 
 module pipelined_mac (
     input logic data_valid,
-    input logic [31:0] a,
-    input logic [31:0] b,
-    input logic [31:0] c,
-    output logic [31:0] out,
+    (* data=1 *) input logic [31:0] a,
+    (* data=1 *) input logic [31:0] b,
+    (* data=1 *) input logic [31:0] c,
+    (* data=1 *) output logic [31:0] out,
     output logic output_valid,
     (* go=1 *) input logic go,
     (* clk=1 *) input logic clk,
@@ -1822,36 +1822,36 @@ endmodule
 module fsm_main_def (
     input logic clk,
     input logic reset,
-    output logic [3:0] fsm_b_addr0_in,
-    output logic [31:0] fsm_read_b_in_in,
-    output logic [3:0] fsm_a_addr0_in,
-    output logic [31:0] fsm_read_a_in_in,
-    output logic [0:0] fsm_read_a_write_en_in,
     output logic [0:0] fsm_read_b_write_en_in,
-    output logic [31:0] fsm_mac_a_in,
-    output logic [0:0] fsm_mac_go_in,
-    output logic [0:0] fsm_mac_data_valid_in,
+    output logic [3:0] fsm_a_addr0_in,
+    output logic [3:0] fsm_b_addr0_in,
+    output logic [0:0] fsm_read_a_write_en_in,
+    output logic [31:0] fsm_read_b_in_in,
+    output logic [31:0] fsm_read_a_in_in,
     output logic [31:0] fsm_mac_b_in,
-    output logic [3:0] fsm_add0_left_in,
+    output logic [0:0] fsm_mac_data_valid_in,
+    output logic [0:0] fsm_mac_go_in,
+    output logic [31:0] fsm_mac_a_in,
     output logic [0:0] fsm_idx0_write_en_in,
-    output logic [3:0] fsm_idx0_in_in,
     output logic [3:0] fsm_add0_right_in,
+    output logic [3:0] fsm_add0_left_in,
+    output logic [3:0] fsm_idx0_in_in,
     output logic [0:0] fsm_cond_wire_in_in,
     output logic [3:0] fsm_lt0_left_in,
     output logic [3:0] fsm_lt0_right_in,
     output logic [31:0] fsm_mac_c_in,
+    output logic [0:0] fsm_out_write_en_in,
     output logic [0:0] fsm_out_addr0_in,
     output logic [31:0] fsm_out_write_data_in,
-    output logic [0:0] fsm_out_write_en_in,
     output logic [0:0] fsm_done_in,
     input logic [31:0] b_read_data,
     input logic [31:0] a_read_data,
     input logic [3:0] idx0_out,
-    input logic [31:0] read_b_out,
-    input logic mac_done,
     input logic [31:0] read_a_out,
-    input logic idx0_done,
+    input logic mac_done,
+    input logic [31:0] read_b_out,
     input logic [3:0] add0_out,
+    input logic idx0_done,
     input logic [0:0] lt0_out,
     input logic [31:0] mac_out,
     input logic out_done,
@@ -1872,7 +1872,7 @@ module fsm_main_def (
   localparam logic [3:0] S10 = 4'd10;
   localparam logic [3:0] S11 = 4'd11;
 
-  logic [3:0] current_state = 0;
+  logic [3:0] current_state;
   logic [3:0] next_state;
 
   always @(posedge clk) begin
@@ -1890,9 +1890,6 @@ module fsm_main_def (
         fsm_b_addr0_in = 'b0;
         fsm_done_in = 'b0;
         fsm_idx0_write_en_in = 'b0;
-        fsm_mac_a_in = 'b0;
-        fsm_mac_b_in = 'b0;
-        fsm_mac_c_in = 'b0;
         fsm_mac_data_valid_in = 'b0;
         fsm_mac_go_in = 'b0;
         fsm_out_addr0_in = 'b0;
@@ -1910,9 +1907,6 @@ module fsm_main_def (
         fsm_b_addr0_in = idx0_out;
         fsm_done_in = 'b0;
         fsm_idx0_write_en_in = 'b0;
-        fsm_mac_a_in = 'b0;
-        fsm_mac_b_in = 'b0;
-        fsm_mac_c_in = 'b0;
         fsm_mac_data_valid_in = 'b0;
         fsm_mac_go_in = 'b0;
         fsm_out_addr0_in = 'b0;
@@ -1926,9 +1920,6 @@ module fsm_main_def (
         fsm_b_addr0_in = 'b0;
         fsm_done_in = 'b0;
         fsm_idx0_write_en_in = 'b0;
-        fsm_mac_a_in = read_a_out;
-        fsm_mac_b_in = read_b_out;
-        fsm_mac_c_in = 'b0;
         fsm_mac_data_valid_in = 1'd1;
         fsm_mac_go_in = 1'd1;
         fsm_out_addr0_in = 'b0;
@@ -1946,9 +1937,6 @@ module fsm_main_def (
         fsm_b_addr0_in = 'b0;
         fsm_done_in = 'b0;
         fsm_idx0_write_en_in = 1'd1;
-        fsm_mac_a_in = 'b0;
-        fsm_mac_b_in = 'b0;
-        fsm_mac_c_in = 'b0;
         fsm_mac_data_valid_in = 'b0;
         fsm_mac_go_in = 'b0;
         fsm_out_addr0_in = 'b0;
@@ -1966,9 +1954,6 @@ module fsm_main_def (
         fsm_b_addr0_in = 'b0;
         fsm_done_in = 'b0;
         fsm_idx0_write_en_in = 'b0;
-        fsm_mac_a_in = 'b0;
-        fsm_mac_b_in = 'b0;
-        fsm_mac_c_in = 'b0;
         fsm_mac_data_valid_in = 'b0;
         fsm_mac_go_in = 'b0;
         fsm_out_addr0_in = 'b0;
@@ -1988,9 +1973,6 @@ module fsm_main_def (
         fsm_b_addr0_in = idx0_out;
         fsm_done_in = 'b0;
         fsm_idx0_write_en_in = 'b0;
-        fsm_mac_a_in = 'b0;
-        fsm_mac_b_in = 'b0;
-        fsm_mac_c_in = 'b0;
         fsm_mac_data_valid_in = 'b0;
         fsm_mac_go_in = 'b0;
         fsm_out_addr0_in = 'b0;
@@ -2004,9 +1986,6 @@ module fsm_main_def (
         fsm_b_addr0_in = 'b0;
         fsm_done_in = 'b0;
         fsm_idx0_write_en_in = 'b0;
-        fsm_mac_a_in = read_a_out;
-        fsm_mac_b_in = read_b_out;
-        fsm_mac_c_in = mac_out;
         fsm_mac_data_valid_in = 1'd1;
         fsm_mac_go_in = 1'd1;
         fsm_out_addr0_in = 'b0;
@@ -2024,9 +2003,6 @@ module fsm_main_def (
         fsm_b_addr0_in = 'b0;
         fsm_done_in = 'b0;
         fsm_idx0_write_en_in = 1'd1;
-        fsm_mac_a_in = 'b0;
-        fsm_mac_b_in = 'b0;
-        fsm_mac_c_in = 'b0;
         fsm_mac_data_valid_in = 'b0;
         fsm_mac_go_in = 'b0;
         fsm_out_addr0_in = 'b0;
@@ -2044,9 +2020,6 @@ module fsm_main_def (
         fsm_b_addr0_in = 'b0;
         fsm_done_in = 'b0;
         fsm_idx0_write_en_in = 'b0;
-        fsm_mac_a_in = 'b0;
-        fsm_mac_b_in = 'b0;
-        fsm_mac_c_in = 'b0;
         fsm_mac_data_valid_in = 'b0;
         fsm_mac_go_in = 'b0;
         fsm_out_addr0_in = 'b0;
@@ -2066,9 +2039,6 @@ module fsm_main_def (
         fsm_b_addr0_in = 'b0;
         fsm_done_in = 'b0;
         fsm_idx0_write_en_in = 'b0;
-        fsm_mac_a_in = 'b0;
-        fsm_mac_b_in = 'b0;
-        fsm_mac_c_in = mac_out;
         fsm_mac_data_valid_in = 'b0;
         fsm_mac_go_in = 1'd1;
         fsm_out_addr0_in = 'b0;
@@ -2086,9 +2056,6 @@ module fsm_main_def (
         fsm_b_addr0_in = 'b0;
         fsm_done_in = 'b0;
         fsm_idx0_write_en_in = 'b0;
-        fsm_mac_a_in = 'b0;
-        fsm_mac_b_in = 'b0;
-        fsm_mac_c_in = 'b0;
         fsm_mac_data_valid_in = 'b0;
         fsm_mac_go_in = 'b0;
         fsm_out_addr0_in = 1'd0;
@@ -2106,9 +2073,6 @@ module fsm_main_def (
         fsm_b_addr0_in = 'b0;
         fsm_done_in = 1'd1;
         fsm_idx0_write_en_in = 'b0;
-        fsm_mac_a_in = 'b0;
-        fsm_mac_b_in = 'b0;
-        fsm_mac_c_in = 'b0;
         fsm_mac_data_valid_in = 'b0;
         fsm_mac_go_in = 'b0;
         fsm_out_addr0_in = 'b0;
@@ -2122,9 +2086,6 @@ module fsm_main_def (
         fsm_b_addr0_in = 'b0;
         fsm_done_in = 'b0;
         fsm_idx0_write_en_in = 'b0;
-        fsm_mac_a_in = 'b0;
-        fsm_mac_b_in = 'b0;
-        fsm_mac_c_in = 'b0;
         fsm_mac_data_valid_in = 'b0;
         fsm_mac_go_in = 'b0;
         fsm_out_addr0_in = 'b0;
@@ -2135,14 +2096,17 @@ module fsm_main_def (
       end
     endcase
   end
-  assign fsm_read_a_in_in = a_read_data;
   assign fsm_read_b_in_in = b_read_data;
+  assign fsm_read_a_in_in = a_read_data;
+  assign fsm_mac_b_in = read_b_out;
+  assign fsm_mac_a_in = read_a_out;
   assign fsm_add0_left_in = 4'd1;
   assign fsm_add0_right_in = idx0_out;
   assign fsm_idx0_in_in = add0_out;
   assign fsm_lt0_right_in = 4'd10;
   assign fsm_lt0_left_in = idx0_out;
   assign fsm_cond_wire_in_in = lt0_out;
+  assign fsm_mac_c_in = mac_out;
   assign fsm_out_write_data_in = mac_out;
 endmodule
 
@@ -2462,13 +2426,13 @@ module main (
   assign read_a_reset = reset;
   assign read_a_in = fsm_read_a_in_out;
   assign cond_wire_in = fsm_cond_wire_in_out;
-  assign mac_b = ~mac_done ? fsm_mac_b_out : 32'd0;
+  assign mac_b = fsm_mac_b_out;
   assign mac_data_valid = ~mac_done ? fsm_mac_data_valid_out : 1'd0;
   assign mac_clk = clk;
-  assign mac_a = ~mac_done ? fsm_mac_a_out : 32'd0;
+  assign mac_a = fsm_mac_a_out;
   assign mac_go = ~mac_done ? fsm_mac_go_out : 1'd0;
   assign mac_reset = reset;
-  assign mac_c = ~mac_done ? fsm_mac_c_out : 32'd0;
+  assign mac_c = fsm_mac_c_out;
   assign fsm_start_in = go;
   assign lt0_left = fsm_lt0_left_out;
   assign lt0_right = fsm_lt0_right_out;

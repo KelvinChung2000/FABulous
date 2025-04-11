@@ -11,7 +11,7 @@ yosys opt_expr
 yosys opt_clean
 yosys check
 yosys opt -nodffe -nosdff
-yosys fsm -nomap -expand -encfile $project_root/.FABulous/fsm_state_info.txt
+yosys fsm -nomap -encfile $project_root/.FABulous/fsm_state_info.txt
 yosys opt
 yosys wreduce
 yosys peepopt
@@ -58,7 +58,7 @@ extract "{{ cell }}" \
         "{{ wrapperPath }}"
 {%- endfor %}
 # unwrapping
-yosys techmap -map {{ unWrapperPath }}
+{# yosys techmap -map {{ unWrapperPath }} #}
 yosys opt
 yosys clean -purge
 {% endfor %}
@@ -75,7 +75,7 @@ yosys iopadmap -widthparam WIDTH -outpad IO from_fabric:out -inpad IO to_fabric:
 yosys iopadmap -bits -outpad OUTBUF I:PAD -inpad INBUF O:PAD
 
 # final optimization
-yosys fsm -expand
+yosys fsm -expand -nomap
 yosys opt -full
 yosys clean -purge
 

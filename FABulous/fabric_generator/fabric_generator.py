@@ -4,8 +4,8 @@ from typing import Mapping
 from FABulous.fabric_definition.define import IO, ConfigBitMode, Loc, Side
 from FABulous.fabric_definition.Fabric import Fabric
 from FABulous.fabric_definition.Port import BelPort
-from FABulous.fabric_generator.code_generator_2 import CodeGenerator
-from FABulous.fabric_generator.HDL_Construct.Value import Value
+from hdlgen.code_gen import CodeGenerator
+from hdlgen.HDL_Construct.Value import Value
 
 
 def generateFabric(codeGen: CodeGenerator, fabric: Fabric):
@@ -26,28 +26,26 @@ def generateFabric(codeGen: CodeGenerator, fabric: Fabric):
                 mapping = {}
                 for bel in tile.bels:
                     for externalInput in bel.externalInputs:
-                        mapping[externalInput] = pr.Port(
+                        mapping[externalInput] = pr.InputPort(
                             f"Tile_X{x}Y{y}_{bel.prefix}{externalInput.name}",
-                            externalInput.ioDirection,
                             externalInput.width,
                         )
                     for externalOutput in bel.externalOutputs:
-                        mapping[externalOutput] = pr.Port(
+                        mapping[externalOutput] = pr.OutputPort(
                             f"Tile_X{x}Y{y}_{bel.prefix}{externalOutput.name}",
-                            externalOutput.ioDirection,
                             externalOutput.width,
                         )
                     externalSignalMapping[(x, y)] = mapping
 
             if fabric.configBitMode == ConfigBitMode.FRAME_BASED:
-                frameData = pr.Port(
-                    "FrameData", IO.INPUT, frameBitsPerRow * fabric.height - 1
+                frameData = pr.InputPort(
+                    "FrameData", frameBitsPerRow * fabric.height - 1
                 )
-                frameStrobe = pr.Port(
-                    "FrameStrobe", IO.INPUT, maxFramePerCol * fabric.width - 1
+                frameStrobe = pr.InputPort(
+                    "FrameStrobe", maxFramePerCol * fabric.width - 1
                 )
 
-            userClk = pr.Port("UserCLK", IO.INPUT)
+            userClk = pr.InputPort("UserCLK")
 
         with m.LogicRegion() as lr:
             clkWireInMapping: Mapping[Loc, Value] = {}

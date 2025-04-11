@@ -1406,34 +1406,34 @@ endmodule
 module fsm_pipelined_mac_def (
   input logic clk,
   input logic reset,
-  output logic [0:0] fsm_data_valid_reg_in_in,
   output logic [0:0] fsm_data_valid_reg_write_en_in,
-  output logic [31:0] fsm_add_left_in,
-  output logic [0:0] fsm_cond_write_en_in,
-  output logic [31:0] fsm_pipe2_in_in,
-  output logic [0:0] fsm_mult_pipe_go_in,
+  output logic [0:0] fsm_data_valid_reg_in_in,
+  output logic [31:0] fsm_mult_pipe_right_in,
   output logic [31:0] fsm_add_right_in,
+  output logic [0:0] fsm_mult_pipe_go_in,
   output logic [0:0] fsm_cond_wire0_in_in,
   output logic [31:0] fsm_mult_pipe_left_in,
-  output logic [31:0] fsm_mult_pipe_right_in,
+  output logic [0:0] fsm_cond_write_en_in,
+  output logic [31:0] fsm_add_left_in,
   output logic [0:0] fsm_pipe2_write_en_in,
+  output logic [31:0] fsm_pipe2_in_in,
   output logic [0:0] fsm_cond_in_in,
-  output logic [31:0] fsm_pipe1_in_in,
   output logic [0:0] fsm_pipe1_write_en_in,
+  output logic [31:0] fsm_pipe1_in_in,
   output logic [0:0] fsm_stage2_valid_write_en_in,
+  output logic [0:0] fsm_out_valid_in_in,
   output logic [0:0] fsm_out_valid_write_en_in,
   output logic [0:0] fsm_stage2_valid_in_in,
-  output logic [0:0] fsm_out_valid_in_in,
   output logic [0:0] fsm_done_in,
   input logic [0:0] data_valid,
-  input logic [31:0] a,
+  input logic [31:0] b,
   input logic cond_wire0_out,
+  input logic [31:0] c,
+  input logic stage2_valid_out,
   input logic [0:0] data_valid_reg_out,
+  input logic [31:0] a,
   input logic [0:0] cond_out,
   input logic [31:0] add_out,
-  input logic stage2_valid_out,
-  input logic [31:0] c,
-  input logic [31:0] b,
   input logic [31:0] pipe1_out,
   input logic [31:0] mult_pipe_out,
   input logic fsm_start_out
@@ -1448,7 +1448,7 @@ module fsm_pipelined_mac_def (
   localparam logic[2:0] S6 = 3'd6;
   localparam logic[2:0] S7 = 3'd7;
 
-  logic [2:0] current_state = S0;
+  logic [2:0] current_state;
   logic [2:0] next_state;
 
   always @(posedge clk) begin
@@ -1569,18 +1569,18 @@ module fsm_pipelined_mac_def (
     endcase
   end
 assign fsm_data_valid_reg_in_in = data_valid;
-assign fsm_cond_in_in = data_valid_reg_out;
-assign fsm_mult_pipe_left_in = a;
 assign fsm_mult_pipe_right_in = b;
-assign fsm_add_right_in = c;
-assign fsm_add_left_in = pipe1_out;
-assign fsm_pipe2_in_in = add_out;
+assign fsm_mult_pipe_left_in = a;
 assign fsm_cond_wire0_in_in = 
        current_state == S2 ? data_valid_reg_out :
        current_state == S3 ? cond_out :
        current_state == S4 ? cond_out :
        current_state == S5 ? cond_out :
        1'dx;
+assign fsm_pipe2_in_in = add_out;
+assign fsm_add_right_in = c;
+assign fsm_cond_in_in = data_valid_reg_out;
+assign fsm_add_left_in = pipe1_out;
 assign fsm_pipe1_in_in = mult_pipe_out;
 assign fsm_out_valid_in_in = 
        ((current_state == S6) & (stage2_valid_out)) ? 1'd1 :
@@ -1889,31 +1889,31 @@ endmodule
 module fsm_main_def (
   input logic clk,
   input logic reset,
-  output logic [31:0] fsm_read_a_in_in,
-  output logic [3:0] fsm_a_addr0_in,
-  output logic [3:0] fsm_b_addr0_in,
   output logic [31:0] fsm_read_b_in_in,
   output logic [0:0] fsm_read_a_write_en_in,
   output logic [0:0] fsm_read_b_write_en_in,
-  output logic [31:0] fsm_mac_a_in,
-  output logic [0:0] fsm_mac_go_in,
+  output logic [31:0] fsm_read_a_in_in,
+  output logic [3:0] fsm_b_addr0_in,
+  output logic [3:0] fsm_a_addr0_in,
   output logic [31:0] fsm_mac_b_in,
   output logic [0:0] fsm_mac_data_valid_in,
+  output logic [31:0] fsm_mac_a_in,
+  output logic [0:0] fsm_mac_go_in,
   output logic [0:0] fsm_idx0_write_en_in,
-  output logic [3:0] fsm_add0_left_in,
-  output logic [3:0] fsm_idx0_in_in,
   output logic [3:0] fsm_add0_right_in,
-  output logic [3:0] fsm_lt0_right_in,
+  output logic [3:0] fsm_idx0_in_in,
+  output logic [3:0] fsm_add0_left_in,
   output logic [0:0] fsm_cond_wire_in_in,
   output logic [3:0] fsm_lt0_left_in,
+  output logic [3:0] fsm_lt0_right_in,
   output logic [31:0] fsm_mac_c_in,
   output logic [31:0] fsm_out_write_data_in,
-  output logic [0:0] fsm_out_addr0_in,
   output logic [0:0] fsm_out_write_en_in,
+  output logic [0:0] fsm_out_addr0_in,
   output logic [0:0] fsm_done_in,
   input logic [3:0] idx0_out,
-  input logic [31:0] a_read_data,
   input logic [31:0] b_read_data,
+  input logic [31:0] a_read_data,
   input logic [31:0] read_b_out,
   input logic mac_done,
   input logic [31:0] read_a_out,
@@ -1939,7 +1939,7 @@ module fsm_main_def (
   localparam logic[3:0] S10 = 4'd10;
   localparam logic[3:0] S11 = 4'd11;
 
-  logic [3:0] current_state = S0;
+  logic [3:0] current_state;
   logic [3:0] next_state;
 
   always @(posedge clk) begin
@@ -2177,11 +2177,11 @@ module fsm_main_def (
   end
 assign fsm_read_b_in_in = b_read_data;
 assign fsm_read_a_in_in = a_read_data;
-assign fsm_mac_b_in = read_b_out;
 assign fsm_mac_a_in = read_a_out;
-assign fsm_add0_left_in = 4'd1;
-assign fsm_idx0_in_in = add0_out;
+assign fsm_mac_b_in = read_b_out;
 assign fsm_add0_right_in = idx0_out;
+assign fsm_idx0_in_in = add0_out;
+assign fsm_add0_left_in = 4'd1;
 assign fsm_cond_wire_in_in = lt0_out;
 assign fsm_lt0_left_in = idx0_out;
 assign fsm_lt0_right_in = 4'd10;

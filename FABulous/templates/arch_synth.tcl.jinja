@@ -11,7 +11,8 @@ yosys opt_expr
 yosys opt_clean
 yosys check
 yosys opt -nodffe -nosdff
-yosys fsm -nomap -encfile $project_root/.FABulous/fsm_state_info.txt
+yosys fsm_detect
+yosys fsm_extract
 yosys opt
 yosys wreduce
 yosys peepopt
@@ -65,6 +66,7 @@ yosys clean -purge
 
 # cell techmapping
 yosys techmap -map $project_root/.FABulous/techmaps.v
+yosys techmap -map /home/kelvin/FABulous_fork/myProject/PnR/fsm_map.v
 
 # const unit mapping
 {# yosys read_rtlil -lib $project_root/Tile/PE/metadata/cell_const_unit.il #}
@@ -75,10 +77,8 @@ yosys iopadmap -widthparam WIDTH -outpad IO from_fabric:out -inpad IO to_fabric:
 yosys iopadmap -bits -outpad OUTBUF I:PAD -inpad INBUF O:PAD
 
 # final optimization
-yosys fsm -expand -nomap
 yosys opt -full
 yosys clean -purge
-
 yosys show -enum -long -width -format dot -prefix $project_root/.FABulous/design
 yosys write_json $project_root/user_design/synth_test.json
 yosys fsm_info

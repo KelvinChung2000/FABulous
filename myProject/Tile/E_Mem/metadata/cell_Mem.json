@@ -6,7 +6,7 @@
         "CELL": "00000000000000000000000000000001",
         "dynports": "00000000000000000000000000000001",
         "top": "00000000000000000000000000000001",
-        "src": "myProject/Tile/E_Mem_bot/Mem.v:2.1-26.10"
+        "src": "myProject/Tile/E_Mem/Mem.v:2.1-26.10"
       },
       "parameter_default_values": {
         "IDX_SIZE": "00000000000000000000000000000100",
@@ -161,19 +161,19 @@
         }
       },
       "netnames": {
-        "$0$memwr$\\mem$myProject/Tile/E_Mem_bot/Mem.v:23$54_ADDR[3:0]$57": {
+        "$0$memwr$\\mem$myProject/Tile/E_Mem/Mem.v:23$54_ADDR[3:0]$57": {
           "hide_name": 1,
           "bits": [ 134, 135, 136, 137 ],
           "attributes": {
           }
         },
-        "$0$memwr$\\mem$myProject/Tile/E_Mem_bot/Mem.v:23$54_DATA[31:0]$58": {
+        "$0$memwr$\\mem$myProject/Tile/E_Mem/Mem.v:23$54_DATA[31:0]$58": {
           "hide_name": 1,
           "bits": [ 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133 ],
           "attributes": {
           }
         },
-        "$0$memwr$\\mem$myProject/Tile/E_Mem_bot/Mem.v:23$54_EN[31:0]$59": {
+        "$0$memwr$\\mem$myProject/Tile/E_Mem/Mem.v:23$54_EN[31:0]$59": {
           "hide_name": 1,
           "bits": [ 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101 ],
           "attributes": {

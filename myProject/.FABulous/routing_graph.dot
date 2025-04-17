@@ -6732,7 +6732,7 @@ style=rounded;
 rank=source;
 }
 subgraph cluster_5_1 {
-label="tile_5_1_E_Mem_bot";
+label="tile_5_1_E_Mem";
 margin=15;
 style=rounded;
 rank=source;
@@ -6773,34 +6773,64 @@ label="c0.Mem";
 "X5Y1.c0.Mem.read_data" -> "X5Y1.c0.read_data";
 }
 "X5Y1.user_clk_o" -> "X5Y1.c0.Mem_clk_i";
+"X5Y1.c0.addr_o_internal";
+"X5Y1.c0.addr_o";
+"X5Y1.c0.addr_o_internal" -> "X5Y1.c0.addr_o";
 "X5Y1.c0.out3_internal";
 "X5Y1.c0.out3";
 "X5Y1.c0.out3_internal" -> "X5Y1.c0.out3";
-"X5Y1.c0.read_data" -> "X5Y1.c0.out3_internal";
-"X5Y1.c0.addr_i";
-"X5Y1.c0.addr_i" -> "X5Y1.c0.addr0";
-"X5Y1.c0.in3";
-"X5Y1.c0.in3" -> "X5Y1.c0.write_data";
 }
-"X5Y1.c0.out3" -> "X4Y1.c0.in1" [dir=none, color=blue];
 subgraph cluster_5_2 {
-label="tile_5_2_E_Mem_top";
+label="tile_5_2_E_Mem";
 margin=15;
 style=rounded;
 rank=source;
+subgraph cluster_5_2_CLK_DRV {
+label="CLK_DRV";
+"X5Y2.bel_CLK_DRV" [label="bel_CLK_DRV(z=0xffff)", shape=box];
+"X5Y2.CLK_DRV.CLK_O" [label="CLK_O", shape=hexagon];
+"X5Y2.bel_CLK_DRV" -> "X5Y2.CLK_DRV.CLK_O";
+"X5Y2.user_clk_o";
+"X5Y2.CLK_DRV.CLK_O" -> "X5Y2.user_clk_o";
+}
+subgraph "cluster_5_2_c0.Mem" {
+label="c0.Mem";
+"X5Y2.bel_c0.Mem" [label="bel_c0.Mem(z=0x0000)", shape=box];
+"X5Y2.c0.Mem.clk" [label=clk, shape=hexagon];
+"X5Y2.c0.Mem_clk_i";
+"X5Y2.c0.Mem_clk_i" -> "X5Y2.c0.Mem.clk";
+"X5Y2.c0.Mem.clk" -> "X5Y2.bel_c0.Mem";
+"X5Y2.c0.Mem.addr0" [label=addr0, shape=hexagon];
+"X5Y2.c0.addr0";
+"X5Y2.c0.addr0" -> "X5Y2.c0.Mem.addr0";
+"X5Y2.c0.Mem.addr0" -> "X5Y2.bel_c0.Mem";
+"X5Y2.c0.Mem.reset" [label=reset, shape=hexagon];
+"X5Y2.c0.reset";
+"X5Y2.c0.reset" -> "X5Y2.c0.Mem.reset";
+"X5Y2.c0.Mem.reset" -> "X5Y2.bel_c0.Mem";
+"X5Y2.c0.Mem.write_data" [label="write_data", shape=hexagon];
+"X5Y2.c0.write_data";
+"X5Y2.c0.write_data" -> "X5Y2.c0.Mem.write_data";
+"X5Y2.c0.Mem.write_data" -> "X5Y2.bel_c0.Mem";
+"X5Y2.c0.Mem.write_en" [label="write_en", shape=hexagon];
+"X5Y2.c0.write_en";
+"X5Y2.c0.write_en" -> "X5Y2.c0.Mem.write_en";
+"X5Y2.c0.Mem.write_en" -> "X5Y2.bel_c0.Mem";
+"X5Y2.c0.Mem.read_data" [label="read_data", shape=hexagon];
+"X5Y2.bel_c0.Mem" -> "X5Y2.c0.Mem.read_data";
+"X5Y2.c0.read_data";
+"X5Y2.c0.Mem.read_data" -> "X5Y2.c0.read_data";
+}
+"X5Y2.user_clk_o" -> "X5Y2.c0.Mem_clk_i";
 "X5Y2.c0.addr_o_internal";
 "X5Y2.c0.addr_o";
 "X5Y2.c0.addr_o_internal" -> "X5Y2.c0.addr_o";
 "X5Y2.c0.out3_internal";
 "X5Y2.c0.out3";
 "X5Y2.c0.out3_internal" -> "X5Y2.c0.out3";
-"X5Y2.c0.in3";
-"X5Y2.c0.in3" -> "X5Y2.c0.out3_internal";
-"X5Y2.c0.in3" -> "X5Y2.c0.addr_o_internal";
 }
-"X5Y2.c0.out3" -> "X4Y2.c0.in1" [dir=none, color=blue];
 subgraph cluster_5_3 {
-label="tile_5_3_E_Mem_bot";
+label="tile_5_3_E_Mem";
 margin=15;
 style=rounded;
 rank=source;
@@ -6841,34 +6871,64 @@ label="c0.Mem";
 "X5Y3.c0.Mem.read_data" -> "X5Y3.c0.read_data";
 }
 "X5Y3.user_clk_o" -> "X5Y3.c0.Mem_clk_i";
+"X5Y3.c0.addr_o_internal";
+"X5Y3.c0.addr_o";
+"X5Y3.c0.addr_o_internal" -> "X5Y3.c0.addr_o";
 "X5Y3.c0.out3_internal";
 "X5Y3.c0.out3";
 "X5Y3.c0.out3_internal" -> "X5Y3.c0.out3";
-"X5Y3.c0.read_data" -> "X5Y3.c0.out3_internal";
-"X5Y3.c0.addr_i";
-"X5Y3.c0.addr_i" -> "X5Y3.c0.addr0";
-"X5Y3.c0.in3";
-"X5Y3.c0.in3" -> "X5Y3.c0.write_data";
 }
-"X5Y3.c0.out3" -> "X4Y3.c0.in1" [dir=none, color=blue];
 subgraph cluster_5_4 {
-label="tile_5_4_E_Mem_top";
+label="tile_5_4_E_Mem";
 margin=15;
 style=rounded;
 rank=source;
+subgraph cluster_5_4_CLK_DRV {
+label="CLK_DRV";
+"X5Y4.bel_CLK_DRV" [label="bel_CLK_DRV(z=0xffff)", shape=box];
+"X5Y4.CLK_DRV.CLK_O" [label="CLK_O", shape=hexagon];
+"X5Y4.bel_CLK_DRV" -> "X5Y4.CLK_DRV.CLK_O";
+"X5Y4.user_clk_o";
+"X5Y4.CLK_DRV.CLK_O" -> "X5Y4.user_clk_o";
+}
+subgraph "cluster_5_4_c0.Mem" {
+label="c0.Mem";
+"X5Y4.bel_c0.Mem" [label="bel_c0.Mem(z=0x0000)", shape=box];
+"X5Y4.c0.Mem.clk" [label=clk, shape=hexagon];
+"X5Y4.c0.Mem_clk_i";
+"X5Y4.c0.Mem_clk_i" -> "X5Y4.c0.Mem.clk";
+"X5Y4.c0.Mem.clk" -> "X5Y4.bel_c0.Mem";
+"X5Y4.c0.Mem.addr0" [label=addr0, shape=hexagon];
+"X5Y4.c0.addr0";
+"X5Y4.c0.addr0" -> "X5Y4.c0.Mem.addr0";
+"X5Y4.c0.Mem.addr0" -> "X5Y4.bel_c0.Mem";
+"X5Y4.c0.Mem.reset" [label=reset, shape=hexagon];
+"X5Y4.c0.reset";
+"X5Y4.c0.reset" -> "X5Y4.c0.Mem.reset";
+"X5Y4.c0.Mem.reset" -> "X5Y4.bel_c0.Mem";
+"X5Y4.c0.Mem.write_data" [label="write_data", shape=hexagon];
+"X5Y4.c0.write_data";
+"X5Y4.c0.write_data" -> "X5Y4.c0.Mem.write_data";
+"X5Y4.c0.Mem.write_data" -> "X5Y4.bel_c0.Mem";
+"X5Y4.c0.Mem.write_en" [label="write_en", shape=hexagon];
+"X5Y4.c0.write_en";
+"X5Y4.c0.write_en" -> "X5Y4.c0.Mem.write_en";
+"X5Y4.c0.Mem.write_en" -> "X5Y4.bel_c0.Mem";
+"X5Y4.c0.Mem.read_data" [label="read_data", shape=hexagon];
+"X5Y4.bel_c0.Mem" -> "X5Y4.c0.Mem.read_data";
+"X5Y4.c0.read_data";
+"X5Y4.c0.Mem.read_data" -> "X5Y4.c0.read_data";
+}
+"X5Y4.user_clk_o" -> "X5Y4.c0.Mem_clk_i";
 "X5Y4.c0.addr_o_internal";
 "X5Y4.c0.addr_o";
 "X5Y4.c0.addr_o_internal" -> "X5Y4.c0.addr_o";
 "X5Y4.c0.out3_internal";
 "X5Y4.c0.out3";
 "X5Y4.c0.out3_internal" -> "X5Y4.c0.out3";
-"X5Y4.c0.in3";
-"X5Y4.c0.in3" -> "X5Y4.c0.out3_internal";
-"X5Y4.c0.in3" -> "X5Y4.c0.addr_o_internal";
 }
-"X5Y4.c0.out3" -> "X4Y4.c0.in1" [dir=none, color=blue];
 subgraph cluster_5_5 {
-label="tile_5_5_E_Mem_bot";
+label="tile_5_5_E_Mem";
 margin=15;
 style=rounded;
 rank=source;
@@ -6909,32 +6969,62 @@ label="c0.Mem";
 "X5Y5.c0.Mem.read_data" -> "X5Y5.c0.read_data";
 }
 "X5Y5.user_clk_o" -> "X5Y5.c0.Mem_clk_i";
+"X5Y5.c0.addr_o_internal";
+"X5Y5.c0.addr_o";
+"X5Y5.c0.addr_o_internal" -> "X5Y5.c0.addr_o";
 "X5Y5.c0.out3_internal";
 "X5Y5.c0.out3";
 "X5Y5.c0.out3_internal" -> "X5Y5.c0.out3";
-"X5Y5.c0.read_data" -> "X5Y5.c0.out3_internal";
-"X5Y5.c0.addr_i";
-"X5Y5.c0.addr_i" -> "X5Y5.c0.addr0";
-"X5Y5.c0.in3";
-"X5Y5.c0.in3" -> "X5Y5.c0.write_data";
 }
-"X5Y5.c0.out3" -> "X4Y5.c0.in1" [dir=none, color=blue];
 subgraph cluster_5_6 {
-label="tile_5_6_E_Mem_top";
+label="tile_5_6_E_Mem";
 margin=15;
 style=rounded;
 rank=source;
+subgraph cluster_5_6_CLK_DRV {
+label="CLK_DRV";
+"X5Y6.bel_CLK_DRV" [label="bel_CLK_DRV(z=0xffff)", shape=box];
+"X5Y6.CLK_DRV.CLK_O" [label="CLK_O", shape=hexagon];
+"X5Y6.bel_CLK_DRV" -> "X5Y6.CLK_DRV.CLK_O";
+"X5Y6.user_clk_o";
+"X5Y6.CLK_DRV.CLK_O" -> "X5Y6.user_clk_o";
+}
+subgraph "cluster_5_6_c0.Mem" {
+label="c0.Mem";
+"X5Y6.bel_c0.Mem" [label="bel_c0.Mem(z=0x0000)", shape=box];
+"X5Y6.c0.Mem.clk" [label=clk, shape=hexagon];
+"X5Y6.c0.Mem_clk_i";
+"X5Y6.c0.Mem_clk_i" -> "X5Y6.c0.Mem.clk";
+"X5Y6.c0.Mem.clk" -> "X5Y6.bel_c0.Mem";
+"X5Y6.c0.Mem.addr0" [label=addr0, shape=hexagon];
+"X5Y6.c0.addr0";
+"X5Y6.c0.addr0" -> "X5Y6.c0.Mem.addr0";
+"X5Y6.c0.Mem.addr0" -> "X5Y6.bel_c0.Mem";
+"X5Y6.c0.Mem.reset" [label=reset, shape=hexagon];
+"X5Y6.c0.reset";
+"X5Y6.c0.reset" -> "X5Y6.c0.Mem.reset";
+"X5Y6.c0.Mem.reset" -> "X5Y6.bel_c0.Mem";
+"X5Y6.c0.Mem.write_data" [label="write_data", shape=hexagon];
+"X5Y6.c0.write_data";
+"X5Y6.c0.write_data" -> "X5Y6.c0.Mem.write_data";
+"X5Y6.c0.Mem.write_data" -> "X5Y6.bel_c0.Mem";
+"X5Y6.c0.Mem.write_en" [label="write_en", shape=hexagon];
+"X5Y6.c0.write_en";
+"X5Y6.c0.write_en" -> "X5Y6.c0.Mem.write_en";
+"X5Y6.c0.Mem.write_en" -> "X5Y6.bel_c0.Mem";
+"X5Y6.c0.Mem.read_data" [label="read_data", shape=hexagon];
+"X5Y6.bel_c0.Mem" -> "X5Y6.c0.Mem.read_data";
+"X5Y6.c0.read_data";
+"X5Y6.c0.Mem.read_data" -> "X5Y6.c0.read_data";
+}
+"X5Y6.user_clk_o" -> "X5Y6.c0.Mem_clk_i";
 "X5Y6.c0.addr_o_internal";
 "X5Y6.c0.addr_o";
 "X5Y6.c0.addr_o_internal" -> "X5Y6.c0.addr_o";
 "X5Y6.c0.out3_internal";
 "X5Y6.c0.out3";
 "X5Y6.c0.out3_internal" -> "X5Y6.c0.out3";
-"X5Y6.c0.in3";
-"X5Y6.c0.in3" -> "X5Y6.c0.out3_internal";
-"X5Y6.c0.in3" -> "X5Y6.c0.addr_o_internal";
 }
-"X5Y6.c0.out3" -> "X4Y6.c0.in1" [dir=none, color=blue];
 subgraph cluster_5_7 {
 label="tile_5_7_NULL";
 margin=15;

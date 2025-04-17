@@ -162,7 +162,7 @@ class FABulous_CLI(Cmd):
                 Path,
                 "The fabric file ",
                 self,
-                completer=Cmd.path_complete,
+                completer=Cmd.path_complete,  # type: ignore
             )
         )
 
@@ -232,8 +232,7 @@ class FABulous_CLI(Cmd):
         """Override the onecmd method to handle exceptions."""
         try:
             return super().onecmd(*arg, **kwargs)
-        except Exception as e:
-            logger.error(f"Error occurred: {type(e).__name__}: {e}")
+        except Exception:
             logger.debug(traceback.format_exc())
             self.exit_code = 1
             return False
@@ -596,15 +595,9 @@ class FABulous_CLI(Cmd):
 
     @with_category(CMD_FABRIC_FLOW)
     def do_gen_FABulous_CAD_tool_files(self, *ignored):
-        try:
-            self.do_gen_bitStream_spec()
-            self.do_gen_cells_and_techmaps()
-            self.do_gen_chipdb()
-        except Exception as e:
-            logger.error(f"FABulous CAD tool files generation failed: {e}")
-            logger.error(f"Stack trace:\n{traceback.format_exc()}")
-            self.exit_code = 1
-            return True
+        self.do_gen_bitStream_spec()
+        self.do_gen_cells_and_techmaps()
+        self.do_gen_chipdb()
 
     @with_category(CMD_FABRIC_FLOW)
     def do_gen_model_npnr(self, *ignored):

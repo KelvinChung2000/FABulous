@@ -21,7 +21,19 @@ ALU:data_out 32 reg_unit:reg_in 32 3
 
 #W_reg_unit:rst
 
+#Mem:addr0
+
 #Mem:reset
+
+#Mem:write_data
+
+#Mem:write_en
+
+#Mem:addr0
+
+#Mem:reset
+
+#Mem:write_data
 
 #Mem:write_en
 

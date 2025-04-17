@@ -1,8 +1,8 @@
 # Do not modify the boilerplate code, as it is used to generate the listFile.py file
 
-from myProject.Tile.E_Mem_top.metadata.E_Mem_top_ports import E_Mem_top_ports
+from myProject.Tile.E_Mem.metadata.E_Mem_ports import E_Mem_ports
 
-class MuxList(E_Mem_top_ports):
+class MuxList(E_Mem_ports):
 
     def construct(self):
         # remove the placeholder pass and add your code here
@@ -21,6 +21,4 @@ class MuxList(E_Mem_top_ports):
         # All the input to a mux will be in the order which the connections are made
         # For example, if you connect self.out //= self.a and then self.out //= self.b
         # The inputs to the mux will be [self.a, self.b]
-        
-        self.addr_o //= self.in3
-        self.out3 //= self.in3
+        pass

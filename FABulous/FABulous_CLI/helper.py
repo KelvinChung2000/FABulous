@@ -14,6 +14,10 @@ from FABulous.fabric_generator.define import WriterType
 MAX_BITBYTES = 16384
 
 
+def error_callback(msg):
+    raise Exception
+
+
 def setup_logger(verbosity: int):
     # Remove the default logger to avoid duplicate logs
     logger.remove()
@@ -30,7 +34,14 @@ def setup_logger(verbosity: int):
         log_format = "<level>{level:}</level> | <level>{message}</level>"
 
     # Add logger to write logs to stdout
-    logger.add(sys.stdout, format=log_format, level="DEBUG", colorize=True)
+    logger.add(sys.stdout, format=log_format, level="DEBUG", colorize=True, catch=False)
+    logger.add(
+        error_callback,
+        format=log_format,
+        colorize=True,
+        catch=False,
+        filter=lambda msg: msg["level"].name == "ERROR",
+    )
 
 
 def setup_global_env_vars(args: argparse.Namespace) -> None:

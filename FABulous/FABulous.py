@@ -3,6 +3,7 @@ import os
 from contextlib import redirect_stdout
 from importlib.metadata import version
 from pathlib import Path
+import sys
 
 from loguru import logger
 
@@ -170,7 +171,8 @@ def main():
                 with redirect_stdout(log):
                     fab_CLI.cmdloop()
         else:
-            fab_CLI.cmdloop()
+            exit_code = fab_CLI.cmdloop()
+            sys.exit(exit_code)
 
 
 if __name__ == "__main__":

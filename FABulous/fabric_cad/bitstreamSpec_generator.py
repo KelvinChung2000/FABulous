@@ -81,11 +81,12 @@ def generateBitsStreamSpec(fabric: Fabric) -> FeatureMap:
                                 f"X{x}Y{y}.{outputName}__{w}.{input}__{w}"
                             ] = FeatureValue((x, y), multiBitIndex, i)
 
-            for wire in tile.wireTypes:
-                for i in range(wire.wireCount):
-                    featureToBitString[
-                        f"X{x}Y{y}.c{c}.{wire.sourcePort.name}__{i}.{wire.destinationPort.name}__{i}"
-                    ] = FeatureValue((x, y), ((None, None),), 0)
+            for subTile in tile.wireTypes:
+                for wire in tile.wireTypes[subTile]:
+                    for i in range(wire.wireCount):
+                        featureToBitString[
+                            f"X{x}Y{y}.c{c}.{wire.sourcePort.name}__{i}.{wire.destinationPort.name}__{i}"
+                        ] = FeatureValue((x, y), ((None, None),), 0)
 
     for key, i in featureToBitString.items():
         if i.value is not None:

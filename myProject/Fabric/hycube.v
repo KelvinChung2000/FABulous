@@ -269,6 +269,7 @@ reg [31:0] Tile_X4Y6_out2;
 reg [31:0] Tile_X4Y6_out3;
 reg [31:0] Tile_X5Y6_addr_o;
 reg [31:0] Tile_X5Y6_out3;
+reg [31:0] Tile_X5Y6_out3;
 reg [31:0] Tile_X0Y5_out1;
 reg [31:0] Tile_X1Y5_out0;
 reg [31:0] Tile_X1Y5_out1;
@@ -286,6 +287,8 @@ reg [31:0] Tile_X4Y5_out0;
 reg [31:0] Tile_X4Y5_out1;
 reg [31:0] Tile_X4Y5_out2;
 reg [31:0] Tile_X4Y5_out3;
+reg [31:0] Tile_X5Y5_addr_o;
+reg [31:0] Tile_X5Y5_out3;
 reg [31:0] Tile_X5Y5_out3;
 reg [31:0] Tile_X0Y4_out1;
 reg [31:0] Tile_X1Y4_out0;
@@ -306,6 +309,7 @@ reg [31:0] Tile_X4Y4_out2;
 reg [31:0] Tile_X4Y4_out3;
 reg [31:0] Tile_X5Y4_addr_o;
 reg [31:0] Tile_X5Y4_out3;
+reg [31:0] Tile_X5Y4_out3;
 reg [31:0] Tile_X0Y3_out1;
 reg [31:0] Tile_X1Y3_out0;
 reg [31:0] Tile_X1Y3_out1;
@@ -323,6 +327,8 @@ reg [31:0] Tile_X4Y3_out0;
 reg [31:0] Tile_X4Y3_out1;
 reg [31:0] Tile_X4Y3_out2;
 reg [31:0] Tile_X4Y3_out3;
+reg [31:0] Tile_X5Y3_addr_o;
+reg [31:0] Tile_X5Y3_out3;
 reg [31:0] Tile_X5Y3_out3;
 reg [31:0] Tile_X0Y2_out1;
 reg [31:0] Tile_X1Y2_out0;
@@ -343,6 +349,7 @@ reg [31:0] Tile_X4Y2_out2;
 reg [31:0] Tile_X4Y2_out3;
 reg [31:0] Tile_X5Y2_addr_o;
 reg [31:0] Tile_X5Y2_out3;
+reg [31:0] Tile_X5Y2_out3;
 reg [31:0] Tile_X0Y1_out1;
 reg [31:0] Tile_X1Y1_out0;
 reg [31:0] Tile_X1Y1_out1;
@@ -360,6 +367,8 @@ reg [31:0] Tile_X4Y1_out0;
 reg [31:0] Tile_X4Y1_out1;
 reg [31:0] Tile_X4Y1_out2;
 reg [31:0] Tile_X4Y1_out3;
+reg [31:0] Tile_X5Y1_addr_o;
+reg [31:0] Tile_X5Y1_out3;
 reg [31:0] Tile_X5Y1_out3;
 reg [31:0] Tile_X1Y0_out0;
 reg [31:0] Tile_X2Y0_out0;
@@ -596,16 +605,18 @@ PE #(
     .FrameStrobe_o(Tile_X4Y6_FrameStrobe)
 );
 
-E_Mem_top #(
+E_Mem #(
     .MaxFramesPerCol(MaxFramesPerCol),
     .FrameBitsPerRow(FrameBitsPerRow),
     .EMULATION_ENABLE(EMULATION_ENABLE),
     .EMULATION_CONFIG(EMULATION_CONFIG),
     .X_CORD(3'd5),
     .Y_CORD(3'd6)
-) E_Mem_top_Tile_X5Y6 (
+) E_Mem_Tile_X5Y6 (
     .addr_o(Tile_X5Y6_addr_o),
     .out3(Tile_X5Y6_out3),
+    .out3(Tile_X5Y6_out3),
+    .in3(Tile_X4Y6_out1),
     .in3(Tile_X4Y6_out1),
     .UserCLK(Tile_X5Y7_UserCLK),
     .UserCLK_o(Tile_X5Y6_UserCLK_o),
@@ -727,16 +738,19 @@ PE #(
     .FrameStrobe_o(Tile_X4Y5_FrameStrobe)
 );
 
-E_Mem_bot #(
+E_Mem #(
     .MaxFramesPerCol(MaxFramesPerCol),
     .FrameBitsPerRow(FrameBitsPerRow),
     .EMULATION_ENABLE(EMULATION_ENABLE),
     .EMULATION_CONFIG(EMULATION_CONFIG),
     .X_CORD(3'd5),
     .Y_CORD(3'd5)
-) E_Mem_bot_Tile_X5Y5 (
+) E_Mem_Tile_X5Y5 (
+    .addr_o(Tile_X5Y5_addr_o),
+    .out3(Tile_X5Y5_out3),
     .out3(Tile_X5Y5_out3),
     .addr_i(Tile_X5Y6_addr_o),
+    .in3(Tile_X4Y5_out1),
     .in3(Tile_X4Y5_out1),
     .UserCLK(UserCLK),
     .UserCLK_o(Tile_X5Y5_UserCLK_o),
@@ -858,16 +872,19 @@ PE #(
     .FrameStrobe_o(Tile_X4Y4_FrameStrobe)
 );
 
-E_Mem_top #(
+E_Mem #(
     .MaxFramesPerCol(MaxFramesPerCol),
     .FrameBitsPerRow(FrameBitsPerRow),
     .EMULATION_ENABLE(EMULATION_ENABLE),
     .EMULATION_CONFIG(EMULATION_CONFIG),
     .X_CORD(3'd5),
     .Y_CORD(3'd4)
-) E_Mem_top_Tile_X5Y4 (
+) E_Mem_Tile_X5Y4 (
     .addr_o(Tile_X5Y4_addr_o),
     .out3(Tile_X5Y4_out3),
+    .out3(Tile_X5Y4_out3),
+    .addr_i(Tile_X5Y5_addr_o),
+    .in3(Tile_X4Y4_out1),
     .in3(Tile_X4Y4_out1),
     .UserCLK(Tile_X5Y5_UserCLK),
     .UserCLK_o(Tile_X5Y4_UserCLK_o),
@@ -989,16 +1006,19 @@ PE #(
     .FrameStrobe_o(Tile_X4Y3_FrameStrobe)
 );
 
-E_Mem_bot #(
+E_Mem #(
     .MaxFramesPerCol(MaxFramesPerCol),
     .FrameBitsPerRow(FrameBitsPerRow),
     .EMULATION_ENABLE(EMULATION_ENABLE),
     .EMULATION_CONFIG(EMULATION_CONFIG),
     .X_CORD(3'd5),
     .Y_CORD(2'd3)
-) E_Mem_bot_Tile_X5Y3 (
+) E_Mem_Tile_X5Y3 (
+    .addr_o(Tile_X5Y3_addr_o),
+    .out3(Tile_X5Y3_out3),
     .out3(Tile_X5Y3_out3),
     .addr_i(Tile_X5Y4_addr_o),
+    .in3(Tile_X4Y3_out1),
     .in3(Tile_X4Y3_out1),
     .UserCLK(Tile_X5Y4_UserCLK),
     .UserCLK_o(Tile_X5Y3_UserCLK_o),
@@ -1120,16 +1140,19 @@ PE #(
     .FrameStrobe_o(Tile_X4Y2_FrameStrobe)
 );
 
-E_Mem_top #(
+E_Mem #(
     .MaxFramesPerCol(MaxFramesPerCol),
     .FrameBitsPerRow(FrameBitsPerRow),
     .EMULATION_ENABLE(EMULATION_ENABLE),
     .EMULATION_CONFIG(EMULATION_CONFIG),
     .X_CORD(3'd5),
     .Y_CORD(2'd2)
-) E_Mem_top_Tile_X5Y2 (
+) E_Mem_Tile_X5Y2 (
     .addr_o(Tile_X5Y2_addr_o),
     .out3(Tile_X5Y2_out3),
+    .out3(Tile_X5Y2_out3),
+    .addr_i(Tile_X5Y3_addr_o),
+    .in3(Tile_X4Y2_out1),
     .in3(Tile_X4Y2_out1),
     .UserCLK(Tile_X5Y3_UserCLK),
     .UserCLK_o(Tile_X5Y2_UserCLK_o),
@@ -1255,16 +1278,19 @@ PE #(
     .FrameStrobe_o(Tile_X4Y1_FrameStrobe)
 );
 
-E_Mem_bot #(
+E_Mem #(
     .MaxFramesPerCol(MaxFramesPerCol),
     .FrameBitsPerRow(FrameBitsPerRow),
     .EMULATION_ENABLE(EMULATION_ENABLE),
     .EMULATION_CONFIG(EMULATION_CONFIG),
     .X_CORD(3'd5),
     .Y_CORD(1'd1)
-) E_Mem_bot_Tile_X5Y1 (
+) E_Mem_Tile_X5Y1 (
+    .addr_o(Tile_X5Y1_addr_o),
+    .out3(Tile_X5Y1_out3),
     .out3(Tile_X5Y1_out3),
     .addr_i(Tile_X5Y2_addr_o),
+    .in3(Tile_X4Y1_out1),
     .in3(Tile_X4Y1_out1),
     .UserCLK(Tile_X5Y2_UserCLK),
     .UserCLK_o(Tile_X5Y1_UserCLK_o),

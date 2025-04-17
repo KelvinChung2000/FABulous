@@ -42,7 +42,6 @@ PARAM: {
 TILES: 
   - ./Tile/PE/PE.yaml
   - ./Tile/N_IO/N_IO.yaml
-  - ./Tile/E_Mem_top/E_Mem_top.yaml
-  - ./Tile/E_Mem_bot/E_Mem_bot.yaml
+  - ./Tile/E_Mem/E_Mem.yaml
   - ./Tile/S_IO/S_IO.yaml
   - ./Tile/W_IO/W_IO.yaml

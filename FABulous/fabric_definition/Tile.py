@@ -1,3 +1,4 @@
+from collections import defaultdict
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Iterable, cast
@@ -38,7 +39,9 @@ class Tile:
     switchMatrix: SwitchMatrix
     configMems: ConfigurationMemory
     tileMap: list[list[str]]
-    wireTypes: list[WireType] = field(default_factory=list)
+    wireTypes: dict[str, list[WireType]] = field(
+        default_factory=lambda: defaultdict(list)
+    )
     withUserCLK: bool = False
     tileDir: Path = Path(".")
 
@@ -152,18 +155,20 @@ class Tile:
         }
 
     def getWireType(self, port: TilePort) -> WireType:
-        for i in self.wireTypes:
-            if i.sourcePort.name == port.name or i.destinationPort.name == port.name:
-                return i
+        for subTile in self.wireTypes:
+            for i in self.wireTypes[subTile]:
+                if i.sourcePort == port or i.destinationPort == port:
+                    return i
         else:
             raise ValueError(
                 f"The given port {port} does not exist in tile {self.name}"
             )
 
     def getCascadeWireCount(self, port: TilePort) -> int:
-        for i in self.wireTypes:
-            if i.sourcePort.name == port.name or i.destinationPort.name == port.name:
-                return port.width * (abs(i.offsetX) + abs(i.offsetY))
+        for subTile in self.wireTypes:
+            for i in self.wireTypes[subTile]:
+                if i.sourcePort == port or i.destinationPort == port:
+                    return port.width * (abs(i.offsetX) + abs(i.offsetY))
         else:
             return port.width
 
@@ -172,9 +177,10 @@ class Tile:
             raise ValueError(
                 "The given port is an output port. Please provide an input port."
             )
-        for i in self.wireTypes:
-            if i.sourcePort.name == port.name:
-                return cast(TilePort, i.destinationPort)
+        for subTile in self.wireTypes:
+            for i in self.wireTypes[subTile]:
+                if i.sourcePort == port or i.destinationPort == port:
+                    return cast(TilePort, i.destinationPort)
         else:
             raise ValueError(
                 f"The given port {port} does not exist in tile {self.name}"
@@ -185,9 +191,10 @@ class Tile:
             raise ValueError(
                 "The given port is an input port. Please provide an output port."
             )
-        for i in self.wireTypes:
-            if i.destinationPort.name == port.name:
-                return cast(TilePort, i.sourcePort)
+        for subTile in self.wireTypes:
+            for i in self.wireTypes[subTile]:
+                if i.destinationPort.name == port.name:
+                    return cast(TilePort, i.sourcePort)
         else:
             raise ValueError(
                 f"The given port {port} does not exist in tile {self.name}"
@@ -200,9 +207,9 @@ class Tile:
         else:
             raise ValueError(f"The port {portName} does not exist in tile {self.name}")
 
-    def addWireType(self, wireType: WireType) -> None:
-        if wireType not in self.wireTypes:
-            self.wireTypes.append(wireType)
+    def addWireType(self, subTileName: str, wireType: WireType) -> None:
+        if wireType not in self.wireTypes[subTileName]:
+            self.wireTypes[subTileName].append(wireType)
 
     def getUniqueBelType(self) -> Iterable[Bel]:
         belSet = set()

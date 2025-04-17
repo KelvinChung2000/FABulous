@@ -2,14 +2,22 @@ from FABulous.fabric_definition.SwitchMatrix import MuxPort
 from FABulous.fabric_definition.define import IO, Side
 from FABulous.fabric_definition.Port import TilePort, Port, BelPort
 
-class E_MEM_TOP_ports:
+class E_Mem_ports:
     def __init__(self, tilePorts: list[TilePort], belInputs: list[BelPort], belOutputs: list[BelPort]):
         # tile ports
         self.in3 = MuxPort(tilePorts[0], isTilePort=True, isBus=False, width=32)
         self.out3 = MuxPort(tilePorts[1], isTilePort=True, isBus=False, width=32)
-        self.addr_o = MuxPort(tilePorts[2], isTilePort=True, isBus=False, width=32)
+        self.addr_i = MuxPort(tilePorts[2], isTilePort=True, isBus=False, width=32)
+        self.in3 = MuxPort(tilePorts[3], isTilePort=True, isBus=False, width=32)
+        self.out3 = MuxPort(tilePorts[4], isTilePort=True, isBus=False, width=32)
+        self.addr_o = MuxPort(tilePorts[5], isTilePort=True, isBus=False, width=32)
 
         # bel ports
+        self.addr0 = MuxPort(belInputs[0], isBelPort=True, isBus=False, width=32)
+        self.reset = MuxPort(belInputs[1], isBelPort=True, isBus=False, width=1)
+        self.write_data = MuxPort(belInputs[2], isBelPort=True, isBus=False, width=32)
+        self.write_en = MuxPort(belInputs[3], isBelPort=True, isBus=False, width=1)
+        self.read_data = MuxPort(belOutputs[0], isBelPort=True, isBus=False, width=32)
 
 
         self.GND = MuxPort(Port(name="gnd", ioDirection=IO.OUTPUT, width=1, isBus=False), width=1)

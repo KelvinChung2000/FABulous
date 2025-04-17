@@ -1,6 +1,6 @@
 from typing import Mapping
 
-from FABulous.fabric_definition.define import IO, ConfigBitMode
+from FABulous.fabric_definition.define import ConfigBitMode
 from FABulous.fabric_definition.Fabric import Fabric
 from FABulous.fabric_definition.Port import BelPort, Port, SlicedPort, TilePort
 from FABulous.fabric_definition.Tile import Tile
@@ -49,10 +49,10 @@ def generateTile(codeGen: CodeGenerator, fabric: Fabric, tile: Tile):
             userClkOut = pr.OutputPort("UserCLK_o")
 
             if fabric.configBitMode == ConfigBitMode.FRAME_BASED:
-                frameData = pr.Port("FrameData", IO.INPUT, frameBitsPerRow - 1)
-                frameDataOut = pr.Port("FrameData_o", IO.OUTPUT, frameBitsPerRow - 1)
-                frameStrobe = pr.Port("FrameStrobe", IO.INPUT, maxFramePerCol - 1)
-                frameStrobeOut = pr.Port("FrameStrobe_o", IO.OUTPUT, maxFramePerCol - 1)
+                frameData = pr.InputPort("FrameData", frameBitsPerRow - 1)
+                frameDataOut = pr.OutputPort("FrameData_o", frameBitsPerRow - 1)
+                frameStrobe = pr.InputPort("FrameStrobe", maxFramePerCol - 1)
+                frameStrobeOut = pr.OutputPort("FrameStrobe_o", maxFramePerCol - 1)
 
             else:
                 pr.InputPort("MODE")
@@ -161,41 +161,50 @@ def generateTile(codeGen: CodeGenerator, fabric: Fabric, tile: Tile):
                     lr.ConnectPair("X", userClkOut),
                 ],
             )
-            for wire in tile.wireTypes:
-                if not wire.spanning:
-                    continue
-                lr.Comment(
-                    f"Buffer spanning wire: {wire.destinationPort.name}->{wire.sourcePort.name}"
-                )
-                bufferOutToIn = lr.Signal(
-                    f"{wire.destinationPort.name}_to_{wire.sourcePort.name}",
-                    wire.cascadeWireCount - wire.wireCount,
-                )
-                lr.InitModule(
-                    "my_buf_pack",
-                    f"{wire.destinationPort.name}_inbuf",
-                    [
-                        lr.ConnectPair(
-                            "A", portMapping[wire.destinationPort][: wire.wireCount]
-                        ),
-                        lr.ConnectPair("X", bufferOutToIn),
-                    ],
-                    [lr.ConnectPair("WIDTH", wire.cascadeWireCount - wire.wireCount)],
-                )
-                lr.InitModule(
-                    "my_buf_pack",
-                    f"{wire.sourcePort.name}_outbuf",
-                    [
-                        lr.ConnectPair("A", bufferOutToIn),
-                        lr.ConnectPair(
-                            "X",
-                            portMapping[wire.sourcePort][
-                                wire.cascadeWireCount - wire.wireCount - 1 :
-                            ],
-                        ),
-                    ],
-                    [lr.ConnectPair("WIDTH", wire.cascadeWireCount - wire.wireCount)],
-                )
+            for subTile in tile.wireTypes:
+                for wire in tile.wireTypes[subTile]:
+                    if not wire.spanning:
+                        continue
+                    lr.Comment(
+                        f"Buffer spanning wire: {wire.destinationPort.name}->{wire.sourcePort.name}"
+                    )
+                    bufferOutToIn = lr.Signal(
+                        f"{wire.destinationPort.name}_to_{wire.sourcePort.name}",
+                        wire.cascadeWireCount - wire.wireCount,
+                    )
+                    lr.InitModule(
+                        "my_buf_pack",
+                        f"{wire.destinationPort.name}_inbuf",
+                        [
+                            lr.ConnectPair(
+                                "A", portMapping[wire.destinationPort][: wire.wireCount]
+                            ),
+                            lr.ConnectPair("X", bufferOutToIn),
+                        ],
+                        [
+                            lr.ConnectPair(
+                                "WIDTH", wire.cascadeWireCount - wire.wireCount
+                            )
+                        ],
+                    )
+                    lr.InitModule(
+                        "my_buf_pack",
+                        f"{wire.sourcePort.name}_outbuf",
+                        [
+                            lr.ConnectPair("A", bufferOutToIn),
+                            lr.ConnectPair(
+                                "X",
+                                portMapping[wire.sourcePort][
+                                    wire.cascadeWireCount - wire.wireCount - 1 :
+                                ],
+                            ),
+                        ],
+                        [
+                            lr.ConnectPair(
+                                "WIDTH", wire.cascadeWireCount - wire.wireCount
+                            )
+                        ],
+                    )
 
             # if fabric.configBitMode == ConfigBitMode.FLIPFLOP_CHAIN:
             #     lr.Comment("top configuration data daisy chaining")

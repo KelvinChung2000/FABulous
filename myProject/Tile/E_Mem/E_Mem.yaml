@@ -1,25 +1,30 @@
-TILE: E_MEM
+
+TILE: E_Mem
 # {side: <>, source_name: <>, X-offset: <>, Y-offset: <>, destination_name: <>, wires: <>}
-SUPER_TILE: true
 INCLUDE:
 PORTS:
-  E_MEM_TOP:
+  E_Mem_top:
     - {side: WEST, name: in3, inOut: input, wires: 32, terminal: false}
     - {side: WEST, name: out3, inOut: output, wires: 32, terminal: false}
-  E_MEM_BOT:
+    - {side: NORTH, name: addr_i, inOut: input, wires: 32, terminal: false}
+  E_Mem_bot:
     - {side: WEST, name: in3, inOut: input, wires: 32, terminal: false}
     - {side: WEST, name: out3, inOut: output, wires: 32, terminal: false}
+    - {side: SOUTH, name: addr_o, inOut: output, wires: 32, terminal: false}
 
 WIRES:
-  E_MEM_TOP:
+  E_Mem_top:
     - {source_name: out3, X-offset:  -1, Y-offset: 0, destination_name: in1}
-  E_MEM_BOT:
+  E_Mem_bot:
     - {source_name: out3, X-offset:  -1, Y-offset: 0, destination_name: in1}
 
-BELS: 
+BELS:
   - {BEL: ./Mem.v, prefix: }
 
 SUB_TILE_MAP: [
-  [E_MEM_TOP],
-  [E_MEM_BOT]
+  [E_Mem_top],
+  [E_Mem_bot],
 ]
+
+MATRIX: ./list.py
+# CONFIG_MEM: ./E_IO_ConfigMem.csv

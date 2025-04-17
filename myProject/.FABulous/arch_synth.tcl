@@ -11,7 +11,8 @@ yosys opt_expr
 yosys opt_clean
 yosys check
 yosys opt -nodffe -nosdff
-yosys fsm -nomap -encfile $project_root/.FABulous/fsm_state_info.txt
+yosys fsm_detect
+yosys fsm_extract
 yosys opt
 yosys wreduce
 yosys peepopt
@@ -123,13 +124,13 @@ yosys opt
 yosys clean -purge
 
 # wrapping base design
-yosys techmap -map myProject/Tile/E_Mem_bot/metadata/wrap_map_Mem.v
+yosys techmap -map myProject/Tile/E_Mem/metadata/wrap_map_Mem.v
 yosys connwrappers -unsigned \$__mux_wrapper Y WIDTH 
 yosys connwrappers -unsigned \$__mem_v2_wrapper RD_DATA WIDTH 
 
 # extract cells
-extract "myProject/Tile/E_Mem_bot/metadata/cell_Mem.json" \
-        "myProject/Tile/E_Mem_bot/metadata/wrap_map_Mem.v"
+extract "myProject/Tile/E_Mem/metadata/cell_Mem.json" \
+        "myProject/Tile/E_Mem/metadata/wrap_map_Mem.v"
 # unwrapping
 
 yosys opt
@@ -138,6 +139,7 @@ yosys clean -purge
 
 # cell techmapping
 yosys techmap -map $project_root/.FABulous/techmaps.v
+yosys techmap -map /home/kelvin/FABulous_fork/myProject/PnR/fsm_map.v
 
 # const unit mapping
 
@@ -148,10 +150,8 @@ yosys iopadmap -widthparam WIDTH -outpad IO from_fabric:out -inpad IO to_fabric:
 yosys iopadmap -bits -outpad OUTBUF I:PAD -inpad INBUF O:PAD
 
 # final optimization
-yosys fsm -expand -nomap
 yosys opt -full
 yosys clean -purge
-
 yosys show -enum -long -width -format dot -prefix $project_root/.FABulous/design
 yosys write_json $project_root/user_design/synth_test.json
 yosys fsm_info

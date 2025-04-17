@@ -14,10 +14,11 @@ from FABulous.fabric_definition.define import IO
 from FABulous.fabric_definition.Fabric import Fabric
 from FABulous.fabric_definition.Port import ConfigPort
 from FABulous.fabric_generator.define import WriterType
+from hdlgen.define import WriterType as codeGenWriterType
 
 
 def genPrims(bel: Bel, filePath: Path):
-    cg = CodeGenerator(filePath, WriterType.VERILOG)
+    cg = CodeGenerator(filePath, codeGenWriterType.VERILOG)
     with cg.Module(f"{bel.name}", [cg.Attribute("blackbox")]) as m:
         with m.ParameterRegion() as pr:
             for i in bel.configPort:
@@ -33,7 +34,7 @@ def genPrims(bel: Bel, filePath: Path):
 
 
 def genWrapMap(cell, filename, belName, wrapping=True):
-    cg = CodeGenerator(filename, WriterType.VERILOG, "a")
+    cg = CodeGenerator(filename, codeGenWriterType.VERILOG, "a")
     cellType = cell["type"].replace("$", "_")
 
     if wrapping:
@@ -257,7 +258,7 @@ def genCellsAndMaps(bel: Bel):
         runPass("design -load base")
 
     module = design.top_module()
-    cg = CodeGenerator(Path(f"{filePath}/map_{bel.name}.v"), WriterType.VERILOG)
+    cg = CodeGenerator(Path(f"{filePath}/map_{bel.name}.v"), codeGenWriterType.VERILOG)
     for name, c in cellDict.items():
         with cg.Module(f"map_{name}", [cg.Attribute("techmap_celltype", name)]) as m:
             with m.ParameterRegion() as pr:

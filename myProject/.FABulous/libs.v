@@ -1,4 +1,17 @@
 (* blackbox *)
+module compare #(
+    parameter conf = 0
+)
+(
+    input wire[31:0] A,
+    input wire[31:0] B,
+    output reg[31:0] Y
+);
+
+endmodule
+
+
+(* blackbox *)
 module reg_unit #(
     parameter tide_en = 0,
     parameter tide_rst = 0
@@ -9,6 +22,17 @@ module reg_unit #(
     input wire rst,
     output reg[31:0] reg_out,
     input wire clk
+);
+
+endmodule
+
+
+(* blackbox *)
+module const_unit #(
+    parameter ConfigBits = 0
+)
+(
+    output reg[31:0] const_out
 );
 
 endmodule
@@ -28,13 +52,15 @@ endmodule
 
 
 (* blackbox *)
-module compare #(
-    parameter conf = 0
+module Mem #(
 )
 (
-    input wire[31:0] A,
-    input wire[31:0] B,
-    output reg[31:0] Y
+    input wire[31:0] addr0,
+    input wire reset,
+    input wire[31:0] write_data,
+    input wire write_en,
+    output reg[31:0] read_data,
+    input wire clk
 );
 
 endmodule
@@ -49,32 +75,6 @@ module ALU #(
     input wire[31:0] data_in2,
     input wire[31:0] data_in3,
     output reg[31:0] data_out
-);
-
-endmodule
-
-
-(* blackbox *)
-module const_unit #(
-    parameter ConfigBits = 0
-)
-(
-    output reg[31:0] const_out
-);
-
-endmodule
-
-
-(* blackbox *)
-module Mem #(
-)
-(
-    input wire[31:0] addr0,
-    input wire reset,
-    input wire[31:0] write_data,
-    input wire write_en,
-    output reg[31:0] read_data,
-    input wire clk
 );
 
 endmodule

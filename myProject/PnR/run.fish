@@ -10,8 +10,9 @@
 # cd -
 
 function check_status
-    if test $status -ne 0
-        echo "Error: Command failed with status $status"
+    set -l last_status $status
+    if test $last_status -ne 0
+        echo "Error: Command failed with status $last_status"
     end
 end
 
@@ -27,9 +28,10 @@ cd -
 calyx --dump-ir -p fsm-opt -p lower --synthesis --nested -b verilog -d papercut -d cell-share $source_futil -o $source_hdl > $ir
 check_status
 cd ../..
-# FABulous --debug myProject -p "load_fabric; gen_fabric;"
-FABulous --debug myProject -p "load_fabric; gen_fabric; gen_FABulous_CAD_tool_files; \
+FABulous --debug myProject -p "load_fabric; gen_FABulous_CAD_tool_files; \
          synthesis_script $source_hdl -tcl $my_FAB_ROOT/myProject/.FABulous/arch_synth.tcl;"
+# FABulous --debug myProject -p "load_fabric; gen_fabric; gen_FABulous_CAD_tool_files; \
+#          synthesis_script $source_hdl -tcl $my_FAB_ROOT/myProject/.FABulous/arch_synth.tcl;"
 check_status
 cd -
 # # # FABulous --debug ../../myProject -p "load_fabric; gen_FABulous_CAD_tool_files;"

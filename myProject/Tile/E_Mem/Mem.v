@@ -1,4 +1,4 @@
-(* CELL *)
+(* CELL, MEM *)
 module Mem #(
     parameter WIDTH = 32,
     parameter SIZE = 16,

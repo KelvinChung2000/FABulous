@@ -3,9 +3,10 @@
   "modules": {
     "reg_unit_tide_en_0_tide_rst_1": {
       "attributes": {
+        "REG": "00000000000000000000000000000001",
         "dynports": "00000000000000000000000000000001",
         "top": "00000000000000000000000000000001",
-        "src": "myProject/Tile/PE/reg_unit.v:1.1-23.10"
+        "src": "myProject/Tile/PE/reg_unit.v:2.1-24.10"
       },
       "parameter_default_values": {
         "NoConfigBits": "00000000000000000000000000000010",

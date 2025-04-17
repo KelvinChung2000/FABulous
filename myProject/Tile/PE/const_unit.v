@@ -1,4 +1,4 @@
-(* CELL *)
+(* ARITH, CELL *)
 module const_unit #(
     parameter NoConfigBits = 3,
     parameter WIDTH = 32

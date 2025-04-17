@@ -1,0 +1,14 @@
+ram distributed cell_Mem {
+    abits 4;
+    width 32;
+    cost 1;
+    init any;
+    
+    port arsw "RW0" {
+        clock posedge;
+        rdinit none;
+        rdarst init;
+        rdsrst init;
+    }
+    
+}

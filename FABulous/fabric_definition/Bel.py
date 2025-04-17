@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from pathlib import Path
 
-from FABulous.fabric_definition.define import IO
+from FABulous.fabric_definition.define import IO, BelType
 from FABulous.fabric_definition.Port import (
     BelPort,
     ConfigPort,
@@ -56,6 +56,7 @@ class Bel:
     src: Path
     prefix: str
     name: str
+    belType: BelType
     inputs: list[BelPort]
     outputs: list[BelPort]
     externalInputs: list[BelPort]
@@ -65,37 +66,37 @@ class Bel:
     configBits: int
     belFeatureMap: dict[str, int]
     userCLK: Port | None
+    constantBel: bool
     z: int = 0
-    constantBel: bool = False
 
-    def __init__(
-        self,
-        src: Path,
-        prefix: str,
-        internal: list[BelPort],
-        external: list[BelPort],
-        configPort: list[ConfigPort],
-        sharedPort: list[SharedPort],
-        configBit: int,
-        belFeatureMap: dict[str, int],
-        userCLK: Port | None,
-    ) -> None:
-        self.src = src
-        self.prefix = prefix
-        self.name = src.stem
-        self.inputs = [p for p in internal if p.ioDirection == IO.INPUT]
-        self.outputs = [p for p in internal if p.ioDirection == IO.OUTPUT]
-        self.externalInputs = [p for p in external if p.ioDirection == IO.INPUT]
-        self.externalOutputs = [p for p in external if p.ioDirection == IO.OUTPUT]
-        self.configPort = configPort
-        self.sharedPort = sharedPort
-        self.configBits = configBit
-        self.userCLK = userCLK
-        self.belFeatureMap = belFeatureMap
-        self.z = 0
+    # def __init__(
+    #     self,
+    #     src: Path,
+    #     prefix: str,
+    #     internal: list[BelPort],
+    #     external: list[BelPort],
+    #     configPort: list[ConfigPort],
+    #     sharedPort: list[SharedPort],
+    #     configBit: int,
+    #     belFeatureMap: dict[str, int],
+    #     userCLK: Port | None,
+    # ) -> None:
+    #     self.src = src
+    #     self.prefix = prefix
+    #     self.name = src.stem
+    #     self.inputs = [p for p in internal if p.ioDirection == IO.INPUT]
+    #     self.outputs = [p for p in internal if p.ioDirection == IO.OUTPUT]
+    #     self.externalInputs = [p for p in external if p.ioDirection == IO.INPUT]
+    #     self.externalOutputs = [p for p in external if p.ioDirection == IO.OUTPUT]
+    #     self.configPort = configPort
+    #     self.sharedPort = sharedPort
+    #     self.configBits = configBit
+    #     self.userCLK = userCLK
+    #     self.belFeatureMap = belFeatureMap
+    #     self.z = 0
 
-        if len(self.inputs) + len(self.externalInputs) == 0:
-            self.constantBel = True
+    #     if len(self.inputs) + len(self.externalInputs) == 0:
+    #         self.constantBel = True
 
     def __hash__(self) -> int:
         return hash(f"{self.prefix}{self.name}({self.src})")

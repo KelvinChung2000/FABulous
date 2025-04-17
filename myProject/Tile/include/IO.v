@@ -1,4 +1,4 @@
-(* CELL *)
+(* IO, CELL *)
 module IO #(
     parameter WIDTH = 32
 ) (

@@ -1,3 +1,4 @@
+(* REG *)
 module reg_unit #(
     parameter NoConfigBits = 2,
     parameter WIDTH = 32

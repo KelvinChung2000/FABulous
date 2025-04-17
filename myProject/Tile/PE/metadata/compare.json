@@ -3,9 +3,10 @@
   "modules": {
     "compare": {
       "attributes": {
+        "ARITH": 1,
         "dynports": 1,
         "cells_not_processed": 1,
-        "src": "myProject/Tile/PE/compare.v:1.1-31.10"
+        "src": "myProject/Tile/PE/compare.v:2.1-32.10"
       },
       "parameter_default_values": {
         "NoConfigBits": 2,
@@ -30,9 +31,33 @@
         }
       },
       "cells": {
-        "$eq$myProject/Tile/PE/compare.v:26$4": {
+        "$eq$myProject/Tile/PE/compare.v:27$4": {
           "hide_name": 1,
           "type": "$eq",
+          "parameters": {
+            "A_SIGNED": 0,
+            "A_WIDTH": 32,
+            "B_SIGNED": 0,
+            "B_WIDTH": 32,
+            "Y_WIDTH": 32
+          },
+          "attributes": {
+            "src": "myProject/Tile/PE/compare.v:27.19-27.25"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33 ],
+            "B": [ 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65 ],
+            "Y": [ 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131 ]
+          }
+        },
+        "$le$myProject/Tile/PE/compare.v:26$3": {
+          "hide_name": 1,
+          "type": "$le",
           "parameters": {
             "A_SIGNED": 0,
             "A_WIDTH": 32,
@@ -51,34 +76,10 @@
           "connections": {
             "A": [ 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33 ],
             "B": [ 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65 ],
-            "Y": [ 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131 ]
-          }
-        },
-        "$le$myProject/Tile/PE/compare.v:25$3": {
-          "hide_name": 1,
-          "type": "$le",
-          "parameters": {
-            "A_SIGNED": 0,
-            "A_WIDTH": 32,
-            "B_SIGNED": 0,
-            "B_WIDTH": 32,
-            "Y_WIDTH": 32
-          },
-          "attributes": {
-            "src": "myProject/Tile/PE/compare.v:25.19-25.25"
-          },
-          "port_directions": {
-            "A": "input",
-            "B": "input",
-            "Y": "output"
-          },
-          "connections": {
-            "A": [ 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33 ],
-            "B": [ 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65 ],
             "Y": [ 132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163 ]
           }
         },
-        "$lt$myProject/Tile/PE/compare.v:24$2": {
+        "$lt$myProject/Tile/PE/compare.v:25$2": {
           "hide_name": 1,
           "type": "$lt",
           "parameters": {
@@ -89,7 +90,7 @@
             "Y_WIDTH": 32
           },
           "attributes": {
-            "src": "myProject/Tile/PE/compare.v:24.18-24.23"
+            "src": "myProject/Tile/PE/compare.v:25.18-25.23"
           },
           "port_directions": {
             "A": "input",
@@ -111,7 +112,7 @@
           },
           "attributes": {
             "full_case": 1,
-            "src": "myProject/Tile/PE/compare.v:0.0-0.0|myProject/Tile/PE/compare.v:23.5-28.12"
+            "src": "myProject/Tile/PE/compare.v:0.0-0.0|myProject/Tile/PE/compare.v:24.5-29.12"
           },
           "port_directions": {
             "A": "input",
@@ -138,7 +139,7 @@
           },
           "attributes": {
             "full_case": 1,
-            "src": "myProject/Tile/PE/compare.v:0.0-0.0|myProject/Tile/PE/compare.v:23.5-28.12"
+            "src": "myProject/Tile/PE/compare.v:0.0-0.0|myProject/Tile/PE/compare.v:24.5-29.12"
           },
           "port_directions": {
             "A": "input",
@@ -163,7 +164,7 @@
           },
           "attributes": {
             "full_case": 1,
-            "src": "myProject/Tile/PE/compare.v:0.0-0.0|myProject/Tile/PE/compare.v:23.5-28.12"
+            "src": "myProject/Tile/PE/compare.v:0.0-0.0|myProject/Tile/PE/compare.v:24.5-29.12"
           },
           "port_directions": {
             "A": "input",
@@ -188,7 +189,7 @@
           },
           "attributes": {
             "full_case": 1,
-            "src": "myProject/Tile/PE/compare.v:0.0-0.0|myProject/Tile/PE/compare.v:23.5-28.12"
+            "src": "myProject/Tile/PE/compare.v:0.0-0.0|myProject/Tile/PE/compare.v:24.5-29.12"
           },
           "port_directions": {
             "A": "input",
@@ -207,35 +208,35 @@
           "hide_name": 1,
           "bits": [ 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97 ],
           "attributes": {
-            "src": "myProject/Tile/PE/compare.v:22.3-29.6"
+            "src": "myProject/Tile/PE/compare.v:23.3-30.6"
           }
         },
         "$1\\Y[31:0]": {
           "hide_name": 1,
           "bits": [ 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97 ],
           "attributes": {
-            "src": "myProject/Tile/PE/compare.v:22.3-29.6"
+            "src": "myProject/Tile/PE/compare.v:23.3-30.6"
           }
         },
-        "$eq$myProject/Tile/PE/compare.v:26$4_Y": {
+        "$eq$myProject/Tile/PE/compare.v:27$4_Y": {
           "hide_name": 1,
           "bits": [ 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131 ],
+          "attributes": {
+            "src": "myProject/Tile/PE/compare.v:27.19-27.25"
+          }
+        },
+        "$le$myProject/Tile/PE/compare.v:26$3_Y": {
+          "hide_name": 1,
+          "bits": [ 132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163 ],
           "attributes": {
             "src": "myProject/Tile/PE/compare.v:26.19-26.25"
           }
         },
-        "$le$myProject/Tile/PE/compare.v:25$3_Y": {
-          "hide_name": 1,
-          "bits": [ 132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163 ],
-          "attributes": {
-            "src": "myProject/Tile/PE/compare.v:25.19-25.25"
-          }
-        },
-        "$lt$myProject/Tile/PE/compare.v:24$2_Y": {
+        "$lt$myProject/Tile/PE/compare.v:25$2_Y": {
           "hide_name": 1,
           "bits": [ 164, 165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195 ],
           "attributes": {
-            "src": "myProject/Tile/PE/compare.v:24.18-24.23"
+            "src": "myProject/Tile/PE/compare.v:25.18-25.23"
           }
         },
         "$procmux$6_Y": {
@@ -268,7 +269,7 @@
           "attributes": {
             "BUS": 1,
             "FABulous": 1,
-            "src": "myProject/Tile/PE/compare.v:7.48-7.49"
+            "src": "myProject/Tile/PE/compare.v:8.48-8.49"
           }
         },
         "B": {
@@ -277,7 +278,7 @@
           "attributes": {
             "BUS": 1,
             "FABulous": 1,
-            "src": "myProject/Tile/PE/compare.v:8.48-8.49"
+            "src": "myProject/Tile/PE/compare.v:9.48-9.49"
           }
         },
         "Y": {
@@ -286,7 +287,7 @@
           "attributes": {
             "BUS": 1,
             "FABulous": 1,
-            "src": "myProject/Tile/PE/compare.v:9.48-9.49"
+            "src": "myProject/Tile/PE/compare.v:10.48-10.49"
           }
         },
         "conf": {
@@ -296,7 +297,7 @@
             "CONFIG_BIT": 1,
             "FABulous": 1,
             "FEATURE": "LT;LTE;EQ",
-            "src": "myProject/Tile/PE/compare.v:11.17-11.21"
+            "src": "myProject/Tile/PE/compare.v:12.17-12.21"
           }
         }
       }

@@ -6,7 +6,7 @@ from pprint import pprint
 from loguru import logger
 
 from FABulous.fabric_definition.Bel import Bel
-from FABulous.fabric_definition.define import IO, FABulousPortType, FeatureType
+from FABulous.fabric_definition.define import IO, BelType, FABulousPortType, FeatureType
 from FABulous.fabric_definition.Port import BelPort, ConfigPort, Port, SharedPort
 
 
@@ -218,16 +218,41 @@ def parseBelFile(
         else:
             internalPort.append(port)
 
+    attList = []
+    moduleAttributes = module.get("attributes", {})
+    for a in moduleAttributes:
+        if a.upper() in BelType:
+            attList.append(a)
+
+    if len(attList) > 1:
+        logger.opt(exception=ValueError()).error(
+            f"Multiple BelType attributes found in {filename}. Only one BelType attribute per file is allowed."
+        )
+
+    if len(attList) == 0:
+        logger.opt(exception=ValueError()).error(
+            f"No BelType attribute found in {filename}. At least one BelType attribute is required."
+        )
+
+    inputs = [p for p in internalPort if p.ioDirection == IO.INPUT]
+    outputs = [p for p in internalPort if p.ioDirection == IO.OUTPUT]
+    externalInputs = [p for p in externalPort if p.ioDirection == IO.INPUT]
+    externalOutputs = [p for p in externalPort if p.ioDirection == IO.OUTPUT]
     return Bel(
         src=filename,
         prefix=belPrefix,
-        internal=internalPort,
-        external=externalPort,
+        name=filename.stem,
+        belType=attList[0],
+        inputs=inputs,
+        outputs=outputs,
+        externalInputs=externalInputs,
+        externalOutputs=externalOutputs,
         configPort=configPort,
         sharedPort=sharedPort,
-        configBit=sum([i.width for i in configPort]),
+        configBits=sum([i.width for i in configPort]),
         belFeatureMap=belFeatureMap,
         userCLK=userClk,
+        constantBel=len(externalInputs) + len(inputs) == 0,
     )
 
 

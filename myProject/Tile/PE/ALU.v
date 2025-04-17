@@ -1,3 +1,4 @@
+(* ARITH *)
 module ALU #(
     parameter NoConfigBits = 3,
     parameter WIDTH = 32

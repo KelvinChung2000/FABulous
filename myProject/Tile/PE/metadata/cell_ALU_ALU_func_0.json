@@ -3,9 +3,10 @@
   "modules": {
     "ALU_ALU_func_0": {
       "attributes": {
+        "ARITH": "00000000000000000000000000000001",
         "dynports": "00000000000000000000000000000001",
         "top": "00000000000000000000000000000001",
-        "src": "myProject/Tile/PE/ALU.v:1.1-40.10"
+        "src": "myProject/Tile/PE/ALU.v:2.1-41.10"
       },
       "parameter_default_values": {
         "NoConfigBits": "00000000000000000000000000000011",
@@ -34,7 +35,7 @@
         }
       },
       "cells": {
-        "$add$myProject/Tile/PE/ALU.v:29$2": {
+        "$add$myProject/Tile/PE/ALU.v:30$2": {
           "hide_name": 1,
           "type": "$add",
           "parameters": {

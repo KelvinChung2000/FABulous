@@ -4,6 +4,7 @@
     "IO": {
       "attributes": {
         "CELL": 1,
+        "IO": 1,
         "dynports": 1,
         "cells_not_processed": 1,
         "src": "myProject/Tile/W_IO/../include/IO.v:2.1-14.10"

@@ -1,0 +1,13 @@
+ram distributed {{ moduleName }} {
+    abits {{ addressBits }};
+    width {{ dataWidth }};
+    cost 1;
+    init {{ initValue }};
+    {% for portName, portConfig in ports.items() %}
+    port {{ portName }} {
+        {%- for config in portConfig %}
+        {{ config }};
+        {%- endfor %}
+    }
+    {% endfor %}
+}

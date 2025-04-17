@@ -1,3 +1,4 @@
+from collections import defaultdict
 import json
 from functools import partial
 from itertools import product
@@ -5,16 +6,15 @@ from pathlib import Path
 from typing import Mapping
 
 from hdlgen.code_gen import CodeGenerator
+from hdlgen.define import WriterType as codeGenWriterType
 from hdlgen.HDL_Construct.Value import Value
 from jinja2 import Environment, PackageLoader
 from pyosys import libyosys as ys
 
 from FABulous.fabric_definition.Bel import Bel
-from FABulous.fabric_definition.define import IO
+from FABulous.fabric_definition.define import IO, BelType
 from FABulous.fabric_definition.Fabric import Fabric
 from FABulous.fabric_definition.Port import ConfigPort
-from FABulous.fabric_generator.define import WriterType
-from hdlgen.define import WriterType as codeGenWriterType
 
 
 def genPrims(bel: Bel, filePath: Path):
@@ -38,9 +38,9 @@ def genWrapMap(cell, filename, belName, wrapping=True):
     cellType = cell["type"].replace("$", "_")
 
     if wrapping:
-        srcCell, targetCell = f"\\{cell["type"]}", f"\\$_{cellType}_wrapper"
+        srcCell, targetCell = f"\\{cell['type']}", f"\\$_{cellType}_wrapper"
     else:
-        srcCell, targetCell = f"\\$_{cellType}_wrapper", f"\\{cell["type"]}"
+        srcCell, targetCell = f"\\$_{cellType}_wrapper", f"\\{cell['type']}"
 
     with cg.Module(
         f"wrap_{belName}_{cellType}" if wrapping else f"unwrap_{belName}_{cellType}",
@@ -149,6 +149,184 @@ def genWrappingMapPair(bel: Bel, filePrefix: Path) -> list[str]:
     return wrapperInfos
 
 
+def genMemMap(paths: list[Path], dest: Path):
+    with open(dest, "w") as f:
+        pass
+
+    for c in paths:
+        with open(c) as f:
+            jsonData = json.load(f)
+
+        module: dict = jsonData["modules"][next(iter(jsonData["modules"].keys()))]
+        for i in module["cells"].values():
+            if i["type"] != "$mem_v2":
+                continue
+
+            parameters: dict[str, str] = i["parameters"]
+            connections: dict[str, list[str]] = i["connections"]
+
+            addressBits: int = int(parameters["ABITS"], 2)
+            dataWidth: int = int(parameters["WIDTH"], 2)
+            initValueRaw: str = parameters["INIT"]
+            readPorts: int = int(parameters["RD_PORTS"], 2)
+            writePorts: int = int(parameters["WR_PORTS"], 2)
+
+            if initValueRaw == "x" * (2**addressBits):
+                initValue = "none"
+            elif initValueRaw == "0" * (2**addressBits):
+                initValue = "zero"
+            else:
+                initValue = "any"
+
+            def groupList(d, n):
+                return [d[i : i + n] for i in range(0, len(d), n)]
+
+            def getClockEdge(polarityBit: str) -> str:
+                return "posedge" if polarityBit == "1" else "negedge"
+
+            def getMemValueString(
+                value: str, dataWidth: int, initValue: str | None = None
+            ) -> str:
+                # Check for 'init' only if initValue is provided and matches
+                if initValue is not None and value == initValue:
+                    return "init"
+                if value == "x" * dataWidth:
+                    return "none"
+                if value == "0" * dataWidth:
+                    return "zero"
+                # Otherwise, it's 'any' non-zero/non-x value or doesn't match init
+                return "any"
+
+            def buildReadPortConfig(rdIdx: int, dataWidth: int) -> list[str]:
+                config = []
+                # Safely access parameters using .get() and check index bounds
+                rdClkPolarity = parameters.get("RD_CLK_POLARITY", "")
+                if rdIdx < len(rdClkPolarity) and connections["RD_CLK"][rdIdx] != "x":
+                    config.append(f"clock {getClockEdge(rdClkPolarity[rdIdx])}")
+
+                rdClkEn = parameters.get("RD_CLK_EN", "")
+                if rdIdx < len(rdClkEn) and rdClkEn[rdIdx] == "1":
+                    config.append("rden")
+
+                initVal = parameters.get("RD_INIT_VALUE")
+                if initVal is not None:
+                    config.append(
+                        f"rdinit {getMemValueString(initVal, dataWidth)}"
+                    )  # No initValue comparison needed here
+
+                arstVal = parameters.get("RD_ARST_VALUE")
+                if arstVal is not None and initVal is not None:
+                    config.append(
+                        f"rdarst {getMemValueString(arstVal, dataWidth, initVal)}"
+                    )
+
+                srstVal = parameters.get("RD_SRST_VALUE")
+                if srstVal is not None and initVal is not None:
+                    config.append(
+                        f"rdsrst {getMemValueString(srstVal, dataWidth, initVal)}"
+                    )
+
+                return config
+
+            def buildWritePortConfig(wrIdx: int) -> list[str]:
+                config = []
+                # Safely access parameters using .get() and check index bounds
+                wrClkPolarity = parameters.get("WR_CLK_POLARITY", "")
+                if wrIdx < len(wrClkPolarity):
+                    config.append(f"clock {getClockEdge(wrClkPolarity[wrIdx])}")
+
+                wrClkEn = parameters.get("WR_CLK_EN", "")
+                if wrIdx < len(wrClkEn) and wrClkEn[wrIdx] == "1":
+                    config.append("clken")  # Yosys uses 'clken' for write enable
+
+                return config
+
+            readAddrSignals = connections.get("RD_ADDR", [])
+            writeAddrSignals = connections.get("WR_ADDR", [])
+            readPortList = (
+                groupList(readAddrSignals, addressBits)
+                if readPorts > 0 and addressBits > 0
+                else []
+            )
+            writePortList = (
+                groupList(writeAddrSignals, addressBits)
+                if writePorts > 0 and addressBits > 0
+                else []
+            )
+
+            rdPortSet = set(tuple(item) for item in readPortList if item)
+            wrPortSet = set(tuple(item) for item in writePortList if item)
+
+            # Identify port types based on address signal usage
+            commonPorts = rdPortSet.intersection(wrPortSet)
+            readOnlyPorts = rdPortSet.difference(wrPortSet)
+            writeOnlyPorts = wrPortSet.difference(rdPortSet)
+
+            ports: dict[str, list[str]] = defaultdict(list)
+
+            # Process common ports (Read-Write)
+            for i, portTuple in enumerate(commonPorts):
+                portAddr = list(portTuple)
+                rdIdx = readPortList.index(portAddr)
+                wrIdx = writePortList.index(portAddr)
+
+                # Determine read type prefix (asynchronous 'ar' or synchronous 'sr')
+                # Check if RD_CLK exists and is all 'x' (indicating asynchronous)
+                isAsyncRead = (
+                    connections.get("RD_CLK", [""])[0] == "x"
+                )  # Simplified check
+                portPrefix = "ar" if isAsyncRead else "sr"
+                portName = f'{portPrefix}sw "RW{i}"'  # Combined Read/Write port
+
+                # Build config: Start with write part, then add read part
+                portConfig = buildWritePortConfig(wrIdx)
+                portConfig.extend(buildReadPortConfig(rdIdx, dataWidth))
+
+                # Remove potential duplicate 'clock' entries if polarities match
+                portConfig = list(dict.fromkeys(portConfig))
+
+                ports[portName].extend(portConfig)
+
+            # Process read-only ports
+            for i, portTuple in enumerate(readOnlyPorts):
+                portAddr = list(portTuple)
+                rdIdx = readPortList.index(portAddr)
+
+                isAsyncRead = connections.get("RD_CLK", [""])[0] == "x"
+                portPrefix = "ar" if isAsyncRead else "sr"
+                portName = f'{portPrefix} "R{i}"'  # Read-Only port
+
+                ports[portName].extend(buildReadPortConfig(rdIdx, dataWidth))
+
+            # Process write-only ports
+            for i, portTuple in enumerate(writeOnlyPorts):
+                portAddr = list(portTuple)
+                wrIdx = writePortList.index(portAddr)
+
+                portName = f'sw "W{i}"'
+                ports[portName].extend(buildWritePortConfig(wrIdx))
+
+            environment = Environment(
+                loader=PackageLoader("FABulous")
+            )  # Assuming FABulous is the package
+            template = environment.get_template(
+                "memory_mapping.txt.jinja"
+            )  # Create a template file
+
+            # Render the template with the extracted data
+            memoryDefinition = template.render(
+                moduleName=f"{c.stem}",
+                addressBits=addressBits,
+                dataWidth=dataWidth,
+                initValue=initValue,
+                ports=ports,
+                connections=connections,
+            )
+
+            with open(dest, "a") as f:
+                f.write(memoryDefinition)
+
+
 def genSynthScript(fabric: Fabric, filename: Path):
     environment = Environment(loader=PackageLoader("FABulous"))
     template = environment.get_template("arch_synth.tcl.jinja")
@@ -157,6 +335,13 @@ def genSynthScript(fabric: Fabric, filename: Path):
         if bel.constantBel:
             continue
         path = bel.src.parent / "metadata"
+        if bel.belType == BelType.MEM:
+            genMemMap(
+                list(path.glob(f"cell_{bel.name}*.json")),
+                fabric.fabricDir.parent / ".FABulous/memory_map.txt",
+            )
+            continue
+
         cellsPath = list(path.glob(f"cell_{bel.name}*.json"))
         wrapperInfos = genWrappingMapPair(bel, path)
         wrappers.append(
@@ -197,7 +382,8 @@ def genCellsAndMaps(bel: Bel):
     runPass("select -none")
     runPass("select A:CELL")
     if len(design.selected_modules()) > 0:
-        runPass(f"write_json {filePath / f"cell_{bel.prefix}{bel.name}.json"}")
+        runPass("proc; opt -full;;;")
+        runPass(f"write_json {filePath / f'cell_{bel.prefix}{bel.name}.json'}")
         return
 
     runPass("select -none")
@@ -217,7 +403,6 @@ def genCellsAndMaps(bel: Bel):
     for wire in module.selected_wires():
         p = bel.findPortByName(wire.name.str()[1:])
         if isinstance(p, ConfigPort):
-            print(p.features)
             if len(p.features) == 1:
                 ranges.append(range(2))
             else:
@@ -242,18 +427,19 @@ def genCellsAndMaps(bel: Bel):
 
     for c in combinations:
         nameStr = f"{bel.name}_" + "_".join(
-            [f"{cKey.removeprefix("\\")}_{cValue}" for cKey, cValue in c]
+            [f"{cKey.removeprefix('\\')}_{cValue}" for cKey, cValue in c]
         )
         for cKey, cValue in c:
             if cValue != "z":
                 runPass(f"connect -set {cKey} {cValue}")
-        runPass("opt;")
+        runPass("opt -full;")
         runPass("clean -purge")
         module = design.top_module()
         runPass("select c:*")
         if len(module.selected_cells()) >= 1:
             runPass(f"rename -top {nameStr}")
-            runPass(f"write_json {filePath / f"cell_{nameStr}.json"}")
+            runPass("proc; memory; opt -full;;;")
+            runPass(f"write_json {filePath / f'cell_{nameStr}.json'}")
             cellDict[nameStr] = c
         runPass("design -load base")
 
@@ -265,7 +451,7 @@ def genCellsAndMaps(bel: Bel):
                 runPass("select a:DATA")
                 for port in module.selected_wires():
                     pr.Parameter(
-                        f"_TECHMAP_CONSTVAL_{port.name.str().removeprefix("\\")}_",
+                        f"_TECHMAP_CONSTVAL_{port.name.str().removeprefix('\\')}_",
                         Value(f"{port.width}'bx", None, False),
                     )
 
@@ -314,16 +500,18 @@ def genCellsAndMaps(bel: Bel):
 
 
 if __name__ == "__main__":
-    from FABulous.fabric_generator.define import WriterType
-    from FABulous.FABulous_API import FABulous_API
 
-    f = FABulous_API(
-        Path("/home/kelvin/FABulous_fork/myProject/fabric.yaml"), WriterType.VERILOG
-    )
+    # f = FABulous_API(
+    #     Path("/home/kelvin/FABulous_fork/myProject/fabric.yaml"), WriterType.VERILOG
+    # )
     # genCellsAndMaps(f.fabric.tileDict["PE"].bels[2])
     # genWrappingMap(f.fabric.tileDict["PE"].bels[0], Path("/home/kelvin/FABulous_fork/myProject/.FABulous/test_wrap_map.v"))
     # f.gen_cellsAndTechmaps(Path("/home/kelvin/FABulous_fork/myProject/.FABulous"))
 
-    genSynthScript(
-        f.fabric, Path("/home/kelvin/FABulous_fork/myProject/.FABulous/arch_synth.tcl")
+    # genSynthScript(
+    #     f.fabric, Path("/home/kelvin/FABulous_fork/myProject/.FABulous/arch_synth.tcl")
+    # )
+    s = genMemMap(
+        [Path("/home/kelvin/FABulous_fork/myProject/Tile/E_Mem/metadata/cell_Mem.json")]
     )
+    print(s)

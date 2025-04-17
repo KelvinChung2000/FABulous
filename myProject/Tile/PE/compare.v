@@ -1,3 +1,4 @@
+(* ARITH *)
 module compare #(
     parameter NoConfigBits = 2,
     parameter WIDTH = 32

@@ -123,19 +123,8 @@ yosys techmap -map myProject/Tile/N_IO/../include/metadata/wrap_map_IO.v
 yosys opt
 yosys clean -purge
 
-# wrapping base design
-yosys techmap -map myProject/Tile/E_Mem/metadata/wrap_map_Mem.v
-yosys connwrappers -unsigned \$__mux_wrapper Y WIDTH 
-yosys connwrappers -unsigned \$__mem_v2_wrapper RD_DATA WIDTH 
 
-# extract cells
-extract "myProject/Tile/E_Mem/metadata/cell_Mem.json" \
-        "myProject/Tile/E_Mem/metadata/wrap_map_Mem.v"
-# unwrapping
-
-yosys opt
-yosys clean -purge
-
+yosys memory_libmap -lib $project_root/.FABulous/memory_map.txt
 
 # cell techmapping
 yosys techmap -map $project_root/.FABulous/techmaps.v

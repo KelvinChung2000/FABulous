@@ -3,9 +3,10 @@
   "modules": {
     "ALU": {
       "attributes": {
+        "ARITH": 1,
         "dynports": 1,
         "cells_not_processed": 1,
-        "src": "myProject/Tile/PE/ALU.v:1.1-40.10"
+        "src": "myProject/Tile/PE/ALU.v:2.1-41.10"
       },
       "parameter_default_values": {
         "NoConfigBits": 3,
@@ -34,7 +35,7 @@
         }
       },
       "cells": {
-        "$add$myProject/Tile/PE/ALU.v:29$2": {
+        "$add$myProject/Tile/PE/ALU.v:30$2": {
           "hide_name": 1,
           "type": "$add",
           "parameters": {
@@ -45,7 +46,7 @@
             "Y_WIDTH": 32
           },
           "attributes": {
-            "src": "myProject/Tile/PE/ALU.v:29.23-29.42"
+            "src": "myProject/Tile/PE/ALU.v:30.23-30.42"
           },
           "port_directions": {
             "A": "input",
@@ -58,7 +59,7 @@
             "Y": [ 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164 ]
           }
         },
-        "$mul$myProject/Tile/PE/ALU.v:34$6": {
+        "$mul$myProject/Tile/PE/ALU.v:35$6": {
           "hide_name": 1,
           "type": "$mul",
           "parameters": {
@@ -69,7 +70,7 @@
             "Y_WIDTH": 32
           },
           "attributes": {
-            "src": "myProject/Tile/PE/ALU.v:34.23-34.42"
+            "src": "myProject/Tile/PE/ALU.v:35.23-35.42"
           },
           "port_directions": {
             "A": "input",
@@ -82,7 +83,7 @@
             "Y": [ 165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196 ]
           }
         },
-        "$or$myProject/Tile/PE/ALU.v:32$4": {
+        "$or$myProject/Tile/PE/ALU.v:33$4": {
           "hide_name": 1,
           "type": "$or",
           "parameters": {
@@ -93,7 +94,7 @@
             "Y_WIDTH": 32
           },
           "attributes": {
-            "src": "myProject/Tile/PE/ALU.v:32.22-32.41"
+            "src": "myProject/Tile/PE/ALU.v:33.22-33.41"
           },
           "port_directions": {
             "A": "input",
@@ -118,7 +119,7 @@
           },
           "attributes": {
             "full_case": 1,
-            "src": "myProject/Tile/PE/ALU.v:0.0-0.0|myProject/Tile/PE/ALU.v:28.5-37.12"
+            "src": "myProject/Tile/PE/ALU.v:0.0-0.0|myProject/Tile/PE/ALU.v:29.5-38.12"
           },
           "port_directions": {
             "A": "input",
@@ -143,7 +144,7 @@
           },
           "attributes": {
             "full_case": 1,
-            "src": "myProject/Tile/PE/ALU.v:0.0-0.0|myProject/Tile/PE/ALU.v:28.5-37.12"
+            "src": "myProject/Tile/PE/ALU.v:0.0-0.0|myProject/Tile/PE/ALU.v:29.5-38.12"
           },
           "port_directions": {
             "A": "input",
@@ -168,7 +169,7 @@
           },
           "attributes": {
             "full_case": 1,
-            "src": "myProject/Tile/PE/ALU.v:0.0-0.0|myProject/Tile/PE/ALU.v:28.5-37.12"
+            "src": "myProject/Tile/PE/ALU.v:0.0-0.0|myProject/Tile/PE/ALU.v:29.5-38.12"
           },
           "port_directions": {
             "A": "input",
@@ -193,7 +194,7 @@
           },
           "attributes": {
             "full_case": 1,
-            "src": "myProject/Tile/PE/ALU.v:0.0-0.0|myProject/Tile/PE/ALU.v:28.5-37.12"
+            "src": "myProject/Tile/PE/ALU.v:0.0-0.0|myProject/Tile/PE/ALU.v:29.5-38.12"
           },
           "port_directions": {
             "A": "input",
@@ -218,7 +219,7 @@
           },
           "attributes": {
             "full_case": 1,
-            "src": "myProject/Tile/PE/ALU.v:0.0-0.0|myProject/Tile/PE/ALU.v:28.5-37.12"
+            "src": "myProject/Tile/PE/ALU.v:0.0-0.0|myProject/Tile/PE/ALU.v:29.5-38.12"
           },
           "port_directions": {
             "A": "input",
@@ -243,7 +244,7 @@
           },
           "attributes": {
             "full_case": 1,
-            "src": "myProject/Tile/PE/ALU.v:0.0-0.0|myProject/Tile/PE/ALU.v:28.5-37.12"
+            "src": "myProject/Tile/PE/ALU.v:0.0-0.0|myProject/Tile/PE/ALU.v:29.5-38.12"
           },
           "port_directions": {
             "A": "input",
@@ -265,7 +266,7 @@
           },
           "attributes": {
             "full_case": 1,
-            "src": "myProject/Tile/PE/ALU.v:0.0-0.0|myProject/Tile/PE/ALU.v:28.5-37.12"
+            "src": "myProject/Tile/PE/ALU.v:0.0-0.0|myProject/Tile/PE/ALU.v:29.5-38.12"
           },
           "port_directions": {
             "A": "input",
@@ -280,7 +281,7 @@
             "Y": [ 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129 ]
           }
         },
-        "$sub$myProject/Tile/PE/ALU.v:30$3": {
+        "$sub$myProject/Tile/PE/ALU.v:31$3": {
           "hide_name": 1,
           "type": "$sub",
           "parameters": {
@@ -291,7 +292,7 @@
             "Y_WIDTH": 32
           },
           "attributes": {
-            "src": "myProject/Tile/PE/ALU.v:30.23-30.42"
+            "src": "myProject/Tile/PE/ALU.v:31.23-31.42"
           },
           "port_directions": {
             "A": "input",
@@ -304,14 +305,14 @@
             "Y": [ 299, 300, 301, 302, 303, 304, 305, 306, 307, 308, 309, 310, 311, 312, 313, 314, 315, 316, 317, 318, 319, 320, 321, 322, 323, 324, 325, 326, 327, 328, 329, 330 ]
           }
         },
-        "$ternary$myProject/Tile/PE/ALU.v:35$7": {
+        "$ternary$myProject/Tile/PE/ALU.v:36$7": {
           "hide_name": 1,
           "type": "$mux",
           "parameters": {
             "WIDTH": 32
           },
           "attributes": {
-            "src": "myProject/Tile/PE/ALU.v:35.23-35.56"
+            "src": "myProject/Tile/PE/ALU.v:36.23-36.56"
           },
           "port_directions": {
             "A": "input",
@@ -326,7 +327,7 @@
             "Y": [ 235, 236, 237, 238, 239, 240, 241, 242, 243, 244, 245, 246, 247, 248, 249, 250, 251, 252, 253, 254, 255, 256, 257, 258, 259, 260, 261, 262, 263, 264, 265, 266 ]
           }
         },
-        "$xor$myProject/Tile/PE/ALU.v:33$5": {
+        "$xor$myProject/Tile/PE/ALU.v:34$5": {
           "hide_name": 1,
           "type": "$xor",
           "parameters": {
@@ -337,7 +338,7 @@
             "Y_WIDTH": 32
           },
           "attributes": {
-            "src": "myProject/Tile/PE/ALU.v:33.23-33.42"
+            "src": "myProject/Tile/PE/ALU.v:34.23-34.42"
           },
           "port_directions": {
             "A": "input",
@@ -356,35 +357,35 @@
           "hide_name": 1,
           "bits": [ 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129 ],
           "attributes": {
-            "src": "myProject/Tile/PE/ALU.v:27.3-38.6"
+            "src": "myProject/Tile/PE/ALU.v:28.3-39.6"
           }
         },
         "$1\\data_out[31:0]": {
           "hide_name": 1,
           "bits": [ 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129 ],
           "attributes": {
-            "src": "myProject/Tile/PE/ALU.v:27.3-38.6"
+            "src": "myProject/Tile/PE/ALU.v:28.3-39.6"
           }
         },
-        "$add$myProject/Tile/PE/ALU.v:29$2_Y": {
+        "$add$myProject/Tile/PE/ALU.v:30$2_Y": {
           "hide_name": 1,
           "bits": [ 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164 ],
           "attributes": {
-            "src": "myProject/Tile/PE/ALU.v:29.23-29.42"
+            "src": "myProject/Tile/PE/ALU.v:30.23-30.42"
           }
         },
-        "$mul$myProject/Tile/PE/ALU.v:34$6_Y": {
+        "$mul$myProject/Tile/PE/ALU.v:35$6_Y": {
           "hide_name": 1,
           "bits": [ 165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196 ],
           "attributes": {
-            "src": "myProject/Tile/PE/ALU.v:34.23-34.42"
+            "src": "myProject/Tile/PE/ALU.v:35.23-35.42"
           }
         },
-        "$or$myProject/Tile/PE/ALU.v:32$4_Y": {
+        "$or$myProject/Tile/PE/ALU.v:33$4_Y": {
           "hide_name": 1,
           "bits": [ 197, 198, 199, 200, 201, 202, 203, 204, 205, 206, 207, 208, 209, 210, 211, 212, 213, 214, 215, 216, 217, 218, 219, 220, 221, 222, 223, 224, 225, 226, 227, 228 ],
           "attributes": {
-            "src": "myProject/Tile/PE/ALU.v:32.22-32.41"
+            "src": "myProject/Tile/PE/ALU.v:33.22-33.41"
           }
         },
         "$procmux$10_CMP": {
@@ -429,25 +430,25 @@
           "attributes": {
           }
         },
-        "$sub$myProject/Tile/PE/ALU.v:30$3_Y": {
+        "$sub$myProject/Tile/PE/ALU.v:31$3_Y": {
           "hide_name": 1,
           "bits": [ 299, 300, 301, 302, 303, 304, 305, 306, 307, 308, 309, 310, 311, 312, 313, 314, 315, 316, 317, 318, 319, 320, 321, 322, 323, 324, 325, 326, 327, 328, 329, 330 ],
           "attributes": {
-            "src": "myProject/Tile/PE/ALU.v:30.23-30.42"
+            "src": "myProject/Tile/PE/ALU.v:31.23-31.42"
           }
         },
-        "$ternary$myProject/Tile/PE/ALU.v:35$7_Y": {
+        "$ternary$myProject/Tile/PE/ALU.v:36$7_Y": {
           "hide_name": 1,
           "bits": [ 235, 236, 237, 238, 239, 240, 241, 242, 243, 244, 245, 246, 247, 248, 249, 250, 251, 252, 253, 254, 255, 256, 257, 258, 259, 260, 261, 262, 263, 264, 265, 266 ],
           "attributes": {
-            "src": "myProject/Tile/PE/ALU.v:35.23-35.56"
+            "src": "myProject/Tile/PE/ALU.v:36.23-36.56"
           }
         },
-        "$xor$myProject/Tile/PE/ALU.v:33$5_Y": {
+        "$xor$myProject/Tile/PE/ALU.v:34$5_Y": {
           "hide_name": 1,
           "bits": [ 267, 268, 269, 270, 271, 272, 273, 274, 275, 276, 277, 278, 279, 280, 281, 282, 283, 284, 285, 286, 287, 288, 289, 290, 291, 292, 293, 294, 295, 296, 297, 298 ],
           "attributes": {
-            "src": "myProject/Tile/PE/ALU.v:33.23-33.42"
+            "src": "myProject/Tile/PE/ALU.v:34.23-34.42"
           }
         },
         "ALU_func": {
@@ -457,7 +458,7 @@
             "CONFIG_BIT": 1,
             "FABulous": 1,
             "FEATURE": "ADD;SUB;AND;OR;XOR;MUL;MUL_ADD",
-            "src": "myProject/Tile/PE/ALU.v:12.17-12.25"
+            "src": "myProject/Tile/PE/ALU.v:13.17-13.25"
           }
         },
         "data_in1": {
@@ -466,7 +467,7 @@
           "attributes": {
             "BUS": 1,
             "FABulous": 1,
-            "src": "myProject/Tile/PE/ALU.v:7.48-7.56"
+            "src": "myProject/Tile/PE/ALU.v:8.48-8.56"
           }
         },
         "data_in2": {
@@ -475,7 +476,7 @@
           "attributes": {
             "BUS": 1,
             "FABulous": 1,
-            "src": "myProject/Tile/PE/ALU.v:8.48-8.56"
+            "src": "myProject/Tile/PE/ALU.v:9.48-9.56"
           }
         },
         "data_in3": {
@@ -484,7 +485,7 @@
           "attributes": {
             "BUS": 1,
             "FABulous": 1,
-            "src": "myProject/Tile/PE/ALU.v:9.48-9.56"
+            "src": "myProject/Tile/PE/ALU.v:10.48-10.56"
           }
         },
         "data_out": {
@@ -493,7 +494,7 @@
           "attributes": {
             "BUS": 1,
             "FABulous": 1,
-            "src": "myProject/Tile/PE/ALU.v:10.48-10.56"
+            "src": "myProject/Tile/PE/ALU.v:11.48-11.56"
           }
         }
       }

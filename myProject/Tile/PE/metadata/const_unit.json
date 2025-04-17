@@ -4,6 +4,7 @@
     "const_unit": {
       "attributes": {
         "CELL": 1,
+        "ARITH": 1,
         "dynports": 1,
         "cells_not_processed": 1,
         "src": "myProject/Tile/PE/const_unit.v:2.1-12.10"

@@ -24,6 +24,15 @@ class Side(StrEnum):
     ANY = "ANY"
 
 
+class BelType(StrEnum):
+    ARITH = "ARITH"
+    LOGIC = "LOGIC"
+    REG = "REG"
+    MEM = "MEM"
+    CTRL = "CTRL"
+    IO = "IO"
+
+
 class MultiplexerStyle(StrEnum):
     CUSTOM = "CUSTOM"
     GENERIC = "GENERIC"

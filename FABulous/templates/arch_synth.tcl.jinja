@@ -64,6 +64,8 @@ yosys opt
 yosys clean -purge
 {% endfor %}
 
+yosys memory_libmap -lib $project_root/.FABulous/memory_map.txt
+
 # cell techmapping
 yosys techmap -map $project_root/.FABulous/techmaps.v
 yosys techmap -map /home/kelvin/FABulous_fork/myProject/PnR/fsm_map.v

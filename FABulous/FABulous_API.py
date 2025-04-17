@@ -1,6 +1,7 @@
 from pathlib import Path
 
 from hdlgen.code_gen import CodeGenerator
+from hdlgen.define import WriterType as CodeGenWriterType
 from loguru import logger
 
 import FABulous.fabric_cad.model_generation_npnr as model_gen_npnr
@@ -49,7 +50,7 @@ class FABulous_API:
         Represents the parsed fabric data.
     """
 
-    writerType: WriterType
+    writerType: CodeGenWriterType
     geometryGenerator: GeometryGenerator
     fabric: Fabric
 
@@ -82,7 +83,7 @@ class FABulous_API:
                 raise ValueError
             self.geometryGenerator = GeometryGenerator(self.fabric)
 
-        self.writerType = writeType
+        self.writerType = CodeGenWriterType[str(writeType).upper()]
 
         # self.fabricGenerator = FabricGenerator(fabric, writer)
 

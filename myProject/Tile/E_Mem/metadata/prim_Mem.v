@@ -1,5 +1,6 @@
 (* blackbox *)
 module Mem #(
+    parameter config_bits = 0
 )
 (
     input wire[31:0] addr0,

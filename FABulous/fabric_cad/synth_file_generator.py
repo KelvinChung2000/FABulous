@@ -12,7 +12,13 @@ from jinja2 import Environment, PackageLoader
 from pyosys import libyosys as ys
 
 from FABulous.fabric_definition.Bel import Bel
-from FABulous.fabric_definition.define import IO, BelType
+from FABulous.fabric_definition.define import (
+    IO,
+    BelType,
+    BitVector,
+    YosysJson,
+    YosysModule,
+)
 from FABulous.fabric_definition.Fabric import Fabric
 from FABulous.fabric_definition.Port import ConfigPort
 
@@ -149,21 +155,25 @@ def genWrappingMapPair(bel: Bel, filePrefix: Path) -> list[str]:
     return wrapperInfos
 
 
-def genMemMap(paths: list[Path], dest: Path):
+def genMemMap(bel: Bel, dest: Path):
     with open(dest, "w") as f:
         pass
 
-    for c in paths:
-        with open(c) as f:
-            jsonData = json.load(f)
+    filePath = bel.src.parent / "metadata"
+    with open(Path(f"{filePath}/map_{bel.name}.v"), "w") as f:
+        pass
 
-        module: dict = jsonData["modules"][next(iter(jsonData["modules"].keys()))]
-        for i in module["cells"].values():
-            if i["type"] != "$mem_v2":
+    paths = list(filePath.glob(f"cell_{bel.name}*.json"))
+    for c in paths:
+        yosysJson = YosysJson(c)
+
+        module: YosysModule = yosysJson.modules[next(iter(yosysJson.modules))]
+        for cell in module.cells.values():
+            if cell.type != "$mem_v2":
                 continue
 
-            parameters: dict[str, str] = i["parameters"]
-            connections: dict[str, list[str]] = i["connections"]
+            parameters: dict[str, str] = cell.parameters
+            connections: dict[str, BitVector] = cell.connections
 
             addressBits: int = int(parameters["ABITS"], 2)
             dataWidth: int = int(parameters["WIDTH"], 2)
@@ -188,43 +198,44 @@ def genMemMap(paths: list[Path], dest: Path):
                 value: str, dataWidth: int, initValue: str | None = None
             ) -> str:
                 # Check for 'init' only if initValue is provided and matches
-                if initValue is not None and value == initValue:
-                    return "init"
                 if value == "x" * dataWidth:
                     return "none"
                 if value == "0" * dataWidth:
                     return "zero"
+                if initValue is not None and value == initValue:
+                    return "init"
                 # Otherwise, it's 'any' non-zero/non-x value or doesn't match init
                 return "any"
 
             def buildReadPortConfig(rdIdx: int, dataWidth: int) -> list[str]:
                 config = []
-                # Safely access parameters using .get() and check index bounds
-                rdClkPolarity = parameters.get("RD_CLK_POLARITY", "")
-                if rdIdx < len(rdClkPolarity) and connections["RD_CLK"][rdIdx] != "x":
-                    config.append(f"clock {getClockEdge(rdClkPolarity[rdIdx])}")
+                if connections["RD_CLK"][rdIdx] != "x":
+                    # Safely access parameters using .get() and check index bounds
+                    rdClkPolarity = parameters.get("RD_CLK_POLARITY", "")
+                    if rdIdx < len(rdClkPolarity):
+                        config.append(f"clock {getClockEdge(rdClkPolarity[rdIdx])}")
 
-                rdClkEn = parameters.get("RD_CLK_EN", "")
-                if rdIdx < len(rdClkEn) and rdClkEn[rdIdx] == "1":
-                    config.append("rden")
+                    rdClkEn = parameters.get("RD_CLK_EN", "")
+                    if rdIdx < len(rdClkEn) and rdClkEn[rdIdx] == "1":
+                        config.append("rden")
 
-                initVal = parameters.get("RD_INIT_VALUE")
-                if initVal is not None:
-                    config.append(
-                        f"rdinit {getMemValueString(initVal, dataWidth)}"
-                    )  # No initValue comparison needed here
+                    initVal = parameters.get("RD_INIT_VALUE")
+                    if initVal is not None:
+                        config.append(
+                            f"rdinit {getMemValueString(initVal, dataWidth)}"
+                        )  # No initValue comparison needed here
 
-                arstVal = parameters.get("RD_ARST_VALUE")
-                if arstVal is not None and initVal is not None:
-                    config.append(
-                        f"rdarst {getMemValueString(arstVal, dataWidth, initVal)}"
-                    )
+                    arstVal = parameters.get("RD_ARST_VALUE")
+                    if arstVal is not None and initVal is not None:
+                        config.append(
+                            f"rdarst {getMemValueString(arstVal, dataWidth, initVal)}"
+                        )
 
-                srstVal = parameters.get("RD_SRST_VALUE")
-                if srstVal is not None and initVal is not None:
-                    config.append(
-                        f"rdsrst {getMemValueString(srstVal, dataWidth, initVal)}"
-                    )
+                    srstVal = parameters.get("RD_SRST_VALUE")
+                    if srstVal is not None and initVal is not None:
+                        config.append(
+                            f"rdsrst {getMemValueString(srstVal, dataWidth, initVal)}"
+                        )
 
                 return config
 
@@ -265,7 +276,7 @@ def genMemMap(paths: list[Path], dest: Path):
             ports: dict[str, list[str]] = defaultdict(list)
 
             # Process common ports (Read-Write)
-            for i, portTuple in enumerate(commonPorts):
+            for cell, portTuple in enumerate(commonPorts):
                 portAddr = list(portTuple)
                 rdIdx = readPortList.index(portAddr)
                 wrIdx = writePortList.index(portAddr)
@@ -276,7 +287,7 @@ def genMemMap(paths: list[Path], dest: Path):
                     connections.get("RD_CLK", [""])[0] == "x"
                 )  # Simplified check
                 portPrefix = "ar" if isAsyncRead else "sr"
-                portName = f'{portPrefix}sw "RW{i}"'  # Combined Read/Write port
+                portName = f'{portPrefix}sw "RW{cell}"'  # Combined Read/Write port
 
                 # Build config: Start with write part, then add read part
                 portConfig = buildWritePortConfig(wrIdx)
@@ -288,22 +299,22 @@ def genMemMap(paths: list[Path], dest: Path):
                 ports[portName].extend(portConfig)
 
             # Process read-only ports
-            for i, portTuple in enumerate(readOnlyPorts):
+            for cell, portTuple in enumerate(readOnlyPorts):
                 portAddr = list(portTuple)
                 rdIdx = readPortList.index(portAddr)
 
                 isAsyncRead = connections.get("RD_CLK", [""])[0] == "x"
                 portPrefix = "ar" if isAsyncRead else "sr"
-                portName = f'{portPrefix} "R{i}"'  # Read-Only port
+                portName = f'{portPrefix} "R{cell}"'  # Read-Only port
 
                 ports[portName].extend(buildReadPortConfig(rdIdx, dataWidth))
 
             # Process write-only ports
-            for i, portTuple in enumerate(writeOnlyPorts):
+            for cell, portTuple in enumerate(writeOnlyPorts):
                 portAddr = list(portTuple)
                 wrIdx = writePortList.index(portAddr)
 
-                portName = f'sw "W{i}"'
+                portName = f'sw "W{cell}"'
                 ports[portName].extend(buildWritePortConfig(wrIdx))
 
             environment = Environment(
@@ -315,7 +326,7 @@ def genMemMap(paths: list[Path], dest: Path):
 
             # Render the template with the extracted data
             memoryDefinition = template.render(
-                moduleName=f"{c.stem}",
+                moduleName=f"$__{c.stem}",
                 addressBits=addressBits,
                 dataWidth=dataWidth,
                 initValue=initValue,
@@ -325,6 +336,64 @@ def genMemMap(paths: list[Path], dest: Path):
 
             with open(dest, "a") as f:
                 f.write(memoryDefinition)
+
+            design = ys.Design()
+            runPass = partial(lambda design, cmd: ys.run_pass(cmd, design), design)
+            runPass("read_json " + str(c))
+            mod = design.top_module()
+            cg = CodeGenerator(
+                Path(f"{filePath}/map_{bel.name}.v"),
+                codeGenWriterType.VERILOG,
+                writeMode="a",
+            )
+            with cg.Module(
+                f"map_{bel.name}", [cg.Attribute("techmap_celltype", f"$__{c.stem}")]
+            ) as m:
+                with m.ParameterRegion() as pr:
+                    pass
+
+                portDict = {}
+                with m.PortRegion() as pr:
+                    for cell in ports:
+                        kind, name = cell.split(" ")
+                        name = name.strip('"')
+                        portDict[name] = pr.Port(
+                            f"PORT_{name}_ADDR", IO.INPUT, addressBits
+                        )
+                        match kind:
+                            case "arsw" | "srsw":
+                                portDict[f"{name}_WR_DATA"] = pr.Port(
+                                    f"PORT_{name}_WR_DATA", IO.INPUT, dataWidth
+                                )
+                                portDict[f"{name}_RD_DATA"] = pr.Port(
+                                    f"PORT_{name}_RD_DATA", IO.OUTPUT, dataWidth
+                                )
+                                portDict[f"{name}_WR_EN"] = pr.Port(
+                                    f"PORT_{name}_WR_EN", IO.INPUT, 1
+                                )
+
+                            case "ar" | "sr":
+                                portDict[f"{name}_RD_DATA"] = pr.Port(
+                                    f"PORT_{name}_RD_DATA", IO.OUTPUT, dataWidth
+                                )
+
+                            case "sw":
+                                portDict[f"{name}_WR_DATA"] = pr.Port(
+                                    f"PORT_{name}_WR_DATA", IO.INPUT, dataWidth
+                                )
+
+                with m.LogicRegion() as lr:
+                    runPass("select a:CONFIG_BIT")
+                    wires = [
+                        i.name.str().removeprefix("\\") for i in mod.selected_wires()
+                    ]
+                    params = []
+                    for cell in wires:
+                        v = int(
+                            "".join([str(i) for i in module.netnames[cell].bits]), 2
+                        )
+                        params.append(lr.ConnectPair(cell, v))
+                    lr.InitModule(f"{bel.name}", "_TECHMAP_REPLACE_", [], params)
 
 
 def genSynthScript(fabric: Fabric, filename: Path):
@@ -337,7 +406,7 @@ def genSynthScript(fabric: Fabric, filename: Path):
         path = bel.src.parent / "metadata"
         if bel.belType == BelType.MEM:
             genMemMap(
-                list(path.glob(f"cell_{bel.name}*.json")),
+                bel,
                 fabric.fabricDir.parent / ".FABulous/memory_map.txt",
             )
             continue
@@ -373,8 +442,8 @@ def genCellsAndMaps(bel: Bel):
     runPass("hierarchy -auto-top")
     runPass("flatten")
     runPass("proc")
-    runPass("memory -nomap")
     runPass("opt")
+    runPass("check -assert")
     # runPass("clean -purge")
     runPass("setattr -unset src")
     runPass("design -save base")
@@ -382,7 +451,7 @@ def genCellsAndMaps(bel: Bel):
     runPass("select -none")
     runPass("select A:CELL")
     if len(design.selected_modules()) > 0:
-        runPass("proc; opt -full;;;")
+        runPass("proc; memory -nomap; opt -full;;;")
         runPass(f"write_json {filePath / f'cell_{bel.prefix}{bel.name}.json'}")
         return
 
@@ -433,16 +502,19 @@ def genCellsAndMaps(bel: Bel):
             if cValue != "z":
                 runPass(f"connect -set {cKey} {cValue}")
         runPass("opt -full;")
-        runPass("clean -purge")
+        # runPass("clean -purge")
         module = design.top_module()
         runPass("select c:*")
         if len(module.selected_cells()) >= 1:
+            runPass("cd")
             runPass(f"rename -top {nameStr}")
-            runPass("proc; memory; opt -full;;;")
+            runPass("proc; opt -full; memory -nomap;;;")
             runPass(f"write_json {filePath / f'cell_{nameStr}.json'}")
             cellDict[nameStr] = c
         runPass("design -load base")
 
+    if bel.belType == BelType.MEM:
+        return
     module = design.top_module()
     cg = CodeGenerator(Path(f"{filePath}/map_{bel.name}.v"), codeGenWriterType.VERILOG)
     for name, c in cellDict.items():

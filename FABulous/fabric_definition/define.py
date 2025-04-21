@@ -1,4 +1,8 @@
+import json
+from dataclasses import dataclass
 from enum import StrEnum
+from pathlib import Path
+from typing import Literal
 
 
 class IO(StrEnum):
@@ -62,3 +66,89 @@ class FeatureType(StrEnum):
 
 
 Loc = tuple[int, int]
+
+BitVector = list[int | Literal["0", "1", "x", "z"]]
+
+
+@dataclass
+class YosysPortDetails:
+    direction: Literal["input", "output", "inout"]
+    bits: BitVector
+    offset: int = 0
+    upto: int = 0
+    signed: int = 0
+
+
+@dataclass
+class YosysCellDetails:
+    hide_name: Literal[1, 0]
+    type: str
+    parameters: dict[str, str]
+    attributes: dict[str, str | int]
+    port_directions: dict[str, Literal["input", "output", "inout"]]
+    connections: dict[str, BitVector]
+    model: str = ""
+
+
+@dataclass
+class YosysMemoryDetails:
+    hide_name: Literal[1, 0]
+    attributes: dict[str, str]
+    width: int
+    start_offset: int
+    size: int
+
+
+@dataclass
+class YosysNetDetails:
+    hide_name: Literal[1, 0]
+    bits: BitVector
+    attributes: dict[str, str]
+    offset: int = 0
+    upto: int = 0
+    signed: int = 0
+
+
+@dataclass
+class YosysModule:
+    attributes: dict[str, str | int]
+    parameter_default_values: dict[str, str | int]
+    ports: dict[str, YosysPortDetails]
+    cells: dict[str, YosysCellDetails]
+    memories: dict[str, YosysMemoryDetails]
+    netnames: dict[str, YosysNetDetails]
+
+    def __init__(
+        self, *, attributes, parameter_default_values, ports, cells, memories, netnames
+    ):
+        self.attributes = attributes
+        self.parameter_default_values = parameter_default_values
+        self.ports = {k: YosysPortDetails(**v) for k, v in ports.items()}
+        self.cells = {k: YosysCellDetails(**v) for k, v in cells.items()}
+        self.memories = {k: YosysMemoryDetails(**v) for k, v in memories.items()}
+        self.netnames = {k: YosysNetDetails(**v) for k, v in netnames.items()}
+
+
+@dataclass
+class YosysJson:
+    creator: str
+    modules: dict[str, YosysModule]
+    models: dict
+
+    def __init__(self, path: Path):
+        with open(path, "r") as f:
+            o = json.load(f)
+        self.creator = o.get("creator", "")  # Use .get() for safety
+        # Provide default empty dicts for potentially missing keys in module data
+        self.modules = {
+            k: YosysModule(
+                attributes=v.get("attributes", {}),
+                parameter_default_values=v.get("parameter_default_values", {}),
+                ports=v.get("ports", {}),
+                cells=v.get("cells", {}),
+                memories=v.get("memories", {}),  # Provide default for memories
+                netnames=v.get("netnames", {}),  # Provide default for netnames
+            )
+            for k, v in o.get("modules", {}).items()  # Use .get() for safety
+        }
+        self.models = o.get("models", {})  # Use .get() for safety

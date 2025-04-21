@@ -779,16 +779,16 @@ module comb_mem_d1 #(
     parameter SIZE = 16,
     parameter IDX_SIZE = 4
 ) (
-   input wire                logic [IDX_SIZE-1:0] addr0,
-   input wire                logic [ WIDTH-1:0] write_data,
-   input wire                logic write_en,
+   (* keep *)input wire                logic [IDX_SIZE-1:0] addr0,
+   (* keep *)input wire                logic [ WIDTH-1:0] write_data,
+   (* keep *)input wire                logic write_en,
    input wire                logic clk,
    input wire                logic reset,
-   (* keep = 1*)output logic [ WIDTH-1:0] read_data,
+   (* keep *)output logic [ WIDTH-1:0] read_data,
    output logic              done
 );
 
-  logic [WIDTH-1:0] mem[SIZE-1:0];
+  (* keep *)logic [WIDTH-1:0] mem[SIZE-1:0];
 
   /* verilator lint_off WIDTH */
   assign read_data = mem[addr0];
@@ -2193,19 +2193,18 @@ module main(
   (* go=1 *) input logic go,
   (* clk=1 *) input logic clk,
   (* reset=1 *) input logic reset,
+// input logic [31:0] a_write_data,
+// input logic  a_write_en,
+// input logic [31:0] b_write_data,
+// input logic b_write_en,
+// output logic [31:0] out_read_data,
   (* done=1 *) output logic done
 );
 // COMPONENT START: main
-logic [3:0] a_addr0;
-logic [31:0] a_write_data;
-logic a_write_en;
 logic a_clk;
 logic a_reset;
 logic [31:0] a_read_data;
 logic a_done;
-logic [3:0] b_addr0;
-logic [31:0] b_write_data;
-logic b_write_en;
 logic b_clk;
 logic b_reset;
 logic [31:0] b_read_data;
@@ -2479,7 +2478,6 @@ fsm_main_def fsm (
 assign done = fsm_done_out;
 assign add0_left = fsm_add0_left_out;
 assign add0_right = fsm_add0_right_out;
-assign b_write_en = 1'd0;
 assign b_clk = clk;
 assign b_addr0 = fsm_b_addr0_out;
 assign b_reset = reset;
@@ -2492,7 +2490,6 @@ assign idx0_write_en =
 assign idx0_clk = clk;
 assign idx0_reset = reset;
 assign idx0_in = fsm_idx0_in_out;
-assign a_write_en = 1'd0;
 assign a_clk = clk;
 assign a_addr0 = fsm_a_addr0_out;
 assign a_reset = reset;

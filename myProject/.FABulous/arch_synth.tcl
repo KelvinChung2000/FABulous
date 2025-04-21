@@ -132,7 +132,7 @@ yosys techmap -map /home/kelvin/FABulous_fork/myProject/PnR/fsm_map.v
 
 # const unit mapping
 
-yosys constmap -cell const_unit const_out ConfigBits
+
 
 # io mapping
 yosys iopadmap -widthparam WIDTH -outpad IO from_fabric:out -inpad IO to_fabric:in

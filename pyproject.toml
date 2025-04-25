@@ -21,6 +21,16 @@ dependencies = [
     'python-dotenv>=1.0.0',
     'loguru>=0.7.0',
     'fasm>=0.0.2',
+    "hdlgen",
+    "cocotb>=1.9.2",
+    "cmd2>=2.5.11",
+    "pydot>=3.0.4",
+    "lark>=1.2.2",
+    "jinja2>=3.1.6",
+    "bitarray>=3.3.1",
+    "ruamel-yaml>=0.18.10",
+    "pyyaml>=6.0.2",
+    "pyosys<0.52",
 ]
 
 [project.urls]
@@ -42,3 +52,6 @@ exclude = ["docs, demo"]  # exclude packages matching these glob patterns (empty
 
 [tool.setuptools.package-data]
 mypkg = ["FABulous/**/*"]
+
+[tool.uv.sources]
+hdlgen = { path = "../HDLGen" }

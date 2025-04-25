@@ -7,10 +7,10 @@ class E_Mem_ports:
         # tile ports
         self.in3 = MuxPort(tilePorts[0], isTilePort=True, isBus=False, width=32)
         self.out3 = MuxPort(tilePorts[1], isTilePort=True, isBus=False, width=32)
-        self.addr_i = MuxPort(tilePorts[2], isTilePort=True, isBus=False, width=32)
+        self.pred_in3 = MuxPort(tilePorts[2], isTilePort=True, isBus=False, width=1)
         self.in3 = MuxPort(tilePorts[3], isTilePort=True, isBus=False, width=32)
         self.out3 = MuxPort(tilePorts[4], isTilePort=True, isBus=False, width=32)
-        self.addr_o = MuxPort(tilePorts[5], isTilePort=True, isBus=False, width=32)
+        self.pred_in3 = MuxPort(tilePorts[5], isTilePort=True, isBus=False, width=1)
 
         # bel ports
         self.addr0 = MuxPort(belInputs[0], isBelPort=True, isBus=False, width=32)

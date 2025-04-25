@@ -13,6 +13,14 @@ class PE_ports:
         self.out1 = MuxPort(tilePorts[5], isTilePort=True, isBus=False, width=32)
         self.out2 = MuxPort(tilePorts[6], isTilePort=True, isBus=False, width=32)
         self.out3 = MuxPort(tilePorts[7], isTilePort=True, isBus=False, width=32)
+        self.pred_out0 = MuxPort(tilePorts[8], isTilePort=True, isBus=False, width=1)
+        self.pred_out1 = MuxPort(tilePorts[9], isTilePort=True, isBus=False, width=1)
+        self.pred_out2 = MuxPort(tilePorts[10], isTilePort=True, isBus=False, width=1)
+        self.pred_out3 = MuxPort(tilePorts[11], isTilePort=True, isBus=False, width=1)
+        self.pred_in0 = MuxPort(tilePorts[12], isTilePort=True, isBus=False, width=1)
+        self.pred_in1 = MuxPort(tilePorts[13], isTilePort=True, isBus=False, width=1)
+        self.pred_in2 = MuxPort(tilePorts[14], isTilePort=True, isBus=False, width=1)
+        self.pred_in3 = MuxPort(tilePorts[15], isTilePort=True, isBus=False, width=1)
 
         # bel ports
         self.data_in1 = MuxPort(belInputs[0], isBelPort=True, isBus=True, width=32)

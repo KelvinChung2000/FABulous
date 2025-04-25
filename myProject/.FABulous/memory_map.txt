@@ -11,8 +11,7 @@ ram distributed $__cell_Mem_config_bits_1 {
         rdsrst none;
     }
     
-}
-ram distributed $__cell_Mem_config_bits_0 {
+}ram distributed $__cell_Mem_config_bits_0 {
     abits 4;
     width 32;
     cost 1;

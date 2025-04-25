@@ -12,6 +12,15 @@ PORTS:
   - {side: SOUTH, name: out2, inOut: output, wires: 32, terminal: false}
   - {side: WEST, name: out3, inOut: output, wires: 32, terminal: false}
 
+  - {side: NORTH, name: pred_out0, inOut: output, wires: 1, terminal: false}
+  - {side: EAST, name: pred_out1, inOut: output, wires: 1, terminal: false}
+  - {side: SOUTH, name: pred_out2, inOut: output, wires: 1, terminal: false}
+  - {side: WEST, name: pred_out3, inOut: output, wires: 1, terminal: false}
+
+  - {side: NORTH, name: pred_in0, inOut: input, wires: 1, terminal: false}
+  - {side: EAST, name: pred_in1, inOut: input, wires: 1, terminal: false}
+  - {side: SOUTH, name: pred_in2, inOut: input, wires: 1, terminal: false}
+  - {side: WEST, name: pred_in3, inOut: input, wires: 1, terminal: false}
     # {side: EAST, name: spanIn, inOut: input, wires: 2, terminal: false},
     # {side: WEST, name: spanOut, inOut: output, wires: 2, terminal: false},
 
@@ -20,6 +29,11 @@ WIRES:
   - {source_name: out1, X-offset:  1, Y-offset:  0, destination_name: in3}
   - {source_name: out2, X-offset:  0, Y-offset:  1, destination_name: in0}
   - {source_name: out3, X-offset: -1, Y-offset:  0, destination_name: in1}
+
+  - {source_name: pred_out0, X-offset:  0, Y-offset: -1, destination_name: pred_in2}
+  - {source_name: pred_out1, X-offset:  1, Y-offset:  0, destination_name: pred_in3}
+  - {source_name: pred_out2, X-offset:  0, Y-offset:  1, destination_name: pred_in0}
+  - {source_name: pred_out3, X-offset: -1, Y-offset:  0, destination_name: pred_in1}
   # {source_name: spanOut, X-offset: 2, Y-offset:  0, destination_name: spanIn},
 
 BELS: 

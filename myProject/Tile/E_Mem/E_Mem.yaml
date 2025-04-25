@@ -6,11 +6,13 @@ PORTS:
   E_Mem_top:
     - {side: WEST, name: in3, inOut: input, wires: 32, terminal: false}
     - {side: WEST, name: out3, inOut: output, wires: 32, terminal: false}
-    - {side: NORTH, name: addr_i, inOut: input, wires: 32, terminal: false}
+    - {side: WEST, name: pred_in3, inOut: input, wires: 1, terminal: true}
+    
   E_Mem_bot:
     - {side: WEST, name: in3, inOut: input, wires: 32, terminal: false}
     - {side: WEST, name: out3, inOut: output, wires: 32, terminal: false}
-    - {side: SOUTH, name: addr_o, inOut: output, wires: 32, terminal: false}
+    - {side: WEST, name: pred_in3, inOut: input, wires: 1, terminal: true}
+
 
 WIRES:
   E_Mem_top:

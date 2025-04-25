@@ -410,9 +410,7 @@ def parseTileYAML(
     return (
         Tile(
             name=tileName,
-            ports=list(
-                chain.from_iterable(ports.values() for ports in portsDict.values())
-            ),
+            ports={k: list(z.values()) for k, z in portsDict.items()},
             bels=bels,
             switchMatrix=sm,
             configMems=configMems,

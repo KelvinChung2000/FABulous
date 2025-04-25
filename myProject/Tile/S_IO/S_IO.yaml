@@ -4,9 +4,11 @@ INCLUDE:
 PORTS: [
     # {side: SOUTH, name: out2, inOut: output, wires: 32, terminal: true},
     # {side: SOUTH, name: in2, inOut: input, wires: 32, terminal: true},
-
     {side: NORTH, name: in0, inOut: input, wires: 32, terminal: false},
     {side: NORTH, name: out0, inOut: output, wires: 32, terminal: false},
+
+    {side: NORTH, name: pred_in0, inOut: input, wires: 1, terminal: true},
+
   ]
 WIRES: [
   {source_name: out0, X-offset:  0, Y-offset: -1, destination_name: in2},

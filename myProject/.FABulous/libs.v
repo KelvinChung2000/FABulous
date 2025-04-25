@@ -1,31 +1,4 @@
 (* blackbox *)
-module reg_unit #(
-    parameter tide_en = 0,
-    parameter tide_rst = 0
-)
-(
-    input wire en,
-    input wire[31:0] reg_in,
-    input wire rst,
-    output reg[31:0] reg_out,
-    input wire clk
-);
-
-endmodule
-
-
-(* blackbox *)
-module const_unit #(
-    parameter ConfigBits = 0
-)
-(
-    output reg[31:0] const_out
-);
-
-endmodule
-
-
-(* blackbox *)
 module Mem #(
     parameter config_bits = 0
 )
@@ -36,19 +9,6 @@ module Mem #(
     input wire write_en,
     output reg[31:0] read_data,
     input wire clk
-);
-
-endmodule
-
-
-(* blackbox *)
-module compare #(
-    parameter conf = 0
-)
-(
-    input wire[31:0] A,
-    input wire[31:0] B,
-    output reg[31:0] Y
 );
 
 endmodule
@@ -69,6 +29,35 @@ endmodule
 
 
 (* blackbox *)
+module compare #(
+    parameter conf = 0
+)
+(
+    input wire[31:0] A,
+    input wire[31:0] B,
+    output reg[31:0] Y
+);
+
+endmodule
+
+
+(* blackbox *)
+module reg_unit #(
+    parameter tide_en = 0,
+    parameter tide_rst = 0
+)
+(
+    input wire en,
+    input wire[31:0] reg_in,
+    input wire rst,
+    output reg[31:0] reg_out,
+    input wire clk
+);
+
+endmodule
+
+
+(* blackbox *)
 module IO #(
 )
 (
@@ -76,6 +65,17 @@ module IO #(
     input wire[31:0] in,
     output reg[31:0] to_fabric,
     output reg[31:0] out
+);
+
+endmodule
+
+
+(* blackbox *)
+module const_unit #(
+    parameter ConfigBits = 0
+)
+(
+    output reg[31:0] const_out
 );
 
 endmodule

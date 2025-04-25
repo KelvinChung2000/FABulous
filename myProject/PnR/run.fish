@@ -1,4 +1,4 @@
-#! /bin/fish
+#!fish
 # /home/kelvin/FABulous_fork/.venv/bin/python /home/kelvin/FABulous_fork/FABulous/fabric_cad/chip_database_generation.py
 # cd /home/kelvin/FABulous_fork/myProject/PnR
 # yosys -q ./test.v ./synth.ys -o test.json

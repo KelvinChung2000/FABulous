@@ -34,7 +34,7 @@ class Tile:
     """
 
     name: str
-    ports: list[TilePort]
+    ports: dict[str, list[TilePort]]
     bels: list[Bel]
     switchMatrix: SwitchMatrix
     configMems: ConfigurationMemory
@@ -66,11 +66,12 @@ class Tile:
             list[TilePort]: A list of TilePort objects located on the west side of the tile.
         """
         if io is None:
-            return [p for p in self.ports if p.sideOfTile == Side.WEST]
+            return [p for st in [i[-1] for i in self.tileMap] for p in self.ports[st] if p.sideOfTile == Side.WEST]
         else:
             return [
                 p
-                for p in self.ports
+                for st in [i[-1] for i in self.tileMap]
+                for p in self.ports[st]
                 if p.sideOfTile == Side.WEST and p.ioDirection == io
             ]
 
@@ -86,11 +87,12 @@ class Tile:
            list[TilePort]: A list of TilePort objects located on the south side of the tile. If `io` is specified, only ports matching the IO type are returned.
         """
         if io is None:
-            return [p for p in self.ports if p.sideOfTile == Side.SOUTH]
+            return [p for st in self.tileMap[-1] for p in self.ports[st] if p.sideOfTile == Side.SOUTH]
         else:
             return [
                 p
-                for p in self.ports
+                for st in self.tileMap[-1]
+                for p in self.ports[st]
                 if p.sideOfTile == Side.SOUTH and p.ioDirection == io
             ]
 
@@ -106,11 +108,12 @@ class Tile:
            list[TilePort]: A list of TilePort objects located on the south side of the tile. If `io` is specified, only ports matching the IO type are returned.
         """
         if io is None:
-            return [p for p in self.ports if p.sideOfTile == Side.EAST]
+            return [p for st in [i[0] for i in self.tileMap] for p in self.ports[st] if p.sideOfTile == Side.EAST]
         else:
             return [
                 p
-                for p in self.ports
+                for st in [i[0] for i in self.tileMap]
+                for p in self.ports[st]
                 if p.sideOfTile == Side.EAST and p.ioDirection == io
             ]
 
@@ -126,25 +129,26 @@ class Tile:
            list[TilePort]: A list of TilePort objects located on the south side of the tile. If `io` is specified, only ports matching the IO type are returned.
         """
         if io is None:
-            return [p for p in self.ports if p.sideOfTile == Side.NORTH]
+            return [p for st in self.tileMap[0] for p in self.ports[st] if p.sideOfTile == Side.NORTH]
         else:
             return [
                 p
-                for p in self.ports
+                for st in self.tileMap[0]
+                for p in self.ports[st]
                 if p.sideOfTile == Side.NORTH and p.ioDirection == io
             ]
 
     def getTileInputNames(self) -> list[str]:
-        return [p.name for p in self.ports if p.ioDirection == IO.INPUT]
+        return sorted([p.name for st in self.getSubTiles() for p in self.ports[st] if p.ioDirection == IO.INPUT])
 
     def getTileOutputNames(self) -> list[str]:
-        return [p.name for p in self.ports if p.ioDirection == IO.OUTPUT]
+        return sorted([p.name for st in self.getSubTiles() for p in self.ports[st] if p.ioDirection == IO.OUTPUT])
 
     def getTileInputPorts(self) -> list[TilePort]:
-        return sorted([p for p in self.ports if p.ioDirection == IO.INPUT])
+        return sorted([p for st in self.getSubTiles() for p in self.ports[st] if p.ioDirection == IO.INPUT])
 
     def getTileOutputPorts(self) -> list[TilePort]:
-        return sorted([p for p in self.ports if p.ioDirection == IO.OUTPUT])
+        return sorted([p for st in self.getSubTiles() for p in self.ports[st] if p.ioDirection == IO.OUTPUT])
 
     def getTilePortGrouped(self, io: IO | None = None) -> dict[Side, list[TilePort]]:
         return {
@@ -201,9 +205,10 @@ class Tile:
             )
 
     def findPortByName(self, portName: str) -> TilePort:
-        for i in self.ports:
-            if i.name == portName:
-                return i
+        for portList in self.ports.values():
+            for i in portList:
+                if i.name == portName:
+                    return i
         else:
             raise ValueError(f"The port {portName} does not exist in tile {self.name}")
 

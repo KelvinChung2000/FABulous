@@ -7,6 +7,7 @@ class N_IO_ports:
         # tile ports
         self.in2 = MuxPort(tilePorts[0], isTilePort=True, isBus=False, width=32)
         self.out2 = MuxPort(tilePorts[1], isTilePort=True, isBus=False, width=32)
+        self.pred_in2 = MuxPort(tilePorts[2], isTilePort=True, isBus=False, width=1)
 
         # bel ports
         self.N_from_fabric = MuxPort(belInputs[0], isBelPort=True, isBus=True, width=32)

@@ -11,6 +11,16 @@ class Port:
     width: int
     isBus: bool
 
+    def __post_init__(self) -> None:
+        if self.width <= 0:
+            raise ValueError(f"Width must be greater than 0, got {self.width}")
+        if not isinstance(self.isBus, bool):
+            raise TypeError(f"isBus must be a boolean, got {type(self.isBus)}")
+        if not isinstance(self.ioDirection, IO):
+            raise TypeError(f"ioDirection must be an instance of IO, got {type(self.ioDirection)}")
+        if not isinstance(self.name, str):
+            raise TypeError(f"Name must be a string, got {type(self.name)}")
+
     def __repr__(self) -> str:
         return f"Port({self.ioDirection.value} {self.name}[{self.width-1}:0])"
 

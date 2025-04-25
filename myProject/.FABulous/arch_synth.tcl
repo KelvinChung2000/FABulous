@@ -50,25 +50,25 @@ proc extract {cell wrapperPath} {
 
 # wrapping base design
 yosys techmap -map myProject/Tile/PE/metadata/wrap_map_ALU.v
-yosys connwrappers -unsigned \$__or_wrapper Y Y_WIDTH 
-yosys connwrappers -unsigned \$__xor_wrapper Y Y_WIDTH 
-yosys connwrappers -unsigned \$__mul_wrapper Y Y_WIDTH 
 yosys connwrappers -unsigned \$__add_wrapper Y Y_WIDTH 
 yosys connwrappers -unsigned \$__sub_wrapper Y Y_WIDTH 
 yosys connwrappers -unsigned \$__mux_wrapper Y WIDTH 
+yosys connwrappers -unsigned \$__xor_wrapper Y Y_WIDTH 
+yosys connwrappers -unsigned \$__mul_wrapper Y Y_WIDTH 
+yosys connwrappers -unsigned \$__or_wrapper Y Y_WIDTH 
 
 # extract cells
-extract "myProject/Tile/PE/metadata/cell_ALU_ALU_func_3.json" \
-        "myProject/Tile/PE/metadata/wrap_map_ALU.v"
-extract "myProject/Tile/PE/metadata/cell_ALU_ALU_func_4.json" \
-        "myProject/Tile/PE/metadata/wrap_map_ALU.v"
-extract "myProject/Tile/PE/metadata/cell_ALU_ALU_func_5.json" \
-        "myProject/Tile/PE/metadata/wrap_map_ALU.v"
 extract "myProject/Tile/PE/metadata/cell_ALU_ALU_func_0.json" \
         "myProject/Tile/PE/metadata/wrap_map_ALU.v"
 extract "myProject/Tile/PE/metadata/cell_ALU_ALU_func_1.json" \
         "myProject/Tile/PE/metadata/wrap_map_ALU.v"
 extract "myProject/Tile/PE/metadata/cell_ALU_ALU_func_6.json" \
+        "myProject/Tile/PE/metadata/wrap_map_ALU.v"
+extract "myProject/Tile/PE/metadata/cell_ALU_ALU_func_4.json" \
+        "myProject/Tile/PE/metadata/wrap_map_ALU.v"
+extract "myProject/Tile/PE/metadata/cell_ALU_ALU_func_5.json" \
+        "myProject/Tile/PE/metadata/wrap_map_ALU.v"
+extract "myProject/Tile/PE/metadata/cell_ALU_ALU_func_3.json" \
         "myProject/Tile/PE/metadata/wrap_map_ALU.v"
 # unwrapping
 
@@ -77,16 +77,16 @@ yosys clean -purge
 
 # wrapping base design
 yosys techmap -map myProject/Tile/PE/metadata/wrap_map_compare.v
+yosys connwrappers -unsigned \$__eq_wrapper Y Y_WIDTH 
 yosys connwrappers -unsigned \$__lt_wrapper Y Y_WIDTH 
 yosys connwrappers -unsigned \$__le_wrapper Y Y_WIDTH 
-yosys connwrappers -unsigned \$__eq_wrapper Y Y_WIDTH 
 
 # extract cells
+extract "myProject/Tile/PE/metadata/cell_compare_conf_2.json" \
+        "myProject/Tile/PE/metadata/wrap_map_compare.v"
 extract "myProject/Tile/PE/metadata/cell_compare_conf_0.json" \
         "myProject/Tile/PE/metadata/wrap_map_compare.v"
 extract "myProject/Tile/PE/metadata/cell_compare_conf_1.json" \
-        "myProject/Tile/PE/metadata/wrap_map_compare.v"
-extract "myProject/Tile/PE/metadata/cell_compare_conf_2.json" \
         "myProject/Tile/PE/metadata/wrap_map_compare.v"
 # unwrapping
 
@@ -95,19 +95,19 @@ yosys clean -purge
 
 # wrapping base design
 yosys techmap -map myProject/Tile/PE/metadata/wrap_map_reg_unit.v
-yosys connwrappers -unsigned \$__sdffe_wrapper Q WIDTH 
 yosys connwrappers -unsigned \$__sdff_wrapper Q WIDTH 
 yosys connwrappers -unsigned \$__dff_wrapper Q WIDTH 
 yosys connwrappers -unsigned \$__dffe_wrapper Q WIDTH 
+yosys connwrappers -unsigned \$__sdffe_wrapper Q WIDTH 
 
 # extract cells
-extract "myProject/Tile/PE/metadata/cell_reg_unit_tide_en_0_tide_rst_1.json" \
-        "myProject/Tile/PE/metadata/wrap_map_reg_unit.v"
 extract "myProject/Tile/PE/metadata/cell_reg_unit_tide_en_1_tide_rst_1.json" \
         "myProject/Tile/PE/metadata/wrap_map_reg_unit.v"
 extract "myProject/Tile/PE/metadata/cell_reg_unit_tide_en_1_tide_rst_0.json" \
         "myProject/Tile/PE/metadata/wrap_map_reg_unit.v"
 extract "myProject/Tile/PE/metadata/cell_reg_unit_tide_en_0_tide_rst_0.json" \
+        "myProject/Tile/PE/metadata/wrap_map_reg_unit.v"
+extract "myProject/Tile/PE/metadata/cell_reg_unit_tide_en_0_tide_rst_1.json" \
         "myProject/Tile/PE/metadata/wrap_map_reg_unit.v"
 # unwrapping
 

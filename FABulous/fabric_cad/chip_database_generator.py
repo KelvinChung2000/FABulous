@@ -12,6 +12,7 @@ from FABulous.fabric_cad.chip_database.database_timing import TimingValue
 from FABulous.fabric_cad.chip_database.define import NodeWire, PinType
 from FABulous.fabric_cad.graph_draw import genRoutingResourceGraph
 from FABulous.fabric_definition.Bel import Bel
+from FABulous.fabric_definition.define import IO
 from FABulous.fabric_definition.Fabric import Fabric
 from FABulous.fabric_definition.Port import BelPort
 from FABulous.fabric_definition.SwitchMatrix import SwitchMatrix
@@ -27,17 +28,16 @@ PSEUDO_PIP_MID = 2
 PSEUDO_PIP_END = 3
 
 
-def genSwitchMatrix(tile: Tile, tileType: TileType, context=1):
+def genSwitchMatrix(tile: Tile, subTile: str, tileType: TileType, context=1):
     if not isinstance(tile.switchMatrix, SwitchMatrix):
         raise ValueError("Switch matrix is not a SwitchMatrix object")
-
     zIn = 0
     zOut = 0
     for c in range(context):
         outputMapping: Mapping[str, str] = {}
 
         for p in tile.getTileInputPorts():
-            if p.terminal:
+            if p.terminal and p.ioDirection == IO.OUTPUT:
                 for wtc in range(tile.getWireType(p).spanning):
                     for wc in range(p.width):
                         tileType.create_wire(f"c{c}.{p.name}[{wc}]_{wtc}", "src", z=zIn)
@@ -221,10 +221,10 @@ def genBel(bels: Iterable[Bel], tile: TileType, context=1):
             count += 1
 
 
-def genTile(tile: Tile, chip: Chip, context=1) -> TileType:
-    tt = chip.create_tile_type(tile.name)
+def genTile(tile: Tile, subTile: str, chip: Chip, context=1) -> TileType:
+    tt = chip.create_tile_type(subTile)
     genBel(tile.bels, tt, context=context)
-    genSwitchMatrix(tile, tt, context=context)
+    genSwitchMatrix(tile, subTile, tt, context=context)
     tt.add_extraData(
         TileExtraData(
             uniqueBelCount=len(tile.bels),
@@ -348,14 +348,15 @@ def generateChipDatabase(
 
     ch.strs.read_constids(str(baseConstIdsPath))
     for tile in fabric.tileDict.values():
-        genTile(tile, ch, fabric.contextCount)
+        for subTile in tile.getSubTiles():
+            genTile(tile, subTile, ch, fabric.contextCount)
 
     logger.info("Generating the chip database")
     ch.create_tile_type("NULL")
 
-    for (x, y), tile in fabric:
+    for (x, y), tile in fabric.tileNames_iter():
         if tile is not None:
-            ch.set_tile_type(x, y, tile.name)
+            ch.set_tile_type(x, y, tile)
         else:
             ch.set_tile_type(x, y, "NULL")
 

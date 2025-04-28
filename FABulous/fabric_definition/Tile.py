@@ -66,7 +66,12 @@ class Tile:
             list[TilePort]: A list of TilePort objects located on the west side of the tile.
         """
         if io is None:
-            return [p for st in [i[-1] for i in self.tileMap] for p in self.ports[st] if p.sideOfTile == Side.WEST]
+            return [
+                p
+                for st in [i[-1] for i in self.tileMap]
+                for p in self.ports[st]
+                if p.sideOfTile == Side.WEST
+            ]
         else:
             return [
                 p
@@ -87,7 +92,12 @@ class Tile:
            list[TilePort]: A list of TilePort objects located on the south side of the tile. If `io` is specified, only ports matching the IO type are returned.
         """
         if io is None:
-            return [p for st in self.tileMap[-1] for p in self.ports[st] if p.sideOfTile == Side.SOUTH]
+            return [
+                p
+                for st in self.tileMap[-1]
+                for p in self.ports[st]
+                if p.sideOfTile == Side.SOUTH
+            ]
         else:
             return [
                 p
@@ -108,7 +118,12 @@ class Tile:
            list[TilePort]: A list of TilePort objects located on the south side of the tile. If `io` is specified, only ports matching the IO type are returned.
         """
         if io is None:
-            return [p for st in [i[0] for i in self.tileMap] for p in self.ports[st] if p.sideOfTile == Side.EAST]
+            return [
+                p
+                for st in [i[0] for i in self.tileMap]
+                for p in self.ports[st]
+                if p.sideOfTile == Side.EAST
+            ]
         else:
             return [
                 p
@@ -129,7 +144,12 @@ class Tile:
            list[TilePort]: A list of TilePort objects located on the south side of the tile. If `io` is specified, only ports matching the IO type are returned.
         """
         if io is None:
-            return [p for st in self.tileMap[0] for p in self.ports[st] if p.sideOfTile == Side.NORTH]
+            return [
+                p
+                for st in self.tileMap[0]
+                for p in self.ports[st]
+                if p.sideOfTile == Side.NORTH
+            ]
         else:
             return [
                 p
@@ -139,16 +159,50 @@ class Tile:
             ]
 
     def getTileInputNames(self) -> list[str]:
-        return sorted([p.name for st in self.getSubTiles() for p in self.ports[st] if p.ioDirection == IO.INPUT])
+        return sorted(
+            [
+                p.name
+                for st in self.getSubTiles()
+                for p in self.ports[st]
+                if p.ioDirection == IO.INPUT
+            ]
+        )
 
     def getTileOutputNames(self) -> list[str]:
-        return sorted([p.name for st in self.getSubTiles() for p in self.ports[st] if p.ioDirection == IO.OUTPUT])
+        return sorted(
+            [
+                p.name
+                for st in self.getSubTiles()
+                for p in self.ports[st]
+                if p.ioDirection == IO.OUTPUT
+            ]
+        )
 
-    def getTileInputPorts(self) -> list[TilePort]:
-        return sorted([p for st in self.getSubTiles() for p in self.ports[st] if p.ioDirection == IO.INPUT])
+    def getTileInputPorts(self, st: str = "") -> list[TilePort]:
+        if st:
+            return sorted([p for p in self.ports[st] if p.ioDirection == IO.INPUT])
+        else:
+            return sorted(
+                [
+                    p
+                    for st in self.getSubTiles()
+                    for p in self.ports[st]
+                    if p.ioDirection == IO.INPUT
+                ]
+            )
 
-    def getTileOutputPorts(self) -> list[TilePort]:
-        return sorted([p for st in self.getSubTiles() for p in self.ports[st] if p.ioDirection == IO.OUTPUT])
+    def getTileOutputPorts(self, st: str = "") -> list[TilePort]:
+        if st:
+            return sorted([p for p in self.ports[st] if p.ioDirection == IO.OUTPUT])
+        else:
+            return sorted(
+                [
+                    p
+                    for st in self.getSubTiles()
+                    for p in self.ports[st]
+                    if p.ioDirection == IO.OUTPUT
+                ]
+            )
 
     def getTilePortGrouped(self, io: IO | None = None) -> dict[Side, list[TilePort]]:
         return {

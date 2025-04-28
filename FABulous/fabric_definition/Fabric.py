@@ -149,23 +149,23 @@ class Fabric:
             for x, tile in enumerate(row):
                 loc = (x, self.height - y - 1)
                 if tile is not None:
-                    if tile in self.tileDict:
-                        yield (
-                            loc,
-                            self.tileDict.get(tile, None),
-                        )
+                    t: Tile
+                    for i in self.tileDict.values():
+                        if i.partOfTile(tile):
+                            t = i
+                            break
                     else:
-                        t: Tile
-                        for i in self.tileDict.values():
-                            if i.partOfTile(tile):
-                                t = i
-                                break
-                        else:
-                            raise ValueError(f"Cannot find tile {tile} in Fabric")
-                        yield (loc, t)
+                        raise ValueError(f"Cannot find tile {tile} in Fabric")
+                    yield (loc, t)
 
                 else:
                     yield (loc, None)
+
+    def tileNames_iter(self) -> Generator[tuple[Loc, str | None], None, None]:
+        for y, row in enumerate(self.tiles):
+            for x, tile in enumerate(row):
+                loc = (x, self.height - y - 1)
+                yield (loc, tile)
 
     # def getFlattenFabric(self) -> Generator[tuple[Loc, Tile | None], None, None]:
     #     for y, row in enumerate(self.tiles):

@@ -5,7 +5,7 @@ from typing import Any, Iterable, cast
 
 from FABulous.fabric_definition.Bel import Bel
 from FABulous.fabric_definition.ConfigMem import ConfigurationMemory
-from FABulous.fabric_definition.define import IO, Side
+from FABulous.fabric_definition.define import IO, Loc, Side
 from FABulous.fabric_definition.Port import BelPort, TilePort
 from FABulous.fabric_definition.SwitchMatrix import SwitchMatrix
 from FABulous.fabric_definition.Wire import WireType
@@ -178,9 +178,9 @@ class Tile:
             ]
         )
 
-    def getTileInputPorts(self, st: str = "") -> list[TilePort]:
-        if st:
-            return sorted([p for p in self.ports[st] if p.ioDirection == IO.INPUT])
+    def getTileInputPorts(self, subTile: str = "") -> list[TilePort]:
+        if subTile:
+            return sorted([p for p in self.ports[subTile] if p.ioDirection == IO.INPUT])
         else:
             return sorted(
                 [
@@ -191,9 +191,9 @@ class Tile:
                 ]
             )
 
-    def getTileOutputPorts(self, st: str = "") -> list[TilePort]:
-        if st:
-            return sorted([p for p in self.ports[st] if p.ioDirection == IO.OUTPUT])
+    def getTileOutputPorts(self, subTile: str = "") -> list[TilePort]:
+        if subTile:
+            return sorted([p for p in self.ports[subTile] if p.ioDirection == IO.OUTPUT])
         else:
             return sorted(
                 [
@@ -304,3 +304,9 @@ class Tile:
             list[str]: A list of subtiles.
         """
         return [name for row in self.tileMap for name in row if name is not None]
+    
+    def getSubTileOffset(self, subTile: str) -> Loc:
+        for y, row in enumerate(self.tileMap):
+            for x, name in enumerate(row):
+                if name == subTile:
+                    return (x, y)

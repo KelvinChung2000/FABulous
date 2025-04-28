@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import Any
+from typing import Any, Generator, Iterator
 
 from FABulous.fabric_definition.define import IO, FeatureType, Side
 
@@ -23,6 +23,19 @@ class Port:
 
     def __repr__(self) -> str:
         return f"Port({self.ioDirection.value} {self.name}[{self.width-1}:0])"
+    
+    def expand(self) -> Iterator[str]:
+        """Expand the port name into a generator of strings based on the width.
+
+        Yields:
+            Iterator[str]: A generator that yields the expanded port names.
+        """
+        if self.width == 1:
+            yield f"{self.name}"
+        else:
+            for i in range(self.width):
+                yield f"{self.name}[{i}]"
+        
 
 
 @dataclass(frozen=True, eq=True)
@@ -112,6 +125,18 @@ class BelPort(Port):
 
     def __repr__(self) -> str:
         return f"BelPort({self.ioDirection.value} {self.prefix}{self.name}[{self.width-1}:0])"
+    
+    def expand(self) -> Iterator[str]:
+        """Expand the port name into a generator of strings based on the width.
+
+        Yields:
+            Iterator[str]: A generator that yields the expanded port names.
+        """
+        if self.width == 1:
+            yield f"{self.prefix}{self.name}"
+        else:
+            for i in range(self.width):
+                yield f"{self.prefix}{self.name}[{i}]"
 
 
 @dataclass(frozen=True, eq=True)

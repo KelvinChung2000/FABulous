@@ -21,4 +21,9 @@ class MuxList(E_Mem_ports):
         # All the input to a mux will be in the order which the connections are made
         # For example, if you connect self.out //= self.a and then self.out //= self.b
         # The inputs to the mux will be [self.a, self.b]
-        pass
+        self.addr0 //= [self.E_Mem_top_in3, self.E_Mem_bot_in3]
+        self.write_data //= [self.E_Mem_top_in3, self.E_Mem_bot_in3]
+        self.write_en //= [self.E_Mem_top_pred_in3, self.E_Mem_bot_pred_in3]
+        self.E_Mem_bot_out3 //= self.read_data
+        self.E_Mem_top_out3 //= self.read_data
+

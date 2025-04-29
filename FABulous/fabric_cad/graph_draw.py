@@ -44,7 +44,7 @@ def genRoutingResourceGraph(
     else:
 
         def removeBit(i: str) -> str:
-            return re.sub(r"\[\d+\]$", "", i)
+            return re.sub(r"\[\d+\]", "", i)
 
     pairs = list(
         product(range(chip.width), range(chip.height))
@@ -156,21 +156,21 @@ def genRoutingResourceGraph(
     outputPath = filePath / "routing_graph.dot"
     logger.info(f"Writing routing graph to {outputPath}")
     graph.write(str(outputPath))
-    # Generate PNG file from dot file
-    try:
-        logger.info(f"Generating SVG from dot file {outputPath}")
-        pngOutputPath = outputPath.with_suffix(".svg")
-        sp.run(
-            ["osage", "-Tsvg", str(outputPath), "-o", str(pngOutputPath)],
-            check=True,
-            capture_output=True,
-        )
-        logger.info(f"PNG file generated at {pngOutputPath}")
-    except sp.CalledProcessError as e:
-        logger.error(f"Failed to generate SVG: {e}")
-        logger.error(f"Error output: {e.stderr.decode()}")
-    except FileNotFoundError:
-        logger.error("Could not find 'osage' command. Make sure Graphviz is installed.")
+    # # Generate PNG file from dot file
+    # try:
+    #     logger.info(f"Generating SVG from dot file {outputPath}")
+    #     pngOutputPath = outputPath.with_suffix(".svg")
+    #     sp.run(
+    #         ["osage", "-Tsvg", str(outputPath), "-o", str(pngOutputPath)],
+    #         check=True,
+    #         capture_output=True,
+    #     )
+    #     logger.info(f"PNG file generated at {pngOutputPath}")
+    # except sp.CalledProcessError as e:
+    #     logger.error(f"Failed to generate SVG: {e}")
+    #     logger.error(f"Error output: {e.stderr.decode()}")
+    # except FileNotFoundError:
+    #     logger.error("Could not find 'osage' command. Make sure Graphviz is installed.")
 
 
 def genRoutedGraph(

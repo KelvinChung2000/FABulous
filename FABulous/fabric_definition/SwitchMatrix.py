@@ -1,6 +1,6 @@
 from collections import defaultdict, namedtuple
 from dataclasses import dataclass, field
-from pprint import pprint
+from itertools import zip_longest
 from typing import Any, Iterable, Self
 
 from FABulous.fabric_definition.define import IO
@@ -87,25 +87,26 @@ class MuxPort:
 
 
 class Mux:
-    _name: str
-    _inputs: list[GenericPort]
     _output: GenericPort
+    _inputs: list[GenericPort]
     _width: int
 
-    def __init__(self, name: str, inputs: list[GenericPort], output: GenericPort):
+    def __init__(
+        self, output: GenericPort, inputs: list[GenericPort], prefix: str = ""
+    ):
         for p in inputs:
             if p.width != output.width:
                 raise ValueError(
                     f"All inputs {inputs} and output {output} must have the same width"
                 )
 
-        self._name = name
+        self._name = f"{prefix}{output.name}"
         self._inputs = inputs
         self._output = output
         self._width = output.width
 
     def __repr__(self) -> str:
-        return f"{self.output}<({self.name}({self.configBits}))-{list(self.inputs)}"
+        return f"{self.output}<({self.name}(cfg:{self.configBits}))-{list(self.inputs)}"
 
     @property
     def name(self):
@@ -132,6 +133,24 @@ class Mux:
             if i.width != self.output.width:
                 raise ValueError("All inputs and output must have the same width")
             self._inputs.append(i)
+
+    def getFlattenMux(self) -> list[tuple[str, tuple[str, ...]]]:
+        """Get the flattened mux inputs and output.
+
+        Returns
+        -------
+        tuple[str, list[str]]
+            The first element is the output name, and the second element is a list of input names.
+        """
+        expandedInputLists = [inputPort.expand() for inputPort in self.inputs]
+
+        # Group items by position using zip_longest
+        groupedInputs: list[tuple[str, ...]] = []
+        for group in zip_longest(*expandedInputLists):
+            # Filter out None values that zip_longest adds for shorter lists
+            groupedInputs.append(tuple([item for item in group if item is not None]))
+
+        return list(zip(self.output.expand(), groupedInputs))
 
 
 @dataclass
@@ -172,7 +191,6 @@ class SwitchMatrix:
         if len(mux.inputs) == 0:
             if isinstance(mux.output, TilePort) and mux.output.ioDirection == IO.OUTPUT:
                 raise ValueError(f"A tile output port {mux.output} has no inputs")
-
         if mux.output in self._uniqueOutput:
             self.muxesDict[mux.output].extendInputs(mux.inputs)
         else:

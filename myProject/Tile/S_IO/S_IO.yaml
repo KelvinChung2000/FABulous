@@ -11,7 +11,7 @@ PORTS: [
 
   ]
 WIRES: [
-  {source_name: out0, X-offset:  0, Y-offset: -1, destination_name: in2},
+  {source_name: out0, X-offset:  0, Y-offset: 1, destination_name: in2},
   
 ]
 BELS: [

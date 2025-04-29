@@ -13,9 +13,10 @@ module N_IO #(
     // SOUTH
     input wire[31:0] in2,
     output reg[31:0] out2,
+    input wire pred_in2,
     // WEST
-    input wire[31:0] N_in,
-    output reg[31:0] N_out,
+    input wire[31:0] N_N_in,
+    output reg[31:0] N_N_out,
     input wire UserCLK,
     output reg UserCLK_o,
     input wire[FrameBitsPerRow - 1:0] FrameData,
@@ -25,8 +26,8 @@ module N_IO #(
 );
 
 // Signal Creation
-reg [31:0] N_from_fabric;
-reg [31:0] N_to_fabric;
+reg [31:0] N_N_from_fabric;
+reg [31:0] N_N_to_fabric;
 
 // Buffering incoming and out outgoing wires
 // FrameStrobe Buffer
@@ -54,17 +55,17 @@ clk_buf #() inst_clk_buf (
 
 // Instantiate BEL N_IO
 IO #() Inst_N_IO (
-    .from_fabric(N_from_fabric),
-    .to_fabric(N_to_fabric),
-    .in(N_in),
-    .out(N_out)
+    .N_from_fabric(N_N_from_fabric),
+    .N_to_fabric(N_N_to_fabric),
+    .N_in(N_N_in),
+    .N_out(N_N_out)
 );
 
 // Init Switch Matrix
 N_IO_switch_matrix #() Inst_N_IO_switch_matrix (
     .out2(out2),
-    .N_from_fabric(N_from_fabric),
-    .N_to_fabric(N_to_fabric),
+    .N_N_from_fabric(N_N_from_fabric),
+    .N_N_to_fabric(N_N_to_fabric),
     .in2(in2)
 );
 

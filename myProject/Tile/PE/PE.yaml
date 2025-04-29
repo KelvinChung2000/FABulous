@@ -25,14 +25,14 @@ PORTS:
     # {side: WEST, name: spanOut, inOut: output, wires: 2, terminal: false},
 
 WIRES: 
-  - {source_name: out0, X-offset:  0, Y-offset: -1, destination_name: in2}
+  - {source_name: out0, X-offset:  0, Y-offset: 1, destination_name: in2}
   - {source_name: out1, X-offset:  1, Y-offset:  0, destination_name: in3}
-  - {source_name: out2, X-offset:  0, Y-offset:  1, destination_name: in0}
+  - {source_name: out2, X-offset:  0, Y-offset:  -1, destination_name: in0}
   - {source_name: out3, X-offset: -1, Y-offset:  0, destination_name: in1}
 
-  - {source_name: pred_out0, X-offset:  0, Y-offset: -1, destination_name: pred_in2}
+  - {source_name: pred_out0, X-offset:  0, Y-offset: 1, destination_name: pred_in2}
   - {source_name: pred_out1, X-offset:  1, Y-offset:  0, destination_name: pred_in3}
-  - {source_name: pred_out2, X-offset:  0, Y-offset:  1, destination_name: pred_in0}
+  - {source_name: pred_out2, X-offset:  0, Y-offset:  -1, destination_name: pred_in0}
   - {source_name: pred_out3, X-offset: -1, Y-offset:  0, destination_name: pred_in1}
   # {source_name: spanOut, X-offset: 2, Y-offset:  0, destination_name: spanIn},
 

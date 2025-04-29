@@ -1,8 +1,8 @@
+from pprint import pprint
 import re
 from collections import defaultdict
-from itertools import chain
 from pathlib import Path
-from typing import Generator
+from typing import Generator, Mapping
 
 import yaml
 from loguru import logger
@@ -16,7 +16,7 @@ from FABulous.fabric_definition.define import (
     Side,
 )
 from FABulous.fabric_definition.Fabric import Fabric
-from FABulous.fabric_definition.Port import TilePort
+from FABulous.fabric_definition.Port import BelPort, TilePort
 from FABulous.fabric_definition.SwitchMatrix import Mux, SwitchMatrix
 from FABulous.fabric_definition.Tile import Tile
 from FABulous.fabric_definition.Wire import Wire, WireType
@@ -70,13 +70,16 @@ def parseFabricYAML(fileName: Path) -> Fabric:
     tileDict: dict[str, Tile] = {}
     wireDictUnprocessed: dict[MainTileName, dict[SubTileName, WireInfo]] = {}
 
-    for i in data["TILES"]:
+    tileNameMap: Mapping[str, str] = {}
+
+    for mainTile in data["TILES"]:
         newTile, wireInfo = parseTileYAML(
-            filePath.joinpath(i), frameBitsPerRow, maxFramesPerCol
+            filePath.joinpath(mainTile), frameBitsPerRow, maxFramesPerCol
         )
-        for i in newTile.getSubTiles():
-            tileDict[i] = newTile
-            wireDictUnprocessed[i] = wireInfo[i]
+        for subTile in newTile.getSubTiles():
+            tileDict[newTile.name] = newTile
+            tileNameMap[subTile] = newTile.name
+            wireDictUnprocessed.update(wireInfo)
 
     usedTile = set()
     fabricTiles: list[list[str | None]] = []
@@ -99,88 +102,86 @@ def parseFabricYAML(fileName: Path) -> Fabric:
     width = len(fabricTiles[0])
 
     def tileIter() -> Generator[tuple[Loc, str], None, None]:
-        for y, row in enumerate(fabricTiles):
+        for y, row in enumerate(reversed(fabricTiles)):
             for x, tileName in enumerate(row):
                 if tileName is not None:
-                    yield (x, (height - y - 1)), tileName
+                    yield (x, y), tileName
 
     wireDict: dict[Loc, list[Wire]] = defaultdict(list)
-    for (x, y), tileName in tileIter():
-
+    for (x, y), subTileName in tileIter():
         # TODO add empty tile that have contains crossing wires
-        if tileName is None:
+        if subTileName is None:
             continue
+        tileName = tileNameMap.get(subTileName, subTileName)
+        wireEntries = wireDictUnprocessed[tileName][subTileName]
+        for wireEntry in wireEntries:
+            tx = int(wireEntry["X-offset"])
+            ty = int(wireEntry["Y-offset"])
 
-        for subTileName, wireEntries in wireDictUnprocessed[tileName].items():
-            for wireEntry in wireEntries:
-                tx = int(wireEntry["X-offset"])
-                ty = int(wireEntry["Y-offset"])
+            if tx == ty == 0:
+                continue
 
-                if tx == ty == 0:
-                    continue
+            sourcePort: TilePort | BelPort = tileDict[tileName].findPortByName(
+                wireEntry["source_name"]
+            )
 
-                sourcePort: TilePort = tileDict[tileName].findPortByName(
-                    wireEntry["source_name"]
+            xCord = max(0, min(x + tx, width - 1))
+            yCord = (height - 1) - max(0, min(y + ty, height - 1))
+            targetTileName = fabricTiles[yCord][xCord]
+            if targetTileName is None:
+                continue
+            targetTileName = tileNameMap.get(targetTileName, targetTileName)
+            destinationPort: TilePort | BelPort = tileDict[
+                targetTileName
+            ].findPortByName(wireEntry["destination_name"])
+
+            if tx != 0 and ty != 0 and tx != ty and not wireEntry.get("super", False):
+                logger.error(
+                    f"Invalid wire offset detected: source port '{sourcePort.name}' to destination port '{destinationPort.name}' "
+                    f"has an offset of X={tx}, Y={ty}. The offset must be either only in the X direction, only in the Y direction, "
+                    "or both X and Y must be the same for diagonal."
                 )
-
-                xCord = max(0, min(x + tx, width - 1))
-                yCord = max(0, min(y + ty, height - 1))
-                targetTileName = fabricTiles[yCord][xCord]
-                if targetTileName is None:
-                    continue
-                destinationPort: TilePort = tileDict[targetTileName].findPortByName(
-                    wireEntry["destination_name"]
+                raise ValueError
+            if sourcePort.width != destinationPort.width:
+                logger.error(
+                    f"Port {sourcePort.name} and {destinationPort.name} must have the same wire count."
                 )
+                raise ValueError
 
-                if tx != 0 and ty != 0 and tx != ty:
-                    logger.error(
-                        f"Invalid wire offset detected: source port '{sourcePort.name}' to destination port '{destinationPort.name}' "
-                        f"has an offset of X={tx}, Y={ty}. The offset must be either only in the X direction, only in the Y direction, "
-                        "or both X and Y must be the same for diagonal."
-                    )
-                    raise ValueError
-                if sourcePort.width != destinationPort.width:
-                    logger.error(
-                        f"Port {sourcePort.name} and {destinationPort.name} must have the same wire count."
-                    )
-                    raise ValueError
-
+            spanning = 0
+            if abs(tx) + abs(ty) > 1 and tx != ty:
+                wireCount = sourcePort.width * (abs(tx) + abs(ty))
+                spanning = abs(tx) + abs(ty)
+            elif tx == ty:
+                wireCount = sourcePort.width * abs(tx)
+                spanning = abs(tx)
+            else:
+                wireCount = sourcePort.width
                 spanning = 0
-                if abs(tx) + abs(ty) > 1 and tx != ty:
-                    wireCount = sourcePort.width * (abs(tx) + abs(ty))
-                    spanning = abs(tx) + abs(ty)
-                elif tx == ty:
-                    wireCount = sourcePort.width * abs(tx)
-                    spanning = abs(tx)
-                else:
-                    wireCount = sourcePort.width
-                    spanning = 0
-
-                wireDict[(x, y)].append(
-                    Wire(
-                        source=sourcePort,
-                        xOffset=tx,
-                        yOffset=ty,
-                        destination=destinationPort,
-                        sourceTile=f"X{x}Y{y}",
-                        destinationTile=f"X{x + tx}Y{y + ty}",
-                        wireCount=wireCount,
-                    )
+            wireDict[(x, y)].append(
+                Wire(
+                    source=sourcePort,
+                    xOffset=tx,
+                    yOffset=ty,
+                    destination=destinationPort,
+                    sourceTile=f"X{x}Y{y}",
+                    destinationTile=f"X{x + tx}Y{y + ty}",
+                    wireCount=wireCount,
                 )
+            )
 
-                tileDict[tileName].addWireType(
-                    subTileName,
-                    WireType(
-                        sourcePort=sourcePort,
-                        destinationPort=destinationPort,
-                        offsetX=tx,
-                        offsetY=ty,
-                        wireCount=sourcePort.width,
-                        cascadeWireCount=wireCount,
-                        spanning=spanning,
-                    ),
-                )
-
+            tileDict[tileName].addWireType(
+                subTileName,
+                WireType(
+                    sourcePort=sourcePort,
+                    destinationPort=destinationPort,
+                    offsetX=tx,
+                    offsetY=ty,
+                    wireCount=sourcePort.width,
+                    cascadeWireCount=wireCount,
+                    spanning=spanning,
+                ),
+            )
     logger.info("Fabric YAML parsed successfully.")
     return Fabric(
         name=name,
@@ -257,7 +258,7 @@ def parseTileYAML(
         data = yaml.safe_load(f)
 
     tileName = data.get("TILE", "")
-    portsDict: dict[MainTileName, dict[SubTileName, TilePort]] = {}
+    portsDict: dict[SubTileName, list[TilePort]] = defaultdict(list)
     bels: list[Bel] = []
     matrixDir: Path | None = None
     withUserCLK = False
@@ -276,6 +277,11 @@ def parseTileYAML(
                 row.append(j)
         tileMap.append(row)
 
+    if tileMap[-1][0] is None:
+        raise ValueError(
+            "The bottom left corner of the tile map must be filled with a tile."
+        )
+
     # Flatten the tileMap and count the number of items
     flatTileMap = [item for row in tileMap for item in row if item is not None]
     if len(data.get("PORTS", {})) != len(flatTileMap) and len(flatTileMap) != 1:
@@ -291,8 +297,9 @@ def parseTileYAML(
             iTile, iWireInfo = parseTileYAML(
                 filePathParent.joinpath(i), frameBitsPerRow, maxFramePerCol
             )
-            for ports in iTile.ports:
-                portsDict[iTile.name][ports.name] = ports
+            for ports, item in iTile.ports.items():
+                for fm in flatTileMap:
+                    portsDict[fm].extend(item)
             for bel in iTile.bels:
                 bels.append(bel)
 
@@ -302,33 +309,33 @@ def parseTileYAML(
                         wires[tileName][tName].extend(wireInfos)
 
     if len(flatTileMap) == 1:
-        portsDict[tileName] = {}
+        portsDict[tileName] = []
         for portEntry in data.get("PORTS", []):
-            tempDict = {}
-            tempDict[f"{portEntry["name"]}"] = TilePort(
-                width=int(portEntry["wires"]),
-                name=portEntry["name"],
-                ioDirection=IO[portEntry["inOut"].upper()],
-                sideOfTile=Side[portEntry["side"].upper()],
-                isBus=portEntry.get("isBus", False),
-                terminal=portEntry.get("terminal", False),
-                tileType=tileName,
-            )
-            portsDict[tileName].update(tempDict)
-    else:
-        for tName in flatTileMap:
-            tempDict = {}
-            for portEntry in data.get("PORTS", {})[tName]:
-                tempDict[f"{portEntry['name']}"] = TilePort(
+            portsDict[tileName].append(
+                TilePort(
                     width=int(portEntry["wires"]),
-                    name=f"{portEntry["name"]}",
+                    name=portEntry["name"],
                     ioDirection=IO[portEntry["inOut"].upper()],
                     sideOfTile=Side[portEntry["side"].upper()],
                     isBus=portEntry.get("isBus", False),
                     terminal=portEntry.get("terminal", False),
                     tileType=tileName,
                 )
-            portsDict[tName] = tempDict
+            )
+    else:
+        for tName in flatTileMap:
+            for portEntry in data.get("PORTS", {})[tName]:
+                portsDict[tName].append(
+                    TilePort(
+                        width=int(portEntry["wires"]),
+                        name=f"{portEntry['name']}",
+                        ioDirection=IO[portEntry["inOut"].upper()],
+                        sideOfTile=Side[portEntry["side"].upper()],
+                        isBus=portEntry.get("isBus", False),
+                        terminal=portEntry.get("terminal", False),
+                        tileType=tileName,
+                    )
+                )
 
     bels = []
     for z, belEntry in enumerate(data.get("BELS", [])):
@@ -353,11 +360,8 @@ def parseTileYAML(
                     sm.addMux(mux)
                 configBit += sm.configBits
             case ".py":
-                allPorts = list(
-                    chain.from_iterable(ports.values() for ports in portsDict.values())
-                )
-                setupPortData(tileName, matrixDir, allPorts, bels)
-                sm = genSwitchMatrix(tileName, matrixDir, allPorts, bels)
+                setupPortData(tileName, matrixDir, portsDict, bels)
+                sm = genSwitchMatrix(tileName, matrixDir, portsDict, bels)
                 configBit += sm.configBits
             case "_matrix.csv":
                 for _, v in parseMatrix(matrixDir, tileName).items():
@@ -407,10 +411,27 @@ def parseTileYAML(
         for tName in flatTileMap:
             wires[tileName][tName].extend(data.get("WIRES", {}).get(tName, []))
 
+    for y, row in enumerate(reversed(tileMap)):
+        for x, st in enumerate(row):
+            if st is None:
+                continue
+            if (x, y) == (0, 0):
+                continue
+            for bel in bels:
+                for p in bel.inputs + bel.outputs:
+                    wires[tileName][tileMap[-1][0]].append(
+                        {
+                            "X-offset": x,
+                            "Y-offset": y,
+                            "source_name": p.name,
+                            "destination_name": p.name,
+                            "super": True,
+                        }
+                    )
     return (
         Tile(
             name=tileName,
-            ports={k: list(z.values()) for k, z in portsDict.items()},
+            ports=portsDict,
             bels=bels,
             switchMatrix=sm,
             configMems=configMems,

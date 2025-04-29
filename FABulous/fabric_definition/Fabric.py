@@ -116,8 +116,12 @@ class Fabric:
 
         return fabric
 
-    def getTileByName(self, name: str) -> Tile | None:
-        return self.tileDict.get(name)
+    def getTileByName(self, name: str) -> Tile:
+        for i in self.tileDict.values():
+            for j in i.getSubTiles():
+                if j == name:
+                    return i
+        raise ValueError(f"Cannot find tile '{name}' in Fabric")
 
     def getSuperTileByName(self, name: str) -> SuperTile | None:
         return self.superTileDict.get(name)
@@ -145,9 +149,9 @@ class Fabric:
         )
 
     def __iter__(self) -> Generator[tuple[Loc, Tile | None], None, None]:
-        for y, row in enumerate(self.tiles):
+        for y, row in enumerate(reversed(self.tiles)):
             for x, tile in enumerate(row):
-                loc = (x, self.height - y - 1)
+                loc = (x, y)
                 if tile is not None:
                     t: Tile
                     for i in self.tileDict.values():

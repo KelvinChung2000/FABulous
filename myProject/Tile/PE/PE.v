@@ -12,15 +12,23 @@ module PE #(
     // NORTH
     input wire[31:0] in0,
     output reg[31:0] out0,
+    output reg pred_out0,
+    input wire pred_in0,
     // EAST
     input wire[31:0] in1,
     output reg[31:0] out1,
+    output reg pred_out1,
+    input wire pred_in1,
     // SOUTH
     input wire[31:0] in2,
     output reg[31:0] out2,
+    output reg pred_out2,
+    input wire pred_in2,
     // WEST
     input wire[31:0] in3,
     output reg[31:0] out3,
+    output reg pred_out3,
+    input wire pred_in3,
     input wire UserCLK,
     output reg UserCLK_o,
     input wire[FrameBitsPerRow - 1:0] FrameData,
@@ -38,26 +46,26 @@ reg [31:0] A;
 reg [31:0] B;
 reg [31:0] Y;
 reg [31:0] const_out;
-reg RES_en;
-reg [31:0] RES_reg_in;
-reg RES_rst;
-reg [31:0] RES_reg_out;
-reg N_en;
-reg [31:0] N_reg_in;
-reg N_rst;
-reg [31:0] N_reg_out;
-reg E_en;
-reg [31:0] E_reg_in;
-reg E_rst;
-reg [31:0] E_reg_out;
-reg S_en;
-reg [31:0] S_reg_in;
-reg S_rst;
-reg [31:0] S_reg_out;
-reg W_en;
-reg [31:0] W_reg_in;
-reg W_rst;
-reg [31:0] W_reg_out;
+reg RES_RES_en;
+reg [31:0] RES_RES_reg_in;
+reg RES_RES_rst;
+reg [31:0] RES_RES_reg_out;
+reg N_N_en;
+reg [31:0] N_N_reg_in;
+reg N_N_rst;
+reg [31:0] N_N_reg_out;
+reg E_E_en;
+reg [31:0] E_E_reg_in;
+reg E_E_rst;
+reg [31:0] E_E_reg_out;
+reg S_S_en;
+reg [31:0] S_S_reg_in;
+reg S_S_rst;
+reg [31:0] S_S_reg_out;
+reg W_W_en;
+reg [31:0] W_W_reg_in;
+reg W_W_rst;
+reg [31:0] W_W_reg_out;
 
 // ConfigBits Wires
 reg [NoConfigBits - 1:0] ConfigBits;
@@ -143,55 +151,55 @@ const_unit #() Inst_const_unit (
 
 // Instantiate BEL RES_reg_unit
 reg_unit #() Inst_RES_reg_unit (
-    .en(RES_en),
-    .reg_in(RES_reg_in),
-    .rst(RES_rst),
-    .reg_out(RES_reg_out),
-    .clk(UserCLK),
+    .RES_en(RES_RES_en),
+    .RES_reg_in(RES_RES_reg_in),
+    .RES_rst(RES_RES_rst),
+    .RES_reg_out(RES_RES_reg_out),
+    .RES_clk(UserCLK),
     .tide_en(ConfigBits[13]),
     .tide_rst(ConfigBits[14])
 );
 
 // Instantiate BEL N_reg_unit
 reg_unit #() Inst_N_reg_unit (
-    .en(N_en),
-    .reg_in(N_reg_in),
-    .rst(N_rst),
-    .reg_out(N_reg_out),
-    .clk(UserCLK),
+    .N_en(N_N_en),
+    .N_reg_in(N_N_reg_in),
+    .N_rst(N_N_rst),
+    .N_reg_out(N_N_reg_out),
+    .N_clk(UserCLK),
     .tide_en(ConfigBits[15]),
     .tide_rst(ConfigBits[16])
 );
 
 // Instantiate BEL E_reg_unit
 reg_unit #() Inst_E_reg_unit (
-    .en(E_en),
-    .reg_in(E_reg_in),
-    .rst(E_rst),
-    .reg_out(E_reg_out),
-    .clk(UserCLK),
+    .E_en(E_E_en),
+    .E_reg_in(E_E_reg_in),
+    .E_rst(E_E_rst),
+    .E_reg_out(E_E_reg_out),
+    .E_clk(UserCLK),
     .tide_en(ConfigBits[17]),
     .tide_rst(ConfigBits[18])
 );
 
 // Instantiate BEL S_reg_unit
 reg_unit #() Inst_S_reg_unit (
-    .en(S_en),
-    .reg_in(S_reg_in),
-    .rst(S_rst),
-    .reg_out(S_reg_out),
-    .clk(UserCLK),
+    .S_en(S_S_en),
+    .S_reg_in(S_S_reg_in),
+    .S_rst(S_S_rst),
+    .S_reg_out(S_S_reg_out),
+    .S_clk(UserCLK),
     .tide_en(ConfigBits[19]),
     .tide_rst(ConfigBits[20])
 );
 
 // Instantiate BEL W_reg_unit
 reg_unit #() Inst_W_reg_unit (
-    .en(W_en),
-    .reg_in(W_reg_in),
-    .rst(W_rst),
-    .reg_out(W_reg_out),
-    .clk(UserCLK),
+    .W_en(W_W_en),
+    .W_reg_in(W_W_reg_in),
+    .W_rst(W_W_rst),
+    .W_reg_out(W_W_reg_out),
+    .W_clk(UserCLK),
     .tide_en(ConfigBits[21]),
     .tide_rst(ConfigBits[22])
 );
@@ -207,21 +215,21 @@ PE_switch_matrix #() Inst_PE_switch_matrix (
     .data_in3(data_in3),
     .A(A),
     .B(B),
-    .RES_reg_in(RES_reg_in),
-    .N_reg_in(N_reg_in),
-    .E_reg_in(E_reg_in),
-    .S_reg_in(S_reg_in),
-    .W_reg_in(W_reg_in),
+    .RES_RES_reg_in(RES_RES_reg_in),
+    .N_N_reg_in(N_N_reg_in),
+    .E_E_reg_in(E_E_reg_in),
+    .S_S_reg_in(S_S_reg_in),
+    .W_W_reg_in(W_W_reg_in),
     .data_out(data_out),
-    .RES_reg_out(RES_reg_out),
+    .RES_RES_reg_out(RES_RES_reg_out),
     .in2(in2),
     .in3(in3),
     .in0(in0),
     .in1(in1),
-    .N_reg_out(N_reg_out),
-    .E_reg_out(E_reg_out),
-    .S_reg_out(S_reg_out),
-    .W_reg_out(W_reg_out),
+    .N_N_reg_out(N_N_reg_out),
+    .E_E_reg_out(E_E_reg_out),
+    .S_S_reg_out(S_S_reg_out),
+    .W_W_reg_out(W_W_reg_out),
     .const_out(const_out),
     .Y(Y),
     .ConfigBits(ConfigBits[50:23]),

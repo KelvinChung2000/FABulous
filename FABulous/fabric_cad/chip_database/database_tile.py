@@ -159,7 +159,6 @@ class TileType(BBAStruct):
             timing_idx=self.tmg.pip_class_idx(timing_class),
             flags=flags,
         )
-
         if pip not in self.pips:
             self.wires[src_idx].pips_downhill.append(pip.index)
             self.wires[dst_idx].pips_uphill.append(pip.index)

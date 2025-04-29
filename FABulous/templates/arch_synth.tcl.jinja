@@ -11,15 +11,18 @@ yosys opt_expr
 yosys opt_clean
 yosys check
 yosys opt -nodffe -nosdff
-yosys fsm_detect
-yosys fsm_extract
+{# yosys fsm -nomap -encoding binary -expand #}
+yosys fsm -encoding binary -expand
 yosys opt
+yosys techmap -map $project_root/.FABulous/reduce_bool_to_or.v
 yosys wreduce
 yosys peepopt
 yosys opt_clean
 yosys share
 yosys opt_expr
 yosys opt_clean
+
+yosys stat
 
 # memory opt
 yosys opt_mem_priority
@@ -47,6 +50,8 @@ proc extract {cell wrapperPath} {
     yosys design -delete xmap
 }
 
+yosys memory_libmap -lib $project_root/.FABulous/memory_map.txt
+
 {% for wrapperPath, unWrapperPath, wrapperNames, cells in wrappers %}
 # wrapping base design
 yosys techmap -map {{ wrapperPath }}
@@ -64,15 +69,16 @@ yosys opt
 yosys clean -purge
 {% endfor %}
 
-yosys memory_libmap -lib $project_root/.FABulous/memory_map.txt
+# FSM mapping
+{# yosys techmap -map /home/kelvin/FABulous_fork/myProject/PnR/fsm_map.v
+yosys memory_libmap -lib $project_root/.FABulous/memory_map.txt #}
 
 # cell techmapping
 yosys techmap -map $project_root/.FABulous/techmaps.v
-yosys techmap -map /home/kelvin/FABulous_fork/myProject/PnR/fsm_map.v
 
 # const unit mapping
-{# yosys read_rtlil -lib $project_root/Tile/PE/metadata/cell_const_unit.il #}
-{# yosys constmap -cell const_unit const_out ConfigBits #}
+yosys read_rtlil -lib $project_root/Tile/PE/metadata/cell_const_unit.il
+yosys constmap -cell const_unit const_out ConfigBits
 
 # io mapping
 yosys iopadmap -widthparam WIDTH -outpad IO from_fabric:out -inpad IO to_fabric:in
@@ -81,7 +87,7 @@ yosys iopadmap -bits -outpad OUTBUF I:PAD -inpad INBUF O:PAD
 # final optimization
 yosys opt -full
 yosys clean -purge
+yosys fsm_info
 yosys show -enum -long -width -format dot -prefix $project_root/.FABulous/design
 yosys write_json $project_root/user_design/synth_test.json
-yosys fsm_info
 yosys stat

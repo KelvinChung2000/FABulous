@@ -1,13 +1,13 @@
 from dataclasses import dataclass
 from typing import Any
 
-from FABulous.fabric_definition.Port import Port, TilePort
+from FABulous.fabric_definition.Port import BelPort, Port, TilePort
 
 
 @dataclass(frozen=True, eq=True)
 class WireType:
-    sourcePort: TilePort
-    destinationPort: TilePort
+    sourcePort: TilePort | BelPort
+    destinationPort: TilePort | BelPort
     offsetX: int
     offsetY: int
     wireCount: int

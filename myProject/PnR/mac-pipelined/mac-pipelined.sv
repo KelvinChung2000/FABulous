@@ -779,16 +779,16 @@ module comb_mem_d1 #(
     parameter SIZE = 16,
     parameter IDX_SIZE = 4
 ) (
-   (* keep *)input wire                logic [IDX_SIZE-1:0] addr0,
-   (* keep *)input wire                logic [ WIDTH-1:0] write_data,
-   (* keep *)input wire                logic write_en,
+   input wire                logic [IDX_SIZE-1:0] addr0,
+   input wire                logic [ WIDTH-1:0] write_data,
+   input wire                logic write_en,
    input wire                logic clk,
    input wire                logic reset,
-   (* keep *)output logic [ WIDTH-1:0] read_data,
+   output logic [ WIDTH-1:0] read_data,
    output logic              done
 );
 
-  (* keep *)logic [WIDTH-1:0] mem[SIZE-1:0];
+  logic [WIDTH-1:0] mem[SIZE-1:0];
 
   /* verilator lint_off WIDTH */
   assign read_data = mem[addr0];
@@ -1369,8 +1369,7 @@ module std_reg #(
    output logic [WIDTH-1:0] out,
    output logic done
 );
-initial out = 0;
-  always_ff @(posedge clk) begin
+always_ff @(posedge clk) begin
     if (reset) begin
        out <= 0;
        done <= 0;
@@ -1406,37 +1405,37 @@ endmodule
 module fsm_pipelined_mac_def (
   input logic clk,
   input logic reset,
-  output logic [0:0] fsm_data_valid_reg_write_en_in,
   output logic [0:0] fsm_data_valid_reg_in_in,
-  output logic [0:0] fsm_cond_write_en_in,
+  output logic [0:0] fsm_data_valid_reg_write_en_in,
+  output logic [31:0] fsm_pipe2_in_in,
+  output logic [31:0] fsm_add_left_in,
   output logic [0:0] fsm_mult_pipe_go_in,
+  output logic [0:0] fsm_cond_wire_in_in,
+  output logic [0:0] fsm_cond_in_in,
   output logic [0:0] fsm_pipe2_write_en_in,
   output logic [31:0] fsm_mult_pipe_left_in,
-  output logic [31:0] fsm_pipe2_in_in,
   output logic [31:0] fsm_mult_pipe_right_in,
-  output logic [31:0] fsm_add_left_in,
-  output logic [0:0] fsm_cond_in_in,
-  output logic [0:0] fsm_cond_wire0_in_in,
   output logic [31:0] fsm_add_right_in,
-  output logic [0:0] fsm_pipe1_write_en_in,
+  output logic [0:0] fsm_cond_write_en_in,
   output logic [31:0] fsm_pipe1_in_in,
-  output logic [0:0] fsm_stage2_valid_in_in,
+  output logic [0:0] fsm_pipe1_write_en_in,
   output logic [0:0] fsm_out_valid_write_en_in,
+  output logic [0:0] fsm_stage2_valid_in_in,
   output logic [0:0] fsm_out_valid_in_in,
   output logic [0:0] fsm_stage2_valid_write_en_in,
   output logic [0:0] fsm_done_in,
   input logic [0:0] data_valid,
-  input logic [31:0] add_out,
-  input logic stage2_valid_out,
-  input logic [31:0] c,
-  input logic [31:0] pipe1_out,
   input logic [0:0] data_valid_reg_out,
-  input logic [0:0] cond_out,
   input logic [31:0] a,
-  input logic cond_wire0_out,
+  input logic [0:0] cond_wire_out,
   input logic [31:0] b,
+  input logic [31:0] add_out,
+  input logic [0:0] stage2_valid_out,
+  input logic [31:0] pipe1_out,
+  input logic [31:0] c,
+  input logic [0:0] cond_out,
   input logic [31:0] mult_pipe_out,
-  input logic fsm_start_out
+  input logic [0:0] fsm_start_out
 );
 
   localparam logic[2:0] S0 = 3'd0;
@@ -1569,18 +1568,18 @@ module fsm_pipelined_mac_def (
     endcase
   end
 assign fsm_data_valid_reg_in_in = data_valid;
+assign fsm_add_left_in = pipe1_out;
 assign fsm_pipe2_in_in = add_out;
-assign fsm_mult_pipe_left_in = a;
-assign fsm_cond_wire0_in_in = 
+assign fsm_cond_wire_in_in = 
        current_state == S2 ? data_valid_reg_out :
        current_state == S3 ? cond_out :
        current_state == S4 ? cond_out :
        current_state == S5 ? cond_out :
        1'dx;
-assign fsm_cond_in_in = data_valid_reg_out;
-assign fsm_mult_pipe_right_in = b;
 assign fsm_add_right_in = c;
-assign fsm_add_left_in = pipe1_out;
+assign fsm_cond_in_in = data_valid_reg_out;
+assign fsm_mult_pipe_left_in = a;
+assign fsm_mult_pipe_right_in = b;
 assign fsm_pipe1_in_in = mult_pipe_out;
 assign fsm_stage2_valid_in_in = 
        ((current_state == S6) & (data_valid_reg_out)) ? 1'd1 :
@@ -1651,16 +1650,16 @@ logic cond_clk;
 logic cond_reset;
 logic cond_out;
 logic cond_done;
-logic cond_wire0_in;
-logic cond_wire0_out;
+logic cond_wire_in;
+logic cond_wire_out;
 logic fsm_data_valid_reg_write_en_in;
 logic fsm_data_valid_reg_write_en_out;
 logic fsm_data_valid_reg_in_in;
 logic fsm_data_valid_reg_in_out;
 logic fsm_cond_in_in;
 logic fsm_cond_in_out;
-logic fsm_cond_wire0_in_in;
-logic fsm_cond_wire0_in_out;
+logic fsm_cond_wire_in_in;
+logic fsm_cond_wire_in_out;
 logic fsm_cond_write_en_in;
 logic fsm_cond_write_en_out;
 logic fsm_mult_pipe_go_in;
@@ -1787,11 +1786,11 @@ std_reg # (
     .write_en(cond_write_en)
 );
 
-assign cond_wire0_out = cond_wire0_in;
+assign cond_wire_out = cond_wire_in;
 assign fsm_data_valid_reg_write_en_out = fsm_data_valid_reg_write_en_in;
 assign fsm_data_valid_reg_in_out = fsm_data_valid_reg_in_in;
 assign fsm_cond_in_out = fsm_cond_in_in;
-assign fsm_cond_wire0_in_out = fsm_cond_wire0_in_in;
+assign fsm_cond_wire_in_out = fsm_cond_wire_in_in;
 assign fsm_cond_write_en_out = fsm_cond_write_en_in;
 assign fsm_mult_pipe_go_out = fsm_mult_pipe_go_in;
 assign fsm_mult_pipe_left_out = fsm_mult_pipe_left_in;
@@ -1811,41 +1810,41 @@ assign fsm_done_out = fsm_done_in;
 fsm_pipelined_mac_def fsm (
   .clk(clk),
   .reset(reset),
-  .fsm_data_valid_reg_write_en_in(fsm_data_valid_reg_write_en_in),
   .fsm_data_valid_reg_in_in(fsm_data_valid_reg_in_in),
-  .data_valid(data_valid),
+  .fsm_data_valid_reg_write_en_in(fsm_data_valid_reg_write_en_in),
+  .fsm_add_left_in(fsm_add_left_in),
+  .fsm_pipe2_in_in(fsm_pipe2_in_in),
+  .fsm_add_right_in(fsm_add_right_in),
+  .fsm_cond_wire_in_in(fsm_cond_wire_in_in),
   .fsm_cond_in_in(fsm_cond_in_in),
-  .data_valid_reg_out(data_valid_reg_out),
-  .fsm_cond_wire0_in_in(fsm_cond_wire0_in_in),
   .fsm_cond_write_en_in(fsm_cond_write_en_in),
+  .fsm_mult_pipe_right_in(fsm_mult_pipe_right_in),
+  .fsm_pipe2_write_en_in(fsm_pipe2_write_en_in),
   .fsm_mult_pipe_go_in(fsm_mult_pipe_go_in),
   .fsm_mult_pipe_left_in(fsm_mult_pipe_left_in),
-  .a(a),
-  .fsm_mult_pipe_right_in(fsm_mult_pipe_right_in),
-  .b(b),
-  .fsm_pipe2_write_en_in(fsm_pipe2_write_en_in),
-  .fsm_pipe2_in_in(fsm_pipe2_in_in),
-  .add_out(add_out),
-  .fsm_add_left_in(fsm_add_left_in),
-  .pipe1_out(pipe1_out),
-  .fsm_add_right_in(fsm_add_right_in),
-  .c(c),
-  .cond_out(cond_out),
-  .fsm_pipe1_write_en_in(fsm_pipe1_write_en_in),
   .fsm_pipe1_in_in(fsm_pipe1_in_in),
-  .mult_pipe_out(mult_pipe_out),
+  .fsm_pipe1_write_en_in(fsm_pipe1_write_en_in),
   .fsm_stage2_valid_write_en_in(fsm_stage2_valid_write_en_in),
   .fsm_stage2_valid_in_in(fsm_stage2_valid_in_in),
-  .fsm_out_valid_write_en_in(fsm_out_valid_write_en_in),
   .fsm_out_valid_in_in(fsm_out_valid_in_in),
+  .fsm_out_valid_write_en_in(fsm_out_valid_write_en_in),
   .fsm_done_in(fsm_done_in),
+  .data_valid(data_valid),
+  .data_valid_reg_out(data_valid_reg_out),
+  .a(a),
+  .cond_wire_out(cond_wire_out),
+  .b(b),
+  .add_out(add_out),
+  .stage2_valid_out(stage2_valid_out),
+  .pipe1_out(pipe1_out),
+  .c(c),
+  .cond_out(cond_out),
+  .mult_pipe_out(mult_pipe_out),
   .fsm_start_out(fsm_start_out)
 );
-
 assign done = fsm_done_out;
 assign out = pipe2_out;
 assign output_valid = out_valid_out;
-assign cond_wire0_in = fsm_cond_wire0_in_out;
 assign cond_write_en = fsm_cond_write_en_out;
 assign cond_clk = clk;
 assign cond_reset = reset;
@@ -1863,7 +1862,7 @@ assign out_valid_in = fsm_out_valid_in_out;
 assign mult_pipe_clk = clk;
 assign mult_pipe_left = fsm_mult_pipe_left_out;
 assign mult_pipe_go =
- cond_wire0_out ? fsm_mult_pipe_go_out : 1'd0;
+ cond_wire_out ? fsm_mult_pipe_go_out : 1'd0;
 assign mult_pipe_reset = reset;
 assign mult_pipe_right = fsm_mult_pipe_right_out;
 assign data_valid_reg_write_en = fsm_data_valid_reg_write_en_out;
@@ -1877,8 +1876,9 @@ assign stage2_valid_write_en =
 assign stage2_valid_clk = clk;
 assign stage2_valid_reset = reset;
 assign stage2_valid_in = fsm_stage2_valid_in_out;
+assign cond_wire_in = fsm_cond_wire_in_out;
 assign pipe1_write_en =
- cond_wire0_out ? fsm_pipe1_write_en_out : 1'd0;
+ cond_wire_out ? fsm_pipe1_write_en_out : 1'd0;
 assign pipe1_clk = clk;
 assign pipe1_reset = reset;
 assign pipe1_in = fsm_pipe1_in_out;
@@ -1889,58 +1889,69 @@ endmodule
 module fsm_main_def (
   input logic clk,
   input logic reset,
-  output logic [0:0] fsm_read_b_write_en_in,
   output logic [31:0] fsm_read_b_in_in,
-  output logic [31:0] fsm_read_a_in_in,
-  output logic [3:0] fsm_a_addr0_in,
-  output logic [3:0] fsm_b_addr0_in,
   output logic [0:0] fsm_read_a_write_en_in,
-  output logic [31:0] fsm_mac_b_in,
-  output logic [0:0] fsm_mac_data_valid_in,
-  output logic [0:0] fsm_mac_go_in,
+  output logic [3:0] fsm_b_addr0_in,
+  output logic [0:0] fsm_read_b_write_en_in,
+  output logic [3:0] fsm_a_addr0_in,
+  output logic [31:0] fsm_read_a_in_in,
   output logic [31:0] fsm_mac_a_in,
-  output logic [0:0] fsm_idx0_write_en_in,
-  output logic [3:0] fsm_idx0_in_in,
+  output logic [31:0] fsm_mac_b_in,
   output logic [3:0] fsm_add0_left_in,
+  output logic [0:0] fsm_mac_data_valid_in,
+  output logic [3:0] fsm_idx0_in_in,
   output logic [3:0] fsm_add0_right_in,
-  output logic [3:0] fsm_lt0_right_in,
-  output logic [0:0] fsm_cond_wire_in_in,
+  output logic [0:0] fsm_mac_go_in,
+  output logic [0:0] fsm_idx0_write_en_in,
   output logic [3:0] fsm_lt0_left_in,
+  output logic [0:0] fsm_comb_reg_write_en_in,
+  output logic [3:0] fsm_lt0_right_in,
+  output logic [0:0] fsm_comb_reg_in_in,
   output logic [31:0] fsm_mac_c_in,
   output logic [0:0] fsm_out_write_en_in,
   output logic [0:0] fsm_out_addr0_in,
   output logic [31:0] fsm_out_write_data_in,
   output logic [0:0] fsm_done_in,
   input logic [3:0] idx0_out,
-  input logic [31:0] b_read_data,
   input logic [31:0] a_read_data,
-  input logic [31:0] read_b_out,
-  input logic mac_done,
+  input logic [31:0] b_read_data,
   input logic [31:0] read_a_out,
+  input logic [31:0] read_b_out,
   input logic [3:0] add0_out,
-  input logic idx0_done,
   input logic [0:0] lt0_out,
   input logic [31:0] mac_out,
-  input logic out_done,
-  input logic fsm_start_out,
-  input logic cond_wire_out
+  input logic [0:0] fsm_start_out,
+  input logic [0:0] comb_reg_out
 );
 
-  localparam logic[3:0] S0 = 4'd0;
-  localparam logic[3:0] S1 = 4'd1;
-  localparam logic[3:0] S2 = 4'd2;
-  localparam logic[3:0] S3 = 4'd3;
-  localparam logic[3:0] S4 = 4'd4;
-  localparam logic[3:0] S5 = 4'd5;
-  localparam logic[3:0] S6 = 4'd6;
-  localparam logic[3:0] S7 = 4'd7;
-  localparam logic[3:0] S8 = 4'd8;
-  localparam logic[3:0] S9 = 4'd9;
-  localparam logic[3:0] S10 = 4'd10;
-  localparam logic[3:0] S11 = 4'd11;
+  localparam logic[4:0] S0 = 5'd0;
+  localparam logic[4:0] S1 = 5'd1;
+  localparam logic[4:0] S2 = 5'd2;
+  localparam logic[4:0] S3 = 5'd3;
+  localparam logic[4:0] S4 = 5'd4;
+  localparam logic[4:0] S5 = 5'd5;
+  localparam logic[4:0] S6 = 5'd6;
+  localparam logic[4:0] S7 = 5'd7;
+  localparam logic[4:0] S8 = 5'd8;
+  localparam logic[4:0] S9 = 5'd9;
+  localparam logic[4:0] S10 = 5'd10;
+  localparam logic[4:0] S11 = 5'd11;
+  localparam logic[4:0] S12 = 5'd12;
+  localparam logic[4:0] S13 = 5'd13;
+  localparam logic[4:0] S14 = 5'd14;
+  localparam logic[4:0] S15 = 5'd15;
+  localparam logic[4:0] S16 = 5'd16;
+  localparam logic[4:0] S17 = 5'd17;
+  localparam logic[4:0] S18 = 5'd18;
+  localparam logic[4:0] S19 = 5'd19;
+  localparam logic[4:0] S20 = 5'd20;
+  localparam logic[4:0] S21 = 5'd21;
+  localparam logic[4:0] S22 = 5'd22;
+  localparam logic[4:0] S23 = 5'd23;
+  localparam logic[4:0] S24 = 5'd24;
 
-  logic [3:0] current_state;
-  logic [3:0] next_state;
+  logic [4:0] current_state;
+  logic [4:0] next_state;
 
   always @(posedge clk) begin
     if (reset) begin
@@ -1954,13 +1965,10 @@ module fsm_main_def (
   always_comb begin
     case ( current_state )
         S0: begin
-          fsm_a_addr0_in = 'b0;
-          fsm_b_addr0_in = 'b0;
+          fsm_comb_reg_write_en_in = 'b0;
           fsm_done_in = 'b0;
           fsm_idx0_write_en_in = 'b0;
-          fsm_mac_data_valid_in = 'b0;
           fsm_mac_go_in = 'b0;
-          fsm_out_addr0_in = 'b0;
           fsm_out_write_en_in = 'b0;
           fsm_read_a_write_en_in = 'b0;
           fsm_read_b_write_en_in = 'b0;
@@ -1972,202 +1980,266 @@ module fsm_main_def (
           end
         end
         S1: begin
-          fsm_a_addr0_in = idx0_out;
-          fsm_b_addr0_in = idx0_out;
+          fsm_comb_reg_write_en_in = 'b0;
           fsm_done_in = 'b0;
           fsm_idx0_write_en_in = 'b0;
-          fsm_mac_data_valid_in = 'b0;
           fsm_mac_go_in = 'b0;
-          fsm_out_addr0_in = 'b0;
           fsm_out_write_en_in = 'b0;
           fsm_read_a_write_en_in = 1'd1;
           fsm_read_b_write_en_in = 1'd1;
           next_state = S2;
         end
         S2: begin
-          fsm_a_addr0_in = 'b0;
-          fsm_b_addr0_in = 'b0;
-          fsm_done_in = 'b0;
-          fsm_idx0_write_en_in = 'b0;
-          fsm_mac_data_valid_in = 1'd1;
-          fsm_mac_go_in = 1'd1;
-          fsm_out_addr0_in = 'b0;
-          fsm_out_write_en_in = 'b0;
-          fsm_read_a_write_en_in = 'b0;
-          fsm_read_b_write_en_in = 'b0;
-          if (mac_done) begin
-            next_state = S3;
-          end
-          else begin
-            next_state = S2;
-          end
-        end
-        S3: begin
-          fsm_a_addr0_in = 'b0;
-          fsm_b_addr0_in = 'b0;
+          fsm_comb_reg_write_en_in = 'b0;
           fsm_done_in = 'b0;
           fsm_idx0_write_en_in = 1'd1;
-          fsm_mac_data_valid_in = 'b0;
-          fsm_mac_go_in = 'b0;
-          fsm_out_addr0_in = 'b0;
+          fsm_mac_go_in = 1'd1;
           fsm_out_write_en_in = 'b0;
           fsm_read_a_write_en_in = 'b0;
           fsm_read_b_write_en_in = 'b0;
-          if (idx0_done) begin
-            next_state = S4;
-          end
-          else begin
-            next_state = S3;
-          end
+          next_state = S3;
+        end
+        S3: begin
+          fsm_comb_reg_write_en_in = 'b0;
+          fsm_done_in = 'b0;
+          fsm_idx0_write_en_in = 'b0;
+          fsm_mac_go_in = 1'd1;
+          fsm_out_write_en_in = 'b0;
+          fsm_read_a_write_en_in = 'b0;
+          fsm_read_b_write_en_in = 'b0;
+          next_state = S4;
         end
         S4: begin
-          fsm_a_addr0_in = 'b0;
-          fsm_b_addr0_in = 'b0;
+          fsm_comb_reg_write_en_in = 'b0;
           fsm_done_in = 'b0;
           fsm_idx0_write_en_in = 'b0;
-          fsm_mac_data_valid_in = 'b0;
-          fsm_mac_go_in = 'b0;
-          fsm_out_addr0_in = 'b0;
+          fsm_mac_go_in = 1'd1;
           fsm_out_write_en_in = 'b0;
           fsm_read_a_write_en_in = 'b0;
           fsm_read_b_write_en_in = 'b0;
-          if (cond_wire_out) begin
-            next_state = S5;
-          end
-          else if (~(cond_wire_out)) begin
-            next_state = S9;
-          end
-          else begin
-            next_state = S4;
-          end
+          next_state = S5;
         end
         S5: begin
-          fsm_a_addr0_in = idx0_out;
-          fsm_b_addr0_in = idx0_out;
+          fsm_comb_reg_write_en_in = 'b0;
           fsm_done_in = 'b0;
           fsm_idx0_write_en_in = 'b0;
-          fsm_mac_data_valid_in = 'b0;
-          fsm_mac_go_in = 'b0;
-          fsm_out_addr0_in = 'b0;
+          fsm_mac_go_in = 1'd1;
           fsm_out_write_en_in = 'b0;
-          fsm_read_a_write_en_in = 1'd1;
-          fsm_read_b_write_en_in = 1'd1;
+          fsm_read_a_write_en_in = 'b0;
+          fsm_read_b_write_en_in = 'b0;
           next_state = S6;
         end
         S6: begin
-          fsm_a_addr0_in = 'b0;
-          fsm_b_addr0_in = 'b0;
+          fsm_comb_reg_write_en_in = 'b0;
           fsm_done_in = 'b0;
           fsm_idx0_write_en_in = 'b0;
-          fsm_mac_data_valid_in = 1'd1;
           fsm_mac_go_in = 1'd1;
-          fsm_out_addr0_in = 'b0;
           fsm_out_write_en_in = 'b0;
           fsm_read_a_write_en_in = 'b0;
           fsm_read_b_write_en_in = 'b0;
-          if (mac_done) begin
-            next_state = S7;
-          end
-          else begin
-            next_state = S6;
-          end
+          next_state = S7;
         end
         S7: begin
-          fsm_a_addr0_in = 'b0;
-          fsm_b_addr0_in = 'b0;
-          fsm_done_in = 'b0;
-          fsm_idx0_write_en_in = 1'd1;
-          fsm_mac_data_valid_in = 'b0;
-          fsm_mac_go_in = 'b0;
-          fsm_out_addr0_in = 'b0;
-          fsm_out_write_en_in = 'b0;
-          fsm_read_a_write_en_in = 'b0;
-          fsm_read_b_write_en_in = 'b0;
-          if (idx0_done) begin
-            next_state = S8;
-          end
-          else begin
-            next_state = S7;
-          end
-        end
-        S8: begin
-          fsm_a_addr0_in = 'b0;
-          fsm_b_addr0_in = 'b0;
+          fsm_comb_reg_write_en_in = 'b0;
           fsm_done_in = 'b0;
           fsm_idx0_write_en_in = 'b0;
-          fsm_mac_data_valid_in = 'b0;
-          fsm_mac_go_in = 'b0;
-          fsm_out_addr0_in = 'b0;
+          fsm_mac_go_in = 1'd1;
           fsm_out_write_en_in = 'b0;
           fsm_read_a_write_en_in = 'b0;
           fsm_read_b_write_en_in = 'b0;
-          if (cond_wire_out) begin
-            next_state = S5;
-          end
-          else if (~(cond_wire_out)) begin
+          next_state = S8;
+        end
+        S8: begin
+          fsm_comb_reg_write_en_in = 1'd1;
+          fsm_done_in = 'b0;
+          fsm_idx0_write_en_in = 'b0;
+          fsm_mac_go_in = 'b0;
+          fsm_out_write_en_in = 'b0;
+          fsm_read_a_write_en_in = 'b0;
+          fsm_read_b_write_en_in = 'b0;
+          if (comb_reg_out) begin
             next_state = S9;
+          end
+          else if (~(comb_reg_out)) begin
+            next_state = S17;
           end
           else begin
             next_state = S8;
           end
         end
         S9: begin
-          fsm_a_addr0_in = 'b0;
-          fsm_b_addr0_in = 'b0;
+          fsm_comb_reg_write_en_in = 'b0;
           fsm_done_in = 'b0;
           fsm_idx0_write_en_in = 'b0;
-          fsm_mac_data_valid_in = 'b0;
+          fsm_mac_go_in = 'b0;
+          fsm_out_write_en_in = 'b0;
+          fsm_read_a_write_en_in = 1'd1;
+          fsm_read_b_write_en_in = 1'd1;
+          next_state = S10;
+        end
+        S10: begin
+          fsm_comb_reg_write_en_in = 'b0;
+          fsm_done_in = 'b0;
+          fsm_idx0_write_en_in = 1'd1;
           fsm_mac_go_in = 1'd1;
-          fsm_out_addr0_in = 'b0;
           fsm_out_write_en_in = 'b0;
           fsm_read_a_write_en_in = 'b0;
           fsm_read_b_write_en_in = 'b0;
-          if (mac_done) begin
-            next_state = S10;
-          end
-          else begin
-            next_state = S9;
-          end
+          next_state = S11;
         end
-        S10: begin
-          fsm_a_addr0_in = 'b0;
-          fsm_b_addr0_in = 'b0;
+        S11: begin
+          fsm_comb_reg_write_en_in = 'b0;
           fsm_done_in = 'b0;
           fsm_idx0_write_en_in = 'b0;
-          fsm_mac_data_valid_in = 'b0;
+          fsm_mac_go_in = 1'd1;
+          fsm_out_write_en_in = 'b0;
+          fsm_read_a_write_en_in = 'b0;
+          fsm_read_b_write_en_in = 'b0;
+          next_state = S12;
+        end
+        S12: begin
+          fsm_comb_reg_write_en_in = 'b0;
+          fsm_done_in = 'b0;
+          fsm_idx0_write_en_in = 'b0;
+          fsm_mac_go_in = 1'd1;
+          fsm_out_write_en_in = 'b0;
+          fsm_read_a_write_en_in = 'b0;
+          fsm_read_b_write_en_in = 'b0;
+          next_state = S13;
+        end
+        S13: begin
+          fsm_comb_reg_write_en_in = 'b0;
+          fsm_done_in = 'b0;
+          fsm_idx0_write_en_in = 'b0;
+          fsm_mac_go_in = 1'd1;
+          fsm_out_write_en_in = 'b0;
+          fsm_read_a_write_en_in = 'b0;
+          fsm_read_b_write_en_in = 'b0;
+          next_state = S14;
+        end
+        S14: begin
+          fsm_comb_reg_write_en_in = 'b0;
+          fsm_done_in = 'b0;
+          fsm_idx0_write_en_in = 'b0;
+          fsm_mac_go_in = 1'd1;
+          fsm_out_write_en_in = 'b0;
+          fsm_read_a_write_en_in = 'b0;
+          fsm_read_b_write_en_in = 'b0;
+          next_state = S15;
+        end
+        S15: begin
+          fsm_comb_reg_write_en_in = 'b0;
+          fsm_done_in = 'b0;
+          fsm_idx0_write_en_in = 'b0;
+          fsm_mac_go_in = 1'd1;
+          fsm_out_write_en_in = 'b0;
+          fsm_read_a_write_en_in = 'b0;
+          fsm_read_b_write_en_in = 'b0;
+          next_state = S16;
+        end
+        S16: begin
+          fsm_comb_reg_write_en_in = 1'd1;
+          fsm_done_in = 'b0;
+          fsm_idx0_write_en_in = 'b0;
           fsm_mac_go_in = 'b0;
-          fsm_out_addr0_in = 1'd0;
+          fsm_out_write_en_in = 'b0;
+          fsm_read_a_write_en_in = 'b0;
+          fsm_read_b_write_en_in = 'b0;
+          if (comb_reg_out) begin
+            next_state = S9;
+          end
+          else if (~(comb_reg_out)) begin
+            next_state = S17;
+          end
+          else begin
+            next_state = S16;
+          end
+        end
+        S17: begin
+          fsm_comb_reg_write_en_in = 'b0;
+          fsm_done_in = 'b0;
+          fsm_idx0_write_en_in = 'b0;
+          fsm_mac_go_in = 1'd1;
+          fsm_out_write_en_in = 'b0;
+          fsm_read_a_write_en_in = 'b0;
+          fsm_read_b_write_en_in = 'b0;
+          next_state = S18;
+        end
+        S18: begin
+          fsm_comb_reg_write_en_in = 'b0;
+          fsm_done_in = 'b0;
+          fsm_idx0_write_en_in = 'b0;
+          fsm_mac_go_in = 1'd1;
+          fsm_out_write_en_in = 'b0;
+          fsm_read_a_write_en_in = 'b0;
+          fsm_read_b_write_en_in = 'b0;
+          next_state = S19;
+        end
+        S19: begin
+          fsm_comb_reg_write_en_in = 'b0;
+          fsm_done_in = 'b0;
+          fsm_idx0_write_en_in = 'b0;
+          fsm_mac_go_in = 1'd1;
+          fsm_out_write_en_in = 'b0;
+          fsm_read_a_write_en_in = 'b0;
+          fsm_read_b_write_en_in = 'b0;
+          next_state = S20;
+        end
+        S20: begin
+          fsm_comb_reg_write_en_in = 'b0;
+          fsm_done_in = 'b0;
+          fsm_idx0_write_en_in = 'b0;
+          fsm_mac_go_in = 1'd1;
+          fsm_out_write_en_in = 'b0;
+          fsm_read_a_write_en_in = 'b0;
+          fsm_read_b_write_en_in = 'b0;
+          next_state = S21;
+        end
+        S21: begin
+          fsm_comb_reg_write_en_in = 'b0;
+          fsm_done_in = 'b0;
+          fsm_idx0_write_en_in = 'b0;
+          fsm_mac_go_in = 1'd1;
+          fsm_out_write_en_in = 'b0;
+          fsm_read_a_write_en_in = 'b0;
+          fsm_read_b_write_en_in = 'b0;
+          next_state = S22;
+        end
+        S22: begin
+          fsm_comb_reg_write_en_in = 'b0;
+          fsm_done_in = 'b0;
+          fsm_idx0_write_en_in = 'b0;
+          fsm_mac_go_in = 1'd1;
+          fsm_out_write_en_in = 'b0;
+          fsm_read_a_write_en_in = 'b0;
+          fsm_read_b_write_en_in = 'b0;
+          next_state = S23;
+        end
+        S23: begin
+          fsm_comb_reg_write_en_in = 'b0;
+          fsm_done_in = 'b0;
+          fsm_idx0_write_en_in = 'b0;
+          fsm_mac_go_in = 'b0;
           fsm_out_write_en_in = 1'd1;
           fsm_read_a_write_en_in = 'b0;
           fsm_read_b_write_en_in = 'b0;
-          if (out_done) begin
-            next_state = S11;
-          end
-          else begin
-            next_state = S10;
-          end
+          next_state = S24;
         end
-        S11: begin
-          fsm_a_addr0_in = 'b0;
-          fsm_b_addr0_in = 'b0;
+        S24: begin
+          fsm_comb_reg_write_en_in = 'b0;
           fsm_done_in = 1'd1;
           fsm_idx0_write_en_in = 'b0;
-          fsm_mac_data_valid_in = 'b0;
           fsm_mac_go_in = 'b0;
-          fsm_out_addr0_in = 'b0;
           fsm_out_write_en_in = 'b0;
           fsm_read_a_write_en_in = 'b0;
           fsm_read_b_write_en_in = 'b0;
           next_state = S0;
         end
       default begin
-          fsm_a_addr0_in = 'b0;
-          fsm_b_addr0_in = 'b0;
+          fsm_comb_reg_write_en_in = 'b0;
           fsm_done_in = 'b0;
           fsm_idx0_write_en_in = 'b0;
-          fsm_mac_data_valid_in = 'b0;
           fsm_mac_go_in = 'b0;
-          fsm_out_addr0_in = 'b0;
           fsm_out_write_en_in = 'b0;
           fsm_read_a_write_en_in = 'b0;
           fsm_read_b_write_en_in = 'b0;
@@ -2175,17 +2247,21 @@ module fsm_main_def (
       end
     endcase
   end
-assign fsm_read_b_in_in = b_read_data;
+assign fsm_a_addr0_in = idx0_out;
+assign fsm_b_addr0_in = idx0_out;
 assign fsm_read_a_in_in = a_read_data;
-assign fsm_mac_b_in = read_b_out;
-assign fsm_mac_a_in = read_a_out;
-assign fsm_add0_right_in = idx0_out;
+assign fsm_read_b_in_in = b_read_data;
 assign fsm_idx0_in_in = add0_out;
+assign fsm_mac_a_in = read_a_out;
 assign fsm_add0_left_in = 4'd1;
-assign fsm_cond_wire_in_in = lt0_out;
+assign fsm_mac_b_in = read_b_out;
+assign fsm_add0_right_in = idx0_out;
+assign fsm_mac_data_valid_in = 1'd1;
 assign fsm_lt0_right_in = 4'd10;
 assign fsm_lt0_left_in = idx0_out;
+assign fsm_comb_reg_in_in = lt0_out;
 assign fsm_mac_c_in = mac_out;
+assign fsm_out_addr0_in = 1'd0;
 assign fsm_out_write_data_in = mac_out;
 endmodule
 
@@ -2193,18 +2269,19 @@ module main(
   (* go=1 *) input logic go,
   (* clk=1 *) input logic clk,
   (* reset=1 *) input logic reset,
-// input logic [31:0] a_write_data,
-// input logic  a_write_en,
-// input logic [31:0] b_write_data,
-// input logic b_write_en,
-// output logic [31:0] out_read_data,
   (* done=1 *) output logic done
 );
 // COMPONENT START: main
+logic [3:0] a_addr0;
+logic [31:0] a_write_data;
+logic a_write_en;
 logic a_clk;
 logic a_reset;
 logic [31:0] a_read_data;
 logic a_done;
+logic [3:0] b_addr0;
+logic [31:0] b_write_data;
+logic b_write_en;
 logic b_clk;
 logic b_reset;
 logic [31:0] b_read_data;
@@ -2250,8 +2327,12 @@ logic mac_go;
 logic mac_clk;
 logic mac_reset;
 logic mac_done;
-logic cond_wire_in;
-logic cond_wire_out;
+logic comb_reg_in;
+logic comb_reg_write_en;
+logic comb_reg_clk;
+logic comb_reg_reset;
+logic comb_reg_out;
+logic comb_reg_done;
 logic [3:0] fsm_a_addr0_in;
 logic [3:0] fsm_a_addr0_out;
 logic fsm_read_a_write_en_in;
@@ -2284,8 +2365,10 @@ logic [3:0] fsm_lt0_left_in;
 logic [3:0] fsm_lt0_left_out;
 logic [3:0] fsm_lt0_right_in;
 logic [3:0] fsm_lt0_right_out;
-logic fsm_cond_wire_in_in;
-logic fsm_cond_wire_in_out;
+logic fsm_comb_reg_in_in;
+logic fsm_comb_reg_in_out;
+logic fsm_comb_reg_write_en_in;
+logic fsm_comb_reg_write_en_out;
 logic [31:0] fsm_mac_c_in;
 logic [31:0] fsm_mac_c_out;
 logic fsm_out_addr0_in;
@@ -2298,7 +2381,7 @@ logic fsm_start_in;
 logic fsm_start_out;
 logic fsm_done_in;
 logic fsm_done_out;
-(* external=1, data=1, keep=1 *)
+(* external=1, data=1 *)
 comb_mem_d1 # (
     .IDX_SIZE(4),
     .SIZE(10),
@@ -2313,7 +2396,7 @@ comb_mem_d1 # (
     .write_en(a_write_en)
 );
 
-(* external=1, data=1, keep=1 *)
+(* external=1, data=1 *)
 comb_mem_d1 # (
     .IDX_SIZE(4),
     .SIZE(10),
@@ -2328,7 +2411,7 @@ comb_mem_d1 # (
     .write_en(b_write_en)
 );
 
-(* external=1, data=1, keep=1 *)
+(* external=1, data=1 *)
 comb_mem_d1 # (
     .IDX_SIZE(1),
     .SIZE(1),
@@ -2411,7 +2494,18 @@ pipelined_mac mac (
     .reset(mac_reset)
 );
 
-assign cond_wire_out = cond_wire_in;
+(* generated=1 *)
+std_reg # (
+    .WIDTH(1)
+) comb_reg (
+    .clk(comb_reg_clk),
+    .done(comb_reg_done),
+    .in(comb_reg_in),
+    .out(comb_reg_out),
+    .reset(comb_reg_reset),
+    .write_en(comb_reg_write_en)
+);
+
 assign fsm_a_addr0_out = fsm_a_addr0_in;
 assign fsm_read_a_write_en_out = fsm_read_a_write_en_in;
 assign fsm_read_a_in_out = fsm_read_a_in_in;
@@ -2428,7 +2522,8 @@ assign fsm_add0_left_out = fsm_add0_left_in;
 assign fsm_add0_right_out = fsm_add0_right_in;
 assign fsm_lt0_left_out = fsm_lt0_left_in;
 assign fsm_lt0_right_out = fsm_lt0_right_in;
-assign fsm_cond_wire_in_out = fsm_cond_wire_in_in;
+assign fsm_comb_reg_in_out = fsm_comb_reg_in_in;
+assign fsm_comb_reg_write_en_out = fsm_comb_reg_write_en_in;
 assign fsm_mac_c_out = fsm_mac_c_in;
 assign fsm_out_addr0_out = fsm_out_addr0_in;
 assign fsm_out_write_en_out = fsm_out_write_en_in;
@@ -2438,80 +2533,77 @@ assign fsm_done_out = fsm_done_in;
 fsm_main_def fsm (
   .clk(clk),
   .reset(reset),
-  .fsm_a_addr0_in(fsm_a_addr0_in),
-  .idx0_out(idx0_out),
-  .fsm_read_a_write_en_in(fsm_read_a_write_en_in),
-  .fsm_read_a_in_in(fsm_read_a_in_in),
-  .a_read_data(a_read_data),
   .fsm_b_addr0_in(fsm_b_addr0_in),
-  .fsm_read_b_write_en_in(fsm_read_b_write_en_in),
   .fsm_read_b_in_in(fsm_read_b_in_in),
-  .b_read_data(b_read_data),
+  .fsm_a_addr0_in(fsm_a_addr0_in),
+  .fsm_read_a_in_in(fsm_read_a_in_in),
+  .fsm_read_a_write_en_in(fsm_read_a_write_en_in),
+  .fsm_read_b_write_en_in(fsm_read_b_write_en_in),
+  .fsm_idx0_in_in(fsm_idx0_in_in),
+  .fsm_idx0_write_en_in(fsm_idx0_write_en_in),
+  .fsm_add0_left_in(fsm_add0_left_in),
   .fsm_mac_go_in(fsm_mac_go_in),
   .fsm_mac_data_valid_in(fsm_mac_data_valid_in),
-  .fsm_mac_a_in(fsm_mac_a_in),
-  .read_a_out(read_a_out),
   .fsm_mac_b_in(fsm_mac_b_in),
-  .read_b_out(read_b_out),
-  .fsm_idx0_write_en_in(fsm_idx0_write_en_in),
-  .fsm_idx0_in_in(fsm_idx0_in_in),
-  .add0_out(add0_out),
-  .fsm_add0_left_in(fsm_add0_left_in),
   .fsm_add0_right_in(fsm_add0_right_in),
-  .fsm_lt0_left_in(fsm_lt0_left_in),
+  .fsm_mac_a_in(fsm_mac_a_in),
+  .fsm_comb_reg_in_in(fsm_comb_reg_in_in),
   .fsm_lt0_right_in(fsm_lt0_right_in),
-  .fsm_cond_wire_in_in(fsm_cond_wire_in_in),
-  .lt0_out(lt0_out),
+  .fsm_comb_reg_write_en_in(fsm_comb_reg_write_en_in),
+  .fsm_lt0_left_in(fsm_lt0_left_in),
   .fsm_mac_c_in(fsm_mac_c_in),
-  .mac_out(mac_out),
-  .fsm_out_addr0_in(fsm_out_addr0_in),
   .fsm_out_write_en_in(fsm_out_write_en_in),
   .fsm_out_write_data_in(fsm_out_write_data_in),
+  .fsm_out_addr0_in(fsm_out_addr0_in),
   .fsm_done_in(fsm_done_in),
+  .idx0_out(idx0_out),
+  .a_read_data(a_read_data),
+  .b_read_data(b_read_data),
+  .read_a_out(read_a_out),
+  .read_b_out(read_b_out),
+  .add0_out(add0_out),
+  .lt0_out(lt0_out),
+  .mac_out(mac_out),
   .fsm_start_out(fsm_start_out),
-  .mac_done(mac_done),
-  .idx0_done(idx0_done),
-  .cond_wire_out(cond_wire_out),
-  .out_done(out_done)
+  .comb_reg_out(comb_reg_out)
 );
-
 assign done = fsm_done_out;
 assign add0_left = fsm_add0_left_out;
 assign add0_right = fsm_add0_right_out;
+assign b_write_en = 1'd0;
 assign b_clk = clk;
 assign b_addr0 = fsm_b_addr0_out;
 assign b_reset = reset;
+assign comb_reg_write_en = fsm_comb_reg_write_en_out;
+assign comb_reg_clk = clk;
+assign comb_reg_reset = reset;
+assign comb_reg_in = fsm_comb_reg_in_out;
 assign read_b_write_en = fsm_read_b_write_en_out;
 assign read_b_clk = clk;
 assign read_b_reset = reset;
 assign read_b_in = fsm_read_b_in_out;
-assign idx0_write_en =
- ~idx0_done ? fsm_idx0_write_en_out : 1'd0;
+assign idx0_write_en = fsm_idx0_write_en_out;
 assign idx0_clk = clk;
 assign idx0_reset = reset;
 assign idx0_in = fsm_idx0_in_out;
+assign a_write_en = 1'd0;
 assign a_clk = clk;
 assign a_addr0 = fsm_a_addr0_out;
 assign a_reset = reset;
-assign out_write_en =
- ~out_done ? fsm_out_write_en_out : 1'd0;
+assign out_write_en = fsm_out_write_en_out;
 assign out_clk = clk;
-assign out_addr0 =
- ~out_done ? fsm_out_addr0_out : 1'd0;
+assign out_addr0 = fsm_out_addr0_out;
 assign out_reset = reset;
 assign out_write_data = fsm_out_write_data_out;
 assign read_a_write_en = fsm_read_a_write_en_out;
 assign read_a_clk = clk;
 assign read_a_reset = reset;
 assign read_a_in = fsm_read_a_in_out;
-assign cond_wire_in = fsm_cond_wire_in_out;
 assign mac_b = fsm_mac_b_out;
-assign mac_data_valid =
- ~mac_done ? fsm_mac_data_valid_out : 1'd0;
+assign mac_data_valid = fsm_mac_data_valid_out;
 assign mac_clk = clk;
 assign mac_a = fsm_mac_a_out;
-assign mac_go =
- ~mac_done ? fsm_mac_go_out : 1'd0;
+assign mac_go = fsm_mac_go_out;
 assign mac_reset = reset;
 assign mac_c = fsm_mac_c_out;
 assign fsm_start_in = go;

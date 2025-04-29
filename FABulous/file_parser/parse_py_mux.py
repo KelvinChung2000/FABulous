@@ -1,3 +1,4 @@
+import itertools
 import sys
 from importlib.util import module_from_spec, spec_from_file_location
 from pathlib import Path
@@ -13,7 +14,7 @@ GenericPort = Port | TilePort
 
 
 def setupPortData(
-    tileName: str, tileDir: Path, tilePorts: list[TilePort], bels: list[Bel]
+    tileName: str, tileDir: Path, tilePorts: dict[str, list[TilePort]], bels: list[Bel]
 ):
     environment = Environment(loader=PackageLoader("FABulous"))
     template = environment.get_template("portData.py.jinja")
@@ -25,9 +26,11 @@ def setupPortData(
         for port in bel.outputs:
             belOutputs.append(port)
 
+    ports = list(itertools.chain([(k, j) for k, v in tilePorts.items() for j in v]))
     content = template.render(
         tileName=tileName,
-        tilePorts=tilePorts,
+        subTileCount=len(tilePorts),
+        tilePorts=ports,
         belInputs=belInputs,
         belOutputs=belOutputs,
     )
@@ -46,7 +49,7 @@ def setupPortData(
 
 
 def genSwitchMatrix(
-    tileName: str, tileDir: Path, ports: list[TilePort], bels: list[Bel]
+    tileName: str, tileDir: Path, ports: dict[str, list[TilePort]], bels: list[Bel]
 ) -> SwitchMatrix:
     if listModuleSpec := spec_from_file_location(
         tileDir.parent.name, tileDir.parent / "list.py"
@@ -66,7 +69,11 @@ def genSwitchMatrix(
             belInputs.append(port)
         for port in bel.outputs:
             belOutputs.append(port)
-    muxList = listModule.MuxList(ports, belInputs, belOutputs)
+    muxList = listModule.MuxList(
+        list(itertools.chain.from_iterable([i for i in ports.values()])),
+        belInputs,
+        belOutputs,
+    )
     muxList.construct()
     sm = SwitchMatrix()
     slicedPort: list[MuxPort] = []
@@ -77,7 +84,6 @@ def genSwitchMatrix(
         if i.isSliced:
             slicedPort.append(i)
             continue
-
         if i.isTilePort and i.port.ioDirection == IO.INPUT:
             continue
 
@@ -87,13 +93,7 @@ def genSwitchMatrix(
         if not i.inputs:
             continue
 
-        if i.isBelPort:
-            assert isinstance(i.port, BelPort)
-            m = Mux(f"{i.port.prefix}{i.port.name}", [p.port for p in i.inputs], i.port)
-        else:
-            m = Mux(i.port.name, [p.port for p in i.inputs], i.port)
-
-        sm.addMux(m)
+        sm.addMux(Mux(i.port, [p.port for p in i.inputs]))
 
     for sPort in slicedPort:
         if not sPort.slicingAssignDict.keys():
@@ -158,12 +158,12 @@ def genSwitchMatrix(
                             )
                         )
 
-                m = Mux(
-                    f"{sPort.port.name}_{start}_{end}",
-                    newInputPortList,
-                    newTargetPort,
+                sm.addMux(
+                    Mux(
+                        newTargetPort,
+                        newInputPortList,
+                    )
                 )
-                sm.addMux(m)
     return sm
 
 

@@ -1,5 +1,5 @@
-from collections import defaultdict
 import json
+from collections import defaultdict
 from functools import partial
 from itertools import product
 from pathlib import Path
@@ -168,18 +168,19 @@ def genMemMap(bel: Bel, dest: Path):
         yosysJson = YosysJson(c)
 
         module: YosysModule = yosysJson.modules[next(iter(yosysJson.modules))]
-        for cell in module.cells.values():
-            if cell.type != "$mem_v2":
+        for idx in module.cells.values():
+            if idx.type != "$mem_v2":
                 continue
 
-            parameters: dict[str, str] = cell.parameters
-            connections: dict[str, BitVector] = cell.connections
+            parameters: dict[str, str] = idx.parameters
+            connections: dict[str, BitVector] = idx.connections
 
             addressBits: int = int(parameters["ABITS"], 2)
             dataWidth: int = int(parameters["WIDTH"], 2)
             initValueRaw: str = parameters["INIT"]
             readPorts: int = int(parameters["RD_PORTS"], 2)
             writePorts: int = int(parameters["WR_PORTS"], 2)
+            cost: int = 1
 
             if initValueRaw == "x" * (2**addressBits):
                 initValue = "none"
@@ -188,8 +189,8 @@ def genMemMap(bel: Bel, dest: Path):
             else:
                 initValue = "any"
 
-            def groupList(d, n):
-                return [d[i : i + n] for i in range(0, len(d), n)]
+            def groupList(d, n) -> tuple:
+                return tuple([d[i : i + n] for i in range(0, len(d), n)])
 
             def getClockEdge(polarityBit: str) -> str:
                 return "posedge" if polarityBit == "1" else "negedge"
@@ -209,33 +210,47 @@ def genMemMap(bel: Bel, dest: Path):
 
             def buildReadPortConfig(rdIdx: int, dataWidth: int) -> list[str]:
                 config = []
-                if connections["RD_CLK"][rdIdx] != "x":
-                    # Safely access parameters using .get() and check index bounds
-                    rdClkPolarity = parameters.get("RD_CLK_POLARITY", "")
-                    if rdIdx < len(rdClkPolarity):
-                        config.append(f"clock {getClockEdge(rdClkPolarity[rdIdx])}")
+                if connections["RD_CLK"][rdIdx] == "x":
+                    return config
 
-                    rdClkEn = parameters.get("RD_CLK_EN", "")
-                    if rdIdx < len(rdClkEn) and rdClkEn[rdIdx] == "1":
-                        config.append("rden")
+                # Safely access parameters using .get() and check index bounds
+                rdClkPolarity = parameters.get("RD_CLK_POLARITY", "")
+                if rdIdx < len(rdClkPolarity):
+                    config.append(f"clock {getClockEdge(rdClkPolarity[rdIdx])}")
 
-                    initVal = parameters.get("RD_INIT_VALUE")
-                    if initVal is not None:
-                        config.append(
-                            f"rdinit {getMemValueString(initVal, dataWidth)}"
-                        )  # No initValue comparison needed here
+                rdClkEn = parameters.get("RD_CLK_ENABLE", "")
+                rdEn = connections.get("RD_EN", "")
+                initVal = parameters.get("RD_INIT_VALUE", "")
+                arstVal = parameters.get("RD_ARST_VALUE", "")
+                srstVal = parameters.get("RD_SRST_VALUE", "")
+                ceOverSrst = parameters.get("RD_CE_OVER_SRST", "0")
 
-                    arstVal = parameters.get("RD_ARST_VALUE")
-                    if arstVal is not None and initVal is not None:
-                        config.append(
-                            f"rdarst {getMemValueString(arstVal, dataWidth, initVal)}"
-                        )
+                if rdIdx < len(rdClkEn) and rdClkEn[rdIdx] == "1":
+                    config.append("clken")
 
-                    srstVal = parameters.get("RD_SRST_VALUE")
-                    if srstVal is not None and initVal is not None:
-                        config.append(
-                            f"rdsrst {getMemValueString(srstVal, dataWidth, initVal)}"
-                        )
+                if rdIdx < len(rdEn) and rdEn[rdIdx] != "0" and rdEn[rdIdx] != "1":
+                    config.append("rden")
+
+                config.append(
+                    f"rdinit {getMemValueString(initVal, dataWidth)}"
+                )  # No initValue comparison needed here
+
+                config.append(
+                    f"rdarst {getMemValueString(arstVal, dataWidth, initVal)}"
+                )
+
+                if getMemValueString(srstVal, dataWidth, initVal) == "none":
+                    config.append(
+                        f"rdsrst {getMemValueString(arstVal, dataWidth, initVal)}"
+                    )
+                elif ceOverSrst == "1":
+                    config.append(
+                        f"rdsrst {getMemValueString(srstVal, dataWidth, initVal)} gated_clken"
+                    )
+                else:
+                    config.append(
+                        f"rdsrst {getMemValueString(srstVal, dataWidth, initVal)} ungated"
+                    )
 
                 return config
 
@@ -273,10 +288,11 @@ def genMemMap(bel: Bel, dest: Path):
             readOnlyPorts = rdPortSet.difference(wrPortSet)
             writeOnlyPorts = wrPortSet.difference(rdPortSet)
 
-            ports: dict[str, list[str]] = defaultdict(list)
+            memMapPortsCfg: dict[str, list[str]] = defaultdict(list)
+            cellPortSignalMapping: Mapping[str, tuple] = {}
 
             # Process common ports (Read-Write)
-            for cell, portTuple in enumerate(commonPorts):
+            for idx, portTuple in enumerate(commonPorts):
                 portAddr = list(portTuple)
                 rdIdx = readPortList.index(portAddr)
                 wrIdx = writePortList.index(portAddr)
@@ -286,8 +302,22 @@ def genMemMap(bel: Bel, dest: Path):
                 isAsyncRead = (
                     connections.get("RD_CLK", [""])[0] == "x"
                 )  # Simplified check
-                portPrefix = "ar" if isAsyncRead else "sr"
-                portName = f'{portPrefix}sw "RW{cell}"'  # Combined Read/Write port
+                portPrefix = "arsw" if isAsyncRead else "srsw"
+                cost += 1 if isAsyncRead else 0
+                portName = f'{portPrefix} "RW{idx}"'  # Combined Read/Write port
+                cellPortSignalMapping[f"PORT_RW{idx}_ADDR"] = portTuple
+                cellPortSignalMapping[f"PORT_RW{idx}_WR_DATA"] = groupList(
+                    connections["WR_DATA"], dataWidth
+                )[idx]
+                cellPortSignalMapping[f"PORT_RW{idx}_RD_DATA"] = groupList(
+                    connections["RD_DATA"], dataWidth
+                )[idx]
+                cellPortSignalMapping[f"PORT_RW{idx}_WR_EN"] = groupList(
+                    connections["WR_EN"], 1
+                )[idx]
+                cellPortSignalMapping[f"PORT_RW{idx}_CLK"] = tuple(
+                    connections["WR_CLK"]
+                )
 
                 # Build config: Start with write part, then add read part
                 portConfig = buildWritePortConfig(wrIdx)
@@ -295,27 +325,44 @@ def genMemMap(bel: Bel, dest: Path):
 
                 # Remove potential duplicate 'clock' entries if polarities match
                 portConfig = list(dict.fromkeys(portConfig))
-
-                ports[portName].extend(portConfig)
+                memMapPortsCfg[portName].extend(portConfig)
 
             # Process read-only ports
-            for cell, portTuple in enumerate(readOnlyPorts):
+            for idx, portTuple in enumerate(readOnlyPorts):
                 portAddr = list(portTuple)
                 rdIdx = readPortList.index(portAddr)
 
                 isAsyncRead = connections.get("RD_CLK", [""])[0] == "x"
                 portPrefix = "ar" if isAsyncRead else "sr"
-                portName = f'{portPrefix} "R{cell}"'  # Read-Only port
+                cost += 1 if isAsyncRead else 0
+                portName = f'{portPrefix} "R{idx}"'  # Read-Only port
+                cellPortSignalMapping[f"PORT_R{idx}_ADDR"] = portTuple
+                cellPortSignalMapping[f"PORT_R{idx}_RD_DATA"] = groupList(
+                    connections["RD_DATA"], dataWidth
+                )[idx]
+                if not isAsyncRead:
+                    cellPortSignalMapping[f"PORT_R{idx}_CLK"] = tuple(
+                        connections["RD_CLK"]
+                    )
 
-                ports[portName].extend(buildReadPortConfig(rdIdx, dataWidth))
+                memMapPortsCfg[portName].extend(buildReadPortConfig(rdIdx, dataWidth))
 
             # Process write-only ports
-            for cell, portTuple in enumerate(writeOnlyPorts):
+            for idx, portTuple in enumerate(writeOnlyPorts):
                 portAddr = list(portTuple)
                 wrIdx = writePortList.index(portAddr)
 
-                portName = f'sw "W{cell}"'
-                ports[portName].extend(buildWritePortConfig(wrIdx))
+                portName = f'sw "W{idx}"'
+                cellPortSignalMapping[f"PORT_W{idx}_ADDR"] = portTuple
+                cellPortSignalMapping[f"PORT_W{idx}_WR_DATA"] = groupList(
+                    connections["WR_DATA"], dataWidth
+                )[idx]
+                cellPortSignalMapping[f"PORT_W{idx}_WR_EN"] = groupList(
+                    connections["WR_EN"], 1
+                )[idx]
+                cellPortSignalMapping[f"PORT_W{idx}_CLK"] = tuple(connections["WR_CLK"])
+
+                memMapPortsCfg[portName].extend(buildWritePortConfig(wrIdx))
 
             environment = Environment(
                 loader=PackageLoader("FABulous")
@@ -330,12 +377,14 @@ def genMemMap(bel: Bel, dest: Path):
                 addressBits=addressBits,
                 dataWidth=dataWidth,
                 initValue=initValue,
-                ports=ports,
+                ports=memMapPortsCfg,
                 connections=connections,
+                cost=cost,
             )
 
             with open(dest, "a") as f:
                 f.write(memoryDefinition)
+                f.write("\n")
 
             design = ys.Design()
             runPass = partial(lambda design, cmd: ys.run_pass(cmd, design), design)
@@ -346,54 +395,76 @@ def genMemMap(bel: Bel, dest: Path):
                 codeGenWriterType.VERILOG,
                 writeMode="a",
             )
-            with cg.Module(
-                f"map_{bel.name}", [cg.Attribute("techmap_celltype", f"$__{c.stem}")]
-            ) as m:
+            with cg.Module(f"$__{c.stem}") as m:
                 with m.ParameterRegion() as pr:
-                    pass
+                    init = pr.Parameter("INIT", parameters["INIT"])
 
                 portDict = {}
                 with m.PortRegion() as pr:
-                    for cell in ports:
-                        kind, name = cell.split(" ")
+                    for portName, portConfig in memMapPortsCfg.items():
+                        configStr = " ".join(portConfig)
+                        kind, name = portName.split(" ")
                         name = name.strip('"')
-                        portDict[name] = pr.Port(
-                            f"PORT_{name}_ADDR", IO.INPUT, addressBits
-                        )
-                        match kind:
-                            case "arsw" | "srsw":
-                                portDict[f"{name}_WR_DATA"] = pr.Port(
-                                    f"PORT_{name}_WR_DATA", IO.INPUT, dataWidth
-                                )
-                                portDict[f"{name}_RD_DATA"] = pr.Port(
-                                    f"PORT_{name}_RD_DATA", IO.OUTPUT, dataWidth
-                                )
-                                portDict[f"{name}_WR_EN"] = pr.Port(
-                                    f"PORT_{name}_WR_EN", IO.INPUT, 1
-                                )
+                        addrPort = f"PORT_{name}_ADDR"
+                        portDict[addrPort] = pr.Port(addrPort, IO.INPUT, addressBits)
 
-                            case "ar" | "sr":
-                                portDict[f"{name}_RD_DATA"] = pr.Port(
-                                    f"PORT_{name}_RD_DATA", IO.OUTPUT, dataWidth
-                                )
+                        if "sr" in kind or "ar" in kind:
+                            clkPort = f"PORT_{name}_CLK"
+                            portDict[clkPort] = pr.Port(clkPort, IO.INPUT, 1)
 
-                            case "sw":
-                                portDict[f"{name}_WR_DATA"] = pr.Port(
-                                    f"PORT_{name}_WR_DATA", IO.INPUT, dataWidth
-                                )
+                            if "clken" in configStr:
+                                clken = f"PORT_{name}_CLK_EN"
+                                portDict[clken] = pr.Port(clken, IO.INPUT, 1)
+
+                        if "ar" in kind or "sr" in kind:
+                            rDataPort = f"PORT_{name}_RD_DATA"
+                            portDict[rDataPort] = pr.Port(
+                                rDataPort, IO.OUTPUT, dataWidth
+                            )
+                            portDict[clkPort] = pr.Port(clkPort, IO.INPUT, 1)
+                            if "rden" in configStr:
+                                rden = f"PORT_{name}_RD_EN"
+                                portDict[rden] = pr.Port(rden, IO.INPUT, 1)
+
+                            if "rdarst" in configStr:
+                                arst = f"PORT_{name}_RD_ARST"
+                                portDict[arst] = pr.Port(arst, IO.INPUT, 1)
+
+                            if "rdsrst" in configStr:
+                                srst = f"PORT_{name}_RD_SRST"
+                                portDict[srst] = pr.Port(srst, IO.INPUT, 1)
+
+                        if "sw" in kind:
+                            wDataPort = f"PORT_{name}_WR_DATA"
+                            portDict[wDataPort] = pr.Port(
+                                wDataPort, IO.INPUT, dataWidth
+                            )
+                            enPort = f"PORT_{name}_WR_EN"
+                            portDict[enPort] = pr.Port(enPort, IO.INPUT, 1)
 
                 with m.LogicRegion() as lr:
                     runPass("select a:CONFIG_BIT")
                     wires = [
                         i.name.str().removeprefix("\\") for i in mod.selected_wires()
                     ]
-                    params = []
-                    for cell in wires:
-                        v = int(
-                            "".join([str(i) for i in module.netnames[cell].bits]), 2
-                        )
-                        params.append(lr.ConnectPair(cell, v))
-                    lr.InitModule(f"{bel.name}", "_TECHMAP_REPLACE_", [], params)
+                    params = [
+                        lr.ConnectPair("INIT", init),
+                    ]
+                    for idx in wires:
+                        v = int("".join([str(i) for i in module.netnames[idx].bits]), 2)
+                        params.append(lr.ConnectPair(idx, v))
+
+                    portConnect = []
+                    for mPort, detail in module.ports.items():
+                        for cPort, sig in cellPortSignalMapping.items():
+                            if set(sig).issubset(set(detail.bits)):
+                                portConnect.append(
+                                    lr.ConnectPair(mPort, portDict[cPort])
+                                )
+
+                    lr.InitModule(
+                        f"{bel.name}", "_TECHMAP_REPLACE_", portConnect, params
+                    )
 
 
 def genSynthScript(fabric: Fabric, filename: Path):
@@ -472,16 +543,15 @@ def genCellsAndMaps(bel: Bel):
     for wire in module.selected_wires():
         p = bel.findPortByName(wire.name.str()[1:])
         if isinstance(p, ConfigPort):
-            if len(p.features) == 1:
-                ranges.append(range(2))
-            else:
-                ranges.append(range(len(p.features)))
+            ranges.append(range(1 << p.width))
+            # if p.width == 1:
+            #     ranges.append(range(2))
+            # else:
         else:
             ranges.append(list(range(wire.width + 1)) + ["z"])
 
     keys = [i.name.str().removeprefix("\\") for i in module.selected_wires()]
     combinations = [tuple(zip(keys, values)) for values in product(*ranges)]
-
     runPass("cd")
 
     cellDict = {}
@@ -493,7 +563,6 @@ def genCellsAndMaps(bel: Bel):
         )
 
     runPass("cd")
-
     for c in combinations:
         nameStr = f"{bel.name}_" + "_".join(
             [f"{cKey.removeprefix('\\')}_{cValue}" for cKey, cValue in c]

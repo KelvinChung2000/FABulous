@@ -11,21 +11,21 @@ module PE_switch_matrix #(
     output reg[31:0] data_in3,
     output reg[31:0] A,
     output reg[31:0] B,
-    output reg[31:0] RES_reg_in,
-    output reg[31:0] N_reg_in,
-    output reg[31:0] E_reg_in,
-    output reg[31:0] S_reg_in,
-    output reg[31:0] W_reg_in,
+    output reg[31:0] RES_RES_reg_in,
+    output reg[31:0] N_N_reg_in,
+    output reg[31:0] E_E_reg_in,
+    output reg[31:0] S_S_reg_in,
+    output reg[31:0] W_W_reg_in,
     input wire[31:0] data_out,
-    input wire[31:0] RES_reg_out,
+    input wire[31:0] RES_RES_reg_out,
     input wire[31:0] in2,
     input wire[31:0] in3,
     input wire[31:0] in0,
     input wire[31:0] in1,
-    input wire[31:0] N_reg_out,
-    input wire[31:0] E_reg_out,
-    input wire[31:0] S_reg_out,
-    input wire[31:0] W_reg_out,
+    input wire[31:0] N_N_reg_out,
+    input wire[31:0] E_E_reg_out,
+    input wire[31:0] S_S_reg_out,
+    input wire[31:0] W_W_reg_out,
     input wire[31:0] const_out,
     input wire[31:0] Y,
     input wire[NoConfigBits - 1:0] ConfigBits,
@@ -40,7 +40,7 @@ cus_mux41_buf_pack #(
     .WIDTH(6'd32)
 ) inst_cus_mux41_buf_pack_out0 (
     .A0(in2),
-    .A1(RES_reg_out),
+    .A1(RES_RES_reg_out),
     .A2(data_out),
     .A3(GND),
     .S0(ConfigBits[0]),
@@ -55,7 +55,7 @@ cus_mux41_buf_pack #(
     .WIDTH(6'd32)
 ) inst_cus_mux41_buf_pack_out1 (
     .A0(in3),
-    .A1(RES_reg_out),
+    .A1(RES_RES_reg_out),
     .A2(data_out),
     .A3(GND),
     .S0(ConfigBits[2]),
@@ -70,7 +70,7 @@ cus_mux41_buf_pack #(
     .WIDTH(6'd32)
 ) inst_cus_mux41_buf_pack_out2 (
     .A0(in0),
-    .A1(RES_reg_out),
+    .A1(RES_RES_reg_out),
     .A2(data_out),
     .A3(GND),
     .S0(ConfigBits[4]),
@@ -85,7 +85,7 @@ cus_mux41_buf_pack #(
     .WIDTH(6'd32)
 ) inst_cus_mux41_buf_pack_out3 (
     .A0(in1),
-    .A1(RES_reg_out),
+    .A1(RES_RES_reg_out),
     .A2(data_out),
     .A3(GND),
     .S0(ConfigBits[6]),
@@ -99,11 +99,11 @@ cus_mux41_buf_pack #(
 cus_mux161_buf_pack #(
     .WIDTH(6'd32)
 ) inst_cus_mux161_buf_pack_data_in1 (
-    .A0(W_reg_out),
-    .A1(S_reg_out),
-    .A2(E_reg_out),
-    .A3(N_reg_out),
-    .A4(RES_reg_out),
+    .A0(W_W_reg_out),
+    .A1(S_S_reg_out),
+    .A2(E_E_reg_out),
+    .A3(N_N_reg_out),
+    .A4(RES_RES_reg_out),
     .A5(in3),
     .A6(in2),
     .A7(in1),
@@ -130,11 +130,11 @@ cus_mux161_buf_pack #(
 cus_mux161_buf_pack #(
     .WIDTH(6'd32)
 ) inst_cus_mux161_buf_pack_data_in2 (
-    .A0(W_reg_out),
-    .A1(S_reg_out),
-    .A2(E_reg_out),
-    .A3(N_reg_out),
-    .A4(RES_reg_out),
+    .A0(W_W_reg_out),
+    .A1(S_S_reg_out),
+    .A2(E_E_reg_out),
+    .A3(N_N_reg_out),
+    .A4(RES_RES_reg_out),
     .A5(const_out),
     .A6(in3),
     .A7(in2),
@@ -215,45 +215,45 @@ cus_mux81_buf_pack #(
 );
 
 // switch matrix multiplexer RES_reg_in MUX-1
-assign RES_reg_in = data_out;
+assign RES_RES_reg_in = data_out;
 // switch matrix multiplexer N_reg_in MUX-2
 cus_mux21_pack #(
     .WIDTH(6'd32)
 ) inst_cus_mux21_pack_N_reg_in (
-    .A0(N_reg_out),
+    .A0(N_N_reg_out),
     .A1(in0),
     .S(ConfigBits[24]),
-    .X(N_reg_in)
+    .X(N_N_reg_in)
 );
 
 // switch matrix multiplexer E_reg_in MUX-2
 cus_mux21_pack #(
     .WIDTH(6'd32)
 ) inst_cus_mux21_pack_E_reg_in (
-    .A0(E_reg_out),
+    .A0(E_E_reg_out),
     .A1(in1),
     .S(ConfigBits[25]),
-    .X(E_reg_in)
+    .X(E_E_reg_in)
 );
 
 // switch matrix multiplexer S_reg_in MUX-2
 cus_mux21_pack #(
     .WIDTH(6'd32)
 ) inst_cus_mux21_pack_S_reg_in (
-    .A0(S_reg_out),
+    .A0(S_S_reg_out),
     .A1(in2),
     .S(ConfigBits[26]),
-    .X(S_reg_in)
+    .X(S_S_reg_in)
 );
 
 // switch matrix multiplexer W_reg_in MUX-2
 cus_mux21_pack #(
     .WIDTH(6'd32)
 ) inst_cus_mux21_pack_W_reg_in (
-    .A0(W_reg_out),
+    .A0(W_W_reg_out),
     .A1(in3),
     .S(ConfigBits[27]),
-    .X(W_reg_in)
+    .X(W_W_reg_in)
 );
 
 endmodule

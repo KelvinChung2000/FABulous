@@ -1,4 +1,4 @@
-#!fish
+#!/bin/fish
 # /home/kelvin/FABulous_fork/.venv/bin/python /home/kelvin/FABulous_fork/FABulous/fabric_cad/chip_database_generation.py
 # cd /home/kelvin/FABulous_fork/myProject/PnR
 # yosys -q ./test.v ./synth.ys -o test.json
@@ -17,7 +17,8 @@ function check_status
 end
 
 set source_futil /home/kelvin/FABulous_fork/myProject/PnR/mac-pipelined/mac-pipelined.futil 
-set source_hdl /home/kelvin/FABulous_fork/myProject/PnR/mac-pipelined/mac-pipelined.sv
+# set source_hdl /home/kelvin/FABulous_fork/myProject/PnR/mac-pipelined/mac-pipelined.sv
+set source_hdl /home/kelvin/FABulous_fork/benchmarks/userbench/loop_array/loop_array.sv
 set ir /home/kelvin/FABulous_fork/myProject/PnR/mac-pipelined/ir.log
 set my_FAB_ROOT /home/kelvin/FABulous_fork
 
@@ -25,13 +26,14 @@ cd /home/kelvin/calyx
 cargo build
 cd -
 
-calyx --dump-ir -p fsm-opt -p lower --synthesis --nested -b verilog -d papercut -d cell-share $source_futil -o $source_hdl > $ir
+set clayx_flag "-p fsm-opt -x simplify-with-control:without-register -x static-inline:offload-pause=false -p lower --nested -d papercut  -d cell-share"
+
+calyx --dump-ir $clayx_flag $source_futil -o $source_hdl > $ir
 check_status
 cd ../..
-FABulous --debug myProject -p "load_fabric; gen_FABulous_CAD_tool_files;"
-        # synthesis_script $source_hdl -tcl $my_FAB_ROOT/myProject/.FABulous/arch_synth.tcl;"
-# FABulous --debug myProject -p "load_fabric; gen_fabric; gen_FABulous_CAD_tool_files; \
-#          synthesis_script $source_hdl -tcl $my_FAB_ROOT/myProject/.FABulous/arch_synth.tcl;"
+# FABulous --debug myProject -p "load_fabric; gen_FABulous_CAD_tool_files"
+FABulous --debug myProject -p "load_fabric; gen_FABulous_CAD_tool_files; \
+         synthesis_script $source_hdl -tcl $my_FAB_ROOT/myProject/.FABulous/arch_synth.tcl;"
 check_status
 cd -
 # # # FABulous --debug ../../myProject -p "load_fabric; gen_FABulous_CAD_tool_files;"

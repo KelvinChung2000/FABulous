@@ -1,44 +1,74 @@
-from dataclasses import dataclass, field
-from typing import Any, Generator, Iterator
+from typing import Any, Iterable
 
 from FABulous.fabric_definition.define import IO, FeatureType, Side
 
 
-@dataclass(frozen=True, eq=True)
 class Port:
-    name: str
-    ioDirection: IO
-    width: int
-    isBus: bool
+    _name: str
+    _ioDirection: IO
+    _width: int
+    _isBus: bool
 
-    def __post_init__(self) -> None:
+    __slots__ = ("_name", "_ioDirection", "_width", "_isBus")
+
+    def __init__(
+        self, name: str, ioDirection: IO, width: int, isBus: bool = False
+    ) -> None:
+        self._name = name
+        self._ioDirection = ioDirection
+        self._width = width
+        self._isBus = isBus
+
         if self.width <= 0:
             raise ValueError(f"Width must be greater than 0, got {self.width}")
         if not isinstance(self.isBus, bool):
             raise TypeError(f"isBus must be a boolean, got {type(self.isBus)}")
         if not isinstance(self.ioDirection, IO):
-            raise TypeError(f"ioDirection must be an instance of IO, got {type(self.ioDirection)}")
-        if not isinstance(self.name, str):
-            raise TypeError(f"Name must be a string, got {type(self.name)}")
+            raise TypeError(
+                f"ioDirection must be an instance of IO, got {type(self.ioDirection)}"
+            )
+        if not isinstance(self._name, str):
+            raise TypeError(f"name must be a string, got {type(self._name)}")
 
     def __repr__(self) -> str:
-        return f"Port({self.ioDirection.value} {self.name}[{self.width-1}:0])"
-    
-    def expand(self) -> Iterator[str]:
+        return f"Port({self.ioDirection.value} {self.name}[{self.width - 1}:0])"
+
+    @property
+    def name(self):
+        return self._name
+
+    @property
+    def ioDirection(self):
+        return self._ioDirection
+
+    @property
+    def width(self):
+        return self._width
+
+    @property
+    def isBus(self):
+        return self._isBus
+
+    def expand(self) -> list[str]:
         """Expand the port name into a generator of strings based on the width.
 
         Yields:
             Iterator[str]: A generator that yields the expanded port names.
         """
         if self.width == 1:
-            yield f"{self.name}"
+            return [f"{self.name}"]
         else:
-            for i in range(self.width):
-                yield f"{self.name}[{i}]"
-        
+            return [f"{self.name}[{i}]" for i in range(self.width)]
+
+    def __eq__(self, __o: Any) -> bool:
+        if __o is None or not isinstance(__o, Port):
+            return False
+        return self is __o
+
+    def __hash__(self) -> int:
+        return id(self)
 
 
-@dataclass(frozen=True, eq=True)
 class TilePort(Port):
     """TilePort is a subclass of Port that represents a port on a tile with a specific
     side and terminal status. It is an immutable and comparable dataclass. When sorting
@@ -68,15 +98,47 @@ class TilePort(Port):
             Compares if the current TilePort instance is greater than or equal to another TilePort instance.
     """
 
-    sideOfTile: Side
-    terminal: bool = False
-    tileType: str = ""
+    _sideOfTile: Side
+    _terminal: bool
+    _tileType: str
+
+    __slots__ = ("_sideOfTile", "_terminal", "_tileType")
+
+    def __init__(
+        self,
+        name: str,
+        ioDirection: IO,
+        width: int,
+        sideOfTile: Side,
+        isBus: bool = False,
+        terminal: bool = False,
+        tileType: str = "",
+    ) -> None:
+        super().__init__(name, ioDirection, width, isBus)
+        self._sideOfTile = sideOfTile
+        self._terminal = terminal
+        self._tileType = tileType
 
     __order = {Side.NORTH: 0, Side.EAST: 1, Side.SOUTH: 2, Side.WEST: 3, Side.ANY: 4}
     __io = {IO.OUTPUT: 0, IO.INPUT: 1, IO.INOUT: 2}
 
+    @property
+    def sideOfTile(self) -> Side:
+        return self._sideOfTile
+
+    @property
+    def terminal(self) -> bool:
+        return self._terminal
+
+    @property
+    def tileType(self) -> str:
+        return self._tileType
+
     def __repr__(self) -> str:
-        return f"TilePort({{{self.sideOfTile}}} {self.ioDirection.value} {self.name}[{self.width-1}:0])"
+        return f"TilePort({{{self.sideOfTile}}} {self.ioDirection.value} {self.name}[{self.width - 1}:0])"
+
+    def __hash__(self) -> int:
+        return super().__hash__()
 
     def __lt__(self, __o: Any) -> bool:
         if not isinstance(__o, TilePort):
@@ -111,46 +173,149 @@ class TilePort(Port):
         )
 
 
-@dataclass(frozen=True, eq=True)
 class SlicedPort(Port):
-    sliceRange: tuple[int, int]
-    originalPort: Port
+    _sliceRange: tuple[int, int]
+    _originalPort: Port
+
+    __slots__ = ("_sliceRange", "_originalPort")
+
+    def __init__(
+        self,
+        name: str,
+        ioDirection: IO,
+        width: int,
+        originalPort: Port,
+        isBus: bool = False,
+        sliceRange: tuple[int, int] = (-1, -1),
+    ) -> None:
+        super().__init__(name, ioDirection, width, isBus)
+        self._originalPort = originalPort
+        self._sliceRange = sliceRange
+
+    @property
+    def originalPort(self) -> Port:
+        return self._originalPort
+
+    @property
+    def sliceRange(self) -> tuple[int, int]:
+        return self._sliceRange
+
+    def __hash__(self) -> int:
+        return super().__hash__()
 
 
-@dataclass(frozen=True, eq=True)
 class BelPort(Port):
-    prefix: str
-    external: bool
-    control: bool
+    _prefix: str
+    _external: bool
+    _control: bool
+
+    __slots__ = ("_prefix", "_external", "_control")
+
+    def __init__(
+        self,
+        name: str,
+        ioDirection: IO,
+        width: int,
+        isBus: bool = False,
+        prefix: str = "",
+        external: bool = False,
+        control: bool = False,
+    ) -> None:
+        super().__init__(name, ioDirection, width, isBus)
+        self._prefix = prefix
+        self._external = external
+        self._control = control
+
+    @property
+    def prefix(self) -> str:
+        return self._prefix
+
+    @property
+    def external(self) -> bool:
+        return self._external
+
+    @property
+    def control(self) -> bool:
+        return self._control
 
     def __repr__(self) -> str:
-        return f"BelPort({self.ioDirection.value} {self.prefix}{self.name}[{self.width-1}:0])"
-    
-    def expand(self) -> Iterator[str]:
+        return f"BelPort({self.ioDirection.value} {self.prefix}{self.name}[{self.width - 1}:0])"
+
+    @property
+    def name(self):
+        return f"{self.prefix}{self._name}"
+
+    def expand(self) -> list[str]:
         """Expand the port name into a generator of strings based on the width.
 
         Yields:
             Iterator[str]: A generator that yields the expanded port names.
         """
         if self.width == 1:
-            yield f"{self.prefix}{self.name}"
+            return [f"{self.name}"]
         else:
-            for i in range(self.width):
-                yield f"{self.prefix}{self.name}[{i}]"
+            return [f"{self.name}[{i}]" for i in range(self.width)]
+
+    def __hash__(self) -> int:
+        return super().__hash__()
 
 
-@dataclass(frozen=True, eq=True)
 class ConfigPort(Port):
-    features: list[tuple[str, int]] = field(default_factory=list)
-    featureType: FeatureType = FeatureType.INIT
+    _features: list[tuple[str, int]]
+    _featureType: FeatureType
+
+    __slots__ = ("_features", "_featureType")
+
+    def __init__(
+        self,
+        name: str,
+        ioDirection: IO,
+        width: int,
+        isBus: bool = False,
+        features: list[tuple[str, int]] = [],
+        featureType: FeatureType = FeatureType.INIT,
+    ) -> None:
+        super().__init__(name, ioDirection, width, isBus)
+        self._features = features
+        self._featureType = featureType
+
+    @property
+    def features(self) -> Iterable[tuple[str, int]]:
+        return self._features
+
+    @property
+    def featureType(self) -> FeatureType:
+        return self._featureType
 
     def __repr__(self) -> str:
-        return f"ConfigPort({self.ioDirection.value} {self.name}[{self.width-1}:0])"
+        return f"ConfigPort({self.ioDirection.value} {self.name}[{self.width - 1}:0])"
+
+    def __hash__(self) -> int:
+        return super().__hash__()
 
 
-@dataclass(frozen=True, eq=True)
 class SharedPort(Port):
-    sharedWith: str = ""
+    _sharedWith: str
+
+    __slots__ = ("_sharedWith",)
+
+    def __init__(
+        self,
+        name: str,
+        ioDirection: IO,
+        width: int,
+        isBus: bool = False,
+        sharedWith: str = "",
+    ) -> None:
+        super().__init__(name, ioDirection, width, isBus)
+        self._sharedWith = sharedWith
+
+    @property
+    def sharedWith(self) -> str:
+        return self._sharedWith
+
+    def __hash__(self) -> int:
+        return super().__hash__()
 
 
 GenericPort = Port | TilePort | SlicedPort | BelPort | ConfigPort | SharedPort

@@ -12,7 +12,7 @@ PORTS: [
     
   ]
 WIRES: [
-  {source_name: out2, X-offset:  0, Y-offset: 1, destination_name: in0},
+  {source_name: out2, X-offset:  0, Y-offset: -1, destination_name: in0},
 ]
 BELS: [
     {BEL: ../include/IO.v, prefix: "N_"},

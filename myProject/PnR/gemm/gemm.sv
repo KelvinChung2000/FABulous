@@ -1309,7 +1309,7 @@ module std_reg #(
    (* write_together=1, interval=1, go=1 *) input wire logic write_en,
    (* clk=1 *) input wire logic clk,
    (* reset=1 *) input wire logic reset,
-   (* stable=1 *) output wire logic [WIDTH-1:0] out,
+   (* stable=1, data=1 *) output wire logic [WIDTH-1:0] out,
    (* done=1 *) output wire logic done
 );
 always_ff @(posedge clk) begin
@@ -1415,10 +1415,17 @@ logic gemm_instance_arg_mem_2_write_en;
 logic [31:0] gemm_instance_arg_mem_2_write_data;
 logic [9:0] gemm_instance_arg_mem_1_addr0;
 logic gemm_instance_arg_mem_1_content_en;
+<<<<<<< Updated upstream
 logic invoke0_go_in;
 logic invoke0_go_out;
 logic invoke0_done_in;
 logic invoke0_done_out;
+=======
+logic fsm_start_in;
+logic fsm_start_out;
+logic fsm_done_in;
+logic fsm_done_out;
+>>>>>>> Stashed changes
 (* external=1, data=1 *)
 seq_mem_d1 # (
     .IDX_SIZE(10),
@@ -1434,7 +1441,10 @@ seq_mem_d1 # (
     .write_data(mem_3_write_data),
     .write_en(mem_3_write_en)
 );
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
 (* external=1, data=1 *)
 seq_mem_d1 # (
     .IDX_SIZE(10),
@@ -1450,7 +1460,10 @@ seq_mem_d1 # (
     .write_data(mem_2_write_data),
     .write_en(mem_2_write_en)
 );
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
 (* external=1, data=1 *)
 seq_mem_d1 # (
     .IDX_SIZE(10),
@@ -1466,7 +1479,10 @@ seq_mem_d1 # (
     .write_data(mem_1_write_data),
     .write_en(mem_1_write_en)
 );
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
 (* external=1, data=1 *)
 seq_mem_d1 # (
     .IDX_SIZE(10),
@@ -1482,7 +1498,10 @@ seq_mem_d1 # (
     .write_data(mem_0_write_data),
     .write_en(mem_0_write_en)
 );
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
 (* data=1 *)
 gemm gemm_instance (
     .arg_mem_0_addr0(gemm_instance_arg_mem_0_addr0),
@@ -1516,7 +1535,10 @@ gemm gemm_instance (
     .in1(gemm_instance_in1),
     .reset(gemm_instance_reset)
 );
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
 (* generated=1 *)
 std_wire # (
     .WIDTH(1)
@@ -1524,7 +1546,10 @@ std_wire # (
     .in(invoke0_go_in),
     .out(invoke0_go_out)
 );
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
 (* generated=1 *)
 std_wire # (
     .WIDTH(1)
@@ -1533,7 +1558,15 @@ std_wire # (
     .out(invoke0_done_out)
 );
 
+<<<<<<< Updated upstream
 assign done = invoke0_done_out;
+=======
+assign mem_3_write_data = gemm_instance_arg_mem_3_write_data;
+assign mem_1_addr0 = gemm_instance_arg_mem_1_addr0;
+assign mem_0_addr0 = gemm_instance_arg_mem_0_addr0;
+assign mem_3_addr0 = gemm_instance_arg_mem_3_addr0;
+assign done = fsm_done_out;
+>>>>>>> Stashed changes
 assign mem_2_write_en = 1'd0;
 assign mem_2_clk = clk;
 assign mem_2_content_en = 1'd0;
@@ -4313,7 +4346,10 @@ std_slice # (
     .in(std_slice_3_in),
     .out(std_slice_3_out)
 );
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
 (* data=1 *)
 std_slice # (
     .IN_WIDTH(32),
@@ -4322,7 +4358,10 @@ std_slice # (
     .in(std_slice_2_in),
     .out(std_slice_2_out)
 );
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
 (* data=1 *)
 std_slice # (
     .IN_WIDTH(32),
@@ -4331,7 +4370,10 @@ std_slice # (
     .in(std_slice_1_in),
     .out(std_slice_1_out)
 );
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
 (* data=1 *)
 std_slice # (
     .IN_WIDTH(32),
@@ -4340,7 +4382,10 @@ std_slice # (
     .in(std_slice_0_in),
     .out(std_slice_0_out)
 );
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
 (* data=1 *)
 std_add # (
     .WIDTH(32)
@@ -4349,6 +4394,7 @@ std_add # (
     .out(std_add_6_out),
     .right(std_add_6_right)
 );
+<<<<<<< Updated upstream
 
 (* data=1 *)
 std_add # (
@@ -4377,6 +4423,8 @@ std_add # (
     .right(std_add_3_right)
 );
 
+=======
+>>>>>>> Stashed changes
 (* data=1 *)
 std_reg # (
     .WIDTH(32)
@@ -4388,7 +4436,10 @@ std_reg # (
     .reset(load_0_reg_reset),
     .write_en(load_0_reg_write_en)
 );
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
 (* data=1 *)
 std_reg # (
     .WIDTH(32)
@@ -4400,7 +4451,10 @@ std_reg # (
     .reset(muli_3_reg_reset),
     .write_en(muli_3_reg_write_en)
 );
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
 (* data=1 *)
 std_mult_pipe # (
     .WIDTH(32)
@@ -4413,7 +4467,10 @@ std_mult_pipe # (
     .reset(std_mult_pipe_3_reset),
     .right(std_mult_pipe_3_right)
 );
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
 (* data=1 *)
 std_add # (
     .WIDTH(32)
@@ -4422,7 +4479,10 @@ std_add # (
     .out(std_add_2_out),
     .right(std_add_2_right)
 );
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
 (* data=1 *)
 std_reg # (
     .WIDTH(32)
@@ -4434,7 +4494,10 @@ std_reg # (
     .reset(muli_2_reg_reset),
     .write_en(muli_2_reg_write_en)
 );
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
 (* data=1 *)
 std_mult_pipe # (
     .WIDTH(32)
@@ -4447,7 +4510,10 @@ std_mult_pipe # (
     .reset(std_mult_pipe_2_reset),
     .right(std_mult_pipe_2_right)
 );
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
 (* data=1 *)
 std_reg # (
     .WIDTH(32)
@@ -4459,7 +4525,10 @@ std_reg # (
     .reset(muli_1_reg_reset),
     .write_en(muli_1_reg_write_en)
 );
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
 (* data=1 *)
 std_mult_pipe # (
     .WIDTH(32)
@@ -4472,7 +4541,42 @@ std_mult_pipe # (
     .reset(std_mult_pipe_1_reset),
     .right(std_mult_pipe_1_right)
 );
+<<<<<<< Updated upstream
 
+=======
+(* data=1 *)
+std_add # (
+    .WIDTH(32)
+) std_add_4 (
+    .left(std_add_4_left),
+    .out(std_add_4_out),
+    .right(std_add_4_right)
+);
+(* data=1 *)
+std_add # (
+    .WIDTH(32)
+) std_add_3 (
+    .left(std_add_3_left),
+    .out(std_add_3_out),
+    .right(std_add_3_right)
+);
+(* control=1 *)
+std_slt # (
+    .WIDTH(32)
+) std_slt_2 (
+    .left(std_slt_2_left),
+    .out(std_slt_2_out),
+    .right(std_slt_2_right)
+);
+(* data=1 *)
+std_add # (
+    .WIDTH(32)
+) std_add_2 (
+    .left(std_add_2_left),
+    .out(std_add_2_out),
+    .right(std_add_2_right)
+);
+>>>>>>> Stashed changes
 (* data=1 *)
 std_add # (
     .WIDTH(32)
@@ -4481,16 +4585,24 @@ std_add # (
     .out(std_add_1_out),
     .right(std_add_1_right)
 );
+<<<<<<< Updated upstream
 
 (* data=1 *)
 std_add # (
+=======
+(* control=1 *)
+std_slt # (
+>>>>>>> Stashed changes
     .WIDTH(32)
 ) std_add_0 (
     .left(std_add_0_left),
     .out(std_add_0_out),
     .right(std_add_0_right)
 );
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
 (* data=1 *)
 std_reg # (
     .WIDTH(32)
@@ -4502,7 +4614,10 @@ std_reg # (
     .reset(muli_0_reg_reset),
     .write_en(muli_0_reg_write_en)
 );
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
 (* data=1 *)
 std_mult_pipe # (
     .WIDTH(32)
@@ -4515,9 +4630,22 @@ std_mult_pipe # (
     .reset(std_mult_pipe_0_reset),
     .right(std_mult_pipe_0_right)
 );
+<<<<<<< Updated upstream
 
 (* data=1 *)
 std_reg # (
+=======
+(* data=1 *)
+std_add # (
+    .WIDTH(32)
+) std_add_0 (
+    .left(std_add_0_left),
+    .out(std_add_0_out),
+    .right(std_add_0_right)
+);
+(* control=1 *)
+std_slt # (
+>>>>>>> Stashed changes
     .WIDTH(32)
 ) for_2_induction_var_reg (
     .clk(for_2_induction_var_reg_clk),
@@ -4527,7 +4655,10 @@ std_reg # (
     .reset(for_2_induction_var_reg_reset),
     .write_en(for_2_induction_var_reg_write_en)
 );
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
 (* data=1 *)
 std_reg # (
     .WIDTH(32)
@@ -4539,7 +4670,10 @@ std_reg # (
     .reset(for_1_induction_var_reg_reset),
     .write_en(for_1_induction_var_reg_write_en)
 );
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
 (* data=1 *)
 std_reg # (
     .WIDTH(32)
@@ -4551,8 +4685,12 @@ std_reg # (
     .reset(for_0_induction_var_reg_reset),
     .write_en(for_0_induction_var_reg_write_en)
 );
+<<<<<<< Updated upstream
 
 (* generated=1 *)
+=======
+(* data=1 *)
+>>>>>>> Stashed changes
 std_reg # (
     .WIDTH(5)
 ) idx (
@@ -4563,8 +4701,12 @@ std_reg # (
     .reset(idx_reset),
     .write_en(idx_write_en)
 );
+<<<<<<< Updated upstream
 
 (* generated=1 *)
+=======
+(* data=1, generated=1 *)
+>>>>>>> Stashed changes
 std_reg # (
     .WIDTH(1)
 ) cond_reg (
@@ -4605,8 +4747,12 @@ std_reg # (
     .reset(idx0_reset),
     .write_en(idx0_write_en)
 );
+<<<<<<< Updated upstream
 
 (* generated=1 *)
+=======
+(* data=1, generated=1 *)
+>>>>>>> Stashed changes
 std_reg # (
     .WIDTH(1)
 ) cond_reg0 (
@@ -4617,6 +4763,7 @@ std_reg # (
     .reset(cond_reg0_reset),
     .write_en(cond_reg0_write_en)
 );
+<<<<<<< Updated upstream
 
 (* generated=1 *)
 std_add # (
@@ -4649,6 +4796,9 @@ std_reg # (
 );
 
 (* generated=1 *)
+=======
+(* data=1, generated=1 *)
+>>>>>>> Stashed changes
 std_reg # (
     .WIDTH(1)
 ) cond_reg1 (
@@ -4659,6 +4809,7 @@ std_reg # (
     .reset(cond_reg1_reset),
     .write_en(cond_reg1_write_en)
 );
+<<<<<<< Updated upstream
 
 (* generated=1 *)
 std_add # (
@@ -4678,6 +4829,8 @@ std_lt # (
     .right(lt1_right)
 );
 
+=======
+>>>>>>> Stashed changes
 (* generated=1 *)
 std_wire # (
     .WIDTH(1)
@@ -4685,7 +4838,10 @@ std_wire # (
     .in(fsm_start_in),
     .out(fsm_start_out)
 );
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
 (* generated=1 *)
 std_wire # (
     .WIDTH(1)
@@ -4825,25 +4981,44 @@ assign for_2_induction_var_reg_in =
        fsm_s1_out ? 32'd0 :
        fsm_s27_out ? std_add_6_out :
        'dx;
+<<<<<<< Updated upstream
 assign std_mult_pipe_0_right = 32'd30;
 assign std_mult_pipe_0_left = for_2_induction_var_reg_out;
 assign for_1_induction_var_reg_in =
+=======
+assign comb_reg_in = std_slt_0_out;
+assign std_mult_pipe_0_left = while_2_arg0_reg_out;
+assign while_1_arg0_reg_in =
+>>>>>>> Stashed changes
        fsm_s3_out ? 32'd0 :
        fsm_s25_out ? std_add_5_out :
        'dx;
+<<<<<<< Updated upstream
+=======
+assign std_mult_pipe_0_right = 32'd30;
+>>>>>>> Stashed changes
 assign muli_0_reg_in = std_mult_pipe_0_out;
 assign for_0_induction_var_reg_in =
        fsm_s8_out ? 32'd0 :
        fsm_s23_out ? std_add_4_out :
        'dx;
+<<<<<<< Updated upstream
 assign std_slice_3_in = std_add_1_out;
 assign arg_mem_0_addr0 = std_slice_3_out;
 assign std_add_1_left = muli_0_reg_out;
 assign std_add_1_right = for_0_induction_var_reg_out;
 assign std_mult_pipe_2_left = for_0_induction_var_reg_out;
+=======
+assign comb_reg1_in = std_slt_2_out;
+assign std_add_4_right = while_0_arg0_reg_out;
+assign arg_mem_0_addr0 = std_slice_3_out;
+assign std_add_4_left = muli_0_reg_out;
+assign std_slice_3_in = std_add_4_out;
+assign std_mult_pipe_2_left = while_0_arg0_reg_out;
+>>>>>>> Stashed changes
 assign std_mult_pipe_1_right = arg_mem_0_read_data;
-assign std_mult_pipe_1_left = in0;
 assign std_mult_pipe_2_right = 32'd30;
+<<<<<<< Updated upstream
 assign muli_2_reg_in = std_mult_pipe_2_out;
 assign muli_1_reg_in = std_mult_pipe_1_out;
 assign std_slice_2_in = std_add_2_out;
@@ -4855,10 +5030,23 @@ assign std_mult_pipe_3_right = arg_mem_1_read_data;
 assign muli_3_reg_in = std_mult_pipe_3_out;
 assign std_add_0_left = muli_0_reg_out;
 assign std_slice_1_in = std_add_0_out;
+=======
+assign std_mult_pipe_1_left = in0;
+assign muli_2_reg_in = std_mult_pipe_2_out;
+assign muli_1_reg_in = std_mult_pipe_1_out;
+assign std_add_5_left = muli_2_reg_out;
+assign std_add_5_right = while_1_arg0_reg_out;
+assign arg_mem_1_addr0 = std_slice_2_out;
+assign std_slice_2_in = std_add_5_out;
+assign std_mult_pipe_3_left = muli_1_reg_out;
+assign std_mult_pipe_3_right = arg_mem_1_read_data;
+assign muli_3_reg_in = std_mult_pipe_3_out;
+>>>>>>> Stashed changes
 assign arg_mem_3_addr0 =
        fsm_s20_out ? std_slice_1_out :
        fsm_s22_out ? std_slice_0_out :
        'dx;
+<<<<<<< Updated upstream
 assign std_add_0_right = for_1_induction_var_reg_out;
 assign load_0_reg_in = arg_mem_3_read_data;
 assign std_add_3_left = load_0_reg_out;
@@ -4873,6 +5061,22 @@ assign std_add_6_right = 32'd1;
 assign std_add_6_left = for_2_induction_var_reg_out;
 assign cond_reg1_clk = clk;
 assign cond_reg1_reset = reset;
+=======
+assign std_slice_1_in = std_add_2_out;
+assign std_add_2_right = while_1_arg0_reg_out;
+assign std_add_2_left = muli_0_reg_out;
+assign load_0_reg_in = arg_mem_3_read_data;
+assign std_slice_0_in = std_add_2_out;
+assign std_add_6_left = load_0_reg_out;
+assign std_add_6_right = muli_3_reg_out;
+assign arg_mem_3_write_data = std_add_6_out;
+assign std_add_3_right = 32'd1;
+assign std_add_3_left = while_0_arg0_reg_out;
+assign std_add_1_right = 32'd1;
+assign std_add_1_left = while_1_arg0_reg_out;
+assign std_add_0_left = while_2_arg0_reg_out;
+assign std_add_0_right = 32'd1;
+>>>>>>> Stashed changes
 assign done = fsm_done_out;
 assign arg_mem_1_write_data = 32'd0;
 assign arg_mem_2_addr0 = 10'd0;

@@ -1,5 +1,5 @@
 frame_name,frame_index,bits_used_in_frame,used_bits_mask,ConfigBits_ranges
-frame0,0,1,10000000,0:0
+frame0,0,4,11110000,3:0
 frame1,1,0,00000000,# NULL
 frame2,2,0,00000000,# NULL
 frame3,3,0,00000000,# NULL

@@ -1,39 +1,25 @@
-#RES_reg_unit:en
+#RES_reg_unit:RES_en
 
-#RES_reg_unit:reg_in
-ALU:data_out 32 reg_unit:reg_in 32 3 
+#RES_reg_unit:RES_reg_in
+ALU:data_out 32 reg_unit:RES_reg_in 32 3 
 
-#RES_reg_unit:rst
+#RES_reg_unit:RES_rst
 
-#N_reg_unit:en
+#N_reg_unit:N_en
 
-#N_reg_unit:rst
+#N_reg_unit:N_rst
 
-#E_reg_unit:en
+#E_reg_unit:E_en
 
-#E_reg_unit:rst
+#E_reg_unit:E_rst
 
-#S_reg_unit:en
+#S_reg_unit:S_en
 
-#S_reg_unit:rst
+#S_reg_unit:S_rst
 
-#W_reg_unit:en
+#W_reg_unit:W_en
 
-#W_reg_unit:rst
-
-#Mem:addr0
+#W_reg_unit:W_rst
 
 #Mem:reset
-
-#Mem:write_data
-
-#Mem:write_en
-
-#Mem:addr0
-
-#Mem:reset
-
-#Mem:write_data
-
-#Mem:write_en
 

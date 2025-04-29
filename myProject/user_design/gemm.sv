@@ -1611,7 +1611,6 @@ seq_mem_d1 # (
     .write_data(mem_3_write_data),
     .write_en(mem_3_write_en)
 );
-
 (* external=1, data=1 *)
 seq_mem_d1 # (
     .IDX_SIZE(10),
@@ -1627,7 +1626,6 @@ seq_mem_d1 # (
     .write_data(mem_2_write_data),
     .write_en(mem_2_write_en)
 );
-
 (* external=1, data=1 *)
 seq_mem_d1 # (
     .IDX_SIZE(10),
@@ -1643,7 +1641,6 @@ seq_mem_d1 # (
     .write_data(mem_1_write_data),
     .write_en(mem_1_write_en)
 );
-
 (* external=1, data=1 *)
 seq_mem_d1 # (
     .IDX_SIZE(10),
@@ -1659,8 +1656,7 @@ seq_mem_d1 # (
     .write_data(mem_0_write_data),
     .write_en(mem_0_write_en)
 );
-
-(* data=1, control=1 *)
+(* data=1 *)
 gemm gemm_instance (
     .arg_mem_0_addr0(gemm_instance_arg_mem_0_addr0),
     .arg_mem_0_content_en(gemm_instance_arg_mem_0_content_en),
@@ -1693,7 +1689,6 @@ gemm gemm_instance (
     .in1(gemm_instance_in1),
     .reset(gemm_instance_reset)
 );
-
 (* generated=1 *)
 std_wire # (
     .WIDTH(1)
@@ -1701,7 +1696,6 @@ std_wire # (
     .in(fsm_start_in),
     .out(fsm_start_out)
 );
-
 (* generated=1 *)
 std_wire # (
     .WIDTH(1)
@@ -1750,9 +1744,9 @@ fsm_main_def fsm (
   .gemm_instance_done(gemm_instance_done)
 );
 
+assign mem_3_write_data = gemm_instance_arg_mem_3_write_data;
 assign mem_1_addr0 = gemm_instance_arg_mem_1_addr0;
 assign mem_0_addr0 = gemm_instance_arg_mem_0_addr0;
-assign mem_3_write_data = gemm_instance_arg_mem_3_write_data;
 assign mem_3_addr0 = gemm_instance_arg_mem_3_addr0;
 assign done = fsm_done_out;
 assign mem_2_write_en = 1'd0;
@@ -3206,7 +3200,6 @@ std_slice # (
     .in(std_slice_3_in),
     .out(std_slice_3_out)
 );
-
 (* data=1 *)
 std_slice # (
     .IN_WIDTH(32),
@@ -3215,7 +3208,6 @@ std_slice # (
     .in(std_slice_2_in),
     .out(std_slice_2_out)
 );
-
 (* data=1 *)
 std_slice # (
     .IN_WIDTH(32),
@@ -3224,7 +3216,6 @@ std_slice # (
     .in(std_slice_1_in),
     .out(std_slice_1_out)
 );
-
 (* data=1 *)
 std_slice # (
     .IN_WIDTH(32),
@@ -3233,7 +3224,6 @@ std_slice # (
     .in(std_slice_0_in),
     .out(std_slice_0_out)
 );
-
 (* data=1 *)
 std_add # (
     .WIDTH(32)
@@ -3242,7 +3232,6 @@ std_add # (
     .out(std_add_6_out),
     .right(std_add_6_right)
 );
-
 (* data=1 *)
 std_reg # (
     .WIDTH(32)
@@ -3254,7 +3243,6 @@ std_reg # (
     .reset(load_0_reg_reset),
     .write_en(load_0_reg_write_en)
 );
-
 (* data=1 *)
 std_reg # (
     .WIDTH(32)
@@ -3266,7 +3254,6 @@ std_reg # (
     .reset(muli_3_reg_reset),
     .write_en(muli_3_reg_write_en)
 );
-
 (* data=1 *)
 std_mult_pipe # (
     .WIDTH(32)
@@ -3279,7 +3266,6 @@ std_mult_pipe # (
     .reset(std_mult_pipe_3_reset),
     .right(std_mult_pipe_3_right)
 );
-
 (* data=1 *)
 std_add # (
     .WIDTH(32)
@@ -3288,7 +3274,6 @@ std_add # (
     .out(std_add_5_out),
     .right(std_add_5_right)
 );
-
 (* data=1 *)
 std_reg # (
     .WIDTH(32)
@@ -3300,7 +3285,6 @@ std_reg # (
     .reset(muli_2_reg_reset),
     .write_en(muli_2_reg_write_en)
 );
-
 (* data=1 *)
 std_mult_pipe # (
     .WIDTH(32)
@@ -3313,7 +3297,6 @@ std_mult_pipe # (
     .reset(std_mult_pipe_2_reset),
     .right(std_mult_pipe_2_right)
 );
-
 (* data=1 *)
 std_reg # (
     .WIDTH(32)
@@ -3325,7 +3308,6 @@ std_reg # (
     .reset(muli_1_reg_reset),
     .write_en(muli_1_reg_write_en)
 );
-
 (* data=1 *)
 std_mult_pipe # (
     .WIDTH(32)
@@ -3338,7 +3320,6 @@ std_mult_pipe # (
     .reset(std_mult_pipe_1_reset),
     .right(std_mult_pipe_1_right)
 );
-
 (* data=1 *)
 std_add # (
     .WIDTH(32)
@@ -3347,8 +3328,7 @@ std_add # (
     .out(std_add_4_out),
     .right(std_add_4_right)
 );
-
-(* data=1, control=1 *)
+(* data=1 *)
 std_add # (
     .WIDTH(32)
 ) std_add_3 (
@@ -3356,7 +3336,6 @@ std_add # (
     .out(std_add_3_out),
     .right(std_add_3_right)
 );
-
 (* control=1 *)
 std_slt # (
     .WIDTH(32)
@@ -3365,7 +3344,6 @@ std_slt # (
     .out(std_slt_2_out),
     .right(std_slt_2_right)
 );
-
 (* data=1 *)
 std_add # (
     .WIDTH(32)
@@ -3374,8 +3352,7 @@ std_add # (
     .out(std_add_2_out),
     .right(std_add_2_right)
 );
-
-(* data=1, control=1 *)
+(* data=1 *)
 std_add # (
     .WIDTH(32)
 ) std_add_1 (
@@ -3383,7 +3360,6 @@ std_add # (
     .out(std_add_1_out),
     .right(std_add_1_right)
 );
-
 (* control=1 *)
 std_slt # (
     .WIDTH(32)
@@ -3392,7 +3368,6 @@ std_slt # (
     .out(std_slt_1_out),
     .right(std_slt_1_right)
 );
-
 (* data=1 *)
 std_reg # (
     .WIDTH(32)
@@ -3404,7 +3379,6 @@ std_reg # (
     .reset(muli_0_reg_reset),
     .write_en(muli_0_reg_write_en)
 );
-
 (* data=1 *)
 std_mult_pipe # (
     .WIDTH(32)
@@ -3417,8 +3391,7 @@ std_mult_pipe # (
     .reset(std_mult_pipe_0_reset),
     .right(std_mult_pipe_0_right)
 );
-
-(* data=1, control=1 *)
+(* data=1 *)
 std_add # (
     .WIDTH(32)
 ) std_add_0 (
@@ -3426,7 +3399,6 @@ std_add # (
     .out(std_add_0_out),
     .right(std_add_0_right)
 );
-
 (* control=1 *)
 std_slt # (
     .WIDTH(32)
@@ -3435,7 +3407,6 @@ std_slt # (
     .out(std_slt_0_out),
     .right(std_slt_0_right)
 );
-
 (* data=1 *)
 std_reg # (
     .WIDTH(32)
@@ -3447,7 +3418,6 @@ std_reg # (
     .reset(while_2_arg0_reg_reset),
     .write_en(while_2_arg0_reg_write_en)
 );
-
 (* data=1 *)
 std_reg # (
     .WIDTH(32)
@@ -3459,7 +3429,6 @@ std_reg # (
     .reset(while_1_arg0_reg_reset),
     .write_en(while_1_arg0_reg_write_en)
 );
-
 (* data=1 *)
 std_reg # (
     .WIDTH(32)
@@ -3471,8 +3440,7 @@ std_reg # (
     .reset(while_0_arg0_reg_reset),
     .write_en(while_0_arg0_reg_write_en)
 );
-
-(* control=1, generated=1 *)
+(* data=1, generated=1 *)
 std_reg # (
     .WIDTH(1)
 ) comb_reg (
@@ -3483,8 +3451,7 @@ std_reg # (
     .reset(comb_reg_reset),
     .write_en(comb_reg_write_en)
 );
-
-(* control=1, generated=1 *)
+(* data=1, generated=1 *)
 std_reg # (
     .WIDTH(1)
 ) comb_reg0 (
@@ -3495,8 +3462,7 @@ std_reg # (
     .reset(comb_reg0_reset),
     .write_en(comb_reg0_write_en)
 );
-
-(* control=1, generated=1 *)
+(* data=1, generated=1 *)
 std_reg # (
     .WIDTH(1)
 ) comb_reg1 (
@@ -3507,7 +3473,6 @@ std_reg # (
     .reset(comb_reg1_reset),
     .write_en(comb_reg1_write_en)
 );
-
 (* generated=1 *)
 std_wire # (
     .WIDTH(1)
@@ -3515,7 +3480,6 @@ std_wire # (
     .in(fsm_start_in),
     .out(fsm_start_out)
 );
-
 (* generated=1 *)
 std_wire # (
     .WIDTH(1)
@@ -3523,7 +3487,7 @@ std_wire # (
     .in(fsm_done_in),
     .out(fsm_done_out)
 );
-
+(* control *)
 fsm_gemm_def fsm (
   .clk(clk),
   .reset(reset),
@@ -3583,11 +3547,12 @@ assign while_2_arg0_reg_in =
        fsm_s1_out ? 32'd0 :
        fsm_s27_out ? std_add_0_out :
        'dx;
+assign comb_reg_in = std_slt_0_out;
+assign std_mult_pipe_0_left = while_2_arg0_reg_out;
 assign while_1_arg0_reg_in =
        fsm_s3_out ? 32'd0 :
        fsm_s25_out ? std_add_1_out :
        'dx;
-assign std_mult_pipe_0_left = while_2_arg0_reg_out;
 assign std_mult_pipe_0_right = 32'd30;
 assign muli_0_reg_in = std_mult_pipe_0_out;
 assign while_0_arg0_reg_in =
@@ -3595,19 +3560,19 @@ assign while_0_arg0_reg_in =
        fsm_s23_out ? std_add_3_out :
        'dx;
 assign std_add_4_right = while_0_arg0_reg_out;
-assign std_add_4_left = muli_0_reg_out;
 assign arg_mem_0_addr0 = std_slice_3_out;
+assign std_add_4_left = muli_0_reg_out;
 assign std_slice_3_in = std_add_4_out;
-assign std_mult_pipe_2_right = 32'd30;
 assign std_mult_pipe_2_left = while_0_arg0_reg_out;
-assign std_mult_pipe_1_left = in0;
 assign std_mult_pipe_1_right = arg_mem_0_read_data;
+assign std_mult_pipe_2_right = 32'd30;
+assign std_mult_pipe_1_left = in0;
 assign muli_2_reg_in = std_mult_pipe_2_out;
 assign muli_1_reg_in = std_mult_pipe_1_out;
-assign std_add_5_right = while_1_arg0_reg_out;
-assign std_slice_2_in = std_add_5_out;
-assign arg_mem_1_addr0 = std_slice_2_out;
 assign std_add_5_left = muli_2_reg_out;
+assign std_add_5_right = while_1_arg0_reg_out;
+assign arg_mem_1_addr0 = std_slice_2_out;
+assign std_slice_2_in = std_add_5_out;
 assign std_mult_pipe_3_left = muli_1_reg_out;
 assign std_mult_pipe_3_right = arg_mem_1_read_data;
 assign muli_3_reg_in = std_mult_pipe_3_out;
@@ -3615,18 +3580,18 @@ assign arg_mem_3_addr0 =
        fsm_s20_out ? std_slice_1_out :
        fsm_s22_out ? std_slice_0_out :
        'dx;
-assign std_add_2_left = muli_0_reg_out;
 assign std_slice_1_in = std_add_2_out;
 assign std_add_2_right = while_1_arg0_reg_out;
+assign std_add_2_left = muli_0_reg_out;
 assign load_0_reg_in = arg_mem_3_read_data;
 assign std_slice_0_in = std_add_2_out;
 assign std_add_6_left = load_0_reg_out;
-assign arg_mem_3_write_data = std_add_6_out;
 assign std_add_6_right = muli_3_reg_out;
+assign arg_mem_3_write_data = std_add_6_out;
 assign std_add_3_right = 32'd1;
 assign std_add_3_left = while_0_arg0_reg_out;
-assign std_add_1_left = while_1_arg0_reg_out;
 assign std_add_1_right = 32'd1;
+assign std_add_1_left = while_1_arg0_reg_out;
 assign std_add_0_left = while_2_arg0_reg_out;
 assign std_add_0_right = 32'd1;
 assign done = fsm_done_out;

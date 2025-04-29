@@ -193,7 +193,9 @@ class Tile:
 
     def getTileOutputPorts(self, subTile: str = "") -> list[TilePort]:
         if subTile:
-            return sorted([p for p in self.ports[subTile] if p.ioDirection == IO.OUTPUT])
+            return sorted(
+                [p for p in self.ports[subTile] if p.ioDirection == IO.OUTPUT]
+            )
         else:
             return sorted(
                 [
@@ -258,13 +260,18 @@ class Tile:
                 f"The given port {port} does not exist in tile {self.name}"
             )
 
-    def findPortByName(self, portName: str) -> TilePort:
+    def findPortByName(self, portName: str) -> TilePort | BelPort:
         for portList in self.ports.values():
             for i in portList:
                 if i.name == portName:
                     return i
-        else:
-            raise ValueError(f"The port {portName} does not exist in tile {self.name}")
+
+        for bel in self.bels:
+            for i in bel.inputs + bel.outputs:
+                if i.name == portName:
+                    return i
+
+        raise ValueError(f"The port {portName} does not exist in tile {self.name}")
 
     def addWireType(self, subTileName: str, wireType: WireType) -> None:
         if wireType not in self.wireTypes[subTileName]:
@@ -275,7 +282,7 @@ class Tile:
         for i in self.bels:
             if i.name not in belSet:
                 belSet.add(i.name)
-                yield i
+        return list(belSet)
 
     def getBelByBelPort(self, belPort: BelPort) -> Bel:
         for i in self.bels:
@@ -304,9 +311,13 @@ class Tile:
             list[str]: A list of subtiles.
         """
         return [name for row in self.tileMap for name in row if name is not None]
-    
+
     def getSubTileOffset(self, subTile: str) -> Loc:
-        for y, row in enumerate(self.tileMap):
+        for y, row in enumerate(reversed(self.tileMap)):
             for x, name in enumerate(row):
                 if name == subTile:
                     return (x, y)
+        else:
+            raise ValueError(
+                f"The given subTile {subTile} does not exist in tile {self.name}"
+            )

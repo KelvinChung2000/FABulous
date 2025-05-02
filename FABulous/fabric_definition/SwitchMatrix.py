@@ -1,10 +1,11 @@
-from collections import defaultdict, namedtuple
+from collections import namedtuple
 from dataclasses import dataclass, field
 from itertools import zip_longest
-from typing import Any, Iterable, Self
+from typing import Any, Iterable
 
 from FABulous.fabric_definition.define import IO
-from FABulous.fabric_definition.Port import GenericPort, TilePort
+from FABulous.fabric_definition.Port import GenericPort, SlicedPort, TilePort
+import inspect
 
 SliceRange = namedtuple("SliceRange", ["start", "end"])
 
@@ -19,65 +20,57 @@ class SlicedSignal:
 class MuxPort:
     port: GenericPort
     inputs: list["MuxPort"] = field(default_factory=list)
-    isTilePort: bool = False
-    isBelPort: bool = False
-    isSliced: bool = False
-    isBus: bool = False
-    isCreated: bool = False
-    width: int = 1
-    sliceRange: SliceRange = SliceRange(-1, -1)
-    slicingAssignDict: dict[SliceRange, list[SlicedSignal]] = field(
-        default_factory=lambda: defaultdict(list)
-    )
 
     def __getitem__(self, key: slice | int):
         if isinstance(key, slice):
-            if self.isBus:
-                raise ValueError("Cannot slice a bus")
+            if self.port.isBus:
+                raise ValueError(f"{self.port} is a bus, cannot slice")
             if key.step is not None:
                 raise ValueError("Cannot slice with step")
-            if abs(key.start - key.stop) > self.width:
+            if key.start is None:
+                raise ValueError(
+                    "You must specify a start index. If you are trying to do sig[0:4] you should write sig[4:0]"
+                )
+            if key.start < key.stop:
+                raise ValueError(
+                    "Start index must be less than stop index, the slicing is following the Verilog convention"
+                )
+            if abs(key.start - key.stop) > self.port.width:
                 raise ValueError("Slice width is greater than bit width")
-            self.isSliced = True
-            self.sliceRange = SliceRange(key.start, key.stop)
-            return self
+            return MuxPort(SlicedPort(self.port, (key.start, key.stop)), self.inputs)
         elif isinstance(key, int):
-            if self.isBus:
-                raise ValueError("Cannot slice a bus")
-            if key >= self.width:
+            if self.port.isBus:
+                raise ValueError(f"{self.port} is a bus, cannot slice")
+            if key >= self.port.width:
                 raise ValueError("Index out of range")
-            self.isSliced = True
-            self.sliceRange = SliceRange(key, key)
-            return self
+            return MuxPort(SlicedPort(self.port, (key, key)), self.inputs)
         else:
             raise ValueError("Invalid slicing for MuxPort")
 
-    def __setitem__(self, key: slice | int, value: Self):
-        pass
-        # raise ValueError("Cannot perform set item, use the //= operator")
+    def __setitem__(self, *_):
+        raise ValueError("Cannot perform set item, use the //= operator")
 
     def __ifloordiv__(self, other: Any):
-        if self.isSliced:
-            if isinstance(other, list):
-                for i in other:
-                    self.slicingAssignDict[self.sliceRange].append(
-                        SlicedSignal(port=i.port, sliceRange=i.sliceRange)
-                    )
-            else:
-                self.slicingAssignDict[self.sliceRange].append(
-                    SlicedSignal(port=other.port, sliceRange=other.sliceRange)
-                )
-            return self
+        if isinstance(other, list):
+            for i in other:
+                if not isinstance(i, MuxPort):
+                    raise ValueError("Invalid type for MuxPort")
+                if i.port.width != self.port.width:
+                    raise ValueError("All inputs must have the same width")
+                self.inputs.append(i)
         else:
-            if isinstance(other, MuxPort):
-                self.inputs.append(other)
-            elif isinstance(other, list):
-                for i in other:
-                    self.inputs.append(i)
-            else:
+            if not isinstance(other, MuxPort):
                 raise ValueError("Invalid type for MuxPort")
+            if other.port.width != self.port.width:
+                raise ValueError(
+                    (
+                        "All inputs must have the same width."
+                        f"target width is {self.port.width} but the input width is {other.port.width}"
+                    )
+                )
+            self.inputs.append(other)
 
-            return self
+        return self
 
     # def __repr__(self) -> str:
     #     if self.isSliced:

@@ -75,6 +75,16 @@ class Fabric:
     superTileDict: dict[str, SuperTile] = field(default_factory=dict)
     wireDict: dict[Loc, list[Wire]] = field(default_factory=dict)
 
+    def __post_init__(self):
+        for t in self.tileDict.values():
+            if (
+                t.configBits * self.contextCount
+                > self.frameBitsPerRow * self.maxFramesPerCol
+            ):
+                raise ValueError(
+                    f"Tile {t.name} has too many config bits: {t.configBits} > {self.frameBitsPerRow * self.maxFramesPerCol}"
+                )
+
     def __getitem__(self, index: Any) -> Tile | SuperTile | None:
         if isinstance(index, tuple):
             if t := self.tiles[index[1]][index[0]]:

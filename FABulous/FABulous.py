@@ -52,6 +52,9 @@ def main():
 
     parser.add_argument("project_dir", help="The directory to the project folder")
 
+    # Create a mutually exclusive group for script/command execution options
+    script_group = parser.add_mutually_exclusive_group()
+
     parser.add_argument(
         "-c",
         "--createProject",
@@ -60,7 +63,7 @@ def main():
         help="Create a new project",
     )
 
-    parser.add_argument(
+    script_group.add_argument(
         "-fs",
         "--FABulousScript",
         default="",
@@ -68,13 +71,20 @@ def main():
         "This will automatically exit the CLI once the command finish execution, and the exit will always happen gracefully.",
         type=Path,
     )
-    parser.add_argument(
+
+    script_group.add_argument(
         "-ts",
         "--TCLScript",
         default="",
         help="Run FABulous with a TCL script. A TCL script is a text file containing a mix of TCL commands and FABulous commands."
         "This will automatically exit the CLI once the command finish execution, and the exit will always happen gracefully.",
         type=Path,
+    )
+
+    script_group.add_argument(
+        "-p",
+        "--commands",
+        help="execute <commands> (to chain commands, separate them with semicolon + whitespace: 'cmd1; cmd2')",
     )
 
     parser.add_argument(
@@ -126,12 +136,6 @@ def main():
 
     parser.add_argument("--debug", action="store_true", help="Enable debug mode")
 
-    parser.add_argument(
-        "-p",
-        "--commands",
-        help="execute <commands> (to chain commands, separate them with semicolon + whitespace: 'cmd1; cmd2')",
-    )
-
     args = parser.parse_args()
 
     setup_logger(args.verbose)
@@ -161,18 +165,38 @@ def main():
         )
         fab_CLI.debug = args.debug
 
-        if args.verbose == 2:
-            fab_CLI.verbose = True
-        if args.metaDataDir:
-            metaDataDir = args.metaDataDir
-
-        if args.log:
-            with open(args.log, "w") as log:
-                with redirect_stdout(log):
-                    fab_CLI.cmdloop()
+        if commands := args.commands:
+            for c in commands.split("; "):
+                if fab_CLI.onecmd_plus_hooks(c):
+                    exit(1)
+                else:
+                    logger.info(f"Command {c} executed successfully")
+                    exit(0)
+        elif args.FABulousScript:
+            if fab_CLI.onecmd_plus_hooks(f"run_script {args.FABulousScript}"):
+                exit(1)
+            else:
+                logger.info(
+                    f"FABulous script {args.FABulousScript} executed successfully"
+                )
+                exit(0)
+        elif args.TCLScript:
+            if fab_CLI.onecmd_plus_hooks(f"run_script {args.TCLScript}"):
+                exit(1)
+            else:
+                logger.info(f"TCL script {args.TCLScript} executed successfully")
+                exit(0)
         else:
-            exit_code = fab_CLI.cmdloop()
-            sys.exit(exit_code)
+            if args.verbose == 2:
+                fab_CLI.verbose = True
+
+            if args.log:
+                with open(args.log, "w") as log:
+                    with redirect_stdout(log):
+                        fab_CLI.cmdloop()
+            else:
+                exit_code = fab_CLI.cmdloop()
+                sys.exit(exit_code)
 
 
 if __name__ == "__main__":

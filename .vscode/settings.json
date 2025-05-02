@@ -5,6 +5,7 @@
   "cSpell.words": [
     "desync",
     "exitcond",
+    "FPAA",
     "INBUF",
     "libyosys",
     "netnames",
@@ -73,5 +74,5 @@
     "tests"
   ],
   "python.testing.unittestEnabled": false,
-  "python.testing.pytestEnabled": true,
+  "python.testing.pytestEnabled": true
 }

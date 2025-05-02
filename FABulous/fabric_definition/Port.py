@@ -177,18 +177,19 @@ class SlicedPort(Port):
     _sliceRange: tuple[int, int]
     _originalPort: Port
 
-    __slots__ = ("_sliceRange", "_originalPort")
+    __slots__ = ("_slicedWidth", "_sliceRange", "_originalPort")
 
     def __init__(
         self,
-        name: str,
-        ioDirection: IO,
-        width: int,
         originalPort: Port,
-        isBus: bool = False,
         sliceRange: tuple[int, int] = (-1, -1),
     ) -> None:
-        super().__init__(name, ioDirection, width, isBus)
+        super().__init__(
+            originalPort.name,
+            originalPort.ioDirection,
+            sliceRange[0] - sliceRange[1] + 1,
+            originalPort.isBus,
+        )
         self._originalPort = originalPort
         self._sliceRange = sliceRange
 
@@ -200,8 +201,30 @@ class SlicedPort(Port):
     def sliceRange(self) -> tuple[int, int]:
         return self._sliceRange
 
+    def expand(self) -> list[str]:
+        if isinstance(self.originalPort, BelPort):
+            return [
+                f"{self.originalPort.prefix}{self.originalPort.name}[{i}]"
+                for i in range(self.sliceRange[0], self.sliceRange[1] + 1)
+            ]
+        elif isinstance(self.originalPort, TilePort):
+            return [
+                f"{self.originalPort.name}[{i}]"
+                for i in range(self.sliceRange[0], self.sliceRange[1] + 1)
+            ]
+        elif isinstance(self.originalPort, SlicedPort):
+            r = self.originalPort.expand()
+            return [r[i] for i in range(self.sliceRange[0], self.sliceRange[1] + 1)]
+        else:
+            raise ValueError(
+                f"type {type(self.originalPort)} not supported for slicing"
+            )
+
     def __hash__(self) -> int:
         return super().__hash__()
+
+    def __repr__(self) -> str:
+        return f"SlicedPort({self.ioDirection.value} {self.name}[{self.width - 1}:0] from {self.originalPort.name})"
 
 
 class BelPort(Port):

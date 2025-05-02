@@ -14,15 +14,13 @@ yosys opt -nodffe -nosdff
 
 yosys fsm -encoding binary -expand
 yosys opt
-yosys techmap -map $project_root/.FABulous/reduce_bool_to_or.v
+yosys techmap -map $project_root/.FABulous/logic_to_std.v
 yosys wreduce
 yosys peepopt
 yosys opt_clean
 yosys share
 yosys opt_expr
 yosys opt_clean
-
-yosys stat
 
 # memory opt
 yosys opt_mem_priority
@@ -55,8 +53,8 @@ yosys memory_libmap -lib $project_root/.FABulous/memory_map.txt
 
 # wrapping base design
 yosys techmap -map myProject/Tile/PE/metadata/wrap_map_ALU.v
-yosys connwrappers -unsigned \$__and_wrapper Y Y_WIDTH 
-yosys connwrappers -unsigned \$__or_wrapper Y Y_WIDTH 
+yosys connwrappers -unsigned \$__reduce_and_wrapper Y Y_WIDTH 
+yosys connwrappers -unsigned \$__reduce_or_wrapper Y Y_WIDTH 
 yosys connwrappers -unsigned \$__xor_wrapper Y Y_WIDTH 
 yosys connwrappers -unsigned \$__mul_wrapper Y Y_WIDTH 
 yosys connwrappers -unsigned \$__add_wrapper Y Y_WIDTH 
@@ -89,11 +87,11 @@ yosys clean -purge
 # wrapping base design
 yosys techmap -map myProject/Tile/PE/metadata/wrap_map_compare.v
 yosys connwrappers -unsigned \$__lt_wrapper Y Y_WIDTH 
-yosys connwrappers -unsigned \$__logic_not_wrapper Y Y_WIDTH 
-yosys connwrappers -unsigned \$__reduce_or_wrapper Y Y_WIDTH 
+yosys connwrappers -unsigned \$__not_wrapper Y Y_WIDTH 
+yosys connwrappers -unsigned \$__or_wrapper Y Y_WIDTH 
 yosys connwrappers -unsigned \$__ne_wrapper Y Y_WIDTH 
 yosys connwrappers -unsigned \$__le_wrapper Y Y_WIDTH 
-yosys connwrappers -unsigned \$__reduce_and_wrapper Y Y_WIDTH 
+yosys connwrappers -unsigned \$__and_wrapper Y Y_WIDTH 
 yosys connwrappers -unsigned \$__eq_wrapper Y Y_WIDTH 
 
 # extract cells
@@ -158,7 +156,8 @@ yosys read_rtlil -lib $project_root/Tile/PE/metadata/cell_const_unit.il
 yosys constmap -cell const_unit const_out ConfigBits
 
 # io mapping
-yosys iopadmap -widthparam WIDTH -outpad IO from_fabric:out -inpad IO to_fabric:in
+yosys iopadmap -widthparam WIDTH -outpad \$__external_out I:O -inpad \$__external_in O:I
+yosys techmap -map $project_root/.FABulous/IO_techmap.v
 yosys iopadmap -bits -outpad OUTBUF I:PAD -inpad INBUF O:PAD
 
 # final optimization

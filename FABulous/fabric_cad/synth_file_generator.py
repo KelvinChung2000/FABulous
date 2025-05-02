@@ -3,6 +3,7 @@ from collections import defaultdict
 from functools import partial
 from itertools import product
 from pathlib import Path
+from pprint import pprint
 from typing import Mapping
 
 from hdlgen.code_gen import CodeGenerator
@@ -32,11 +33,11 @@ def genPrims(bel: Bel, filePath: Path):
 
         with m.PortRegion() as pr:
             for i in bel.inputs + bel.externalInputs:
-                pr.Port(i.name, IO.INPUT, i.width)
+                pr.Port(i.name.removeprefix(bel.prefix), IO.INPUT, i.width)
             for i in bel.outputs + bel.externalOutputs:
-                pr.Port(i.name, IO.OUTPUT, i.width)
-            if bel.userCLK:
-                pr.Port(bel.userCLK.name, IO.INPUT, 1)
+                pr.Port(i.name.removeprefix(bel.prefix), IO.OUTPUT, i.width)
+            # if bel.userCLK:
+            #     pr.Port(bel.userCLK.name.removeprefix(bel.prefix), IO.INPUT, 1)
 
 
 def genWrapMap(cell, filename, belName, wrapping=True):
@@ -164,6 +165,7 @@ def genMemMap(bel: Bel, dest: Path):
         pass
 
     paths = list(filePath.glob(f"cell_{bel.name}*.json"))
+
     for c in paths:
         yosysJson = YosysJson(c)
 
@@ -408,7 +410,7 @@ def genMemMap(bel: Bel, dest: Path):
                         addrPort = f"PORT_{name}_ADDR"
                         portDict[addrPort] = pr.Port(addrPort, IO.INPUT, addressBits)
 
-                        if "sr" in kind or "ar" in kind:
+                        if "sr" in kind or "sw" in kind:
                             clkPort = f"PORT_{name}_CLK"
                             portDict[clkPort] = pr.Port(clkPort, IO.INPUT, 1)
 
@@ -421,7 +423,6 @@ def genMemMap(bel: Bel, dest: Path):
                             portDict[rDataPort] = pr.Port(
                                 rDataPort, IO.OUTPUT, dataWidth
                             )
-                            portDict[clkPort] = pr.Port(clkPort, IO.INPUT, 1)
                             if "rden" in configStr:
                                 rden = f"PORT_{name}_RD_EN"
                                 portDict[rden] = pr.Port(rden, IO.INPUT, 1)
@@ -453,9 +454,11 @@ def genMemMap(bel: Bel, dest: Path):
                     for idx in wires:
                         v = int("".join([str(i) for i in module.netnames[idx].bits]), 2)
                         params.append(lr.ConnectPair(idx, v))
-
                     portConnect = []
                     for mPort, detail in module.ports.items():
+                        if "USER_CLK" in module.netnames[mPort].attributes:
+                            continue
+
                         for cPort, sig in cellPortSignalMapping.items():
                             if set(sig).issubset(set(detail.bits)):
                                 portConnect.append(
@@ -465,6 +468,34 @@ def genMemMap(bel: Bel, dest: Path):
                     lr.InitModule(
                         f"{bel.name}", "_TECHMAP_REPLACE_", portConnect, params
                     )
+
+
+def genIOMap(bel: Bel):
+    filePath = bel.src.parent / "metadata"
+    with open(Path(f"{filePath}/map_{bel.name}.v"), "w"):
+        pass
+
+    paths = list(filePath.glob(f"cell_{bel.name}*.json"))
+
+    for c in paths:
+        yosysJson = YosysJson(c)
+        module: YosysModule = yosysJson.modules[next(iter(yosysJson.modules))]
+
+        cg = CodeGenerator(
+            Path(f"{filePath}/map_{bel.name}.v"),
+            codeGenWriterType.VERILOG,
+            writeMode="a",
+        )
+        with cg.Module("$__external") as m:
+            with m.ParameterRegion() as pr:
+                width = pr.Parameter("WIDTH", module.parameter_default_values["WIDTH"])
+
+            with m.PortRegion() as pr:
+                from_fabric = pr.InputPort("from_fabric", width)
+
+            # with m.LogicRegion() as lr:
+            #     for i in bel.externalInputs:
+            #         lr.InitModule(bel.name, "_TECHMAP_REPLACE_", connect)
 
 
 def genSynthScript(fabric: Fabric, filename: Path):
@@ -510,7 +541,12 @@ def genCellsAndMaps(bel: Bel):
     runPass = partial(lambda design, cmd: ys.run_pass(cmd, design), design)
 
     runPass("read_verilog -sv " + str(bel.src))
-    runPass("hierarchy -auto-top")
+    runPass("select A:blackbox")
+    if len(design.selected_modules()) > 0:
+        runPass(f"write_json {filePath / f'cell_{bel.prefix}{bel.name}.json'}")
+        return
+    runPass("cd")
+    runPass(f"hierarchy -top {bel.name}")
     runPass("flatten")
     runPass("proc")
     runPass("opt")
@@ -584,8 +620,17 @@ def genCellsAndMaps(bel: Bel):
 
     if bel.belType == BelType.MEM:
         return
+    if bel.belType == BelType.IO:
+        return
+
+    genArithTechmap(bel, filePath, design, runPass, cellDict)
+
+
+def genArithTechmap(bel: Bel, destFilePath: Path, design, runPass, cellDict):
     module = design.top_module()
-    cg = CodeGenerator(Path(f"{filePath}/map_{bel.name}.v"), codeGenWriterType.VERILOG)
+    cg = CodeGenerator(
+        Path(f"{destFilePath}/map_{bel.name}.v"), codeGenWriterType.VERILOG
+    )
     for name, c in cellDict.items():
         with cg.Module(f"map_{name}", [cg.Attribute("techmap_celltype", name)]) as m:
             with m.ParameterRegion() as pr:
@@ -599,15 +644,16 @@ def genCellsAndMaps(bel: Bel):
             with m.PortRegion() as pr:
                 runPass("select i:*")
                 for port in module.selected_wires():
-                    pr.Port(port.name.str().removeprefix("\\"), IO.INPUT, port.width)
+                    pr.InputPort(port.name.str().removeprefix("\\"), port.width)
                 runPass("select o:*")
                 for port in module.selected_wires():
-                    pr.Port(port.name.str().removeprefix("\\"), IO.OUTPUT, port.width)
+                    pr.OutputPort(port.name.str().removeprefix("\\"), port.width)
 
             with m.LogicRegion() as lr:
                 with lr.Generate() as g:
                     runPass("select x:*")
                     runPass("select -del a:CONFIG_BIT")
+                    runPass("select -del a:USER_CLK")
                     wires = [
                         i.name.str().removeprefix("\\") for i in module.selected_wires()
                     ]
@@ -619,6 +665,16 @@ def genCellsAndMaps(bel: Bel):
                     portConnect = []
                     for i, j in tDict.items():
                         portConnect.append(g.ConnectPair(i, j))
+
+                    # if bel.userCLK:
+                    #     usrClk = g.Signal(bel.userCLK.name, 1)
+                    #     g.InitModule(
+                    #         "CLK_DRV",
+                    #         "CLK",
+                    #         [g.ConnectPair("CLK_O", usrClk)],
+                    #         [],
+                    #     )
+                    #     portConnect.append(g.ConnectPair(bel.userCLK.name.removeprefix(bel.prefix), usrClk))
 
                     runPass("select a:CONFIG_BIT")
                     wires = [

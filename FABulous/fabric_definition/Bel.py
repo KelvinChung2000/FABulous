@@ -69,34 +69,16 @@ class Bel:
     constantBel: bool
     z: int = 0
 
-    # def __init__(
-    #     self,
-    #     src: Path,
-    #     prefix: str,
-    #     internal: list[BelPort],
-    #     external: list[BelPort],
-    #     configPort: list[ConfigPort],
-    #     sharedPort: list[SharedPort],
-    #     configBit: int,
-    #     belFeatureMap: dict[str, int],
-    #     userCLK: Port | None,
-    # ) -> None:
-    #     self.src = src
-    #     self.prefix = prefix
-    #     self.name = src.stem
-    #     self.inputs = [p for p in internal if p.ioDirection == IO.INPUT]
-    #     self.outputs = [p for p in internal if p.ioDirection == IO.OUTPUT]
-    #     self.externalInputs = [p for p in external if p.ioDirection == IO.INPUT]
-    #     self.externalOutputs = [p for p in external if p.ioDirection == IO.OUTPUT]
-    #     self.configPort = configPort
-    #     self.sharedPort = sharedPort
-    #     self.configBits = configBit
-    #     self.userCLK = userCLK
-    #     self.belFeatureMap = belFeatureMap
-    #     self.z = 0
-
-    #     if len(self.inputs) + len(self.externalInputs) == 0:
-    #         self.constantBel = True
+    def __post__init__(self):
+        if self.belType == BelType.IO:
+            if len(self.externalInputs) > 1:
+                raise ValueError(
+                    f"IO Bel {self.name} have at most one external input port"
+                )
+            if len(self.externalOutputs) > 1:
+                raise ValueError(
+                    f"IO Bel {self.name} have at most one external output port"
+                )
 
     def __hash__(self) -> int:
         return hash(f"{self.prefix}{self.name}({self.src})")

@@ -144,7 +144,7 @@ def parseFabricYAML(fileName: Path) -> Fabric:
                 raise ValueError
             if sourcePort.width != destinationPort.width:
                 logger.error(
-                    f"Port {sourcePort.name} and {destinationPort.name} must have the same wire count."
+                    f"Source port {sourcePort.name} and destination {destinationPort.name} must have the same wire count."
                 )
                 raise ValueError
 

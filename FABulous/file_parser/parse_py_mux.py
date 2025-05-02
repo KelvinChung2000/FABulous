@@ -1,4 +1,5 @@
 import itertools
+from pprint import pprint
 import sys
 from importlib.util import module_from_spec, spec_from_file_location
 from pathlib import Path
@@ -76,18 +77,14 @@ def genSwitchMatrix(
     )
     muxList.construct()
     sm = SwitchMatrix()
-    slicedPort: list[MuxPort] = []
     for i in muxList.__dict__.values():
         if not isinstance(i, MuxPort):
             continue
 
-        if i.isSliced:
-            slicedPort.append(i)
-            continue
-        if i.isTilePort and i.port.ioDirection == IO.INPUT:
+        if isinstance(i.port, TilePort) and i.port.ioDirection == IO.INPUT:
             continue
 
-        if i.isBelPort and i.port.ioDirection == IO.OUTPUT:
+        if isinstance(i.port, BelPort) and i.port.ioDirection == IO.OUTPUT:
             continue
 
         if not i.inputs:
@@ -95,76 +92,76 @@ def genSwitchMatrix(
 
         sm.addMux(Mux(i.port, [p.port for p in i.inputs]))
 
-    for sPort in slicedPort:
-        if not sPort.slicingAssignDict.keys():
-            continue
-
-        combinedAssignWidth = 0
-        for targetRange in sPort.slicingAssignDict.keys():
-            combinedAssignWidth += (targetRange.start - targetRange.end) + 1
-
-        if combinedAssignWidth != sPort.port.width:
-            print(combinedAssignWidth, sPort.port.width)
-            raise ValueError("not all the signal of the original port is assigned")
-
-        for test_range in sPort.slicingAssignDict.keys():
-            for range in sPort.slicingAssignDict.keys():
-                if test_range == range:
-                    continue
-                if test_range.start >= range.start and test_range.end <= range.end:
-                    raise ValueError(
-                        "Sliced signals overlap, please check the slicing assignment"
-                    )
-
-        for targetRange, slicedSignals in sPort.slicingAssignDict.items():
-            uniqueSWidth = set()
-            for signal in slicedSignals:
-                if signal.sliceRange == (-1, -1):
-                    uniqueSWidth.add(signal.port.width)
-                else:
-                    uniqueSWidth.add(
-                        signal.sliceRange.start - signal.sliceRange.end + 1
-                    )
-
-            if len(uniqueSWidth) != 1:
-                raise ValueError("Not all the slice signals have the same width")
-            if uniqueSWidth.pop() != targetRange.start - targetRange.end + 1:
-                raise ValueError("Sliced signals do not match target range")
-
-            start, end = targetRange
-            for signal in slicedSignals:
-                newTargetPort = SlicedPort(
-                    name=f"{sPort.port.name}_{start}_{end}",
-                    ioDirection=sPort.port.ioDirection,
-                    width=start - end + 1,
-                    isBus=False,
-                    originalPort=sPort.port,
-                    sliceRange=targetRange,
-                )
-                newInputPortList = []
-
-                for i in slicedSignals:
-                    if i.sliceRange == (-1, -1):
-                        newInputPortList.append(i.port)
-                    else:
-                        newInputPortList.append(
-                            SlicedPort(
-                                name=f"{i.port.name}_{i.sliceRange.start}_{i.sliceRange.end}",
-                                ioDirection=i.port.ioDirection,
-                                width=i.sliceRange.start - i.sliceRange.end + 1,
-                                isBus=False,
-                                originalPort=i.port,
-                                sliceRange=i.sliceRange,
-                            )
-                        )
-
-                sm.addMux(
-                    Mux(
-                        newTargetPort,
-                        newInputPortList,
-                    )
-                )
     return sm
+    # for sPort in slicedPort:
+    #     if not sPort.slicingAssignDict.keys():
+    #         continue
+
+    #     combinedAssignWidth = 0
+    #     for targetRange in sPort.slicingAssignDict.keys():
+    #         combinedAssignWidth += (targetRange.start - targetRange.end) + 1
+
+    #     if combinedAssignWidth != sPort.port.width:
+    #         print(combinedAssignWidth, sPort.port.width)
+    #         raise ValueError("not all the signal of the original port is assigned")
+
+    #     for test_range in sPort.slicingAssignDict.keys():
+    #         for range in sPort.slicingAssignDict.keys():
+    #             if test_range == range:
+    #                 continue
+    #             if test_range.start >= range.start and test_range.end <= range.end:
+    #                 raise ValueError(
+    #                     "Sliced signals overlap, please check the slicing assignment"
+    #                 )
+
+    #     for targetRange, slicedSignals in sPort.slicingAssignDict.items():
+    #         uniqueSWidth = set()
+    #         for signal in slicedSignals:
+    #             if signal.sliceRange == (-1, -1):
+    #                 uniqueSWidth.add(signal.port.width)
+    #             else:
+    #                 uniqueSWidth.add(
+    #                     signal.sliceRange.start - signal.sliceRange.end + 1
+    #                 )
+
+    #         if len(uniqueSWidth) != 1:
+    #             raise ValueError("Not all the slice signals have the same width")
+    #         if uniqueSWidth.pop() != targetRange.start - targetRange.end + 1:
+    #             raise ValueError("Sliced signals do not match target range")
+
+    #         start, end = targetRange
+    #         for signal in slicedSignals:
+    #             newTargetPort = SlicedPort(
+    #                 name=f"{sPort.port.name}_{start}_{end}",
+    #                 ioDirection=sPort.port.ioDirection,
+    #                 width=start - end + 1,
+    #                 isBus=False,
+    #                 originalPort=sPort.port,
+    #                 sliceRange=targetRange,
+    #             )
+    #             newInputPortList = []
+
+    #             for i in slicedSignals:
+    #                 if i.sliceRange == (-1, -1):
+    #                     newInputPortList.append(i.port)
+    #                 else:
+    #                     newInputPortList.append(
+    #                         SlicedPort(
+    #                             name=f"{i.port.name}_{i.sliceRange.start}_{i.sliceRange.end}",
+    #                             ioDirection=i.port.ioDirection,
+    #                             width=i.sliceRange.start - i.sliceRange.end + 1,
+    #                             isBus=False,
+    #                             originalPort=i.port,
+    #                             sliceRange=i.sliceRange,
+    #                         )
+    #                     )
+
+    #             sm.addMux(
+    #                 Mux(
+    #                     newTargetPort,
+    #                     newInputPortList,
+    #                 )
+    #             )
 
 
 # if __name__ == "__main__":

@@ -1,6 +1,5 @@
 from itertools import islice
 from pathlib import Path
-from pprint import pprint
 from subprocess import run
 from typing import Iterable, Mapping, cast
 
@@ -152,7 +151,7 @@ def genBel(bels: Iterable[Bel], tile: TileType, wireOnly: bool, context=1):
                 for pName in i.expand():
                     tile.add_bel_pin(
                         belData,
-                        f"{i.name}",
+                        f"{pName}".removeprefix(bel.prefix),
                         f"c{c}.{pName}",
                         PinType.INPUT,
                     )
@@ -161,7 +160,7 @@ def genBel(bels: Iterable[Bel], tile: TileType, wireOnly: bool, context=1):
                 for pName in i.expand():
                     tile.add_bel_pin(
                         belData,
-                        f"{i.name}",
+                        f"{pName}".removeprefix(bel.prefix),
                         f"c{c}.{pName}",
                         PinType.OUTPUT,
                     )
@@ -298,13 +297,16 @@ def generateConstrainPair(fabric: Fabric, dest: Path):
 
                             if tBel.z < bel.z:
                                 f.write(
-                                    f"{tBel.name}:{d.name} {d.width} {bel.name}:{i.name} {i.width} {bel.z - tBel.z} \n"
+                                    f"{tBel.name}:{d.name.removeprefix(bel.prefix)} {d.width} {bel.name}:{i.name.removeprefix(bel.prefix)} {i.width} {bel.z - tBel.z} \n"
                                 )
                             else:
                                 f.write(
-                                    f"{bel.name}:{i.name} {i.width} {tBel.name}:{d.name} {d.width} {tBel.z - bel.z} \n"
+                                    f"{bel.name}:{i.name.removeprefix(bel.prefix)} {i.width} {tBel.name}:{d.name.removeprefix(bel.prefix)} {d.width} {tBel.z - bel.z} \n"
                                 )
                         f.write("\n")
+
+                # if bel.userCLK:
+                #     f.write(f"{bel.name}:{bel.userCLK.name.rep} 1 CLK_DRV:CLK_O 1 {TILE_CLK-bel.z} \n")
 
 
 def generateChipDatabase(
@@ -364,7 +366,7 @@ def generateChipDatabase(
     generateConstrainPair(fabric, filePath / f"{fabric.name}_constrain_pair.inc")
 
     if dotDir is not Path():
-        genRoutingResourceGraph(ch, filePath, False, [(5, 1), (5, 2), (4, 1), (4, 2)])
+        genRoutingResourceGraph(ch, filePath, True, [(1, 1)])
 
 
 def groupByThree(inputList: list) -> list:

@@ -345,6 +345,7 @@ def parseTileYAML(
 
         bel = parseBelFile(belFilePath, belEntry["prefix"])
         bel.z = z
+        bel.paramOverride = belEntry.get("param", {})
         bels.append(bel)
 
     withUserCLK = any(bel.userCLK for bel in bels)

@@ -540,7 +540,13 @@ def genCellsAndMaps(bel: Bel):
     design = ys.Design()
     runPass = partial(lambda design, cmd: ys.run_pass(cmd, design), design)
 
-    runPass("read_verilog -sv " + str(bel.src))
+    if bel.paramOverride:
+        runPass(f"read_verilog -defer -sv {bel.src}")
+        for k, v in bel.paramOverride.items():
+            runPass(f"chparam -set {k} {v} {bel.name}")
+    else:
+        runPass(f"read_verilog -sv {bel.src}")
+
     runPass("select A:blackbox")
     if len(design.selected_modules()) > 0:
         runPass(f"write_json {filePath / f'cell_{bel.prefix}{bel.name}.json'}")

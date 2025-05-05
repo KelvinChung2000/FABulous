@@ -46,5 +46,10 @@ BELS:
   - {BEL: ./reg_unit.v, prefix: S_}
   - {BEL: ./reg_unit.v, prefix: W_}
 
+  - {BEL: ./reg_unit.v, prefix: N_pred_, param: {WIDTH: 1}}
+  - {BEL: ./reg_unit.v, prefix: E_pred_, param: {WIDTH: 1}}
+  - {BEL: ./reg_unit.v, prefix: S_pred_, param: {WIDTH: 1}}
+  - {BEL: ./reg_unit.v, prefix: W_pred_, param: {WIDTH: 1}}
+
 MATRIX: list.py
 # CONFIG_MEM: PE_ConfigMem.csv

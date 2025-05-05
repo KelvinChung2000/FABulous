@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 
 from FABulous.fabric_definition.define import IO, BelType
@@ -68,6 +68,7 @@ class Bel:
     userCLK: Port | None
     constantBel: bool
     z: int = 0
+    paramOverride: dict[str, str] = field(default_factory=dict)
 
     def __post__init__(self):
         if self.belType == BelType.IO:

@@ -1,9 +1,9 @@
 import argparse
 import os
+import sys
 from contextlib import redirect_stdout
 from importlib.metadata import version
 from pathlib import Path
-import sys
 
 from loguru import logger
 
@@ -45,6 +45,8 @@ def main():
         Set global .env file path. Default is $FAB_ROOT/.env
     -pde, --projectDotEnv : str, optional
         Set project .env file path. Default is $FAB_PROJ_DIR/.env
+    --force : bool, optional
+        Force command running even if any one of the command fails.
     """
     parser = argparse.ArgumentParser(
         description="The command line interface for FABulous"
@@ -136,6 +138,12 @@ def main():
 
     parser.add_argument("--debug", action="store_true", help="Enable debug mode")
 
+    parser.add_argument(
+        "--force",
+        action="store_true",
+        help="Force command running even if any one of the command fails",
+    )
+
     args = parser.parse_args()
 
     setup_logger(args.verbose)
@@ -159,9 +167,7 @@ def main():
         fab_CLI = FABulous_CLI(
             WriterType[os.getenv("FAB_PROJ_LANG", "VERILOG").upper()],
             Path(str(os.getenv("FAB_PROJ_DIR"))),
-            FABulousScript=args.FABulousScript,
-            TCLScript=args.TCLScript,
-            commands=args.commands.split("; ") if args.commands else [],
+            force=args.force,
         )
         fab_CLI.debug = args.debug
 
@@ -169,9 +175,9 @@ def main():
             for c in commands.split("; "):
                 if fab_CLI.onecmd_plus_hooks(c):
                     exit(1)
-                else:
-                    logger.info(f"Command {c} executed successfully")
-                    exit(0)
+            else:
+                logger.info(f"Commands [{commands}]  executed successfully")
+                exit(0)
         elif args.FABulousScript:
             if fab_CLI.onecmd_plus_hooks(f"run_script {args.FABulousScript}"):
                 exit(1)

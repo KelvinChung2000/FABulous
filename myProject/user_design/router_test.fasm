@@ -535,10 +535,6 @@
 # routing for net '$techmap348$auto$fsm_map.cc:172:map_fsm$208.Q_32[15]'
 
 # routing for net '$techmap348$auto$fsm_map.cc:172:map_fsm$208.Q_32[14]'
-X1Y2.c0.data_in1__14.c0.in0__14
-# pip end: X1Y3.c0.out2__14.c0.out2__14_internal'
-# pip start: X1Y3.c0.out2__14_internal.c0.RES_reg_out__14
-X1Y3.c0.out2__14.c0.RES_reg_out__14
 
 # routing for net '$techmap348$auto$fsm_map.cc:172:map_fsm$208.Q_32[13]'
 
@@ -609,18 +605,10 @@ X1Y3.c0.out2__14.c0.RES_reg_out__14
 # routing for net '$iopadmap$in1[11]'
 
 # routing for net '$iopadmap$in1[10]'
-# pip end: X0Y4.c0.out1__10.c0.out1__10_internal'
-# pip start: X0Y4.c0.out1__10_internal.c0.W_to_fabric__10
-X0Y4.c0.out1__10.c0.W_to_fabric__10
-X1Y4.c0.data_in1__10.c0.in3__10
 
 # routing for net '$iopadmap$in1[9]'
 
 # routing for net '$iopadmap$in1[8]'
-# pip end: X0Y4.c0.out1__8.c0.out1__8_internal'
-# pip start: X0Y4.c0.out1__8_internal.c0.W_to_fabric__8
-X0Y4.c0.out1__8.c0.W_to_fabric__8
-X1Y4.c0.data_in1__8.c0.in3__8
 
 # routing for net '$iopadmap$in1[7]'
 
@@ -685,7 +673,6 @@ X1Y4.c0.data_in1__8.c0.in3__8
 # routing for net 'loop_array_instance.arg_mem_0_read_data[9]'
 
 # routing for net 'loop_array_instance.arg_mem_0_read_data[8]'
-X2Y2.c0.RES_reg_in__8.c0.data_out__8
 
 # routing for net 'loop_array_instance.arg_mem_0_read_data[7]'
 
@@ -766,7 +753,6 @@ X2Y2.c0.RES_reg_in__8.c0.data_out__8
 # routing for net 'mem_0.read_data[1]'
 
 # routing for net 'mem_0.read_data[0]'
-X2Y2.c0.data_in1__0.c0.N_reg_out__0
 
 # routing for net '$techmap304$flatten\loop_array_instance.\fsm.$ternary$/home/kelvin/FABulous_fork/benchmarks/userbench/loop_array_inner/loop_array_inner.sv:771$24.Y_32[31]'
 
@@ -833,10 +819,6 @@ X2Y2.c0.data_in1__0.c0.N_reg_out__0
 # routing for net 'loop_array_instance.arg_mem_0_addr0[0]'
 
 # routing for net 'loop_array_instance.fsm.current_state'
-X1Y2.c0.B__0.c0.in0__0
-# pip end: X1Y3.c0.out2__0.c0.out2__0_internal'
-# pip start: X1Y3.c0.out2__0_internal.c0.RES_reg_out__0
-X1Y3.c0.out2__0.c0.RES_reg_out__0
 
 # routing for net '$iopadmap$go'
 
@@ -897,16 +879,6 @@ X1Y3.c0.out2__0.c0.RES_reg_out__0
 # routing for net '$techmap431$iopadmap$main.done.O_32[4]'
 
 # routing for net '$iopadmap$in0[3]'
-X4Y4.c0.data_in1__3.c0.in0__3
-# pip end: X4Y5.c0.out2__3.c0.out2__3_internal'
-# pip start: X4Y5.c0.out2__3_internal.c0.in0__3
-X4Y5.c0.out2__3.c0.in0__3
-# pip end: X4Y6.c0.out2__3.c0.out2__3_internal'
-# pip start: X4Y6.c0.out2__3_internal.c0.in0__3
-X4Y6.c0.out2__3.c0.in0__3
-# pip end: X4Y7.c0.out2__3.c0.out2__3_internal'
-# pip start: X4Y7.c0.out2__3_internal.c0.N_to_fabric__3
-X4Y7.c0.out2__3.c0.N_to_fabric__3
 
 # routing for net '$iopadmap$in0[2]'
 
@@ -1335,10 +1307,6 @@ X4Y7.c0.out2__3.c0.N_to_fabric__3
 # routing for net '$techmap303$flatten\loop_array_instance.\std_add_0.$add$/home/kelvin/FABulous_fork/benchmarks/userbench/loop_array_inner/loop_array_inner.sv:516$84.Y_32[10]'
 
 # routing for net '$techmap303$flatten\loop_array_instance.\std_add_0.$add$/home/kelvin/FABulous_fork/benchmarks/userbench/loop_array_inner/loop_array_inner.sv:516$84.Y_32[9]'
-X3Y3.c0.data_in2__9.c0.in0__9
-# pip end: X3Y4.c0.out2__9.c0.out2__9_internal'
-# pip start: X3Y4.c0.out2__9_internal.c0.data_out__9
-X3Y4.c0.out2__9.c0.data_out__9
 
 # routing for net '$techmap303$flatten\loop_array_instance.\std_add_0.$add$/home/kelvin/FABulous_fork/benchmarks/userbench/loop_array_inner/loop_array_inner.sv:516$84.Y_32[8]'
 
@@ -1361,24 +1329,12 @@ X3Y4.c0.out2__9.c0.data_out__9
 # routing for net '$techmap299$ternary$/home/kelvin/FABulous_fork/benchmarks/userbench/loop_array_inner/loop_array_inner.sv:659$30.Y_32[31]'
 
 # routing for net '$techmap299$ternary$/home/kelvin/FABulous_fork/benchmarks/userbench/loop_array_inner/loop_array_inner.sv:659$30.Y_32[30]'
-X3Y4.c0.data_in1__30.c0.in1__30
-# pip end: X4Y4.c0.out3__30.c0.out3__30_internal'
-# pip start: X4Y4.c0.out3__30_internal.c0.data_out__30
-X4Y4.c0.out3__30.c0.data_out__30
 
 # routing for net '$techmap299$ternary$/home/kelvin/FABulous_fork/benchmarks/userbench/loop_array_inner/loop_array_inner.sv:659$30.Y_32[29]'
 
 # routing for net '$techmap299$ternary$/home/kelvin/FABulous_fork/benchmarks/userbench/loop_array_inner/loop_array_inner.sv:659$30.Y_32[28]'
-X3Y4.c0.data_in1__28.c0.in1__28
-# pip end: X4Y4.c0.out3__28.c0.out3__28_internal'
-# pip start: X4Y4.c0.out3__28_internal.c0.data_out__28
-X4Y4.c0.out3__28.c0.data_out__28
 
 # routing for net '$techmap299$ternary$/home/kelvin/FABulous_fork/benchmarks/userbench/loop_array_inner/loop_array_inner.sv:659$30.Y_32[27]'
-X3Y4.c0.data_in1__27.c0.in1__27
-# pip end: X4Y4.c0.out3__27.c0.out3__27_internal'
-# pip start: X4Y4.c0.out3__27_internal.c0.data_out__27
-X4Y4.c0.out3__27.c0.data_out__27
 
 # routing for net '$techmap299$ternary$/home/kelvin/FABulous_fork/benchmarks/userbench/loop_array_inner/loop_array_inner.sv:659$30.Y_32[26]'
 
@@ -1405,22 +1361,8 @@ X4Y4.c0.out3__27.c0.data_out__27
 # routing for net '$techmap299$ternary$/home/kelvin/FABulous_fork/benchmarks/userbench/loop_array_inner/loop_array_inner.sv:659$30.Y_32[15]'
 
 # routing for net '$techmap299$ternary$/home/kelvin/FABulous_fork/benchmarks/userbench/loop_array_inner/loop_array_inner.sv:659$30.Y_32[14]'
-X3Y3.c0.data_in1__14.c0.in1__14
-# pip end: X4Y3.c0.out3__14.c0.out3__14_internal'
-# pip start: X4Y3.c0.out3__14_internal.c0.in0__14
-X4Y3.c0.out3__14.c0.in0__14
-# pip end: X4Y4.c0.out2__14.c0.out2__14_internal'
-# pip start: X4Y4.c0.out2__14_internal.c0.data_out__14
-X4Y4.c0.out2__14.c0.data_out__14
 
 # routing for net '$techmap299$ternary$/home/kelvin/FABulous_fork/benchmarks/userbench/loop_array_inner/loop_array_inner.sv:659$30.Y_32[13]'
-X3Y3.c0.data_in1__13.c0.in0__13
-# pip end: X3Y4.c0.out2__13.c0.out2__13_internal'
-# pip start: X3Y4.c0.out2__13_internal.c0.in1__13
-X3Y4.c0.out2__13.c0.in1__13
-# pip end: X4Y4.c0.out3__13.c0.out3__13_internal'
-# pip start: X4Y4.c0.out3__13_internal.c0.data_out__13
-X4Y4.c0.out3__13.c0.data_out__13
 
 # routing for net '$techmap299$ternary$/home/kelvin/FABulous_fork/benchmarks/userbench/loop_array_inner/loop_array_inner.sv:659$30.Y_32[12]'
 
@@ -1519,10 +1461,6 @@ X4Y4.c0.out3__13.c0.data_out__13
 # routing for net 'loop_array_instance.fsm.fsm_std_add_1_right_in[29]'
 
 # routing for net 'loop_array_instance.fsm.fsm_std_add_1_right_in[28]'
-# pip end: X2Y2.c0.out0__28.c0.out0__28_internal'
-# pip start: X2Y2.c0.out0__28_internal.c0.RES_reg_out__28
-X2Y2.c0.out0__28.c0.RES_reg_out__28
-X2Y3.c0.data_in2__28.c0.in2__28
 
 # routing for net 'loop_array_instance.fsm.fsm_std_add_1_right_in[27]'
 
@@ -1539,10 +1477,6 @@ X2Y3.c0.data_in2__28.c0.in2__28
 # routing for net 'loop_array_instance.fsm.fsm_std_add_1_right_in[21]'
 
 # routing for net 'loop_array_instance.fsm.fsm_std_add_1_right_in[20]'
-# pip end: X2Y2.c0.out0__20.c0.out0__20_internal'
-# pip start: X2Y2.c0.out0__20_internal.c0.RES_reg_out__20
-X2Y2.c0.out0__20.c0.RES_reg_out__20
-X2Y3.c0.data_in2__20.c0.in2__20
 
 # routing for net 'loop_array_instance.fsm.fsm_std_add_1_right_in[19]'
 
@@ -1551,10 +1485,6 @@ X2Y3.c0.data_in2__20.c0.in2__20
 # routing for net 'loop_array_instance.fsm.fsm_std_add_1_right_in[17]'
 
 # routing for net 'loop_array_instance.fsm.fsm_std_add_1_right_in[16]'
-# pip end: X2Y2.c0.out0__16.c0.out0__16_internal'
-# pip start: X2Y2.c0.out0__16_internal.c0.RES_reg_out__16
-X2Y2.c0.out0__16.c0.RES_reg_out__16
-X2Y3.c0.data_in2__16.c0.in2__16
 
 # routing for net 'loop_array_instance.fsm.fsm_std_add_1_right_in[15]'
 
@@ -1613,13 +1543,6 @@ X2Y3.c0.data_in2__16.c0.in2__16
 # routing for net 'loop_array_instance.fsm.fsm_std_add_1_left_in[20]'
 
 # routing for net 'loop_array_instance.fsm.fsm_std_add_1_left_in[19]'
-X2Y3.c0.data_in1__19.c0.in0__19
-# pip end: X1Y4.c0.out1__19.c0.out1__19_internal'
-# pip start: X1Y4.c0.out1__19_internal.c0.data_out__19
-X1Y4.c0.out1__19.c0.data_out__19
-# pip end: X2Y4.c0.out2__19.c0.out2__19_internal'
-# pip start: X2Y4.c0.out2__19_internal.c0.in3__19
-X2Y4.c0.out2__19.c0.in3__19
 
 # routing for net 'loop_array_instance.fsm.fsm_std_add_1_left_in[18]'
 
@@ -1642,6 +1565,10 @@ X2Y4.c0.out2__19.c0.in3__19
 # routing for net 'loop_array_instance.fsm.fsm_std_add_1_left_in[9]'
 
 # routing for net 'loop_array_instance.fsm.fsm_std_add_1_left_in[8]'
+# pip end: X1Y3.c0.out1__8.c0.out1__8_internal'
+# pip start: X1Y3.c0.out1__8_internal.c0.data_out__8
+X1Y3.c0.out1__8.c0.data_out__8
+X2Y3.c0.data_in1__8.c0.in3__8
 
 # routing for net 'loop_array_instance.fsm.fsm_std_add_1_left_in[7]'
 
@@ -1698,14 +1625,12 @@ X2Y4.c0.out2__19.c0.in3__19
 # routing for net '$auto$constmap.cc:35:constmap_worker$424[13]'
 
 # routing for net '$auto$constmap.cc:35:constmap_worker$424[12]'
-X1Y4.c0.data_in2__12.c0.const_out__12
 
 # routing for net '$auto$constmap.cc:35:constmap_worker$424[11]'
 
 # routing for net '$auto$constmap.cc:35:constmap_worker$424[10]'
 
 # routing for net '$auto$constmap.cc:35:constmap_worker$424[9]'
-X1Y4.c0.data_in2__9.c0.const_out__9
 
 # routing for net '$auto$constmap.cc:35:constmap_worker$424[8]'
 
@@ -1792,18 +1717,17 @@ X1Y4.c0.data_in2__9.c0.const_out__9
 # routing for net 'in1[12]'
 
 # routing for net '$auto$constmap.cc:35:constmap_worker$418[31]'
+X1Y1.c0.B__31.c0.const_out__31
 
 # routing for net '$auto$constmap.cc:35:constmap_worker$418[30]'
 
 # routing for net '$auto$constmap.cc:35:constmap_worker$418[29]'
-X1Y1.c0.B__29.c0.const_out__29
 
 # routing for net '$auto$constmap.cc:35:constmap_worker$418[28]'
 
 # routing for net '$auto$constmap.cc:35:constmap_worker$418[27]'
 
 # routing for net '$auto$constmap.cc:35:constmap_worker$418[26]'
-X1Y1.c0.B__26.c0.const_out__26
 
 # routing for net '$auto$constmap.cc:35:constmap_worker$418[25]'
 
@@ -1830,12 +1754,10 @@ X1Y1.c0.B__26.c0.const_out__26
 # routing for net '$auto$constmap.cc:35:constmap_worker$418[14]'
 
 # routing for net '$auto$constmap.cc:35:constmap_worker$418[13]'
-X1Y1.c0.B__13.c0.const_out__13
 
 # routing for net '$auto$constmap.cc:35:constmap_worker$418[12]'
 
 # routing for net '$auto$constmap.cc:35:constmap_worker$418[11]'
-X1Y1.c0.B__11.c0.const_out__11
 
 # routing for net '$auto$constmap.cc:35:constmap_worker$418[10]'
 
@@ -1874,12 +1796,10 @@ X1Y1.c0.B__11.c0.const_out__11
 # routing for net '$auto$constmap.cc:35:constmap_worker$416[25]'
 
 # routing for net '$auto$constmap.cc:35:constmap_worker$416[24]'
-X2Y2.c0.data_in2__24.c0.const_out__24
 
 # routing for net '$auto$constmap.cc:35:constmap_worker$416[23]'
 
 # routing for net '$auto$constmap.cc:35:constmap_worker$416[22]'
-X2Y2.c0.data_in2__22.c0.const_out__22
 
 # routing for net '$auto$constmap.cc:35:constmap_worker$416[21]'
 
@@ -1922,7 +1842,6 @@ X2Y2.c0.data_in2__22.c0.const_out__22
 # routing for net '$auto$constmap.cc:35:constmap_worker$416[2]'
 
 # routing for net '$auto$constmap.cc:35:constmap_worker$416[1]'
-X2Y2.c0.data_in2__1.c0.const_out__1
 
 # routing for net '$auto$constmap.cc:35:constmap_worker$416[0]'
 
@@ -2027,19 +1946,6 @@ X2Y2.c0.data_in2__1.c0.const_out__1
 # routing for net '$\mem_0.mem$rdreg[0]$d[25]'
 
 # routing for net '$\mem_0.mem$rdreg[0]$d[24]'
-X2Y2.c0.N_reg_in__24.c0.in0__24
-# pip end: X2Y3.c0.out2__24.c0.out2__24_internal'
-# pip start: X2Y3.c0.out2__24_internal.c0.in1__24
-X2Y3.c0.out2__24.c0.in1__24
-# pip end: X3Y3.c0.out3__24.c0.out3__24_internal'
-# pip start: X3Y3.c0.out3__24_internal.c0.in1__24
-X3Y3.c0.out3__24.c0.in1__24
-# pip end: X4Y3.c0.out3__24.c0.out3__24_internal'
-# pip start: X4Y3.c0.out3__24_internal.c0.in1__24
-X4Y3.c0.out3__24.c0.in1__24
-# pip end: X5Y3.c0.out3__24.c0.out3__24_internal'
-# pip start: X5Y3.c0.out3__24_internal.c0.read_data__24
-X5Y3.c0.out3__24.c0.read_data__24
 
 # routing for net '$\mem_0.mem$rdreg[0]$d[23]'
 
@@ -2064,19 +1970,6 @@ X5Y3.c0.out3__24.c0.read_data__24
 # routing for net '$\mem_0.mem$rdreg[0]$d[13]'
 
 # routing for net '$\mem_0.mem$rdreg[0]$d[12]'
-X2Y2.c0.N_reg_in__12.c0.in0__12
-# pip end: X2Y3.c0.out2__12.c0.out2__12_internal'
-# pip start: X2Y3.c0.out2__12_internal.c0.in1__12
-X2Y3.c0.out2__12.c0.in1__12
-# pip end: X3Y3.c0.out3__12.c0.out3__12_internal'
-# pip start: X3Y3.c0.out3__12_internal.c0.in1__12
-X3Y3.c0.out3__12.c0.in1__12
-# pip end: X4Y3.c0.out3__12.c0.out3__12_internal'
-# pip start: X4Y3.c0.out3__12_internal.c0.in1__12
-X4Y3.c0.out3__12.c0.in1__12
-# pip end: X5Y3.c0.out3__12.c0.out3__12_internal'
-# pip start: X5Y3.c0.out3__12_internal.c0.read_data__12
-X5Y3.c0.out3__12.c0.read_data__12
 
 # routing for net '$\mem_0.mem$rdreg[0]$d[11]'
 
@@ -2143,7 +2036,6 @@ X5Y3.c0.out3__12.c0.read_data__12
 # routing for net '$auto$constmap.cc:35:constmap_worker$406[3]'
 
 # routing for net '$auto$constmap.cc:35:constmap_worker$406[2]'
-X3Y1.c0.B__2.c0.const_out__2
 
 # routing for net '$auto$constmap.cc:35:constmap_worker$406[1]'
 
@@ -2154,7 +2046,6 @@ X3Y1.c0.B__2.c0.const_out__2
 # routing for net '$auto$constmap.cc:35:constmap_worker$404[30]'
 
 # routing for net '$auto$constmap.cc:35:constmap_worker$404[29]'
-X2Y1.c0.B__29.c0.const_out__29
 
 # routing for net '$auto$constmap.cc:35:constmap_worker$404[28]'
 
@@ -2241,7 +2132,6 @@ X2Y1.c0.B__29.c0.const_out__29
 # routing for net '$auto$constmap.cc:35:constmap_worker$394[23]'
 
 # routing for net '$auto$constmap.cc:35:constmap_worker$394[22]'
-X3Y4.c0.data_in2__22.c0.const_out__22
 
 # routing for net '$auto$constmap.cc:35:constmap_worker$394[21]'
 
@@ -2286,7 +2176,6 @@ X3Y4.c0.data_in2__22.c0.const_out__22
 # routing for net '$auto$constmap.cc:35:constmap_worker$394[1]'
 
 # routing for net '$auto$constmap.cc:35:constmap_worker$394[0]'
-X3Y4.c0.data_in2__0.c0.const_out__0
 
 # routing for net '$\mem_0.mem$rdreg[0]$d[4]'
 
@@ -2433,7 +2322,6 @@ X3Y4.c0.data_in2__0.c0.const_out__0
 # routing for net '$auto$constmap.cc:35:constmap_worker$382[27]'
 
 # routing for net '$auto$constmap.cc:35:constmap_worker$382[26]'
-X4Y4.c0.data_in2__26.c0.const_out__26
 
 # routing for net '$auto$constmap.cc:35:constmap_worker$382[25]'
 
@@ -2452,7 +2340,6 @@ X4Y4.c0.data_in2__26.c0.const_out__26
 # routing for net '$auto$constmap.cc:35:constmap_worker$382[18]'
 
 # routing for net '$auto$constmap.cc:35:constmap_worker$382[17]'
-X4Y4.c0.data_in2__17.c0.const_out__17
 
 # routing for net '$auto$constmap.cc:35:constmap_worker$382[16]'
 
@@ -2494,46 +2381,90 @@ X4Y4.c0.data_in2__17.c0.const_out__17
 X1Y1.c0.compare.conf = 3'b101
 
 # config for cell '$extract$\compare_conf_4$342'
-X2Y2.c0.compare.conf = 3'b100
+X4Y1.c0.compare.conf = 3'b100
 
 # config for cell '$extract$\compare_conf_4$341'
 X3Y2.c0.compare.conf = 3'b100
 
 # config for cell '$extract$\ALU_ALU_func_7$321'
-X3Y2.c0.ALU.data_in1[1] = 1'b0
-X3Y2.c0.ALU.data_in1[2] = 1'b0
-X3Y2.c0.ALU.data_in1[3] = 1'b0
-X3Y2.c0.ALU.data_in1[4] = 1'b0
-X3Y2.c0.ALU.data_in1[5] = 1'b0
-X3Y2.c0.ALU.data_in1[6] = 1'b0
-X3Y2.c0.ALU.data_in1[7] = 1'b0
-X3Y2.c0.ALU.data_in1[8] = 1'b0
-X3Y2.c0.ALU.data_in1[9] = 1'b0
-X3Y2.c0.ALU.data_in1[10] = 1'b0
-X3Y2.c0.ALU.data_in1[11] = 1'b0
-X3Y2.c0.ALU.data_in1[12] = 1'b0
-X3Y2.c0.ALU.data_in1[13] = 1'b0
-X3Y2.c0.ALU.data_in1[14] = 1'b0
-X3Y2.c0.ALU.data_in1[15] = 1'b0
-X3Y2.c0.ALU.data_in1[16] = 1'b0
-X3Y2.c0.ALU.data_in1[17] = 1'b0
-X3Y2.c0.ALU.data_in1[18] = 1'b0
-X3Y2.c0.ALU.data_in1[19] = 1'b0
-X3Y2.c0.ALU.data_in1[20] = 1'b0
-X3Y2.c0.ALU.data_in1[21] = 1'b0
-X3Y2.c0.ALU.data_in1[22] = 1'b0
-X3Y2.c0.ALU.data_in1[23] = 1'b0
-X3Y2.c0.ALU.data_in1[24] = 1'b0
-X3Y2.c0.ALU.data_in1[25] = 1'b0
-X3Y2.c0.ALU.data_in1[26] = 1'b0
-X3Y2.c0.ALU.data_in1[27] = 1'b0
-X3Y2.c0.ALU.data_in1[28] = 1'b0
-X3Y2.c0.ALU.data_in1[29] = 1'b0
-X3Y2.c0.ALU.data_in1[30] = 1'b0
-X3Y2.c0.ALU.data_in1[31] = 1'b0
-X3Y2.c0.ALU.ALU_func = 3'b111
+X4Y1.c0.ALU.data_in1[1] = 1'b0
+X4Y1.c0.ALU.data_in1[2] = 1'b0
+X4Y1.c0.ALU.data_in1[3] = 1'b0
+X4Y1.c0.ALU.data_in1[4] = 1'b0
+X4Y1.c0.ALU.data_in1[5] = 1'b0
+X4Y1.c0.ALU.data_in1[6] = 1'b0
+X4Y1.c0.ALU.data_in1[7] = 1'b0
+X4Y1.c0.ALU.data_in1[8] = 1'b0
+X4Y1.c0.ALU.data_in1[9] = 1'b0
+X4Y1.c0.ALU.data_in1[10] = 1'b0
+X4Y1.c0.ALU.data_in1[11] = 1'b0
+X4Y1.c0.ALU.data_in1[12] = 1'b0
+X4Y1.c0.ALU.data_in1[13] = 1'b0
+X4Y1.c0.ALU.data_in1[14] = 1'b0
+X4Y1.c0.ALU.data_in1[15] = 1'b0
+X4Y1.c0.ALU.data_in1[16] = 1'b0
+X4Y1.c0.ALU.data_in1[17] = 1'b0
+X4Y1.c0.ALU.data_in1[18] = 1'b0
+X4Y1.c0.ALU.data_in1[19] = 1'b0
+X4Y1.c0.ALU.data_in1[20] = 1'b0
+X4Y1.c0.ALU.data_in1[21] = 1'b0
+X4Y1.c0.ALU.data_in1[22] = 1'b0
+X4Y1.c0.ALU.data_in1[23] = 1'b0
+X4Y1.c0.ALU.data_in1[24] = 1'b0
+X4Y1.c0.ALU.data_in1[25] = 1'b0
+X4Y1.c0.ALU.data_in1[26] = 1'b0
+X4Y1.c0.ALU.data_in1[27] = 1'b0
+X4Y1.c0.ALU.data_in1[28] = 1'b0
+X4Y1.c0.ALU.data_in1[29] = 1'b0
+X4Y1.c0.ALU.data_in1[30] = 1'b0
+X4Y1.c0.ALU.data_in1[31] = 1'b0
+X4Y1.c0.ALU.ALU_func = 3'b111
 
 # config for cell '$extract$\ALU_ALU_func_3$311'
+X2Y1.c0.ALU.data_in1[3] = 1'b0
+X2Y1.c0.ALU.data_in1[4] = 1'b0
+X2Y1.c0.ALU.data_in1[5] = 1'b0
+X2Y1.c0.ALU.data_in1[6] = 1'b0
+X2Y1.c0.ALU.data_in1[7] = 1'b0
+X2Y1.c0.ALU.data_in1[8] = 1'b0
+X2Y1.c0.ALU.data_in1[9] = 1'b0
+X2Y1.c0.ALU.data_in1[10] = 1'b0
+X2Y1.c0.ALU.data_in1[11] = 1'b0
+X2Y1.c0.ALU.data_in1[12] = 1'b0
+X2Y1.c0.ALU.data_in1[13] = 1'b0
+X2Y1.c0.ALU.data_in1[14] = 1'b0
+X2Y1.c0.ALU.data_in1[15] = 1'b0
+X2Y1.c0.ALU.data_in1[16] = 1'b0
+X2Y1.c0.ALU.data_in1[17] = 1'b0
+X2Y1.c0.ALU.data_in1[18] = 1'b0
+X2Y1.c0.ALU.data_in1[19] = 1'b0
+X2Y1.c0.ALU.data_in1[20] = 1'b0
+X2Y1.c0.ALU.data_in1[21] = 1'b0
+X2Y1.c0.ALU.data_in1[22] = 1'b0
+X2Y1.c0.ALU.data_in1[23] = 1'b0
+X2Y1.c0.ALU.data_in1[24] = 1'b0
+X2Y1.c0.ALU.data_in1[25] = 1'b0
+X2Y1.c0.ALU.data_in1[26] = 1'b0
+X2Y1.c0.ALU.data_in1[27] = 1'b0
+X2Y1.c0.ALU.data_in1[28] = 1'b0
+X2Y1.c0.ALU.data_in1[29] = 1'b0
+X2Y1.c0.ALU.data_in1[30] = 1'b0
+X2Y1.c0.ALU.data_in1[31] = 1'b0
+X2Y1.c0.ALU.ALU_func = 2'b11
+
+# config for cell '$extract$\ALU_ALU_func_7$320'
+X1Y2.c0.ALU.ALU_func = 3'b111
+
+# config for cell '$extract$\ALU_ALU_func_6$326'
+X1Y3.c0.ALU.ALU_func = 3'b110
+
+# config for cell '$extract$\ALU_ALU_func_6$325'
+X2Y2.c0.ALU.ALU_func = 3'b110
+
+# config for cell '$extract$\ALU_ALU_func_6$324'
+X4Y3.c0.ALU.ALU_func = 3'b110
+
+# config for cell '$extract$\ALU_ALU_func_3$310'
 X1Y1.c0.ALU.data_in1[3] = 1'b0
 X1Y1.c0.ALU.data_in1[4] = 1'b0
 X1Y1.c0.ALU.data_in1[5] = 1'b0
@@ -2565,61 +2496,17 @@ X1Y1.c0.ALU.data_in1[30] = 1'b0
 X1Y1.c0.ALU.data_in1[31] = 1'b0
 X1Y1.c0.ALU.ALU_func = 2'b11
 
-# config for cell '$extract$\ALU_ALU_func_7$320'
-X1Y2.c0.ALU.ALU_func = 3'b111
-
-# config for cell '$extract$\ALU_ALU_func_6$326'
-X1Y4.c0.ALU.ALU_func = 3'b110
-
-# config for cell '$extract$\ALU_ALU_func_6$325'
-X2Y2.c0.ALU.ALU_func = 3'b110
-
-# config for cell '$extract$\ALU_ALU_func_6$324'
-X3Y3.c0.ALU.ALU_func = 3'b110
-
-# config for cell '$extract$\ALU_ALU_func_3$310'
-X1Y3.c0.ALU.data_in1[3] = 1'b0
-X1Y3.c0.ALU.data_in1[4] = 1'b0
-X1Y3.c0.ALU.data_in1[5] = 1'b0
-X1Y3.c0.ALU.data_in1[6] = 1'b0
-X1Y3.c0.ALU.data_in1[7] = 1'b0
-X1Y3.c0.ALU.data_in1[8] = 1'b0
-X1Y3.c0.ALU.data_in1[9] = 1'b0
-X1Y3.c0.ALU.data_in1[10] = 1'b0
-X1Y3.c0.ALU.data_in1[11] = 1'b0
-X1Y3.c0.ALU.data_in1[12] = 1'b0
-X1Y3.c0.ALU.data_in1[13] = 1'b0
-X1Y3.c0.ALU.data_in1[14] = 1'b0
-X1Y3.c0.ALU.data_in1[15] = 1'b0
-X1Y3.c0.ALU.data_in1[16] = 1'b0
-X1Y3.c0.ALU.data_in1[17] = 1'b0
-X1Y3.c0.ALU.data_in1[18] = 1'b0
-X1Y3.c0.ALU.data_in1[19] = 1'b0
-X1Y3.c0.ALU.data_in1[20] = 1'b0
-X1Y3.c0.ALU.data_in1[21] = 1'b0
-X1Y3.c0.ALU.data_in1[22] = 1'b0
-X1Y3.c0.ALU.data_in1[23] = 1'b0
-X1Y3.c0.ALU.data_in1[24] = 1'b0
-X1Y3.c0.ALU.data_in1[25] = 1'b0
-X1Y3.c0.ALU.data_in1[26] = 1'b0
-X1Y3.c0.ALU.data_in1[27] = 1'b0
-X1Y3.c0.ALU.data_in1[28] = 1'b0
-X1Y3.c0.ALU.data_in1[29] = 1'b0
-X1Y3.c0.ALU.data_in1[30] = 1'b0
-X1Y3.c0.ALU.data_in1[31] = 1'b0
-X1Y3.c0.ALU.ALU_func = 2'b11
-
 # config for cell '$extract$\ALU_ALU_func_0$317'
-X3Y4.c0.ALU.ALU_func = 1'b0
+X3Y3.c0.ALU.ALU_func = 1'b0
 
 # config for cell '$extract$\ALU_ALU_func_0$316'
 X2Y3.c0.ALU.ALU_func = 1'b0
 
 # config for cell '$auto$constmap.cc:36:constmap_worker$425'
-X1Y4.c0.const_unit.ConfigBits = 32'b00000000000000000000000000000000
+X1Y3.c0.const_unit.ConfigBits = 32'b00000000000000000000000000000000
 
 # config for cell '$extract$\compare_conf_4$340'
-X1Y2.c0.compare.conf = 3'b100
+X2Y2.c0.compare.conf = 3'b100
 
 # config for cell '$extract$\compare_conf_2$345'
 X3Y1.c0.compare.conf = 2'b10
@@ -2669,41 +2556,41 @@ X3Y1.c0.RES_reg_unit.tide_rst = 1'b0
 X3Y1.c0.RES_reg_unit.tide_en = 1'b1
 
 # config for cell '$iopadmap$main.done'
-X3Y0.c0.S_IO.from_fabric[1] = 1'b0
-X3Y0.c0.S_IO.from_fabric[2] = 1'b0
-X3Y0.c0.S_IO.from_fabric[3] = 1'b0
-X3Y0.c0.S_IO.from_fabric[4] = 1'b0
-X3Y0.c0.S_IO.from_fabric[5] = 1'b0
-X3Y0.c0.S_IO.from_fabric[6] = 1'b0
-X3Y0.c0.S_IO.from_fabric[7] = 1'b0
-X3Y0.c0.S_IO.from_fabric[8] = 1'b0
-X3Y0.c0.S_IO.from_fabric[9] = 1'b0
-X3Y0.c0.S_IO.from_fabric[10] = 1'b0
-X3Y0.c0.S_IO.from_fabric[11] = 1'b0
-X3Y0.c0.S_IO.from_fabric[12] = 1'b0
-X3Y0.c0.S_IO.from_fabric[13] = 1'b0
-X3Y0.c0.S_IO.from_fabric[14] = 1'b0
-X3Y0.c0.S_IO.from_fabric[15] = 1'b0
-X3Y0.c0.S_IO.from_fabric[16] = 1'b0
-X3Y0.c0.S_IO.from_fabric[17] = 1'b0
-X3Y0.c0.S_IO.from_fabric[18] = 1'b0
-X3Y0.c0.S_IO.from_fabric[19] = 1'b0
-X3Y0.c0.S_IO.from_fabric[20] = 1'b0
-X3Y0.c0.S_IO.from_fabric[21] = 1'b0
-X3Y0.c0.S_IO.from_fabric[22] = 1'b0
-X3Y0.c0.S_IO.from_fabric[23] = 1'b0
-X3Y0.c0.S_IO.from_fabric[24] = 1'b0
-X3Y0.c0.S_IO.from_fabric[25] = 1'b0
-X3Y0.c0.S_IO.from_fabric[26] = 1'b0
-X3Y0.c0.S_IO.from_fabric[27] = 1'b0
-X3Y0.c0.S_IO.from_fabric[28] = 1'b0
-X3Y0.c0.S_IO.from_fabric[29] = 1'b0
-X3Y0.c0.S_IO.from_fabric[30] = 1'b0
-X3Y0.c0.S_IO.from_fabric[31] = 1'b0
-X3Y0.c0.S_IO.WIDTH = 32'b00000000000000000000000000100000
+X2Y0.c0.S_IO.from_fabric[1] = 1'b0
+X2Y0.c0.S_IO.from_fabric[2] = 1'b0
+X2Y0.c0.S_IO.from_fabric[3] = 1'b0
+X2Y0.c0.S_IO.from_fabric[4] = 1'b0
+X2Y0.c0.S_IO.from_fabric[5] = 1'b0
+X2Y0.c0.S_IO.from_fabric[6] = 1'b0
+X2Y0.c0.S_IO.from_fabric[7] = 1'b0
+X2Y0.c0.S_IO.from_fabric[8] = 1'b0
+X2Y0.c0.S_IO.from_fabric[9] = 1'b0
+X2Y0.c0.S_IO.from_fabric[10] = 1'b0
+X2Y0.c0.S_IO.from_fabric[11] = 1'b0
+X2Y0.c0.S_IO.from_fabric[12] = 1'b0
+X2Y0.c0.S_IO.from_fabric[13] = 1'b0
+X2Y0.c0.S_IO.from_fabric[14] = 1'b0
+X2Y0.c0.S_IO.from_fabric[15] = 1'b0
+X2Y0.c0.S_IO.from_fabric[16] = 1'b0
+X2Y0.c0.S_IO.from_fabric[17] = 1'b0
+X2Y0.c0.S_IO.from_fabric[18] = 1'b0
+X2Y0.c0.S_IO.from_fabric[19] = 1'b0
+X2Y0.c0.S_IO.from_fabric[20] = 1'b0
+X2Y0.c0.S_IO.from_fabric[21] = 1'b0
+X2Y0.c0.S_IO.from_fabric[22] = 1'b0
+X2Y0.c0.S_IO.from_fabric[23] = 1'b0
+X2Y0.c0.S_IO.from_fabric[24] = 1'b0
+X2Y0.c0.S_IO.from_fabric[25] = 1'b0
+X2Y0.c0.S_IO.from_fabric[26] = 1'b0
+X2Y0.c0.S_IO.from_fabric[27] = 1'b0
+X2Y0.c0.S_IO.from_fabric[28] = 1'b0
+X2Y0.c0.S_IO.from_fabric[29] = 1'b0
+X2Y0.c0.S_IO.from_fabric[30] = 1'b0
+X2Y0.c0.S_IO.from_fabric[31] = 1'b0
+X2Y0.c0.S_IO.WIDTH = 32'b00000000000000000000000000100000
 
 # config for cell '$iopadmap$main.in1'
-X0Y4.c0.W_IO.WIDTH = 32'b00000000000000000000000000100000
+X0Y3.c0.W_IO.WIDTH = 32'b00000000000000000000000000100000
 
 # config for cell '$auto$constmap.cc:36:constmap_worker$407'
 X3Y1.c0.const_unit.ConfigBits = 32'b00000000000000000000000000000010
@@ -2712,182 +2599,182 @@ X3Y1.c0.const_unit.ConfigBits = 32'b00000000000000000000000000000010
 X2Y1.c0.const_unit.ConfigBits = 32'b00000000000000000000000000000011
 
 # config for cell '$extract$\ALU_ALU_func_6$323'
-X4Y4.c0.ALU.data_in1[4] = 1'b0
-X4Y4.c0.ALU.data_in1[5] = 1'b0
-X4Y4.c0.ALU.data_in1[6] = 1'b0
-X4Y4.c0.ALU.data_in1[7] = 1'b0
-X4Y4.c0.ALU.data_in1[8] = 1'b0
-X4Y4.c0.ALU.data_in1[9] = 1'b0
-X4Y4.c0.ALU.data_in1[10] = 1'b0
-X4Y4.c0.ALU.data_in1[11] = 1'b0
-X4Y4.c0.ALU.data_in1[12] = 1'b0
-X4Y4.c0.ALU.data_in1[13] = 1'b0
-X4Y4.c0.ALU.data_in1[14] = 1'b0
-X4Y4.c0.ALU.data_in1[15] = 1'b0
-X4Y4.c0.ALU.data_in1[16] = 1'b0
-X4Y4.c0.ALU.data_in1[17] = 1'b0
-X4Y4.c0.ALU.data_in1[18] = 1'b0
-X4Y4.c0.ALU.data_in1[19] = 1'b0
-X4Y4.c0.ALU.data_in1[20] = 1'b0
-X4Y4.c0.ALU.data_in1[21] = 1'b0
-X4Y4.c0.ALU.data_in1[22] = 1'b0
-X4Y4.c0.ALU.data_in1[23] = 1'b0
-X4Y4.c0.ALU.data_in1[24] = 1'b0
-X4Y4.c0.ALU.data_in1[25] = 1'b0
-X4Y4.c0.ALU.data_in1[26] = 1'b0
-X4Y4.c0.ALU.data_in1[27] = 1'b0
-X4Y4.c0.ALU.data_in1[28] = 1'b0
-X4Y4.c0.ALU.data_in1[29] = 1'b0
-X4Y4.c0.ALU.data_in1[30] = 1'b0
-X4Y4.c0.ALU.data_in1[31] = 1'b0
-X4Y4.c0.ALU.ALU_func = 3'b110
+X3Y2.c0.ALU.data_in1[4] = 1'b0
+X3Y2.c0.ALU.data_in1[5] = 1'b0
+X3Y2.c0.ALU.data_in1[6] = 1'b0
+X3Y2.c0.ALU.data_in1[7] = 1'b0
+X3Y2.c0.ALU.data_in1[8] = 1'b0
+X3Y2.c0.ALU.data_in1[9] = 1'b0
+X3Y2.c0.ALU.data_in1[10] = 1'b0
+X3Y2.c0.ALU.data_in1[11] = 1'b0
+X3Y2.c0.ALU.data_in1[12] = 1'b0
+X3Y2.c0.ALU.data_in1[13] = 1'b0
+X3Y2.c0.ALU.data_in1[14] = 1'b0
+X3Y2.c0.ALU.data_in1[15] = 1'b0
+X3Y2.c0.ALU.data_in1[16] = 1'b0
+X3Y2.c0.ALU.data_in1[17] = 1'b0
+X3Y2.c0.ALU.data_in1[18] = 1'b0
+X3Y2.c0.ALU.data_in1[19] = 1'b0
+X3Y2.c0.ALU.data_in1[20] = 1'b0
+X3Y2.c0.ALU.data_in1[21] = 1'b0
+X3Y2.c0.ALU.data_in1[22] = 1'b0
+X3Y2.c0.ALU.data_in1[23] = 1'b0
+X3Y2.c0.ALU.data_in1[24] = 1'b0
+X3Y2.c0.ALU.data_in1[25] = 1'b0
+X3Y2.c0.ALU.data_in1[26] = 1'b0
+X3Y2.c0.ALU.data_in1[27] = 1'b0
+X3Y2.c0.ALU.data_in1[28] = 1'b0
+X3Y2.c0.ALU.data_in1[29] = 1'b0
+X3Y2.c0.ALU.data_in1[30] = 1'b0
+X3Y2.c0.ALU.data_in1[31] = 1'b0
+X3Y2.c0.ALU.ALU_func = 3'b110
 
 # config for cell 'mem_0.mem.0.0'
 X5Y3.c0.Mem.config_bits = 1'b0
 X5Y3.c0.Mem.INIT = 512'b00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 
 # config for cell '$iopadmap$main.clk'
-X0Y5.c0.W_IO.in[1] = 1'b0
-X0Y5.c0.W_IO.in[2] = 1'b0
-X0Y5.c0.W_IO.in[3] = 1'b0
-X0Y5.c0.W_IO.in[4] = 1'b0
-X0Y5.c0.W_IO.in[5] = 1'b0
-X0Y5.c0.W_IO.in[6] = 1'b0
-X0Y5.c0.W_IO.in[7] = 1'b0
-X0Y5.c0.W_IO.in[8] = 1'b0
-X0Y5.c0.W_IO.in[9] = 1'b0
-X0Y5.c0.W_IO.in[10] = 1'b0
-X0Y5.c0.W_IO.in[11] = 1'b0
-X0Y5.c0.W_IO.in[12] = 1'b0
-X0Y5.c0.W_IO.in[13] = 1'b0
-X0Y5.c0.W_IO.in[14] = 1'b0
-X0Y5.c0.W_IO.in[15] = 1'b0
-X0Y5.c0.W_IO.in[16] = 1'b0
-X0Y5.c0.W_IO.in[17] = 1'b0
-X0Y5.c0.W_IO.in[18] = 1'b0
-X0Y5.c0.W_IO.in[19] = 1'b0
-X0Y5.c0.W_IO.in[20] = 1'b0
-X0Y5.c0.W_IO.in[21] = 1'b0
-X0Y5.c0.W_IO.in[22] = 1'b0
-X0Y5.c0.W_IO.in[23] = 1'b0
-X0Y5.c0.W_IO.in[24] = 1'b0
-X0Y5.c0.W_IO.in[25] = 1'b0
-X0Y5.c0.W_IO.in[26] = 1'b0
-X0Y5.c0.W_IO.in[27] = 1'b0
-X0Y5.c0.W_IO.in[28] = 1'b0
-X0Y5.c0.W_IO.in[29] = 1'b0
-X0Y5.c0.W_IO.in[30] = 1'b0
-X0Y5.c0.W_IO.in[31] = 1'b0
-X0Y5.c0.W_IO.WIDTH = 32'b00000000000000000000000000100000
+X2Y7.c0.N_IO.in[1] = 1'b0
+X2Y7.c0.N_IO.in[2] = 1'b0
+X2Y7.c0.N_IO.in[3] = 1'b0
+X2Y7.c0.N_IO.in[4] = 1'b0
+X2Y7.c0.N_IO.in[5] = 1'b0
+X2Y7.c0.N_IO.in[6] = 1'b0
+X2Y7.c0.N_IO.in[7] = 1'b0
+X2Y7.c0.N_IO.in[8] = 1'b0
+X2Y7.c0.N_IO.in[9] = 1'b0
+X2Y7.c0.N_IO.in[10] = 1'b0
+X2Y7.c0.N_IO.in[11] = 1'b0
+X2Y7.c0.N_IO.in[12] = 1'b0
+X2Y7.c0.N_IO.in[13] = 1'b0
+X2Y7.c0.N_IO.in[14] = 1'b0
+X2Y7.c0.N_IO.in[15] = 1'b0
+X2Y7.c0.N_IO.in[16] = 1'b0
+X2Y7.c0.N_IO.in[17] = 1'b0
+X2Y7.c0.N_IO.in[18] = 1'b0
+X2Y7.c0.N_IO.in[19] = 1'b0
+X2Y7.c0.N_IO.in[20] = 1'b0
+X2Y7.c0.N_IO.in[21] = 1'b0
+X2Y7.c0.N_IO.in[22] = 1'b0
+X2Y7.c0.N_IO.in[23] = 1'b0
+X2Y7.c0.N_IO.in[24] = 1'b0
+X2Y7.c0.N_IO.in[25] = 1'b0
+X2Y7.c0.N_IO.in[26] = 1'b0
+X2Y7.c0.N_IO.in[27] = 1'b0
+X2Y7.c0.N_IO.in[28] = 1'b0
+X2Y7.c0.N_IO.in[29] = 1'b0
+X2Y7.c0.N_IO.in[30] = 1'b0
+X2Y7.c0.N_IO.in[31] = 1'b0
+X2Y7.c0.N_IO.WIDTH = 32'b00000000000000000000000000100000
 
 # config for cell '$iopadmap$main.reset'
-X2Y0.c0.S_IO.in[1] = 1'b0
-X2Y0.c0.S_IO.in[2] = 1'b0
-X2Y0.c0.S_IO.in[3] = 1'b0
-X2Y0.c0.S_IO.in[4] = 1'b0
-X2Y0.c0.S_IO.in[5] = 1'b0
-X2Y0.c0.S_IO.in[6] = 1'b0
-X2Y0.c0.S_IO.in[7] = 1'b0
-X2Y0.c0.S_IO.in[8] = 1'b0
-X2Y0.c0.S_IO.in[9] = 1'b0
-X2Y0.c0.S_IO.in[10] = 1'b0
-X2Y0.c0.S_IO.in[11] = 1'b0
-X2Y0.c0.S_IO.in[12] = 1'b0
-X2Y0.c0.S_IO.in[13] = 1'b0
-X2Y0.c0.S_IO.in[14] = 1'b0
-X2Y0.c0.S_IO.in[15] = 1'b0
-X2Y0.c0.S_IO.in[16] = 1'b0
-X2Y0.c0.S_IO.in[17] = 1'b0
-X2Y0.c0.S_IO.in[18] = 1'b0
-X2Y0.c0.S_IO.in[19] = 1'b0
-X2Y0.c0.S_IO.in[20] = 1'b0
-X2Y0.c0.S_IO.in[21] = 1'b0
-X2Y0.c0.S_IO.in[22] = 1'b0
-X2Y0.c0.S_IO.in[23] = 1'b0
-X2Y0.c0.S_IO.in[24] = 1'b0
-X2Y0.c0.S_IO.in[25] = 1'b0
-X2Y0.c0.S_IO.in[26] = 1'b0
-X2Y0.c0.S_IO.in[27] = 1'b0
-X2Y0.c0.S_IO.in[28] = 1'b0
-X2Y0.c0.S_IO.in[29] = 1'b0
-X2Y0.c0.S_IO.in[30] = 1'b0
-X2Y0.c0.S_IO.in[31] = 1'b0
-X2Y0.c0.S_IO.WIDTH = 32'b00000000000000000000000000100000
+X4Y0.c0.S_IO.in[1] = 1'b0
+X4Y0.c0.S_IO.in[2] = 1'b0
+X4Y0.c0.S_IO.in[3] = 1'b0
+X4Y0.c0.S_IO.in[4] = 1'b0
+X4Y0.c0.S_IO.in[5] = 1'b0
+X4Y0.c0.S_IO.in[6] = 1'b0
+X4Y0.c0.S_IO.in[7] = 1'b0
+X4Y0.c0.S_IO.in[8] = 1'b0
+X4Y0.c0.S_IO.in[9] = 1'b0
+X4Y0.c0.S_IO.in[10] = 1'b0
+X4Y0.c0.S_IO.in[11] = 1'b0
+X4Y0.c0.S_IO.in[12] = 1'b0
+X4Y0.c0.S_IO.in[13] = 1'b0
+X4Y0.c0.S_IO.in[14] = 1'b0
+X4Y0.c0.S_IO.in[15] = 1'b0
+X4Y0.c0.S_IO.in[16] = 1'b0
+X4Y0.c0.S_IO.in[17] = 1'b0
+X4Y0.c0.S_IO.in[18] = 1'b0
+X4Y0.c0.S_IO.in[19] = 1'b0
+X4Y0.c0.S_IO.in[20] = 1'b0
+X4Y0.c0.S_IO.in[21] = 1'b0
+X4Y0.c0.S_IO.in[22] = 1'b0
+X4Y0.c0.S_IO.in[23] = 1'b0
+X4Y0.c0.S_IO.in[24] = 1'b0
+X4Y0.c0.S_IO.in[25] = 1'b0
+X4Y0.c0.S_IO.in[26] = 1'b0
+X4Y0.c0.S_IO.in[27] = 1'b0
+X4Y0.c0.S_IO.in[28] = 1'b0
+X4Y0.c0.S_IO.in[29] = 1'b0
+X4Y0.c0.S_IO.in[30] = 1'b0
+X4Y0.c0.S_IO.in[31] = 1'b0
+X4Y0.c0.S_IO.WIDTH = 32'b00000000000000000000000000100000
 
 # config for cell '$auto$constmap.cc:36:constmap_worker$395'
-X3Y4.c0.const_unit.ConfigBits = 32'b00000000000000000000000000001111
+X3Y3.c0.const_unit.ConfigBits = 32'b00000000000000000000000000001111
 
 # config for cell '$iopadmap$main.in0'
-X4Y7.c0.N_IO.WIDTH = 32'b00000000000000000000000000100000
+X3Y0.c0.S_IO.WIDTH = 32'b00000000000000000000000000100000
 
 # config for cell '$iopadmap$main.go'
-X0Y1.c0.W_IO.in[1] = 1'b0
-X0Y1.c0.W_IO.in[2] = 1'b0
-X0Y1.c0.W_IO.in[3] = 1'b0
-X0Y1.c0.W_IO.in[4] = 1'b0
-X0Y1.c0.W_IO.in[5] = 1'b0
-X0Y1.c0.W_IO.in[6] = 1'b0
-X0Y1.c0.W_IO.in[7] = 1'b0
-X0Y1.c0.W_IO.in[8] = 1'b0
-X0Y1.c0.W_IO.in[9] = 1'b0
-X0Y1.c0.W_IO.in[10] = 1'b0
-X0Y1.c0.W_IO.in[11] = 1'b0
-X0Y1.c0.W_IO.in[12] = 1'b0
-X0Y1.c0.W_IO.in[13] = 1'b0
-X0Y1.c0.W_IO.in[14] = 1'b0
-X0Y1.c0.W_IO.in[15] = 1'b0
-X0Y1.c0.W_IO.in[16] = 1'b0
-X0Y1.c0.W_IO.in[17] = 1'b0
-X0Y1.c0.W_IO.in[18] = 1'b0
-X0Y1.c0.W_IO.in[19] = 1'b0
-X0Y1.c0.W_IO.in[20] = 1'b0
-X0Y1.c0.W_IO.in[21] = 1'b0
-X0Y1.c0.W_IO.in[22] = 1'b0
-X0Y1.c0.W_IO.in[23] = 1'b0
-X0Y1.c0.W_IO.in[24] = 1'b0
-X0Y1.c0.W_IO.in[25] = 1'b0
-X0Y1.c0.W_IO.in[26] = 1'b0
-X0Y1.c0.W_IO.in[27] = 1'b0
-X0Y1.c0.W_IO.in[28] = 1'b0
-X0Y1.c0.W_IO.in[29] = 1'b0
-X0Y1.c0.W_IO.in[30] = 1'b0
-X0Y1.c0.W_IO.in[31] = 1'b0
-X0Y1.c0.W_IO.WIDTH = 32'b00000000000000000000000000100000
+X1Y0.c0.S_IO.in[1] = 1'b0
+X1Y0.c0.S_IO.in[2] = 1'b0
+X1Y0.c0.S_IO.in[3] = 1'b0
+X1Y0.c0.S_IO.in[4] = 1'b0
+X1Y0.c0.S_IO.in[5] = 1'b0
+X1Y0.c0.S_IO.in[6] = 1'b0
+X1Y0.c0.S_IO.in[7] = 1'b0
+X1Y0.c0.S_IO.in[8] = 1'b0
+X1Y0.c0.S_IO.in[9] = 1'b0
+X1Y0.c0.S_IO.in[10] = 1'b0
+X1Y0.c0.S_IO.in[11] = 1'b0
+X1Y0.c0.S_IO.in[12] = 1'b0
+X1Y0.c0.S_IO.in[13] = 1'b0
+X1Y0.c0.S_IO.in[14] = 1'b0
+X1Y0.c0.S_IO.in[15] = 1'b0
+X1Y0.c0.S_IO.in[16] = 1'b0
+X1Y0.c0.S_IO.in[17] = 1'b0
+X1Y0.c0.S_IO.in[18] = 1'b0
+X1Y0.c0.S_IO.in[19] = 1'b0
+X1Y0.c0.S_IO.in[20] = 1'b0
+X1Y0.c0.S_IO.in[21] = 1'b0
+X1Y0.c0.S_IO.in[22] = 1'b0
+X1Y0.c0.S_IO.in[23] = 1'b0
+X1Y0.c0.S_IO.in[24] = 1'b0
+X1Y0.c0.S_IO.in[25] = 1'b0
+X1Y0.c0.S_IO.in[26] = 1'b0
+X1Y0.c0.S_IO.in[27] = 1'b0
+X1Y0.c0.S_IO.in[28] = 1'b0
+X1Y0.c0.S_IO.in[29] = 1'b0
+X1Y0.c0.S_IO.in[30] = 1'b0
+X1Y0.c0.S_IO.in[31] = 1'b0
+X1Y0.c0.S_IO.WIDTH = 32'b00000000000000000000000000100000
 
 # config for cell '$extract$\reg_unit_tide_en_1_tide_rst_0$355'
-X1Y3.c0.RES_reg_unit.reg_in[1] = 1'b0
-X1Y3.c0.RES_reg_unit.reg_in[2] = 1'b0
-X1Y3.c0.RES_reg_unit.reg_in[3] = 1'b0
-X1Y3.c0.RES_reg_unit.reg_in[4] = 1'b0
-X1Y3.c0.RES_reg_unit.reg_in[5] = 1'b0
-X1Y3.c0.RES_reg_unit.reg_in[6] = 1'b0
-X1Y3.c0.RES_reg_unit.reg_in[7] = 1'b0
-X1Y3.c0.RES_reg_unit.reg_in[8] = 1'b0
-X1Y3.c0.RES_reg_unit.reg_in[9] = 1'b0
-X1Y3.c0.RES_reg_unit.reg_in[10] = 1'b0
-X1Y3.c0.RES_reg_unit.reg_in[11] = 1'b0
-X1Y3.c0.RES_reg_unit.reg_in[12] = 1'b0
-X1Y3.c0.RES_reg_unit.reg_in[13] = 1'b0
-X1Y3.c0.RES_reg_unit.reg_in[14] = 1'b0
-X1Y3.c0.RES_reg_unit.reg_in[15] = 1'b0
-X1Y3.c0.RES_reg_unit.reg_in[16] = 1'b0
-X1Y3.c0.RES_reg_unit.reg_in[17] = 1'b0
-X1Y3.c0.RES_reg_unit.reg_in[18] = 1'b0
-X1Y3.c0.RES_reg_unit.reg_in[19] = 1'b0
-X1Y3.c0.RES_reg_unit.reg_in[20] = 1'b0
-X1Y3.c0.RES_reg_unit.reg_in[21] = 1'b0
-X1Y3.c0.RES_reg_unit.reg_in[22] = 1'b0
-X1Y3.c0.RES_reg_unit.reg_in[23] = 1'b0
-X1Y3.c0.RES_reg_unit.reg_in[24] = 1'b0
-X1Y3.c0.RES_reg_unit.reg_in[25] = 1'b0
-X1Y3.c0.RES_reg_unit.reg_in[26] = 1'b0
-X1Y3.c0.RES_reg_unit.reg_in[27] = 1'b0
-X1Y3.c0.RES_reg_unit.reg_in[28] = 1'b0
-X1Y3.c0.RES_reg_unit.reg_in[29] = 1'b0
-X1Y3.c0.RES_reg_unit.reg_in[30] = 1'b0
-X1Y3.c0.RES_reg_unit.reg_in[31] = 1'b0
-X1Y3.c0.RES_reg_unit.tide_rst = 1'b0
-X1Y3.c0.RES_reg_unit.tide_en = 1'b1
+X1Y1.c0.RES_reg_unit.reg_in[1] = 1'b0
+X1Y1.c0.RES_reg_unit.reg_in[2] = 1'b0
+X1Y1.c0.RES_reg_unit.reg_in[3] = 1'b0
+X1Y1.c0.RES_reg_unit.reg_in[4] = 1'b0
+X1Y1.c0.RES_reg_unit.reg_in[5] = 1'b0
+X1Y1.c0.RES_reg_unit.reg_in[6] = 1'b0
+X1Y1.c0.RES_reg_unit.reg_in[7] = 1'b0
+X1Y1.c0.RES_reg_unit.reg_in[8] = 1'b0
+X1Y1.c0.RES_reg_unit.reg_in[9] = 1'b0
+X1Y1.c0.RES_reg_unit.reg_in[10] = 1'b0
+X1Y1.c0.RES_reg_unit.reg_in[11] = 1'b0
+X1Y1.c0.RES_reg_unit.reg_in[12] = 1'b0
+X1Y1.c0.RES_reg_unit.reg_in[13] = 1'b0
+X1Y1.c0.RES_reg_unit.reg_in[14] = 1'b0
+X1Y1.c0.RES_reg_unit.reg_in[15] = 1'b0
+X1Y1.c0.RES_reg_unit.reg_in[16] = 1'b0
+X1Y1.c0.RES_reg_unit.reg_in[17] = 1'b0
+X1Y1.c0.RES_reg_unit.reg_in[18] = 1'b0
+X1Y1.c0.RES_reg_unit.reg_in[19] = 1'b0
+X1Y1.c0.RES_reg_unit.reg_in[20] = 1'b0
+X1Y1.c0.RES_reg_unit.reg_in[21] = 1'b0
+X1Y1.c0.RES_reg_unit.reg_in[22] = 1'b0
+X1Y1.c0.RES_reg_unit.reg_in[23] = 1'b0
+X1Y1.c0.RES_reg_unit.reg_in[24] = 1'b0
+X1Y1.c0.RES_reg_unit.reg_in[25] = 1'b0
+X1Y1.c0.RES_reg_unit.reg_in[26] = 1'b0
+X1Y1.c0.RES_reg_unit.reg_in[27] = 1'b0
+X1Y1.c0.RES_reg_unit.reg_in[28] = 1'b0
+X1Y1.c0.RES_reg_unit.reg_in[29] = 1'b0
+X1Y1.c0.RES_reg_unit.reg_in[30] = 1'b0
+X1Y1.c0.RES_reg_unit.reg_in[31] = 1'b0
+X1Y1.c0.RES_reg_unit.tide_rst = 1'b0
+X1Y1.c0.RES_reg_unit.tide_en = 1'b1
 
 # config for cell '$extract$\reg_unit_tide_en_0_tide_rst_1$352'
 X2Y2.c0.N_reg_unit.tide_rst = 1'b1
@@ -2927,7 +2814,7 @@ X3Y1.c0.ALU.data_in1[31] = 1'b0
 X3Y1.c0.ALU.ALU_func = 2'b11
 
 # config for cell '$auto$constmap.cc:36:constmap_worker$383'
-X4Y4.c0.const_unit.ConfigBits = 32'b00000000000000000000000000000000
+X3Y2.c0.const_unit.ConfigBits = 32'b00000000000000000000000000000000
 
 # config for cell '$extract$\reg_unit_tide_en_0_tide_rst_1$351'
 X2Y2.c0.RES_reg_unit.tide_rst = 1'b1

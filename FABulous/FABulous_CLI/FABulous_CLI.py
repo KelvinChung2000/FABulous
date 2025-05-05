@@ -102,14 +102,13 @@ class FABulous_CLI(Cmd):
     fabricFilePath: Path
     extension: Literal[".v", ".sv", ".vhdl"] = ".v"
     script: str = ""
+    force: bool = False
 
     def __init__(
         self,
         writerType: WriterType,
         projectDir: Path,
-        FABulousScript: Path = Path(),
-        TCLScript: Path = Path(),
-        commands: list[str] = [],
+        force: bool = False,
     ):
         """Initialises the FABulous shell instance.
 
@@ -128,13 +127,15 @@ class FABulous_CLI(Cmd):
         super().__init__(
             persistent_history_file=f"{os.getenv('FAB_PROJ_DIR')}/{META_DATA_DIR}/.fabulous_history",
             allow_cli_args=False,
-            startup_script=str(FABulousScript) if not FABulousScript.is_dir() else "",
         )
 
         self.projectDir = projectDir.absolute()
         self.add_settable(
             Settable("projectDir", Path, "The directory of the project", self)
         )
+
+        self.force = force
+        self.add_settable(Settable("force", bool, "Force command execution", self))
 
         self.tiles = []
         self.superTiles = []
@@ -217,7 +218,7 @@ class FABulous_CLI(Cmd):
         except Exception:
             logger.debug(traceback.format_exc())
             self.exit_code = 1
-            return False
+            return not self.force
 
     def do_exit(self, *ignored):
         """Exits the FABulous shell and logs info message."""
@@ -285,7 +286,6 @@ class FABulous_CLI(Cmd):
                 logger.error(
                     "No argument is given and the csv file is set or the file does not exist"
                 )
-                return
         else:
             self.fabulousAPI.loadFabric(args.file)
             self.fabricFilePath = args.file
@@ -440,7 +440,9 @@ class FABulous_CLI(Cmd):
     def do_gen_all_tile(self, *ignored):
         """Generates all tiles by calling 'do_gen_tile'."""
         logger.info("Generating all tiles")
-        self.do_gen_tile(" ".join(list(self.fabulousAPI.getTilesNames())))
+        self.onecmd_plus_hooks(
+            f"gen_tile {" ".join(list(self.fabulousAPI.getTilesNames()))}"
+        )
         logger.info("Generated all tiles")
 
     @with_category(CMD_FABRIC_FLOW)
@@ -577,9 +579,23 @@ class FABulous_CLI(Cmd):
 
     @with_category(CMD_FABRIC_FLOW)
     def do_gen_FABulous_CAD_tool_files(self, *ignored):
-        self.do_gen_bitStream_spec()
-        self.do_gen_cells_and_techmaps()
-        self.do_gen_chipdb()
+        logger.info("Generating FABulous CAD tool files")
+        logger.info("Generating bitStreamSpec")
+        if self.onecmd_plus_hooks("gen_bitStream_spec"):
+            logger.error("FABulous CAD tool files generation failed")
+            return True
+
+        logger.info("Generating Techmaps")
+        if self.onecmd_plus_hooks("gen_cells_and_techmaps"):
+            logger.error("FABulous CAD tool files generation failed")
+            return True
+
+        logger.info("Generating chip database")
+        if self.onecmd_plus_hooks("gen_chipdb"):
+            logger.error("FABulous CAD tool files generation failed")
+            return True
+
+        logger.info("Generating FABulous CAD tool files completed successfully.")
 
     @with_category(CMD_FABRIC_FLOW)
     def do_gen_model_npnr(self, *ignored):

@@ -54,8 +54,9 @@ class Bel:
     """
 
     src: Path
+    jsonPath: Path
     prefix: str
-    name: str
+    _name: str
     belType: BelType
     inputs: list[BelPort]
     outputs: list[BelPort]
@@ -69,6 +70,51 @@ class Bel:
     constantBel: bool
     z: int = 0
     paramOverride: dict[str, str] = field(default_factory=dict)
+
+    def __init__(
+        self,
+        src: Path,
+        jsonPath: Path,
+        prefix: str,
+        name: str,
+        belType: BelType,
+        inputs: list[BelPort],
+        outputs: list[BelPort],
+        externalInputs: list[BelPort],
+        externalOutputs: list[BelPort],
+        configPort: list[ConfigPort],
+        sharedPort: list[SharedPort],
+        configBits: int,
+        belFeatureMap: dict[str, int],
+        userCLK: Port | None = None,
+        constantBel: bool = False,
+        z: int = 0,
+        paramOverride: dict[str, str] = {},
+    ):
+        self.src = src
+        self.jsonPath = jsonPath
+        self.prefix = prefix
+        self._name = name
+        self.belType = belType
+        self.inputs = inputs
+        self.outputs = outputs
+        self.externalInputs = externalInputs
+        self.externalOutputs = externalOutputs
+        self.configPort = configPort
+        self.sharedPort = sharedPort
+        self.configBits = configBits
+        self.belFeatureMap = belFeatureMap
+        self.userCLK = userCLK
+        self.constantBel = constantBel
+        self.z = z
+        self.paramOverride = paramOverride
+
+    @property
+    def name(self) -> str:
+        if len(self.paramOverride) == 0:
+            return f"{self._name}"
+        else:
+            return f"{self._name}_{'__'.join([f'{k}_{v}' for k, v in self.paramOverride.items()])}"
 
     def __post__init__(self):
         if self.belType == BelType.IO:

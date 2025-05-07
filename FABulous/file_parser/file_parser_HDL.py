@@ -1,18 +1,29 @@
 import json
+import re
 import subprocess
+from functools import partial
 from pathlib import Path
 from pprint import pprint
 
 from loguru import logger
+from pyosys import libyosys as ys
 
 from FABulous.fabric_definition.Bel import Bel
-from FABulous.fabric_definition.define import IO, BelType, FABulousPortType, FeatureType
+from FABulous.fabric_definition.define import (
+    IO,
+    BelType,
+    FABulousPortType,
+    FeatureType,
+    YosysJson,
+    YosysModule,
+)
 from FABulous.fabric_definition.Port import BelPort, ConfigPort, Port, SharedPort
 
 
 def parseBelFile(
     filename: Path,
     belPrefix: str = "",
+    paramOverride: dict[str, str] = {},
 ) -> Bel:
     """Parse a Verilog or VHDL bel file and return all the related information of the
     bel. The tuple returned for relating to ports will be a list of (belName, IO) pair.
@@ -107,64 +118,79 @@ def parseBelFile(
         raise ValueError
 
     Path(filename.parent / "metadata").mkdir(exist_ok=True)
-    json_file = filename.parent / Path("metadata") / filename.with_suffix(".json").name
+    jsonFile: Path
+
+    with open(filename, "r") as f:
+        fileContent = f.read()
+        if (
+            moduleName := re.search(r"module\s+(\w+)", fileContent)
+        ) and moduleName.group(1) != filename.stem:
+            logger.error(
+                f"Module name {moduleName.group(1)} does not match file name {filename.stem}."
+            )
+            raise ValueError
+
     if filename.suffix == ".v":
         # Runs yosys on verilog file, creates netlist, saves to json in same directory.
+        if len(paramOverride) == 0:
+            nName = f"{filename.stem}"
+        else:
+            nName = f"{filename.stem}_{'__'.join([f'{k}_{v}' for k, v in paramOverride.items()])}"
+        jsonFile = filename.parent / Path("metadata") / Path(f"{nName}.json")
         runCmd = [
             "yosys",
             "-qp",
-            f"read_verilog -sv {filename}; proc -noopt; write_json -compat-int {json_file}",
+            f"read_verilog -defer -sv {filename}; "
+            + " ".join([f"chparam -set {u} {v};" for u, v in paramOverride.items()])
+            + f" hierarchy -top {filename.stem}; rename -top {nName}; proc -noopt;  write_json -compat-int {jsonFile}",
         ]
     elif filename.suffix == ".vhdl":
+        jsonFile = filename.parent / Path("metadata") / Path(f"{filename.stem}.json")
         runCmd = [
             "yosys",
             "-m ghdl",
             "-qp",
-            f"ghdl {filename}; proc -noopt; write_json -compat-int {json_file}",
+            f"ghdl {filename}; proc -noopt; write_json -compat-int {jsonFile}",
         ]
 
     try:
         logger.info(f"Parsing bel file: {filename}")
         subprocess.run(runCmd, check=True, text=True, capture_output=True)
     except subprocess.CalledProcessError as e:
-        logger.error(f"Failed to run yosys command: {' '.join(runCmd)}")
-        logger.error(e.stderr)
+        logger.error(f"Failed to run yosys command: {' '.join(runCmd)}\n{e.stderr}")
         raise ValueError
 
-    with open(f"{json_file}", "r") as f:
-        data_dict = json.load(f)
+    yosysObj = YosysJson(jsonFile)
 
-    modules = data_dict.get("modules", {})
-    if len(modules) > 1:
+    if len(yosysObj.modules) > 1:
         logger.error(
             f"Multiple modules found in {filename}. Only one module per file is allowed."
         )
         raise ValueError
-    elif len(modules) == 0:
+    elif len(yosysObj.modules) == 0:
         logger.error(f"No modules found in {filename}.")
         raise ValueError
 
-    module: dict = modules[list(modules.keys())[0]]
+    moduleName = next(iter(yosysObj.modules))
+    module: YosysModule = yosysObj.modules[moduleName]
 
     ports: dict[str, IO] = {}
 
-    for port_name, port_info in module["ports"].items():
-        ports[port_name] = IO[port_info["direction"].upper()]
+    for port_name, port_info in module.ports.items():
+        ports[port_name] = IO[port_info.direction.upper()]
 
     # Passed attributes dont show in port list, checks for attributes in netnames.
-    netnames = module.get("netnames", {})
-    for net, details in netnames.items():
+    for net, details in module.netnames.items():
         if net not in ports:
             continue
 
-        netBitWidth = len(details.get("bits", [1]))
-        attributes = set(details.get("attributes", {}).keys())
+        netBitWidth = len(details.bits)
+        attributes = set(details.attributes)
 
         port = BelPort(
             name=f"{net}",
             ioDirection=ports[net],
             width=netBitWidth,
-            isBus=FABulousPortType.BUS in attributes,
             prefix=belPrefix,
             external=FABulousPortType.EXTERNAL in attributes,
             control=FABulousPortType.CONTROL in attributes,
@@ -172,7 +198,7 @@ def parseBelFile(
         if FABulousPortType.EXTERNAL in attributes:
             externalPort.append(port)
         elif FABulousPortType.CONFIG_BIT in attributes:
-            features = details.get("attributes", {}).get("FEATURE", "")
+            features = details.attributes.get("FEATURE", "")
             features = list(filter(lambda x: x != "", features.split(";")))
             featureType = attributes - set(["FABulous", "CONFIG_BIT", "src", "FEATURE"])
             if len(features) == 0:
@@ -192,7 +218,6 @@ def parseBelFile(
                     name=f"{net}",
                     ioDirection=IO.INPUT,
                     width=netBitWidth,
-                    isBus=FABulousPortType.BUS in attributes,
                     features=[(feature, i) for i, feature in enumerate(features)],
                     featureType=FeatureType.INIT,
                 )
@@ -205,8 +230,7 @@ def parseBelFile(
                     name=f"{belPrefix}{net}",
                     ioDirection=ports[net],
                     width=netBitWidth,
-                    isBus=FABulousPortType.BUS in attributes,
-                    sharedWith=details.get("attributes", {}).get("SHARED_WITH", ""),
+                    sharedWith=details.attributes.get("SHARED_WITH", ""),
                 )
             )
         elif FABulousPortType.CONTROL in attributes:
@@ -219,7 +243,7 @@ def parseBelFile(
             internalPort.append(port)
 
     attList = []
-    moduleAttributes = module.get("attributes", {})
+    moduleAttributes = module.attributes
     for a in moduleAttributes:
         if a.upper() in BelType:
             attList.append(a)
@@ -240,6 +264,7 @@ def parseBelFile(
     externalOutputs = [p for p in externalPort if p.ioDirection == IO.OUTPUT]
     return Bel(
         src=filename,
+        jsonPath=jsonFile,
         prefix=belPrefix,
         name=filename.stem,
         belType=attList[0],
@@ -253,6 +278,7 @@ def parseBelFile(
         belFeatureMap=belFeatureMap,
         userCLK=userClk,
         constantBel=len(externalInputs) + len(inputs) == 0,
+        paramOverride=paramOverride,
     )
 
 

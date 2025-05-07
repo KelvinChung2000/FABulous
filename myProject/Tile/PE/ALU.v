@@ -32,8 +32,8 @@ module ALU #(
       SUB: data_out = data_in1 - data_in2;
       XOR: data_out = data_in1 ^ data_in2;
       MUL: data_out = data_in1 * data_in2;
-      REDUCE_OR: data_out[0] = |data_in1;
-      REDUCE_AND: data_out[0] = &data_in1;
+      // REDUCE_OR: data_out[0] = |data_in1;
+      // REDUCE_AND: data_out[0] = &data_in1;
       NOT: data_out = ~data_in1;
       SEL: data_out = data_in3 ? data_in1 : data_in2;
       default: data_out = {WIDTH{1'b0}};

@@ -117,7 +117,7 @@ requires-dist = [
     { name = "cmd2", specifier = ">=2.5.11" },
     { name = "cocotb", specifier = ">=1.9.2" },
     { name = "fasm", specifier = ">=0.0.2" },
-    { name = "hdlgen", directory = "../HDLGen" },
+    { name = "hdlgen", editable = "../HDLGen" },
     { name = "jinja2", specifier = ">=3.1.6" },
     { name = "lark", specifier = ">=1.2.2" },
     { name = "loguru", specifier = ">=0.7.0" },
@@ -161,7 +161,7 @@ wheels = [
 [[package]]
 name = "hdlgen"
 version = "0.0.1"
-source = { directory = "../HDLGen" }
+source = { editable = "../HDLGen" }
 
 [package.metadata]
 

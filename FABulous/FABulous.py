@@ -172,11 +172,14 @@ def main():
         fab_CLI.debug = args.debug
 
         if commands := args.commands:
-            for c in commands.split("; "):
+            commands = commands.split("; ")
+            for c in commands:
                 if fab_CLI.onecmd_plus_hooks(c):
                     exit(1)
             else:
-                logger.info(f"Commands [{commands}]  executed successfully")
+                logger.info(
+                    f'Commands "{'; '.join(i.strip() for i in commands)}" executed successfully'
+                )
                 exit(0)
         elif args.FABulousScript:
             if fab_CLI.onecmd_plus_hooks(f"run_script {args.FABulousScript}"):

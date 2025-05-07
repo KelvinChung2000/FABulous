@@ -3,7 +3,6 @@ from collections import defaultdict
 from functools import partial
 from itertools import product
 from pathlib import Path
-from pprint import pprint
 from typing import Mapping
 
 from hdlgen.code_gen import CodeGenerator
@@ -17,6 +16,7 @@ from FABulous.fabric_definition.define import (
     IO,
     BelType,
     BitVector,
+    YosysCellDetails,
     YosysJson,
     YosysModule,
 )
@@ -40,29 +40,28 @@ def genPrims(bel: Bel, filePath: Path):
             #     pr.Port(bel.userCLK.name.removeprefix(bel.prefix), IO.INPUT, 1)
 
 
-def genWrapMap(cell, filename, belName, wrapping=True):
+def genWrapMap(cell: YosysCellDetails, filename, belName, wrapping=True):
     cg = CodeGenerator(filename, codeGenWriterType.VERILOG, "a")
-    cellType = cell["type"].replace("$", "_")
+    cellType = cell.type.replace("$", "_")
 
     if wrapping:
-        srcCell, targetCell = f"\\{cell['type']}", f"\\$_{cellType}_wrapper"
+        srcCell, targetCell = f"\\{cell.type}", f"\\$_{cellType}_wrapper"
     else:
-        srcCell, targetCell = f"\\$_{cellType}_wrapper", f"\\{cell['type']}"
+        srcCell, targetCell = f"\\$_{cellType}_wrapper", f"\\{cell.type}"
 
     with cg.Module(
         f"wrap_{belName}_{cellType}" if wrapping else f"unwrap_{belName}_{cellType}",
         [cg.Attribute("techmap_celltype", srcCell)],
     ) as m:
-
         params: Mapping[str, Value] = {}
         with m.ParameterRegion() as pr:
-            for i in cell["parameters"]:
+            for i in cell.parameters:
                 params[i] = pr.Parameter(i, 0)
 
         ports: Mapping[str, Value] = {}
         with m.PortRegion() as pr:
-            for i, direction in cell["port_directions"].items():
-                width = len(cell["connections"][i])
+            for i, direction in cell.port_directions.items():
+                width = len(cell.connections[i])
                 if wrapping:
                     ports[i] = pr.Port(
                         i,
@@ -74,33 +73,39 @@ def genWrapMap(cell, filename, belName, wrapping=True):
 
         sigMapping: Mapping[str, Value] = {}
         with m.LogicRegion() as lr:
-            for i in cell["port_directions"]:
-                width = len(cell["connections"][i])
-                if wrapping:
-                    sigMapping[i] = lr.Signal(f"{i}_{width}", width)
-                else:
-                    sigMapping[i] = lr.Signal(
-                        f"{i}_orig",
-                        params.get(f"{i}_WIDTH", params.get("WIDTH", width + 1)) - 1,
-                    )
+            with lr.Generate() as g:
+                for i in cell.port_directions:
+                    width = len(cell.connections[i])
+                    if wrapping:
+                        sigMapping[i] = g.Signal(f"{i}_{width}", width)
+                    else:
+                        sigMapping[i] = g.Signal(
+                            f"{i}_orig",
+                            params.get(f"{i}_WIDTH", params.get("WIDTH", width + 1))
+                            - 1,
+                        )
 
-            for i, direction in cell["port_directions"].items():
-                if i not in sigMapping:
-                    continue
-                if IO[direction.upper()] == IO.INPUT:
-                    lr.Assign(sigMapping[i], ports[i])
-                else:
-                    lr.Assign(ports[i], sigMapping[i])
+                for i, direction in cell.port_directions.items():
+                    if i not in sigMapping:
+                        continue
+                    if IO[direction.upper()] == IO.INPUT:
+                        g.Assign(sigMapping[i], ports[i])
+                    else:
+                        g.Assign(ports[i], sigMapping[i])
 
-            lr.InitModule(
-                targetCell,
-                "_TECHMAP_REPLACE_",
-                [
-                    lr.ConnectPair(i, sigMapping.get(i, ports[i]))
-                    for i in cell["port_directions"]
-                ],
-                [lr.ConnectPair(i, params[i]) for i in cell["parameters"]],
-            )
+                with g.IfElse(params.get("WIDTH", 0) <= width) as tf:
+                    with tf.TrueRegion() as t:
+                        t.InitModule(
+                            targetCell,
+                            "_TECHMAP_REPLACE_",
+                            [
+                                t.ConnectPair(i, sigMapping.get(i, ports[i]))
+                                for i in cell.port_directions
+                            ],
+                            [t.ConnectPair(i, params[i]) for i in cell.parameters],
+                        )
+                    with tf.FalseRegion() as f:
+                        f.Signal_default("_TECHMAP_FAIL_", 1, 1)
 
 
 def genWrappingMapPair(bel: Bel, filePrefix: Path) -> list[str]:
@@ -117,11 +122,8 @@ def genWrappingMapPair(bel: Bel, filePrefix: Path) -> list[str]:
         pass
 
     for cellPath in filePrefix.glob(f"cell_{bel.name}*.json"):
+        modules = YosysJson(cellPath).modules
 
-        with open(cellPath, "r") as f:
-            jsonData = json.load(f)
-
-        modules: dict = jsonData["modules"]
         if len(modules) == 0:
             raise ValueError(f"File {metaPath} is empty.")
         if len(modules) > 1:
@@ -130,19 +132,19 @@ def genWrappingMapPair(bel: Bel, filePrefix: Path) -> list[str]:
         moduleKey = next(iter(modules))
         module = modules[moduleKey]
 
-        for cName, cell in module["cells"].items():
-            cellType = cell["type"].replace("$", "_")
+        for cName, cell in module.cells.items():
+            cellType = cell.type.replace("$", "_")
             if cellType in repeatSet:
                 continue
 
             outPort = []
-            for i, v in cell["port_directions"].items():
+            for i, v in cell.port_directions.items():
                 if v == "output":
                     outPort.append(i)
 
             outWidthPair = []
             for i in outPort:
-                if f"{i}_WIDTH" in cell["parameters"]:
+                if f"{i}_WIDTH" in cell.parameters:
                     outWidthPair.append((i, f"{i}_WIDTH"))
                 else:
                     outWidthPair.append((i, "WIDTH"))
@@ -502,7 +504,9 @@ def genSynthScript(fabric: Fabric, filename: Path):
     environment = Environment(loader=PackageLoader("FABulous"))
     template = environment.get_template("arch_synth.tcl.jinja")
     wrappers = []
-    for bel in fabric.getAllUniqueBels():
+    for bel in sorted(
+        fabric.getAllUniqueBels(), key=lambda x: x.paramOverride.get("WIDTH", 128)
+    ):
         if bel.constantBel:
             continue
         path = bel.src.parent / "metadata"
@@ -533,23 +537,19 @@ def genCellsAndMaps(bel: Bel):
     if not bel.src.exists():
         raise ValueError(f"File {bel.src} not found.")
 
-    Path(bel.src.parent / "metadata").mkdir(exist_ok=True)
+    if not bel.jsonPath.exists():
+        raise ValueError(f"File {bel.jsonPath} not found.")
+
     filePath = bel.src.parent / "metadata"
 
     # generate cells
     design = ys.Design()
     runPass = partial(lambda design, cmd: ys.run_pass(cmd, design), design)
 
-    if bel.paramOverride:
-        runPass(f"read_verilog -defer -sv {bel.src}")
-        for k, v in bel.paramOverride.items():
-            runPass(f"chparam -set {k} {v} {bel.name}")
-    else:
-        runPass(f"read_verilog -sv {bel.src}")
-
+    runPass(f"read_json {bel.jsonPath}")
     runPass("select A:blackbox")
     if len(design.selected_modules()) > 0:
-        runPass(f"write_json {filePath / f'cell_{bel.prefix}{bel.name}.json'}")
+        runPass(f"write_json {filePath / f'{bel.jsonPath}'}")
         return
     runPass("cd")
     runPass(f"hierarchy -top {bel.name}")
@@ -703,7 +703,6 @@ def genArithTechmap(bel: Bel, destFilePath: Path, design, runPass, cellDict):
 
 
 if __name__ == "__main__":
-
     # f = FABulous_API(
     #     Path("/home/kelvin/FABulous_fork/myProject/fabric.yaml"), WriterType.VERILOG
     # )

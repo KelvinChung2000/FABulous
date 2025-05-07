@@ -5,8 +5,9 @@
       "attributes": {
         "IO": 1,
         "CELL": 1,
+        "hdlname": "IO",
         "dynports": 1,
-        "cells_not_processed": 1,
+        "top": 1,
         "src": "myProject/Tile/W_IO/../include/IO.v:2.1-14.10"
       },
       "parameter_default_values": {
@@ -37,40 +38,36 @@
           "hide_name": 0,
           "bits": [ 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33 ],
           "attributes": {
-            "BUS": 1,
             "DATA": 1,
             "FABulous": 1,
-            "src": "myProject/Tile/W_IO/../include/IO.v:5.49-5.60"
+            "src": "myProject/Tile/W_IO/../include/IO.v:5.44-5.55"
           }
         },
         "in": {
           "hide_name": 0,
           "bits": [ 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65 ],
           "attributes": {
-            "BUS": 1,
             "EXTERNAL": 1,
             "FABulous": 1,
-            "src": "myProject/Tile/W_IO/../include/IO.v:7.53-7.55"
+            "src": "myProject/Tile/W_IO/../include/IO.v:7.48-7.50"
           }
         },
         "out": {
           "hide_name": 0,
           "bits": [ 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33 ],
           "attributes": {
-            "BUS": 1,
             "EXTERNAL": 1,
             "FABulous": 1,
-            "src": "myProject/Tile/W_IO/../include/IO.v:8.54-8.57"
+            "src": "myProject/Tile/W_IO/../include/IO.v:8.49-8.52"
           }
         },
         "to_fabric": {
           "hide_name": 0,
           "bits": [ 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65 ],
           "attributes": {
-            "BUS": 1,
             "DATA": 1,
             "FABulous": 1,
-            "src": "myProject/Tile/W_IO/../include/IO.v:6.50-6.59"
+            "src": "myProject/Tile/W_IO/../include/IO.v:6.45-6.54"
           }
         }
       }

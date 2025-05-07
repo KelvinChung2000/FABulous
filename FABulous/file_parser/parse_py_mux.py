@@ -1,3 +1,4 @@
+import contextlib
 import itertools
 from pprint import pprint
 import sys
@@ -9,9 +10,30 @@ from jinja2 import Environment, PackageLoader
 from FABulous.fabric_definition.Bel import Bel
 from FABulous.fabric_definition.define import IO
 from FABulous.fabric_definition.Port import BelPort, Port, SlicedPort, TilePort
-from FABulous.fabric_definition.SwitchMatrix import Mux, MuxPort, SwitchMatrix
+from FABulous.fabric_definition.SwitchMatrix import Mux, MuxPack, SwitchMatrix
 
 GenericPort = Port | TilePort
+
+
+@contextlib.contextmanager
+def addPythonPath(pathToAdd: Path):
+    """Temporarily add a directory to the Python path.
+
+    Parameters
+    ----------
+    pathToAdd : Path
+        Directory to add to Python path
+
+    Yields
+    ------
+    None
+    """
+    oldPath = sys.path.copy()
+    sys.path.insert(0, str(pathToAdd))
+    try:
+        yield
+    finally:
+        sys.path = oldPath
 
 
 def setupPortData(
@@ -50,118 +72,60 @@ def setupPortData(
 
 
 def genSwitchMatrix(
-    tileName: str, tileDir: Path, ports: dict[str, list[TilePort]], bels: list[Bel]
+    tileName: str,
+    tileDir: Path,
+    ports: dict[str, list[TilePort]],
+    bels: list[Bel],
+    fabricDir: Path,
 ) -> SwitchMatrix:
-    if listModuleSpec := spec_from_file_location(
-        tileDir.parent.name, tileDir.parent / "list.py"
-    ):
-        listModule = module_from_spec(listModuleSpec)
-        sys.modules[tileName] = listModule
-        if loader := listModuleSpec.loader:
-            loader.exec_module(listModule)
+    with addPythonPath(fabricDir.parent.absolute().resolve()):
+        if listModuleSpec := spec_from_file_location(
+            tileDir.parent.name, tileDir.parent / "list.py"
+        ):
+            listModule = module_from_spec(listModuleSpec)
+            sys.modules[tileName] = listModule
+            if loader := listModuleSpec.loader:
+                loader.exec_module(listModule)
+            else:
+                raise ValueError("No loader found")
         else:
-            raise ValueError("No loader found")
-    else:
-        raise ValueError("File loading failed")
-    belInputs = []
-    belOutputs = []
-    for bel in bels:
-        for port in bel.inputs:
-            belInputs.append(port)
-        for port in bel.outputs:
-            belOutputs.append(port)
-    muxList = listModule.MuxList(
-        list(itertools.chain.from_iterable([i for i in ports.values()])),
-        belInputs,
-        belOutputs,
-    )
-    muxList.construct()
+            raise ValueError("File loading failed")
+        belInputs = []
+        belOutputs = []
+        for bel in bels:
+            for port in bel.inputs:
+                belInputs.append(port)
+            for port in bel.outputs:
+                belOutputs.append(port)
+        muxList = listModule.MuxList(
+            list(itertools.chain.from_iterable([i for i in ports.values()])),
+            belInputs,
+            belOutputs,
+        )
+        muxList.construct()
     sm = SwitchMatrix()
     for i in muxList.__dict__.values():
-        if not isinstance(i, MuxPort):
+        if not isinstance(i, MuxPack):
             continue
 
-        if isinstance(i.port, TilePort) and i.port.ioDirection == IO.INPUT:
+        if isinstance(i.ogPort, TilePort) and i.ogPort.ioDirection == IO.INPUT:
             continue
 
-        if isinstance(i.port, BelPort) and i.port.ioDirection == IO.OUTPUT:
+        if isinstance(i.ogPort, BelPort) and i.ogPort.ioDirection == IO.OUTPUT:
             continue
 
-        if not i.inputs:
-            continue
-
-        sm.addMux(Mux(i.port, [p.port for p in i.inputs]))
+        if all([len(i.port[0].inputs) == len(m.inputs) for m in i.port[1:]]):
+            r = [p.originalPort for p in i.port[0].inputs if isinstance(p, SlicedPort)]
+            if len(r) == 0:
+                continue
+            sm.addMux(Mux(i.ogPort, r))
+        else:
+            for i in i.port:
+                if len(i.inputs) == 0:
+                    continue
+                sm.addMux(i)
 
     return sm
-    # for sPort in slicedPort:
-    #     if not sPort.slicingAssignDict.keys():
-    #         continue
-
-    #     combinedAssignWidth = 0
-    #     for targetRange in sPort.slicingAssignDict.keys():
-    #         combinedAssignWidth += (targetRange.start - targetRange.end) + 1
-
-    #     if combinedAssignWidth != sPort.port.width:
-    #         print(combinedAssignWidth, sPort.port.width)
-    #         raise ValueError("not all the signal of the original port is assigned")
-
-    #     for test_range in sPort.slicingAssignDict.keys():
-    #         for range in sPort.slicingAssignDict.keys():
-    #             if test_range == range:
-    #                 continue
-    #             if test_range.start >= range.start and test_range.end <= range.end:
-    #                 raise ValueError(
-    #                     "Sliced signals overlap, please check the slicing assignment"
-    #                 )
-
-    #     for targetRange, slicedSignals in sPort.slicingAssignDict.items():
-    #         uniqueSWidth = set()
-    #         for signal in slicedSignals:
-    #             if signal.sliceRange == (-1, -1):
-    #                 uniqueSWidth.add(signal.port.width)
-    #             else:
-    #                 uniqueSWidth.add(
-    #                     signal.sliceRange.start - signal.sliceRange.end + 1
-    #                 )
-
-    #         if len(uniqueSWidth) != 1:
-    #             raise ValueError("Not all the slice signals have the same width")
-    #         if uniqueSWidth.pop() != targetRange.start - targetRange.end + 1:
-    #             raise ValueError("Sliced signals do not match target range")
-
-    #         start, end = targetRange
-    #         for signal in slicedSignals:
-    #             newTargetPort = SlicedPort(
-    #                 name=f"{sPort.port.name}_{start}_{end}",
-    #                 ioDirection=sPort.port.ioDirection,
-    #                 width=start - end + 1,
-    #                 isBus=False,
-    #                 originalPort=sPort.port,
-    #                 sliceRange=targetRange,
-    #             )
-    #             newInputPortList = []
-
-    #             for i in slicedSignals:
-    #                 if i.sliceRange == (-1, -1):
-    #                     newInputPortList.append(i.port)
-    #                 else:
-    #                     newInputPortList.append(
-    #                         SlicedPort(
-    #                             name=f"{i.port.name}_{i.sliceRange.start}_{i.sliceRange.end}",
-    #                             ioDirection=i.port.ioDirection,
-    #                             width=i.sliceRange.start - i.sliceRange.end + 1,
-    #                             isBus=False,
-    #                             originalPort=i.port,
-    #                             sliceRange=i.sliceRange,
-    #                         )
-    #                     )
-
-    #             sm.addMux(
-    #                 Mux(
-    #                     newTargetPort,
-    #                     newInputPortList,
-    #                 )
-    #             )
 
 
 # if __name__ == "__main__":

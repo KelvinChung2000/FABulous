@@ -366,7 +366,7 @@ def generateChipDatabase(
     generateConstrainPair(fabric, filePath / f"{fabric.name}_constrain_pair.inc")
 
     if dotDir is not Path():
-        genRoutingResourceGraph(ch, filePath, True, [(1, 1)])
+        genRoutingResourceGraph(ch, filePath, False, [(1, 3), (2, 3)])
 
 
 def groupByThree(inputList: list) -> list:

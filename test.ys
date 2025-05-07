@@ -1,5 +1,5 @@
-read_verilog -sv example.sv
-hierarchy -auto-top; flatten; proc; opt -nodffe -nosdff; clean -purge
-fsm -expand
-opt -full
-stat
+read_verilog /home/kelvin/FABulous_fork/test.v
+hierarchy -auto-top; proc; opt -full;;;
+techmap -map /home/kelvin/FABulous_fork/myProject/.FABulous/reduce_or_to_or.v -autoproc
+opt -full;;;
+show

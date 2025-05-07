@@ -1,4 +1,4 @@
-from FABulous.fabric_definition.SwitchMatrix import MuxPort
+from FABulous.fabric_definition.SwitchMatrix import MuxPack
 from FABulous.fabric_definition.define import IO
 from FABulous.fabric_definition.Port import TilePort, Port, BelPort
 
@@ -8,35 +8,35 @@ class {{ tileName }}_ports:
         # tile ports
     {%- if subTileCount == 1 %}
     {%- for (st, p) in tilePorts %}
-        self.{{ p.name }} = MuxPort(tilePorts[{{ loop.index0 }}])
+        self.{{ p.name }} = MuxPack(tilePorts[{{ loop.index0 }}])
     {%- endfor %}
     {% else %}
     {%- for (st, p) in tilePorts %}
-        self.{{ st }}_{{ p.name }} = MuxPort(tilePorts[{{ loop.index0 }}])
+        self.{{ st }}_{{ p.name }} = MuxPack(tilePorts[{{ loop.index0 }}])
     {%- endfor %}
     {% endif %}
         # bel input ports
     {%- for p in belInputs %}
-        self.{{ p.name }} = MuxPort(belInputs[{{ loop.index0 }}])
+        self.{{ p.name }} = MuxPack(belInputs[{{ loop.index0 }}])
     {%- endfor %}
 
         # bel output ports
     {%- for p in belOutputs %}
-        self.{{ p.name }} = MuxPort(belOutputs[{{ loop.index0 }}])
+        self.{{ p.name }} = MuxPack(belOutputs[{{ loop.index0 }}])
     {%- endfor %}
 
-        self.GND = MuxPort(Port(name="gnd", ioDirection=IO.OUTPUT, width=1, isBus=False))
-        self.VCC = MuxPort(Port(name="vcc", ioDirection=IO.OUTPUT, width=1, isBus=False))
+        self.GND = MuxPack(Port(name="gnd", ioDirection=IO.OUTPUT, width=1))
+        self.VCC = MuxPack(Port(name="vcc", ioDirection=IO.OUTPUT, width=1))
 
-    def NewWire(self, srcName: str, dstName: str, width: int) -> tuple[MuxPort, MuxPort]:
+    {# def NewWire(self, srcName: str, dstName: str, width: int) -> tuple[MuxPort, MuxPort]:
         portSrc = MuxPort(Port(_name=srcName, ioDirection=IO.INPUT, width=width, isBus=False))
         setattr(self, srcName, portSrc)
         portDst = MuxPort(Port(_name=dstName, ioDirection=IO.OUTPUT, width=width, isBus=False))
         setattr(self, dstName, portDst)
-        return portSrc, portDst
+        return portSrc, portDst #}
 
-    def __getitem__(self, key: str) -> MuxPort:
+    def __getitem__(self, key: str) -> MuxPack:
         return getattr(self, key)
 
-    def __setitem__(self, key: str, value: MuxPort):
+    def __setitem__(self, key: str, value: MuxPack):
         pass

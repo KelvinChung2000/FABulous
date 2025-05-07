@@ -15,12 +15,13 @@ yosys opt -nodffe -nosdff
 yosys fsm -encoding binary -expand
 yosys opt
 yosys techmap -map $project_root/.FABulous/logic_to_std.v
-yosys wreduce
+{# yosys wreduce #}
 yosys peepopt
 yosys opt_clean
 yosys share
 yosys opt_expr
 yosys opt_clean
+yosys techmap -map $project_root/.FABulous/reduce_or_to_or.v
 
 # memory opt
 yosys opt_mem_priority
@@ -62,7 +63,7 @@ extract "{{ cell }}" \
         "{{ wrapperPath }}"
 {%- endfor %}
 # unwrapping
-{# yosys techmap -map {{ unWrapperPath }} #}
+yosys techmap -map {{ unWrapperPath }}
 yosys opt
 yosys clean -purge
 {% endfor %}

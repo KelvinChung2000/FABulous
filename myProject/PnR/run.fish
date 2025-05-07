@@ -32,20 +32,19 @@ set my_FAB_ROOT /home/kelvin/FABulous_fork
 # calyx --dump-ir $clayx_flag $source_futil -o $source_hdl > $ir
 # check_status
 cd ../..
-FABulous --debug myProject -p "load_fabric; gen_FABulous_CAD_tool_files"
-# FABulous --debug myProject -p "load_fabric; gen_FABulous_CAD_tool_files; \
-#          synthesis_script $source_hdl -tcl $my_FAB_ROOT/myProject/.FABulous/arch_synth.tcl;"
+# FABulous --debug myProject -p "load_fabric; gen_FABulous_CAD_tool_files"
+FABulous --debug myProject -p "load_fabric; gen_FABulous_CAD_tool_files; \
+         synthesis_script $source_hdl -tcl $my_FAB_ROOT/myProject/.FABulous/arch_synth.tcl;"
 check_status
 cd -
 # # # FABulous --debug ../../myProject -p "load_fabric; gen_FABulous_CAD_tool_files;"
 # # # xdot /home/kelvin/FABulous_fork/myProject/.FABulous/routing_graph.dot &
-# nextpnr-himbaechel --chipdb "$my_FAB_ROOT/myProject/.FABulous/hycube.bit" --device "FABulous" \
-#                    --json "$my_FAB_ROOT/myProject/user_design/synth_test.json" \
-#                    --write "$my_FAB_ROOT/myProject/user_design/router_test.json" \
-#                    -o constrain-pair="$my_FAB_ROOT/myProject/.FABulous/hycube_constrain_pair.inc" \
-#                    -o fasm="$my_FAB_ROOT/myProject/user_design/router_test.fasm" \
-#                    -o placeTrial=100 \
-#                    --debug-router
+nextpnr-himbaechel --chipdb "$my_FAB_ROOT/myProject/.FABulous/hycube.bit" --device "FABulous" \
+                   --json "$my_FAB_ROOT/myProject/user_design/synth_test.json" \
+                   --write "$my_FAB_ROOT/myProject/user_design/router_test.json" \
+                   -o constrain-pair="$my_FAB_ROOT/myProject/.FABulous/hycube_constrain_pair.inc" \
+                   -o fasm="$my_FAB_ROOT/myProject/user_design/router_test.fasm" \
+                   -o placeTrial=100 --debug-router
 
 # python $my_FAB_ROOT/myProject/Test/test_fabric.py
 

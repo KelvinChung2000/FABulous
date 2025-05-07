@@ -54,4 +54,4 @@ exclude = ["docs, demo"]  # exclude packages matching these glob patterns (empty
 mypkg = ["FABulous/**/*"]
 
 [tool.uv.sources]
-hdlgen = { path = "../HDLGen" }
+hdlgen = { path = "../HDLGen", editable = true }

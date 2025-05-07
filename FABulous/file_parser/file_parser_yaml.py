@@ -74,7 +74,7 @@ def parseFabricYAML(fileName: Path) -> Fabric:
 
     for mainTile in data["TILES"]:
         newTile, wireInfo = parseTileYAML(
-            filePath.joinpath(mainTile), frameBitsPerRow, maxFramesPerCol
+            filePath.joinpath(mainTile), frameBitsPerRow, maxFramesPerCol, filePath
         )
         for subTile in newTile.getSubTiles():
             tileDict[newTile.name] = newTile
@@ -233,7 +233,7 @@ def parseMatrixAsMux(fileName: Path, tileName: str) -> dict[str, Mux]:
 
 
 def parseTileYAML(
-    fileName: Path, frameBitsPerRow: int, maxFramePerCol: int
+    fileName: Path, frameBitsPerRow: int, maxFramePerCol: int, fabricDir: Path
 ) -> tuple[Tile, dict[str, dict[str, WireInfo]]]:
     """Parses a yaml tile configuration file and returns all tile objects.
 
@@ -317,7 +317,6 @@ def parseTileYAML(
                     name=portEntry["name"],
                     ioDirection=IO[portEntry["inOut"].upper()],
                     sideOfTile=Side[portEntry["side"].upper()],
-                    isBus=portEntry.get("isBus", False),
                     terminal=portEntry.get("terminal", False),
                     tileType=tileName,
                 )
@@ -331,7 +330,6 @@ def parseTileYAML(
                         name=f"{portEntry['name']}",
                         ioDirection=IO[portEntry["inOut"].upper()],
                         sideOfTile=Side[portEntry["side"].upper()],
-                        isBus=portEntry.get("isBus", False),
                         terminal=portEntry.get("terminal", False),
                         tileType=tileName,
                     )
@@ -343,10 +341,19 @@ def parseTileYAML(
         if belEntry["prefix"] is None:
             belEntry["prefix"] = ""
 
-        bel = parseBelFile(belFilePath, belEntry["prefix"])
+        bel = parseBelFile(
+            belFilePath, belEntry["prefix"], paramOverride=belEntry.get("param", {})
+        )
         bel.z = z
-        bel.paramOverride = belEntry.get("param", {})
         bels.append(bel)
+
+    portName = set()
+    for bel in bels:
+        for i in bel.inputs + bel.outputs + bel.externalInputs + bel.externalOutputs:
+            if i.name in portName:
+                logger.error(f"Duplicate bel port name {i.name} in tile {tileName}.")
+                raise ValueError
+            portName.add(i.name)
 
     withUserCLK = any(bel.userCLK for bel in bels)
     for b in bels:
@@ -362,7 +369,7 @@ def parseTileYAML(
                 configBit += sm.configBits
             case ".py":
                 setupPortData(tileName, matrixDir, portsDict, bels)
-                sm = genSwitchMatrix(tileName, matrixDir, portsDict, bels)
+                sm = genSwitchMatrix(tileName, matrixDir, portsDict, bels, fabricDir)
                 configBit += sm.configBits
             case "_matrix.csv":
                 for _, v in parseMatrix(matrixDir, tileName).items():

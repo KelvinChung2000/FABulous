@@ -99,56 +99,6 @@ endgenerate
 
 endmodule
 
-(* techmap_celltype = "ALU_ALU_func_2" *)
-module map_ALU_ALU_func_2 #(
-)
-(
-    input wire[2:0] ALU_func,
-    input wire[31:0] data_in1,
-    input wire[31:0] data_in2,
-    input wire data_in3,
-    output reg[31:0] data_out
-);
-
-generate
-    ALU #(
-        .ALU_func(2'd2)
-    ) _TECHMAP_REPLACE_ (
-        .data_in1(data_in1),
-        .data_in2(data_in2),
-        .data_in3(data_in3),
-        .data_out(data_out)
-    );
-
-endgenerate
-
-endmodule
-
-(* techmap_celltype = "ALU_ALU_func_3" *)
-module map_ALU_ALU_func_3 #(
-)
-(
-    input wire[2:0] ALU_func,
-    input wire[31:0] data_in1,
-    input wire[31:0] data_in2,
-    input wire data_in3,
-    output reg[31:0] data_out
-);
-
-generate
-    ALU #(
-        .ALU_func(2'd3)
-    ) _TECHMAP_REPLACE_ (
-        .data_in1(data_in1),
-        .data_in2(data_in2),
-        .data_in3(data_in3),
-        .data_out(data_out)
-    );
-
-endgenerate
-
-endmodule
-
 (* techmap_celltype = "ALU_ALU_func_4" *)
 module map_ALU_ALU_func_4 #(
 )
@@ -256,7 +206,7 @@ module map_compare_conf_0 #(
 (
     input wire[31:0] A,
     input wire[31:0] B,
-    input wire[2:0] conf,
+    input wire[1:0] conf,
     output reg Y
 );
 
@@ -279,7 +229,7 @@ module map_compare_conf_1 #(
 (
     input wire[31:0] A,
     input wire[31:0] B,
-    input wire[2:0] conf,
+    input wire[1:0] conf,
     output reg Y
 );
 
@@ -302,7 +252,7 @@ module map_compare_conf_2 #(
 (
     input wire[31:0] A,
     input wire[31:0] B,
-    input wire[2:0] conf,
+    input wire[1:0] conf,
     output reg Y
 );
 
@@ -325,7 +275,7 @@ module map_compare_conf_3 #(
 (
     input wire[31:0] A,
     input wire[31:0] B,
-    input wire[2:0] conf,
+    input wire[1:0] conf,
     output reg Y
 );
 
@@ -342,19 +292,20 @@ endgenerate
 
 endmodule
 
-(* techmap_celltype = "compare_conf_4" *)
-module map_compare_conf_4 #(
+
+(* techmap_celltype = "logic_op_conf_0" *)
+module map_logic_op_conf_0 #(
 )
 (
-    input wire[31:0] A,
-    input wire[31:0] B,
-    input wire[2:0] conf,
+    input wire A,
+    input wire B,
+    input wire[1:0] conf,
     output reg Y
 );
 
 generate
-    compare #(
-        .conf(3'd4)
+    logic_op #(
+        .conf(1'd0)
     ) _TECHMAP_REPLACE_ (
         .A(A),
         .B(B),
@@ -365,19 +316,19 @@ endgenerate
 
 endmodule
 
-(* techmap_celltype = "compare_conf_5" *)
-module map_compare_conf_5 #(
+(* techmap_celltype = "logic_op_conf_1" *)
+module map_logic_op_conf_1 #(
 )
 (
-    input wire[31:0] A,
-    input wire[31:0] B,
-    input wire[2:0] conf,
+    input wire A,
+    input wire B,
+    input wire[1:0] conf,
     output reg Y
 );
 
 generate
-    compare #(
-        .conf(3'd5)
+    logic_op #(
+        .conf(1'd1)
     ) _TECHMAP_REPLACE_ (
         .A(A),
         .B(B),
@@ -388,19 +339,19 @@ endgenerate
 
 endmodule
 
-(* techmap_celltype = "compare_conf_6" *)
-module map_compare_conf_6 #(
+(* techmap_celltype = "logic_op_conf_2" *)
+module map_logic_op_conf_2 #(
 )
 (
-    input wire[31:0] A,
-    input wire[31:0] B,
-    input wire[2:0] conf,
+    input wire A,
+    input wire B,
+    input wire[1:0] conf,
     output reg Y
 );
 
 generate
-    compare #(
-        .conf(3'd6)
+    logic_op #(
+        .conf(2'd2)
     ) _TECHMAP_REPLACE_ (
         .A(A),
         .B(B),
@@ -519,6 +470,127 @@ module map_reg_unit_tide_en_1_tide_rst_1 #(
 
 generate
     reg_unit #(
+        .tide_en(1'd1),
+        .tide_rst(1'd1)
+    ) _TECHMAP_REPLACE_ (
+        .en(en),
+        .reg_in(reg_in),
+        .reg_out(reg_out),
+        .rst(rst)
+    );
+
+endgenerate
+
+endmodule
+
+
+(* techmap_celltype = "reg_unit_WIDTH_1_tide_en_0_tide_rst_0" *)
+module map_reg_unit_WIDTH_1_tide_en_0_tide_rst_0 #(
+    parameter _TECHMAP_CONSTVAL_reg_in_ = 1'bx,
+    parameter _TECHMAP_CONSTVAL_reg_out_ = 1'bx
+)
+(
+    input wire clk,
+    input wire en,
+    input wire reg_in,
+    input wire rst,
+    input wire tide_en,
+    input wire tide_rst,
+    output reg reg_out
+);
+
+generate
+    reg_unit_WIDTH_1 #(
+        .tide_en(1'd0),
+        .tide_rst(1'd0)
+    ) _TECHMAP_REPLACE_ (
+        .en(en),
+        .reg_in(reg_in),
+        .reg_out(reg_out),
+        .rst(rst)
+    );
+
+endgenerate
+
+endmodule
+
+(* techmap_celltype = "reg_unit_WIDTH_1_tide_en_0_tide_rst_1" *)
+module map_reg_unit_WIDTH_1_tide_en_0_tide_rst_1 #(
+    parameter _TECHMAP_CONSTVAL_reg_in_ = 1'bx,
+    parameter _TECHMAP_CONSTVAL_reg_out_ = 1'bx
+)
+(
+    input wire clk,
+    input wire en,
+    input wire reg_in,
+    input wire rst,
+    input wire tide_en,
+    input wire tide_rst,
+    output reg reg_out
+);
+
+generate
+    reg_unit_WIDTH_1 #(
+        .tide_en(1'd0),
+        .tide_rst(1'd1)
+    ) _TECHMAP_REPLACE_ (
+        .en(en),
+        .reg_in(reg_in),
+        .reg_out(reg_out),
+        .rst(rst)
+    );
+
+endgenerate
+
+endmodule
+
+(* techmap_celltype = "reg_unit_WIDTH_1_tide_en_1_tide_rst_0" *)
+module map_reg_unit_WIDTH_1_tide_en_1_tide_rst_0 #(
+    parameter _TECHMAP_CONSTVAL_reg_in_ = 1'bx,
+    parameter _TECHMAP_CONSTVAL_reg_out_ = 1'bx
+)
+(
+    input wire clk,
+    input wire en,
+    input wire reg_in,
+    input wire rst,
+    input wire tide_en,
+    input wire tide_rst,
+    output reg reg_out
+);
+
+generate
+    reg_unit_WIDTH_1 #(
+        .tide_en(1'd1),
+        .tide_rst(1'd0)
+    ) _TECHMAP_REPLACE_ (
+        .en(en),
+        .reg_in(reg_in),
+        .reg_out(reg_out),
+        .rst(rst)
+    );
+
+endgenerate
+
+endmodule
+
+(* techmap_celltype = "reg_unit_WIDTH_1_tide_en_1_tide_rst_1" *)
+module map_reg_unit_WIDTH_1_tide_en_1_tide_rst_1 #(
+    parameter _TECHMAP_CONSTVAL_reg_in_ = 1'bx,
+    parameter _TECHMAP_CONSTVAL_reg_out_ = 1'bx
+)
+(
+    input wire clk,
+    input wire en,
+    input wire reg_in,
+    input wire rst,
+    input wire tide_en,
+    input wire tide_rst,
+    output reg reg_out
+);
+
+generate
+    reg_unit_WIDTH_1 #(
         .tide_en(1'd1),
         .tide_rst(1'd1)
     ) _TECHMAP_REPLACE_ (

@@ -25,7 +25,6 @@ def generateBitsStreamSpec(fabric: Fabric) -> FeatureMap:
         for c in range(fabric.contextCount):
             for i, bel in enumerate(tile.bels):
                 for config in bel.configPort:
-                    print(bel)
                     if config.width == 1 and len(config.features) == 1:
                         featureToBitString[
                             f"X{x}Y{y}.c{c}.{bel.prefix}{bel.name}.{config.name}"

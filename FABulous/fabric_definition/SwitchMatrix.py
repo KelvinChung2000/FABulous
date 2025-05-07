@@ -1,82 +1,26 @@
+from pprint import pprint
+import threading
 from collections import namedtuple
 from dataclasses import dataclass, field
 from itertools import zip_longest
-from typing import Any, Iterable
+from typing import Any, Iterable, Union
+
+from loguru import logger
 
 from FABulous.fabric_definition.define import IO
 from FABulous.fabric_definition.Port import GenericPort, SlicedPort, TilePort
-import inspect
 
 SliceRange = namedtuple("SliceRange", ["start", "end"])
+
+# Track completed in-place operations to avoid double-processing
+_COMPLETED_INPLACE_OPS = threading.local()
+_COMPLETED_INPLACE_OPS.items = set()
 
 
 @dataclass
 class SlicedSignal:
     port: GenericPort
     sliceRange: SliceRange
-
-
-@dataclass
-class MuxPort:
-    port: GenericPort
-    inputs: list["MuxPort"] = field(default_factory=list)
-
-    def __getitem__(self, key: slice | int):
-        if isinstance(key, slice):
-            if self.port.isBus:
-                raise ValueError(f"{self.port} is a bus, cannot slice")
-            if key.step is not None:
-                raise ValueError("Cannot slice with step")
-            if key.start is None:
-                raise ValueError(
-                    "You must specify a start index. If you are trying to do sig[0:4] you should write sig[4:0]"
-                )
-            if key.start < key.stop:
-                raise ValueError(
-                    "Start index must be less than stop index, the slicing is following the Verilog convention"
-                )
-            if abs(key.start - key.stop) > self.port.width:
-                raise ValueError("Slice width is greater than bit width")
-            return MuxPort(SlicedPort(self.port, (key.start, key.stop)), self.inputs)
-        elif isinstance(key, int):
-            if self.port.isBus:
-                raise ValueError(f"{self.port} is a bus, cannot slice")
-            if key >= self.port.width:
-                raise ValueError("Index out of range")
-            return MuxPort(SlicedPort(self.port, (key, key)), self.inputs)
-        else:
-            raise ValueError("Invalid slicing for MuxPort")
-
-    def __setitem__(self, *_):
-        raise ValueError("Cannot perform set item, use the //= operator")
-
-    def __ifloordiv__(self, other: Any):
-        if isinstance(other, list):
-            for i in other:
-                if not isinstance(i, MuxPort):
-                    raise ValueError("Invalid type for MuxPort")
-                if i.port.width != self.port.width:
-                    raise ValueError("All inputs must have the same width")
-                self.inputs.append(i)
-        else:
-            if not isinstance(other, MuxPort):
-                raise ValueError("Invalid type for MuxPort")
-            if other.port.width != self.port.width:
-                raise ValueError(
-                    (
-                        "All inputs must have the same width."
-                        f"target width is {self.port.width} but the input width is {other.port.width}"
-                    )
-                )
-            self.inputs.append(other)
-
-        return self
-
-    # def __repr__(self) -> str:
-    #     if self.isSliced:
-    #         return f"MuxPort(port={self.port}, sliceDict={self.slicingAssignDict})"
-    #     else:
-    #         return f"MuxPort(port={self.port})"
 
 
 class Mux:
@@ -99,7 +43,10 @@ class Mux:
         self._width = output.width
 
     def __repr__(self) -> str:
-        return f"{self.output}<({self.name}(cfg:{self.configBits}))-{list(self.inputs)}"
+        if len(self.inputs) == 0:
+            return f"Mux({self.output}<({self.name}(cfg:-))-{list(self.inputs)})"
+        else:
+            return f"Mux({self.output}<({self.name}(cfg:{self.configBits}))-{list(self.inputs)})"
 
     @property
     def name(self):
@@ -119,12 +66,20 @@ class Mux:
 
     @property
     def configBits(self):
+        if len(self.inputs) == 0:
+            raise ValueError("Invalid Mux, no inputs")
         return (len(self.inputs) - 1).bit_length()
 
     def extendInputs(self, inputs: Iterable[GenericPort]):
         for i in inputs:
+            if not isinstance(i, GenericPort):
+                raise TypeError("Input must be a Port")
+
             if i.width != self.output.width:
-                raise ValueError("All inputs and output must have the same width")
+                raise ValueError(
+                    "All inputs and output must have the same width "
+                    f"input port {i} != output port {self.output}"
+                )
             self._inputs.append(i)
 
     def getFlattenMux(self) -> list[tuple[str, tuple[str, ...]]]:
@@ -142,8 +97,73 @@ class Mux:
         for group in zip_longest(*expandedInputLists):
             # Filter out None values that zip_longest adds for shorter lists
             groupedInputs.append(tuple([item for item in group if item is not None]))
-
+        print(self)
         return list(zip(self.output.expand(), groupedInputs))
+
+
+class MuxPack:
+    port: list[Mux]
+    ogPort: GenericPort
+    _lastGet: "MuxPack"
+
+    def __init__(self, port: GenericPort):
+        self.port = []
+        self.ogPort = port
+        for i in range(port.width):
+            self.port.append(Mux(SlicedPort(self.ogPort, (i, i)), []))
+
+    def __getitem__(self, key: slice | int):
+        if isinstance(key, slice):
+            if key.step is not None:
+                raise ValueError("Cannot slice with step")
+            if key.start is None:
+                raise ValueError(
+                    "You must specify a start index. If you are trying to do sig[0:4] you should write sig[4:0]"
+                )
+            if key.start < key.stop:
+                raise ValueError(
+                    "Start index must be less than stop index, the slicing is following the Verilog convention"
+                )
+            if abs(key.start - key.stop) > self.ogPort.width:
+                raise ValueError("Slice width is greater than bit width")
+            self._lastGet = MuxPack(self.ogPort)
+            self._lastGet.port = self.port[key.stop : key.start : -1]
+            return self._lastGet
+        elif isinstance(key, int):
+            if key > self.ogPort.width:
+                raise ValueError("Index out of range")
+            self._lastGet = MuxPack(self.ogPort)
+            self._lastGet.port = [self.port[key]]
+            return self._lastGet
+        else:
+            raise ValueError("Invalid slicing for MuxPack")
+
+    def __setitem__(self, key, value):
+        if self._lastGet is value:
+            return
+        raise TypeError(
+            "Cannot perform direct assignment on MuxPort. Use the //= operator for connecting ports"
+        )
+
+    def __ifloordiv__(self, other: Any):
+        if isinstance(other, (list, tuple)):
+            try:
+                r = list(
+                    zip(*[i.port for i in other if isinstance(i, MuxPack)], strict=True)
+                )
+            except ValueError:
+                raise ValueError(
+                    f"not all the object in the list have the same width {other}"
+                )
+            for o, i in zip(self.port, r):
+                o.extendInputs([j.output for j in i])
+        elif isinstance(other, MuxPack):
+            for k, o in enumerate(self.port):
+                o.extendInputs([other.port[k].output])
+        else:
+            raise ValueError("Invalid type for Mux construction")
+
+        return self
 
 
 @dataclass

@@ -1,4 +1,4 @@
-from typing import Any, Iterable
+from typing import Any
 
 from FABulous.fabric_definition.define import IO, FeatureType, Side
 
@@ -7,22 +7,16 @@ class Port:
     _name: str
     _ioDirection: IO
     _width: int
-    _isBus: bool
 
-    __slots__ = ("_name", "_ioDirection", "_width", "_isBus")
+    __slots__ = ("_name", "_ioDirection", "_width")
 
-    def __init__(
-        self, name: str, ioDirection: IO, width: int, isBus: bool = False
-    ) -> None:
+    def __init__(self, name: str, ioDirection: IO, width: int) -> None:
         self._name = name
         self._ioDirection = ioDirection
         self._width = width
-        self._isBus = isBus
 
         if self.width <= 0:
             raise ValueError(f"Width must be greater than 0, got {self.width}")
-        if not isinstance(self.isBus, bool):
-            raise TypeError(f"isBus must be a boolean, got {type(self.isBus)}")
         if not isinstance(self.ioDirection, IO):
             raise TypeError(
                 f"ioDirection must be an instance of IO, got {type(self.ioDirection)}"
@@ -44,10 +38,6 @@ class Port:
     @property
     def width(self):
         return self._width
-
-    @property
-    def isBus(self):
-        return self._isBus
 
     def expand(self) -> list[str]:
         """Expand the port name into a generator of strings based on the width.
@@ -110,11 +100,10 @@ class TilePort(Port):
         ioDirection: IO,
         width: int,
         sideOfTile: Side,
-        isBus: bool = False,
         terminal: bool = False,
         tileType: str = "",
     ) -> None:
-        super().__init__(name, ioDirection, width, isBus)
+        super().__init__(name, ioDirection, width)
         self._sideOfTile = sideOfTile
         self._terminal = terminal
         self._tileType = tileType
@@ -188,7 +177,6 @@ class SlicedPort(Port):
             originalPort.name,
             originalPort.ioDirection,
             sliceRange[0] - sliceRange[1] + 1,
-            originalPort.isBus,
         )
         self._originalPort = originalPort
         self._sliceRange = sliceRange
@@ -204,7 +192,7 @@ class SlicedPort(Port):
     def expand(self) -> list[str]:
         if isinstance(self.originalPort, BelPort):
             return [
-                f"{self.originalPort.prefix}{self.originalPort.name}[{i}]"
+                f"{self.originalPort.name}[{i}]"
                 for i in range(self.sliceRange[0], self.sliceRange[1] + 1)
             ]
         elif isinstance(self.originalPort, TilePort):
@@ -224,7 +212,7 @@ class SlicedPort(Port):
         return super().__hash__()
 
     def __repr__(self) -> str:
-        return f"SlicedPort({self.ioDirection.value} {self.name}[{self.width - 1}:0] from {self.originalPort.name})"
+        return f"SlicedPort({self.ioDirection.value} {self.name}[{self.sliceRange[0]}:{self.sliceRange[1]}] from {self.originalPort.name})"
 
 
 class BelPort(Port):
@@ -239,12 +227,11 @@ class BelPort(Port):
         name: str,
         ioDirection: IO,
         width: int,
-        isBus: bool = False,
         prefix: str = "",
         external: bool = False,
         control: bool = False,
     ) -> None:
-        super().__init__(name, ioDirection, width, isBus)
+        super().__init__(name, ioDirection, width)
         self._prefix = prefix
         self._external = external
         self._control = control
@@ -262,7 +249,7 @@ class BelPort(Port):
         return self._control
 
     def __repr__(self) -> str:
-        return f"BelPort({self.ioDirection.value} {self.prefix}{self.name}[{self.width - 1}:0])"
+        return f"BelPort({self.ioDirection.value} {self.name}[{self.width - 1}:0])"
 
     @property
     def name(self):
@@ -294,16 +281,15 @@ class ConfigPort(Port):
         name: str,
         ioDirection: IO,
         width: int,
-        isBus: bool = False,
         features: list[tuple[str, int]] = [],
         featureType: FeatureType = FeatureType.INIT,
     ) -> None:
-        super().__init__(name, ioDirection, width, isBus)
+        super().__init__(name, ioDirection, width)
         self._features = features
         self._featureType = featureType
 
     @property
-    def features(self) -> Iterable[tuple[str, int]]:
+    def features(self) -> list[tuple[str, int]]:
         return self._features
 
     @property
@@ -327,10 +313,9 @@ class SharedPort(Port):
         name: str,
         ioDirection: IO,
         width: int,
-        isBus: bool = False,
         sharedWith: str = "",
     ) -> None:
-        super().__init__(name, ioDirection, width, isBus)
+        super().__init__(name, ioDirection, width)
         self._sharedWith = sharedWith
 
     @property

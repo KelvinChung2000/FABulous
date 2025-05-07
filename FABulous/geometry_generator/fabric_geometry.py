@@ -251,7 +251,7 @@ class FabricGeometry:
                 )
             writer.writerows([[], []])
 
-            for tileName in self.tileNames:
+            for tileName in sorted(self.tileNames):
                 tileGeometry = self.tileGeomMap[tileName]
                 tileGeometry.saveToCSV(writer)
 

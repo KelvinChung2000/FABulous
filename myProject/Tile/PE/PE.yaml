@@ -38,9 +38,9 @@ WIRES:
 
 BELS: 
   - {BEL: ./ALU.v, prefix: } 
-  - {BEL: ./compare.v, prefix: }
+  # - {BEL: ./compare.v, prefix: }
   - {BEL: ./const_unit.v, prefix: }
-  - {BEL: ./logic_op.v, prefix: l_}
+  - {BEL: ./logic_op.v, prefix: }
   - {BEL: ./reg_unit.v, prefix: RES_}
   - {BEL: ./reg_unit.v, prefix: N_}
   - {BEL: ./reg_unit.v, prefix: E_}

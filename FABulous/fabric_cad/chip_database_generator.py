@@ -21,6 +21,8 @@ from FABulous.fabric_definition.Tile import Tile
 CONTROL_GND_OFFSET = 0x2000
 CONTROL_VCC_OFFSET = 0x4000
 TILE_CLK = 0xFFFF
+TILE_GND = 0xFFFE
+TILE_VCC = 0xFFFD
 
 NORMAL = 0
 PSEUDO_PIP_START = 1
@@ -127,7 +129,19 @@ def genBel(bels: Iterable[Bel], tile: TileType, wireOnly: bool, context=1):
         tile.create_wire("user_clk_o", "CLK")
         tile.add_bel_pin(clkDRV, "CLK_O", "user_clk_o", PinType.OUTPUT)
         count += 1
+    gnd = tile.create_bel("GND_DRV", "GND_DRV", z=TILE_GND)
+    tile.create_wire("gnd", "GND", "0")
+    tile.add_bel_pin(gnd, "gnd", "gnd", PinType.OUTPUT)
+    vcc = tile.create_bel("VCC_DRV", "VCC_DRV", z=TILE_VCC)
+    tile.create_wire("vcc", "VCC", "1")
+    tile.add_bel_pin(vcc, "vcc", "vcc", PinType.OUTPUT)
+
     for c in range(context):
+        tile.create_wire(f"c{c}.gnd", "GND")
+        tile.create_wire(f"c{c}.vcc", "VCC")
+        tile.create_pip("vcc", f"c{c}.vcc")
+        tile.create_pip("gnd", f"c{c}.gnd")
+
         for z, bel in enumerate(bels):
             for i in bel.externalInputs + bel.inputs:
                 for pName in i.expand():
@@ -366,7 +380,7 @@ def generateChipDatabase(
     generateConstrainPair(fabric, filePath / f"{fabric.name}_constrain_pair.inc")
 
     if dotDir is not Path():
-        genRoutingResourceGraph(ch, filePath, False, [(1, 3), (2, 3)])
+        genRoutingResourceGraph(ch, filePath, False, [(1, 3), (0, 3)])
 
 
 def groupByThree(inputList: list) -> list:

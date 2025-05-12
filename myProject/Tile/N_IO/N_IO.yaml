@@ -9,14 +9,16 @@ PORTS: [
     {side: SOUTH, name: out2, inOut: output, wires: 32, terminal: false},
 
     {side: SOUTH, name: pred_in2, inOut: input, wires: 1, terminal: true},
+    {side: SOUTH, name: pred_out2, inOut: output, wires: 1, terminal: false},
     
   ]
 WIRES: [
   {source_name: out2, X-offset:  0, Y-offset: -1, destination_name: in0},
+  {source_name: pred_out2, X-offset:  0, Y-offset: -1, destination_name: pred_in0},
 ]
 BELS: [
     {BEL: ../include/IO.v, prefix: "N_"},
-
+    {BEL: ../include/IO.v, prefix: "N_pred_", param: {WIDTH: 1}},
 ]
 MATRIX: ./list.py
 # CONFIG_MEM: ./N_IO_ConfigMem.csv

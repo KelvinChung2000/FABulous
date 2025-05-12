@@ -321,3 +321,37 @@ class Tile:
             raise ValueError(
                 f"The given subTile {subTile} does not exist in tile {self.name}"
             )
+
+    def __str__(self) -> str:
+        """Return a formatted string representation of the tile.
+
+        Returns:
+            str: A formatted string showing the tile's key information.
+        """
+        lines = [
+            f"Tile: {self.name}",
+            "Ports:",
+        ]
+
+        # Add ports grouped by side
+        for side, ports in self.getTilePortGrouped().items():
+            if ports:
+                lines.append(f"  {side.name}:")
+                for port in ports:
+                    lines.append(f"    {port}")
+
+        # Add Bels
+        lines.append("Bels:")
+        for bel in self.bels:
+            lines.append(f"  {bel.name} (z={bel.z})")
+
+        # Add Switch Matrix info
+        lines.append(f"Switch Matrix: {self.switchMatrix}")
+
+        # Add Config Bits
+        lines.append(f"Config Bits: {self.configBits}")
+
+        # Add User CLK status
+        lines.append(f"User CLK: {self.withUserCLK}")
+
+        return "\n".join(lines)

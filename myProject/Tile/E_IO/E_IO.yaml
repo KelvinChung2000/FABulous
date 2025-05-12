@@ -8,13 +8,14 @@ PORTS: [
     {side: WEST, name: out3, inOut: output, wires: 32, terminal: false},
 
     {side: WEST, name: pred_in3, inOut: input, wires: 1, terminal: true},
+    {side: WEST, name: pred_out3, inOut: output, wires: 1, terminal: true},
 ]
 WIRES: [
   {source_name: out3, X-offset:  -1, Y-offset: 0, destination_name: in1},
 ]
 BELS: [
     {BEL: ../include/IO.v, prefix: "E_"},
-
+    {BEL: ../include/IO.v, prefix: "E_pred_", param: {WIDTH: 1}},
 ]
 MATRIX: ./list.py
 # CONFIG_MEM: ./E_IO_ConfigMem.csv

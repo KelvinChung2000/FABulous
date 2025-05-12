@@ -8,18 +8,20 @@ module logic_op #(
     (* FABulous *) input wire [WIDTH-1:0] A,
     (* FABulous *) input wire [WIDTH-1:0] B,
     (* FABulous, BUS *) output reg Y,
-    (* FABulous, CONFIG_BIT, FEATURE="AND;OR;NOT"*)
+    (* FABulous, CONFIG_BIT, FEATURE="AND;OR;XOR;NOT"*)
     input [1:0] conf
 );
   // Define operation codes
   localparam AND = 2'b00;
   localparam OR  = 2'b01;
-  localparam NOT = 2'b10;
+  localparam XOR  = 2'b10;
+  localparam NOT = 2'b11;
 
   always @(*) begin
     case (conf)
         AND:  Y = A & B;
         OR:   Y = A | B;
+        XOR:   Y = A ^ B;
         NOT:  Y = ~A;
         default: Y = {WIDTH{1'b0}};
     endcase

@@ -27,6 +27,19 @@ endmodule
 
 
 (* blackbox *)
+module IO_WIDTH_1 #(
+)
+(
+    input wire from_fabric,
+    input wire in,
+    output reg to_fabric,
+    output reg out
+);
+
+endmodule
+
+
+(* blackbox *)
 module ALU #(
     parameter ALU_func = 0
 )

@@ -174,31 +174,6 @@ endgenerate
 
 endmodule
 
-(* techmap_celltype = "ALU_ALU_func_7" *)
-module map_ALU_ALU_func_7 #(
-)
-(
-    input wire[2:0] ALU_func,
-    input wire[31:0] data_in1,
-    input wire[31:0] data_in2,
-    input wire data_in3,
-    output reg[31:0] data_out
-);
-
-generate
-    ALU #(
-        .ALU_func(3'd7)
-    ) _TECHMAP_REPLACE_ (
-        .data_in1(data_in1),
-        .data_in2(data_in2),
-        .data_in3(data_in3),
-        .data_out(data_out)
-    );
-
-endgenerate
-
-endmodule
-
 
 (* techmap_celltype = "compare_conf_0" *)
 module map_compare_conf_0 #(
@@ -352,6 +327,29 @@ module map_logic_op_conf_2 #(
 generate
     logic_op #(
         .conf(2'd2)
+    ) _TECHMAP_REPLACE_ (
+        .A(A),
+        .B(B),
+        .Y(Y)
+    );
+
+endgenerate
+
+endmodule
+
+(* techmap_celltype = "logic_op_conf_3" *)
+module map_logic_op_conf_3 #(
+)
+(
+    input wire A,
+    input wire B,
+    input wire[1:0] conf,
+    output reg Y
+);
+
+generate
+    logic_op #(
+        .conf(2'd3)
     ) _TECHMAP_REPLACE_ (
         .A(A),
         .B(B),

@@ -1,5 +1,4 @@
 read_verilog /home/kelvin/FABulous_fork/test.v
 hierarchy -auto-top; proc; opt -full;;;
-techmap -map /home/kelvin/FABulous_fork/myProject/.FABulous/reduce_or_to_or.v -autoproc
-opt -full;;;
+techmap -map /home/kelvin/FABulous_fork/myProject/.FABulous/ne_to_xor.v -autoproc
 show

@@ -5,8 +5,11 @@ class MuxList(W_IO_ports):
 
     def construct(self):
         self.W_from_fabric //= self.in1
-        # self.out1 //= self.W_to_fabric
-        for i in range(8):
-            self.out1[i] //= [self.W_to_fabric[j] for j in range(8)]
+        self.out1 //= self.W_to_fabric
 
-        self.out1[31:8] //= self.W_to_fabric[31:8]
+        self.W_pred_from_fabric //= self.pred_in1
+        self.pred_out1 //= self.W_pred_to_fabric
+
+        # for i in range(8):
+        #     self.out1[i] //= [self.W_to_fabric[j] for j in range(8)]
+        # self.out1[31:8] //= self.W_to_fabric[31:8]

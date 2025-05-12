@@ -26,6 +26,7 @@ module \$reduce_or (A, Y);
             assign Y = A;
         end
         if (A_WIDTH == 2) begin
+            wire ybuf;
             \$or #(
                     .A_SIGNED(A_SIGNED),
                     .B_SIGNED(A_SIGNED),

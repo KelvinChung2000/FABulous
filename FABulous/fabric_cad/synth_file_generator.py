@@ -500,6 +500,10 @@ def genIOMap(bel: Bel):
             #         lr.InitModule(bel.name, "_TECHMAP_REPLACE_", connect)
 
 
+# def genConstMap():
+#     filePath
+
+
 def genSynthScript(fabric: Fabric, filename: Path):
     environment = Environment(loader=PackageLoader("FABulous"))
     template = environment.get_template("arch_synth.tcl.jinja")
@@ -515,6 +519,9 @@ def genSynthScript(fabric: Fabric, filename: Path):
                 bel,
                 fabric.fabricDir.parent / ".FABulous/memory_map.txt",
             )
+            continue
+
+        if bel.belType == BelType.IO:
             continue
 
         cellsPath = list(path.glob(f"cell_{bel.name}*.json"))

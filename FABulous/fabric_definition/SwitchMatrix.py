@@ -1,11 +1,8 @@
-from pprint import pprint
 import threading
 from collections import namedtuple
 from dataclasses import dataclass, field
 from itertools import zip_longest
-from typing import Any, Iterable, Union
-
-from loguru import logger
+from typing import Any, Iterable
 
 from FABulous.fabric_definition.define import IO
 from FABulous.fabric_definition.Port import GenericPort, SlicedPort, TilePort
@@ -44,9 +41,10 @@ class Mux:
 
     def __repr__(self) -> str:
         if len(self.inputs) == 0:
-            return f"Mux({self.output}<({self.name}(cfg:-))-{list(self.inputs)})"
+            return f"Mux({self.output.name} <- [no inputs] (cfg: -))"
         else:
-            return f"Mux({self.output}<({self.name}(cfg:{self.configBits}))-{list(self.inputs)})"
+            input_names = [f"{i.name}" for i in self.inputs]
+            return f"Mux({self.output.name} <- [{', '.join(input_names)}] (cfg: {self.configBits} bits))"
 
     @property
     def name(self):
@@ -77,8 +75,7 @@ class Mux:
 
             if i.width != self.output.width:
                 raise ValueError(
-                    "All inputs and output must have the same width "
-                    f"input port {i} != output port {self.output}"
+                    f"All inputs and output must have the same width input port {i} != output port {self.output}"
                 )
             self._inputs.append(i)
 
@@ -239,3 +236,11 @@ class SwitchMatrix:
                 for i in mux.inputs:
                     sourceList.add(i)
         return list(sourceList)
+
+    def __str__(self) -> str:
+        """Return a formatted string representation of the switch matrix.
+
+        Returns:
+            str: A formatted string showing the switch matrix's multiplexers and their connections.
+        """
+        return self.__repr__()

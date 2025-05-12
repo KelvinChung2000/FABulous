@@ -6,17 +6,27 @@ module \$__external_in #(
     output wire[WIDTH-1:0] O
 );
 
-wire [31:0] I_32;
-wire [31:0] O_32;
-assign I_32 = I;
-assign O = O_32;
+wire [WIDTH-1:0] I_WIDTH;
+wire [WIDTH-1:0] O_WIDTH;
+assign I_WIDTH = I;
+assign O = O_WIDTH;
 
-IO #(.WIDTH(32)) _TECHMAP_REPLACE_ (
-    .from_fabric(),
-    .to_fabric(O_32),
-    .in(I_32),
-    .out()
-);
+if (WIDTH == 1)
+    IO_WIDTH_1 #(.WIDTH(WIDTH)) _TECHMAP_REPLACE_ (
+        .from_fabric(),
+        .to_fabric(O_WIDTH),
+        .in(I_WIDTH),
+        .out()
+    );
+else if (WIDTH == 32)
+    IO #(.WIDTH(WIDTH)) _TECHMAP_REPLACE_ (
+        .from_fabric(),
+        .to_fabric(O_WIDTH),
+        .in(I_WIDTH),
+        .out()
+    );
+else
+    wire _TECHMAP_FAIL_ = 1;
 
 endmodule
 
@@ -27,16 +37,26 @@ module \$__external_out #(
     input wire[WIDTH-1:0] I,
     output wire[WIDTH-1:0] O
 );
-wire [31:0] I_32;
-wire [31:0] O_32;
-assign I_32 = I;
-assign O = O_32;
+wire [WIDTH-1:0] I_WIDTH;
+wire [WIDTH-1:0] O_WIDTH;
+assign I_WIDTH = I;
+assign O = O_WIDTH;
 
-IO #(.WIDTH(32)) _TECHMAP_REPLACE_ (
-    .from_fabric(I_32),
-    .to_fabric(),
-    .in(),
-    .out(O_32)
-);
+if (WIDTH == 1)
+    IO_WIDTH_1 #(.WIDTH(WIDTH)) _TECHMAP_REPLACE_ (
+        .from_fabric(I_WIDTH),
+        .to_fabric(),
+        .in(),
+        .out(O_WIDTH)
+    );
+else if (WIDTH == 32)
+    IO #(.WIDTH(WIDTH)) _TECHMAP_REPLACE_ (
+        .from_fabric(I_WIDTH),
+        .to_fabric(),
+        .in(),
+        .out(O_WIDTH)
+    );
+else
+    wire _TECHMAP_FAIL_ = 1;
 
 endmodule

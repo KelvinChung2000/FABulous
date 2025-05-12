@@ -22,6 +22,8 @@ yosys share
 yosys opt_expr
 yosys opt_clean
 yosys techmap -map $project_root/.FABulous/reduce_or_to_or.v
+yosys techmap -map $project_root/.FABulous/eq_to_and.v
+yosys techmap -map $project_root/.FABulous/ne_to_xor.v
 
 # memory opt
 yosys opt_mem_priority
@@ -76,8 +78,8 @@ yosys memory_libmap -lib $project_root/.FABulous/memory_map.txt #}
 yosys techmap -map $project_root/.FABulous/techmaps.v
 
 # const unit mapping
-yosys read_rtlil -lib $project_root/Tile/PE/metadata/cell_const_unit.il
-yosys constmap -cell const_unit const_out ConfigBits
+yosys constmap -cell \$__const O VALUE
+yosys techmap -map $project_root/.FABulous/const_map.v
 
 # io mapping
 yosys iopadmap -widthparam WIDTH -outpad \$__external_out I:O -inpad \$__external_in O:I

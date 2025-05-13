@@ -11,3 +11,5 @@ X(GND_DRV)
 X(GND)
 X(VCC_DRV)
 X(VCC)
+
+X(BEL)

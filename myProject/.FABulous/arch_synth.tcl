@@ -25,6 +25,7 @@ yosys techmap -map $project_root/.FABulous/reduce_or_to_or.v
 yosys techmap -map $project_root/.FABulous/eq_to_and.v
 yosys techmap -map $project_root/.FABulous/ne_to_xor.v
 
+
 # memory opt
 yosys opt_mem_priority
 yosys opt_mem_feedback
@@ -36,6 +37,13 @@ yosys opt_mem_widen
 yosys opt_clean
 yosys memory_collect
 
+yosys opt -full
+yosys memory_libmap -lib $project_root/.FABulous/memory_map.txt
+yosys techmap -map $project_root/.FABulous/techmaps.v
+
+# const unit mapping
+yosys constmap -cell \$__const O VALUE
+yosys techmap -map $project_root/.FABulous/const_map.v
 yosys opt -full
 
 proc extract {cell wrapperPath} {
@@ -51,12 +59,6 @@ proc extract {cell wrapperPath} {
     yosys design -delete xmap
 }
 
-yosys memory_libmap -lib $project_root/.FABulous/memory_map.txt
-
-# io mapping
-yosys iopadmap -widthparam WIDTH -outpad \$__external_out I:O -inpad \$__external_in O:I
-yosys techmap -map $project_root/.FABulous/IO_techmap.v
-yosys iopadmap -bits -outpad OUTBUF I:PAD -inpad INBUF O:PAD
 
 
 # wrapping base design
@@ -77,7 +79,7 @@ extract "myProject/Tile/PE/metadata/cell_reg_unit_WIDTH_1_tide_en_1_tide_rst_0.j
         "myProject/Tile/PE/metadata/wrap_map_reg_unit_WIDTH_1.v"
 # unwrapping
 yosys techmap -map myProject/Tile/PE/metadata/unwrap_map_reg_unit_WIDTH_1.v
-yosys opt
+yosys opt -full
 yosys clean -purge
 
 # wrapping base design
@@ -101,7 +103,7 @@ extract "myProject/Tile/PE/metadata/cell_ALU_ALU_func_6.json" \
         "myProject/Tile/PE/metadata/wrap_map_ALU.v"
 # unwrapping
 yosys techmap -map myProject/Tile/PE/metadata/unwrap_map_ALU.v
-yosys opt
+yosys opt -full
 yosys clean -purge
 
 # wrapping base design
@@ -122,7 +124,7 @@ extract "myProject/Tile/PE/metadata/cell_logic_op_conf_2.json" \
         "myProject/Tile/PE/metadata/wrap_map_logic_op.v"
 # unwrapping
 yosys techmap -map myProject/Tile/PE/metadata/unwrap_map_logic_op.v
-yosys opt
+yosys opt -full
 yosys clean -purge
 
 # wrapping base design
@@ -151,7 +153,7 @@ extract "myProject/Tile/PE/metadata/cell_reg_unit_tide_en_0_tide_rst_0.json" \
         "myProject/Tile/PE/metadata/wrap_map_reg_unit.v"
 # unwrapping
 yosys techmap -map myProject/Tile/PE/metadata/unwrap_map_reg_unit.v
-yosys opt
+yosys opt -full
 yosys clean -purge
 
 
@@ -161,9 +163,11 @@ yosys clean -purge
 # cell techmapping
 yosys techmap -map $project_root/.FABulous/techmaps.v
 
-# const unit mapping
-yosys constmap -cell \$__const O VALUE
-yosys techmap -map $project_root/.FABulous/const_map.v
+
+
+# io mapping
+yosys iopadmap -widthparam WIDTH -outpad \$__external_out I:O -inpad \$__external_in O:I
+yosys techmap -map $project_root/.FABulous/IO_techmap.v
 
 
 # final optimization

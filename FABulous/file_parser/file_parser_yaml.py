@@ -74,7 +74,11 @@ def parseFabricYAML(fileName: Path) -> Fabric:
 
     for mainTile in data["TILES"]:
         newTile, wireInfo = parseTileYAML(
-            filePath.joinpath(mainTile), frameBitsPerRow, maxFramesPerCol, filePath
+            filePath.joinpath(mainTile),
+            contextCount,
+            frameBitsPerRow,
+            maxFramesPerCol,
+            filePath,
         )
         for subTile in newTile.getSubTiles():
             tileDict[newTile.name] = newTile
@@ -124,6 +128,12 @@ def parseFabricYAML(fileName: Path) -> Fabric:
             sourcePort: TilePort | BelPort = tileDict[tileName].findPortByName(
                 wireEntry["source_name"]
             )
+
+            if sourcePort.ioDirection != IO.OUTPUT and isinstance(sourcePort, TilePort):
+                logger.error(
+                    f"Source Tile port {sourcePort.name} at Tile {tileName} must be an output port."
+                )
+                raise ValueError
 
             xCord = max(0, min(x + tx, width - 1))
             yCord = (height - 1) - max(0, min(y + ty, height - 1))
@@ -233,7 +243,11 @@ def parseMatrixAsMux(fileName: Path, tileName: str) -> dict[str, Mux]:
 
 
 def parseTileYAML(
-    fileName: Path, frameBitsPerRow: int, maxFramePerCol: int, fabricDir: Path
+    fileName: Path,
+    contextCount: int,
+    frameBitsPerRow: int,
+    maxFramePerCol: int,
+    fabricDir: Path,
 ) -> tuple[Tile, dict[str, dict[str, WireInfo]]]:
     """Parses a yaml tile configuration file and returns all tile objects.
 
@@ -396,6 +410,7 @@ def parseTileYAML(
     else:
         sm = SwitchMatrix()
 
+    configBit = configBit * contextCount
     if p := data.get("CONFIG_MEM", None):
         configMems = parseConfigMem(
             fileName.parent.joinpath(p),

@@ -14,7 +14,7 @@ from FABulous.fabric_cad.graph_draw import genRoutingResourceGraph
 from FABulous.fabric_definition.Bel import Bel
 from FABulous.fabric_definition.define import IO
 from FABulous.fabric_definition.Fabric import Fabric
-from FABulous.fabric_definition.Port import BelPort
+from FABulous.fabric_definition.Port import BelPort, TilePort
 from FABulous.fabric_definition.SwitchMatrix import SwitchMatrix
 from FABulous.fabric_definition.Tile import Tile
 
@@ -35,68 +35,77 @@ def genSwitchMatrix(tile: Tile, subTile: str, tileType: TileType, context=1):
         raise ValueError("Switch matrix is not a SwitchMatrix object")
     zIn = 0
     zOut = 0
-    for c in [f"c{i}" for i in range(context)]:
-        outputMapping: Mapping[str, str] = {}
-
+    outputMapping: Mapping[str, str] = {}
+    for c in range(context):
         for p in tile.getTileInputPorts(subTile):
             if p.terminal and p.ioDirection == IO.OUTPUT:
                 for wtc in range(tile.getWireType(p).spanning):
                     for pName in p.expand():
-                        tileType.create_wire(f"{c}.{pName}_{wtc}", "src", z=zIn)
+                        tileType.create_wire(
+                            f"c{c}.{pName}_{wtc}", "src", z=zIn, flags=c + 1
+                        )
             else:
                 for pName in p.expand():
-                    tileType.create_wire(f"{c}.{pName}", "src", z=zIn)
+                    tileType.create_wire(f"c{c}.{pName}", "src", z=zIn, flags=c + 1)
             zIn += 1
         for p in tile.getTileOutputPorts(subTile):
             if p.terminal:
                 for wtc in range(tile.getWireType(p).spanning):
                     for pName in p.expand():
                         tileType.create_wire(
-                            f"{c}.{pName}_internal_{wtc}", "dst", z=zOut
+                            f"c{c}.{pName}_internal_{wtc}", "dst", z=zOut, flags=c + 1
                         )
-                        tileType.create_wire(f"{c}.{pName}_{wtc}", "dst", z=zOut)
+                        tileType.create_wire(
+                            f"c{c}.{pName}_{wtc}", "dst", z=zOut, flags=c + 1
+                        )
                         tileType.create_pip(
-                            f"{c}.{pName}_internal_{wtc}",
-                            f"{c}.{pName}_{wtc}",
+                            f"c{c}.{pName}_internal_{wtc}",
+                            f"c{c}.{pName}_{wtc}",
                         )
                         outputMapping[f"c{c}.{pName}_{wtc}"] = (
-                            f"{c}.{pName}_internal_{wtc}"
+                            f"c{c}.{pName}_internal_{wtc}"
                         )
             else:
                 for pName in p.expand():
-                    tileType.create_wire(f"{c}.{pName}_internal", "dst", z=zOut)
-                    tileType.create_wire(f"{c}.{pName}", "dst", z=zOut)
+                    tileType.create_wire(
+                        f"c{c}.{pName}_internal", "dst", z=zOut, flags=c + 1
+                    )
+                    tileType.create_wire(f"c{c}.{pName}", "dst", z=zOut, flags=c + 1)
                     tileType.create_pip(
-                        f"{c}.{pName}_internal",
-                        f"{c}.{pName}",
+                        f"c{c}.{pName}_internal",
+                        f"c{c}.{pName}",
                         flags=PSEUDO_PIP_END,
                     )
-                    outputMapping[f"{c}.{pName}"] = f"{c}.{pName}_internal"
+                    outputMapping[f"c{c}.{pName}"] = f"c{c}.{pName}_internal"
             zOut += 1
 
         for mux in tile.switchMatrix.muxes:
             for pOut, pIns in mux.getFlattenMux():
-                outTarget = outputMapping.get(f"{c}.{pOut}", f"{c}.{pOut}")
+                outTarget = outputMapping.get(f"c{c}.{pOut}", f"c{c}.{pOut}")
                 for i in pIns:
                     tileType.create_pip(
-                        f"{c}.{i}",
+                        f"c{c}.{i}",
                         outTarget,
                         flags=(
                             NORMAL if "internal" not in outTarget else PSEUDO_PIP_START
                         ),
                     )
-    zOut = 0
     for c in range(context - 1):
         for i, p in enumerate(sorted(tile.getTileOutputPorts())):
             for wc in range(p.width):
                 tileType.create_wire(
-                    f"{p.name}_{c}_to_{c + 1}_NextCycle[{wc}]", "NextCycle", z=zOut
+                    f"{p.name}_{c}_to_{c + 1}_NextCycle[{wc}]",
+                    "NextCycle",
+                    z=zOut,
+                    flags=c + 1,
                 )
             zOut += 1
 
     for c in range(context - 1):
         for mux in tile.switchMatrix.muxes:
-            for pName in mux.output.expand():
+            if not isinstance(mux.output, TilePort):
+                continue
+            for wc, pName in enumerate(mux.output.expand()):
                 output = outputMapping.get(f"c{c}.{pName}", f"c{c}.{pName}")
                 tileType.create_pip(
                     output,
@@ -137,19 +146,23 @@ def genBel(bels: Iterable[Bel], tile: TileType, wireOnly: bool, context=1):
     tile.add_bel_pin(vcc, "vcc", "vcc", PinType.OUTPUT)
 
     for c in range(context):
-        tile.create_wire(f"c{c}.gnd", "GND")
-        tile.create_wire(f"c{c}.vcc", "VCC")
+        tile.create_wire(f"c{c}.gnd", "GND", flags=c + 1)
+        tile.create_wire(f"c{c}.vcc", "VCC", flags=c + 1)
         tile.create_pip("vcc", f"c{c}.vcc")
         tile.create_pip("gnd", f"c{c}.gnd")
 
         for z, bel in enumerate(bels):
             for i in bel.externalInputs + bel.inputs:
                 for pName in i.expand():
-                    tile.create_wire(f"c{c}.{pName}", f"{bel.name}_{i.name}")
+                    tile.create_wire(
+                        f"c{c}.{pName}", f"{bel.name}_{i.name}", flags=c + 1
+                    )
 
             for i in bel.externalOutputs + bel.outputs:
                 for pName in i.expand():
-                    tile.create_wire(f"c{c}.{pName}", f"{bel.name}_{i.name}")
+                    tile.create_wire(
+                        f"c{c}.{pName}", f"{bel.name}_{i.name}", flags=c + 1
+                    )
 
             if wireOnly:
                 continue
@@ -180,7 +193,9 @@ def genBel(bels: Iterable[Bel], tile: TileType, wireOnly: bool, context=1):
                     )
 
             if bel.userCLK:
-                tile.create_wire(f"c{c}.{bel.prefix}{bel.name}_clk_i", "CLK")
+                tile.create_wire(
+                    f"c{c}.{bel.prefix}{bel.name}_clk_i", "CLK", flags=c + 1
+                )
                 tile.add_bel_pin(
                     belData,
                     bel.userCLK.name,
@@ -197,6 +212,7 @@ def genBel(bels: Iterable[Bel], tile: TileType, wireOnly: bool, context=1):
 
 def genTile(tile: Tile, subTile: str, chip: Chip, context=1) -> TileType:
     tt = chip.create_tile_type(subTile)
+
     genBel(
         tile.bels,
         tt,
@@ -284,6 +300,19 @@ def setTiming(chip: Chip):
     )
 
 
+def setPackage(chip: Chip, fabric: Fabric):
+    pkg = chip.create_package("FABulous")
+
+    for (x, y), tile in fabric:
+        if tile is None:
+            continue
+
+        for bel in tile.bels:
+            for port in bel.externalInputs + bel.externalOutputs:
+                for pName in port.expand():
+                    pkg.create_pad(pName, tile.name, bel.name, "", 0)
+
+
 def generateConstrainPair(fabric: Fabric, dest: Path):
     with open(dest, "w") as f:
         # for bel in fabric.getAllUniqueBels():
@@ -343,6 +372,7 @@ def generateChipDatabase(
             ch.set_tile_type(x, y, "NULL")
 
     genFabric(fabric, ch, context=fabric.contextCount)
+    setPackage(ch, fabric)
 
     ch.extra_data = ChipExtraData(fabric.contextCount, fabric.getTotalBelCount())
     logger.info(f"Context Count: {fabric.contextCount}")

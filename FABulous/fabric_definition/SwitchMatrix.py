@@ -94,7 +94,6 @@ class Mux:
         for group in zip_longest(*expandedInputLists):
             # Filter out None values that zip_longest adds for shorter lists
             groupedInputs.append(tuple([item for item in group if item is not None]))
-        print(self)
         return list(zip(self.output.expand(), groupedInputs))
 
 

@@ -82,7 +82,7 @@ class Fabric:
                 > self.frameBitsPerRow * self.maxFramesPerCol
             ):
                 raise ValueError(
-                    f"Tile {t.name} has too many config bits: {t.configBits} > {self.frameBitsPerRow * self.maxFramesPerCol}"
+                    f"Tile {t.name} has too many config bits. Tile have {self.frameBitsPerRow * self.maxFramesPerCol} but requires {t.configBits*self.contextCount}"
                 )
 
     def __getitem__(self, index: Any) -> Tile | SuperTile | None:

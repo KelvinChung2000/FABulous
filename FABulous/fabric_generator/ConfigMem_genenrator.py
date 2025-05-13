@@ -50,7 +50,7 @@ def generateConfigMemInit(
             entry["frame_index"] = str(k)
             slice = bits[count : count + frameBitsPerRow]
             entry["bits_used_in_frame"] = slice.count(1)
-            entry["used_bits_mask"] = slice.to01()
+            entry["used_bits_mask"] = slice.to01(8, "_")
             if slice.count(1) == 0:
                 entry["ConfigBits_ranges"] = "# NULL"
             else:

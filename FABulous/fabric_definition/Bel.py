@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from FABulous.fabric_definition.define import IO, BelType
+from FABulous.fabric_definition.define import BelType
 from FABulous.fabric_definition.Port import (
     BelPort,
     ConfigPort,
@@ -116,7 +116,7 @@ class Bel:
         else:
             return f"{self._name}_{'__'.join([f'{k}_{v}' for k, v in self.paramOverride.items()])}"
 
-    def __post__init__(self):
+    def __post_init__(self):
         if self.belType == BelType.IO:
             if len(self.externalInputs) > 1:
                 raise ValueError(
@@ -142,3 +142,62 @@ class Bel:
             if p.name == name:
                 return p
         raise ValueError(f"Port {name} not found in {self.name}")
+
+    def __str__(self) -> str:
+        """Return a formatted string representation of the Bel.
+
+        Returns
+        -------
+        str
+            A well-formatted string representation of the Bel.
+        """
+        ports_str = []
+
+        # Format all port types using a helper function
+        port_attrs = [
+            ("inputs", self.inputs),
+            ("outputs", self.outputs),
+            ("externalInputs", self.externalInputs),
+            ("externalOutputs", self.externalOutputs),
+            ("configPort", self.configPort),
+            ("sharedPort", self.sharedPort),
+        ]
+
+        # Add formatted port strings
+        for attr_name, attr_value in port_attrs:
+            port_items = (
+                ", ".join([f"{item}" for item in attr_value]) if attr_value else ""
+            )
+            ports_str.append(f"  {attr_name}=[{port_items}]")
+
+        # Format dictionaries
+        dict_attrs = [
+            ("belFeatureMap", self.belFeatureMap, lambda k, v: f"'{k}': {v}"),
+            ("paramOverride", self.paramOverride, lambda k, v: f"'{k}': '{v}'"),
+        ]
+
+        # Add formatted dictionary strings
+        for attr_name, attr_value, formatter in dict_attrs:
+            if attr_value:
+                dict_items = ", ".join([formatter(k, v) for k, v in attr_value.items()])
+                ports_str.append(f"  {attr_name}={{{dict_items}}}")
+            else:
+                ports_str.append(f"  {attr_name}={{}}")
+
+        # Build the full string
+        result = [
+            "Bel(",
+            f"  src={self.src},",
+            f"  jsonPath={self.jsonPath},",
+            f"  prefix='{self.prefix}',",
+            f"  name='{self._name}',",
+            f"  belType={self.belType},",
+            *ports_str,
+            f"  configBits={self.configBits},",
+            f"  userCLK={self.userCLK},",
+            f"  constantBel={self.constantBel},",
+            f"  z={self.z}",
+            ")",
+        ]
+
+        return "\n".join(result)

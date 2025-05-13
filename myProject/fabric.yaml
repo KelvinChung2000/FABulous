@@ -30,13 +30,13 @@ PARAM: {
   ConfigBitMode: frame_based, # default is FlipFlopChain, frame_based
   # we configure an entire configuration frame over the full height of the device (like Virtex-II) and 
   # we write FrameBitsPerRow bits per, well, tile=CLB height
-  FrameBitsPerRow: 16,
+  FrameBitsPerRow: 32,
   MaxFramesPerCol: 8,
   #Package: use work.my_package.all;
   GenerateDelayInSwitchMatrix: 80,
   MultiplexerStyle: custom, #custom or generic
   SuperTileEnable: True, #True,False
-  ContextCount: 1
+  ContextCount: 2
 }
 
 TILES: 

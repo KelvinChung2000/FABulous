@@ -91,7 +91,14 @@ class TileType(BBAStruct):
         bel.pins.append(BelPin(pin_id, wire_idx, dir))
         self.wires[wire_idx].bel_pins.append(BelPinRef(bel.index, pin_id))
 
-    def create_wire(self, name: str, type: str = "", const_value: str = "", z: int = 0):
+    def create_wire(
+        self,
+        name: str,
+        type: str = "",
+        const_value: str = "",
+        z: int = 0,
+        flags: int = 0,
+    ):
         # Create a new tile wire of a given name and type (optional) in the tile type
         if self.has_wire(name):
             return self.wires[self._wire2idx[self.strs.id(name)]]
@@ -111,6 +118,7 @@ class TileType(BBAStruct):
             wire_type=self.strs.id(type),
             gfx_wire_id=gfx_wire_id,
             const_value=self.strs.id(const_value),
+            flags=flags,
         )
         self._wire2idx[wire.name] = wire.index
         self.wires.append(wire)

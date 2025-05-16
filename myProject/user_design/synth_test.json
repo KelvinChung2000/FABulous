@@ -65,7 +65,7 @@
       "attributes": {
         "blackbox": "00000000000000000000000000000001",
         "cells_not_processed": "00000000000000000000000000000001",
-        "src": "/home/kelvin/FABulous_fork/myProject/.FABulous/IO_buf.v:15.1-19.10"
+        "src": "/home/kelvin/FABulous_fork/myProject/.FABulous/build_in_lib.v:15.1-19.10"
       },
       "ports": {
         "CLK_O": {
@@ -80,7 +80,31 @@
           "hide_name": 0,
           "bits": [ 2 ],
           "attributes": {
-            "src": "/home/kelvin/FABulous_fork/myProject/.FABulous/IO_buf.v:16.13-16.18"
+            "src": "/home/kelvin/FABulous_fork/myProject/.FABulous/build_in_lib.v:16.13-16.18"
+          }
+        }
+      }
+    },
+    "GND_DRV": {
+      "attributes": {
+        "blackbox": "00000000000000000000000000000001",
+        "cells_not_processed": "00000000000000000000000000000001",
+        "src": "/home/kelvin/FABulous_fork/myProject/.FABulous/build_in_lib.v:21.1-25.10"
+      },
+      "ports": {
+        "O": {
+          "direction": "output",
+          "bits": [ 2 ]
+        }
+      },
+      "cells": {
+      },
+      "netnames": {
+        "O": {
+          "hide_name": 0,
+          "bits": [ 2 ],
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/.FABulous/build_in_lib.v:22.12-22.13"
           }
         }
       }
@@ -89,7 +113,7 @@
       "attributes": {
         "blackbox": "00000000000000000000000000000001",
         "cells_not_processed": "00000000000000000000000000000001",
-        "src": "/home/kelvin/FABulous_fork/myProject/.FABulous/IO_buf.v:1.1-6.10"
+        "src": "/home/kelvin/FABulous_fork/myProject/.FABulous/build_in_lib.v:1.1-6.10"
       },
       "ports": {
         "PAD": {
@@ -108,14 +132,14 @@
           "hide_name": 0,
           "bits": [ 3 ],
           "attributes": {
-            "src": "/home/kelvin/FABulous_fork/myProject/.FABulous/IO_buf.v:3.13-3.14"
+            "src": "/home/kelvin/FABulous_fork/myProject/.FABulous/build_in_lib.v:3.13-3.14"
           }
         },
         "PAD": {
           "hide_name": 0,
           "bits": [ 2 ],
           "attributes": {
-            "src": "/home/kelvin/FABulous_fork/myProject/.FABulous/IO_buf.v:2.12-2.15"
+            "src": "/home/kelvin/FABulous_fork/myProject/.FABulous/build_in_lib.v:2.12-2.15"
           }
         }
       }
@@ -309,7 +333,7 @@
       "attributes": {
         "blackbox": "00000000000000000000000000000001",
         "cells_not_processed": "00000000000000000000000000000001",
-        "src": "/home/kelvin/FABulous_fork/myProject/.FABulous/IO_buf.v:8.1-13.10"
+        "src": "/home/kelvin/FABulous_fork/myProject/.FABulous/build_in_lib.v:8.1-13.10"
       },
       "ports": {
         "PAD": {
@@ -328,14 +352,38 @@
           "hide_name": 0,
           "bits": [ 3 ],
           "attributes": {
-            "src": "/home/kelvin/FABulous_fork/myProject/.FABulous/IO_buf.v:10.11-10.12"
+            "src": "/home/kelvin/FABulous_fork/myProject/.FABulous/build_in_lib.v:10.11-10.12"
           }
         },
         "PAD": {
           "hide_name": 0,
           "bits": [ 2 ],
           "attributes": {
-            "src": "/home/kelvin/FABulous_fork/myProject/.FABulous/IO_buf.v:9.13-9.16"
+            "src": "/home/kelvin/FABulous_fork/myProject/.FABulous/build_in_lib.v:9.13-9.16"
+          }
+        }
+      }
+    },
+    "VCC_DRV": {
+      "attributes": {
+        "blackbox": "00000000000000000000000000000001",
+        "cells_not_processed": "00000000000000000000000000000001",
+        "src": "/home/kelvin/FABulous_fork/myProject/.FABulous/build_in_lib.v:27.1-31.10"
+      },
+      "ports": {
+        "O": {
+          "direction": "output",
+          "bits": [ 2 ]
+        }
+      },
+      "cells": {
+      },
+      "netnames": {
+        "O": {
+          "hide_name": 0,
+          "bits": [ 2 ],
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/.FABulous/build_in_lib.v:28.12-28.13"
           }
         }
       }
@@ -469,7 +517,7 @@
       "attributes": {
         "hdlname": "main",
         "top": "00000000000000000000000000000001",
-        "src": "/home/kelvin/FABulous_fork/benchmarks/userbench/loop_array/loop_array.sv:1347.1-1437.10"
+        "src": "/home/kelvin/FABulous_fork/benchmarks/userbench/loop_array_inner/loop_array_inner.sv:571.1-661.10"
       },
       "ports": {
         "in0": {
@@ -498,7 +546,79 @@
         }
       },
       "cells": {
-        "$extract$\\ALU_ALU_func_0$674": {
+        "$auto$constmap.cc:36:constmap_worker$404": {
+          "hide_name": 1,
+          "type": "const_unit",
+          "parameters": {
+            "ConfigBits": "00000000000000000000000000000000",
+            "WIDTH": "00000000000000000000000000100000"
+          },
+          "attributes": {
+            "module_not_derived": "00000000000000000000000000000001",
+            "src": "/home/kelvin/FABulous_fork/myProject/.FABulous/const_map.v:13.7-15.6"
+          },
+          "port_directions": {
+            "const_out": "output"
+          },
+          "connections": {
+            "const_out": [ 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101 ]
+          }
+        },
+        "$auto$constmap.cc:36:constmap_worker$412": {
+          "hide_name": 1,
+          "type": "const_unit",
+          "parameters": {
+            "ConfigBits": "00000000000000000000000000001111",
+            "WIDTH": "00000000000000000000000000100000"
+          },
+          "attributes": {
+            "module_not_derived": "00000000000000000000000000000001",
+            "src": "/home/kelvin/FABulous_fork/myProject/.FABulous/const_map.v:13.7-15.6"
+          },
+          "port_directions": {
+            "const_out": "output"
+          },
+          "connections": {
+            "const_out": [ 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133 ]
+          }
+        },
+        "$auto$constmap.cc:36:constmap_worker$426": {
+          "hide_name": 1,
+          "type": "const_unit",
+          "parameters": {
+            "ConfigBits": "00000000000000000000000000000000",
+            "WIDTH": "00000000000000000000000000100000"
+          },
+          "attributes": {
+            "module_not_derived": "00000000000000000000000000000001",
+            "src": "/home/kelvin/FABulous_fork/myProject/.FABulous/const_map.v:13.7-15.6"
+          },
+          "port_directions": {
+            "const_out": "output"
+          },
+          "connections": {
+            "const_out": [ 134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165 ]
+          }
+        },
+        "$auto$constmap.cc:36:constmap_worker$428": {
+          "hide_name": 1,
+          "type": "const_unit",
+          "parameters": {
+            "ConfigBits": "00000000000000000000000000000000",
+            "WIDTH": "00000000000000000000000000100000"
+          },
+          "attributes": {
+            "module_not_derived": "00000000000000000000000000000001",
+            "src": "/home/kelvin/FABulous_fork/myProject/.FABulous/const_map.v:13.7-15.6"
+          },
+          "port_directions": {
+            "const_out": "output"
+          },
+          "connections": {
+            "const_out": [ 166, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197 ]
+          }
+        },
+        "$extract$\\ALU_ALU_func_0$335": {
           "hide_name": 1,
           "type": "ALU",
           "parameters": {
@@ -515,13 +635,128 @@
             "data_out": "output"
           },
           "connections": {
-            "data_in1": [ 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101 ],
-            "data_in2": [ 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133 ],
+            "data_in1": [ 198, 199, 200, 201, 202, 203, 204, 205, 206, 207, 208, 209, 210, 211, 212, 213, 214, 215, 216, 217, 218, 219, 220, 221, 222, 223, 224, 225, 226, 227, 228, 229 ],
+            "data_in2": [ 230, 231, 232, 233, 234, 235, 236, 237, 238, 239, 240, 241, 242, 243, 244, 245, 246, 247, 248, 249, 250, 251, 252, 253, 254, 255, 256, 257, 258, 259, 260, 261 ],
             "data_in3": [ "z" ],
-            "data_out": [ 134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165 ]
+            "data_out": [ 262, 263, 264, 265, 266, 267, 268, 269, 270, 271, 272, 273, 274, 275, 276, 277, 278, 279, 280, 281, 282, 283, 284, 285, 286, 287, 288, 289, 290, 291, 292, 293 ]
           }
         },
-        "$extract$\\logic_op_conf_0$682": {
+        "$extract$\\ALU_ALU_func_0$336": {
+          "hide_name": 1,
+          "type": "ALU",
+          "parameters": {
+            "ALU_func": "0"
+          },
+          "attributes": {
+            "module_not_derived": "00000000000000000000000000000001",
+            "src": "/home/kelvin/FABulous_fork/myProject/.FABulous/techmaps.v:66.7-71.6"
+          },
+          "port_directions": {
+            "data_in1": "input",
+            "data_in2": "input",
+            "data_in3": "input",
+            "data_out": "output"
+          },
+          "connections": {
+            "data_in1": [ 294, 295, 296, 297, 298, 299, 300, 301, 302, 303, 304, 305, 306, 307, 308, 309, 310, 311, 312, 313, 314, 315, 316, 317, 318, 319, 320, 321, 322, 323, 324, 325 ],
+            "data_in2": [ 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133 ],
+            "data_in3": [ "z" ],
+            "data_out": [ 326, 327, 328, 329, 330, 331, 332, 333, 334, 335, 336, 337, 338, 339, 340, 341, 342, 343, 344, 345, 346, 347, 348, 349, 350, 351, 352, 353, 354, 355, 356, 357 ]
+          }
+        },
+        "$extract$\\ALU_ALU_func_6$339": {
+          "hide_name": 1,
+          "type": "ALU",
+          "parameters": {
+            "ALU_func": "110"
+          },
+          "attributes": {
+            "module_not_derived": "00000000000000000000000000000001",
+            "src": "/home/kelvin/FABulous_fork/myProject/.FABulous/techmaps.v:166.7-171.6"
+          },
+          "port_directions": {
+            "data_in1": "input",
+            "data_in2": "input",
+            "data_in3": "input",
+            "data_out": "output"
+          },
+          "connections": {
+            "data_in1": [ 358, 359, 360, 361, "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
+            "data_in2": [ 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101 ],
+            "data_in3": [ 362 ],
+            "data_out": [ 294, 295, 296, 297, 298, 299, 300, 301, 302, 303, 304, 305, 306, 307, 308, 309, 310, 311, 312, 313, 314, 315, 316, 317, 318, 319, 320, 321, 322, 323, 324, 325 ]
+          }
+        },
+        "$extract$\\ALU_ALU_func_6$340": {
+          "hide_name": 1,
+          "type": "ALU",
+          "parameters": {
+            "ALU_func": "110"
+          },
+          "attributes": {
+            "module_not_derived": "00000000000000000000000000000001",
+            "src": "/home/kelvin/FABulous_fork/myProject/.FABulous/techmaps.v:166.7-171.6"
+          },
+          "port_directions": {
+            "data_in1": "input",
+            "data_in2": "input",
+            "data_in3": "input",
+            "data_out": "output"
+          },
+          "connections": {
+            "data_in1": [ 294, 295, 296, 297, 298, 299, 300, 301, 302, 303, 304, 305, 306, 307, 308, 309, 310, 311, 312, 313, 314, 315, 316, 317, 318, 319, 320, 321, 322, 323, 324, 325 ],
+            "data_in2": [ 326, 327, 328, 329, 330, 331, 332, 333, 334, 335, 336, 337, 338, 339, 340, 341, 342, 343, 344, 345, 346, 347, 348, 349, 350, 351, 352, 353, 354, 355, 356, 357 ],
+            "data_in3": [ 363 ],
+            "data_out": [ 364, 365, 366, 367, 368, 369, 370, 371, 372, 373, 374, 375, 376, 377, 378, 379, 380, 381, 382, 383, 384, 385, 386, 387, 388, 389, 390, 391, 392, 393, 394, 395 ]
+          }
+        },
+        "$extract$\\ALU_ALU_func_6$341": {
+          "hide_name": 1,
+          "type": "ALU",
+          "parameters": {
+            "ALU_func": "110"
+          },
+          "attributes": {
+            "module_not_derived": "00000000000000000000000000000001",
+            "src": "/home/kelvin/FABulous_fork/myProject/.FABulous/techmaps.v:166.7-171.6"
+          },
+          "port_directions": {
+            "data_in1": "input",
+            "data_in2": "input",
+            "data_in3": "input",
+            "data_out": "output"
+          },
+          "connections": {
+            "data_in1": [ 396, 397, 398, 399, 400, 401, 402, 403, 404, 405, 406, 407, 408, 409, 410, 411, 412, 413, 414, 415, 416, 417, 418, 419, 420, 421, 422, 423, 424, 425, 426, 427 ],
+            "data_in2": [ 166, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197 ],
+            "data_in3": [ 362 ],
+            "data_out": [ 428, 429, 430, 431, 432, 433, 434, 435, 436, 437, 438, 439, 440, 441, 442, 443, 444, 445, 446, 447, 448, 449, 450, 451, 452, 453, 454, 455, 456, 457, 458, 459 ]
+          }
+        },
+        "$extract$\\ALU_ALU_func_6$342": {
+          "hide_name": 1,
+          "type": "ALU",
+          "parameters": {
+            "ALU_func": "110"
+          },
+          "attributes": {
+            "module_not_derived": "00000000000000000000000000000001",
+            "src": "/home/kelvin/FABulous_fork/myProject/.FABulous/techmaps.v:166.7-171.6"
+          },
+          "port_directions": {
+            "data_in1": "input",
+            "data_in2": "input",
+            "data_in3": "input",
+            "data_out": "output"
+          },
+          "connections": {
+            "data_in1": [ 460, 461, 462, 463, 464, 465, 466, 467, 468, 469, 470, 471, 472, 473, 474, 475, 476, 477, 478, 479, 480, 481, 482, 483, 484, 485, 486, 487, 488, 489, 490, 491 ],
+            "data_in2": [ 134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165 ],
+            "data_in3": [ 362 ],
+            "data_out": [ 198, 199, 200, 201, 202, 203, 204, 205, 206, 207, 208, 209, 210, 211, 212, 213, 214, 215, 216, 217, 218, 219, 220, 221, 222, 223, 224, 225, 226, 227, 228, 229 ]
+          }
+        },
+        "$extract$\\logic_op_conf_0$360": {
           "hide_name": 1,
           "type": "logic_op",
           "parameters": {
@@ -537,12 +772,96 @@
             "Y": "output"
           },
           "connections": {
-            "A": [ 166 ],
-            "B": [ 167 ],
-            "Y": [ 168 ]
+            "A": [ 492 ],
+            "B": [ 493 ],
+            "Y": [ 494 ]
           }
         },
-        "$extract$\\logic_op_conf_1$684": {
+        "$extract$\\logic_op_conf_0$361": {
+          "hide_name": 1,
+          "type": "logic_op",
+          "parameters": {
+            "conf": "0"
+          },
+          "attributes": {
+            "module_not_derived": "00000000000000000000000000000001",
+            "src": "/home/kelvin/FABulous_fork/myProject/.FABulous/techmaps.v:284.7-288.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 495 ],
+            "B": [ 496 ],
+            "Y": [ 497 ]
+          }
+        },
+        "$extract$\\logic_op_conf_0$362": {
+          "hide_name": 1,
+          "type": "logic_op",
+          "parameters": {
+            "conf": "0"
+          },
+          "attributes": {
+            "module_not_derived": "00000000000000000000000000000001",
+            "src": "/home/kelvin/FABulous_fork/myProject/.FABulous/techmaps.v:284.7-288.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 497 ],
+            "B": [ 363 ],
+            "Y": [ 498 ]
+          }
+        },
+        "$extract$\\logic_op_conf_0$363": {
+          "hide_name": 1,
+          "type": "logic_op",
+          "parameters": {
+            "conf": "0"
+          },
+          "attributes": {
+            "module_not_derived": "00000000000000000000000000000001",
+            "src": "/home/kelvin/FABulous_fork/myProject/.FABulous/techmaps.v:284.7-288.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 494 ],
+            "B": [ 363 ],
+            "Y": [ 499 ]
+          }
+        },
+        "$extract$\\logic_op_conf_0$364": {
+          "hide_name": 1,
+          "type": "logic_op",
+          "parameters": {
+            "conf": "0"
+          },
+          "attributes": {
+            "module_not_derived": "00000000000000000000000000000001",
+            "src": "/home/kelvin/FABulous_fork/myProject/.FABulous/techmaps.v:284.7-288.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 492 ],
+            "B": [ 362 ],
+            "Y": [ 495 ]
+          }
+        },
+        "$extract$\\logic_op_conf_1$366": {
           "hide_name": 1,
           "type": "logic_op",
           "parameters": {
@@ -558,12 +877,54 @@
             "Y": "output"
           },
           "connections": {
-            "A": [ 169 ],
-            "B": [ 168 ],
-            "Y": [ 170 ]
+            "A": [ 500 ],
+            "B": [ 498 ],
+            "Y": [ 501 ]
           }
         },
-        "$extract$\\logic_op_conf_3$686": {
+        "$extract$\\logic_op_conf_1$367": {
+          "hide_name": 1,
+          "type": "logic_op",
+          "parameters": {
+            "conf": "1"
+          },
+          "attributes": {
+            "module_not_derived": "00000000000000000000000000000001",
+            "src": "/home/kelvin/FABulous_fork/myProject/.FABulous/techmaps.v:307.7-311.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 502 ],
+            "B": [ 499 ],
+            "Y": [ 500 ]
+          }
+        },
+        "$extract$\\logic_op_conf_1$368": {
+          "hide_name": 1,
+          "type": "logic_op",
+          "parameters": {
+            "conf": "1"
+          },
+          "attributes": {
+            "module_not_derived": "00000000000000000000000000000001",
+            "src": "/home/kelvin/FABulous_fork/myProject/.FABulous/techmaps.v:307.7-311.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 502 ],
+            "B": [ 498 ],
+            "Y": [ 503 ]
+          }
+        },
+        "$extract$\\logic_op_conf_3$370": {
           "hide_name": 1,
           "type": "logic_op",
           "parameters": {
@@ -579,12 +940,12 @@
             "Y": "output"
           },
           "connections": {
-            "A": [ 171 ],
+            "A": [ 363 ],
             "B": [ "z" ],
-            "Y": [ 166 ]
+            "Y": [ 502 ]
           }
         },
-        "$extract$\\logic_op_conf_3$687": {
+        "$extract$\\logic_op_conf_3$371": {
           "hide_name": 1,
           "type": "logic_op",
           "parameters": {
@@ -600,12 +961,54 @@
             "Y": "output"
           },
           "connections": {
-            "A": [ 167 ],
+            "A": [ 362 ],
             "B": [ "z" ],
-            "Y": [ 169 ]
+            "Y": [ 493 ]
           }
         },
-        "$extract$\\reg_unit_WIDTH_1_tide_en_1_tide_rst_0$668": {
+        "$extract$\\logic_op_conf_3$372": {
+          "hide_name": 1,
+          "type": "logic_op",
+          "parameters": {
+            "conf": "11"
+          },
+          "attributes": {
+            "module_not_derived": "00000000000000000000000000000001",
+            "src": "/home/kelvin/FABulous_fork/myProject/.FABulous/techmaps.v:353.7-357.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 504 ],
+            "B": [ "z" ],
+            "Y": [ 496 ]
+          }
+        },
+        "$extract$\\logic_op_conf_3$373": {
+          "hide_name": 1,
+          "type": "logic_op",
+          "parameters": {
+            "conf": "11"
+          },
+          "attributes": {
+            "module_not_derived": "00000000000000000000000000000001",
+            "src": "/home/kelvin/FABulous_fork/myProject/.FABulous/techmaps.v:353.7-357.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 505 ],
+            "B": [ "z" ],
+            "Y": [ 492 ]
+          }
+        },
+        "$extract$\\reg_unit_WIDTH_1_tide_en_1_tide_rst_0$324": {
           "hide_name": 1,
           "type": "reg_unit_WIDTH_1",
           "parameters": {
@@ -624,21 +1027,21 @@
           },
           "connections": {
             "en": [ "z" ],
-            "reg_in": [ 170 ],
-            "reg_out": [ 167 ],
+            "reg_in": [ 503 ],
+            "reg_out": [ 504 ],
             "rst": [ "z" ]
           }
         },
-        "$extract$\\reg_unit_tide_en_0_tide_rst_1$690": {
+        "$extract$\\reg_unit_WIDTH_1_tide_en_1_tide_rst_0$325": {
           "hide_name": 1,
-          "type": "reg_unit",
+          "type": "reg_unit_WIDTH_1",
           "parameters": {
-            "tide_en": "0",
-            "tide_rst": "1"
+            "tide_en": "1",
+            "tide_rst": "0"
           },
           "attributes": {
             "module_not_derived": "00000000000000000000000000000001",
-            "src": "/home/kelvin/FABulous_fork/myProject/.FABulous/techmaps.v:413.7-418.6"
+            "src": "/home/kelvin/FABulous_fork/myProject/.FABulous/techmaps.v:564.7-569.6"
           },
           "port_directions": {
             "en": "input",
@@ -647,13 +1050,13 @@
             "rst": "input"
           },
           "connections": {
-            "en": [ 167 ],
-            "reg_in": [ 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197, 198, 199, 200, 201, 202, 203 ],
-            "reg_out": [ 204, 205, 206, 207, 208, 209, 210, 211, 212, 213, 214, 215, 216, 217, 218, 219, 220, 221, 222, 223, 224, 225, 226, 227, 228, 229, 230, 231, 232, 233, 234, 235 ],
-            "rst": [ 171 ]
+            "en": [ "z" ],
+            "reg_in": [ 501 ],
+            "reg_out": [ 363 ],
+            "rst": [ "z" ]
           }
         },
-        "$extract$\\reg_unit_tide_en_0_tide_rst_1$691": {
+        "$extract$\\reg_unit_tide_en_0_tide_rst_1$375": {
           "hide_name": 1,
           "type": "reg_unit",
           "parameters": {
@@ -671,10 +1074,34 @@
             "rst": "input"
           },
           "connections": {
-            "en": [ 167 ],
-            "reg_in": [ 204, 205, 206, 207, 208, 209, 210, 211, 212, 213, 214, 215, 216, 217, 218, 219, 220, 221, 222, 223, 224, 225, 226, 227, 228, 229, 230, 231, 232, 233, 234, 235 ],
-            "reg_out": [ 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133 ],
-            "rst": [ 171 ]
+            "en": [ 363 ],
+            "reg_in": [ 506, 507, 508, 509, 510, 511, 512, 513, 514, 515, 516, 517, 518, 519, 520, 521, 522, 523, 524, 525, 526, 527, 528, 529, 530, 531, 532, 533, 534, 535, 536, 537 ],
+            "reg_out": [ 396, 397, 398, 399, 400, 401, 402, 403, 404, 405, 406, 407, 408, 409, 410, 411, 412, 413, 414, 415, 416, 417, 418, 419, 420, 421, 422, 423, 424, 425, 426, 427 ],
+            "rst": [ 505 ]
+          }
+        },
+        "$extract$\\reg_unit_tide_en_0_tide_rst_1$376": {
+          "hide_name": 1,
+          "type": "reg_unit",
+          "parameters": {
+            "tide_en": "0",
+            "tide_rst": "1"
+          },
+          "attributes": {
+            "module_not_derived": "00000000000000000000000000000001",
+            "src": "/home/kelvin/FABulous_fork/myProject/.FABulous/techmaps.v:413.7-418.6"
+          },
+          "port_directions": {
+            "en": "input",
+            "reg_in": "input",
+            "reg_out": "output",
+            "rst": "input"
+          },
+          "connections": {
+            "en": [ 363 ],
+            "reg_in": [ 428, 429, 430, 431, 432, 433, 434, 435, 436, 437, 438, 439, 440, 441, 442, 443, 444, 445, 446, 447, 448, 449, 450, 451, 452, 453, 454, 455, 456, 457, 458, 459 ],
+            "reg_out": [ 230, 231, 232, 233, 234, 235, 236, 237, 238, 239, 240, 241, 242, 243, 244, 245, 246, 247, 248, 249, 250, 251, 252, 253, 254, 255, 256, 257, 258, 259, 260, 261 ],
+            "rst": [ 505 ]
           }
         },
         "$iopadmap$main.clk": {
@@ -696,9 +1123,26 @@
           },
           "connections": {
             "from_fabric": [ ],
-            "in": [ 66 ],
+            "in": [ 538 ],
             "out": [ ],
-            "to_fabric": [ 236 ]
+            "to_fabric": [ 539 ]
+          }
+        },
+        "$iopadmap$main.clk_1": {
+          "hide_name": 1,
+          "type": "INBUF",
+          "parameters": {
+          },
+          "attributes": {
+            "keep": "00000000000000000000000000000001"
+          },
+          "port_directions": {
+            "O": "output",
+            "PAD": "input"
+          },
+          "connections": {
+            "O": [ 538 ],
+            "PAD": [ 66 ]
           }
         },
         "$iopadmap$main.done": {
@@ -719,10 +1163,27 @@
             "to_fabric": "output"
           },
           "connections": {
-            "from_fabric": [ 169 ],
+            "from_fabric": [ 502 ],
             "in": [ ],
-            "out": [ 69 ],
+            "out": [ 540 ],
             "to_fabric": [ ]
+          }
+        },
+        "$iopadmap$main.done_1": {
+          "hide_name": 1,
+          "type": "OUTBUF",
+          "parameters": {
+          },
+          "attributes": {
+            "keep": "00000000000000000000000000000001"
+          },
+          "port_directions": {
+            "I": "input",
+            "PAD": "output"
+          },
+          "connections": {
+            "I": [ 540 ],
+            "PAD": [ 69 ]
           }
         },
         "$iopadmap$main.go": {
@@ -744,9 +1205,26 @@
           },
           "connections": {
             "from_fabric": [ ],
-            "in": [ 68 ],
+            "in": [ 541 ],
             "out": [ ],
-            "to_fabric": [ 237 ]
+            "to_fabric": [ 362 ]
+          }
+        },
+        "$iopadmap$main.go_1": {
+          "hide_name": 1,
+          "type": "INBUF",
+          "parameters": {
+          },
+          "attributes": {
+            "keep": "00000000000000000000000000000001"
+          },
+          "port_directions": {
+            "O": "output",
+            "PAD": "input"
+          },
+          "connections": {
+            "O": [ 541 ],
+            "PAD": [ 68 ]
           }
         },
         "$iopadmap$main.in0": {
@@ -768,9 +1246,553 @@
           },
           "connections": {
             "from_fabric": [ ],
-            "in": [ 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33 ],
+            "in": [ 542, 543, 544, 545, 546, 547, 548, 549, 550, 551, 552, 553, 554, 555, 556, 557, 558, 559, 560, 561, 562, 563, 564, 565, 566, 567, 568, 569, 570, 571, 572, 573 ],
             "out": [ ],
-            "to_fabric": [ 238, 239, 240, 241, 242, 243, 244, 245, 246, 247, 248, 249, 250, 251, 252, 253, 254, 255, 256, 257, 258, 259, 260, 261, 262, 263, 264, 265, 266, 267, 268, 269 ]
+            "to_fabric": [ 358, 359, 360, 361, 574, 575, 576, 577, 578, 579, 580, 581, 582, 583, 584, 585, 586, 587, 588, 589, 590, 591, 592, 593, 594, 595, 596, 597, 598, 599, 600, 601 ]
+          }
+        },
+        "$iopadmap$main.in0_1": {
+          "hide_name": 1,
+          "type": "INBUF",
+          "parameters": {
+          },
+          "attributes": {
+            "keep": "00000000000000000000000000000001"
+          },
+          "port_directions": {
+            "O": "output",
+            "PAD": "input"
+          },
+          "connections": {
+            "O": [ 542 ],
+            "PAD": [ 2 ]
+          }
+        },
+        "$iopadmap$main.in0_10": {
+          "hide_name": 1,
+          "type": "INBUF",
+          "parameters": {
+          },
+          "attributes": {
+            "keep": "00000000000000000000000000000001"
+          },
+          "port_directions": {
+            "O": "output",
+            "PAD": "input"
+          },
+          "connections": {
+            "O": [ 551 ],
+            "PAD": [ 11 ]
+          }
+        },
+        "$iopadmap$main.in0_11": {
+          "hide_name": 1,
+          "type": "INBUF",
+          "parameters": {
+          },
+          "attributes": {
+            "keep": "00000000000000000000000000000001"
+          },
+          "port_directions": {
+            "O": "output",
+            "PAD": "input"
+          },
+          "connections": {
+            "O": [ 552 ],
+            "PAD": [ 12 ]
+          }
+        },
+        "$iopadmap$main.in0_12": {
+          "hide_name": 1,
+          "type": "INBUF",
+          "parameters": {
+          },
+          "attributes": {
+            "keep": "00000000000000000000000000000001"
+          },
+          "port_directions": {
+            "O": "output",
+            "PAD": "input"
+          },
+          "connections": {
+            "O": [ 553 ],
+            "PAD": [ 13 ]
+          }
+        },
+        "$iopadmap$main.in0_13": {
+          "hide_name": 1,
+          "type": "INBUF",
+          "parameters": {
+          },
+          "attributes": {
+            "keep": "00000000000000000000000000000001"
+          },
+          "port_directions": {
+            "O": "output",
+            "PAD": "input"
+          },
+          "connections": {
+            "O": [ 554 ],
+            "PAD": [ 14 ]
+          }
+        },
+        "$iopadmap$main.in0_14": {
+          "hide_name": 1,
+          "type": "INBUF",
+          "parameters": {
+          },
+          "attributes": {
+            "keep": "00000000000000000000000000000001"
+          },
+          "port_directions": {
+            "O": "output",
+            "PAD": "input"
+          },
+          "connections": {
+            "O": [ 555 ],
+            "PAD": [ 15 ]
+          }
+        },
+        "$iopadmap$main.in0_15": {
+          "hide_name": 1,
+          "type": "INBUF",
+          "parameters": {
+          },
+          "attributes": {
+            "keep": "00000000000000000000000000000001"
+          },
+          "port_directions": {
+            "O": "output",
+            "PAD": "input"
+          },
+          "connections": {
+            "O": [ 556 ],
+            "PAD": [ 16 ]
+          }
+        },
+        "$iopadmap$main.in0_16": {
+          "hide_name": 1,
+          "type": "INBUF",
+          "parameters": {
+          },
+          "attributes": {
+            "keep": "00000000000000000000000000000001"
+          },
+          "port_directions": {
+            "O": "output",
+            "PAD": "input"
+          },
+          "connections": {
+            "O": [ 557 ],
+            "PAD": [ 17 ]
+          }
+        },
+        "$iopadmap$main.in0_17": {
+          "hide_name": 1,
+          "type": "INBUF",
+          "parameters": {
+          },
+          "attributes": {
+            "keep": "00000000000000000000000000000001"
+          },
+          "port_directions": {
+            "O": "output",
+            "PAD": "input"
+          },
+          "connections": {
+            "O": [ 558 ],
+            "PAD": [ 18 ]
+          }
+        },
+        "$iopadmap$main.in0_18": {
+          "hide_name": 1,
+          "type": "INBUF",
+          "parameters": {
+          },
+          "attributes": {
+            "keep": "00000000000000000000000000000001"
+          },
+          "port_directions": {
+            "O": "output",
+            "PAD": "input"
+          },
+          "connections": {
+            "O": [ 559 ],
+            "PAD": [ 19 ]
+          }
+        },
+        "$iopadmap$main.in0_19": {
+          "hide_name": 1,
+          "type": "INBUF",
+          "parameters": {
+          },
+          "attributes": {
+            "keep": "00000000000000000000000000000001"
+          },
+          "port_directions": {
+            "O": "output",
+            "PAD": "input"
+          },
+          "connections": {
+            "O": [ 560 ],
+            "PAD": [ 20 ]
+          }
+        },
+        "$iopadmap$main.in0_2": {
+          "hide_name": 1,
+          "type": "INBUF",
+          "parameters": {
+          },
+          "attributes": {
+            "keep": "00000000000000000000000000000001"
+          },
+          "port_directions": {
+            "O": "output",
+            "PAD": "input"
+          },
+          "connections": {
+            "O": [ 543 ],
+            "PAD": [ 3 ]
+          }
+        },
+        "$iopadmap$main.in0_20": {
+          "hide_name": 1,
+          "type": "INBUF",
+          "parameters": {
+          },
+          "attributes": {
+            "keep": "00000000000000000000000000000001"
+          },
+          "port_directions": {
+            "O": "output",
+            "PAD": "input"
+          },
+          "connections": {
+            "O": [ 561 ],
+            "PAD": [ 21 ]
+          }
+        },
+        "$iopadmap$main.in0_21": {
+          "hide_name": 1,
+          "type": "INBUF",
+          "parameters": {
+          },
+          "attributes": {
+            "keep": "00000000000000000000000000000001"
+          },
+          "port_directions": {
+            "O": "output",
+            "PAD": "input"
+          },
+          "connections": {
+            "O": [ 562 ],
+            "PAD": [ 22 ]
+          }
+        },
+        "$iopadmap$main.in0_22": {
+          "hide_name": 1,
+          "type": "INBUF",
+          "parameters": {
+          },
+          "attributes": {
+            "keep": "00000000000000000000000000000001"
+          },
+          "port_directions": {
+            "O": "output",
+            "PAD": "input"
+          },
+          "connections": {
+            "O": [ 563 ],
+            "PAD": [ 23 ]
+          }
+        },
+        "$iopadmap$main.in0_23": {
+          "hide_name": 1,
+          "type": "INBUF",
+          "parameters": {
+          },
+          "attributes": {
+            "keep": "00000000000000000000000000000001"
+          },
+          "port_directions": {
+            "O": "output",
+            "PAD": "input"
+          },
+          "connections": {
+            "O": [ 564 ],
+            "PAD": [ 24 ]
+          }
+        },
+        "$iopadmap$main.in0_24": {
+          "hide_name": 1,
+          "type": "INBUF",
+          "parameters": {
+          },
+          "attributes": {
+            "keep": "00000000000000000000000000000001"
+          },
+          "port_directions": {
+            "O": "output",
+            "PAD": "input"
+          },
+          "connections": {
+            "O": [ 565 ],
+            "PAD": [ 25 ]
+          }
+        },
+        "$iopadmap$main.in0_25": {
+          "hide_name": 1,
+          "type": "INBUF",
+          "parameters": {
+          },
+          "attributes": {
+            "keep": "00000000000000000000000000000001"
+          },
+          "port_directions": {
+            "O": "output",
+            "PAD": "input"
+          },
+          "connections": {
+            "O": [ 566 ],
+            "PAD": [ 26 ]
+          }
+        },
+        "$iopadmap$main.in0_26": {
+          "hide_name": 1,
+          "type": "INBUF",
+          "parameters": {
+          },
+          "attributes": {
+            "keep": "00000000000000000000000000000001"
+          },
+          "port_directions": {
+            "O": "output",
+            "PAD": "input"
+          },
+          "connections": {
+            "O": [ 567 ],
+            "PAD": [ 27 ]
+          }
+        },
+        "$iopadmap$main.in0_27": {
+          "hide_name": 1,
+          "type": "INBUF",
+          "parameters": {
+          },
+          "attributes": {
+            "keep": "00000000000000000000000000000001"
+          },
+          "port_directions": {
+            "O": "output",
+            "PAD": "input"
+          },
+          "connections": {
+            "O": [ 568 ],
+            "PAD": [ 28 ]
+          }
+        },
+        "$iopadmap$main.in0_28": {
+          "hide_name": 1,
+          "type": "INBUF",
+          "parameters": {
+          },
+          "attributes": {
+            "keep": "00000000000000000000000000000001"
+          },
+          "port_directions": {
+            "O": "output",
+            "PAD": "input"
+          },
+          "connections": {
+            "O": [ 569 ],
+            "PAD": [ 29 ]
+          }
+        },
+        "$iopadmap$main.in0_29": {
+          "hide_name": 1,
+          "type": "INBUF",
+          "parameters": {
+          },
+          "attributes": {
+            "keep": "00000000000000000000000000000001"
+          },
+          "port_directions": {
+            "O": "output",
+            "PAD": "input"
+          },
+          "connections": {
+            "O": [ 570 ],
+            "PAD": [ 30 ]
+          }
+        },
+        "$iopadmap$main.in0_3": {
+          "hide_name": 1,
+          "type": "INBUF",
+          "parameters": {
+          },
+          "attributes": {
+            "keep": "00000000000000000000000000000001"
+          },
+          "port_directions": {
+            "O": "output",
+            "PAD": "input"
+          },
+          "connections": {
+            "O": [ 544 ],
+            "PAD": [ 4 ]
+          }
+        },
+        "$iopadmap$main.in0_30": {
+          "hide_name": 1,
+          "type": "INBUF",
+          "parameters": {
+          },
+          "attributes": {
+            "keep": "00000000000000000000000000000001"
+          },
+          "port_directions": {
+            "O": "output",
+            "PAD": "input"
+          },
+          "connections": {
+            "O": [ 571 ],
+            "PAD": [ 31 ]
+          }
+        },
+        "$iopadmap$main.in0_31": {
+          "hide_name": 1,
+          "type": "INBUF",
+          "parameters": {
+          },
+          "attributes": {
+            "keep": "00000000000000000000000000000001"
+          },
+          "port_directions": {
+            "O": "output",
+            "PAD": "input"
+          },
+          "connections": {
+            "O": [ 572 ],
+            "PAD": [ 32 ]
+          }
+        },
+        "$iopadmap$main.in0_32": {
+          "hide_name": 1,
+          "type": "INBUF",
+          "parameters": {
+          },
+          "attributes": {
+            "keep": "00000000000000000000000000000001"
+          },
+          "port_directions": {
+            "O": "output",
+            "PAD": "input"
+          },
+          "connections": {
+            "O": [ 573 ],
+            "PAD": [ 33 ]
+          }
+        },
+        "$iopadmap$main.in0_4": {
+          "hide_name": 1,
+          "type": "INBUF",
+          "parameters": {
+          },
+          "attributes": {
+            "keep": "00000000000000000000000000000001"
+          },
+          "port_directions": {
+            "O": "output",
+            "PAD": "input"
+          },
+          "connections": {
+            "O": [ 545 ],
+            "PAD": [ 5 ]
+          }
+        },
+        "$iopadmap$main.in0_5": {
+          "hide_name": 1,
+          "type": "INBUF",
+          "parameters": {
+          },
+          "attributes": {
+            "keep": "00000000000000000000000000000001"
+          },
+          "port_directions": {
+            "O": "output",
+            "PAD": "input"
+          },
+          "connections": {
+            "O": [ 546 ],
+            "PAD": [ 6 ]
+          }
+        },
+        "$iopadmap$main.in0_6": {
+          "hide_name": 1,
+          "type": "INBUF",
+          "parameters": {
+          },
+          "attributes": {
+            "keep": "00000000000000000000000000000001"
+          },
+          "port_directions": {
+            "O": "output",
+            "PAD": "input"
+          },
+          "connections": {
+            "O": [ 547 ],
+            "PAD": [ 7 ]
+          }
+        },
+        "$iopadmap$main.in0_7": {
+          "hide_name": 1,
+          "type": "INBUF",
+          "parameters": {
+          },
+          "attributes": {
+            "keep": "00000000000000000000000000000001"
+          },
+          "port_directions": {
+            "O": "output",
+            "PAD": "input"
+          },
+          "connections": {
+            "O": [ 548 ],
+            "PAD": [ 8 ]
+          }
+        },
+        "$iopadmap$main.in0_8": {
+          "hide_name": 1,
+          "type": "INBUF",
+          "parameters": {
+          },
+          "attributes": {
+            "keep": "00000000000000000000000000000001"
+          },
+          "port_directions": {
+            "O": "output",
+            "PAD": "input"
+          },
+          "connections": {
+            "O": [ 549 ],
+            "PAD": [ 9 ]
+          }
+        },
+        "$iopadmap$main.in0_9": {
+          "hide_name": 1,
+          "type": "INBUF",
+          "parameters": {
+          },
+          "attributes": {
+            "keep": "00000000000000000000000000000001"
+          },
+          "port_directions": {
+            "O": "output",
+            "PAD": "input"
+          },
+          "connections": {
+            "O": [ 550 ],
+            "PAD": [ 10 ]
           }
         },
         "$iopadmap$main.in1": {
@@ -792,9 +1814,553 @@
           },
           "connections": {
             "from_fabric": [ ],
-            "in": [ 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65 ],
+            "in": [ 602, 603, 604, 605, 606, 607, 608, 609, 610, 611, 612, 613, 614, 615, 616, 617, 618, 619, 620, 621, 622, 623, 624, 625, 626, 627, 628, 629, 630, 631, 632, 633 ],
             "out": [ ],
-            "to_fabric": [ 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101 ]
+            "to_fabric": [ 460, 461, 462, 463, 464, 465, 466, 467, 468, 469, 470, 471, 472, 473, 474, 475, 476, 477, 478, 479, 480, 481, 482, 483, 484, 485, 486, 487, 488, 489, 490, 491 ]
+          }
+        },
+        "$iopadmap$main.in1_1": {
+          "hide_name": 1,
+          "type": "INBUF",
+          "parameters": {
+          },
+          "attributes": {
+            "keep": "00000000000000000000000000000001"
+          },
+          "port_directions": {
+            "O": "output",
+            "PAD": "input"
+          },
+          "connections": {
+            "O": [ 602 ],
+            "PAD": [ 34 ]
+          }
+        },
+        "$iopadmap$main.in1_10": {
+          "hide_name": 1,
+          "type": "INBUF",
+          "parameters": {
+          },
+          "attributes": {
+            "keep": "00000000000000000000000000000001"
+          },
+          "port_directions": {
+            "O": "output",
+            "PAD": "input"
+          },
+          "connections": {
+            "O": [ 611 ],
+            "PAD": [ 43 ]
+          }
+        },
+        "$iopadmap$main.in1_11": {
+          "hide_name": 1,
+          "type": "INBUF",
+          "parameters": {
+          },
+          "attributes": {
+            "keep": "00000000000000000000000000000001"
+          },
+          "port_directions": {
+            "O": "output",
+            "PAD": "input"
+          },
+          "connections": {
+            "O": [ 612 ],
+            "PAD": [ 44 ]
+          }
+        },
+        "$iopadmap$main.in1_12": {
+          "hide_name": 1,
+          "type": "INBUF",
+          "parameters": {
+          },
+          "attributes": {
+            "keep": "00000000000000000000000000000001"
+          },
+          "port_directions": {
+            "O": "output",
+            "PAD": "input"
+          },
+          "connections": {
+            "O": [ 613 ],
+            "PAD": [ 45 ]
+          }
+        },
+        "$iopadmap$main.in1_13": {
+          "hide_name": 1,
+          "type": "INBUF",
+          "parameters": {
+          },
+          "attributes": {
+            "keep": "00000000000000000000000000000001"
+          },
+          "port_directions": {
+            "O": "output",
+            "PAD": "input"
+          },
+          "connections": {
+            "O": [ 614 ],
+            "PAD": [ 46 ]
+          }
+        },
+        "$iopadmap$main.in1_14": {
+          "hide_name": 1,
+          "type": "INBUF",
+          "parameters": {
+          },
+          "attributes": {
+            "keep": "00000000000000000000000000000001"
+          },
+          "port_directions": {
+            "O": "output",
+            "PAD": "input"
+          },
+          "connections": {
+            "O": [ 615 ],
+            "PAD": [ 47 ]
+          }
+        },
+        "$iopadmap$main.in1_15": {
+          "hide_name": 1,
+          "type": "INBUF",
+          "parameters": {
+          },
+          "attributes": {
+            "keep": "00000000000000000000000000000001"
+          },
+          "port_directions": {
+            "O": "output",
+            "PAD": "input"
+          },
+          "connections": {
+            "O": [ 616 ],
+            "PAD": [ 48 ]
+          }
+        },
+        "$iopadmap$main.in1_16": {
+          "hide_name": 1,
+          "type": "INBUF",
+          "parameters": {
+          },
+          "attributes": {
+            "keep": "00000000000000000000000000000001"
+          },
+          "port_directions": {
+            "O": "output",
+            "PAD": "input"
+          },
+          "connections": {
+            "O": [ 617 ],
+            "PAD": [ 49 ]
+          }
+        },
+        "$iopadmap$main.in1_17": {
+          "hide_name": 1,
+          "type": "INBUF",
+          "parameters": {
+          },
+          "attributes": {
+            "keep": "00000000000000000000000000000001"
+          },
+          "port_directions": {
+            "O": "output",
+            "PAD": "input"
+          },
+          "connections": {
+            "O": [ 618 ],
+            "PAD": [ 50 ]
+          }
+        },
+        "$iopadmap$main.in1_18": {
+          "hide_name": 1,
+          "type": "INBUF",
+          "parameters": {
+          },
+          "attributes": {
+            "keep": "00000000000000000000000000000001"
+          },
+          "port_directions": {
+            "O": "output",
+            "PAD": "input"
+          },
+          "connections": {
+            "O": [ 619 ],
+            "PAD": [ 51 ]
+          }
+        },
+        "$iopadmap$main.in1_19": {
+          "hide_name": 1,
+          "type": "INBUF",
+          "parameters": {
+          },
+          "attributes": {
+            "keep": "00000000000000000000000000000001"
+          },
+          "port_directions": {
+            "O": "output",
+            "PAD": "input"
+          },
+          "connections": {
+            "O": [ 620 ],
+            "PAD": [ 52 ]
+          }
+        },
+        "$iopadmap$main.in1_2": {
+          "hide_name": 1,
+          "type": "INBUF",
+          "parameters": {
+          },
+          "attributes": {
+            "keep": "00000000000000000000000000000001"
+          },
+          "port_directions": {
+            "O": "output",
+            "PAD": "input"
+          },
+          "connections": {
+            "O": [ 603 ],
+            "PAD": [ 35 ]
+          }
+        },
+        "$iopadmap$main.in1_20": {
+          "hide_name": 1,
+          "type": "INBUF",
+          "parameters": {
+          },
+          "attributes": {
+            "keep": "00000000000000000000000000000001"
+          },
+          "port_directions": {
+            "O": "output",
+            "PAD": "input"
+          },
+          "connections": {
+            "O": [ 621 ],
+            "PAD": [ 53 ]
+          }
+        },
+        "$iopadmap$main.in1_21": {
+          "hide_name": 1,
+          "type": "INBUF",
+          "parameters": {
+          },
+          "attributes": {
+            "keep": "00000000000000000000000000000001"
+          },
+          "port_directions": {
+            "O": "output",
+            "PAD": "input"
+          },
+          "connections": {
+            "O": [ 622 ],
+            "PAD": [ 54 ]
+          }
+        },
+        "$iopadmap$main.in1_22": {
+          "hide_name": 1,
+          "type": "INBUF",
+          "parameters": {
+          },
+          "attributes": {
+            "keep": "00000000000000000000000000000001"
+          },
+          "port_directions": {
+            "O": "output",
+            "PAD": "input"
+          },
+          "connections": {
+            "O": [ 623 ],
+            "PAD": [ 55 ]
+          }
+        },
+        "$iopadmap$main.in1_23": {
+          "hide_name": 1,
+          "type": "INBUF",
+          "parameters": {
+          },
+          "attributes": {
+            "keep": "00000000000000000000000000000001"
+          },
+          "port_directions": {
+            "O": "output",
+            "PAD": "input"
+          },
+          "connections": {
+            "O": [ 624 ],
+            "PAD": [ 56 ]
+          }
+        },
+        "$iopadmap$main.in1_24": {
+          "hide_name": 1,
+          "type": "INBUF",
+          "parameters": {
+          },
+          "attributes": {
+            "keep": "00000000000000000000000000000001"
+          },
+          "port_directions": {
+            "O": "output",
+            "PAD": "input"
+          },
+          "connections": {
+            "O": [ 625 ],
+            "PAD": [ 57 ]
+          }
+        },
+        "$iopadmap$main.in1_25": {
+          "hide_name": 1,
+          "type": "INBUF",
+          "parameters": {
+          },
+          "attributes": {
+            "keep": "00000000000000000000000000000001"
+          },
+          "port_directions": {
+            "O": "output",
+            "PAD": "input"
+          },
+          "connections": {
+            "O": [ 626 ],
+            "PAD": [ 58 ]
+          }
+        },
+        "$iopadmap$main.in1_26": {
+          "hide_name": 1,
+          "type": "INBUF",
+          "parameters": {
+          },
+          "attributes": {
+            "keep": "00000000000000000000000000000001"
+          },
+          "port_directions": {
+            "O": "output",
+            "PAD": "input"
+          },
+          "connections": {
+            "O": [ 627 ],
+            "PAD": [ 59 ]
+          }
+        },
+        "$iopadmap$main.in1_27": {
+          "hide_name": 1,
+          "type": "INBUF",
+          "parameters": {
+          },
+          "attributes": {
+            "keep": "00000000000000000000000000000001"
+          },
+          "port_directions": {
+            "O": "output",
+            "PAD": "input"
+          },
+          "connections": {
+            "O": [ 628 ],
+            "PAD": [ 60 ]
+          }
+        },
+        "$iopadmap$main.in1_28": {
+          "hide_name": 1,
+          "type": "INBUF",
+          "parameters": {
+          },
+          "attributes": {
+            "keep": "00000000000000000000000000000001"
+          },
+          "port_directions": {
+            "O": "output",
+            "PAD": "input"
+          },
+          "connections": {
+            "O": [ 629 ],
+            "PAD": [ 61 ]
+          }
+        },
+        "$iopadmap$main.in1_29": {
+          "hide_name": 1,
+          "type": "INBUF",
+          "parameters": {
+          },
+          "attributes": {
+            "keep": "00000000000000000000000000000001"
+          },
+          "port_directions": {
+            "O": "output",
+            "PAD": "input"
+          },
+          "connections": {
+            "O": [ 630 ],
+            "PAD": [ 62 ]
+          }
+        },
+        "$iopadmap$main.in1_3": {
+          "hide_name": 1,
+          "type": "INBUF",
+          "parameters": {
+          },
+          "attributes": {
+            "keep": "00000000000000000000000000000001"
+          },
+          "port_directions": {
+            "O": "output",
+            "PAD": "input"
+          },
+          "connections": {
+            "O": [ 604 ],
+            "PAD": [ 36 ]
+          }
+        },
+        "$iopadmap$main.in1_30": {
+          "hide_name": 1,
+          "type": "INBUF",
+          "parameters": {
+          },
+          "attributes": {
+            "keep": "00000000000000000000000000000001"
+          },
+          "port_directions": {
+            "O": "output",
+            "PAD": "input"
+          },
+          "connections": {
+            "O": [ 631 ],
+            "PAD": [ 63 ]
+          }
+        },
+        "$iopadmap$main.in1_31": {
+          "hide_name": 1,
+          "type": "INBUF",
+          "parameters": {
+          },
+          "attributes": {
+            "keep": "00000000000000000000000000000001"
+          },
+          "port_directions": {
+            "O": "output",
+            "PAD": "input"
+          },
+          "connections": {
+            "O": [ 632 ],
+            "PAD": [ 64 ]
+          }
+        },
+        "$iopadmap$main.in1_32": {
+          "hide_name": 1,
+          "type": "INBUF",
+          "parameters": {
+          },
+          "attributes": {
+            "keep": "00000000000000000000000000000001"
+          },
+          "port_directions": {
+            "O": "output",
+            "PAD": "input"
+          },
+          "connections": {
+            "O": [ 633 ],
+            "PAD": [ 65 ]
+          }
+        },
+        "$iopadmap$main.in1_4": {
+          "hide_name": 1,
+          "type": "INBUF",
+          "parameters": {
+          },
+          "attributes": {
+            "keep": "00000000000000000000000000000001"
+          },
+          "port_directions": {
+            "O": "output",
+            "PAD": "input"
+          },
+          "connections": {
+            "O": [ 605 ],
+            "PAD": [ 37 ]
+          }
+        },
+        "$iopadmap$main.in1_5": {
+          "hide_name": 1,
+          "type": "INBUF",
+          "parameters": {
+          },
+          "attributes": {
+            "keep": "00000000000000000000000000000001"
+          },
+          "port_directions": {
+            "O": "output",
+            "PAD": "input"
+          },
+          "connections": {
+            "O": [ 606 ],
+            "PAD": [ 38 ]
+          }
+        },
+        "$iopadmap$main.in1_6": {
+          "hide_name": 1,
+          "type": "INBUF",
+          "parameters": {
+          },
+          "attributes": {
+            "keep": "00000000000000000000000000000001"
+          },
+          "port_directions": {
+            "O": "output",
+            "PAD": "input"
+          },
+          "connections": {
+            "O": [ 607 ],
+            "PAD": [ 39 ]
+          }
+        },
+        "$iopadmap$main.in1_7": {
+          "hide_name": 1,
+          "type": "INBUF",
+          "parameters": {
+          },
+          "attributes": {
+            "keep": "00000000000000000000000000000001"
+          },
+          "port_directions": {
+            "O": "output",
+            "PAD": "input"
+          },
+          "connections": {
+            "O": [ 608 ],
+            "PAD": [ 40 ]
+          }
+        },
+        "$iopadmap$main.in1_8": {
+          "hide_name": 1,
+          "type": "INBUF",
+          "parameters": {
+          },
+          "attributes": {
+            "keep": "00000000000000000000000000000001"
+          },
+          "port_directions": {
+            "O": "output",
+            "PAD": "input"
+          },
+          "connections": {
+            "O": [ 609 ],
+            "PAD": [ 41 ]
+          }
+        },
+        "$iopadmap$main.in1_9": {
+          "hide_name": 1,
+          "type": "INBUF",
+          "parameters": {
+          },
+          "attributes": {
+            "keep": "00000000000000000000000000000001"
+          },
+          "port_directions": {
+            "O": "output",
+            "PAD": "input"
+          },
+          "connections": {
+            "O": [ 610 ],
+            "PAD": [ 42 ]
           }
         },
         "$iopadmap$main.reset": {
@@ -816,9 +2382,26 @@
           },
           "connections": {
             "from_fabric": [ ],
-            "in": [ 67 ],
+            "in": [ 634 ],
             "out": [ ],
-            "to_fabric": [ 171 ]
+            "to_fabric": [ 505 ]
+          }
+        },
+        "$iopadmap$main.reset_1": {
+          "hide_name": 1,
+          "type": "INBUF",
+          "parameters": {
+          },
+          "attributes": {
+            "keep": "00000000000000000000000000000001"
+          },
+          "port_directions": {
+            "O": "output",
+            "PAD": "input"
+          },
+          "connections": {
+            "O": [ 634 ],
+            "PAD": [ 67 ]
           }
         },
         "mem_0.mem.0.0": {
@@ -839,77 +2422,208 @@
             "write_en": "input"
           },
           "connections": {
-            "addr0": [ "0", "0", "0", "0" ],
-            "read_data": [ 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197, 198, 199, 200, 201, 202, 203 ],
-            "write_data": [ 134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165 ],
-            "write_en": [ 169 ]
+            "addr0": [ 364, 365, 366, 367 ],
+            "read_data": [ 506, 507, 508, 509, 510, 511, 512, 513, 514, 515, 516, 517, 518, 519, 520, 521, 522, 523, 524, 525, 526, 527, 528, 529, 530, 531, 532, 533, 534, 535, 536, 537 ],
+            "write_data": [ 262, 263, 264, 265, 266, 267, 268, 269, 270, 271, 272, 273, 274, 275, 276, 277, 278, 279, 280, 281, 282, 283, 284, 285, 286, 287, 288, 289, 290, 291, 292, 293 ],
+            "write_en": [ 503 ]
           }
         }
       },
       "netnames": {
         "$\\mem_0.mem$rdreg[0]$d": {
           "hide_name": 1,
-          "bits": [ 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197, 198, 199, 200, 201, 202, 203 ],
+          "bits": [ 506, 507, 508, 509, 510, 511, 512, 513, 514, 515, 516, 517, 518, 519, 520, 521, 522, 523, 524, 525, 526, 527, 528, 529, 530, 531, 532, 533, 534, 535, 536, 537 ],
           "attributes": {
           }
         },
-        "$auto$fsm_map.cc:118:implement_pattern_cache$450": {
-          "hide_name": 1,
-          "bits": [ 168 ],
-          "attributes": {
-          }
-        },
-        "$auto$fsm_map.cc:144:implement_pattern_cache$464.genblk0.genblk4.next_stage": {
-          "hide_name": 1,
-          "bits": [ 170, 270, 271 ],
-          "attributes": {
-            "src": "/home/kelvin/FABulous_fork/myProject/.FABulous/reduce_or_to_or.v:45.38-45.48",
-            "unused_bits": "1 2"
-          }
-        },
-        "$auto$fsm_map.cc:74:implement_pattern_cache$448": {
-          "hide_name": 1,
-          "bits": [ 166 ],
-          "attributes": {
-          }
-        },
-        "$iopadmap$clk": {
-          "hide_name": 1,
-          "bits": [ 236 ],
-          "attributes": {
-            "unused_bits": "0 "
-          }
-        },
-        "$iopadmap$done": {
-          "hide_name": 1,
-          "bits": [ 169 ],
-          "attributes": {
-          }
-        },
-        "$iopadmap$go": {
-          "hide_name": 1,
-          "bits": [ 237 ],
-          "attributes": {
-            "unused_bits": "0 "
-          }
-        },
-        "$iopadmap$in0": {
-          "hide_name": 1,
-          "bits": [ 238, 239, 240, 241, 242, 243, 244, 245, 246, 247, 248, 249, 250, 251, 252, 253, 254, 255, 256, 257, 258, 259, 260, 261, 262, 263, 264, 265, 266, 267, 268, 269 ],
-          "attributes": {
-            "unused_bits": "0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31"
-          }
-        },
-        "$iopadmap$in1": {
+        "$auto$constmap.cc:35:constmap_worker$403": {
           "hide_name": 1,
           "bits": [ 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101 ],
           "attributes": {
           }
         },
+        "$auto$constmap.cc:35:constmap_worker$411": {
+          "hide_name": 1,
+          "bits": [ 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133 ],
+          "attributes": {
+          }
+        },
+        "$auto$constmap.cc:35:constmap_worker$425": {
+          "hide_name": 1,
+          "bits": [ 134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165 ],
+          "attributes": {
+          }
+        },
+        "$auto$constmap.cc:35:constmap_worker$427": {
+          "hide_name": 1,
+          "bits": [ 166, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197 ],
+          "attributes": {
+          }
+        },
+        "$auto$fsm_map.cc:118:implement_pattern_cache$237": {
+          "hide_name": 1,
+          "bits": [ 499 ],
+          "attributes": {
+          }
+        },
+        "$auto$fsm_map.cc:118:implement_pattern_cache$241": {
+          "hide_name": 1,
+          "bits": [ 498 ],
+          "attributes": {
+          }
+        },
+        "$auto$fsm_map.cc:144:implement_pattern_cache$243.genblk0.genblk4.next_stage": {
+          "hide_name": 1,
+          "bits": [ 500, 498 ],
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/.FABulous/reduce_or_to_or.v:33.38-33.48"
+          }
+        },
+        "$auto$fsm_map.cc:170:map_fsm$221": {
+          "hide_name": 1,
+          "bits": [ 501 ],
+          "attributes": {
+          }
+        },
+        "$auto$fsm_map.cc:74:implement_pattern_cache$235": {
+          "hide_name": 1,
+          "bits": [ 494 ],
+          "attributes": {
+          }
+        },
+        "$auto$fsm_map.cc:74:implement_pattern_cache$239": {
+          "hide_name": 1,
+          "bits": [ 497 ],
+          "attributes": {
+          }
+        },
+        "$auto$rtlil.cc:2918:Not$270": {
+          "hide_name": 1,
+          "bits": [ 493 ],
+          "attributes": {
+          }
+        },
+        "$auto$rtlil.cc:2918:Not$274": {
+          "hide_name": 1,
+          "bits": [ 492 ],
+          "attributes": {
+          }
+        },
+        "$flatten\\mem_0.$0$memwr$\\mem$/home/kelvin/FABulous_fork/benchmarks/userbench/loop_array_inner/loop_array_inner.sv:364$86_EN[31:0]$96": {
+          "hide_name": 1,
+          "bits": [ 503, 503, 503, 503, 503, 503, 503, 503, 503, 503, 503, 503, 503, 503, 503, 503, 503, 503, 503, 503, 503, 503, 503, 503, 503, 503, 503, 503, 503, 503, 503, 503 ],
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/benchmarks/userbench/loop_array_inner/loop_array_inner.sv:609.3-618.2|/home/kelvin/FABulous_fork/benchmarks/userbench/loop_array_inner/loop_array_inner.sv:362.3-365.6"
+          }
+        },
+        "$iopadmap$clk": {
+          "hide_name": 1,
+          "bits": [ 539 ],
+          "attributes": {
+            "unused_bits": "0 "
+          }
+        },
+        "$iopadmap$clk_1": {
+          "hide_name": 1,
+          "bits": [ 538 ],
+          "attributes": {
+          }
+        },
+        "$iopadmap$done": {
+          "hide_name": 1,
+          "bits": [ 502 ],
+          "attributes": {
+          }
+        },
+        "$iopadmap$done_1": {
+          "hide_name": 1,
+          "bits": [ 540 ],
+          "attributes": {
+          }
+        },
+        "$iopadmap$go": {
+          "hide_name": 1,
+          "bits": [ 362 ],
+          "attributes": {
+          }
+        },
+        "$iopadmap$go_1": {
+          "hide_name": 1,
+          "bits": [ 541 ],
+          "attributes": {
+          }
+        },
+        "$iopadmap$in0": {
+          "hide_name": 1,
+          "bits": [ 358, 359, 360, 361, 574, 575, 576, 577, 578, 579, 580, 581, 582, 583, 584, 585, 586, 587, 588, 589, 590, 591, 592, 593, 594, 595, 596, 597, 598, 599, 600, 601 ],
+          "attributes": {
+            "unused_bits": "4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31"
+          }
+        },
+        "$iopadmap$in0_1": {
+          "hide_name": 1,
+          "bits": [ 542, 543, 544, 545, 546, 547, 548, 549, 550, 551, 552, 553, 554, 555, 556, 557, 558, 559, 560, 561, 562, 563, 564, 565, 566, 567, 568, 569, 570, 571, 572, 573 ],
+          "attributes": {
+          }
+        },
+        "$iopadmap$in1": {
+          "hide_name": 1,
+          "bits": [ 460, 461, 462, 463, 464, 465, 466, 467, 468, 469, 470, 471, 472, 473, 474, 475, 476, 477, 478, 479, 480, 481, 482, 483, 484, 485, 486, 487, 488, 489, 490, 491 ],
+          "attributes": {
+          }
+        },
+        "$iopadmap$in1_1": {
+          "hide_name": 1,
+          "bits": [ 602, 603, 604, 605, 606, 607, 608, 609, 610, 611, 612, 613, 614, 615, 616, 617, 618, 619, 620, 621, 622, 623, 624, 625, 626, 627, 628, 629, 630, 631, 632, 633 ],
+          "attributes": {
+          }
+        },
         "$iopadmap$reset": {
           "hide_name": 1,
-          "bits": [ 171 ],
+          "bits": [ 505 ],
           "attributes": {
+          }
+        },
+        "$iopadmap$reset_1": {
+          "hide_name": 1,
+          "bits": [ 634 ],
+          "attributes": {
+          }
+        },
+        "$techmap$auto$fsm_map.cc:77:implement_pattern_cache$231.$eq$/home/kelvin/FABulous_fork/myProject/.FABulous/eq_to_logic.v:38$262_Y": {
+          "hide_name": 1,
+          "bits": [ 496 ],
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/.FABulous/eq_to_logic.v:38.74-38.130"
+          }
+        },
+        "$techmap$auto$fsm_map.cc:77:implement_pattern_cache$240.$eq$/home/kelvin/FABulous_fork/myProject/.FABulous/eq_to_logic.v:38$261_Y": {
+          "hide_name": 1,
+          "bits": [ 495 ],
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/myProject/.FABulous/eq_to_logic.v:38.25-38.69"
+          }
+        },
+        "$techmap328$ternary$/home/kelvin/FABulous_fork/benchmarks/userbench/loop_array_inner/loop_array_inner.sv:659$30.Y_32": {
+          "hide_name": 1,
+          "bits": [ 294, 295, 296, 297, 298, 299, 300, 301, 302, 303, 304, 305, 306, 307, 308, 309, 310, 311, 312, 313, 314, 315, 316, 317, 318, 319, 320, 321, 322, 323, 324, 325 ],
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/benchmarks/userbench/loop_array_inner/loop_array_inner.sv:659.2-659.30|myProject/Tile/PE/metadata/ALU/wrap_map_ALU.v:188.17-188.21"
+          }
+        },
+        "$techmap329$flatten\\loop_array_instance.\\std_add_0.$add$/home/kelvin/FABulous_fork/benchmarks/userbench/loop_array_inner/loop_array_inner.sv:516$84.Y_32": {
+          "hide_name": 1,
+          "bits": [ 326, 327, 328, 329, 330, 331, 332, 333, 334, 335, 336, 337, 338, 339, 340, 341, 342, 343, 344, 345, 346, 347, 348, 349, 350, 351, 352, 353, 354, 355, 356, 357 ],
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/benchmarks/userbench/loop_array_inner/loop_array_inner.sv:621.12-634.2|/home/kelvin/FABulous_fork/benchmarks/userbench/loop_array_inner/loop_array_inner.sv:516.14-516.26|/home/kelvin/FABulous_fork/benchmarks/userbench/loop_array_inner/loop_array_inner.sv:884.3-888.2|myProject/Tile/PE/metadata/ALU/wrap_map_ALU.v:104.17-104.21"
+          }
+        },
+        "$techmap330$flatten\\loop_array_instance.\\fsm.$ternary$/home/kelvin/FABulous_fork/benchmarks/userbench/loop_array_inner/loop_array_inner.sv:771$24.Y_32": {
+          "hide_name": 1,
+          "bits": [ 364, 365, 366, 367, 368, 369, 370, 371, 372, 373, 374, 375, 376, 377, 378, 379, 380, 381, 382, 383, 384, 385, 386, 387, 388, 389, 390, 391, 392, 393, 394, 395 ],
+          "attributes": {
+            "src": "/home/kelvin/FABulous_fork/benchmarks/userbench/loop_array_inner/loop_array_inner.sv:621.12-634.2|/home/kelvin/FABulous_fork/benchmarks/userbench/loop_array_inner/loop_array_inner.sv:771.8-773.12|/home/kelvin/FABulous_fork/benchmarks/userbench/loop_array_inner/loop_array_inner.sv:904.20-931.2|myProject/Tile/PE/metadata/ALU/wrap_map_ALU.v:188.17-188.21",
+            "unused_bits": "4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31"
           }
         },
         "clk": {
@@ -917,7 +2631,7 @@
           "bits": [ 66 ],
           "attributes": {
             "clk": "00000000000000000000000000000001",
-            "src": "/home/kelvin/FABulous_fork/benchmarks/userbench/loop_array/loop_array.sv:1350.27-1350.30"
+            "src": "/home/kelvin/FABulous_fork/benchmarks/userbench/loop_array_inner/loop_array_inner.sv:574.27-574.30"
           }
         },
         "done": {
@@ -925,7 +2639,7 @@
           "bits": [ 69 ],
           "attributes": {
             "done": "00000000000000000000000000000001",
-            "src": "/home/kelvin/FABulous_fork/benchmarks/userbench/loop_array/loop_array.sv:1353.29-1353.33"
+            "src": "/home/kelvin/FABulous_fork/benchmarks/userbench/loop_array_inner/loop_array_inner.sv:577.29-577.33"
           }
         },
         "go": {
@@ -933,62 +2647,111 @@
           "bits": [ 68 ],
           "attributes": {
             "go": "00000000000000000000000000000001",
-            "src": "/home/kelvin/FABulous_fork/benchmarks/userbench/loop_array/loop_array.sv:1352.26-1352.28"
+            "src": "/home/kelvin/FABulous_fork/benchmarks/userbench/loop_array_inner/loop_array_inner.sv:576.26-576.28"
           }
         },
         "in0": {
           "hide_name": 0,
           "bits": [ 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33 ],
           "attributes": {
-            "src": "/home/kelvin/FABulous_fork/benchmarks/userbench/loop_array/loop_array.sv:1348.22-1348.25"
+            "src": "/home/kelvin/FABulous_fork/benchmarks/userbench/loop_array_inner/loop_array_inner.sv:572.22-572.25"
           }
         },
         "in1": {
           "hide_name": 0,
           "bits": [ 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65 ],
           "attributes": {
-            "src": "/home/kelvin/FABulous_fork/benchmarks/userbench/loop_array/loop_array.sv:1349.22-1349.25"
+            "src": "/home/kelvin/FABulous_fork/benchmarks/userbench/loop_array_inner/loop_array_inner.sv:573.22-573.25"
+          }
+        },
+        "loop_array_instance.arg_mem_0_addr0": {
+          "hide_name": 0,
+          "bits": [ 364, 365, 366, 367 ],
+          "attributes": {
+            "data": "00000000000000000000000000000001",
+            "hdlname": "loop_array_instance arg_mem_0_addr0",
+            "src": "/home/kelvin/FABulous_fork/benchmarks/userbench/loop_array_inner/loop_array_inner.sv:621.12-634.2|/home/kelvin/FABulous_fork/benchmarks/userbench/loop_array_inner/loop_array_inner.sv:790.35-790.50"
+          }
+        },
+        "loop_array_instance.arg_mem_0_read_data": {
+          "hide_name": 0,
+          "bits": [ 428, 429, 430, 431, 432, 433, 434, 435, 436, 437, 438, 439, 440, 441, 442, 443, 444, 445, 446, 447, 448, 449, 450, 451, 452, 453, 454, 455, 456, 457, 458, 459 ],
+          "attributes": {
+            "hdlname": "loop_array_instance arg_mem_0_read_data",
+            "src": "/home/kelvin/FABulous_fork/benchmarks/userbench/loop_array_inner/loop_array_inner.sv:621.12-634.2|/home/kelvin/FABulous_fork/benchmarks/userbench/loop_array_inner/loop_array_inner.sv:794.22-794.41"
           }
         },
         "loop_array_instance.arg_mem_0_write_data": {
           "hide_name": 0,
-          "bits": [ 134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165 ],
+          "bits": [ 262, 263, 264, 265, 266, 267, 268, 269, 270, 271, 272, 273, 274, 275, 276, 277, 278, 279, 280, 281, 282, 283, 284, 285, 286, 287, 288, 289, 290, 291, 292, 293 ],
           "attributes": {
             "data": "00000000000000000000000000000001",
             "hdlname": "loop_array_instance arg_mem_0_write_data",
-            "src": "/home/kelvin/FABulous_fork/benchmarks/userbench/loop_array/loop_array.sv:1397.12-1410.2|/home/kelvin/FABulous_fork/benchmarks/userbench/loop_array/loop_array.sv:1661.36-1661.56"
+            "src": "/home/kelvin/FABulous_fork/benchmarks/userbench/loop_array_inner/loop_array_inner.sv:621.12-634.2|/home/kelvin/FABulous_fork/benchmarks/userbench/loop_array_inner/loop_array_inner.sv:793.36-793.56"
           }
         },
         "loop_array_instance.fsm.current_state": {
           "hide_name": 0,
-          "bits": [ 167 ],
+          "bits": [ 363 ],
           "attributes": {
           }
         },
-        "loop_array_instance.fsm.fsm_std_add_2_right_in": {
+        "loop_array_instance.fsm.fsm_std_add_1_left_in": {
           "hide_name": 0,
-          "bits": [ 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133 ],
+          "bits": [ 198, 199, 200, 201, 202, 203, 204, 205, 206, 207, 208, 209, 210, 211, 212, 213, 214, 215, 216, 217, 218, 219, 220, 221, 222, 223, 224, 225, 226, 227, 228, 229 ],
           "attributes": {
-            "hdlname": "loop_array_instance fsm fsm_std_add_2_right_in",
-            "src": "/home/kelvin/FABulous_fork/benchmarks/userbench/loop_array/loop_array.sv:1397.12-1410.2|/home/kelvin/FABulous_fork/benchmarks/userbench/loop_array/loop_array.sv:1459.23-1459.45|/home/kelvin/FABulous_fork/benchmarks/userbench/loop_array/loop_array.sv:1856.20-1896.2"
+            "hdlname": "loop_array_instance fsm fsm_std_add_1_left_in",
+            "src": "/home/kelvin/FABulous_fork/benchmarks/userbench/loop_array_inner/loop_array_inner.sv:621.12-634.2|/home/kelvin/FABulous_fork/benchmarks/userbench/loop_array_inner/loop_array_inner.sv:676.23-676.44|/home/kelvin/FABulous_fork/benchmarks/userbench/loop_array_inner/loop_array_inner.sv:904.20-931.2"
+          }
+        },
+        "loop_array_instance.fsm.fsm_std_add_1_right_in": {
+          "hide_name": 0,
+          "bits": [ 230, 231, 232, 233, 234, 235, 236, 237, 238, 239, 240, 241, 242, 243, 244, 245, 246, 247, 248, 249, 250, 251, 252, 253, 254, 255, 256, 257, 258, 259, 260, 261 ],
+          "attributes": {
+            "hdlname": "loop_array_instance fsm fsm_std_add_1_right_in",
+            "src": "/home/kelvin/FABulous_fork/benchmarks/userbench/loop_array_inner/loop_array_inner.sv:621.12-634.2|/home/kelvin/FABulous_fork/benchmarks/userbench/loop_array_inner/loop_array_inner.sv:677.23-677.45|/home/kelvin/FABulous_fork/benchmarks/userbench/loop_array_inner/loop_array_inner.sv:904.20-931.2"
+          }
+        },
+        "loop_array_instance.fsm.std_slice_0_out": {
+          "hide_name": 0,
+          "bits": [ 294, 295, 296, 297 ],
+          "attributes": {
+            "hdlname": "loop_array_instance fsm std_slice_0_out",
+            "src": "/home/kelvin/FABulous_fork/benchmarks/userbench/loop_array_inner/loop_array_inner.sv:621.12-634.2|/home/kelvin/FABulous_fork/benchmarks/userbench/loop_array_inner/loop_array_inner.sv:685.21-685.36|/home/kelvin/FABulous_fork/benchmarks/userbench/loop_array_inner/loop_array_inner.sv:904.20-931.2"
+          }
+        },
+        "loop_array_instance.fsm.std_slice_1_out": {
+          "hide_name": 0,
+          "bits": [ 326, 327, 328, 329 ],
+          "attributes": {
+            "hdlname": "loop_array_instance fsm std_slice_1_out",
+            "src": "/home/kelvin/FABulous_fork/benchmarks/userbench/loop_array_inner/loop_array_inner.sv:621.12-634.2|/home/kelvin/FABulous_fork/benchmarks/userbench/loop_array_inner/loop_array_inner.sv:679.21-679.36|/home/kelvin/FABulous_fork/benchmarks/userbench/loop_array_inner/loop_array_inner.sv:904.20-931.2"
+          }
+        },
+        "mem_0.done": {
+          "hide_name": 0,
+          "bits": [ 504 ],
+          "attributes": {
+            "hdlname": "mem_0 done",
+            "src": "/home/kelvin/FABulous_fork/benchmarks/userbench/loop_array_inner/loop_array_inner.sv:609.3-618.2|/home/kelvin/FABulous_fork/benchmarks/userbench/loop_array_inner/loop_array_inner.sv:319.17-319.21"
           }
         },
         "mem_0.read_data": {
           "hide_name": 0,
-          "bits": [ 204, 205, 206, 207, 208, 209, 210, 211, 212, 213, 214, 215, 216, 217, 218, 219, 220, 221, 222, 223, 224, 225, 226, 227, 228, 229, 230, 231, 232, 233, 234, 235 ],
+          "bits": [ 396, 397, 398, 399, 400, 401, 402, 403, 404, 405, 406, 407, 408, 409, 410, 411, 412, 413, 414, 415, 416, 417, 418, 419, 420, 421, 422, 423, 424, 425, 426, 427 ],
           "attributes": {
             "hdlname": "mem_0 read_data",
             "keep": "00000000000000000000000000000001",
-            "src": "/home/kelvin/FABulous_fork/benchmarks/userbench/loop_array/loop_array.sv:1385.3-1394.2|/home/kelvin/FABulous_fork/benchmarks/userbench/loop_array/loop_array.sv:1098.40-1098.49"
+            "src": "/home/kelvin/FABulous_fork/benchmarks/userbench/loop_array_inner/loop_array_inner.sv:609.3-618.2|/home/kelvin/FABulous_fork/benchmarks/userbench/loop_array_inner/loop_array_inner.sv:322.40-322.49"
           }
         },
         "mem_0.write_data": {
           "hide_name": 0,
-          "bits": [ 134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165 ],
+          "bits": [ 262, 263, 264, 265, 266, 267, 268, 269, 270, 271, 272, 273, 274, 275, 276, 277, 278, 279, 280, 281, 282, 283, 284, 285, 286, 287, 288, 289, 290, 291, 292, 293 ],
           "attributes": {
             "hdlname": "mem_0 write_data",
             "keep": "00000000000000000000000000000001",
-            "src": "/home/kelvin/FABulous_fork/benchmarks/userbench/loop_array/loop_array.sv:1385.3-1394.2|/home/kelvin/FABulous_fork/benchmarks/userbench/loop_array/loop_array.sv:1101.44-1101.54"
+            "src": "/home/kelvin/FABulous_fork/benchmarks/userbench/loop_array_inner/loop_array_inner.sv:609.3-618.2|/home/kelvin/FABulous_fork/benchmarks/userbench/loop_array_inner/loop_array_inner.sv:325.44-325.54"
           }
         },
         "reset": {
@@ -996,7 +2759,7 @@
           "bits": [ 67 ],
           "attributes": {
             "reset": "00000000000000000000000000000001",
-            "src": "/home/kelvin/FABulous_fork/benchmarks/userbench/loop_array/loop_array.sv:1351.29-1351.34"
+            "src": "/home/kelvin/FABulous_fork/benchmarks/userbench/loop_array_inner/loop_array_inner.sv:575.29-575.34"
           }
         }
       }

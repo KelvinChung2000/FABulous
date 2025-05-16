@@ -3,7 +3,7 @@ from myProject.Tile.PE.metadata.PE_ports import PE_ports
 
 class MuxList(PE_ports):
     def construct(self):
-        self.data_in1 //= [self.in0, self.in1, self.in2, self.in3]
+        self.data_in1 //= [self.in0, self.in1, self.in2, self.in3, self.const_out]
         self.data_in1 //= [
             self.RES_reg_out,
             self.N_reg_out,
@@ -19,6 +19,8 @@ class MuxList(PE_ports):
             self.S_reg_out,
             self.W_reg_out,
         ]
+        self.c_A //= [self.in0, self.in1, self.in2, self.in3]
+        self.c_B //= [self.in0, self.in1, self.in2, self.in3, self.const_out]
 
         self.RES_reg_in //= self.data_out
 
@@ -42,19 +44,60 @@ class MuxList(PE_ports):
         self.W_reg_in //= self.W_reg_out
 
         # Pred network
-        self.data_in3 //= [self.pred_in0, self.pred_in1, self.pred_in2, self.pred_in3, self.Y]
+        self.data_in3 //= [self.pred_in0, self.pred_in1, self.pred_in2, self.pred_in3, self.l_Y, self.c_Y]
         # self.A //= [self.in0, self.in1, self.in2, self.in3]
         # self.B //= [self.in0, self.in1, self.in2, self.in3, self.const_out]
 
         for i in ["N", "E", "S", "W", "RES"]:
-            self[f"{i}_en"] //= [self.pred_in0, self.pred_in1, self.pred_in2, self.pred_in3, self.Y, self.GND, self.VCC]
-            self[f"{i}_rst"] //= [self.pred_in0, self.pred_in1, self.pred_in2, self.pred_in3, self.Y, self.GND, self.VCC]
+            self[f"{i}_en"] //= [
+                self.pred_in0,
+                self.pred_in1,
+                self.pred_in2,
+                self.pred_in3,
+                self.l_Y,
+                self.c_Y,
+                self.GND,
+                self.VCC,
+            ]
+            self[f"{i}_rst"] //= [
+                self.pred_in0,
+                self.pred_in1,
+                self.pred_in2,
+                self.pred_in3,
+                self.l_Y,
+                self.c_Y,
+                self.GND,
+                self.VCC,
+            ]
 
-        self.N_pred_reg_in //= [self.pred_in0, self.VCC, self.GND]
-        self.E_pred_reg_in //= [self.pred_in1, self.VCC, self.GND]
-        self.S_pred_reg_in //= [self.pred_in2, self.VCC, self.GND]
-        self.W_pred_reg_in //= [self.pred_in3, self.VCC, self.GND]
-        self.A //= [
+        for i in ["N", "E", "S", "W"]:
+            self[f"{i}_pred_en"] //= [
+                self.pred_in0,
+                self.pred_in1,
+                self.pred_in2,
+                self.pred_in3,
+                self.l_Y,
+                self.c_Y,
+                self.GND,
+                self.VCC,
+            ]
+            self[f"{i}_pred_rst"] //= [
+                self.pred_in0,
+                self.pred_in1,
+                self.pred_in2,
+                self.pred_in3,
+                self.l_Y,
+                self.c_Y,
+                self.GND,
+                self.VCC,
+            ]
+
+        self.N_pred_reg_in //= [self.pred_in0, self.l_Y, self.c_Y, self.VCC, self.GND]
+        self.E_pred_reg_in //= [self.pred_in1, self.l_Y, self.c_Y, self.VCC, self.GND]
+        self.S_pred_reg_in //= [self.pred_in2, self.l_Y, self.c_Y, self.VCC, self.GND]
+        self.W_pred_reg_in //= [self.pred_in3, self.l_Y, self.c_Y, self.VCC, self.GND]
+
+        self.l_A //= [
             self.pred_in0,
             self.pred_in1,
             self.pred_in2,
@@ -64,7 +107,7 @@ class MuxList(PE_ports):
             self.S_pred_reg_out,
             self.W_pred_reg_out,
         ]
-        self.B //= [
+        self.l_B //= [
             self.pred_in0,
             self.pred_in1,
             self.pred_in2,
@@ -74,10 +117,23 @@ class MuxList(PE_ports):
             self.S_pred_reg_out,
             self.W_pred_reg_out,
         ]
-        self.pred_out0 //= [self.N_pred_reg_out, self.pred_in0, self.pred_in1, self.pred_in2, self.pred_in3, self.Y]
-        self.pred_out1 //= [self.E_pred_reg_out, self.pred_in0, self.pred_in1, self.pred_in2, self.pred_in3, self.Y]
-        self.pred_out2 //= [self.S_pred_reg_out, self.pred_in0, self.pred_in1, self.pred_in2, self.pred_in3, self.Y]
-        self.pred_out3 //= [self.W_pred_reg_out, self.pred_in0, self.pred_in1, self.pred_in2, self.pred_in3, self.Y]
+
+        self.pred_out0 //= self.N_pred_reg_out
+        self.pred_out1 //= self.E_pred_reg_out
+        self.pred_out2 //= self.S_pred_reg_out
+        self.pred_out3 //= self.W_pred_reg_out
+        for i in range(4):
+            self[f"pred_out{i}"] //= [
+                self.pred_in0,
+                self.pred_in1,
+                self.pred_in2,
+                self.pred_in3,
+                self.l_Y,
+                self.c_Y,
+                self.VCC,
+                self.GND,
+            ]
+
 
         # self.spanOut[1] //= self.spanIn[0]
         # self.spanOut[0] //= self.spanIn[1]

@@ -85,7 +85,7 @@ class Fabric:
                     f"Tile {t.name} has too many config bits. Tile have {self.frameBitsPerRow * self.maxFramesPerCol} but requires {t.configBits*self.contextCount}"
                 )
 
-    def __getitem__(self, index: Any) -> Tile | SuperTile | None:
+    def __getitem__(self, index: Any) -> Tile | None:
         if isinstance(index, tuple):
             if t := self.tiles[index[1]][index[0]]:
                 return self.tileDict[t]
@@ -93,8 +93,6 @@ class Fabric:
         if isinstance(index, str):
             if index in self.tileDict:
                 return self.tileDict[index]
-            elif index in self.superTileDict:
-                return self.superTileDict[index]
             else:
                 raise ValueError(f"Cannot find '{index}' in Fabric")
         else:

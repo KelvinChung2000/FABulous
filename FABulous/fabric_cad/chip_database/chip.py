@@ -169,7 +169,7 @@ class PackageInfo(BBAStruct):
     def create_pad(
         self,
         package_pin: str,
-        tile: str,
+        tileLoc: str,
         bel: str,
         pad_function: str,
         pad_bank: int,
@@ -177,7 +177,7 @@ class PackageInfo(BBAStruct):
     ):
         pad = PadInfo(
             package_pin=self.strs.id(package_pin),
-            tile=self.strs.id(tile),
+            tile=self.strs.id(tileLoc),
             bel=self.strs.id(bel),
             pad_function=self.strs.id(pad_function),
             pad_bank=pad_bank,

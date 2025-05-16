@@ -4,8 +4,6 @@ FABRIC: [
     [W_IO,  PE,   PE,   PE,   PE,   E_Mem_bot  ],
     [W_IO,  PE,   PE,   PE,   PE,   E_Mem_top  ],
     [W_IO,  PE,   PE,   PE,   PE,   E_Mem_bot  ],
-    [W_IO,  PE,   PE,   PE,   PE,   E_Mem_top  ],
-    [W_IO,  PE,   PE,   PE,   PE,   E_Mem_bot  ],    
     [None,  S_IO, S_IO, S_IO, S_IO, None       ]
 
     # [None,  N_IO, N_IO, N_IO, None  ],
@@ -31,12 +29,12 @@ PARAM: {
   # we configure an entire configuration frame over the full height of the device (like Virtex-II) and 
   # we write FrameBitsPerRow bits per, well, tile=CLB height
   FrameBitsPerRow: 32,
-  MaxFramesPerCol: 8,
+  MaxFramesPerCol: 16,
   #Package: use work.my_package.all;
   GenerateDelayInSwitchMatrix: 80,
   MultiplexerStyle: custom, #custom or generic
   SuperTileEnable: True, #True,False
-  ContextCount: 2
+  ContextCount: 1
 }
 
 TILES: 

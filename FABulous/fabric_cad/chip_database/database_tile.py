@@ -6,7 +6,9 @@ from FABulous.fabric_cad.bba import BBAWriter
 from FABulous.fabric_cad.chip_database.BBAStruct import BBAStruct
 from FABulous.fabric_cad.chip_database.database_bel import (
     BelData,
+    BelExtraData,
     BelPin,
+    BelPinFlag,
     BelPinRef,
     TileExtraData,
 )
@@ -78,17 +80,21 @@ class TileType(BBAStruct):
             name=self.strs.id(name),
             bel_type=self.strs.id(type),
             z=z,
+            extra_data=BelExtraData(),
         )
         self.bels.append(bel)
         return bel
 
-    def add_bel_pin(self, bel: BelData, pin: str, wire: str, dir: PinType):
+    def add_bel_pin(
+        self, bel: BelData, pin: str, wire: str, dir: PinType, flags: int = 0
+    ):
         # Add a pin with associated wire to a bel. The wire should exist already.
         pin_id = self.strs.id(pin)
         if self.strs.id(wire) not in self._wire2idx:
             raise ValueError(f"Wire {wire} not found")
         wire_idx = self._wire2idx[self.strs.id(wire)]
         bel.pins.append(BelPin(pin_id, wire_idx, dir))
+        bel.extra_data.belPinFlags.append(BelPinFlag(pin_id, flags))
         self.wires[wire_idx].bel_pins.append(BelPinRef(bel.index, pin_id))
 
     def create_wire(

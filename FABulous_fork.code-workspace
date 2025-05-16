@@ -105,7 +105,8 @@
             "locale": "cpp",
             "print": "cpp",
             "queue": "cpp",
-            "stack": "cpp"
+            "stack": "cpp",
+            "*.inc": "cpp"
         },
         "cmake.configureArgs": [
             "-DARCH=himbaechel",

@@ -29,6 +29,8 @@ PSEUDO_PIP_START = 1
 PSEUDO_PIP_MID = 2
 PSEUDO_PIP_END = 3
 
+BEL_PIN_FULLY_INTERNAL = 1
+
 
 def genSwitchMatrix(tile: Tile, subTile: str, tileType: TileType, context=1):
     if not isinstance(tile.switchMatrix, SwitchMatrix):
@@ -130,22 +132,22 @@ def genSwitchMatrix(tile: Tile, subTile: str, tileType: TileType, context=1):
                 )
 
 
-def genBel(bels: Iterable[Bel], tile: TileType, wireOnly: bool, context=1):
-    count = len(list(bels))
+def genBel(t: Tile, tile: TileType, wireOnly: bool, context=1):
+    bels = t.bels
     useClk = any([i.userCLK for i in bels])
     if useClk:
         clkDRV = tile.create_bel("CLK_DRV", "CLK_DRV", z=TILE_CLK)
         tile.create_wire("user_clk_o", "CLK")
         tile.add_bel_pin(clkDRV, "CLK_O", "user_clk_o", PinType.OUTPUT)
-        count += 1
     gnd = tile.create_bel("GND_DRV", "GND_DRV", z=TILE_GND)
     tile.create_wire("gnd", "GND", "0")
-    tile.add_bel_pin(gnd, "gnd", "gnd", PinType.OUTPUT)
+    tile.add_bel_pin(gnd, "O", "gnd", PinType.OUTPUT)
     vcc = tile.create_bel("VCC_DRV", "VCC_DRV", z=TILE_VCC)
     tile.create_wire("vcc", "VCC", "1")
-    tile.add_bel_pin(vcc, "vcc", "vcc", PinType.OUTPUT)
+    tile.add_bel_pin(vcc, "O", "vcc", PinType.OUTPUT)
 
     for c in range(context):
+        baseZ = c * len(list(bels))
         tile.create_wire(f"c{c}.gnd", "GND", flags=c + 1)
         tile.create_wire(f"c{c}.vcc", "VCC", flags=c + 1)
         tile.create_pip("vcc", f"c{c}.vcc")
@@ -171,10 +173,31 @@ def genBel(bels: Iterable[Bel], tile: TileType, wireOnly: bool, context=1):
             belData = tile.create_bel(
                 f"c{c}.{bel.prefix}{bel.name}",
                 f"{bel.name}",
-                bel.z,
+                bel.z + baseZ,
             )
 
-            for i in bel.inputs + bel.externalInputs:
+            for i in bel.inputs:
+                portDrivers = t.switchMatrix.getPortDrivers(i)
+                if all([isinstance(i, BelPort) for i in portDrivers]):
+                    for pName in i.expand():
+                        tile.add_bel_pin(
+                            belData,
+                            f"{pName}".removeprefix(bel.prefix),
+                            f"c{c}.{pName}",
+                            PinType.INPUT,
+                            flags=BEL_PIN_FULLY_INTERNAL,
+                        )
+
+                else:
+                    for pName in i.expand():
+                        tile.add_bel_pin(
+                            belData,
+                            f"{pName}".removeprefix(bel.prefix),
+                            f"c{c}.{pName}",
+                            PinType.INPUT,
+                        )
+
+            for i in bel.externalInputs:
                 for pName in i.expand():
                     tile.add_bel_pin(
                         belData,
@@ -206,15 +229,14 @@ def genBel(bels: Iterable[Bel], tile: TileType, wireOnly: bool, context=1):
                     "user_clk_o",
                     f"c{c}.{bel.prefix}{bel.name}_clk_i",
                 )
-            belData.add_extra_data(BelExtraData(context=c))
-            count += 1
+            belData.extra_data.context = c
 
 
 def genTile(tile: Tile, subTile: str, chip: Chip, context=1) -> TileType:
     tt = chip.create_tile_type(subTile)
 
     genBel(
-        tile.bels,
+        tile,
         tt,
         context=context,
         wireOnly=tile.getSubTileOffset(subTile) != (0, 0),
@@ -309,43 +331,64 @@ def setPackage(chip: Chip, fabric: Fabric):
 
         for bel in tile.bels:
             for port in bel.externalInputs + bel.externalOutputs:
-                for pName in port.expand():
-                    pkg.create_pad(pName, tile.name, bel.name, "", 0)
+                for c in range(fabric.contextCount):
+                    for pName in port.expand():
+                        pkg.create_pad(
+                            f"X{x}Y{y}.{pName}",
+                            f"X{x}Y{y}",
+                            f"c{c}.{bel.prefix}{bel.name}",
+                            "",
+                            0,
+                        )
 
 
 def generateConstrainPair(fabric: Fabric, dest: Path):
+    # for bel in fabric.getAllUniqueBels():
+    #     f.write(f"#{bel.name}\n")
+    #     for idx, i in enumerate(bel.inputs):
+    #         if i.control:
+    #             dz = (idx << 8) | CONTROL_GND_OFFSET
+    #             f.write(f"{bel.name}:{i.name} 1 GND_DRV:GND 1  {dz}\n")
+    #             dz = (idx << 8) | CONTROL_VCC_OFFSET
+    #             f.write(f"{bel.name}:{i.name} 1 VCC_DRV:VCC 1 {dz}\n")
+
+    #     f.write("\n")
     with open(dest, "w") as f:
-        # for bel in fabric.getAllUniqueBels():
-        #     f.write(f"#{bel.name}\n")
-        #     for idx, i in enumerate(bel.inputs):
-        #         if i.control:
-        #             dz = (idx << 8) | CONTROL_GND_OFFSET
-        #             f.write(f"{bel.name}:{i.name} 1 GND_DRV:GND 1  {dz}\n")
-        #             dz = (idx << 8) | CONTROL_VCC_OFFSET
-        #             f.write(f"{bel.name}:{i.name} 1 VCC_DRV:VCC 1 {dz}\n")
-
-        #     f.write("\n")
-
         for t in fabric.tileDict.values():
             for bel in t.bels:
                 for i in bel.inputs:
-                    portDriver = t.switchMatrix.getPortDrivers(i)
-                    if all([isinstance(i, BelPort) for i in portDriver]):
+                    portDrivers = t.switchMatrix.getPortDrivers(i)
+                    if all([isinstance(i, BelPort) for i in portDrivers]):
                         f.write(f"#{bel.prefix}{bel.name}:{i.name}\n")
-                        for d in portDriver:
+                        for d in portDrivers:
                             d = cast(BelPort, d)
                             tBel = t.getBelByBelPort(d)
                             if bel == tBel:
                                 continue
 
+                            source = f"{bel.name}:{i.name.removeprefix(bel.prefix)} {i.width}"
+                            target = f"{tBel.name}:{d.name.removeprefix(bel.prefix)} {d.width}"
                             if tBel.z < bel.z:
-                                f.write(
-                                    f"{tBel.name}:{d.name.removeprefix(bel.prefix)} {d.width} {bel.name}:{i.name.removeprefix(bel.prefix)} {i.width} {bel.z - tBel.z} \n"
-                                )
+                                f.write(f"{target} {source} {bel.z - tBel.z} \n")
                             else:
-                                f.write(
-                                    f"{bel.name}:{i.name.removeprefix(bel.prefix)} {i.width} {tBel.name}:{d.name.removeprefix(bel.prefix)} {d.width} {tBel.z - bel.z} \n"
-                                )
+                                f.write(f"{source} {target} {tBel.z - bel.z} \n")
+                        f.write("\n")
+                for i in bel.outputs:
+                    portUsers = t.switchMatrix.getPortUsers(i)
+                    if all([isinstance(i, BelPort) for i in portUsers]):
+                        f.write(f"#{bel.prefix}{bel.name}:{i.name}\n")
+                        for u in portUsers:
+                            u = cast(BelPort, u)
+                            tBel = t.getBelByBelPort(u)
+                            if bel == tBel:
+                                continue
+
+                            source = f"{bel.name}:{i.name.removeprefix(bel.prefix)} {i.width}"
+                            target = f"{tBel.name}:{u.name.removeprefix(bel.prefix)} {u.width}"
+                            if tBel.z < bel.z:
+                                f.write(f"{target} {source} {bel.z - tBel.z} \n")
+                            else:
+                                f.write(f"{source} {target} {tBel.z - bel.z} \n")
                         f.write("\n")
 
                 # if bel.userCLK:
@@ -410,7 +453,7 @@ def generateChipDatabase(
     generateConstrainPair(fabric, filePath / f"{fabric.name}_constrain_pair.inc")
 
     if dotDir is not Path():
-        genRoutingResourceGraph(ch, filePath, False, [(1, 3), (0, 3)])
+        genRoutingResourceGraph(ch, filePath, False, [(5, 1), (5, 2)])
 
 
 def groupByThree(inputList: list) -> list:

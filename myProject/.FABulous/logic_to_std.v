@@ -19,21 +19,13 @@ endmodule
 
 module \$logic_not #(
     parameter A_SIGNED = 0,
-    parameter A_WIDTH = 32,
+    parameter A_WIDTH = 0,
     parameter Y_WIDTH = 1
 ) (
     input wire[A_WIDTH-1:0] A,
-    output wire[Y_WIDTH-1:0] Y
+    output wire Y
 );
-    \$not #(
-        .A_WIDTH(A_WIDTH),
-        .Y_WIDTH(Y_WIDTH),
-        .A_SIGNED(A_SIGNED)
-    ) 
-    _TECHMAP_REPLACE_ (
-        .A(A),
-        .Y(Y)
-    );
+    assign Y = &(~A);
 endmodule
 
 module \$logic_and #(
@@ -45,20 +37,9 @@ module \$logic_and #(
 ) (
     input wire[A_WIDTH-1:0] A,
     input wire[A_WIDTH-1:0] B,
-    output wire[Y_WIDTH-1:0] Y
+    output wire Y
 );
-    \$and #(
-        .A_SIGNED(A_SIGNED),
-        .A_WIDTH(A_WIDTH),
-        .B_SIGNED(B_SIGNED),
-        .B_WIDTH(B_WIDTH),
-        .Y_WIDTH(Y_WIDTH)
-    ) 
-    _TECHMAP_REPLACE_ (
-        .A(A),
-        .B(B),
-        .Y(Y)
-    );
+    assign Y = ((|A) & (|B));
 endmodule
 
 module \$logic_or #(
@@ -70,18 +51,7 @@ module \$logic_or #(
 ) (
     input wire[A_WIDTH-1:0] A,
     input wire[A_WIDTH-1:0] B,
-    output wire[Y_WIDTH-1:0] Y
+    output wire Y
 );
-    \$or #(
-        .A_SIGNED(A_SIGNED),
-        .A_WIDTH(A_WIDTH),
-        .B_SIGNED(B_SIGNED),
-        .B_WIDTH(B_WIDTH),
-        .Y_WIDTH(Y_WIDTH)
-        ) 
-    _TECHMAP_REPLACE_ (
-        .A(A),
-        .B(B),
-        .Y(Y)
-    );
+    assign Y = ((|A) | (|B));
 endmodule

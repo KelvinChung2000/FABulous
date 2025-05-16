@@ -1,5 +1,5 @@
 module \$__external_in #(
-    parameter WIDTH = 32,
+    parameter WIDTH = 32
 )
 (
     input wire[WIDTH-1:0] I,
@@ -31,7 +31,7 @@ else
 endmodule
 
 module \$__external_out #(
-    parameter WIDTH = 32,
+    parameter WIDTH = 32
 )
 (
     input wire[WIDTH-1:0] I,

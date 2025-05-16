@@ -347,7 +347,6 @@ class FABulous_API:
             setupPortData(i.name, i.tileDir, i.ports, i.bels)
 
     def gen_synthFile(self, dest: Path):
-        cells = set()
         maps = set()
         libs = set()
 
@@ -360,16 +359,13 @@ class FABulous_API:
             else:
                 destPath.mkdir(parents=True, exist_ok=True)
 
-        t = []
         for b in self.fabric.getAllUniqueBels():
             destPath = Path(f"{b.src.parent}/metadata")
-            genPrims(b, destPath / f"prim_{b.name}{b.src.suffix}")
             genCellsAndMaps(b)
-            cells.update(Path(f"{b.src.parent}/metadata").glob("cell_*.il"))
-            maps.update(Path(f"{b.src.parent}/metadata").glob("map_*.v"))
-            libs.update(Path(f"{b.src.parent}/metadata").glob("prim_*.v"))
+            genPrims(b, destPath / f"{b.name}/prim_{b.name}{b.src.suffix}")
+            maps.update(Path(f"{b.src.parent}/metadata/{b.name}").glob("map_*.v"))
+            libs.update(Path(f"{b.src.parent}/metadata/{b.name}").glob("prim_*.v"))
 
         genSynthScript(self.fabric, Path(f"{dest}/arch_synth.tcl"))
-        mergeFiles(sorted(list(cells)), Path(f"{dest}/cells.il"))
         mergeFiles(sorted(list(maps)), Path(f"{dest}/techmaps.v"))
         mergeFiles(sorted(list(libs)), Path(f"{dest}/libs.v"))

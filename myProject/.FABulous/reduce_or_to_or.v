@@ -26,19 +26,7 @@ module \$reduce_or (A, Y);
             assign Y = A;
         end
         if (A_WIDTH == 2) begin
-            wire ybuf;
-            \$or #(
-                    .A_SIGNED(A_SIGNED),
-                    .B_SIGNED(A_SIGNED),
-                    .A_WIDTH(1),
-                    .B_WIDTH(1), 
-                    .Y_WIDTH(1)
-                ) or_gate (
-                    .A(A[0]),   // Previous result in the chain
-                    .B(A[1]),         // Current input bit
-                    .Y(ybuf)      // Current result
-                );
-            assign Y = ybuf;
+            assign Y = A[0] | A[1];
         end
         if (A_WIDTH > 2) begin
             localparam next_stage_sz = (A_WIDTH+1) / 2;

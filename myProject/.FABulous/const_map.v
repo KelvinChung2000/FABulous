@@ -8,22 +8,22 @@ module \$__const #(
 
 if (WIDTH == 32)
     const_unit #(
-        .NoConfigBits(VALUE),
+        .ConfigBits(VALUE),
         .WIDTH(WIDTH)
     ) _TECHMAP_REPLACE_ (
-        .const_out(out),
+        .const_out(O)
     );
 else if (WIDTH == 1 && VALUE == 0)
-    GND_DRV #(
-    ) _TECHMAP_REPLACE_ (
-        .const_out(out),
+    GND_DRV #() 
+    _TECHMAP_REPLACE_ (
+        .O(O)
     );
 else if (WIDTH == 1 && VALUE == 1)
-    VCC_DRV #(
-    ) _TECHMAP_REPLACE_ (
-        .const_out(out),
+    VCC_DRV #() 
+    _TECHMAP_REPLACE_ (
+        .O(O)
     );
 else
-    assign out = VALUE;
+    assign O = VALUE;
 
 endmodule

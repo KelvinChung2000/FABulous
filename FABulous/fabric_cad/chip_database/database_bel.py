@@ -8,6 +8,19 @@ WireIndex = int
 
 
 @dataclass
+class BelPinFlag(BBAStruct):
+    pin: IdString
+    flags: int = 0
+
+    def serialise_lists(self, context: str, bba: BBAWriter):
+        pass
+
+    def serialise(self, context: str, bba: BBAWriter):
+        bba.u32(self.pin.index)
+        bba.u32(self.flags)
+
+
+@dataclass
 class BelPin(BBAStruct):
     name: IdString
     wire: WireIndex
@@ -30,12 +43,18 @@ class BelPin(BBAStruct):
 @dataclass
 class BelExtraData(BBAStruct):
     context: int = 0
+    belPinFlags: list[BelPinFlag] = field(default_factory=list)
 
     def serialise_lists(self, context: str, bba: BBAWriter):
-        pass
+        self.belPinFlags.sort(key=lambda p: p.pin.index)
+
+        bba.label(f"{context}_pin_flags")
+        for i, belPinFlag in enumerate(self.belPinFlags):
+            belPinFlag.serialise(f"{context}_pin_flag{i}", bba)
 
     def serialise(self, context: str, bba: BBAWriter):
         bba.u32(self.context)
+        bba.slice(f"{context}_pin_flags", len(self.belPinFlags))
 
 
 @dataclass
@@ -63,13 +82,13 @@ class BelData(BBAStruct):
     name: IdString
     bel_type: IdString
     z: int
+    extra_data: BelExtraData
 
     flags: int = 0
     site: int = 0
     checker_idx: int = 0
 
     pins: list[BelPin] = field(default_factory=list)
-    extra_data: BelExtraData | None = None
 
     def serialise_lists(self, context: str, bba: BBAWriter):
         # sort pins for fast binary search lookups

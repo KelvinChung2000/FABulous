@@ -3,28 +3,30 @@ set project_root $env(FAB_PROJECT_DIR)
 yosys hierarchy -auto-top
 
 yosys read_verilog -lib $project_root/.FABulous/libs.v
-yosys read_rtlil -lib $project_root/.FABulous/cells.il
-yosys read_verilog -lib $project_root/.FABulous/IO_buf.v
+yosys read_verilog -lib $project_root/.FABulous/build_in_lib.v
 yosys proc
 yosys flatten -noscopeinfo
 yosys opt_expr
 yosys opt_clean
 yosys check
 yosys opt -nodffe -nosdff
-{# yosys fsm -nomap -encoding binary -expand #}
-yosys fsm -encoding binary -expand
-yosys opt
+yosys fsm -expand -nomap
+yosys opt -full
 yosys techmap -map $project_root/.FABulous/logic_to_std.v
-{# yosys wreduce #}
+
+yosys wreduce
 yosys peepopt
 yosys opt_clean
 yosys share
 yosys opt_expr
 yosys opt_clean
+yosys fsm -encoding binary
 yosys techmap -map $project_root/.FABulous/reduce_or_to_or.v
-yosys techmap -map $project_root/.FABulous/eq_to_and.v
-yosys techmap -map $project_root/.FABulous/ne_to_xor.v
-
+yosys techmap -map $project_root/.FABulous/reduce_and_to_and.v
+yosys techmap -map $project_root/.FABulous/eq_to_logic.v
+yosys techmap -map $project_root/.FABulous/ne_to_logic.v
+yosys opt -full
+yosys clean -purge
 
 # memory opt
 yosys opt_mem_priority
@@ -40,37 +42,33 @@ yosys memory_collect
 yosys opt -full
 yosys memory_libmap -lib $project_root/.FABulous/memory_map.txt
 yosys techmap -map $project_root/.FABulous/techmaps.v
-
-# const unit mapping
-yosys constmap -cell \$__const O VALUE
-yosys techmap -map $project_root/.FABulous/const_map.v
-yosys opt -full
+yosys clean -purge
 
 proc extract {cell wrapperPath} {
-    # wrapping for mapping
-    yosys design -push
-    yosys read_json $cell
-    yosys techmap -map $wrapperPath
-    yosys design -save xmap
-    yosys design -pop
+# wrapping for mapping
+yosys design -push
+yosys read_json $cell
+yosys techmap -map $wrapperPath
+yosys design -save xmap
+yosys design -pop
 
-    # extracting cell
-    yosys extract -constports -ignore_parameters -map %xmap
-    yosys design -delete xmap
+# extracting cell
+yosys extract -constports -ignore_parameters -map %xmap
+yosys design -delete xmap
 }
-
-
 {% for wrapperPath, unWrapperPath, wrapperNames, cells in wrappers %}
 # wrapping base design
 yosys techmap -map {{ wrapperPath }}
 {% for wrapperName, outWidthPair in wrapperNames -%}
-yosys connwrappers {% for outPort, outParam in outWidthPair %}-unsigned {{ wrapperName }} {{ outPort }} {{ outParam }} {% endfor %}
+yosys connwrappers {% for outPort, outParam in outWidthPair %}-unsigned {{ wrapperName }} {{ outPort }} {{ outParam }}
+{%- endfor %}
 {% endfor %}
 # extract cells
 {%- for cell in cells %}
 extract "{{ cell }}" \
-        "{{ wrapperPath }}"
+"{{ wrapperPath }}"
 {%- endfor %}
+
 # unwrapping
 yosys techmap -map {{ unWrapperPath }}
 yosys opt -full
@@ -84,16 +82,15 @@ yosys memory_libmap -lib $project_root/.FABulous/memory_map.txt #}
 # cell techmapping
 yosys techmap -map $project_root/.FABulous/techmaps.v
 
-{# # const unit mapping
+# const unit mapping
 yosys constmap -cell \$__const O VALUE
 yosys techmap -map $project_root/.FABulous/const_map.v
-yosys opt -full #}
+yosys opt -full
 
 # io mapping
 yosys iopadmap -widthparam WIDTH -outpad \$__external_out I:O -inpad \$__external_in O:I
 yosys techmap -map $project_root/.FABulous/IO_techmap.v
-
-{# yosys iopadmap -bits -outpad OUTBUF I:PAD -inpad INBUF O:PAD #}
+yosys iopadmap -bits -outpad OUTBUF I:PAD -inpad INBUF O:PAD
 
 # final optimization
 yosys opt -full

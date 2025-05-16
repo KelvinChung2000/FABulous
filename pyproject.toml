@@ -31,6 +31,8 @@ dependencies = [
     "ruamel-yaml>=0.18.10",
     "pyyaml>=6.0.2",
     "pyosys<0.52",
+    "schemdraw[svgmath]>=0.20",
+    "matplotlib>=3.10.3",
 ]
 
 [project.urls]

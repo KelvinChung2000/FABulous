@@ -19,8 +19,8 @@ end
 
 set source_futil /home/kelvin/FABulous_fork/myProject/PnR/mac-pipelined/mac-pipelined.futil 
 # set source_hdl /home/kelvin/FABulous_fork/myProject/PnR/mac-pipelined/mac-pipelined.sv
-set source_hdl /home/kelvin/FABulous_fork/benchmarks/userbench/loop_array/loop_array.sv
-# set source_hdl /home/kelvin/FABulous_fork/benchmarks/userbench/loop_array_inner/loop_array_inner.sv
+# set source_hdl /home/kelvin/FABulous_fork/benchmarks/userbench/loop_array/loop_array.sv
+set source_hdl /home/kelvin/FABulous_fork/benchmarks/userbench/loop_array_inner/loop_array_inner.sv
 set ir /home/kelvin/FABulous_fork/myProject/PnR/mac-pipelined/ir.log
 set my_FAB_ROOT /home/kelvin/FABulous_fork
 
@@ -45,7 +45,8 @@ nextpnr-himbaechel --chipdb "$my_FAB_ROOT/myProject/.FABulous/hycube.bit" --devi
                    --write "$my_FAB_ROOT/myProject/user_design/router_test.json" \
                    -o constrain-pair="$my_FAB_ROOT/myProject/.FABulous/hycube_constrain_pair.inc" \
                    -o fasm="$my_FAB_ROOT/myProject/user_design/router_test.fasm" \
-                   -o placeTrial=100 --debug-placer
+                   -o fdc="$my_FAB_ROOT/myProject/user_design/test.fdc" \
+                   -o placeTrial=100 --placer sa
 
 # python $my_FAB_ROOT/myProject/Test/test_fabric.py
 

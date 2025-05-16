@@ -1,6 +1,5 @@
 import contextlib
 import itertools
-from pprint import pprint
 import sys
 from importlib.util import module_from_spec, spec_from_file_location
 from pathlib import Path
@@ -116,14 +115,31 @@ def genSwitchMatrix(
 
         if all([len(i.port[0].inputs) == len(m.inputs) for m in i.port[1:]]):
             r = [p.originalPort for p in i.port[0].inputs if isinstance(p, SlicedPort)]
+            if (
+                isinstance(i.ogPort, BelPort)
+                and i.ogPort.ioDirection == IO.INPUT
+                and len(r) == 0
+            ):
+                raise ValueError(
+                    f"{i.ogPort} have no input, which should never happen (at: {tileDir.parent / 'list.py'})"
+                )
+
             if len(r) == 0:
                 continue
             sm.addMux(Mux(i.ogPort, r))
         else:
-            for i in i.port:
-                if len(i.inputs) == 0:
+            for j in i.port:
+                if (
+                    isinstance(j, BelPort)
+                    and i.ogPort.ioDirection == IO.INPUT
+                    and len(j.inputs) == 0
+                ):
+                    raise ValueError(
+                        f"{j} have no input, which should never happen (at: {tileDir.parent / 'list.py'})"
+                    )
+                if len(j.inputs) == 0:
                     continue
-                sm.addMux(i)
+                sm.addMux(j)
 
     return sm
 

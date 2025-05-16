@@ -162,7 +162,7 @@ def genMemMap(bel: Bel, dest: Path):
     with open(dest, "w") as f:
         pass
 
-    filePath = bel.src.parent / "metadata"
+    filePath = bel.src.parent / "metadata" / bel.name
     with open(Path(f"{filePath}/map_{bel.name}.v"), "w") as f:
         pass
 
@@ -513,7 +513,7 @@ def genSynthScript(fabric: Fabric, filename: Path):
     ):
         if bel.constantBel:
             continue
-        path = bel.src.parent / "metadata"
+        path = bel.src.parent / "metadata" / bel.name
         if bel.belType == BelType.MEM:
             genMemMap(
                 bel,
@@ -547,7 +547,8 @@ def genCellsAndMaps(bel: Bel):
     if not bel.jsonPath.exists():
         raise ValueError(f"File {bel.jsonPath} not found.")
 
-    filePath = bel.src.parent / "metadata"
+    filePath = bel.src.parent / "metadata" / bel.name
+    filePath.mkdir(exist_ok=True)
 
     # generate cells
     design = ys.Design()

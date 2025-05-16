@@ -1,4 +1,10 @@
 read_verilog /home/kelvin/FABulous_fork/test.v
 hierarchy -auto-top; proc; opt -full;;;
-techmap -map /home/kelvin/FABulous_fork/myProject/.FABulous/ne_to_xor.v -autoproc
-show
+copy test test_gold
+select test
+techmap -map /home/kelvin/FABulous_fork/myProject/.FABulous/logic_to_std.v -autoproc
+clean -purge
+equiv_make -inames test_gold test top_equiv
+select top_equiv
+equiv_simple
+show -width

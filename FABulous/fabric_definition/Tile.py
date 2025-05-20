@@ -6,7 +6,7 @@ from typing import Any, Iterable, cast
 from FABulous.fabric_definition.Bel import Bel
 from FABulous.fabric_definition.ConfigMem import ConfigurationMemory
 from FABulous.fabric_definition.define import IO, Loc, Side
-from FABulous.fabric_definition.Port import BelPort, TilePort
+from FABulous.fabric_definition.Port import BelPort, SharedPort, TilePort
 from FABulous.fabric_definition.SwitchMatrix import SwitchMatrix
 from FABulous.fabric_definition.Wire import WireType
 
@@ -321,6 +321,14 @@ class Tile:
             raise ValueError(
                 f"The given subTile {subTile} does not exist in tile {self.name}"
             )
+
+    def getBelSharedPort(self) -> list[SharedPort]:
+        shared = []
+        for i in self.bels:
+            for p in i.sharedPort:
+                if p not in shared:
+                    shared.append(p)
+        return shared
 
     def __str__(self) -> str:
         """Return a formatted string representation of the tile.

@@ -4,7 +4,8 @@ from FABulous.fabric_definition.Port import TilePort, Port, BelPort
 
 
 class {{ tileName }}_ports:
-    def __init__(self, tilePorts: list[TilePort], belInputs: list[BelPort], belOutputs: list[BelPort]):
+    def __init__(self, tilePorts: list[TilePort],
+                 belInputs: list[BelPort], belOutputs: list[BelPort], belShared: list[BelPort]):
         # tile ports
     {%- if subTileCount == 1 %}
     {%- for (st, p) in tilePorts %}
@@ -23,6 +24,11 @@ class {{ tileName }}_ports:
         # bel output ports
     {%- for p in belOutputs %}
         self.{{ p.name }} = MuxPack(belOutputs[{{ loop.index0 }}])
+    {%- endfor %}
+
+        # bel shared ports
+    {%- for p in belShared %}
+        self.{{ p.sharedWith }} = MuxPack(belShared[{{ loop.index0 }}])
     {%- endfor %}
 
         self.GND = MuxPack(Port(name="gnd", ioDirection=IO.OUTPUT, width=1))

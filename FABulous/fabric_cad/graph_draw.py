@@ -13,7 +13,7 @@ from FABulous.file_parser.file_parser_fasm import parseFASM
 
 
 def genRoutingResourceGraph(
-    chip: Chip, filePath: Path, expand=False, pairFilter: list[Loc] = []
+    chip: Chip, filePath: Path, expand=False, selectTile: list[Loc] = []
 ):
     """Generate a routing resource graph representation of the FPGA fabric.
 
@@ -50,10 +50,11 @@ def genRoutingResourceGraph(
         product(range(chip.width), range(chip.height))
     )  # x, y order for easier grid layout
     globalPairs = set()
-    if pairFilter:
-        pairs = pairFilter
+    if selectTile:
+        pairs = selectTile
 
     logger.info("Adding tile subgraphs")
+    sharedAdded = set()
     for x, y in pairs:
         tileType = chip.tile_type_at(x, y)
         subgraph = pydot.Subgraph(
@@ -64,6 +65,7 @@ def genRoutingResourceGraph(
             rank="source",
         )
 
+        added = set()
         for bel in tileType.bels:
             belSupGraph = pydot.Subgraph(
                 f"cluster_{x}_{y}_{bel.name.value}",
@@ -76,12 +78,14 @@ def genRoutingResourceGraph(
                     shape="box",
                 )
             )
-            added = set()
             for pin in bel.pins:
                 pinWire = removeBit(tileType.wires[pin.wire].name.value)
-                if pinWire in added:
-                    continue
-                added.add(pinWire)
+                if "SHARE" in tileType.wires[pin.wire].wire_type.value:
+                    if f"X{x}Y{y}.{pinWire}" not in sharedAdded:
+                        sharedAdded.add(f"X{x}Y{y}.{pinWire}")
+                        subgraph.add_node(pydot.Node(f"X{x}Y{y}.{pinWire}"))
+                else:
+                    belSupGraph.add_node(pydot.Node(f"X{x}Y{y}.{pinWire}"))
                 if pin.dir == PinType.INPUT:
                     belPin = removeBit(f"X{x}Y{y}.{bel.name.value}.{pin.name.value}")
                     belSupGraph.add_node(
@@ -89,19 +93,25 @@ def genRoutingResourceGraph(
                             belPin, label=removeBit(pin.name.value), shape="hexagon"
                         )
                     )
-                    belSupGraph.add_node(pydot.Node(f"X{x}Y{y}.{pinWire}"))
+                    if (f"X{x}Y{y}.{pinWire}", belPin) in added:
+                        continue
+                    added.add((f"X{x}Y{y}.{pinWire}", belPin))
                     belSupGraph.add_edge(
                         pydot.Edge(
                             f"X{x}Y{y}.{pinWire}",
                             belPin,
                         )
                     )
+                    if (belPin, f"X{x}Y{y}.bel_{bel.name.value}") in added:
+                        continue
+                    added.add((belPin, f"X{x}Y{y}.bel_{bel.name.value}"))
                     belSupGraph.add_edge(
                         pydot.Edge(
                             belPin,
                             f"X{x}Y{y}.bel_{bel.name.value}",
                         )
                     )
+
                 elif pin.dir == PinType.OUTPUT:
                     belPin = removeBit(f"X{x}Y{y}.{bel.name.value}.{pin.name.value}")
                     belSupGraph.add_node(
@@ -109,10 +119,15 @@ def genRoutingResourceGraph(
                             belPin, label=removeBit(pin.name.value), shape="hexagon"
                         )
                     )
+                    if (belPin, f"X{x}Y{y}.{pinWire}") in added:
+                        continue
+                    added.add((belPin, f"X{x}Y{y}.{pinWire}"))
                     belSupGraph.add_edge(
                         pydot.Edge(f"X{x}Y{y}.bel_{bel.name.value}", belPin)
                     )
-                    belSupGraph.add_node(pydot.Node(f"X{x}Y{y}.{pinWire}"))
+                    if (f"X{x}Y{y}.{pinWire}", belPin) in added:
+                        continue
+                    added.add((f"X{x}Y{y}.{pinWire}", belPin))
                     belSupGraph.add_edge(
                         pydot.Edge(
                             belPin,
@@ -153,9 +168,8 @@ def genRoutingResourceGraph(
     graph.set("layout", "dot")
 
     # Write the output file
-    outputPath = filePath / "routing_graph.dot"
-    logger.info(f"Writing routing graph to {outputPath}")
-    graph.write(str(outputPath))
+    logger.info(f"Writing routing graph to {filePath}")
+    graph.write(str(filePath))
     # # Generate PNG file from dot file
     # try:
     #     logger.info(f"Generating SVG from dot file {outputPath}")

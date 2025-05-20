@@ -161,10 +161,10 @@
 # routing for net '$\mem_0.mem$rdreg[0]$d[20]'
 
 # routing for net '$\mem_0.mem$rdreg[0]$d[19]'
-X1Y2.c0.E_reg_in__19.c0.in1__19
-# pip end: X2Y2.c0.out3__19.c0.out3__19_internal'
-# pip start: X2Y2.c0.out3__19_internal.c0.in1__19
-X2Y2.c0.out3__19.c0.in1__19
+# pip end: X2Y2.c0.out0__19.c0.out0__19_internal'
+# pip start: X2Y2.c0.out0__19_internal.c0.in1__19
+X2Y2.c0.out0__19.c0.in1__19
+X2Y2.c0.N_reg_in__19.c0.in0__19
 # pip end: X3Y2.c0.out3__19.c0.out3__19_internal'
 # pip start: X3Y2.c0.out3__19_internal.c0.in1__19
 X3Y2.c0.out3__19.c0.in1__19
@@ -172,20 +172,55 @@ X3Y2.c0.out3__19.c0.in1__19
 # pip start: X4Y2.c0.out3__19_internal.c0.in1__19
 X4Y2.c0.out3__19.c0.in1__19
 # pip end: X5Y2.c0.out3__19.c0.out3__19_internal'
-# pip start: X5Y2.c0.out3__19_internal.c0.read_data__19
-X5Y2.c0.out3__19.c0.read_data__19
+# pip start: X5Y2.c0.out3__19_internal.c0.A_read_data__19
+X5Y2.c0.out3__19.c0.A_read_data__19
+# pip end: X2Y3.c0.out2__19.c0.out2__19_internal'
+# pip start: X2Y3.c0.out2__19_internal.c0.in2__19
+X2Y3.c0.out2__19.c0.in2__19
 
 # routing for net '$\mem_0.mem$rdreg[0]$d[18]'
 
 # routing for net '$\mem_0.mem$rdreg[0]$d[17]'
 
 # routing for net '$\mem_0.mem$rdreg[0]$d[16]'
+# pip end: X2Y2.c0.out0__16.c0.out0__16_internal'
+# pip start: X2Y2.c0.out0__16_internal.c0.in1__16
+X2Y2.c0.out0__16.c0.in1__16
+X2Y2.c0.N_reg_in__16.c0.in0__16
+# pip end: X3Y2.c0.out3__16.c0.out3__16_internal'
+# pip start: X3Y2.c0.out3__16_internal.c0.in1__16
+X3Y2.c0.out3__16.c0.in1__16
+# pip end: X4Y2.c0.out3__16.c0.out3__16_internal'
+# pip start: X4Y2.c0.out3__16_internal.c0.in1__16
+X4Y2.c0.out3__16.c0.in1__16
+# pip end: X5Y2.c0.out3__16.c0.out3__16_internal'
+# pip start: X5Y2.c0.out3__16_internal.c0.A_read_data__16
+X5Y2.c0.out3__16.c0.A_read_data__16
+# pip end: X2Y3.c0.out2__16.c0.out2__16_internal'
+# pip start: X2Y3.c0.out2__16_internal.c0.in2__16
+X2Y3.c0.out2__16.c0.in2__16
 
 # routing for net '$\mem_0.mem$rdreg[0]$d[15]'
 
 # routing for net '$\mem_0.mem$rdreg[0]$d[14]'
 
 # routing for net '$\mem_0.mem$rdreg[0]$d[13]'
+# pip end: X2Y2.c0.out0__13.c0.out0__13_internal'
+# pip start: X2Y2.c0.out0__13_internal.c0.in1__13
+X2Y2.c0.out0__13.c0.in1__13
+X2Y2.c0.N_reg_in__13.c0.in0__13
+# pip end: X3Y2.c0.out3__13.c0.out3__13_internal'
+# pip start: X3Y2.c0.out3__13_internal.c0.in1__13
+X3Y2.c0.out3__13.c0.in1__13
+# pip end: X4Y2.c0.out3__13.c0.out3__13_internal'
+# pip start: X4Y2.c0.out3__13_internal.c0.in1__13
+X4Y2.c0.out3__13.c0.in1__13
+# pip end: X5Y2.c0.out3__13.c0.out3__13_internal'
+# pip start: X5Y2.c0.out3__13_internal.c0.A_read_data__13
+X5Y2.c0.out3__13.c0.A_read_data__13
+# pip end: X2Y3.c0.out2__13.c0.out2__13_internal'
+# pip start: X2Y3.c0.out2__13_internal.c0.in2__13
+X2Y3.c0.out2__13.c0.in2__13
 
 # routing for net '$\mem_0.mem$rdreg[0]$d[12]'
 
@@ -248,10 +283,6 @@ X5Y2.c0.out3__19.c0.read_data__19
 # routing for net '$auto$fsm_map.cc:74:implement_pattern_cache$239'
 
 # routing for net '$techmap$auto$fsm_map.cc:77:implement_pattern_cache$231.$eq$/home/kelvin/FABulous_fork/myProject/.FABulous/eq_to_logic.v:38$262_Y'
-# pip end: X2Y2.c0.pred_out0.c0.pred_out0_internal'
-# pip start: X2Y2.c0.pred_out0_internal.c0.l_Y
-X2Y2.c0.pred_out0.c0.l_Y
-X2Y3.c0.l_B.c0.pred_in2
 
 # routing for net '$techmap$auto$fsm_map.cc:77:implement_pattern_cache$240.$eq$/home/kelvin/FABulous_fork/myProject/.FABulous/eq_to_logic.v:38$261_Y'
 
@@ -330,10 +361,12 @@ X2Y3.c0.l_B.c0.pred_in2
 # routing for net 'loop_array_instance.arg_mem_0_read_data[30]'
 
 # routing for net 'loop_array_instance.arg_mem_0_read_data[29]'
+X2Y2.c0.RES_reg_in__29.c0.data_out__29
 
 # routing for net 'loop_array_instance.arg_mem_0_read_data[28]'
 
 # routing for net 'loop_array_instance.arg_mem_0_read_data[27]'
+X2Y2.c0.RES_reg_in__27.c0.data_out__27
 
 # routing for net 'loop_array_instance.arg_mem_0_read_data[26]'
 
@@ -438,6 +471,7 @@ X2Y3.c0.l_B.c0.pred_in2
 # routing for net 'mem_0.read_data[8]'
 
 # routing for net 'mem_0.read_data[7]'
+X2Y2.c0.data_in1__7.c0.N_reg_out__7
 
 # routing for net 'mem_0.read_data[6]'
 
@@ -598,6 +632,10 @@ X2Y3.c0.l_B.c0.pred_in2
 # routing for net '$techmap329$flatten\loop_array_instance.\std_add_0.$add$/home/kelvin/FABulous_fork/benchmarks/userbench/loop_array_inner/loop_array_inner.sv:516$84.Y_32[26]'
 
 # routing for net '$techmap329$flatten\loop_array_instance.\std_add_0.$add$/home/kelvin/FABulous_fork/benchmarks/userbench/loop_array_inner/loop_array_inner.sv:516$84.Y_32[25]'
+# pip end: X3Y1.c0.out0__25.c0.out0__25_internal'
+# pip start: X3Y1.c0.out0__25_internal.c0.data_out__25
+X3Y1.c0.out0__25.c0.data_out__25
+X3Y2.c0.data_in2__25.c0.in2__25
 
 # routing for net '$techmap329$flatten\loop_array_instance.\std_add_0.$add$/home/kelvin/FABulous_fork/benchmarks/userbench/loop_array_inner/loop_array_inner.sv:516$84.Y_32[24]'
 
@@ -612,6 +650,10 @@ X2Y3.c0.l_B.c0.pred_in2
 # routing for net '$techmap329$flatten\loop_array_instance.\std_add_0.$add$/home/kelvin/FABulous_fork/benchmarks/userbench/loop_array_inner/loop_array_inner.sv:516$84.Y_32[19]'
 
 # routing for net '$techmap329$flatten\loop_array_instance.\std_add_0.$add$/home/kelvin/FABulous_fork/benchmarks/userbench/loop_array_inner/loop_array_inner.sv:516$84.Y_32[18]'
+# pip end: X3Y1.c0.out0__18.c0.out0__18_internal'
+# pip start: X3Y1.c0.out0__18_internal.c0.data_out__18
+X3Y1.c0.out0__18.c0.data_out__18
+X3Y2.c0.data_in2__18.c0.in2__18
 
 # routing for net '$techmap329$flatten\loop_array_instance.\std_add_0.$add$/home/kelvin/FABulous_fork/benchmarks/userbench/loop_array_inner/loop_array_inner.sv:516$84.Y_32[17]'
 
@@ -654,10 +696,33 @@ X2Y3.c0.l_B.c0.pred_in2
 # routing for net '$techmap328$ternary$/home/kelvin/FABulous_fork/benchmarks/userbench/loop_array_inner/loop_array_inner.sv:659$30.Y_32[31]'
 
 # routing for net '$techmap328$ternary$/home/kelvin/FABulous_fork/benchmarks/userbench/loop_array_inner/loop_array_inner.sv:659$30.Y_32[30]'
+# pip end: X2Y1.c0.out1__30.c0.out1__30_internal'
+# pip start: X2Y1.c0.out1__30_internal.c0.in0__30
+X2Y1.c0.out1__30.c0.in0__30
+X3Y1.c0.data_in1__30.c0.in3__30
+# pip end: X2Y2.c0.out2__30.c0.out2__30_internal'
+# pip start: X2Y2.c0.out2__30_internal.c0.in0__30
+X2Y2.c0.out2__30.c0.in0__30
+# pip end: X1Y3.c0.out1__30.c0.out1__30_internal'
+# pip start: X1Y3.c0.out1__30_internal.c0.data_out__30
+X1Y3.c0.out1__30.c0.data_out__30
+# pip end: X2Y3.c0.out2__30.c0.out2__30_internal'
+# pip start: X2Y3.c0.out2__30_internal.c0.in3__30
+X2Y3.c0.out2__30.c0.in3__30
 
 # routing for net '$techmap328$ternary$/home/kelvin/FABulous_fork/benchmarks/userbench/loop_array_inner/loop_array_inner.sv:659$30.Y_32[29]'
 
 # routing for net '$techmap328$ternary$/home/kelvin/FABulous_fork/benchmarks/userbench/loop_array_inner/loop_array_inner.sv:659$30.Y_32[28]'
+X3Y2.c0.data_in1__28.c0.in0__28
+# pip end: X1Y3.c0.out1__28.c0.out1__28_internal'
+# pip start: X1Y3.c0.out1__28_internal.c0.data_out__28
+X1Y3.c0.out1__28.c0.data_out__28
+# pip end: X2Y3.c0.out1__28.c0.out1__28_internal'
+# pip start: X2Y3.c0.out1__28_internal.c0.in3__28
+X2Y3.c0.out1__28.c0.in3__28
+# pip end: X3Y3.c0.out2__28.c0.out2__28_internal'
+# pip start: X3Y3.c0.out2__28_internal.c0.in3__28
+X3Y3.c0.out2__28.c0.in3__28
 
 # routing for net '$techmap328$ternary$/home/kelvin/FABulous_fork/benchmarks/userbench/loop_array_inner/loop_array_inner.sv:659$30.Y_32[27]'
 
@@ -698,6 +763,19 @@ X2Y3.c0.l_B.c0.pred_in2
 # routing for net '$techmap328$ternary$/home/kelvin/FABulous_fork/benchmarks/userbench/loop_array_inner/loop_array_inner.sv:659$30.Y_32[9]'
 
 # routing for net '$techmap328$ternary$/home/kelvin/FABulous_fork/benchmarks/userbench/loop_array_inner/loop_array_inner.sv:659$30.Y_32[8]'
+X3Y1.c0.data_in1__8.c0.in0__8
+# pip end: X2Y2.c0.out1__8.c0.out1__8_internal'
+# pip start: X2Y2.c0.out1__8_internal.c0.in0__8
+X2Y2.c0.out1__8.c0.in0__8
+# pip end: X3Y2.c0.out2__8.c0.out2__8_internal'
+# pip start: X3Y2.c0.out2__8_internal.c0.in3__8
+X3Y2.c0.out2__8.c0.in3__8
+# pip end: X1Y3.c0.out1__8.c0.out1__8_internal'
+# pip start: X1Y3.c0.out1__8_internal.c0.data_out__8
+X1Y3.c0.out1__8.c0.data_out__8
+# pip end: X2Y3.c0.out2__8.c0.out2__8_internal'
+# pip start: X2Y3.c0.out2__8_internal.c0.in3__8
+X2Y3.c0.out2__8.c0.in3__8
 
 # routing for net '$techmap328$ternary$/home/kelvin/FABulous_fork/benchmarks/userbench/loop_array_inner/loop_array_inner.sv:659$30.Y_32[7]'
 
@@ -716,6 +794,16 @@ X2Y3.c0.l_B.c0.pred_in2
 # routing for net 'loop_array_instance.fsm.std_slice_0_out[0]'
 
 # routing for net 'loop_array_instance.arg_mem_0_write_data[31]'
+# pip end: X2Y1.c0.out1__31.c0.out1__31_internal'
+# pip start: X2Y1.c0.out1__31_internal.c0.data_out__31
+X2Y1.c0.out1__31.c0.data_out__31
+# pip end: X3Y1.c0.out1__31.c0.out1__31_internal'
+# pip start: X3Y1.c0.out1__31_internal.c0.in3__31
+X3Y1.c0.out1__31.c0.in3__31
+# pip end: X4Y1.c0.out1__31.c0.out1__31_internal'
+# pip start: X4Y1.c0.out1__31_internal.c0.in3__31
+X4Y1.c0.out1__31.c0.in3__31
+X5Y1.c0.A_write_data__31.c0.in3__31
 
 # routing for net 'loop_array_instance.arg_mem_0_write_data[30]'
 
@@ -762,6 +850,16 @@ X2Y3.c0.l_B.c0.pred_in2
 # routing for net 'loop_array_instance.arg_mem_0_write_data[9]'
 
 # routing for net 'loop_array_instance.arg_mem_0_write_data[8]'
+# pip end: X2Y1.c0.out1__8.c0.out1__8_internal'
+# pip start: X2Y1.c0.out1__8_internal.c0.data_out__8
+X2Y1.c0.out1__8.c0.data_out__8
+# pip end: X3Y1.c0.out1__8.c0.out1__8_internal'
+# pip start: X3Y1.c0.out1__8_internal.c0.in3__8
+X3Y1.c0.out1__8.c0.in3__8
+# pip end: X4Y1.c0.out1__8.c0.out1__8_internal'
+# pip start: X4Y1.c0.out1__8_internal.c0.in3__8
+X4Y1.c0.out1__8.c0.in3__8
+X5Y1.c0.A_write_data__8.c0.in3__8
 
 # routing for net 'loop_array_instance.arg_mem_0_write_data[7]'
 
@@ -788,6 +886,10 @@ X2Y3.c0.l_B.c0.pred_in2
 # routing for net 'loop_array_instance.fsm.fsm_std_add_1_right_in[29]'
 
 # routing for net 'loop_array_instance.fsm.fsm_std_add_1_right_in[28]'
+X2Y1.c0.data_in2__28.c0.in0__28
+# pip end: X2Y2.c0.out2__28.c0.out2__28_internal'
+# pip start: X2Y2.c0.out2__28_internal.c0.RES_reg_out__28
+X2Y2.c0.out2__28.c0.RES_reg_out__28
 
 # routing for net 'loop_array_instance.fsm.fsm_std_add_1_right_in[27]'
 
@@ -834,16 +936,6 @@ X2Y3.c0.l_B.c0.pred_in2
 # routing for net 'loop_array_instance.fsm.fsm_std_add_1_right_in[6]'
 
 # routing for net 'loop_array_instance.fsm.fsm_std_add_1_right_in[5]'
-X3Y1.c0.data_in2__5.c0.in0__5
-# pip end: X1Y2.c0.out1__5.c0.out1__5_internal'
-# pip start: X1Y2.c0.out1__5_internal.c0.RES_reg_out__5
-X1Y2.c0.out1__5.c0.RES_reg_out__5
-# pip end: X2Y2.c0.out1__5.c0.out1__5_internal'
-# pip start: X2Y2.c0.out1__5_internal.c0.in3__5
-X2Y2.c0.out1__5.c0.in3__5
-# pip end: X3Y2.c0.out2__5.c0.out2__5_internal'
-# pip start: X3Y2.c0.out2__5_internal.c0.in3__5
-X3Y2.c0.out2__5.c0.in3__5
 
 # routing for net 'loop_array_instance.fsm.fsm_std_add_1_right_in[4]'
 
@@ -858,6 +950,10 @@ X3Y2.c0.out2__5.c0.in3__5
 # routing for net 'loop_array_instance.fsm.fsm_std_add_1_left_in[31]'
 
 # routing for net 'loop_array_instance.fsm.fsm_std_add_1_left_in[30]'
+# pip end: X1Y1.c0.out1__30.c0.out1__30_internal'
+# pip start: X1Y1.c0.out1__30_internal.c0.data_out__30
+X1Y1.c0.out1__30.c0.data_out__30
+X2Y1.c0.data_in1__30.c0.in3__30
 
 # routing for net 'loop_array_instance.fsm.fsm_std_add_1_left_in[29]'
 
@@ -882,13 +978,6 @@ X3Y2.c0.out2__5.c0.in3__5
 # routing for net 'loop_array_instance.fsm.fsm_std_add_1_left_in[19]'
 
 # routing for net 'loop_array_instance.fsm.fsm_std_add_1_left_in[18]'
-# pip end: X1Y1.c0.out1__18.c0.out1__18_internal'
-# pip start: X1Y1.c0.out1__18_internal.c0.data_out__18
-X1Y1.c0.out1__18.c0.data_out__18
-# pip end: X2Y1.c0.out1__18.c0.out1__18_internal'
-# pip start: X2Y1.c0.out1__18_internal.c0.in3__18
-X2Y1.c0.out1__18.c0.in3__18
-X3Y1.c0.data_in1__18.c0.in3__18
 
 # routing for net 'loop_array_instance.fsm.fsm_std_add_1_left_in[17]'
 
@@ -897,6 +986,10 @@ X3Y1.c0.data_in1__18.c0.in3__18
 # routing for net 'loop_array_instance.fsm.fsm_std_add_1_left_in[15]'
 
 # routing for net 'loop_array_instance.fsm.fsm_std_add_1_left_in[14]'
+# pip end: X1Y1.c0.out1__14.c0.out1__14_internal'
+# pip start: X1Y1.c0.out1__14_internal.c0.data_out__14
+X1Y1.c0.out1__14.c0.data_out__14
+X2Y1.c0.data_in1__14.c0.in3__14
 
 # routing for net 'loop_array_instance.fsm.fsm_std_add_1_left_in[13]'
 
@@ -959,6 +1052,7 @@ X3Y1.c0.data_in1__18.c0.in3__18
 # routing for net '$auto$constmap.cc:35:constmap_worker$427[16]'
 
 # routing for net '$auto$constmap.cc:35:constmap_worker$427[15]'
+X2Y2.c0.data_in2__15.c0.const_out__15
 
 # routing for net '$auto$constmap.cc:35:constmap_worker$427[14]'
 
@@ -975,6 +1069,7 @@ X3Y1.c0.data_in1__18.c0.in3__18
 # routing for net '$auto$constmap.cc:35:constmap_worker$427[8]'
 
 # routing for net '$auto$constmap.cc:35:constmap_worker$427[7]'
+X2Y2.c0.data_in2__7.c0.const_out__7
 
 # routing for net '$auto$constmap.cc:35:constmap_worker$427[6]'
 
@@ -1021,7 +1116,6 @@ X3Y1.c0.data_in1__18.c0.in3__18
 # routing for net '$auto$constmap.cc:35:constmap_worker$425[17]'
 
 # routing for net '$auto$constmap.cc:35:constmap_worker$425[16]'
-X1Y1.c0.data_in2__16.c0.const_out__16
 
 # routing for net '$auto$constmap.cc:35:constmap_worker$425[15]'
 
@@ -1036,6 +1130,7 @@ X1Y1.c0.data_in2__16.c0.const_out__16
 # routing for net '$auto$constmap.cc:35:constmap_worker$425[10]'
 
 # routing for net '$auto$constmap.cc:35:constmap_worker$425[9]'
+X1Y1.c0.data_in2__9.c0.const_out__9
 
 # routing for net '$auto$constmap.cc:35:constmap_worker$425[8]'
 
@@ -1068,7 +1163,6 @@ X1Y1.c0.data_in2__16.c0.const_out__16
 # routing for net '$auto$constmap.cc:35:constmap_worker$411[26]'
 
 # routing for net '$auto$constmap.cc:35:constmap_worker$411[25]'
-X2Y2.c0.data_in2__25.c0.const_out__25
 
 # routing for net '$auto$constmap.cc:35:constmap_worker$411[24]'
 
@@ -1153,7 +1247,6 @@ X2Y2.c0.data_in2__25.c0.const_out__25
 # routing for net '$auto$constmap.cc:35:constmap_worker$403[16]'
 
 # routing for net '$auto$constmap.cc:35:constmap_worker$403[15]'
-X2Y1.c0.data_in2__15.c0.const_out__15
 
 # routing for net '$auto$constmap.cc:35:constmap_worker$403[14]'
 
@@ -1189,135 +1282,135 @@ X2Y1.c0.data_in2__15.c0.const_out__15
 X0Y3.c0.W_pred_IO_WIDTH_1.WIDTH = 32'b00000000000000000000000000000001
 
 # config for cell '$iopadmap$main.reset'
-X0Y4.c0.W_pred_IO_WIDTH_1.WIDTH = 32'b00000000000000000000000000000001
+X0Y2.c0.W_pred_IO_WIDTH_1.WIDTH = 32'b00000000000000000000000000000001
 
 # config for cell '$iopadmap$main.done'
-X0Y1.c1.W_pred_IO_WIDTH_1.WIDTH = 32'b00000000000000000000000000000001
+X4Y0.c0.S_pred_IO_WIDTH_1.WIDTH = 32'b00000000000000000000000000000001
 
 # config for cell 'mem_0.mem.0.0'
-X5Y1.c0.Mem.config_bits = 1'b0
-X5Y1.c0.Mem.INIT = 512'b00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+X5Y1.c0.A_Mem.config_bits = 1'b0
+X5Y1.c0.A_Mem.INIT = 512'b00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 
 # config for cell '$iopadmap$main.clk'
 X0Y1.c0.W_pred_IO_WIDTH_1.WIDTH = 32'b00000000000000000000000000000001
 
 # config for cell '$extract$\reg_unit_tide_en_0_tide_rst_1$376'
-X1Y2.c0.RES_reg_unit.tide_rst = 1'b1
-X1Y2.c0.RES_reg_unit.tide_en = 1'b0
+X2Y2.c0.RES_reg_unit.tide_rst = 1'b1
+X2Y2.c0.RES_reg_unit.tide_en = 1'b0
 
 # config for cell '$extract$\reg_unit_tide_en_0_tide_rst_1$375'
-X1Y2.c0.E_reg_unit.tide_rst = 1'b1
-X1Y2.c0.E_reg_unit.tide_en = 1'b0
+X2Y2.c0.N_reg_unit.tide_rst = 1'b1
+X2Y2.c0.N_reg_unit.tide_en = 1'b0
 
 # config for cell '$extract$\reg_unit_WIDTH_1_tide_en_1_tide_rst_0$325'
-X2Y3.c0.E_pred_reg_unit_WIDTH_1.tide_rst = 1'b0
-X2Y3.c0.E_pred_reg_unit_WIDTH_1.tide_en = 1'b1
+X3Y2.c0.W_pred_reg_unit_WIDTH_1.tide_rst = 1'b0
+X3Y2.c0.W_pred_reg_unit_WIDTH_1.tide_en = 1'b1
 
 # config for cell '$extract$\reg_unit_WIDTH_1_tide_en_1_tide_rst_0$324'
-X2Y2.c0.S_pred_reg_unit_WIDTH_1.tide_rst = 1'b0
-X2Y2.c0.S_pred_reg_unit_WIDTH_1.tide_en = 1'b1
+X3Y1.c0.E_pred_reg_unit_WIDTH_1.tide_rst = 1'b0
+X3Y1.c0.E_pred_reg_unit_WIDTH_1.tide_en = 1'b1
 
 # config for cell '$extract$\logic_op_conf_3$373'
-X1Y4.c0.l_logic_op.conf = 2'b11
-
-# config for cell '$extract$\logic_op_conf_3$372'
-X2Y2.c0.l_logic_op.conf = 2'b11
-
-# config for cell '$extract$\logic_op_conf_3$371'
-X3Y3.c0.l_logic_op.conf = 2'b11
-
-# config for cell '$extract$\logic_op_conf_3$370'
 X1Y2.c0.l_logic_op.conf = 2'b11
 
+# config for cell '$extract$\logic_op_conf_3$372'
+X1Y1.c0.l_logic_op.conf = 2'b11
+
+# config for cell '$extract$\logic_op_conf_3$371'
+X1Y3.c0.l_logic_op.conf = 2'b11
+
+# config for cell '$extract$\logic_op_conf_3$370'
+X3Y2.c0.l_logic_op.conf = 2'b11
+
 # config for cell '$extract$\logic_op_conf_1$368'
-X1Y1.c0.l_logic_op.conf = 1'b1
+X4Y1.c0.l_logic_op.conf = 1'b1
 
 # config for cell '$extract$\logic_op_conf_1$367'
-X3Y1.c0.l_logic_op.conf = 1'b1
+X4Y3.c0.l_logic_op.conf = 1'b1
 
 # config for cell '$extract$\logic_op_conf_1$366'
-X2Y1.c0.l_logic_op.conf = 1'b1
+X4Y2.c0.l_logic_op.conf = 1'b1
 
 # config for cell '$extract$\logic_op_conf_0$364'
-X2Y4.c0.l_logic_op.conf = 1'b0
+X2Y2.c0.l_logic_op.conf = 1'b0
 
 # config for cell '$extract$\logic_op_conf_0$363'
-X3Y2.c0.l_logic_op.conf = 1'b0
+X3Y3.c0.l_logic_op.conf = 1'b0
 
 # config for cell '$extract$\logic_op_conf_0$362'
-X1Y3.c0.l_logic_op.conf = 1'b0
+X3Y1.c0.l_logic_op.conf = 1'b0
 
 # config for cell '$extract$\logic_op_conf_0$361'
-X2Y3.c0.l_logic_op.conf = 1'b0
+X2Y1.c0.l_logic_op.conf = 1'b0
 
 # config for cell '$extract$\logic_op_conf_0$360'
-X3Y4.c0.l_logic_op.conf = 1'b0
+X2Y3.c0.l_logic_op.conf = 1'b0
 
 # config for cell '$extract$\ALU_ALU_func_6$342'
 X1Y1.c0.ALU.ALU_func = 3'b110
 
 # config for cell '$extract$\ALU_ALU_func_6$341'
-X1Y2.c0.ALU.ALU_func = 3'b110
+X2Y2.c0.ALU.ALU_func = 3'b110
 
 # config for cell '$extract$\ALU_ALU_func_6$340'
-X2Y3.c0.ALU.ALU_func = 3'b110
+X3Y2.c0.ALU.ALU_func = 3'b110
 
 # config for cell '$iopadmap$main.in0'
-X2Y0.c1.S_IO.WIDTH = 32'b00000000000000000000000000100000
+X0Y3.c0.W_IO.WIDTH = 32'b00000000000000000000000000100000
 
 # config for cell '$iopadmap$main.in1'
 X0Y1.c1.W_IO.WIDTH = 32'b00000000000000000000000000100000
 
 # config for cell '$extract$\ALU_ALU_func_6$339'
-X2Y1.c0.ALU.data_in1[4] = 1'b0
-X2Y1.c0.ALU.data_in1[5] = 1'b0
-X2Y1.c0.ALU.data_in1[6] = 1'b0
-X2Y1.c0.ALU.data_in1[7] = 1'b0
-X2Y1.c0.ALU.data_in1[8] = 1'b0
-X2Y1.c0.ALU.data_in1[9] = 1'b0
-X2Y1.c0.ALU.data_in1[10] = 1'b0
-X2Y1.c0.ALU.data_in1[11] = 1'b0
-X2Y1.c0.ALU.data_in1[12] = 1'b0
-X2Y1.c0.ALU.data_in1[13] = 1'b0
-X2Y1.c0.ALU.data_in1[14] = 1'b0
-X2Y1.c0.ALU.data_in1[15] = 1'b0
-X2Y1.c0.ALU.data_in1[16] = 1'b0
-X2Y1.c0.ALU.data_in1[17] = 1'b0
-X2Y1.c0.ALU.data_in1[18] = 1'b0
-X2Y1.c0.ALU.data_in1[19] = 1'b0
-X2Y1.c0.ALU.data_in1[20] = 1'b0
-X2Y1.c0.ALU.data_in1[21] = 1'b0
-X2Y1.c0.ALU.data_in1[22] = 1'b0
-X2Y1.c0.ALU.data_in1[23] = 1'b0
-X2Y1.c0.ALU.data_in1[24] = 1'b0
-X2Y1.c0.ALU.data_in1[25] = 1'b0
-X2Y1.c0.ALU.data_in1[26] = 1'b0
-X2Y1.c0.ALU.data_in1[27] = 1'b0
-X2Y1.c0.ALU.data_in1[28] = 1'b0
-X2Y1.c0.ALU.data_in1[29] = 1'b0
-X2Y1.c0.ALU.data_in1[30] = 1'b0
-X2Y1.c0.ALU.data_in1[31] = 1'b0
-X2Y1.c0.ALU.ALU_func = 3'b110
+X1Y3.c0.ALU.data_in1[4] = 1'b0
+X1Y3.c0.ALU.data_in1[5] = 1'b0
+X1Y3.c0.ALU.data_in1[6] = 1'b0
+X1Y3.c0.ALU.data_in1[7] = 1'b0
+X1Y3.c0.ALU.data_in1[8] = 1'b0
+X1Y3.c0.ALU.data_in1[9] = 1'b0
+X1Y3.c0.ALU.data_in1[10] = 1'b0
+X1Y3.c0.ALU.data_in1[11] = 1'b0
+X1Y3.c0.ALU.data_in1[12] = 1'b0
+X1Y3.c0.ALU.data_in1[13] = 1'b0
+X1Y3.c0.ALU.data_in1[14] = 1'b0
+X1Y3.c0.ALU.data_in1[15] = 1'b0
+X1Y3.c0.ALU.data_in1[16] = 1'b0
+X1Y3.c0.ALU.data_in1[17] = 1'b0
+X1Y3.c0.ALU.data_in1[18] = 1'b0
+X1Y3.c0.ALU.data_in1[19] = 1'b0
+X1Y3.c0.ALU.data_in1[20] = 1'b0
+X1Y3.c0.ALU.data_in1[21] = 1'b0
+X1Y3.c0.ALU.data_in1[22] = 1'b0
+X1Y3.c0.ALU.data_in1[23] = 1'b0
+X1Y3.c0.ALU.data_in1[24] = 1'b0
+X1Y3.c0.ALU.data_in1[25] = 1'b0
+X1Y3.c0.ALU.data_in1[26] = 1'b0
+X1Y3.c0.ALU.data_in1[27] = 1'b0
+X1Y3.c0.ALU.data_in1[28] = 1'b0
+X1Y3.c0.ALU.data_in1[29] = 1'b0
+X1Y3.c0.ALU.data_in1[30] = 1'b0
+X1Y3.c0.ALU.data_in1[31] = 1'b0
+X1Y3.c0.ALU.ALU_func = 3'b110
 
 # config for cell '$extract$\ALU_ALU_func_0$336'
-X2Y2.c0.ALU.ALU_func = 1'b0
-
-# config for cell '$extract$\ALU_ALU_func_0$335'
 X3Y1.c0.ALU.ALU_func = 1'b0
 
+# config for cell '$extract$\ALU_ALU_func_0$335'
+X2Y1.c0.ALU.ALU_func = 1'b0
+
 # config for cell '$auto$constmap.cc:36:constmap_worker$428'
-X1Y2.c0.const_unit.WIDTH = 32'b00000000000000000000000000100000
-X1Y2.c0.const_unit.ConfigBits = 32'b00000000000000000000000000000000
+X2Y2.c0.const_unit.WIDTH = 32'b00000000000000000000000000100000
+X2Y2.c0.const_unit.ConfigBits = 32'b00000000000000000000000000000000
 
 # config for cell '$auto$constmap.cc:36:constmap_worker$426'
 X1Y1.c0.const_unit.WIDTH = 32'b00000000000000000000000000100000
 X1Y1.c0.const_unit.ConfigBits = 32'b00000000000000000000000000000000
 
 # config for cell '$auto$constmap.cc:36:constmap_worker$412'
-X2Y2.c0.const_unit.WIDTH = 32'b00000000000000000000000000100000
-X2Y2.c0.const_unit.ConfigBits = 32'b00000000000000000000000000001111
+X3Y1.c0.const_unit.WIDTH = 32'b00000000000000000000000000100000
+X3Y1.c0.const_unit.ConfigBits = 32'b00000000000000000000000000001111
 
 # config for cell '$auto$constmap.cc:36:constmap_worker$404'
-X2Y1.c0.const_unit.WIDTH = 32'b00000000000000000000000000100000
-X2Y1.c0.const_unit.ConfigBits = 32'b00000000000000000000000000000000
+X1Y3.c0.const_unit.WIDTH = 32'b00000000000000000000000000100000
+X1Y3.c0.const_unit.ConfigBits = 32'b00000000000000000000000000000000
 

@@ -34,8 +34,15 @@ set my_FAB_ROOT /home/kelvin/FABulous_fork
 # check_status
 cd ../..
 # FABulous --debug myProject -p "load_fabric; gen_FABulous_CAD_tool_files"
-FABulous --debug myProject -p "load_fabric; gen_FABulous_CAD_tool_files; \
-         synthesis_script $source_hdl -tcl $my_FAB_ROOT/myProject/.FABulous/arch_synth.tcl;"
+FABulous --debug myProject -p \
+        "\
+        load_fabric; \
+        gen_bitStream_spec; \
+        gen_cells_and_techmaps; \
+        gen_chipdb -routing_graph $my_FAB_ROOT/myProject/.FABulous/routing_graph.dot -filter 1,1; \
+        synthesis_script $source_hdl -tcl $my_FAB_ROOT/myProject/.FABulous/arch_synth.tcl; \
+        "
+# /home/kelvin/FABulous_fork/.venv/bin/python /home/kelvin/FABulous_fork/FABulous/fabric_cad/graph_draw2.py
 check_status
 cd -
 # # # FABulous --debug ../../myProject -p "load_fabric; gen_FABulous_CAD_tool_files;"
@@ -46,8 +53,8 @@ nextpnr-himbaechel --chipdb "$my_FAB_ROOT/myProject/.FABulous/hycube.bit" --devi
                    -o constrain-pair="$my_FAB_ROOT/myProject/.FABulous/hycube_constrain_pair.inc" \
                    -o fasm="$my_FAB_ROOT/myProject/user_design/router_test.fasm" \
                    -o fdc="$my_FAB_ROOT/myProject/user_design/test.fdc" \
-                   -o placeTrial=100 --placer sa
+                   -o placeTrial=100
 
 # python $my_FAB_ROOT/myProject/Test/test_fabric.py
 
-# /home/kelvin/FABulous_fork/.venv/bin/python /home/kelvin/FABulous_fork/FABulous/fabric_cad/graph_draw.py
+/home/kelvin/FABulous_fork/.venv/bin/python /home/kelvin/FABulous_fork/FABulous/fabric_cad/graph_draw2.py

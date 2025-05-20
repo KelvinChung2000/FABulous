@@ -1,7 +1,9 @@
+from collections import defaultdict
 import json
 from dataclasses import dataclass
 from enum import StrEnum
 from pathlib import Path
+import re
 from typing import Literal
 
 
@@ -131,11 +133,13 @@ class YosysModule:
 
 @dataclass
 class YosysJson:
+    srcPath: Path
     creator: str
     modules: dict[str, YosysModule]
     models: dict
 
     def __init__(self, path: Path):
+        self.srcPath = path
         with open(path, "r") as f:
             o = json.load(f)
         self.creator = o.get("creator", "")  # Use .get() for safety
@@ -152,3 +156,59 @@ class YosysJson:
             for k, v in o.get("modules", {}).items()  # Use .get() for safety
         }
         self.models = o.get("models", {})  # Use .get() for safety
+
+    def getTopModule(self) -> YosysModule:
+        for module in self.modules.values():
+            if "top" in module.attributes:
+                return module
+        raise ValueError("No top module found in Yosys JSON")
+
+    def isTopModuleNet(self, net: int) -> bool:
+        for module in self.modules.values():
+            for pDetail in module.ports.values():
+                if net in pDetail.bits:
+                    return True
+        return False
+
+    def isNetUsed(self, net: int) -> bool:
+        for module in self.modules.values():
+            for net_name, net_details in module.netnames.items():
+                if net in net_details.bits and "unused_bits" in net_details.attributes:
+                    if r := re.search(r"\w+\[(\d+)\]", net_name):
+                        if int(r.group(1)) in [
+                            int(i)
+                            for i in net_details.attributes["unused_bits"].split(" ")
+                        ]:
+                            return False
+
+                    else:
+                        if "0 " in net_details.attributes["unused_bits"]:
+                            return False
+        return True
+
+    def getNetPortSrcSinks(
+        self, net: int
+    ) -> tuple[tuple[str, str], list[tuple[str, str]]]:
+        src: list[tuple[str, str]] = []
+        sinks: list[tuple[str, str]] = []
+        for module in self.modules.values():
+            for cell_name, cell_details in module.cells.items():
+                for conn_name, conn_details in cell_details.connections.items():
+                    if net in conn_details:
+                        if cell_details.port_directions[conn_name] == "output":
+                            src.append((cell_name, conn_name))
+                        else:
+                            sinks.append((cell_name, conn_name))
+
+        if len(sinks) == 0:
+            raise ValueError(
+                f"Net {net} not found in Yosys JSON or is a top module port output"
+            )
+
+        if len(src) == 0:
+            src.append(("", "z"))
+
+        if len(src) > 1:
+            raise ValueError(f"Multiple driver found for net {net}: {src}")
+
+        return src[0], sinks

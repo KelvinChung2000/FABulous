@@ -116,6 +116,7 @@
         "cmake.ctestPath": "${workspaceFolder}/../nextpnr",
         "cmake.buildDirectory": "${workspaceFolder}/../nextpnr/build",
         "cSpell.words": [
+            "chipdb",
             "SHIFTX",
             "SRST",
             "xnor",

@@ -42,11 +42,15 @@ def setupPortData(
     template = environment.get_template("portData.py.jinja")
     belInputs = []
     belOutputs = []
+    belShared = []
     for bel in bels:
         for port in bel.inputs:
             belInputs.append(port)
         for port in bel.outputs:
             belOutputs.append(port)
+        for port in bel.sharedPort:
+            if port not in belShared:
+                belShared.append(port)
 
     ports = list(itertools.chain([(k, j) for k, v in tilePorts.items() for j in v]))
     content = template.render(
@@ -55,6 +59,7 @@ def setupPortData(
         tilePorts=ports,
         belInputs=belInputs,
         belOutputs=belOutputs,
+        belShared=belShared,
     )
     with open(tileDir.parent / f"metadata/{tileName}_ports.py", "w") as f:
         f.write(content)
@@ -91,15 +96,20 @@ def genSwitchMatrix(
             raise ValueError("File loading failed")
         belInputs = []
         belOutputs = []
+        belShared = []
         for bel in bels:
             for port in bel.inputs:
                 belInputs.append(port)
             for port in bel.outputs:
                 belOutputs.append(port)
+            for port in bel.sharedPort:
+                if port not in belShared:
+                    belShared.append(port)
         muxList = listModule.MuxList(
             list(itertools.chain.from_iterable([i for i in ports.values()])),
             belInputs,
             belOutputs,
+            belShared,
         )
         muxList.construct()
     sm = SwitchMatrix()

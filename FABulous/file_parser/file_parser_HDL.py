@@ -1,7 +1,5 @@
-import json
 import re
 import subprocess
-from functools import partial
 from pathlib import Path
 from pprint import pprint
 
@@ -171,8 +169,7 @@ def parseBelFile(
         logger.error(f"No modules found in {filename}.")
         raise ValueError
 
-    moduleName = next(iter(yosysObj.modules))
-    module: YosysModule = yosysObj.modules[moduleName]
+    module: YosysModule = yosysObj.getTopModule()
 
     ports: dict[str, IO] = {}
 
@@ -230,7 +227,7 @@ def parseBelFile(
                     name=f"{belPrefix}{net}",
                     ioDirection=ports[net],
                     width=netBitWidth,
-                    sharedWith=details.attributes.get("SHARED_WITH", ""),
+                    sharedWith=details.attributes.get("SHARED", ""),
                 )
             )
         elif FABulousPortType.CONTROL in attributes:
@@ -274,10 +271,8 @@ def parseBelFile(
         externalOutputs=externalOutputs,
         configPort=configPort,
         sharedPort=sharedPort,
-        configBits=sum([i.width for i in configPort]),
         belFeatureMap=belFeatureMap,
         userCLK=userClk,
-        constantBel=len(externalInputs) + len(inputs) == 0,
         paramOverride=paramOverride,
     )
 

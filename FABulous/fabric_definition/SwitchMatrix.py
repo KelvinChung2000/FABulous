@@ -5,7 +5,12 @@ from itertools import zip_longest
 from typing import Any, Iterable
 
 from FABulous.fabric_definition.define import IO
-from FABulous.fabric_definition.Port import GenericPort, SlicedPort, TilePort
+from FABulous.fabric_definition.Port import (
+    GenericPort,
+    SharedPort,
+    SlicedPort,
+    TilePort,
+)
 
 SliceRange = namedtuple("SliceRange", ["start", "end"])
 
@@ -94,7 +99,10 @@ class Mux:
         for group in zip_longest(*expandedInputLists):
             # Filter out None values that zip_longest adds for shorter lists
             groupedInputs.append(tuple([item for item in group if item is not None]))
-        return list(zip(self.output.expand(), groupedInputs))
+        if isinstance(self.output, SharedPort):
+            return list(zip(self.output.shareExpand(), groupedInputs))
+        else:
+            return list(zip(self.output.expand(), groupedInputs))
 
 
 class MuxPack:

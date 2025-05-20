@@ -1,18 +1,17 @@
 from itertools import islice
 from pathlib import Path
 from subprocess import run
-from typing import Iterable, Mapping, cast
+from typing import Mapping, cast
 
 from loguru import logger
 
 from FABulous.fabric_cad.chip_database.chip import Chip, ChipExtraData
-from FABulous.fabric_cad.chip_database.database_bel import BelExtraData, TileExtraData
+from FABulous.fabric_cad.chip_database.database_bel import TileExtraData
 from FABulous.fabric_cad.chip_database.database_tile import TileType
 from FABulous.fabric_cad.chip_database.database_timing import TimingValue
 from FABulous.fabric_cad.chip_database.define import NodeWire, PinType
 from FABulous.fabric_cad.graph_draw import genRoutingResourceGraph
-from FABulous.fabric_definition.Bel import Bel
-from FABulous.fabric_definition.define import IO
+from FABulous.fabric_definition.define import IO, Loc
 from FABulous.fabric_definition.Fabric import Fabric
 from FABulous.fabric_definition.Port import BelPort, TilePort
 from FABulous.fabric_definition.SwitchMatrix import SwitchMatrix
@@ -153,6 +152,10 @@ def genBel(t: Tile, tile: TileType, wireOnly: bool, context=1):
         tile.create_pip("vcc", f"c{c}.vcc")
         tile.create_pip("gnd", f"c{c}.gnd")
 
+        for i in t.getBelSharedPort():
+            for pName in i.shareExpand():
+                tile.create_wire(f"c{c}.{pName}", f"SHARED_{i.sharedWith}", flags=c + 1)
+
         for z, bel in enumerate(bels):
             for i in bel.externalInputs + bel.inputs:
                 for pName in i.expand():
@@ -213,6 +216,15 @@ def genBel(t: Tile, tile: TileType, wireOnly: bool, context=1):
                         f"{pName}".removeprefix(bel.prefix),
                         f"c{c}.{pName}",
                         PinType.OUTPUT,
+                    )
+
+            for i in bel.sharedPort:
+                for pName, sName in zip(i.expand(), i.shareExpand()):
+                    tile.add_bel_pin(
+                        belData,
+                        f"{pName}".removeprefix(bel.prefix),
+                        f"c{c}.{sName}",
+                        PinType.INPUT,
                     )
 
             if bel.userCLK:
@@ -324,22 +336,31 @@ def setTiming(chip: Chip):
 
 def setPackage(chip: Chip, fabric: Fabric):
     pkg = chip.create_package("FABulous")
+    with open(fabric.fabricDir.parent / ".FABulous/pinout.csv", "w") as f:
+        # Add CSV header
+        f.write("pad_name,tile_loc,bel_name,pad_function,pad_bank\n")
 
-    for (x, y), tile in fabric:
-        if tile is None:
-            continue
+        for (x, y), tile in fabric:
+            if tile is None:
+                continue
 
-        for bel in tile.bels:
-            for port in bel.externalInputs + bel.externalOutputs:
-                for c in range(fabric.contextCount):
-                    for pName in port.expand():
-                        pkg.create_pad(
-                            f"X{x}Y{y}.{pName}",
-                            f"X{x}Y{y}",
-                            f"c{c}.{bel.prefix}{bel.name}",
-                            "",
-                            0,
-                        )
+            for bel in tile.bels:
+                for port in bel.externalInputs + bel.externalOutputs:
+                    for c in range(fabric.contextCount):
+                        for pName in port.expand():
+                            pad_name = f"X{x}Y{y}.{pName}"
+                            tile_name = f"X{x}Y{y}"
+                            bel_name = f"c{c}.{bel.prefix}{bel.name}"
+                            # Create the pad in the package
+                            pkg.create_pad(
+                                pad_name,
+                                tile_name,
+                                bel_name,
+                                "",
+                                0,
+                            )
+                            # Write the pad information to the CSV file
+                            f.write(f"{pad_name},{tile_name},{bel_name},{''},{0}\n")
 
 
 def generateConstrainPair(fabric: Fabric, dest: Path):
@@ -396,7 +417,11 @@ def generateConstrainPair(fabric: Fabric, dest: Path):
 
 
 def generateChipDatabase(
-    fabric: Fabric, filePath: Path, baseConstIdsPath: Path, dotDir: Path
+    fabric: Fabric,
+    filePath: Path,
+    baseConstIdsPath: Path,
+    dotDir: Path,
+    selectTile: list[Loc] = [],
 ):
     ch = Chip("FABulous", fabric.name, fabric.width, fabric.height)
 
@@ -452,8 +477,8 @@ def generateChipDatabase(
     )
     generateConstrainPair(fabric, filePath / f"{fabric.name}_constrain_pair.inc")
 
-    if dotDir is not Path():
-        genRoutingResourceGraph(ch, filePath, False, [(5, 1), (5, 2)])
+    if dotDir != Path():
+        genRoutingResourceGraph(ch, dotDir, False, selectTile)
 
 
 def groupByThree(inputList: list) -> list:

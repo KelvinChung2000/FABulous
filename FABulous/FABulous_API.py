@@ -20,6 +20,7 @@ from FABulous.fabric_definition.Bel import Bel
 from FABulous.fabric_definition.Fabric import Fabric
 from FABulous.fabric_definition.SuperTile import SuperTile
 from FABulous.fabric_definition.Tile import Tile
+from FABulous.fabric_definition.define import Loc
 from FABulous.fabric_generator.ConfigMem_genenrator import generateConfigMem
 from FABulous.fabric_generator.define import WriterType
 from FABulous.fabric_generator.fabric_generator import generateFabric
@@ -317,7 +318,11 @@ class FABulous_API:
         return self.fabric.superTileDict.values()
 
     def genChipDatabase(
-        self, resultDir: Path, baseConstids: Path, dotDir: Path = Path()
+        self,
+        resultDir: Path,
+        baseConstids: Path,
+        dotDir: Path = Path(),
+        selectTile: list[Loc] = [],
     ):
         """Generates a chip database using the provided result directory and base
         constant IDs.
@@ -329,7 +334,7 @@ class FABulous_API:
         Returns:
             None
         """
-        generateChipDatabase(self.fabric, resultDir, baseConstids, dotDir)
+        generateChipDatabase(self.fabric, resultDir, baseConstids, dotDir, selectTile)
 
     def genPrimsLib(self, result: Path):
         """Generates primitives library using the provided result path.

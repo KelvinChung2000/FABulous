@@ -3,11 +3,11 @@ module reg_unit #(
     parameter NoConfigBits = 2,
     parameter WIDTH = 32
 ) (
-    input wire rst,
-    input wire en,
+    (* FABulous, SHARED="SR" *)input wire rst,
+    (* FABulous, SHARED="SEN" *) input wire en,
     (* FABulous, USER_CLK *) input wire clk,
-    (* FABulous, BUS, DATA *) input  wire [WIDTH-1:0] reg_in,
-    (* FABulous, BUS, DATA *) output reg [WIDTH-1:0] reg_out,
+    (* FABulous *) input  wire [WIDTH-1:0] reg_in,
+    (* FABulous *) output reg [WIDTH-1:0] reg_out,
     (* FABulous, CONFIG_BIT, FEATURE="tide_en" *) input wire tide_en,
     (* FABulous, CONFIG_BIT, FEATURE="tide_rst" *) input wire tide_rst
 );

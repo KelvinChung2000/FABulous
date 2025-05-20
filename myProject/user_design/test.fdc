@@ -1,2 +1,6 @@
-#set_io go N_pred_out
-#set_io go X1Y7.N_pred_in
+#set_io -width 32 in0 X3Y0.S_in
+#set_io -width 32 in1 X4Y0.S_in
+#set_io clk X0Y4.W_pred_in
+#set_io reset X3Y0.S_pred_in 
+#set_io go X4Y0.S_pred_in
+#set_io done X4Y5.N_pred_out

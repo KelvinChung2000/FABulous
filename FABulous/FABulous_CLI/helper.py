@@ -340,3 +340,22 @@ def allow_blank(func):
             func(*args)
 
     return _check_blank
+
+
+def loc_type(entry: str) -> tuple[int, int]:
+    """Converts a string entry into a tuple.
+
+    Parameters
+    ----------
+    entry : str
+        The string entry to convert.
+
+    Returns
+    -------
+    tuple
+        A tuple representation of the entry.
+    """
+    r = tuple(int(item.strip()) for item in entry.split(","))
+    if len(r) != 2:
+        raise ValueError(f"Invalid entry: {entry}")
+    return r

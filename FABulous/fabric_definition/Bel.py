@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from FABulous.fabric_definition.define import BelType
+from FABulous.fabric_definition.define import IO, BelType
 from FABulous.fabric_definition.Port import (
     BelPort,
     ConfigPort,
@@ -64,10 +64,8 @@ class Bel:
     externalOutputs: list[BelPort]
     configPort: list[ConfigPort]
     sharedPort: list[SharedPort]
-    configBits: int
     belFeatureMap: dict[str, int]
     userCLK: Port | None
-    constantBel: bool
     z: int = 0
     paramOverride: dict[str, str] = field(default_factory=dict)
 
@@ -84,10 +82,8 @@ class Bel:
         externalOutputs: list[BelPort],
         configPort: list[ConfigPort],
         sharedPort: list[SharedPort],
-        configBits: int,
         belFeatureMap: dict[str, int],
         userCLK: Port | None = None,
-        constantBel: bool = False,
         z: int = 0,
         paramOverride: dict[str, str] = {},
     ):
@@ -102,10 +98,8 @@ class Bel:
         self.externalOutputs = externalOutputs
         self.configPort = configPort
         self.sharedPort = sharedPort
-        self.configBits = configBits
         self.belFeatureMap = belFeatureMap
         self.userCLK = userCLK
-        self.constantBel = constantBel
         self.z = z
         self.paramOverride = paramOverride
 
@@ -116,6 +110,14 @@ class Bel:
         else:
             return f"{self._name}_{'__'.join([f'{k}_{v}' for k, v in self.paramOverride.items()])}"
 
+    @property
+    def configBits(self) -> int:
+        return sum([i.width for i in self.configPort])
+
+    @property
+    def constantBel(self) -> bool:
+        return len(self.externalInputs) + len(self.inputs) == 0
+
     def __post_init__(self):
         if self.belType == BelType.IO:
             if len(self.externalInputs) > 1:
@@ -125,6 +127,25 @@ class Bel:
             if len(self.externalOutputs) > 1:
                 raise ValueError(
                     f"IO Bel {self.name} have at most one external output port"
+                )
+        for i in self.sharedPort:
+            if not isinstance(i, SharedPort):
+                raise TypeError(
+                    f"Shared port {i} in {self.name} is not a SharedPort object"
+                )
+            if i.ioDirection == IO.OUTPUT:
+                raise ValueError(
+                    f"Shared port {i} in {self.name} is an output port, which is not allowed"
+                )
+
+        for i in self.configPort:
+            if not isinstance(i, ConfigPort):
+                raise TypeError(
+                    f"Config port {i} in {self.name} is not a ConfigPort object"
+                )
+            if i.ioDirection == IO.OUTPUT:
+                raise ValueError(
+                    f"Config port {i} in {self.name} is an output port, which is not allowed"
                 )
 
     def __hash__(self) -> int:

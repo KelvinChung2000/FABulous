@@ -20,6 +20,7 @@ import pprint
 import subprocess as sp
 import sys
 import tkinter as tk
+import traceback
 from pathlib import Path
 from typing import Literal
 
@@ -35,7 +36,6 @@ from loguru import logger
 
 from FABulous.fabric_generator.define import WriterType
 from FABulous.FABulous_API import FABulous_API
-import traceback
 from FABulous.FABulous_CLI import (
     cmd_helper,
     cmd_pnr,
@@ -55,6 +55,7 @@ from FABulous.FABulous_CLI.helper import (
     allow_blank,
     check_if_application_exists,
     copy_verilog_files,
+    loc_type,
     make_hex,
     remove_dir,
     wrap_with_except_handling,
@@ -441,7 +442,7 @@ class FABulous_CLI(Cmd):
         """Generates all tiles by calling 'do_gen_tile'."""
         logger.info("Generating all tiles")
         self.onecmd_plus_hooks(
-            f"gen_tile {" ".join(list(self.fabulousAPI.getTilesNames()))}"
+            f"gen_tile {' '.join(list(self.fabulousAPI.getTilesNames()))}"
         )
         logger.info("Generated all tiles")
 
@@ -560,7 +561,6 @@ class FABulous_CLI(Cmd):
         logger.info("Generated top wrapper")
 
     @with_category(CMD_FABRIC_FLOW)
-    @allow_blank
     def do_run_FABulous_fabric(self, *ignored):
         """Generates the fabric based on the CSV file, creates bitstream specification
         of the fabric, top wrapper of the fabric, Nextpnr model of the fabric and
@@ -570,9 +570,9 @@ class FABulous_CLI(Cmd):
         """
         logger.info("Running FABulous")
         # self.fabulousAPI.gen_port_data()
-        self.do_gen_fabric()
-        self.do_gen_top_wrapper()
-        self.do_gen_FABulous_CAD_tool_files()
+        self.onecmd_plus_hooks("gen_fabric")
+        self.onecmd_plus_hooks("gen_top_wrapper")
+        self.onecmd_plus_hooks("gen_FABulous_CAD_tool_files")
         # self.do_gen_geometry()
         logger.info("FABulous fabric flow complete")
         return
@@ -626,9 +626,27 @@ class FABulous_CLI(Cmd):
 
         logger.info("Generated npnr model")
 
+    chipdb_parser = Cmd2ArgumentParser()
+    chipdb_parser.add_argument(
+        "-routing_graph",
+        type=Path,
+        help="Path to the target file",
+        default=Path(),
+        nargs=argparse.OPTIONAL,
+        completer=Cmd.path_complete,
+    )
+    chipdb_parser.add_argument(
+        "-filter",
+        type=loc_type,
+        help="Filter for the chip database graph generation",
+        default=None,
+        nargs="*",
+    )
+
+    @with_argparser(chipdb_parser)
     @with_category(CMD_FABRIC_FLOW)
-    def do_gen_chipdb(self, *ignored):
-        """Generates chip database by calling 'genChipDB'."""
+    def do_gen_chipdb(self, args):
+        """Generates chip database by calling 'gen_chipdb'."""
         logger.info("Generating chip database")
         logger.info(
             f"Writing to {self.projectDir}/{META_DATA_DIR}/{self.fabulousAPI.fabric.name}.bin"
@@ -636,7 +654,8 @@ class FABulous_CLI(Cmd):
         self.fabulousAPI.genChipDatabase(
             self.projectDir / META_DATA_DIR,
             self.projectDir / META_DATA_DIR / "baseConstIds.inc",
-            self.projectDir / META_DATA_DIR / "routing.dot",
+            args.routing_graph,
+            selectTile=args.filter,
         )
         logger.info("Generated chip database")
 

@@ -33,9 +33,12 @@ def genPrims(bel: Bel, filePath: Path):
 
         with m.PortRegion() as pr:
             for i in bel.inputs + bel.externalInputs:
-                pr.Port(i.name.removeprefix(bel.prefix), IO.INPUT, i.width)
+                pr.InputPort(i.name.removeprefix(bel.prefix), i.width)
             for i in bel.outputs + bel.externalOutputs:
-                pr.Port(i.name.removeprefix(bel.prefix), IO.OUTPUT, i.width)
+                pr.OutputPort(i.name.removeprefix(bel.prefix), i.width)
+            for i in bel.sharedPort:
+                pr.InputPort(i.name.removeprefix(bel.prefix), i.width)
+
             # if bel.userCLK:
             #     pr.Port(bel.userCLK.name.removeprefix(bel.prefix), IO.INPUT, 1)
 

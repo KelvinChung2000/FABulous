@@ -1,6 +1,7 @@
 import argparse
 import functools
 import os
+import re
 import shutil
 import sys
 from pathlib import Path
@@ -132,9 +133,12 @@ def setup_project_env_vars(args: argparse.Namespace) -> None:
         os.environ["FAB_PROJ_LANG"] = args.writer
 
 
-def create_project(project_dir, type: Literal["verilog", "vhdl"] = "verilog"):
-    """Creates a FABulous project containing all required files by copying the
-    appropriate project template and the synthesis directory.
+def create_project(project_dir: Path, lang: Literal["verilog", "vhdl"] = "verilog"):
+    """Creates a FABulous project containing all required files by copying the common
+    files and the appropriate project template. Replces the {HDL_SUFFIX} placeholder in
+    all tile csv files with the appropriate file extension. Creates a .FABulous
+    directory in the project. Also creates a .env file in the project directory with the
+    project language.
 
     File structure as follows:
         FABulous_project_template --> project_dir/
@@ -142,34 +146,48 @@ def create_project(project_dir, type: Literal["verilog", "vhdl"] = "verilog"):
 
     Parameters
     ----------
-    project_dir : str
+    project_dir : Path
         Directory where the project will be created.
-    type : Literal["verilog", "vhdl"], optional
-        The type of project to create ("verilog" or "vhdl"), by default "verilog".
+    lang : Literal["verilog", "vhdl"], optional
+        The language of project to create ("verilog" or "vhdl"), by default "verilog".
     """
-    if os.path.exists(project_dir):
+    if project_dir.exists():
         logger.error("Project directory already exists!")
         sys.exit()
     else:
-        os.mkdir(f"{project_dir}")
+        project_dir.mkdir(parents=True, exist_ok=True)
+        (project_dir / ".FABulous").mkdir(parents=True, exist_ok=True)
 
-    # set default type, since "None" overwrites the default value
-    if not type:
-        type = "verilog"
+    if lang not in ["verilog", "vhdl"]:
+        lang = "verilog"
 
-    os.mkdir(f"{project_dir}/.FABulous")
-    fabulousRoot = os.getenv("FAB_ROOT")
+    fabulousRoot = Path(os.getenv("FAB_ROOT"))
 
-    shutil.copytree(
-        f"{fabulousRoot}/fabric_files/FABulous_project_template_{type}/",
-        f"{project_dir}/",
-        dirs_exist_ok=True,
-    )
+    # Copy the project template
+    common_template = fabulousRoot / "fabric_files/FABulous_project_template_common"
+    lang_template = fabulousRoot / f"fabric_files/FABulous_project_template_{lang}"
+    for source in [common_template, lang_template]:
+        for item in source.rglob("*"):
+            dest_item = project_dir / item.relative_to(source)
+            if item.is_dir():
+                dest_item.mkdir(parents=True, exist_ok=True)
+            else:
+                if dest_item.exists():
+                    logger.warning(f"File {dest_item} already exists. Overwriting...")
+                dest_item.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(item, dest_item)
+
+    # Replace {HDL_SUFFIX} placeholder in all tile csv files
+    new_suffix = "v" if lang == "verilog" else "vhdl"
+    for file_path in project_dir.rglob("*.csv"):
+        content = file_path.read_text()
+        new_content = re.sub(r"\{HDL_SUFFIX\}", new_suffix, content)
+        file_path.write_text(new_content)
 
     with open(os.path.join(project_dir, ".FABulous/.env"), "w") as env_file:
-        env_file.write(f"FAB_PROJ_LANG={type}\n")
+        env_file.write(f"FAB_PROJ_LANG={lang}\n")
 
-    logger.info(f"New FABulous project created in {project_dir} with {type} language.")
+    logger.info(f"New FABulous project created in {project_dir} with {lang} language.")
 
 
 def copy_verilog_files(src: Path, dst: Path):

@@ -492,11 +492,13 @@ class FabricGenerator:
             raise ValueError
 
         noConfigBits = 0
-        for i in connections:
-            if not connections[i]:
-                logger.error(f"{i} not connected to anything!")
+        for port_name in connections:
+            if not connections[port_name]:
+                logger.error(f"{port_name} not connected to anything!")
                 raise ValueError
-            noConfigBits += len(connections[i]).bit_length() - 1
+            mux_size = len(connections[port_name])
+            if mux_size >= 2:
+                noConfigBits += (mux_size - 1).bit_length()
 
         # we pass the NumberOfConfigBits as a comment in the beginning of the file.
         # This simplifies it to generate the configuration port only if needed later when building the fabric where we are only working with the VHDL files
@@ -1110,19 +1112,18 @@ class FabricGenerator:
             signal = []
             userclk_pair = None
 
-            # Internal ports
-            for port in bel.inputs + bel.outputs:
+            # internal + external ports
+            for port in (
+                bel.inputs + bel.outputs + bel.externalInput + bel.externalOutput
+            ):
                 port_name = port.removeprefix(bel.prefix)
-                if r := re.match(r"([a-zA-Z_]+)(\d*)", port_name):
-                    portname, number = r.groups()
-                    port_dict[portname].append((port, number))
-
-            # External ports
-            for port in bel.externalInput + bel.externalOutput:
-                port_name = port.removeprefix(bel.prefix)
-                if r := re.match(r"([a-zA-Z_]+)(\d*)", port_name):
-                    portname, number = r.groups()
-                    port_dict[portname].append((port, number))
+                if r := re.search(r"\d+$", port_name):
+                    number = r.group()
+                    portname = port_name.removesuffix(number)
+                else:
+                    portname = port_name
+                    number = ""
+                port_dict[portname].append((port, number))
 
             # Shared ports
             for port in bel.sharedPort:
@@ -2511,12 +2512,24 @@ class FabricGenerator:
                     continue
                 if "fabric.csv" in str(tile.tileDir):
                     # backward compatibility for old project structure
-                    configMemPath = (
-                        Path(os.getenv("FAB_PROJ_DIR"))
-                        / "Tile"
-                        / tile.name
-                        / f"{tile.name}_ConfigMem.csv"
-                    )
+                    # We need to take the matrixDir from the tile, since there
+                    # is the actual path to the tile defined in the fabric.csv
+                    if tile.matrixDir.is_file():
+                        configMemPath = (
+                            tile.matrixDir.parent / f"{tile.name}_ConfigMem.csv"
+                        )
+                    elif tile.matrixDir.is_dir():
+                        configMemPath = tile.matrixDir / f"{tile.name}_ConfigMem.csv"
+                    else:
+                        configMemPath = (
+                            Path(os.getenv("FAB_PROJ_DIR"))
+                            / "Tile"
+                            / tile.name
+                            / f"{tile.name}_ConfigMem.csv"
+                        )
+                        logger.warning(
+                            f"MatrixDir for {tile.name} is not a valid file or directory. Assuming default path: {configMemPath}"
+                        )
                 else:
                     configMemPath = tile.tileDir.parent.joinpath(
                         f"{tile.name}_ConfigMem.csv"
@@ -2593,7 +2606,7 @@ class FabricGenerator:
                 for source, sinkList in result.items():
                     controlWidth = 0
                     for i, sink in enumerate(reversed(sinkList)):
-                        controlWidth = len(sinkList).bit_length() - 1
+                        controlWidth = (len(sinkList) - 1).bit_length()
                         controlValue = f"{len(sinkList) - 1 - i:0{controlWidth}b}"
                         pip = f"{sink}.{source}"
                         if len(sinkList) < 2:

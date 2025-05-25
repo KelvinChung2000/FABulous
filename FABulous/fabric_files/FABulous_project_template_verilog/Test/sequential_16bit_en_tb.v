@@ -32,7 +32,7 @@ module sequential_16bit_en_tb;
 
 
     wire [27:0] I_top_gold, oeb_gold, T_top_gold;
-    top dut_i (
+    sequential_16bit_en dut_i (
         .clk(CLK),
         .io_out(I_top_gold),
         .io_oeb(oeb_gold),

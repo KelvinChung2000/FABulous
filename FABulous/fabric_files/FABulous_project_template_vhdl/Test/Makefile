@@ -50,13 +50,13 @@ run_simulation: mkdir_build
 	${GHDL} -a ${GHDL_FLAGS} ${FAB_FABRIC_FOLDER}/my_lib.vhdl && \
 	${GHDL} -a ${GHDL_FLAGS} ${FAB_TILE_FOLDER}/LUT4AB/LUT4AB_switch_matrix.vhdl \
 	              ${FAB_TILE_FOLDER}/LUT4AB/LUT4AB_ConfigMem.vhdl \
-	              ${FAB_TILE_FOLDER}/LUT4AB/LUT4c_frame_config.vhdl \
-	              ${FAB_TILE_FOLDER}/LUT4AB/MUX8LUT_frame_config.vhdl \
+	              ${FAB_TILE_FOLDER}/LUT4AB/LUT4c_frame_config_dffesr.vhdl \
+	              ${FAB_TILE_FOLDER}/LUT4AB/MUX8LUT_frame_config_mux.vhdl \
 	              ${FAB_TILE_FOLDER}/LUT4AB/LUT4AB.vhdl && \
 	${GHDL} -a ${GHDL_FLAGS} ${FAB_TILE_FOLDER}/RAM_IO/RAM_IO_switch_matrix.vhdl \
 	              ${FAB_TILE_FOLDER}/RAM_IO/RAM_IO_ConfigMem.vhdl \
-	              ${FAB_TILE_FOLDER}/RAM_IO/InPass4_frame_config.vhdl \
-	              ${FAB_TILE_FOLDER}/RAM_IO/OutPass4_frame_config.vhdl \
+	              ${FAB_TILE_FOLDER}/RAM_IO/InPass4_frame_config_mux.vhdl \
+	              ${FAB_TILE_FOLDER}/RAM_IO/OutPass4_frame_config_mux.vhdl \
 	              ${FAB_TILE_FOLDER}/RAM_IO/RAM_IO.vhdl && \
 	${GHDL} -a ${GHDL_FLAGS} ${FAB_TILE_FOLDER}/RegFile/RegFile_switch_matrix.vhdl \
 	              ${FAB_TILE_FOLDER}/RegFile/RegFile_ConfigMem.vhdl \

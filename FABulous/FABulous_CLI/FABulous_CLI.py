@@ -153,7 +153,7 @@ class FABulous_CLI(Cmd):
 
         self.tiles = []
         self.superTiles = []
-        self.csvFile = Path(projectDir / "fabric.csv")
+        self.csvFile = Path(self.projectDir / "fabric.csv")
         self.add_settable(
             Settable(
                 "csvFile", Path, "The fabric file ", self, completer=Cmd.path_complete

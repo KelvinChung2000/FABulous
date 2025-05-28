@@ -21,6 +21,8 @@ set source_futil /home/kelvin/FABulous_fork/myProject/PnR/mac-pipelined/mac-pipe
 # set source_hdl /home/kelvin/FABulous_fork/myProject/PnR/mac-pipelined/mac-pipelined.sv
 # set source_hdl /home/kelvin/FABulous_fork/benchmarks/userbench/loop_array/loop_array.sv
 set source_hdl /home/kelvin/FABulous_fork/benchmarks/userbench/loop_array_inner/loop_array_inner.sv
+# set source_hdl /home/kelvin/FABulous_fork/myProject/PnR/test.v
+# set source_hdl /home/kelvin/FABulous_fork/myProject/user_design/synth_test_mod.v
 set ir /home/kelvin/FABulous_fork/myProject/PnR/mac-pipelined/ir.log
 set my_FAB_ROOT /home/kelvin/FABulous_fork
 
@@ -39,7 +41,7 @@ FABulous --debug myProject -p \
         load_fabric; \
         gen_bitStream_spec; \
         gen_cells_and_techmaps; \
-        gen_chipdb -routing_graph $my_FAB_ROOT/myProject/.FABulous/routing_graph.dot -filter 1,1; \
+        gen_chipdb -routing_graph $my_FAB_ROOT/myProject/.FABulous/routing_graph.dot -filter 1,1 2,1; \
         synthesis_script $source_hdl -tcl $my_FAB_ROOT/myProject/.FABulous/arch_synth.tcl; \
         "
 # /home/kelvin/FABulous_fork/.venv/bin/python /home/kelvin/FABulous_fork/FABulous/fabric_cad/graph_draw2.py
@@ -47,14 +49,19 @@ check_status
 cd -
 # # # FABulous --debug ../../myProject -p "load_fabric; gen_FABulous_CAD_tool_files;"
 # # # xdot /home/kelvin/FABulous_fork/myProject/.FABulous/routing_graph.dot &
+# gdb -args \
 nextpnr-himbaechel --chipdb "$my_FAB_ROOT/myProject/.FABulous/hycube.bit" --device "FABulous" \
                    --json "$my_FAB_ROOT/myProject/user_design/synth_test.json" \
                    --write "$my_FAB_ROOT/myProject/user_design/router_test.json" \
                    -o constrain-pair="$my_FAB_ROOT/myProject/.FABulous/hycube_constrain_pair.inc" \
                    -o fasm="$my_FAB_ROOT/myProject/user_design/router_test.fasm" \
                    -o fdc="$my_FAB_ROOT/myProject/user_design/test.fdc" \
-                   -o placeTrial=100
-
+                   --placer-heap-seed-placement-strategy graph_grid \
+                   --placer-heap-arch-connectivity-factor 1.0 \
+                   --no-route \
+                   -o placeTrial=10 --router1-timeout 10000 --debug-placer
+                #    --placer-heap-export-init-placement "$my_FAB_ROOT/myProject/user_design/test_init_placement.csv" \
+# successful seed:5743725230106451036 
 # python $my_FAB_ROOT/myProject/Test/test_fabric.py
 
 /home/kelvin/FABulous_fork/.venv/bin/python /home/kelvin/FABulous_fork/FABulous/fabric_cad/graph_draw2.py

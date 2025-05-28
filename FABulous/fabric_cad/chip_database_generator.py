@@ -36,7 +36,7 @@ def genSwitchMatrix(tile: Tile, subTile: str, tileType: TileType, context=1):
         raise ValueError("Switch matrix is not a SwitchMatrix object")
     zIn = 0
     zOut = 0
-    outputMapping: Mapping[str, str] = {}
+    outputMapping: dict[str, str] = {}
     for c in range(context):
         for p in tile.getTileInputPorts(subTile):
             if p.terminal and p.ioDirection == IO.OUTPUT:
@@ -62,6 +62,7 @@ def genSwitchMatrix(tile: Tile, subTile: str, tileType: TileType, context=1):
                         tileType.create_pip(
                             f"c{c}.{pName}_internal_{wtc}",
                             f"c{c}.{pName}_{wtc}",
+                            timing_class="SWNEIGH",
                         )
                         outputMapping[f"c{c}.{pName}_{wtc}"] = (
                             f"c{c}.{pName}_internal_{wtc}"
@@ -76,6 +77,7 @@ def genSwitchMatrix(tile: Tile, subTile: str, tileType: TileType, context=1):
                         f"c{c}.{pName}_internal",
                         f"c{c}.{pName}",
                         flags=PSEUDO_PIP_END,
+                        timing_class="SWNEIGH",
                     )
                     outputMapping[f"c{c}.{pName}"] = f"c{c}.{pName}_internal"
             zOut += 1
@@ -127,6 +129,7 @@ def genSwitchMatrix(tile: Tile, subTile: str, tileType: TileType, context=1):
                 tileType.create_pip(
                     f"{p.name}_{c}_to_{c + 1}_NextCycle[{wc}]",
                     f"{p.name}_{c + 1}_to_{c + 2}_NextCycle[{wc}]",
+                    timing_class="NEXT_CYCLE",
                     flags=PSEUDO_PIP_MID,
                 )
 
@@ -293,7 +296,7 @@ def genFabric(fabric: Fabric, chip: Chip, context=1):
                             f"c{c}.{dst}",
                         ),
                     ]
-                    chip.add_node(node)
+                    chip.add_node(node, "DEFAULT")
     setTiming(chip)
 
 
@@ -321,7 +324,7 @@ def setTiming(chip: Chip):
     tmg.set_pip_class(
         grade=speed,
         name="SWNEIGH",
-        delay=TimingValue(120),  # 120ps intrinstic delay
+        delay=TimingValue(200),  # 120ps intrinstic delay
         in_cap=TimingValue(7000),  # 7pF
         out_res=TimingValue(1200),  # 1.2ohm
     )
@@ -331,6 +334,14 @@ def setTiming(chip: Chip):
         delay=TimingValue(1000),  # 1000ps intrinstic delay
         in_cap=TimingValue(50000),
         out_res=TimingValue(8000),
+    )
+
+    tmg.set_node_class(
+        grade=speed,
+        name="DEFAULT",
+        delay=TimingValue(100),  # 100ps intrinstic delay
+        cap=TimingValue(5000),  # 5pF
+        res=TimingValue(1000),  # 1ohm
     )
 
 
@@ -388,7 +399,7 @@ def generateConstrainPair(fabric: Fabric, dest: Path):
                                 continue
 
                             source = f"{bel.name}:{i.name.removeprefix(bel.prefix)} {i.width}"
-                            target = f"{tBel.name}:{d.name.removeprefix(bel.prefix)} {d.width}"
+                            target = f"{tBel.name}:{d.name.removeprefix(tBel.prefix)} {d.width}"
                             if tBel.z < bel.z:
                                 f.write(f"{target} {source} {bel.z - tBel.z} \n")
                             else:
@@ -405,7 +416,7 @@ def generateConstrainPair(fabric: Fabric, dest: Path):
                                 continue
 
                             source = f"{bel.name}:{i.name.removeprefix(bel.prefix)} {i.width}"
-                            target = f"{tBel.name}:{u.name.removeprefix(bel.prefix)} {u.width}"
+                            target = f"{tBel.name}:{u.name.removeprefix(tBel.prefix)} {u.width}"
                             if tBel.z < bel.z:
                                 f.write(f"{target} {source} {bel.z - tBel.z} \n")
                             else:

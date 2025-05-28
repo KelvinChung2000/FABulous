@@ -3,56 +3,41 @@ from myProject.Tile.PE.metadata.PE_ports import PE_ports
 
 class MuxList(PE_ports):
     def construct(self):
-        self.data_in1 //= [self.in0, self.in1, self.in2, self.in3, self.const_out]
-        self.data_in1 //= [
-            self.RES_reg_out,
-            self.N_reg_out,
-            self.E_reg_out,
-            self.S_reg_out,
-            self.W_reg_out,
-        ]
-        self.data_in2 //= [self.in0, self.in1, self.in2, self.in3, self.const_out]
-        self.data_in2 //= [
-            self.RES_reg_out,
-            self.N_reg_out,
-            self.E_reg_out,
-            self.S_reg_out,
-            self.W_reg_out,
-        ]
-        self.c_A //= [self.in0, self.in1, self.in2, self.in3]
-        self.c_B //= [self.in0, self.in1, self.in2, self.in3, self.const_out]
+        self.data_in1 //= [self.in0, self.in1, self.in2, self.in3, self.A_reg_out, self.const_out]
+        self.data_in2 //= [self.in0, self.in1, self.in2, self.in3, self.B_reg_out, self.const_out]
+
+        self.A_reg_in //= [self.in0, self.in1, self.in2, self.in3, self.RES_reg_out, self.data_out]
+        self.B_reg_in //= [self.in0, self.in1, self.in2, self.in3, self.RES_reg_out, self.data_out]
+
+        self.c_A //= [self.A_reg_out, self.const_out]
+        self.c_B //= [self.B_reg_out, self.const_out]
 
         self.RES_reg_in //= self.data_out
 
-        for i in range(4):
-            self[f"out{i}"] //= self.data_out
-            self[f"out{i}"] //= self.RES_reg_out
-
-        self.out0 //= [self.in0, self.in1, self.in2, self.in3, self.N_reg_out]
-        self.out1 //= [self.in0, self.in1, self.in2, self.in3, self.E_reg_out]
-        self.out2 //= [self.in0, self.in1, self.in2, self.in3, self.S_reg_out]
-        self.out3 //= [self.in0, self.in1, self.in2, self.in3, self.W_reg_out]
-
-        self.N_reg_in //= self.in0
-        self.E_reg_in //= self.in1
-        self.S_reg_in //= self.in2
-        self.W_reg_in //= self.in3
-
-        self.N_reg_in //= self.N_reg_out
-        self.E_reg_in //= self.E_reg_out
-        self.S_reg_in //= self.S_reg_out
-        self.W_reg_in //= self.W_reg_out
+        self.out0 //= [self.in0, self.in1, self.in2, self.in3, self.RES_reg_out, self.data_out]
+        self.out1 //= [self.in0, self.in1, self.in2, self.in3, self.RES_reg_out, self.data_out]
+        self.out2 //= [self.in0, self.in1, self.in2, self.in3, self.RES_reg_out, self.data_out]
+        self.out3 //= [self.in0, self.in1, self.in2, self.in3, self.RES_reg_out, self.data_out]
 
         # Pred network
-        self.data_in3 //= [self.pred_in0, self.pred_in1, self.pred_in2, self.pred_in3, self.l_Y, self.c_Y]
-        # self.A //= [self.in0, self.in1, self.in2, self.in3]
-        # self.B //= [self.in0, self.in1, self.in2, self.in3, self.const_out]
+        self.data_in3 //= [
+            self.pred_in0,
+            self.pred_in1,
+            self.pred_in2,
+            self.pred_in3,
+            self.l_Y,
+            self.c_Y,
+            self.RES_pred_reg_out,
+            self.A_pred_reg_out,
+            self.B_pred_reg_out,
+        ]
 
         self.SEN //= [
             self.pred_in0,
             self.pred_in1,
             self.pred_in2,
             self.pred_in3,
+            self.RES_pred_reg_out,
             self.l_Y,
             self.c_Y,
             self.VCC,
@@ -63,16 +48,15 @@ class MuxList(PE_ports):
             self.pred_in1,
             self.pred_in2,
             self.pred_in3,
+            self.RES_pred_reg_out,
             self.l_Y,
             self.c_Y,
             self.VCC,
             self.GND,
         ]
 
-        self.N_pred_reg_in //= [self.pred_in0, self.l_Y, self.c_Y, self.VCC, self.GND]
-        self.E_pred_reg_in //= [self.pred_in1, self.l_Y, self.c_Y, self.VCC, self.GND]
-        self.S_pred_reg_in //= [self.pred_in2, self.l_Y, self.c_Y, self.VCC, self.GND]
-        self.W_pred_reg_in //= [self.pred_in3, self.l_Y, self.c_Y, self.VCC, self.GND]
+        self.A_pred_reg_in //= [self.pred_in0, self.pred_in1, self.pred_in2, self.pred_in3, self.RES_pred_reg_out]
+        self.B_pred_reg_in //= [self.pred_in0, self.pred_in1, self.pred_in2, self.pred_in3, self.RES_pred_reg_out]
         self.RES_pred_reg_in //= [self.l_Y, self.c_Y]
 
         self.l_A //= [
@@ -80,36 +64,27 @@ class MuxList(PE_ports):
             self.pred_in1,
             self.pred_in2,
             self.pred_in3,
-            self.N_pred_reg_out,
-            self.E_pred_reg_out,
-            self.S_pred_reg_out,
-            self.W_pred_reg_out,
+            self.A_pred_reg_out,
+            self.RES_pred_reg_out,
         ]
         self.l_B //= [
             self.pred_in0,
             self.pred_in1,
             self.pred_in2,
             self.pred_in3,
-            self.N_pred_reg_out,
-            self.E_pred_reg_out,
-            self.S_pred_reg_out,
-            self.W_pred_reg_out,
+            self.B_pred_reg_out,
+            self.RES_pred_reg_out,
         ]
 
-        self.pred_out0 //= [self.N_pred_reg_out, self.RES_pred_reg_out]
-        self.pred_out1 //= [self.E_pred_reg_out, self.RES_pred_reg_out]
-        self.pred_out2 //= [self.S_pred_reg_out, self.RES_pred_reg_out]
-        self.pred_out3 //= [self.W_pred_reg_out, self.RES_pred_reg_out]
         for i in range(4):
             self[f"pred_out{i}"] //= [
                 self.pred_in0,
                 self.pred_in1,
                 self.pred_in2,
                 self.pred_in3,
+                self.RES_pred_reg_out,
                 self.l_Y,
                 self.c_Y,
-                self.VCC,
-                self.GND,
             ]
 
         # self.spanOut[1] //= self.spanIn[0]

@@ -26,6 +26,7 @@ from typing import Dict, List, Tuple
 
 from loguru import logger
 
+from FABulous.fabric_definition.Bel import Bel
 from FABulous.fabric_definition.ConfigMem import ConfigMem
 from FABulous.fabric_definition.define import (
     IO,
@@ -44,7 +45,6 @@ from FABulous.fabric_generator.file_parser import (
     parseConfigMem,
     parseList,
     parseMatrix,
-    parseBelFile,
 )
 
 
@@ -471,7 +471,7 @@ class FabricGenerator:
         """
 
         # convert the matrix to a dictionary map and performs entry check
-        connections: Dict[str, List[str]] = {}
+        connections: dict[str, list[str]] = {}
         if tile.matrixDir.suffix == ".csv":
             connections = parseMatrix(tile.matrixDir, tile.name)
         elif tile.matrixDir.suffix == ".list":

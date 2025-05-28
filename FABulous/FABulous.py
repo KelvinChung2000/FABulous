@@ -17,7 +17,7 @@ from FABulous.FABulous_CLI.helper import (
     setup_project_env_vars,
 )
 
-app = typer.Typer()
+app = typer.Typer(rich_markup_mode="rich")
 
 
 @dataclass
@@ -93,13 +93,13 @@ def setup(
         resolve_path=True,
     ),
     createProject: Path = typer.Option(
-        "", "--createProject", "-c", help="[red][DEPRECATED][/red], use create directly"
+        "", "--createProject", "-c", help="[red][DEPRECATED][/red] use [bold]create[/bold] command directly"
     ),
     fabScript: Path = typer.Option(
         "",
         "--FABulousScript",
         "-fs",
-        help="[red][DEPRECATED][/red], use run_fabulous_script directly",
+        help="[red][DEPRECATED][/red] use [bold]run_fabulous_script[/bold] command directly",
         file_okay=True,
         dir_okay=False,
     ),
@@ -107,7 +107,7 @@ def setup(
         "",
         "--TCLScript",
         "-ts",
-        help="[red][DEPRECATED][/red], use run_tcl directly",
+        help="[red][DEPRECATED][/red] use [bold]run_tcl[/bold] command directly",
         file_okay=True,
         dir_okay=False,
     ),
@@ -115,7 +115,7 @@ def setup(
         "",
         "--install-oss-cad-suite",
         "-iocs",
-        help="[red][DEPRECATED][/red], use install_cad_suite directly",
+        help="[red][DEPRECATED][/red] use [bold]install_cad_suite[/bold] command directly",
         file_okay=False,
         dir_okay=True,
     ),

@@ -1,27 +1,29 @@
 import csv
+import json
 import os
 import re
 import subprocess
-import json
-from loguru import logger
 from copy import deepcopy
-
-from typing import Literal, overload
 from pathlib import Path
-from FABulous.fabric_generator.utilities import expandListPorts
+from typing import Literal, overload
+
+from loguru import logger
+
 from FABulous.fabric_definition.Bel import Bel
-from FABulous.fabric_definition.Port import Port
-from FABulous.fabric_definition.Tile import Tile
-from FABulous.fabric_definition.SuperTile import SuperTile
-from FABulous.fabric_definition.Fabric import Fabric
 from FABulous.fabric_definition.ConfigMem import ConfigMem
 from FABulous.fabric_definition.define import (
     IO,
-    Direction,
-    Side,
     ConfigBitMode,
+    Direction,
     MultiplexerStyle,
+    Side,
 )
+from FABulous.fabric_definition.Fabric import Fabric
+from FABulous.fabric_definition.Port import Port
+from FABulous.fabric_definition.SuperTile import SuperTile
+from FABulous.fabric_definition.Tile import Tile
+from FABulous.fabric_definition.Yosys_obj import YosysJson, YosysModule
+from FABulous.fabric_generator.utilities import expandListPorts
 
 oppositeDic = {"NORTH": "SOUTH", "SOUTH": "NORTH", "EAST": "WEST", "WEST": "EAST"}
 
@@ -136,9 +138,6 @@ def parseFabricCSV(fileName: str) -> Fabric:
         if i[0].startswith("Tile"):
             if "GENERATE" in i:
                 # import here to avoid circular import
-                from FABulous.fabric_generator.fabric_automation import (
-                    generateCustomTileConfig,
-                )
 
                 # we generate the tile right before we parse everything
                 i[1] = str(generate_custom_tile_config(filePath.joinpath(i[1])))
@@ -1024,20 +1023,17 @@ def parseBelFile(
         json_file = filename.with_suffix(".json")
         runCmd = [
             "yosys",
-            "-qp"
-            f"read_verilog -sv {filename}; proc -noopt; write_json -compat-int {json_file}",
+            f"-qpread_verilog -sv {filename}; proc -noopt; write_json -compat-int {json_file}",
         ]
         try:
             subprocess.run(runCmd, check=True)
         except subprocess.CalledProcessError as e:
             logger.error(f"Failed to run yosys command: {e}")
             raise ValueError
+        hdlData = YosysJson(json_file)
 
-        with open(f"{json_file}", "r") as f:
-            data_dict = json.load(f)
-
-        modules = data_dict.get("modules", {})
-        filtered_ports: dict[str, tuple[IO, list]] = {}
+        modules: dict[str, YosysModule] = hdlData.modules
+        filtered_ports = {}
 
         if len(modules) == 0:
             logger.error(f"File {filename} does not contain any modules.")
@@ -1048,8 +1044,7 @@ def parseBelFile(
 
         # Gathers port name and direction, filters out configbits as they show in ports.
         for module_name, module_info in modules.items():
-            ports = module_info["ports"]
-            for port_name, details in ports.items():
+            for port_name, details in module_info.ports.items():
                 if "ConfigBits" in port_name:
                     continue
                 if "UserCLK" in port_name:
@@ -1058,19 +1053,18 @@ def parseBelFile(
                     # FIXME:  This is a temporary fix for the issue where the ports are individually declared
                     #         Check for the last charcter in portname is not really reliable and sould be handeled more rubust in the future.
                     individually_declared = True
-                direction = IO[details["direction"].upper()]
-                bits = details.get("bits", [])
-                filtered_ports[port_name] = (direction, bits)
 
-        param_defaults = module_info.get("parameter_default_values")
+                direction = IO[details.direction.upper()]
+                filtered_ports[port_name] = (direction, details.bits)
+
+        param_defaults = module_info.parameter_default_values
         if param_defaults and "NoConfigBits" in param_defaults:
             noConfigBits = param_defaults["NoConfigBits"]
         # Passed attributes dont show in port list, checks for attributes in netnames.
         # (If passed attributes missing, may need to expand to check other lists e.g "memories".)
-        netnames = module_info.get("netnames", {})
         for portName, (direction, bits) in filtered_ports.items():
-            netDetails = netnames.get(portName, {})
-            attributes = netDetails.get("attributes", {})
+            netDetails = module_info.netnames[portName]
+            attributes = netDetails.attributes
             # Unrolled Ports
             for index in range(len(bits)):
                 new_port_name = (
@@ -1104,7 +1098,7 @@ def parseBelFile(
 
                 if "CARRY" in attributes:
                     # For prefix after carry
-                    carryPrefix = attributes.get("CARRY")
+                    carryPrefix = attributes["CARRY"]
                     if carryPrefix == 1:
                         # Default carry prefix, yosys uses 1 if no value is specified
                         carryPrefix = "FABulous_default"
@@ -1162,7 +1156,7 @@ def parseBelFile(
     )
 
 
-def verilog_belMapProcessing(module_info):
+def verilog_belMapProcessing(module_info: YosysModule):
     """Extracts and transforms BEL mapping attributes in the JSON created from a Verilog
     module.
 
@@ -1178,7 +1172,7 @@ def verilog_belMapProcessing(module_info):
         Dictionary containing the parsed bel mapping information.
     """
     belMapDic = {}
-    attributes = module_info.get("attributes", {})
+    attributes = module_info.attributes
     # if BelMap not present defaults belMapDic to {}
     if "BelMap" not in attributes:
         return belMapDic

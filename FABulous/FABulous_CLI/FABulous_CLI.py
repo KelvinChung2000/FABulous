@@ -113,6 +113,8 @@ class FABulous_CLI(Cmd):
         writerType: str | None,
         projectDir: Path,
         enteringDir: Path,
+        debug: bool = False,
+        verbose: bool = False,
         FABulousScript: Path = Path(),
         TCLScript: Path = Path(),
     ):

@@ -16,12 +16,12 @@ from loguru import logger
 MAX_BITBYTES = 16384
 
 
-def setup_logger(verbosity: int):
+def setup_logger(verbosity: bool = False):
     # Remove the default logger to avoid duplicate logs
     logger.remove()
 
     # Define logger format
-    if verbosity >= 1:
+    if verbosity:
         log_format = (
             "<level>{level:}</level> | "
             "<cyan>[{time:DD-MM-YYYY HH:mm:ss]}</cyan> | "
@@ -35,7 +35,7 @@ def setup_logger(verbosity: int):
     logger.add(sys.stdout, format=log_format, level="DEBUG", colorize=True)
 
 
-def setup_global_env_vars(args: argparse.Namespace) -> None:
+def setup_global_env_vars(globalDotEnv: str, projectDir: Path) -> None:
     """Set up global  environment variables.
 
     Parameters
@@ -101,7 +101,7 @@ def setup_global_env_vars(args: argparse.Namespace) -> None:
         os.environ["PATH"] += os.pathsep + ocs_path + "/bin"
 
 
-def setup_project_env_vars(args: argparse.Namespace) -> None:
+def setup_project_env_vars(projectDotEnv: str, ):
     """Set up environment variables for the project.
 
     Parameters

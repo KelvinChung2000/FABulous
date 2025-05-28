@@ -115,8 +115,6 @@ class FABulous_CLI(Cmd):
         enteringDir: Path,
         debug: bool = False,
         verbose: bool = False,
-        FABulousScript: Path = Path(),
-        TCLScript: Path = Path(),
     ):
         """Initialises the FABulous shell instance.
 
@@ -135,7 +133,6 @@ class FABulous_CLI(Cmd):
         super().__init__(
             persistent_history_file=f"{os.getenv('FAB_PROJ_DIR')}/{META_DATA_DIR}/.fabulous_history",
             allow_cli_args=False,
-            startup_script=str(FABulousScript) if not FABulousScript.is_dir() else "",
         )
         self.enteringDir = enteringDir
 
@@ -207,22 +204,6 @@ class FABulous_CLI(Cmd):
         self.disable_category(
             CMD_HELPER, "Helper commands are disabled until fabric is loaded"
         )
-
-        if not TCLScript.is_dir() and TCLScript.exists():
-            self._startup_commands.append(f"run_tcl {Path(TCLScript).absolute()}")
-            self._startup_commands.append("exit")
-        elif not TCLScript.is_dir() and not TCLScript.exists():
-            logger.error(f"Cannot find {TCLScript}")
-            exit(1)
-
-        if not FABulousScript.is_dir() and FABulousScript.exists():
-            self._startup_commands.append(
-                f"run_script {Path(FABulousScript).absolute()}"
-            )
-            self._startup_commands.append("exit")
-        elif not FABulousScript.is_dir() and not FABulousScript.exists():
-            logger.error(f"Cannot find {FABulousScript}")
-            exit(1)
 
     def do_exit(self, *ignored):
         """Exits the FABulous shell and logs info message."""

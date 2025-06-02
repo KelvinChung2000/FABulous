@@ -67,6 +67,7 @@ class Bel:
     belFeatureMap: dict[str, int]
     userCLK: Port | None
     z: int = 0
+    baseBel: bool = False
     paramOverride: dict[str, str] = field(default_factory=dict)
 
     def __init__(

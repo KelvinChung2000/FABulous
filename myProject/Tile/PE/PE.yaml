@@ -37,17 +37,19 @@ WIRES:
   # {source_name: spanOut, X-offset: 2, Y-offset:  0, destination_name: spanIn},
 
 BELS: 
-  - {BEL: ./reg_unit.v, prefix: RES_}
-  - {BEL: ./ALU.v, prefix: } 
-  - {BEL: ./compare.v, prefix: c_}
-  - {BEL: ./reg_unit.v, prefix: A_}
-  - {BEL: ./reg_unit.v, prefix: B_}
-  - {BEL: ./const_unit.v, prefix: }
+  ALU_GROUP:
+    - {BEL: ./reg_unit.v, prefix: RES_}
+    - {BEL: ./ALU.v, prefix: } 
+    - {BEL: ./compare.v, prefix: c_}
+    - {BEL: ./reg_unit.v, prefix: A_}
+    - {BEL: ./reg_unit.v, prefix: B_}
+    - {BEL: ./const_unit.v, prefix: }
 
-  - {BEL: ./reg_unit.v, prefix: RES_pred_, param: {WIDTH: 1}}
-  - {BEL: ./logic_op.v, prefix: l_}
-  - {BEL: ./reg_unit.v, prefix: A_pred_  , param: {WIDTH: 1}}
-  - {BEL: ./reg_unit.v, prefix: B_pred_  , param: {WIDTH: 1}}
+  PRED_GROUP:
+    - {BEL: ./reg_unit.v, prefix: RES_pred_, param: {WIDTH: 1}}
+    - {BEL: ./logic_op.v, prefix: l_}
+    - {BEL: ./reg_unit.v, prefix: A_pred_  , param: {WIDTH: 1}}
+    - {BEL: ./reg_unit.v, prefix: B_pred_  , param: {WIDTH: 1}}
 
 MATRIX: list.py
 # CONFIG_MEM: PE_ConfigMem.csv

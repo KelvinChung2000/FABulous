@@ -42,8 +42,8 @@ FABulous --debug myProject -p \
         gen_bitStream_spec; \
         gen_cells_and_techmaps; \
         gen_chipdb -routing_graph $my_FAB_ROOT/myProject/.FABulous/routing_graph.dot -filter 1,1 2,1; \
-        synthesis_script $source_hdl -tcl $my_FAB_ROOT/myProject/.FABulous/arch_synth.tcl; \
         "
+        # synthesis_script $source_hdl -tcl $my_FAB_ROOT/myProject/.FABulous/arch_synth.tcl; \
 # /home/kelvin/FABulous_fork/.venv/bin/python /home/kelvin/FABulous_fork/FABulous/fabric_cad/graph_draw2.py
 check_status
 cd -
@@ -59,9 +59,9 @@ nextpnr-himbaechel --chipdb "$my_FAB_ROOT/myProject/.FABulous/hycube.bit" --devi
                    --placer-heap-seed-placement-strategy graph_grid \
                    --placer-heap-arch-connectivity-factor 1.0 \
                    --no-route \
-                   -o placeTrial=10 --router1-timeout 10000 --debug-placer
+                   -o placeTrial=10 --router1-timeout 10000
                 #    --placer-heap-export-init-placement "$my_FAB_ROOT/myProject/user_design/test_init_placement.csv" \
 # successful seed:5743725230106451036 
 # python $my_FAB_ROOT/myProject/Test/test_fabric.py
 
-/home/kelvin/FABulous_fork/.venv/bin/python /home/kelvin/FABulous_fork/FABulous/fabric_cad/graph_draw2.py
+# /home/kelvin/FABulous_fork/.venv/bin/python /home/kelvin/FABulous_fork/FABulous/fabric_cad/graph_draw2.py

@@ -348,18 +348,40 @@ def parseTileYAML(
                         tileType=tileName,
                     )
                 )
+    belGroups = {}
+    if isinstance(data.get("BELS", None), dict):
+        z = 0
+        for belGroup, belEntries in data["BELS"].items():
+            bels = []
+            if belEntries is None:
+                continue
+            for belEntry in belEntries:
+                belFilePath = filePathParent.joinpath(belEntry["BEL"])
+                if belEntry["prefix"] is None:
+                    belEntry["prefix"] = ""
 
-    bels = []
-    for z, belEntry in enumerate(data.get("BELS", [])):
-        belFilePath = filePathParent.joinpath(belEntry["BEL"])
-        if belEntry["prefix"] is None:
-            belEntry["prefix"] = ""
+                bel = parseBelFile(
+                    belFilePath, belEntry["prefix"], paramOverride=belEntry.get("param", {})
+                )
+                bel.z = z
+                bels.append(bel)
+                z += 1
+            belGroups[belGroup] = bels
+            bels[0].baseBel = True
+    elif isinstance(data.get("BELS", None), list):
+        bels = []
+        for z, belEntry in enumerate(data["BELS"]):
+            belFilePath = filePathParent.joinpath(belEntry["BEL"])
+            if belEntry["prefix"] is None:
+                belEntry["prefix"] = ""
 
-        bel = parseBelFile(
-            belFilePath, belEntry["prefix"], paramOverride=belEntry.get("param", {})
-        )
-        bel.z = z
-        bels.append(bel)
+            bel = parseBelFile(
+                belFilePath, belEntry["prefix"], paramOverride=belEntry.get("param", {})
+            )
+            bel.z = z
+            bels.append(bel)
+        belGroups = {"default": bels}
+
 
     portName = set()
     for bel in bels:
@@ -370,8 +392,13 @@ def parseTileYAML(
             portName.add(i.name)
 
     withUserCLK = any(bel.userCLK for bel in bels)
-    for b in bels:
-        configBit += b.configBits
+    for bels in belGroups.values():
+        for b in bels:
+            configBit += b.configBits
+    
+    bels: list[Bel] = []
+    for subList in belGroups.values():
+        bels.extend(subList)
 
     if mPath := data.get("MATRIX", None):
         matrixDir = fileName.parent.joinpath(mPath)
@@ -455,7 +482,7 @@ def parseTileYAML(
         Tile(
             name=tileName,
             ports=portsDict,
-            bels=bels,
+            belGroups=belGroups,
             switchMatrix=sm,
             configMems=configMems,
             withUserCLK=withUserCLK,

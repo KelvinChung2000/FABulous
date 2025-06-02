@@ -340,10 +340,5 @@ class SharedPort(Port):
     def __hash__(self) -> int:
         return super().__hash__()
 
-    def __eq__(self, __o: Any) -> bool:
-        if __o is None or not isinstance(__o, SharedPort):
-            return False
-        return self.sharedWith == __o.sharedWith
-
 
 GenericPort = Port | TilePort | SlicedPort | BelPort | ConfigPort | SharedPort

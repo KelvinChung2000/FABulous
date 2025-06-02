@@ -207,16 +207,54 @@ class PackageInfo(BBAStruct):
 
 
 @dataclass(frozen=True)
-class ChipExtraData(BBAStruct):
-    context: int
-    belCount: int
+class CellPort(BBAStruct):
+    bel: IdString
+    port: IdString
+
+    def serialise(self, context: str, bba: BBAWriter):
+        bba.u32(self.bel.index)
+        bba.u32(self.port.index)
 
     def serialise_lists(self, context: str, bba: BBAWriter):
         pass
 
+
+@dataclass
+class PackingRule(BBAStruct):
+    root: CellPort
+    target: CellPort
+    width: int
+    rel_x: int
+    rel_y: int
+    rel_z: int
+    flag: int
+
+    def serialise(self, context: str, bba: BBAWriter):
+        self.root.serialise(context, bba)
+        self.target.serialise(context, bba)
+        bba.u32(self.width)
+        bba.u32(self.rel_x)
+        bba.u32(self.rel_y)
+        bba.u32(self.rel_z)
+        bba.u32(self.flag)
+
+
+@dataclass
+class ChipExtraData(BBAStruct):
+    context: int = 1
+    belCount: int = 0
+    packingRules: list[PackingRule] = field(default_factory=list)
+
+    def serialise_lists(self, context: str, bba: BBAWriter):
+        bba.label(f"{context}_packing_rules")
+        for i, rule in enumerate(self.packingRules):
+            rule.serialise(f"{context}_rule{i}", bba)
+
+
     def serialise(self, context: str, bba: BBAWriter):
         bba.u32(self.context)
         bba.u32(self.belCount)
+        bba.slice(f"{context}_packing_rules", len(self.packingRules))
 
 
 class Chip:
@@ -234,7 +272,7 @@ class Chip:
         self.tile_shapes = []
         self.tile_shapes_idx = dict()
         self.packages = []
-        self.extra_data = None
+        self.extra_data = ChipExtraData()
         self.timing = TimingPool(self.strs)
         self.gfx_wire_ids = dict()
 
@@ -249,9 +287,7 @@ class Chip:
         return self.tiles[y][x]
 
     def tile_type_at(self, x: int, y: int) -> TileType:
-        assert (
-            self.tiles[y][x].type_idx is not None
-        ), f"tile type at ({x}, {y}) must be set"
+        assert self.tiles[y][x].type_idx is not None, f"tile type at ({x}, {y}) must be set"
         return self.tile_types[self.tiles[y][x].type_idx]
 
     def set_speed_grades(self, speed_grades: list):
@@ -278,9 +314,7 @@ class Chip:
             else:
                 wire_id = w.wire if w.wire is IdString else self.strs.id(w.wire)
                 if wire_id not in self.tile_type_at(w.x, w.y)._wire2idx:
-                    raise ValueError(
-                        f"Wire {w.wire} not found in tile type {self.tile_type_at(w.x, w.y).name}"
-                    )
+                    raise ValueError(f"Wire {w.wire} not found in tile type {self.tile_type_at(w.x, w.y).name}")
                 wire_index = self.tile_type_at(w.x, w.y)._wire2idx[wire_id]
             shape.wires += [w.x - x0, w.y - y0, wire_index]
         # deduplicate node shapes
@@ -302,9 +336,9 @@ class Chip:
             if i == 0:
                 # root of the node. we don't need to back-reference anything because the node is based here
                 # so we re-use the structure to store the index of the node shape, instead
-                assert (
-                    inst.shape.wire_to_node[3 * wire_idx + 0] == MODE.MODE_TILE_WIRE
-                ), f"attempting to add wire {w} to multiple nodes!"
+                assert inst.shape.wire_to_node[3 * wire_idx + 0] == MODE.MODE_TILE_WIRE, (
+                    f"attempting to add wire {w} to multiple nodes!"
+                )
                 inst.shape.wire_to_node[3 * wire_idx + 0] = MODE.MODE_IS_ROOT
                 inst.shape.wire_to_node[3 * wire_idx + 1] = _twos(shape_idx & 0xFFFF)
                 inst.shape.wire_to_node[3 * wire_idx + 2] = (shape_idx >> 16) & 0xFFFF
@@ -312,12 +346,10 @@ class Chip:
                 # back-reference to the root of the node
                 dx = x0 - w.x
                 dy = y0 - w.y
-                assert (
-                    dx < MODE.MODE_TILE_WIRE
-                ), "dx range causes overlap with magic values!"
-                assert (
-                    inst.shape.wire_to_node[3 * wire_idx + 0] == MODE.MODE_TILE_WIRE
-                ), f"attempting to add wire {w} to multiple nodes!"
+                assert dx < MODE.MODE_TILE_WIRE, "dx range causes overlap with magic values!"
+                assert inst.shape.wire_to_node[3 * wire_idx + 0] == MODE.MODE_TILE_WIRE, (
+                    f"attempting to add wire {w} to multiple nodes!"
+                )
                 inst.shape.wire_to_node[3 * wire_idx + 0] = dx
                 inst.shape.wire_to_node[3 * wire_idx + 1] = dy
                 inst.shape.wire_to_node[3 * wire_idx + 2] = shape.wires[0 * 3 + 2]
@@ -440,20 +472,6 @@ class Chip:
         self.extra_data = ChipExtraData
 
     def get_tile_type(self, tileX, tileY: int):
-        """Get the tile type of the specified tile.
-
-        Parameters
-        ----------
-        tileX : int
-            X coordinate of the tile
-        tileY : int
-            Y coordinate of the tile
-
-        Returns
-        -------
-        TileType
-            Tile type of the specified tile
-        """
         # Validate coordinates
         if tileX < 0 or tileX >= self.width or tileY < 0 or tileY >= self.height:
             logger.error(f"Invalid tile coordinates: ({tileX}, {tileY})")
@@ -538,9 +556,39 @@ class Chip:
                             w.append((tileX + dx, tileY + dy, self.strs[wireName]))
                             break
                     else:
-                        logger.error(
-                            f"Wire index {wireIndex} not found in tile type {tileType.name}"
-                        )
+                        logger.error(f"Wire index {wireIndex} not found in tile type {tileType.name}")
                 nodeWires.append(w)
 
         return nodeWires
+
+    def add_packing_rule(
+        self,
+        root_bel: str,
+        root_port: str,
+        target_bel: str,
+        target_port: str,
+        width: int,
+        rel_x: int,
+        rel_y: int,
+        rel_z: int,
+        abs_z: bool = False,
+    ):
+        """Add a packing rule to the chip database."""
+        rule = PackingRule(
+            root=CellPort(
+                bel=self.strs.id(root_bel),
+                port=self.strs.id(root_port),
+            ),
+            target=CellPort(
+                bel=self.strs.id(target_bel),
+                port=self.strs.id(target_port),
+            ),
+            width=width,
+            rel_x=rel_x,
+            rel_y=rel_y,
+            rel_z=rel_z,
+            flag= 0x01 if abs_z else 0x00,
+        )
+        if rule not in self.extra_data.packingRules:
+            logger.info(f"Adding packing rule: {root_bel}:{root_port} -> {target_bel}:{target_port} (z={rel_z}, flag={rule.flag})")
+            self.extra_data.packingRules.append(rule)

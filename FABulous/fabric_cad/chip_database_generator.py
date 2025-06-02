@@ -1,11 +1,11 @@
 from itertools import islice
 from pathlib import Path
 from subprocess import run
-from typing import Mapping, cast
+from typing import cast
 
 from loguru import logger
 
-from FABulous.fabric_cad.chip_database.chip import Chip, ChipExtraData
+from FABulous.fabric_cad.chip_database.chip import Chip
 from FABulous.fabric_cad.chip_database.database_bel import TileExtraData
 from FABulous.fabric_cad.chip_database.database_tile import TileType
 from FABulous.fabric_cad.chip_database.database_timing import TimingValue
@@ -42,9 +42,7 @@ def genSwitchMatrix(tile: Tile, subTile: str, tileType: TileType, context=1):
             if p.terminal and p.ioDirection == IO.OUTPUT:
                 for wtc in range(tile.getWireType(p).spanning):
                     for pName in p.expand():
-                        tileType.create_wire(
-                            f"c{c}.{pName}_{wtc}", "src", z=zIn, flags=c + 1
-                        )
+                        tileType.create_wire(f"c{c}.{pName}_{wtc}", "src", z=zIn, flags=c + 1)
             else:
                 for pName in p.expand():
                     tileType.create_wire(f"c{c}.{pName}", "src", z=zIn, flags=c + 1)
@@ -53,25 +51,17 @@ def genSwitchMatrix(tile: Tile, subTile: str, tileType: TileType, context=1):
             if p.terminal:
                 for wtc in range(tile.getWireType(p).spanning):
                     for pName in p.expand():
-                        tileType.create_wire(
-                            f"c{c}.{pName}_internal_{wtc}", "dst", z=zOut, flags=c + 1
-                        )
-                        tileType.create_wire(
-                            f"c{c}.{pName}_{wtc}", "dst", z=zOut, flags=c + 1
-                        )
+                        tileType.create_wire(f"c{c}.{pName}_internal_{wtc}", "dst", z=zOut, flags=c + 1)
+                        tileType.create_wire(f"c{c}.{pName}_{wtc}", "dst", z=zOut, flags=c + 1)
                         tileType.create_pip(
                             f"c{c}.{pName}_internal_{wtc}",
                             f"c{c}.{pName}_{wtc}",
                             timing_class="SWNEIGH",
                         )
-                        outputMapping[f"c{c}.{pName}_{wtc}"] = (
-                            f"c{c}.{pName}_internal_{wtc}"
-                        )
+                        outputMapping[f"c{c}.{pName}_{wtc}"] = f"c{c}.{pName}_internal_{wtc}"
             else:
                 for pName in p.expand():
-                    tileType.create_wire(
-                        f"c{c}.{pName}_internal", "dst", z=zOut, flags=c + 1
-                    )
+                    tileType.create_wire(f"c{c}.{pName}_internal", "dst", z=zOut, flags=c + 1)
                     tileType.create_wire(f"c{c}.{pName}", "dst", z=zOut, flags=c + 1)
                     tileType.create_pip(
                         f"c{c}.{pName}_internal",
@@ -89,9 +79,7 @@ def genSwitchMatrix(tile: Tile, subTile: str, tileType: TileType, context=1):
                     tileType.create_pip(
                         f"c{c}.{i}",
                         outTarget,
-                        flags=(
-                            NORMAL if "internal" not in outTarget else PSEUDO_PIP_START
-                        ),
+                        flags=(NORMAL if "internal" not in outTarget else PSEUDO_PIP_START),
                     )
     for c in range(context - 1):
         for i, p in enumerate(sorted(tile.getTileOutputPorts())):
@@ -113,9 +101,7 @@ def genSwitchMatrix(tile: Tile, subTile: str, tileType: TileType, context=1):
                 tileType.create_pip(
                     output,
                     f"{mux.output.name}_{c}_to_{c + 1}_NextCycle[{wc}]",
-                    flags=(
-                        PSEUDO_PIP_MID if "internal" not in output else PSEUDO_PIP_START
-                    ),
+                    flags=(PSEUDO_PIP_MID if "internal" not in output else PSEUDO_PIP_START),
                 )
                 tileType.create_pip(
                     f"{mux.output.name}_{c}_to_{c + 1}_NextCycle[{wc}]",
@@ -162,15 +148,11 @@ def genBel(t: Tile, tile: TileType, wireOnly: bool, context=1):
         for z, bel in enumerate(bels):
             for i in bel.externalInputs + bel.inputs:
                 for pName in i.expand():
-                    tile.create_wire(
-                        f"c{c}.{pName}", f"{bel.name}_{i.name}", flags=c + 1
-                    )
+                    tile.create_wire(f"c{c}.{pName}", f"{bel.name}_{i.name}", flags=c + 1)
 
             for i in bel.externalOutputs + bel.outputs:
                 for pName in i.expand():
-                    tile.create_wire(
-                        f"c{c}.{pName}", f"{bel.name}_{i.name}", flags=c + 1
-                    )
+                    tile.create_wire(f"c{c}.{pName}", f"{bel.name}_{i.name}", flags=c + 1)
 
             if wireOnly:
                 continue
@@ -231,9 +213,7 @@ def genBel(t: Tile, tile: TileType, wireOnly: bool, context=1):
                     )
 
             if bel.userCLK:
-                tile.create_wire(
-                    f"c{c}.{bel.prefix}{bel.name}_clk_i", "CLK", flags=c + 1
-                )
+                tile.create_wire(f"c{c}.{bel.prefix}{bel.name}_clk_i", "CLK", flags=c + 1)
                 tile.add_bel_pin(
                     belData,
                     bel.userCLK.name,
@@ -427,6 +407,60 @@ def generateConstrainPair(fabric: Fabric, dest: Path):
                 #     f.write(f"{bel.name}:{bel.userCLK.name.rep} 1 CLK_DRV:CLK_O 1 {TILE_CLK-bel.z} \n")
 
 
+def addPackingRule(chip: Chip, fabric: Fabric):
+    for t in fabric.tileDict.values():
+        for group, bels in t.belGroups.items():
+            for c, bel in enumerate(bels):
+                # for i in bel.inputs:
+                #     portDrivers = t.switchMatrix.getPortDrivers(i)
+                #     if all([isinstance(i, BelPort) for i in portDrivers]):
+                #         for d in portDrivers:
+                #             d = cast(BelPort, d)
+                #             tBel = t.getBelByBelPort(d)
+                #             if bel == tBel:
+                #                 continue
+                #             print(f"Adding packing rule for {bel.name}:{i.name} <= {tBel.name}:{d.name}")
+                #             assert i.width == d.width
+                #             chip.add_packing_rule(
+                #                 bel.name,
+                #                 i.name.removeprefix(bel.prefix),
+                #                 tBel.name,
+                #                 d.name.removeprefix(tBel.prefix),
+                #                 i.width,
+                #                 0,
+                #                 0,
+                #                 tBel.z - bel.z,
+                #                 c == 0,
+                #             )
+
+                for i in bel.outputs:
+                    portUsers = t.switchMatrix.getPortUsers(i)
+                    for u in portUsers:
+                        u = cast(BelPort, u)
+                        if not isinstance(u, BelPort):
+                            continue
+                        tBel = t.getBelByBelPort(u)
+                        if bel == tBel:
+                            continue
+                        if bel not in t.belGroups[group]:
+                            logger.info(f"{tBel.name} not in group {group}")
+                            continue
+                        assert i.width == u.width
+                        if bel.z < tBel.z:
+                            continue
+                        chip.add_packing_rule(
+                            bel.name,
+                            i.name.removeprefix(bel.prefix),
+                            tBel.name,
+                            u.name.removeprefix(tBel.prefix),
+                            i.width,
+                            0,
+                            0,
+                            bel.z - tBel.z,
+                            c == 0,
+                        )
+
+
 def generateChipDatabase(
     fabric: Fabric,
     filePath: Path,
@@ -452,8 +486,10 @@ def generateChipDatabase(
 
     genFabric(fabric, ch, context=fabric.contextCount)
     setPackage(ch, fabric)
+    addPackingRule(ch, fabric)
+    ch.extra_data.context = fabric.contextCount
+    ch.extra_data.belCount = fabric.getTotalBelCount()
 
-    ch.extra_data = ChipExtraData(fabric.contextCount, fabric.getTotalBelCount())
     logger.info(f"Context Count: {fabric.contextCount}")
     logger.info(
         f"Total BEL Count: {fabric.getTotalBelCount()}",
@@ -463,9 +499,7 @@ def generateChipDatabase(
 
     logger.info(f"Writing the chip database to {filePath / f'{fabric.name}.bba'}")
     ch.write_bba(str(filePath / f"{fabric.name}.bba"))
-    logger.info(
-        f"Writing Constant String IDs to {filePath / f'{fabric.name}_constids.inc'}"
-    )
+    logger.info(f"Writing Constant String IDs to {filePath / f'{fabric.name}_constids.inc'}")
 
     try:
         logger.info("Compiling the bba file to bit file")
@@ -483,10 +517,8 @@ def generateChipDatabase(
         logger.error("Failed to compile the bba file to bit file.")
         raise e
 
-    logger.info(
-        f"Writing the constrain pair file to {filePath / fabric.name}_constrain_pair.inc"
-    )
-    generateConstrainPair(fabric, filePath / f"{fabric.name}_constrain_pair.inc")
+    logger.info(f"Writing the constrain pair file to {filePath / fabric.name}_constrain_pair.inc")
+    # generateConstrainPair(fabric, filePath / f"{fabric.name}_constrain_pair.inc")
 
     if dotDir != Path():
         genRoutingResourceGraph(ch, dotDir, False, selectTile)

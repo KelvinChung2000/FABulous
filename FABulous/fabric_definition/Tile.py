@@ -35,7 +35,7 @@ class Tile:
 
     name: str
     ports: dict[str, list[TilePort]]
-    bels: list[Bel]
+    belGroups: dict[str, list[Bel]]
     switchMatrix: SwitchMatrix
     configMems: ConfigurationMemory
     tileMap: list[list[str]]
@@ -49,6 +49,11 @@ class Tile:
         if __o is None or not isinstance(__o, Tile):
             return False
         return self.name == __o.name
+
+    @property    
+    def bels(self):
+        """Retrieve all BELs in the tile."""
+        return [bel for group in self.belGroups.values() for bel in group]
 
     @property
     def configBits(self):
@@ -351,7 +356,7 @@ class Tile:
         # Add Bels
         lines.append("Bels:")
         for bel in self.bels:
-            lines.append(f"  {bel.name} (z={bel.z})")
+            lines.append(f"  {bel.prefix}{bel.name} (z={bel.z})")
 
         # Add Switch Matrix info
         lines.append(f"Switch Matrix: {self.switchMatrix}")

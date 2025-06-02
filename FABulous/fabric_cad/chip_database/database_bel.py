@@ -97,6 +97,7 @@ class BelData(BBAStruct):
         bba.label(f"{context}_pins")
         for i, pin in enumerate(self.pins):
             pin.serialise(f"{context}_pin{i}", bba)
+            
         # extra data (optional)
         if self.extra_data is not None:
             self.extra_data.serialise_lists(f"{context}_extra_data", bba)

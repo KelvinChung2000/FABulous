@@ -408,57 +408,71 @@ def generateConstrainPair(fabric: Fabric, dest: Path):
 
 
 def addPackingRule(chip: Chip, fabric: Fabric):
-    for t in fabric.tileDict.values():
-        for group, bels in t.belGroups.items():
-            for c, bel in enumerate(bels):
-                # for i in bel.inputs:
-                #     portDrivers = t.switchMatrix.getPortDrivers(i)
-                #     if all([isinstance(i, BelPort) for i in portDrivers]):
-                #         for d in portDrivers:
-                #             d = cast(BelPort, d)
-                #             tBel = t.getBelByBelPort(d)
-                #             if bel == tBel:
-                #                 continue
-                #             print(f"Adding packing rule for {bel.name}:{i.name} <= {tBel.name}:{d.name}")
-                #             assert i.width == d.width
-                #             chip.add_packing_rule(
-                #                 bel.name,
-                #                 i.name.removeprefix(bel.prefix),
-                #                 tBel.name,
-                #                 d.name.removeprefix(tBel.prefix),
-                #                 i.width,
-                #                 0,
-                #                 0,
-                #                 tBel.z - bel.z,
-                #                 c == 0,
-                #             )
+    for group, bels in fabric.getAllBelGroups():
+        for belIndex, userBel in enumerate(bels):
+            print(userBel.name)
+            for userPort in userBel.inputs:
+                for driverPort in fabric.getPortDrivers(userPort):
+                    if not isinstance(driverPort, BelPort):
+                        continue
 
-                for i in bel.outputs:
-                    portUsers = t.switchMatrix.getPortUsers(i)
-                    for u in portUsers:
-                        u = cast(BelPort, u)
-                        if not isinstance(u, BelPort):
-                            continue
-                        tBel = t.getBelByBelPort(u)
-                        if bel == tBel:
-                            continue
-                        if bel not in t.belGroups[group]:
-                            logger.info(f"{tBel.name} not in group {group}")
-                            continue
-                        assert i.width == u.width
-                        if bel.z < tBel.z:
-                            continue
-                        chip.add_packing_rule(
-                            bel.name,
-                            i.name.removeprefix(bel.prefix),
-                            tBel.name,
-                            u.name.removeprefix(tBel.prefix),
-                            i.width,
-                            0,
-                            0,
-                            bel.z - tBel.z,
-                            c == 0,
-                        )
+                    driverPort = cast(BelPort, driverPort)
+                    driverBel = fabric.getBelByBelPort(driverPort)
+
+                    if userBel == driverBel:
+                        continue
+
+                    if driverBel not in bels:
+                        continue
+
+                    assert userPort.width == driverPort.width
+
+                    if userBel.z > driverBel.z:
+                        continue
+
+                    chip.add_packing_rule(
+                        driver_bel=driverBel.name,
+                        driver_port=driverPort.name.removeprefix(driverBel.prefix),
+                        user_bel=userBel.name,
+                        user_port=userPort.name.removeprefix(userBel.prefix),
+                        base_z=userBel.z,
+                        width=userPort.width,
+                        rel_x=0,
+                        rel_y=0,
+                        rel_z=driverBel.z - userBel.z,
+                        base_rule=belIndex == 0,
+                    )
+
+                # print(f"Current BEL: {bel.prefix}{bel.name}")
+                # for i in bel.outputs:
+                #     portUsers = t.switchMatrix.getPortUsers(i)
+                #     for u in portUsers:
+                #         u = cast(BelPort, u)
+                #         if not isinstance(u, BelPort):
+                #             continue
+                #         tBel = t.getBelByBelPort(u)
+                #         print(f"{tBel.prefix}{tBel.name}")
+                #         if bel == tBel:
+                #             continue
+                #         if bel not in t.belGroups[group]:
+                #             logger.info(f"{tBel.name} not in group {group}")
+                #             continue
+                #         assert i.width == u.width
+                #         if bel.z > tBel.z:
+                #             continue
+
+                #         print(f"Adding packing rule for {bel.name}:{i.name}({bel.z}) <= {tBel.name}:{u.name}({tBel.z})")
+                #         chip.add_packing_rule(
+                #             bel.name,
+                #             i.name.removeprefix(bel.prefix),
+                #             tBel.name,
+                #             u.name.removeprefix(tBel.prefix),
+                #             i.width,
+                #             0,
+                #             0,
+                #             tBel.z - bel.z,
+                #             c == 0,
+                #         )
 
 
 def generateChipDatabase(

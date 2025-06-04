@@ -25,13 +25,19 @@ class MuxList(E_Mem_ports):
         self.A_write_data //= [self.E_Mem_top_in3, self.E_Mem_bot_in3]
         self.A_write_en //= [self.E_Mem_top_pred_in3, self.E_Mem_bot_pred_in3]
         self.A_reset //= [self.E_Mem_top_pred_in3, self.E_Mem_bot_pred_in3]
-        self.E_Mem_bot_out3 //= self.A_read_data
-        self.E_Mem_top_out3 //= self.A_read_data
 
         self.B_addr0 //= [self.E_Mem_top_in3, self.E_Mem_bot_in3]
         self.B_write_data //= [self.E_Mem_top_in3, self.E_Mem_bot_in3]
         self.B_write_en //= [self.E_Mem_top_pred_in3, self.E_Mem_bot_pred_in3]
         self.B_reset //= [self.E_Mem_top_pred_in3, self.E_Mem_bot_pred_in3]
-        self.E_Mem_bot_out3 //= self.B_read_data
-        self.E_Mem_top_out3 //= self.B_read_data
+        
+        self.E_Mem_bot_out3 //= [self.A_read_data, self.B_read_data]
+        self.E_Mem_top_out3 //= [self.A_read_data, self.B_read_data]
 
+        self.E_Mem_top_out3 //= self.reg_out
+        self.E_Mem_bot_out3 //= self.reg_out
+
+        self.reg_in //= [self.A_read_data, self.B_read_data]
+        self.en //= [self.E_Mem_top_pred_in3, self.E_Mem_bot_pred_in3]
+        self.rst //= [self.E_Mem_top_pred_in3, self.E_Mem_bot_pred_in3]
+        

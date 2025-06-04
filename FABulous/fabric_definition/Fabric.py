@@ -4,11 +4,14 @@ from pathlib import Path
 from typing import Any, Generator, Iterable
 
 from FABulous.fabric_definition.Bel import Bel
+from FABulous.fabric_definition.Port import BelPort, GenericPort
 from FABulous.fabric_definition.define import ConfigBitMode, Loc, MultiplexerStyle
 from FABulous.fabric_definition.SuperTile import SuperTile
 from FABulous.fabric_definition.Tile import Tile
 from FABulous.fabric_definition.Wire import Wire
 
+
+GroupName = str
 
 @dataclass
 class Fabric:
@@ -178,6 +181,36 @@ class Fabric:
             for x, tile in enumerate(row):
                 loc = (x, self.height - y - 1)
                 yield (loc, tile)
+
+    def getAllBelGroups(self) -> Iterable[tuple[GroupName, list[Bel]]]:
+        """Get all unique Bel groups in the fabric."""
+        belGroups = []
+        for tile in self.tileDict.values():
+            for g in tile.belGroups.items():
+                belGroups.append(g)
+        return belGroups
+    
+    def getPortDrivers(self, p: GenericPort) -> list[GenericPort]:
+        for tile in self.tileDict.values():
+            if tile.isPortInTile(p):
+                return tile.switchMatrix.getPortDrivers(p)
+        raise ValueError(f"Port {p} not found in any tile")
+    
+    def getPortUsers(self, p: GenericPort) -> list[GenericPort]:
+        """Get all users of the given port in the fabric."""
+        for tile in self.tileDict.values():
+            if tile.isPortInTile(p):
+                return tile.switchMatrix.getPortUsers(p)
+        raise ValueError(f"Port {p} not found in any tile")
+
+
+    def getBelByBelPort(self, p: BelPort) -> Bel:
+        """Get the Bel that contains the given BelPort."""
+        for tile in self.tileDict.values():
+            if tile.isPortInTile(p):
+                return tile.getBelByBelPort(p)
+        raise ValueError(f"BelPort {p} not found in any tile")
+
 
     # def getFlattenFabric(self) -> Generator[tuple[Loc, Tile | None], None, None]:
     #     for y, row in enumerate(self.tiles):

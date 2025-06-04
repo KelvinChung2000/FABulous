@@ -75,7 +75,6 @@ def generateBitsStreamSpec(fabric: Fabric) -> FeatureMap:
                     multiBitIndex = tuple(
                         [next(indexCounter) for _ in range(mux.configBits)]
                     )
-                    print(tile)
                     for i, input in enumerate(reversed(inputNames)):
                         for w in range(mux.width):
                             featureToBitString[

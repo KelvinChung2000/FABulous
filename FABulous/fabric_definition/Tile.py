@@ -6,7 +6,7 @@ from typing import Any, Iterable, cast
 from FABulous.fabric_definition.Bel import Bel
 from FABulous.fabric_definition.ConfigMem import ConfigurationMemory
 from FABulous.fabric_definition.define import IO, Loc, Side
-from FABulous.fabric_definition.Port import BelPort, SharedPort, TilePort
+from FABulous.fabric_definition.Port import BelPort, GenericPort, SharedPort, TilePort
 from FABulous.fabric_definition.SwitchMatrix import SwitchMatrix
 from FABulous.fabric_definition.Wire import WireType
 
@@ -264,6 +264,16 @@ class Tile:
             raise ValueError(
                 f"The given port {port} does not exist in tile {self.name}"
             )
+
+    def isPortInTile(self, port: GenericPort) -> bool:
+        for portList in self.ports.values():
+            if port in portList:
+                return True
+            
+        for bel in self.bels:
+            if port in bel.inputs or port in bel.outputs:
+                return True
+        return False
 
     def findPortByName(self, portName: str) -> TilePort | BelPort:
         for portList in self.ports.values():

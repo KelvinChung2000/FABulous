@@ -221,18 +221,20 @@ class CellPort(BBAStruct):
 
 @dataclass
 class PackingRule(BBAStruct):
-    root: CellPort
-    target: CellPort
+    driver: CellPort
+    user: CellPort
     width: int
+    base_z: int
     rel_x: int
     rel_y: int
     rel_z: int
     flag: int
 
     def serialise(self, context: str, bba: BBAWriter):
-        self.root.serialise(context, bba)
-        self.target.serialise(context, bba)
+        self.driver.serialise(context, bba)
+        self.user.serialise(context, bba)
         bba.u32(self.width)
+        bba.u32(self.base_z)
         bba.u32(self.rel_x)
         bba.u32(self.rel_y)
         bba.u32(self.rel_z)
@@ -249,7 +251,6 @@ class ChipExtraData(BBAStruct):
         bba.label(f"{context}_packing_rules")
         for i, rule in enumerate(self.packingRules):
             rule.serialise(f"{context}_rule{i}", bba)
-
 
     def serialise(self, context: str, bba: BBAWriter):
         bba.u32(self.context)
@@ -563,32 +564,36 @@ class Chip:
 
     def add_packing_rule(
         self,
-        root_bel: str,
-        root_port: str,
-        target_bel: str,
-        target_port: str,
+        driver_bel: str,
+        driver_port: str,
+        user_bel: str,
+        user_port: str,
+        base_z: int,
         width: int,
         rel_x: int,
         rel_y: int,
         rel_z: int,
-        abs_z: bool = False,
+        base_rule: bool = False,
     ):
         """Add a packing rule to the chip database."""
         rule = PackingRule(
-            root=CellPort(
-                bel=self.strs.id(root_bel),
-                port=self.strs.id(root_port),
+            driver=CellPort(
+                bel=self.strs.id(driver_bel),
+                port=self.strs.id(driver_port),
             ),
-            target=CellPort(
-                bel=self.strs.id(target_bel),
-                port=self.strs.id(target_port),
+            user=CellPort(
+                bel=self.strs.id(user_bel),
+                port=self.strs.id(user_port),
             ),
             width=width,
+            base_z=base_z,
             rel_x=rel_x,
             rel_y=rel_y,
             rel_z=rel_z,
-            flag= 0x01 if abs_z else 0x00,
+            flag=0x01 if base_rule else 0x00,
         )
         if rule not in self.extra_data.packingRules:
-            logger.info(f"Adding packing rule: {root_bel}:{root_port} -> {target_bel}:{target_port} (z={rel_z}, flag={rule.flag})")
+            logger.info(
+                f"Adding packing rule: driver={driver_bel}:{driver_port} user={user_bel}:{user_port} (z={rel_z}, flag={rule.flag})"
+            )
             self.extra_data.packingRules.append(rule)

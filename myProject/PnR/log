@@ -45,293 +45,90 @@ Info: 	                 Mem:       1/      4    25%
 Info: Trying placer heap with seed:3549216002486605715 
 Info: Placed 0 cells based on constraints.
 Info: Seed placement strategy: graph_grid with sparseness heuristic (simplified)
-Info: Cell '$extract$\logic_op_conf_3$329' has 1 unique ports with 3 neighbors, denominator for out-degree: 3
-Info: Cell '$extract$\logic_op_conf_3$328' has 3 unique ports with 5 neighbors, denominator for out-degree: 5
-Info: Cell '$extract$\ALU_ALU_func_6$312' has 4 unique ports with 4 neighbors, denominator for out-degree: 4
-Info: Cell '$extract$\logic_op_conf_0$324' has 1 unique ports with 3 neighbors, denominator for out-degree: 3
-Info: Cell '$extract$\logic_op_conf_0$323' has 1 unique ports with 3 neighbors, denominator for out-degree: 3
-Info: Cell '$iopadmap$main.in0' has 8 unique ports with 4 neighbors, denominator for out-degree: 4
-Info: Cell '$iopadmap$main.in1' has 32 unique ports with 4 neighbors, denominator for out-degree: 4
-Info: Cell '$iopadmap$main.reset' has 3 unique ports with 7 neighbors, denominator for out-degree: 7
-Info: Cell '$extract$\reg_unit_tide_en_0_tide_rst_1$298' has 32 unique ports with 4 neighbors, denominator for out-degree: 4
-Info: Cell '$extract$\reg_unit_WIDTH_1_tide_en_1_tide_rst_0$297' has 5 unique ports with 11 neighbors, denominator for out-degree: 11
-Info: Cell '$extract$\ALU_ALU_func_0$309' has 32 unique ports with 4 neighbors, denominator for out-degree: 4
-Info: Cell '$extract$\ALU_ALU_func_0$308' has 32 unique ports with 4 neighbors, denominator for out-degree: 4
-Info: Candidate: $extract$\reg_unit_tide_en_0_tide_rst_1$298 (out-degree: 8, constraint children: 1, bel score: 0, is I/O: 0, is neighbor of placed: 0)
-Info: Candidate: $extract$\ALU_ALU_func_0$309 (out-degree: 8, constraint children: 1, bel score: 0, is I/O: 0, is neighbor of placed: 0)
-Info: Candidate: $extract$\ALU_ALU_func_0$308 (out-degree: 8, constraint children: 1, bel score: 0, is I/O: 0, is neighbor of placed: 0)
-Info: Candidate: $extract$\reg_unit_WIDTH_1_tide_en_1_tide_rst_0$297 (out-degree: 0, constraint children: 1, bel score: 0, is I/O: 0, is neighbor of placed: 0)
-Info: Candidate: $iopadmap$main.in1 (out-degree: 8, constraint children: 0, bel score: 0, is I/O: 1, is neighbor of placed: 0)
-Info: Candidate: $iopadmap$main.in0 (out-degree: 2, constraint children: 0, bel score: 0, is I/O: 1, is neighbor of placed: 0)
-Info: Candidate: $extract$\ALU_ALU_func_6$312 (out-degree: 1, constraint children: 0, bel score: 0, is I/O: 0, is neighbor of placed: 0)
-Info: Candidate: $iopadmap$main.go (out-degree: 0, constraint children: 0, bel score: 0, is I/O: 1, is neighbor of placed: 0)
-Info: Candidate: $iopadmap$main.reset (out-degree: 0, constraint children: 0, bel score: 0, is I/O: 1, is neighbor of placed: 0)
-Info: Candidate: $iopadmap$main.done (out-degree: 0, constraint children: 0, bel score: 0, is I/O: 1, is neighbor of placed: 0)
-Info: Candidate: $iopadmap$main.clk (out-degree: 0, constraint children: 0, bel score: 0, is I/O: 1, is neighbor of placed: 0)
-Info: Candidate: $extract$\logic_op_conf_3$329 (out-degree: 0, constraint children: 0, bel score: 0, is I/O: 0, is neighbor of placed: 0)
-Info: Candidate: $extract$\logic_op_conf_3$328 (out-degree: 0, constraint children: 0, bel score: 0, is I/O: 0, is neighbor of placed: 0)
-Info: Candidate: $extract$\logic_op_conf_0$324 (out-degree: 0, constraint children: 0, bel score: 0, is I/O: 0, is neighbor of placed: 0)
-Info: Candidate: $extract$\logic_op_conf_0$323 (out-degree: 0, constraint children: 0, bel score: 0, is I/O: 0, is neighbor of placed: 0)
-Info: Current Best: Cell $extract$\reg_unit_tide_en_0_tide_rst_1$298, BEL X2Y2/c0.RES_reg_unit, score -8, distance 0, sparseness 8, pip_hop 0
 
-Info: Current Best: Cell $extract$\ALU_ALU_func_0$309, BEL X2Y2/c0.ALU, score -8, distance 0, sparseness 8, pip_hop 0
-
-Info: Current Best: Cell $extract$\ALU_ALU_func_0$308, BEL X1Y1/c0.ALU, score -5, distance 2, sparseness 7, pip_hop 0
-
-Info: Current Best: Cell $extract$\ALU_ALU_func_0$308, BEL X1Y2/c0.ALU, score -6, distance 1, sparseness 7, pip_hop 0
-
-Info: Current Best: Cell $extract$\reg_unit_WIDTH_1_tide_en_1_tide_rst_0$297, BEL X2Y2/c0.RES_pred_reg_unit_WIDTH_1, score -6, distance 1, sparseness 7, pip_hop 1
-
-Info: Current Best: Cell $iopadmap$main.in1, BEL X0Y1/c0.W_IO, score 153, distance 160, sparseness 7, pip_hop 160
-
-Info: Current Best: Cell $iopadmap$main.in1, BEL X0Y2/c0.W_IO, score 89, distance 96, sparseness 7, pip_hop 96
-
-Info: Current Best: Cell $iopadmap$main.in0, BEL X0Y1/c0.W_IO, score 22, distance 28, sparseness 6, pip_hop 28
-
-Info: Current Best: Cell $iopadmap$main.in0, BEL X1Y0/c0.S_IO, score 20, distance 28, sparseness 8, pip_hop 28
-
-Info: Current Best: Cell $iopadmap$main.in0, BEL X2Y0/c0.S_IO, score 12, distance 20, sparseness 8, pip_hop 20
-
-Info: Current Best: Cell $extract$\ALU_ALU_func_6$312, BEL X1Y1/c0.ALU, score 366, distance 370, sparseness 4, pip_hop 370
-
-Info: Current Best: Cell $extract$\ALU_ALU_func_6$312, BEL X2Y1/c0.ALU, score 217, distance 222, sparseness 5, pip_hop 222
-
-Info: Current Best: Cell $iopadmap$main.go, BEL X0Y1/c0.W_pred_IO_WIDTH_1, score -3, distance 3, sparseness 6, pip_hop 0
-
-Info: Current Best: Cell $iopadmap$main.go, BEL X0Y2/c0.W_pred_IO_WIDTH_1, score -5, distance 2, sparseness 7, pip_hop 0
-
-Info: Current Best: Cell $iopadmap$main.reset, BEL X0Y1/c0.W_pred_IO_WIDTH_1, score 1, distance 7, sparseness 6, pip_hop 7
-
-Info: Current Best: Cell $iopadmap$main.reset, BEL X2Y0/c0.S_pred_IO_WIDTH_1, score -2, distance 5, sparseness 7, pip_hop 5
-
-Info: Current Best: Cell $iopadmap$main.done, BEL X0Y1/c0.W_pred_IO_WIDTH_1, score -3, distance 3, sparseness 6, pip_hop 0
-
-Info: Current Best: Cell $iopadmap$main.done, BEL X0Y4/c0.W_pred_IO_WIDTH_1, score -4, distance 4, sparseness 8, pip_hop 0
-
-Info: Current Best: Cell $iopadmap$main.clk, BEL X0Y1/c0.W_pred_IO_WIDTH_1, score -3, distance 3, sparseness 6, pip_hop 0
-
-Info: Current Best: Cell $iopadmap$main.clk, BEL X4Y0/c0.S_pred_IO_WIDTH_1, score -4, distance 4, sparseness 8, pip_hop 0
-
-Info: Current Best: Cell $extract$\logic_op_conf_3$329, BEL X2Y2/c0.l_logic_op, score 4, distance 10, sparseness 6, pip_hop 10
-
-Info: Current Best: Cell $extract$\logic_op_conf_3$328, BEL X1Y3/c0.l_logic_op, score 11, distance 15, sparseness 4, pip_hop 15
-
-Info: Current Best: Cell $extract$\logic_op_conf_3$328, BEL X1Y4/c0.l_logic_op, score 10, distance 17, sparseness 7, pip_hop 17
-
-Info: Current Best: Cell $extract$\logic_op_conf_0$324, BEL X1Y1/c0.l_logic_op, score 21, distance 24, sparseness 3, pip_hop 24
-
-Info: Current Best: Cell $extract$\logic_op_conf_0$324, BEL X1Y2/c0.l_logic_op, score 11, distance 16, sparseness 5, pip_hop 16
-
-Info: Current Best: Cell $extract$\logic_op_conf_0$323, BEL X1Y1/c0.l_logic_op, score 13, distance 16, sparseness 3, pip_hop 16
-
-Info: Current Best: Cell $extract$\logic_op_conf_0$323, BEL X2Y1/c0.l_logic_op, score 11, distance 16, sparseness 5, pip_hop 16
-
-Info: Current Best: Cell $extract$\logic_op_conf_0$323, BEL X3Y2/c0.l_logic_op, score 10, distance 16, sparseness 6, pip_hop 16
-
-Info: Creating initial analytic placement for 9 cells, placement wirelen = 156.
-Info:     at initial placer iter 0, wirelen = 51
-Info:     at initial placer iter 1, wirelen = 50
-Info:     at initial placer iter 2, wirelen = 51
-Info:     at initial placer iter 3, wirelen = 50
+Info: Creating initial analytic placement for 9 cells, placement wirelen = 189.
+Info:     at initial placer iter 0, wirelen = 38
+Info:     at initial placer iter 1, wirelen = 37
+Info:     at initial placer iter 2, wirelen = 37
+Info:     at initial placer iter 3, wirelen = 37
 Info: Running main analytical placer, max placement attempts per cell = 10000.
-Info:     at iteration #1, type reg_unit: wirelen solved = 120, spread = 120, legal = 403; time = 0.00s
+Info:     at iteration #1, type reg_unit_WIDTH_1: wirelen solved = 37, spread = 37, legal = 49; time = 0.00s
+Info:     at iteration #1, type reg_unit: wirelen solved = 49, spread = 49, legal = 398; time = 0.00s
+Info:       tring binding $extract$\ALU_ALU_func_6$312 to X2Y2/c0.ALU
+Info:     at iteration #1, type ALU: wirelen solved = 398, spread = 366, legal = 498; time = 0.00s
+Info:       tring binding $extract$\logic_op_conf_3$329 to X1Y1/c0.l_logic_op
+Info:       tring binding $extract$\logic_op_conf_0$324 to X2Y3/c0.l_logic_op
+Info:     at iteration #1, type logic_op: wirelen solved = 497, spread = 502, legal = 502; time = 0.00s
+Info:       tring binding $extract$\logic_op_conf_3$329 to X1Y3/c0.l_logic_op
 Info:       tring binding $extract$\ALU_ALU_func_6$312 to X2Y1/c0.ALU
-Info:     at iteration #1, type ALU: wirelen solved = 356, spread = 388, legal = 393; time = 0.00s
-Info:     at iteration #1, type reg_unit_WIDTH_1: wirelen solved = 393, spread = 393, legal = 394; time = 0.01s
-Info:       tring binding $extract$\logic_op_conf_3$329 to X3Y1/c0.l_logic_op
-Info:       tring binding $extract$\logic_op_conf_0$324 to X3Y3/c0.l_logic_op
-Info:     at iteration #1, type logic_op: wirelen solved = 391, spread = 399, legal = 399; time = 0.00s
-Info:       tring binding $extract$\ALU_ALU_func_6$312 to X1Y1/c0.ALU
-Info:       tring binding $extract$\logic_op_conf_3$329 to X2Y1/c0.l_logic_op
-Info:       tring binding $extract$\logic_op_conf_0$324 to X2Y4/c0.l_logic_op
-Info:     at iteration #1, type ALL: wirelen solved = 84, spread = 354, legal = 534; time = 0.00s
-Info:     at iteration #2, type reg_unit: wirelen solved = 193, spread = 193, legal = 416; time = 0.01s
-Info:       tring binding $extract$\ALU_ALU_func_6$312 to X1Y1/c0.ALU
-Info:     at iteration #2, type ALU: wirelen solved = 408, spread = 408, legal = 448; time = 0.01s
-Info:     at iteration #2, type reg_unit_WIDTH_1: wirelen solved = 445, spread = 445, legal = 445; time = 0.01s
-Info:       tring binding $extract$\logic_op_conf_3$329 to X2Y1/c0.l_logic_op
 Info:       tring binding $extract$\logic_op_conf_0$324 to X2Y3/c0.l_logic_op
-Info:     at iteration #2, type logic_op: wirelen solved = 441, spread = 444, legal = 444; time = 0.00s
-Info:       tring binding $extract$\ALU_ALU_func_6$312 to X1Y1/c0.ALU
-Info:       tring binding $extract$\logic_op_conf_3$329 to X2Y1/c0.l_logic_op
-Info:       tring binding $extract$\logic_op_conf_0$324 to X2Y3/c0.l_logic_op
-Info:     at iteration #2, type ALL: wirelen solved = 52, spread = 351, legal = 532; time = 0.00s
-Info:     at iteration #3, type reg_unit: wirelen solved = 188, spread = 188, legal = 532; time = 0.00s
-Info:       tring binding $extract$\ALU_ALU_func_6$312 to X4Y1/c0.ALU
-Info:     at iteration #3, type ALU: wirelen solved = 363, spread = 395, legal = 426; time = 0.00s
+Info:     at iteration #1, type ALL: wirelen solved = 5, spread = 356, legal = 440; time = 0.00s
+Info:     at iteration #2, type reg_unit_WIDTH_1: wirelen solved = 441, spread = 441, legal = 441; time = 0.00s
+Info:     at iteration #2, type reg_unit: wirelen solved = 230, spread = 230, legal = 441; time = 0.00s
+Info:       tring binding $extract$\ALU_ALU_func_6$312 to X2Y3/c0.ALU
+Info:     at iteration #2, type ALU: wirelen solved = 442, spread = 502, legal = 469; time = 0.00s
 Info:       tring binding $extract$\logic_op_conf_3$329 to X1Y2/c0.l_logic_op
-Info:     at iteration #3, type reg_unit_WIDTH_1: wirelen solved = 425, spread = 425, legal = 426; time = 0.01s
-Info:       tring binding $extract$\logic_op_conf_3$329 to X3Y1/c0.l_logic_op
-Info:       tring binding $extract$\logic_op_conf_0$324 to X1Y1/c0.l_logic_op
-Info:     at iteration #3, type logic_op: wirelen solved = 418, spread = 428, legal = 428; time = 0.00s
-Info:       tring binding $extract$\ALU_ALU_func_6$312 to X1Y2/c0.ALU
-Info:       tring binding $extract$\logic_op_conf_3$329 to X2Y1/c0.l_logic_op
-Info:       tring binding $extract$\logic_op_conf_0$324 to X2Y4/c0.l_logic_op
-Info:     at iteration #3, type ALL: wirelen solved = 52, spread = 192, legal = 445; time = 0.00s
-Info:     at iteration #4, type reg_unit: wirelen solved = 162, spread = 162, legal = 445; time = 0.00s
-Info:       tring binding $extract$\ALU_ALU_func_6$312 to X2Y2/c0.ALU
-Info:     at iteration #4, type ALU: wirelen solved = 366, spread = 398, legal = 441; time = 0.00s
-Info:     at iteration #4, type reg_unit_WIDTH_1: wirelen solved = 440, spread = 440, legal = 441; time = 0.00s
-Info:       tring binding $extract$\logic_op_conf_3$329 to X3Y1/c0.l_logic_op
-Info:       tring binding $extract$\logic_op_conf_0$324 to X1Y1/c0.l_logic_op
-Info:     at iteration #4, type logic_op: wirelen solved = 433, spread = 440, legal = 440; time = 0.00s
-Info:       tring binding $extract$\ALU_ALU_func_6$312 to X2Y2/c0.ALU
-Info:       tring binding $extract$\logic_op_conf_3$329 to X2Y1/c0.l_logic_op
-Info:       tring binding $extract$\logic_op_conf_0$324 to X2Y4/c0.l_logic_op
-Info:     at iteration #4, type ALL: wirelen solved = 52, spread = 192, legal = 535; time = 0.00s
-Info:     at iteration #5, type reg_unit: wirelen solved = 131, spread = 131, legal = 535; time = 0.01s
-Info:       tring binding $extract$\ALU_ALU_func_6$312 to X2Y2/c0.ALU
-Info:     at iteration #5, type ALU: wirelen solved = 407, spread = 407, legal = 439; time = 0.00s
-Info:     at iteration #5, type reg_unit_WIDTH_1: wirelen solved = 439, spread = 439, legal = 439; time = 0.00s
-Info:       tring binding $extract$\logic_op_conf_3$329 to X2Y1/c0.l_logic_op
-Info:       tring binding $extract$\logic_op_conf_0$324 to X2Y3/c0.l_logic_op
-Info:     at iteration #5, type logic_op: wirelen solved = 430, spread = 436, legal = 436; time = 0.00s
-Info:       tring binding $extract$\ALU_ALU_func_6$312 to X1Y1/c0.ALU
-Info:       tring binding $extract$\logic_op_conf_3$329 to X2Y1/c0.l_logic_op
-Info:       tring binding $extract$\logic_op_conf_0$324 to X2Y4/c0.l_logic_op
-Info:     at iteration #5, type ALL: wirelen solved = 53, spread = 354, legal = 606; time = 0.00s
-Info:     at iteration #6, type reg_unit: wirelen solved = 265, spread = 265, legal = 606; time = 0.00s
-Info:       tring binding $extract$\ALU_ALU_func_6$312 to X2Y2/c0.ALU
-Info:     at iteration #6, type ALU: wirelen solved = 365, spread = 397, legal = 440; time = 0.00s
-Info:     at iteration #6, type reg_unit_WIDTH_1: wirelen solved = 440, spread = 440, legal = 440; time = 0.00s
-Info:       tring binding $extract$\logic_op_conf_3$329 to X2Y1/c0.l_logic_op
-Info:       tring binding $extract$\logic_op_conf_0$324 to X2Y3/c0.l_logic_op
-Info:     at iteration #6, type logic_op: wirelen solved = 431, spread = 437, legal = 437; time = 0.00s
-Info:       tring binding $extract$\ALU_ALU_func_6$312 to X1Y2/c0.ALU
-Info:       tring binding $extract$\logic_op_conf_3$329 to X2Y1/c0.l_logic_op
-Info:       tring binding $extract$\logic_op_conf_0$324 to X1Y1/c0.l_logic_op
-Info:     at iteration #6, type ALL: wirelen solved = 54, spread = 191, legal = 572; time = 0.00s
-Info:     at iteration #7, type reg_unit: wirelen solved = 160, spread = 160, legal = 442; time = 0.00s
-Info:       tring binding $extract$\ALU_ALU_func_6$312 to X3Y1/c0.ALU
-Info:     at iteration #7, type ALU: wirelen solved = 363, spread = 395, legal = 430; time = 0.00s
-Info:     at iteration #7, type reg_unit_WIDTH_1: wirelen solved = 430, spread = 430, legal = 430; time = 0.00s
-Info:       tring binding $extract$\logic_op_conf_3$329 to X2Y1/c0.l_logic_op
-Info:       tring binding $extract$\logic_op_conf_0$324 to X2Y3/c0.l_logic_op
-Info:     at iteration #7, type logic_op: wirelen solved = 425, spread = 430, legal = 430; time = 0.00s
-Info:       tring binding $extract$\ALU_ALU_func_6$312 to X1Y2/c0.ALU
-Info:       tring binding $extract$\logic_op_conf_3$329 to X2Y1/c0.l_logic_op
-Info:       tring binding $extract$\logic_op_conf_0$324 to X1Y1/c0.l_logic_op
-Info:     at iteration #7, type ALL: wirelen solved = 52, spread = 194, legal = 444; time = 0.00s
-Info:     at iteration #8, type reg_unit: wirelen solved = 164, spread = 164, legal = 574; time = 0.00s
-Info:       tring binding $extract$\ALU_ALU_func_6$312 to X2Y2/c0.ALU
-Info:     at iteration #8, type ALU: wirelen solved = 406, spread = 406, legal = 437; time = 0.00s
-Info:     at iteration #8, type reg_unit_WIDTH_1: wirelen solved = 437, spread = 437, legal = 437; time = 0.00s
-Info:       tring binding $extract$\logic_op_conf_3$329 to X2Y1/c0.l_logic_op
-Info:       tring binding $extract$\logic_op_conf_0$324 to X1Y1/c0.l_logic_op
-Info:     at iteration #8, type logic_op: wirelen solved = 431, spread = 434, legal = 434; time = 0.00s
-Info:       tring binding $extract$\ALU_ALU_func_6$312 to X1Y1/c0.ALU
-Info:       tring binding $extract$\logic_op_conf_3$329 to X2Y1/c0.l_logic_op
-Info:       tring binding $extract$\logic_op_conf_0$324 to X2Y2/c0.l_logic_op
-Info:     at iteration #8, type ALL: wirelen solved = 55, spread = 353, legal = 417; time = 0.00s
-Info:     at iteration #9, type reg_unit: wirelen solved = 194, spread = 194, legal = 535; time = 0.00s
-Info:       tring binding $extract$\ALU_ALU_func_6$312 to X4Y2/c0.ALU
-Info:     at iteration #9, type ALU: wirelen solved = 362, spread = 394, legal = 501; time = 0.00s
-Info:     at iteration #9, type reg_unit_WIDTH_1: wirelen solved = 500, spread = 500, legal = 500; time = 0.00s
-Info:       tring binding $extract$\logic_op_conf_3$329 to X2Y1/c0.l_logic_op
-Info:       tring binding $extract$\logic_op_conf_0$324 to X2Y3/c0.l_logic_op
-Info:     at iteration #9, type logic_op: wirelen solved = 497, spread = 502, legal = 502; time = 0.00s
-Info:       tring binding $extract$\ALU_ALU_func_6$312 to X2Y2/c0.ALU
-Info:       tring binding $extract$\logic_op_conf_3$329 to X1Y2/c0.l_logic_op
-Info:       tring binding $extract$\logic_op_conf_0$324 to X2Y3/c0.l_logic_op
-Info:     at iteration #9, type ALL: wirelen solved = 56, spread = 189, legal = 533; time = 0.00s
-Info:     at iteration #10, type reg_unit: wirelen solved = 130, spread = 130, legal = 533; time = 0.00s
-Info:       tring binding $extract$\ALU_ALU_func_6$312 to X3Y2/c0.ALU
-Info:     at iteration #10, type ALU: wirelen solved = 405, spread = 405, legal = 469; time = 0.00s
-Info:     at iteration #10, type reg_unit_WIDTH_1: wirelen solved = 469, spread = 469, legal = 468; time = 0.00s
-Info:       tring binding $extract$\logic_op_conf_3$329 to X1Y1/c0.l_logic_op
-Info:       tring binding $extract$\logic_op_conf_0$324 to X2Y3/c0.l_logic_op
-Info:     at iteration #10, type logic_op: wirelen solved = 461, spread = 467, legal = 467; time = 0.00s
-Info:       tring binding $extract$\ALU_ALU_func_6$312 to X1Y1/c0.ALU
-Info:       tring binding $extract$\logic_op_conf_3$329 to X2Y1/c0.l_logic_op
-Info:       tring binding $extract$\logic_op_conf_0$324 to X2Y3/c0.l_logic_op
-Info:       tring binding $extract$\logic_op_conf_3$329 to X3Y2/c0.l_logic_op
-Info:     at iteration #10, type ALL: wirelen solved = 57, spread = 351, legal = 567; time = 0.00s
-Info:     at iteration #11, type reg_unit: wirelen solved = 227, spread = 227, legal = 449; time = 0.00s
-Info:       tring binding $extract$\ALU_ALU_func_6$312 to X1Y1/c0.ALU
-Info:     at iteration #11, type ALU: wirelen solved = 405, spread = 405, legal = 445; time = 0.00s
-Info:     at iteration #11, type reg_unit_WIDTH_1: wirelen solved = 445, spread = 445, legal = 445; time = 0.00s
-Info:       tring binding $extract$\logic_op_conf_3$329 to X3Y1/c0.l_logic_op
-Info:       tring binding $extract$\logic_op_conf_0$324 to X3Y3/c0.l_logic_op
-Info:     at iteration #11, type logic_op: wirelen solved = 439, spread = 447, legal = 447; time = 0.00s
-Info:       tring binding $extract$\ALU_ALU_func_6$312 to X1Y1/c0.ALU
-Info:       tring binding $extract$\logic_op_conf_3$329 to X2Y1/c0.l_logic_op
-Info:       tring binding $extract$\logic_op_conf_0$324 to X2Y3/c0.l_logic_op
-Info:       tring binding $extract$\logic_op_conf_3$329 to X1Y2/c0.l_logic_op
-Info:     at iteration #11, type ALL: wirelen solved = 57, spread = 351, legal = 449; time = 0.00s
-Info:     at iteration #12, type reg_unit: wirelen solved = 226, spread = 226, legal = 567; time = 0.00s
-Info:       tring binding $extract$\ALU_ALU_func_6$312 to X2Y2/c0.ALU
-Info:     at iteration #12, type ALU: wirelen solved = 363, spread = 395, legal = 438; time = 0.00s
-Info:     at iteration #12, type reg_unit_WIDTH_1: wirelen solved = 438, spread = 438, legal = 438; time = 0.00s
-Info:       tring binding $extract$\logic_op_conf_3$329 to X2Y1/c0.l_logic_op
-Info:       tring binding $extract$\logic_op_conf_0$324 to X2Y3/c0.l_logic_op
-Info:     at iteration #12, type logic_op: wirelen solved = 431, spread = 437, legal = 437; time = 0.00s
-Info:       tring binding $extract$\ALU_ALU_func_6$312 to X2Y2/c0.ALU
-Info:       tring binding $extract$\logic_op_conf_3$329 to X1Y1/c0.l_logic_op
-Info:       tring binding $extract$\logic_op_conf_0$324 to X2Y3/c0.l_logic_op
-Info:     at iteration #12, type ALL: wirelen solved = 54, spread = 191, legal = 531; time = 0.00s
-Info:     at iteration #13, type reg_unit: wirelen solved = 129, spread = 129, legal = 401; time = 0.00s
+Info:       tring binding $extract$\logic_op_conf_0$324 to X3Y2/c0.l_logic_op
+Info:       tring binding $extract$\logic_op_conf_0$324 to X4Y3/c0.l_logic_op
+Info:     at iteration #2, type logic_op: wirelen solved = 467, spread = 467, legal = 473; time = 0.00s
+Info:       tring binding $extract$\logic_op_conf_3$329 to X1Y3/c0.l_logic_op
 Info:       tring binding $extract$\ALU_ALU_func_6$312 to X2Y1/c0.ALU
-Info:     at iteration #13, type ALU: wirelen solved = 362, spread = 394, legal = 433; time = 0.00s
-Info:     at iteration #13, type reg_unit_WIDTH_1: wirelen solved = 432, spread = 432, legal = 433; time = 0.00s
-Info:       tring binding $extract$\logic_op_conf_3$329 to X1Y1/c0.l_logic_op
 Info:       tring binding $extract$\logic_op_conf_0$324 to X3Y3/c0.l_logic_op
-Info:     at iteration #13, type logic_op: wirelen solved = 429, spread = 436, legal = 436; time = 0.00s
-Info:       tring binding $extract$\ALU_ALU_func_6$312 to X2Y2/c0.ALU
-Info:       tring binding $extract$\logic_op_conf_3$329 to X2Y2/c0.l_logic_op
+Info:     at iteration #2, type ALL: wirelen solved = 76, spread = 128, legal = 403; time = 0.00s
+Info:     at iteration #3, type reg_unit_WIDTH_1: wirelen solved = 403, spread = 403, legal = 403; time = 0.00s
+Info:     at iteration #3, type reg_unit: wirelen solved = 129, spread = 129, legal = 542; time = 0.00s
+Info:       tring binding $extract$\ALU_ALU_func_6$312 to X1Y2/c0.ALU
+Info:     at iteration #3, type ALU: wirelen solved = 510, spread = 478, legal = 474; time = 0.00s
+Info:       tring binding $extract$\logic_op_conf_3$329 to X1Y3/c0.l_logic_op
 Info:       tring binding $extract$\logic_op_conf_0$324 to X2Y3/c0.l_logic_op
-Info:     at iteration #13, type ALL: wirelen solved = 54, spread = 191, legal = 532; time = 0.00s
-Info: AP soln: $extract$\logic_op_conf_3$329 -> X2Y1/c0.l_logic_op
-Info: AP soln: $extract$\logic_op_conf_3$328 -> X1Y3/c0.l_logic_op
-Info: AP soln: $extract$\logic_op_conf_1$326 -> X1Y1/c0.l_logic_op
-Info: AP soln: $extract$\ALU_ALU_func_6$312 -> X1Y1/c0.ALU
-Info: AP soln: $extract$\logic_op_conf_0$324 -> X2Y2/c0.l_logic_op
-Info: AP soln: $extract$\logic_op_conf_0$323 -> X2Y3/c0.l_logic_op
-Info: AP soln: $iopadmap$main.in0 -> X2Y0/c0.S_IO
-Info: AP soln: $iopadmap$main.in1 -> X0Y2/c0.W_IO
-Info: AP soln: $iopadmap$main.go -> X0Y2/c0.W_pred_IO_WIDTH_1
-Info: AP soln: $iopadmap$main.reset -> X2Y0/c0.S_pred_IO_WIDTH_1
-Info: AP soln: $iopadmap$main.done -> X0Y4/c0.W_pred_IO_WIDTH_1
-Info: AP soln: mem_0.mem.0.0 -> X5Y3/c0.A_Mem
-Info: AP soln: $iopadmap$main.clk -> X4Y0/c0.S_pred_IO_WIDTH_1
-Info: AP soln: $extract$\reg_unit_tide_en_0_tide_rst_1$299 -> X1Y3/c0.B_reg_unit
-Info: AP soln: $extract$\reg_unit_tide_en_0_tide_rst_1$298 -> X5Y3/c0.reg_unit
-Info: AP soln: $extract$\reg_unit_WIDTH_1_tide_en_1_tide_rst_0$297 -> X1Y1/c0.RES_pred_reg_unit_WIDTH_1
-Info: AP soln: $extract$\ALU_ALU_func_0$309 -> X1Y2/c0.ALU
-Info: AP soln: $extract$\ALU_ALU_func_0$308 -> X1Y3/c0.ALU
-Info: AP soln: $auto$constmap.cc:36:constmap_worker$347 -> X1Y2/c0.const_unit
-Info: HeAP Placer Time: 0.12s
-Info:   of which solving equations: 0.10s
+Info:     at iteration #3, type logic_op: wirelen solved = 469, spread = 471, legal = 471; time = 0.00s
+Info:       tring binding $extract$\logic_op_conf_3$329 to X1Y3/c0.l_logic_op
+Info:       tring binding $extract$\ALU_ALU_func_6$312 to X1Y2/c0.ALU
+Info:       tring binding $extract$\logic_op_conf_0$324 to X2Y3/c0.l_logic_op
+Info:     at iteration #3, type ALL: wirelen solved = 113, spread = 86, legal = 473; time = 0.00s
+Info:     at iteration #4, type reg_unit_WIDTH_1: wirelen solved = 473, spread = 473, legal = 473; time = 0.00s
+Info:     at iteration #4, type reg_unit: wirelen solved = 250, spread = 250, legal = 473; time = 0.00s
+Info:       tring binding $extract$\ALU_ALU_func_6$312 to X1Y1/c0.ALU
+Info:     at iteration #4, type ALU: wirelen solved = 437, spread = 473, legal = 480; time = 0.00s
+Info:       tring binding $extract$\logic_op_conf_3$329 to X1Y3/c0.l_logic_op
+Info:       tring binding $extract$\logic_op_conf_0$324 to X2Y3/c0.l_logic_op
+Info:     at iteration #4, type logic_op: wirelen solved = 475, spread = 478, legal = 478; time = 0.00s
+Info:       tring binding $extract$\logic_op_conf_3$329 to X1Y4/c0.l_logic_op
+Info:       tring binding $extract$\ALU_ALU_func_6$312 to X1Y2/c0.ALU
+Info:       tring binding $extract$\logic_op_conf_0$324 to X2Y4/c0.l_logic_op
+Info:     at iteration #4, type ALL: wirelen solved = 356, spread = 403, legal = 375; time = 0.00s
+Info: HeAP Placer Time: 0.03s
+Info:   of which solving equations: 0.02s
 Info:   of which spreading cells: 0.00s
-Info:   of which strict legalisation: 0.01s
+Info:   of which strict legalisation: 0.00s
 
 Info: Running simulated annealing placer for refinement.
-Info:   at iteration #1: temp = 0.000000, timing cost = 0, wirelen = 417
-Info:   at iteration #5: temp = 0.000000, timing cost = 0, wirelen = 371
-Info:   at iteration #6: temp = 0.000000, timing cost = 0, wirelen = 371 
+Info:   at iteration #1: temp = 0.000000, timing cost = 0, wirelen = 375
+Info:   at iteration #2: temp = 0.000000, timing cost = 0, wirelen = 370 
 Info: SA placement time 0.01s
-Info: Checksum: 0xcf8a2202
-Info: Heap placer took 0 iterations and 0.13s seconds
+Info: Checksum: 0x61c14fb8
+Info: Heap placer took 0 iterations and 0.03s seconds
 
 Info: ================== Final Placement ===================
-Info: X3Y2/c0.l_logic_op: $extract$\logic_op_conf_3$329
-Info: X1Y3/c0.l_logic_op: $extract$\logic_op_conf_3$328
+Info: X3Y1/c0.l_logic_op: $extract$\logic_op_conf_3$329
+Info: X2Y2/c0.l_logic_op: $extract$\logic_op_conf_3$328
 Info: X1Y1/c0.l_logic_op: $extract$\logic_op_conf_1$326
-Info: X2Y2/c0.ALU: $extract$\ALU_ALU_func_6$312
-Info: X2Y2/c0.l_logic_op: $extract$\logic_op_conf_0$324
-Info: X2Y3/c0.l_logic_op: $extract$\logic_op_conf_0$323
-Info: X0Y2/c0.W_IO: $iopadmap$main.in0
-Info: X0Y3/c0.W_IO: $iopadmap$main.in1
-Info: X4Y5/c0.N_pred_IO_WIDTH_1: $iopadmap$main.go
-Info: X0Y2/c0.W_pred_IO_WIDTH_1: $iopadmap$main.reset
-Info: X2Y0/c0.S_pred_IO_WIDTH_1: $iopadmap$main.done
-Info: X5Y3/c0.A_Mem: mem_0.mem.0.0
-Info: X1Y0/c0.S_pred_IO_WIDTH_1: $iopadmap$main.clk
-Info: X1Y3/c0.B_reg_unit: $extract$\reg_unit_tide_en_0_tide_rst_1$299
-Info: X5Y3/c0.reg_unit: $extract$\reg_unit_tide_en_0_tide_rst_1$298
+Info: X1Y2/c0.ALU: $extract$\ALU_ALU_func_6$312
+Info: X3Y2/c0.l_logic_op: $extract$\logic_op_conf_0$324
+Info: X2Y1/c0.l_logic_op: $extract$\logic_op_conf_0$323
+Info: X0Y3/c0.W_IO: $iopadmap$main.in0
+Info: X1Y0/c0.S_IO: $iopadmap$main.in1
+Info: X4Y0/c0.S_pred_IO_WIDTH_1: $iopadmap$main.go
+Info: X2Y0/c0.S_pred_IO_WIDTH_1: $iopadmap$main.reset
+Info: X3Y0/c0.S_pred_IO_WIDTH_1: $iopadmap$main.done
+Info: X5Y1/c0.A_Mem: mem_0.mem.0.0
+Info: X0Y3/c0.W_pred_IO_WIDTH_1: $iopadmap$main.clk
+Info: X1Y1/c0.B_reg_unit: $extract$\reg_unit_tide_en_0_tide_rst_1$299
+Info: X5Y1/c0.reg_unit: $extract$\reg_unit_tide_en_0_tide_rst_1$298
 Info: X1Y1/c0.RES_pred_reg_unit_WIDTH_1: $extract$\reg_unit_WIDTH_1_tide_en_1_tide_rst_0$297
-Info: X1Y2/c0.ALU: $extract$\ALU_ALU_func_0$309
-Info: X1Y3/c0.ALU: $extract$\ALU_ALU_func_0$308
-Info: X1Y2/c0.const_unit: $auto$constmap.cc:36:constmap_worker$347
+Info: X1Y3/c0.ALU: $extract$\ALU_ALU_func_0$309
+Info: X1Y1/c0.ALU: $extract$\ALU_ALU_func_0$308
+Info: X1Y3/c0.const_unit: $auto$constmap.cc:36:constmap_worker$347
 
 Info: Routing..
 Info: Setting up routing queue.
@@ -339,57 +136,90 @@ Info: Routing net
 Info: Routing 252 arcs.
 Info:            |   (re-)routed arcs  |   delta    | remaining|       time spent     |
 Info:    IterCnt |  w/ripup   wo/ripup |  w/r  wo/r |      arcs| batch(sec) total(sec)|
-Info:       1000 |      723        276 |  723   276 |         1|       0.05       0.05|
-Info:       2000 |     1674        325 |  951    49 |         2|       0.05       0.10|
-Info:       3000 |     2611        388 |  937    63 |         2|       0.05       0.15|
-Info:       4000 |     3575        424 |  964    36 |         4|       0.05       0.21|
-Info:       5000 |     4563        436 |  988    12 |         1|       0.05       0.25|
-Info:       6000 |     5405        594 |  842   158 |         5|       0.04       0.29|
-Info:       7000 |     6266        733 |  861   139 |         5|       0.05       0.34|
-Info:       8000 |     7216        783 |  950    50 |         4|       0.04       0.38|
-Info:       9000 |     8180        819 |  964    36 |         1|       0.04       0.42|
-Info:      10000 |     9118        881 |  938    62 |         2|       0.04       0.46|
-Info:      11000 |    10008        991 |  890   110 |         5|       0.05       0.51|
-Info:      12000 |    10856       1143 |  848   152 |         8|       0.04       0.55|
-Info:      13000 |    11773       1226 |  917    83 |         3|       0.05       0.59|
-Info:      14000 |    12697       1302 |  924    76 |         5|       0.04       0.64|
-Info:      15000 |    13624       1375 |  927    73 |         6|       0.05       0.68|
-Info:      16000 |    14532       1467 |  908    92 |         8|       0.04       0.73|
-Info:      17000 |    15521       1478 |  989    11 |         4|       0.03       0.76|
-Info:      18000 |    16507       1492 |  986    14 |         5|       0.03       0.79|
-Info:      19000 |    17496       1503 |  989    11 |         2|       0.04       0.83|
-Info:      20000 |    18496       1503 | 1000     0 |         2|       0.05       0.88|
-  Current arc_queue size: 3
+Info:       1000 |      699        300 |  699   300 |         4|       0.04       0.04|
+Info:       2000 |     1658        341 |  959    41 |         4|       0.05       0.09|
+Info:       3000 |     2658        341 | 1000     0 |         4|       0.05       0.14|
+Info:       4000 |     3646        353 |  988    12 |         6|       0.05       0.19|
+Info:       5000 |     4613        386 |  967    33 |         4|       0.05       0.23|
+Info:       6000 |     5525        474 |  912    88 |         2|       0.04       0.28|
+Info:       7000 |     6376        623 |  851   149 |         4|       0.04       0.32|
+Info:       8000 |     7366        633 |  990    10 |         5|       0.04       0.36|
+Info:       9000 |     8332        667 |  966    34 |         4|       0.04       0.40|
+Info:      10000 |     9267        732 |  935    65 |         5|       0.04       0.44|
+Info:      11000 |    10234        765 |  967    33 |         5|       0.04       0.48|
+Info:      12000 |    11150        849 |  916    84 |         7|       0.04       0.52|
+Info:      13000 |    11979       1020 |  829   171 |         5|       0.04       0.56|
+Info:      14000 |    12826       1173 |  847   153 |         4|       0.04       0.60|
+Info:      15000 |    13780       1219 |  954    46 |         5|       0.04       0.64|
+Info:      16000 |    14749       1250 |  969    31 |         4|       0.04       0.67|
+Info:      17000 |    15659       1340 |  910    90 |         5|       0.04       0.71|
+Info:      18000 |    16616       1383 |  957    43 |         5|       0.04       0.76|
+Info:      19000 |    17523       1476 |  907    93 |         5|       0.04       0.80|
+Info:      20000 |    18450       1549 |  927    73 |         4|       0.04       0.83|
+Info:      21000 |    19328       1671 |  878   122 |         5|       0.04       0.87|
+Info:      22000 |    20160       1839 |  832   168 |         7|       0.04       0.91|
+Info:      23000 |    20985       2014 |  825   175 |         4|       0.04       0.95|
+Info:      24000 |    21902       2097 |  917    83 |         7|       0.04       0.99|
+Info:      25000 |    22877       2122 |  975    25 |         3|       0.04       1.03|
+Info:      26000 |    23724       2275 |  847   153 |         5|       0.04       1.07|
+Info:      27000 |    24583       2416 |  859   141 |         6|       0.04       1.11|
+Info:      28000 |    25475       2524 |  892   108 |         6|       0.04       1.15|
+Info:      29000 |    26371       2628 |  896   104 |         6|       0.04       1.19|
+Info:      30000 |    27337       2662 |  966    34 |         4|       0.04       1.23|
+Info:      31000 |    28317       2682 |  980    20 |         5|       0.04       1.27|
+Info:      32000 |    29317       2682 | 1000     0 |         5|       0.04       1.31|
+Info:      33000 |    30316       2683 |  999     1 |         4|       0.04       1.35|
+Info:      34000 |    31316       2683 | 1000     0 |         4|       0.04       1.39|
+Info:      35000 |    32316       2683 | 1000     0 |         4|       0.04       1.44|
+Info:      36000 |    33316       2683 | 1000     0 |         4|       0.04       1.48|
+Info:      37000 |    34316       2683 | 1000     0 |         4|       0.04       1.52|
+Info:      38000 |    35316       2683 | 1000     0 |         4|       0.04       1.56|
+Info:      39000 |    36285       2714 |  969    31 |         4|       0.04       1.60|
+Info:      40000 |    37275       2724 |  990    10 |         4|       0.05       1.65|
+Info:      41000 |    38275       2724 | 1000     0 |         4|       0.04       1.69|
+Info:      42000 |    39235       2764 |  960    40 |         7|       0.04       1.73|
+Info:      43000 |    40155       2844 |  920    80 |         7|       0.04       1.77|
+Info:      44000 |    41131       2868 |  976    24 |         4|       0.04       1.81|
+Info:      45000 |    42131       2868 | 1000     0 |         4|       0.04       1.85|
+Info:      46000 |    43131       2868 | 1000     0 |         4|       0.04       1.89|
+Info:      47000 |    44131       2868 | 1000     0 |         4|       0.04       1.93|
+Info:      48000 |    45131       2868 | 1000     0 |         4|       0.04       1.97|
+Info:      49000 |    46131       2868 | 1000     0 |         4|       0.04       2.01|
+Info:      50000 |    47131       2868 | 1000     0 |         4|       0.04       2.06|
+  Current arc_queue size: 4
   Arc_queue contents (top to bottom):
-    Net: $iopadmap$reset, UserIdx: 2, PhysIdx: 0, Priority: 0, Randtag: 704557370
-    Net: $iopadmap$reset, UserIdx: 1, PhysIdx: 0, Priority: 0, Randtag: 702434564
-    Net: $iopadmap$reset, UserIdx: 0, PhysIdx: 0, Priority: 0, Randtag: 120222
+    Net: $auto$fsm_map.cc:170:map_fsm$221, UserIdx: 1, PhysIdx: 0, Priority: 0, Randtag: 544085285
+    Net: $auto$fsm_map.cc:118:implement_pattern_cache$233, UserIdx: 0, PhysIdx: 0, Priority: 0, Randtag: 105205
+    Net: $iopadmap$reset, UserIdx: 2, PhysIdx: 0, Priority: 0, Randtag: 90572
+    Net: $iopadmap$reset, UserIdx: 0, PhysIdx: 0, Priority: 0, Randtag: 50151
 ERROR: Max iteration count reached, stopping routing.
 Info: Writing FASM file to /home/kelvin/FABulous_fork/myProject/user_design/router_test.fasm
-ERROR: Routing design failed.
-0 warnings, 2 errors
-2025-06-04 15:19:35.272 | INFO     | FABulous.file_parser.file_parser_yaml:parseTileYAML:259 - Reading tile configuration: /home/kelvin/FABulous_fork/myProject/Tile/PE/PE.yaml
-2025-06-04 15:19:35.276 | INFO     | FABulous.file_parser.file_parser_HDL:parseBelFile:155 - Parsing bel file: /home/kelvin/FABulous_fork/myProject/Tile/PE/reg_unit.v
-2025-06-04 15:19:35.282 | INFO     | FABulous.file_parser.file_parser_HDL:parseBelFile:155 - Parsing bel file: /home/kelvin/FABulous_fork/myProject/Tile/PE/ALU.v
-2025-06-04 15:19:35.289 | INFO     | FABulous.file_parser.file_parser_HDL:parseBelFile:155 - Parsing bel file: /home/kelvin/FABulous_fork/myProject/Tile/PE/compare.v
-2025-06-04 15:19:35.295 | INFO     | FABulous.file_parser.file_parser_HDL:parseBelFile:155 - Parsing bel file: /home/kelvin/FABulous_fork/myProject/Tile/PE/reg_unit.v
-2025-06-04 15:19:35.300 | INFO     | FABulous.file_parser.file_parser_HDL:parseBelFile:155 - Parsing bel file: /home/kelvin/FABulous_fork/myProject/Tile/PE/reg_unit.v
-2025-06-04 15:19:35.306 | INFO     | FABulous.file_parser.file_parser_HDL:parseBelFile:155 - Parsing bel file: /home/kelvin/FABulous_fork/myProject/Tile/PE/const_unit.v
-2025-06-04 15:19:35.310 | INFO     | FABulous.file_parser.file_parser_HDL:parseBelFile:155 - Parsing bel file: /home/kelvin/FABulous_fork/myProject/Tile/PE/reg_unit.v
-2025-06-04 15:19:35.315 | INFO     | FABulous.file_parser.file_parser_HDL:parseBelFile:155 - Parsing bel file: /home/kelvin/FABulous_fork/myProject/Tile/PE/logic_op.v
-2025-06-04 15:19:35.320 | INFO     | FABulous.file_parser.file_parser_HDL:parseBelFile:155 - Parsing bel file: /home/kelvin/FABulous_fork/myProject/Tile/PE/reg_unit.v
-2025-06-04 15:19:35.326 | INFO     | FABulous.file_parser.file_parser_HDL:parseBelFile:155 - Parsing bel file: /home/kelvin/FABulous_fork/myProject/Tile/PE/reg_unit.v
-2025-06-04 15:19:35.337 | INFO     | FABulous.file_parser.file_parser_yaml:parseTileYAML:259 - Reading tile configuration: /home/kelvin/FABulous_fork/myProject/Tile/N_IO/N_IO.yaml
-2025-06-04 15:19:35.339 | INFO     | FABulous.file_parser.file_parser_HDL:parseBelFile:155 - Parsing bel file: /home/kelvin/FABulous_fork/myProject/Tile/N_IO/../include/IO.v
-2025-06-04 15:19:35.343 | INFO     | FABulous.file_parser.file_parser_HDL:parseBelFile:155 - Parsing bel file: /home/kelvin/FABulous_fork/myProject/Tile/N_IO/../include/IO.v
-2025-06-04 15:19:35.353 | INFO     | FABulous.file_parser.file_parser_yaml:parseTileYAML:259 - Reading tile configuration: /home/kelvin/FABulous_fork/myProject/Tile/E_Mem/E_Mem.yaml
-2025-06-04 15:19:35.355 | INFO     | FABulous.file_parser.file_parser_HDL:parseBelFile:155 - Parsing bel file: /home/kelvin/FABulous_fork/myProject/Tile/E_Mem/reg_unit.v
-2025-06-04 15:19:35.361 | INFO     | FABulous.file_parser.file_parser_HDL:parseBelFile:155 - Parsing bel file: /home/kelvin/FABulous_fork/myProject/Tile/E_Mem/Mem.v
-2025-06-04 15:19:35.366 | INFO     | FABulous.file_parser.file_parser_HDL:parseBelFile:155 - Parsing bel file: /home/kelvin/FABulous_fork/myProject/Tile/E_Mem/Mem.v
-2025-06-04 15:19:35.376 | INFO     | FABulous.file_parser.file_parser_yaml:parseTileYAML:259 - Reading tile configuration: /home/kelvin/FABulous_fork/myProject/Tile/S_IO/S_IO.yaml
-2025-06-04 15:19:35.377 | INFO     | FABulous.file_parser.file_parser_HDL:parseBelFile:155 - Parsing bel file: /home/kelvin/FABulous_fork/myProject/Tile/S_IO/../include/IO.v
-2025-06-04 15:19:35.382 | INFO     | FABulous.file_parser.file_parser_HDL:parseBelFile:155 - Parsing bel file: /home/kelvin/FABulous_fork/myProject/Tile/S_IO/../include/IO.v
-2025-06-04 15:19:35.389 | INFO     | FABulous.file_parser.file_parser_yaml:parseTileYAML:259 - Reading tile configuration: /home/kelvin/FABulous_fork/myProject/Tile/W_IO/W_IO.yaml
-2025-06-04 15:19:35.390 | INFO     | FABulous.file_parser.file_parser_HDL:parseBelFile:155 - Parsing bel file: /home/kelvin/FABulous_fork/myProject/Tile/W_IO/../include/IO.v
-2025-06-04 15:19:35.395 | INFO     | FABulous.file_parser.file_parser_HDL:parseBelFile:155 - Parsing bel file: /home/kelvin/FABulous_fork/myProject/Tile/W_IO/../include/IO.v
-2025-06-04 15:19:35.405 | INFO     | FABulous.file_parser.file_parser_yaml:parseFabricYAML:195 - Fabric YAML parsed successfully.
+
+0 warnings, 1 error
+
+Info: Program finished normally.
+2025-06-06 14:21:12.965 | INFO     | FABulous.file_parser.file_parser_yaml:parseTileYAML:259 - Reading tile configuration: /home/kelvin/FABulous_fork/myProject/Tile/PE/PE.yaml
+2025-06-06 14:21:12.969 | INFO     | FABulous.file_parser.file_parser_HDL:parseBelFile:155 - Parsing bel file: /home/kelvin/FABulous_fork/myProject/Tile/PE/reg_unit.v
+2025-06-06 14:21:12.975 | INFO     | FABulous.file_parser.file_parser_HDL:parseBelFile:155 - Parsing bel file: /home/kelvin/FABulous_fork/myProject/Tile/PE/ALU.v
+2025-06-06 14:21:12.981 | INFO     | FABulous.file_parser.file_parser_HDL:parseBelFile:155 - Parsing bel file: /home/kelvin/FABulous_fork/myProject/Tile/PE/compare.v
+2025-06-06 14:21:12.987 | INFO     | FABulous.file_parser.file_parser_HDL:parseBelFile:155 - Parsing bel file: /home/kelvin/FABulous_fork/myProject/Tile/PE/reg_unit.v
+2025-06-06 14:21:12.992 | INFO     | FABulous.file_parser.file_parser_HDL:parseBelFile:155 - Parsing bel file: /home/kelvin/FABulous_fork/myProject/Tile/PE/reg_unit.v
+2025-06-06 14:21:12.996 | INFO     | FABulous.file_parser.file_parser_HDL:parseBelFile:155 - Parsing bel file: /home/kelvin/FABulous_fork/myProject/Tile/PE/const_unit.v
+2025-06-06 14:21:13.002 | INFO     | FABulous.file_parser.file_parser_HDL:parseBelFile:155 - Parsing bel file: /home/kelvin/FABulous_fork/myProject/Tile/PE/reg_unit.v
+2025-06-06 14:21:13.008 | INFO     | FABulous.file_parser.file_parser_HDL:parseBelFile:155 - Parsing bel file: /home/kelvin/FABulous_fork/myProject/Tile/PE/logic_op.v
+2025-06-06 14:21:13.012 | INFO     | FABulous.file_parser.file_parser_HDL:parseBelFile:155 - Parsing bel file: /home/kelvin/FABulous_fork/myProject/Tile/PE/reg_unit.v
+2025-06-06 14:21:13.017 | INFO     | FABulous.file_parser.file_parser_HDL:parseBelFile:155 - Parsing bel file: /home/kelvin/FABulous_fork/myProject/Tile/PE/reg_unit.v
+2025-06-06 14:21:13.027 | INFO     | FABulous.file_parser.file_parser_yaml:parseTileYAML:259 - Reading tile configuration: /home/kelvin/FABulous_fork/myProject/Tile/N_IO/N_IO.yaml
+2025-06-06 14:21:13.029 | INFO     | FABulous.file_parser.file_parser_HDL:parseBelFile:155 - Parsing bel file: /home/kelvin/FABulous_fork/myProject/Tile/N_IO/../include/IO.v
+2025-06-06 14:21:13.033 | INFO     | FABulous.file_parser.file_parser_HDL:parseBelFile:155 - Parsing bel file: /home/kelvin/FABulous_fork/myProject/Tile/N_IO/../include/IO.v
+2025-06-06 14:21:13.040 | INFO     | FABulous.file_parser.file_parser_yaml:parseTileYAML:259 - Reading tile configuration: /home/kelvin/FABulous_fork/myProject/Tile/E_Mem/E_Mem.yaml
+2025-06-06 14:21:13.042 | INFO     | FABulous.file_parser.file_parser_HDL:parseBelFile:155 - Parsing bel file: /home/kelvin/FABulous_fork/myProject/Tile/E_Mem/reg_unit.v
+2025-06-06 14:21:13.047 | INFO     | FABulous.file_parser.file_parser_HDL:parseBelFile:155 - Parsing bel file: /home/kelvin/FABulous_fork/myProject/Tile/E_Mem/Mem.v
+2025-06-06 14:21:13.054 | INFO     | FABulous.file_parser.file_parser_HDL:parseBelFile:155 - Parsing bel file: /home/kelvin/FABulous_fork/myProject/Tile/E_Mem/Mem.v
+2025-06-06 14:21:13.063 | INFO     | FABulous.file_parser.file_parser_yaml:parseTileYAML:259 - Reading tile configuration: /home/kelvin/FABulous_fork/myProject/Tile/S_IO/S_IO.yaml
+2025-06-06 14:21:13.065 | INFO     | FABulous.file_parser.file_parser_HDL:parseBelFile:155 - Parsing bel file: /home/kelvin/FABulous_fork/myProject/Tile/S_IO/../include/IO.v
+2025-06-06 14:21:13.070 | INFO     | FABulous.file_parser.file_parser_HDL:parseBelFile:155 - Parsing bel file: /home/kelvin/FABulous_fork/myProject/Tile/S_IO/../include/IO.v
+2025-06-06 14:21:13.079 | INFO     | FABulous.file_parser.file_parser_yaml:parseTileYAML:259 - Reading tile configuration: /home/kelvin/FABulous_fork/myProject/Tile/W_IO/W_IO.yaml
+2025-06-06 14:21:13.080 | INFO     | FABulous.file_parser.file_parser_HDL:parseBelFile:155 - Parsing bel file: /home/kelvin/FABulous_fork/myProject/Tile/W_IO/../include/IO.v
+2025-06-06 14:21:13.086 | INFO     | FABulous.file_parser.file_parser_HDL:parseBelFile:155 - Parsing bel file: /home/kelvin/FABulous_fork/myProject/Tile/W_IO/../include/IO.v
+2025-06-06 14:21:13.095 | INFO     | FABulous.file_parser.file_parser_yaml:parseFabricYAML:195 - Fabric YAML parsed successfully.

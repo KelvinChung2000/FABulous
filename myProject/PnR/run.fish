@@ -59,7 +59,7 @@ nextpnr-himbaechel --chipdb "$my_FAB_ROOT/myProject/.FABulous/hycube.bit" --devi
                    --placer-heap-seed-placement-strategy graph_grid \
                    --placer-heap-arch-connectivity-factor 1.0 \
                 #    --no-route \
-                   -o placeTrial=10 --router1-timeout 50000 -f
+                   -o placeTrial=10 --router1-timeout 20000 -f --debug-placer
                 #    --placer-heap-export-init-placement "$my_FAB_ROOT/myProject/user_design/test_init_placement.csv" \
 # successful seed:5743725230106451036 
 # python $my_FAB_ROOT/myProject/Test/test_fabric.py

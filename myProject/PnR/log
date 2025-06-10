@@ -45,181 +45,1532 @@ Info: 	                 Mem:       1/      4    25%
 Info: Trying placer heap with seed:3549216002486605715 
 Info: Placed 0 cells based on constraints.
 Info: Seed placement strategy: graph_grid with sparseness heuristic (simplified)
+Info: Candidate: $extract$\reg_unit_WIDTH_1_tide_en_1_tide_rst_0$297 (children: 1, is_io: 0, is_locked_self: 0, has_placed_neighbor: 0, conn_score: 5, bel_score: 48)
+Info: Candidate: $extract$\reg_unit_tide_en_0_tide_rst_1$298 (children: 1, is_io: 0, is_locked_self: 0, has_placed_neighbor: 0, conn_score: 1, bel_score: 50)
+Info: Candidate: $extract$\ALU_ALU_func_0$309 (children: 1, is_io: 0, is_locked_self: 0, has_placed_neighbor: 0, conn_score: 1, bel_score: 16)
+Info: Candidate: $extract$\ALU_ALU_func_0$308 (children: 1, is_io: 0, is_locked_self: 0, has_placed_neighbor: 0, conn_score: 1, bel_score: 16)
+Info: Candidate: $extract$\logic_op_conf_3$328 (children: 0, is_io: 0, is_locked_self: 0, has_placed_neighbor: 0, conn_score: 3, bel_score: 16)
+Info: Candidate: $iopadmap$main.reset (children: 0, is_io: 1, is_locked_self: 0, has_placed_neighbor: 0, conn_score: 3, bel_score: 12)
+Info: Candidate: $iopadmap$main.in0 (children: 0, is_io: 1, is_locked_self: 0, has_placed_neighbor: 0, conn_score: 2, bel_score: 12)
+Info: Candidate: $extract$\logic_op_conf_3$329 (children: 0, is_io: 0, is_locked_self: 0, has_placed_neighbor: 0, conn_score: 1, bel_score: 16)
+Info: Candidate: $extract$\ALU_ALU_func_6$312 (children: 0, is_io: 0, is_locked_self: 0, has_placed_neighbor: 0, conn_score: 1, bel_score: 16)
+Info: Candidate: $extract$\logic_op_conf_0$324 (children: 0, is_io: 0, is_locked_self: 0, has_placed_neighbor: 0, conn_score: 1, bel_score: 16)
+Info: Candidate: $extract$\logic_op_conf_0$323 (children: 0, is_io: 0, is_locked_self: 0, has_placed_neighbor: 0, conn_score: 1, bel_score: 16)
+Info: Candidate: $iopadmap$main.in1 (children: 0, is_io: 1, is_locked_self: 0, has_placed_neighbor: 0, conn_score: 1, bel_score: 12)
+Info: Candidate: $iopadmap$main.go (children: 0, is_io: 1, is_locked_self: 0, has_placed_neighbor: 0, conn_score: 0, bel_score: 12)
+Info: Candidate: $iopadmap$main.done (children: 0, is_io: 1, is_locked_self: 0, has_placed_neighbor: 0, conn_score: 0, bel_score: 12)
+Info: Candidate: $iopadmap$main.clk (children: 0, is_io: 1, is_locked_self: 0, has_placed_neighbor: 0, conn_score: 0, bel_score: 12)
+Info: Current Best: Cell $extract$\reg_unit_WIDTH_1_tide_en_1_tide_rst_0$297, BEL X2Y2/c0.RES_pred_reg_unit_WIDTH_1, score 0, distance 0, sparseness 8, pip_hop 0
 
+Info: Placed cell '$extract$\reg_unit_WIDTH_1_tide_en_1_tide_rst_0$297' at (2, 2) with BEL 'X2Y2/c0.RES_pred_reg_unit_WIDTH_1'
+
+Info: Current Best: Cell $extract$\reg_unit_tide_en_0_tide_rst_1$298, BEL X2Y2/c0.RES_reg_unit, score 0, distance 0, sparseness 8, pip_hop 0
+
+Info: Placed cell '$extract$\reg_unit_tide_en_0_tide_rst_1$298' at (2, 2) with BEL 'X2Y2/c0.RES_reg_unit'
+
+Info: Current Best: Cell $extract$\ALU_ALU_func_0$309, BEL X2Y2/c0.ALU, score 0, distance 0, sparseness 8, pip_hop 0
+
+Info: Placed cell '$extract$\ALU_ALU_func_0$309' at (2, 2) with BEL 'X2Y2/c0.ALU'
+
+Info: Current Best: Cell $extract$\ALU_ALU_func_0$308, BEL X1Y1/c0.ALU, score 2, distance 2, sparseness 7, pip_hop 0
+
+Info: Current Best: Cell $extract$\ALU_ALU_func_0$308, BEL X1Y2/c0.ALU, score 1, distance 1, sparseness 7, pip_hop 0
+
+Info: Placed cell '$extract$\ALU_ALU_func_0$308' at (1, 2) with BEL 'X1Y2/c0.ALU'
+
+Info: Current Best: Cell $extract$\logic_op_conf_3$328, BEL X2Y2/c0.l_logic_op, score 0, distance 0, sparseness 7, pip_hop 0
+
+Info: Placed cell '$extract$\logic_op_conf_3$328' at (2, 2) with BEL 'X2Y2/c0.l_logic_op'
+
+Info: Current Best: Cell $iopadmap$main.reset, BEL X0Y1/c0.W_pred_IO_WIDTH_1, score 7, distance 7, sparseness 7, pip_hop 7
+
+Info: Current Best: Cell $iopadmap$main.reset, BEL X0Y2/c0.W_pred_IO_WIDTH_1, score 5, distance 5, sparseness 7, pip_hop 5
+
+Info: Current Best: Cell $iopadmap$main.in0, BEL X0Y1/c0.W_IO, score 28, distance 28, sparseness 6, pip_hop 28
+
+Info: Current Best: Cell $iopadmap$main.in0, BEL X0Y2/c0.W_IO, score 20, distance 20, sparseness 7, pip_hop 20
+
+Info: Current Best: Cell $extract$\logic_op_conf_3$329, BEL X1Y1/c0.l_logic_op, score 2, distance 2, sparseness 5, pip_hop 0
+
+Info: Current Best: Cell $extract$\logic_op_conf_3$329, BEL X1Y2/c0.l_logic_op, score 1, distance 1, sparseness 6, pip_hop 0
+
+Info: Placed cell '$extract$\logic_op_conf_3$329' at (1, 2) with BEL 'X1Y2/c0.l_logic_op'
+
+Info: Current Best: Cell $extract$\ALU_ALU_func_6$312, BEL X1Y1/c0.ALU, score 2, distance 2, sparseness 5, pip_hop 0
+
+Info: Current Best: Cell $extract$\ALU_ALU_func_6$312, BEL X2Y1/c0.ALU, score 1, distance 1, sparseness 6, pip_hop 0
+
+Info: Placed cell '$extract$\ALU_ALU_func_6$312' at (2, 1) with BEL 'X2Y1/c0.ALU'
+
+Info: Current Best: Cell $extract$\logic_op_conf_0$324, BEL X1Y1/c0.l_logic_op, score 2, distance 2, sparseness 4, pip_hop 0
+
+Info: Current Best: Cell $extract$\logic_op_conf_0$324, BEL X2Y1/c0.l_logic_op, score 1, distance 1, sparseness 6, pip_hop 0
+
+Info: Placed cell '$extract$\logic_op_conf_0$324' at (2, 1) with BEL 'X2Y1/c0.l_logic_op'
+
+Info: Current Best: Cell $extract$\logic_op_conf_0$323, BEL X1Y1/c0.l_logic_op, score 2, distance 2, sparseness 4, pip_hop 0
+
+Info: Current Best: Cell $extract$\logic_op_conf_0$323, BEL X2Y3/c0.l_logic_op, score 1, distance 1, sparseness 6, pip_hop 0
+
+Info: Placed cell '$extract$\logic_op_conf_0$323' at (2, 3) with BEL 'X2Y3/c0.l_logic_op'
+
+Info: Current Best: Cell $iopadmap$main.in1, BEL X0Y1/c0.W_IO, score 160, distance 160, sparseness 6, pip_hop 160
+
+Info: Current Best: Cell $iopadmap$main.go, BEL X0Y1/c0.W_pred_IO_WIDTH_1, score 3, distance 3, sparseness 6, pip_hop 0
+
+Info: Current Best: Cell $iopadmap$main.go, BEL X2Y0/c0.S_pred_IO_WIDTH_1, score 2, distance 2, sparseness 7, pip_hop 0
+
+Info: Current Best: Cell $iopadmap$main.done, BEL X0Y1/c0.W_pred_IO_WIDTH_1, score 3, distance 3, sparseness 6, pip_hop 0
+
+Info: Current Best: Cell $iopadmap$main.clk, BEL X0Y3/c0.W_pred_IO_WIDTH_1, score 3, distance 3, sparseness 6, pip_hop 0
+
+Info: Updating congestion map...
+Info: Congestion at (2, 3): 3
+Info: Congestion at (0, 1): 33
+Info: Congestion at (2, 1): 44
+Info: Congestion at (0, 2): 11
+Info: Congestion at (2, 2): 181
+Info: Congestion at (1, 2): 142
+Info: Calculated Congestion VMR: 66.4589 (AvgCongested: 69.00, Var: 4585.67, NumCongestedPoints: 6)
 Info: Creating initial analytic placement for 9 cells, placement wirelen = 189.
-Info:     at initial placer iter 0, wirelen = 38
-Info:     at initial placer iter 1, wirelen = 37
-Info:     at initial placer iter 2, wirelen = 37
-Info:     at initial placer iter 3, wirelen = 37
-Info: Running main analytical placer, max placement attempts per cell = 10000.
-Info:     at iteration #1, type reg_unit_WIDTH_1: wirelen solved = 37, spread = 37, legal = 49; time = 0.00s
-Info:     at iteration #1, type reg_unit: wirelen solved = 49, spread = 49, legal = 398; time = 0.00s
-Info:       tring binding $extract$\ALU_ALU_func_6$312 to X2Y2/c0.ALU
-Info:     at iteration #1, type ALU: wirelen solved = 398, spread = 366, legal = 498; time = 0.00s
-Info:       tring binding $extract$\logic_op_conf_3$329 to X1Y1/c0.l_logic_op
-Info:       tring binding $extract$\logic_op_conf_0$324 to X2Y3/c0.l_logic_op
-Info:     at iteration #1, type logic_op: wirelen solved = 497, spread = 502, legal = 502; time = 0.00s
-Info:       tring binding $extract$\logic_op_conf_3$329 to X1Y3/c0.l_logic_op
-Info:       tring binding $extract$\ALU_ALU_func_6$312 to X2Y1/c0.ALU
-Info:       tring binding $extract$\logic_op_conf_0$324 to X2Y3/c0.l_logic_op
-Info:     at iteration #1, type ALL: wirelen solved = 5, spread = 356, legal = 440; time = 0.00s
-Info:     at iteration #2, type reg_unit_WIDTH_1: wirelen solved = 441, spread = 441, legal = 441; time = 0.00s
-Info:     at iteration #2, type reg_unit: wirelen solved = 230, spread = 230, legal = 441; time = 0.00s
-Info:       tring binding $extract$\ALU_ALU_func_6$312 to X2Y3/c0.ALU
-Info:     at iteration #2, type ALU: wirelen solved = 442, spread = 502, legal = 469; time = 0.00s
-Info:       tring binding $extract$\logic_op_conf_3$329 to X1Y2/c0.l_logic_op
-Info:       tring binding $extract$\logic_op_conf_0$324 to X3Y2/c0.l_logic_op
-Info:       tring binding $extract$\logic_op_conf_0$324 to X4Y3/c0.l_logic_op
-Info:     at iteration #2, type logic_op: wirelen solved = 467, spread = 467, legal = 473; time = 0.00s
-Info:       tring binding $extract$\logic_op_conf_3$329 to X1Y3/c0.l_logic_op
-Info:       tring binding $extract$\ALU_ALU_func_6$312 to X2Y1/c0.ALU
-Info:       tring binding $extract$\logic_op_conf_0$324 to X3Y3/c0.l_logic_op
-Info:     at iteration #2, type ALL: wirelen solved = 76, spread = 128, legal = 403; time = 0.00s
-Info:     at iteration #3, type reg_unit_WIDTH_1: wirelen solved = 403, spread = 403, legal = 403; time = 0.00s
-Info:     at iteration #3, type reg_unit: wirelen solved = 129, spread = 129, legal = 542; time = 0.00s
-Info:       tring binding $extract$\ALU_ALU_func_6$312 to X1Y2/c0.ALU
-Info:     at iteration #3, type ALU: wirelen solved = 510, spread = 478, legal = 474; time = 0.00s
-Info:       tring binding $extract$\logic_op_conf_3$329 to X1Y3/c0.l_logic_op
-Info:       tring binding $extract$\logic_op_conf_0$324 to X2Y3/c0.l_logic_op
-Info:     at iteration #3, type logic_op: wirelen solved = 469, spread = 471, legal = 471; time = 0.00s
-Info:       tring binding $extract$\logic_op_conf_3$329 to X1Y3/c0.l_logic_op
-Info:       tring binding $extract$\ALU_ALU_func_6$312 to X1Y2/c0.ALU
-Info:       tring binding $extract$\logic_op_conf_0$324 to X2Y3/c0.l_logic_op
-Info:     at iteration #3, type ALL: wirelen solved = 113, spread = 86, legal = 473; time = 0.00s
-Info:     at iteration #4, type reg_unit_WIDTH_1: wirelen solved = 473, spread = 473, legal = 473; time = 0.00s
-Info:     at iteration #4, type reg_unit: wirelen solved = 250, spread = 250, legal = 473; time = 0.00s
-Info:       tring binding $extract$\ALU_ALU_func_6$312 to X1Y1/c0.ALU
-Info:     at iteration #4, type ALU: wirelen solved = 437, spread = 473, legal = 480; time = 0.00s
-Info:       tring binding $extract$\logic_op_conf_3$329 to X1Y3/c0.l_logic_op
-Info:       tring binding $extract$\logic_op_conf_0$324 to X2Y3/c0.l_logic_op
-Info:     at iteration #4, type logic_op: wirelen solved = 475, spread = 478, legal = 478; time = 0.00s
-Info:       tring binding $extract$\logic_op_conf_3$329 to X1Y4/c0.l_logic_op
-Info:       tring binding $extract$\ALU_ALU_func_6$312 to X1Y2/c0.ALU
-Info:       tring binding $extract$\logic_op_conf_0$324 to X2Y4/c0.l_logic_op
-Info:     at iteration #4, type ALL: wirelen solved = 356, spread = 403, legal = 375; time = 0.00s
-Info: HeAP Placer Time: 0.03s
-Info:   of which solving equations: 0.02s
-Info:   of which spreading cells: 0.00s
-Info:   of which strict legalisation: 0.00s
-
-Info: Running simulated annealing placer for refinement.
-Info:   at iteration #1: temp = 0.000000, timing cost = 0, wirelen = 375
-Info:   at iteration #2: temp = 0.000000, timing cost = 0, wirelen = 370 
-Info: SA placement time 0.01s
-Info: Checksum: 0x61c14fb8
-Info: Heap placer took 0 iterations and 0.03s seconds
-
-Info: ================== Final Placement ===================
-Info: X3Y1/c0.l_logic_op: $extract$\logic_op_conf_3$329
-Info: X2Y2/c0.l_logic_op: $extract$\logic_op_conf_3$328
-Info: X1Y1/c0.l_logic_op: $extract$\logic_op_conf_1$326
-Info: X1Y2/c0.ALU: $extract$\ALU_ALU_func_6$312
-Info: X3Y2/c0.l_logic_op: $extract$\logic_op_conf_0$324
-Info: X2Y1/c0.l_logic_op: $extract$\logic_op_conf_0$323
-Info: X0Y3/c0.W_IO: $iopadmap$main.in0
-Info: X1Y0/c0.S_IO: $iopadmap$main.in1
-Info: X4Y0/c0.S_pred_IO_WIDTH_1: $iopadmap$main.go
-Info: X2Y0/c0.S_pred_IO_WIDTH_1: $iopadmap$main.reset
-Info: X3Y0/c0.S_pred_IO_WIDTH_1: $iopadmap$main.done
-Info: X5Y1/c0.A_Mem: mem_0.mem.0.0
-Info: X0Y3/c0.W_pred_IO_WIDTH_1: $iopadmap$main.clk
-Info: X1Y1/c0.B_reg_unit: $extract$\reg_unit_tide_en_0_tide_rst_1$299
-Info: X5Y1/c0.reg_unit: $extract$\reg_unit_tide_en_0_tide_rst_1$298
-Info: X1Y1/c0.RES_pred_reg_unit_WIDTH_1: $extract$\reg_unit_WIDTH_1_tide_en_1_tide_rst_0$297
-Info: X1Y3/c0.ALU: $extract$\ALU_ALU_func_0$309
-Info: X1Y1/c0.ALU: $extract$\ALU_ALU_func_0$308
-Info: X1Y3/c0.const_unit: $auto$constmap.cc:36:constmap_worker$347
-
-Info: Routing..
-Info: Setting up routing queue.
-Info: Routing net
-Info: Routing 252 arcs.
-Info:            |   (re-)routed arcs  |   delta    | remaining|       time spent     |
-Info:    IterCnt |  w/ripup   wo/ripup |  w/r  wo/r |      arcs| batch(sec) total(sec)|
-Info:       1000 |      699        300 |  699   300 |         4|       0.04       0.04|
-Info:       2000 |     1658        341 |  959    41 |         4|       0.05       0.09|
-Info:       3000 |     2658        341 | 1000     0 |         4|       0.05       0.14|
-Info:       4000 |     3646        353 |  988    12 |         6|       0.05       0.19|
-Info:       5000 |     4613        386 |  967    33 |         4|       0.05       0.23|
-Info:       6000 |     5525        474 |  912    88 |         2|       0.04       0.28|
-Info:       7000 |     6376        623 |  851   149 |         4|       0.04       0.32|
-Info:       8000 |     7366        633 |  990    10 |         5|       0.04       0.36|
-Info:       9000 |     8332        667 |  966    34 |         4|       0.04       0.40|
-Info:      10000 |     9267        732 |  935    65 |         5|       0.04       0.44|
-Info:      11000 |    10234        765 |  967    33 |         5|       0.04       0.48|
-Info:      12000 |    11150        849 |  916    84 |         7|       0.04       0.52|
-Info:      13000 |    11979       1020 |  829   171 |         5|       0.04       0.56|
-Info:      14000 |    12826       1173 |  847   153 |         4|       0.04       0.60|
-Info:      15000 |    13780       1219 |  954    46 |         5|       0.04       0.64|
-Info:      16000 |    14749       1250 |  969    31 |         4|       0.04       0.67|
-Info:      17000 |    15659       1340 |  910    90 |         5|       0.04       0.71|
-Info:      18000 |    16616       1383 |  957    43 |         5|       0.04       0.76|
-Info:      19000 |    17523       1476 |  907    93 |         5|       0.04       0.80|
-Info:      20000 |    18450       1549 |  927    73 |         4|       0.04       0.83|
-Info:      21000 |    19328       1671 |  878   122 |         5|       0.04       0.87|
-Info:      22000 |    20160       1839 |  832   168 |         7|       0.04       0.91|
-Info:      23000 |    20985       2014 |  825   175 |         4|       0.04       0.95|
-Info:      24000 |    21902       2097 |  917    83 |         7|       0.04       0.99|
-Info:      25000 |    22877       2122 |  975    25 |         3|       0.04       1.03|
-Info:      26000 |    23724       2275 |  847   153 |         5|       0.04       1.07|
-Info:      27000 |    24583       2416 |  859   141 |         6|       0.04       1.11|
-Info:      28000 |    25475       2524 |  892   108 |         6|       0.04       1.15|
-Info:      29000 |    26371       2628 |  896   104 |         6|       0.04       1.19|
-Info:      30000 |    27337       2662 |  966    34 |         4|       0.04       1.23|
-Info:      31000 |    28317       2682 |  980    20 |         5|       0.04       1.27|
-Info:      32000 |    29317       2682 | 1000     0 |         5|       0.04       1.31|
-Info:      33000 |    30316       2683 |  999     1 |         4|       0.04       1.35|
-Info:      34000 |    31316       2683 | 1000     0 |         4|       0.04       1.39|
-Info:      35000 |    32316       2683 | 1000     0 |         4|       0.04       1.44|
-Info:      36000 |    33316       2683 | 1000     0 |         4|       0.04       1.48|
-Info:      37000 |    34316       2683 | 1000     0 |         4|       0.04       1.52|
-Info:      38000 |    35316       2683 | 1000     0 |         4|       0.04       1.56|
-Info:      39000 |    36285       2714 |  969    31 |         4|       0.04       1.60|
-Info:      40000 |    37275       2724 |  990    10 |         4|       0.05       1.65|
-Info:      41000 |    38275       2724 | 1000     0 |         4|       0.04       1.69|
-Info:      42000 |    39235       2764 |  960    40 |         7|       0.04       1.73|
-Info:      43000 |    40155       2844 |  920    80 |         7|       0.04       1.77|
-Info:      44000 |    41131       2868 |  976    24 |         4|       0.04       1.81|
-Info:      45000 |    42131       2868 | 1000     0 |         4|       0.04       1.85|
-Info:      46000 |    43131       2868 | 1000     0 |         4|       0.04       1.89|
-Info:      47000 |    44131       2868 | 1000     0 |         4|       0.04       1.93|
-Info:      48000 |    45131       2868 | 1000     0 |         4|       0.04       1.97|
-Info:      49000 |    46131       2868 | 1000     0 |         4|       0.04       2.01|
-Info:      50000 |    47131       2868 | 1000     0 |         4|       0.04       2.06|
-  Current arc_queue size: 4
-  Arc_queue contents (top to bottom):
-    Net: $auto$fsm_map.cc:170:map_fsm$221, UserIdx: 1, PhysIdx: 0, Priority: 0, Randtag: 544085285
-    Net: $auto$fsm_map.cc:118:implement_pattern_cache$233, UserIdx: 0, PhysIdx: 0, Priority: 0, Randtag: 105205
-    Net: $iopadmap$reset, UserIdx: 2, PhysIdx: 0, Priority: 0, Randtag: 90572
-    Net: $iopadmap$reset, UserIdx: 0, PhysIdx: 0, Priority: 0, Randtag: 50151
-ERROR: Max iteration count reached, stopping routing.
-Info: Writing FASM file to /home/kelvin/FABulous_fork/myProject/user_design/router_test.fasm
-
-0 warnings, 1 error
-
-Info: Program finished normally.
-2025-06-06 14:21:12.965 | INFO     | FABulous.file_parser.file_parser_yaml:parseTileYAML:259 - Reading tile configuration: /home/kelvin/FABulous_fork/myProject/Tile/PE/PE.yaml
-2025-06-06 14:21:12.969 | INFO     | FABulous.file_parser.file_parser_HDL:parseBelFile:155 - Parsing bel file: /home/kelvin/FABulous_fork/myProject/Tile/PE/reg_unit.v
-2025-06-06 14:21:12.975 | INFO     | FABulous.file_parser.file_parser_HDL:parseBelFile:155 - Parsing bel file: /home/kelvin/FABulous_fork/myProject/Tile/PE/ALU.v
-2025-06-06 14:21:12.981 | INFO     | FABulous.file_parser.file_parser_HDL:parseBelFile:155 - Parsing bel file: /home/kelvin/FABulous_fork/myProject/Tile/PE/compare.v
-2025-06-06 14:21:12.987 | INFO     | FABulous.file_parser.file_parser_HDL:parseBelFile:155 - Parsing bel file: /home/kelvin/FABulous_fork/myProject/Tile/PE/reg_unit.v
-2025-06-06 14:21:12.992 | INFO     | FABulous.file_parser.file_parser_HDL:parseBelFile:155 - Parsing bel file: /home/kelvin/FABulous_fork/myProject/Tile/PE/reg_unit.v
-2025-06-06 14:21:12.996 | INFO     | FABulous.file_parser.file_parser_HDL:parseBelFile:155 - Parsing bel file: /home/kelvin/FABulous_fork/myProject/Tile/PE/const_unit.v
-2025-06-06 14:21:13.002 | INFO     | FABulous.file_parser.file_parser_HDL:parseBelFile:155 - Parsing bel file: /home/kelvin/FABulous_fork/myProject/Tile/PE/reg_unit.v
-2025-06-06 14:21:13.008 | INFO     | FABulous.file_parser.file_parser_HDL:parseBelFile:155 - Parsing bel file: /home/kelvin/FABulous_fork/myProject/Tile/PE/logic_op.v
-2025-06-06 14:21:13.012 | INFO     | FABulous.file_parser.file_parser_HDL:parseBelFile:155 - Parsing bel file: /home/kelvin/FABulous_fork/myProject/Tile/PE/reg_unit.v
-2025-06-06 14:21:13.017 | INFO     | FABulous.file_parser.file_parser_HDL:parseBelFile:155 - Parsing bel file: /home/kelvin/FABulous_fork/myProject/Tile/PE/reg_unit.v
-2025-06-06 14:21:13.027 | INFO     | FABulous.file_parser.file_parser_yaml:parseTileYAML:259 - Reading tile configuration: /home/kelvin/FABulous_fork/myProject/Tile/N_IO/N_IO.yaml
-2025-06-06 14:21:13.029 | INFO     | FABulous.file_parser.file_parser_HDL:parseBelFile:155 - Parsing bel file: /home/kelvin/FABulous_fork/myProject/Tile/N_IO/../include/IO.v
-2025-06-06 14:21:13.033 | INFO     | FABulous.file_parser.file_parser_HDL:parseBelFile:155 - Parsing bel file: /home/kelvin/FABulous_fork/myProject/Tile/N_IO/../include/IO.v
-2025-06-06 14:21:13.040 | INFO     | FABulous.file_parser.file_parser_yaml:parseTileYAML:259 - Reading tile configuration: /home/kelvin/FABulous_fork/myProject/Tile/E_Mem/E_Mem.yaml
-2025-06-06 14:21:13.042 | INFO     | FABulous.file_parser.file_parser_HDL:parseBelFile:155 - Parsing bel file: /home/kelvin/FABulous_fork/myProject/Tile/E_Mem/reg_unit.v
-2025-06-06 14:21:13.047 | INFO     | FABulous.file_parser.file_parser_HDL:parseBelFile:155 - Parsing bel file: /home/kelvin/FABulous_fork/myProject/Tile/E_Mem/Mem.v
-2025-06-06 14:21:13.054 | INFO     | FABulous.file_parser.file_parser_HDL:parseBelFile:155 - Parsing bel file: /home/kelvin/FABulous_fork/myProject/Tile/E_Mem/Mem.v
-2025-06-06 14:21:13.063 | INFO     | FABulous.file_parser.file_parser_yaml:parseTileYAML:259 - Reading tile configuration: /home/kelvin/FABulous_fork/myProject/Tile/S_IO/S_IO.yaml
-2025-06-06 14:21:13.065 | INFO     | FABulous.file_parser.file_parser_HDL:parseBelFile:155 - Parsing bel file: /home/kelvin/FABulous_fork/myProject/Tile/S_IO/../include/IO.v
-2025-06-06 14:21:13.070 | INFO     | FABulous.file_parser.file_parser_HDL:parseBelFile:155 - Parsing bel file: /home/kelvin/FABulous_fork/myProject/Tile/S_IO/../include/IO.v
-2025-06-06 14:21:13.079 | INFO     | FABulous.file_parser.file_parser_yaml:parseTileYAML:259 - Reading tile configuration: /home/kelvin/FABulous_fork/myProject/Tile/W_IO/W_IO.yaml
-2025-06-06 14:21:13.080 | INFO     | FABulous.file_parser.file_parser_HDL:parseBelFile:155 - Parsing bel file: /home/kelvin/FABulous_fork/myProject/Tile/W_IO/../include/IO.v
-2025-06-06 14:21:13.086 | INFO     | FABulous.file_parser.file_parser_HDL:parseBelFile:155 - Parsing bel file: /home/kelvin/FABulous_fork/myProject/Tile/W_IO/../include/IO.v
-2025-06-06 14:21:13.095 | INFO     | FABulous.file_parser.file_parser_yaml:parseFabricYAML:195 - Fabric YAML parsed successfully.
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$299:reg_in[31] -> $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_out[31]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0093 (congestion score: 323, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_out[31] -> $extract$\reg_unit_tide_en_0_tide_rst_1$299:reg_in[31]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 1.0, scale: 1.00)
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$299:reg_in[31] -> $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_out[31]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0093 (congestion score: 323, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$299:reg_in[30] -> $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_out[30]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0093 (congestion score: 323, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$299:reg_in[30] -> $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_out[30]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0093 (congestion score: 323, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$299:reg_in[29] -> $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_out[29]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0093 (congestion score: 323, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$299:reg_in[29] -> $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_out[29]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0093 (congestion score: 323, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$299:reg_in[28] -> $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_out[28]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0093 (congestion score: 323, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$299:reg_in[28] -> $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_out[28]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0093 (congestion score: 323, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$299:reg_in[27] -> $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_out[27]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0093 (congestion score: 323, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$299:reg_in[27] -> $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_out[27]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0093 (congestion score: 323, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$299:reg_in[26] -> $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_out[26]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0093 (congestion score: 323, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$299:reg_in[26] -> $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_out[26]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0093 (congestion score: 323, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Congestion mult: 1.0093 (congestion score: 323, VMR: 66.46)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$299:reg_in[31] -> $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_out[31]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 1.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0093 (congestion score: 323, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_out[30] -> $extract$\reg_unit_tide_en_0_tide_rst_1$299:reg_in[30]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 1.0, scale: 1.00)
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$299:reg_in[25] -> $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_out[25]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0093 (congestion score: 323, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$299:reg_in[25] -> $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_out[25]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0093 (congestion score: 323, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$299:reg_in[24] -> $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_out[24]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0093 (congestion score: 323, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$299:reg_in[24] -> $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_out[24]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0093 (congestion score: 323, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$299:reg_in[23] -> $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_out[23]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0093 (congestion score: 323, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$299:reg_in[23] -> $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_out[23]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0093 (congestion score: 323, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$299:reg_in[22] -> $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_out[22]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0093 (congestion score: 323, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$299:reg_in[22] -> $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_out[22]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0093 (congestion score: 323, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$299:reg_in[21] -> $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_out[21]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0093 (congestion score: 323, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$299:reg_in[21] -> $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_out[21]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0093 (congestion score: 323, VMR: 66.46)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$299:reg_in[30] -> $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_out[30]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 1.0, scale: 1.00)
+Info:   Congestion mult: 1.0093 (congestion score: 323, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$299:reg_in[20] -> $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_out[20]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0093 (congestion score: 323, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info:   Congestion mult: 1.0093 (congestion score: 323, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$299:reg_in[20] -> $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_out[20]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_out[29] -> $extract$\reg_unit_tide_en_0_tide_rst_1$299:reg_in[29]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 1.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0093 (congestion score: 323, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$299:reg_in[19] -> $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_out[19]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0093 (congestion score: 323, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$299:reg_in[19] -> $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_out[19]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0093 (congestion score: 323, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$299:reg_in[18] -> $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_out[18]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0093 (congestion score: 323, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$299:reg_in[18] -> $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_out[18]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0093 (congestion score: 323, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$299:reg_in[17] -> $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_out[17]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0093 (congestion score: 323, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$299:reg_in[17] -> $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_out[17]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0093 (congestion score: 323, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$299:reg_in[16] -> $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_out[16]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0093 (congestion score: 323, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$299:reg_in[16] -> $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_out[16]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0093 (congestion score: 323, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$299:reg_in[15] -> $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_out[15]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0093 (congestion score: 323, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$299:reg_in[15] -> $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_out[15]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0093 (congestion score: 323, VMR: 66.46)
+Info:   Final Weight: 0.0000
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0093 (congestion score: 323, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$299:reg_in[14] -> $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_out[14]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$299:reg_in[29] -> $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_out[29]
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0093 (congestion score: 323, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$299:reg_in[14] -> $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_out[14]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0093 (congestion score: 323, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$299:reg_in[13] -> $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_out[13]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0093 (congestion score: 323, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$299:reg_in[13] -> $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_out[13]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0093 (congestion score: 323, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$299:reg_in[12] -> $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_out[12]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 1.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0093 (congestion score: 323, VMR: 66.46)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0093 (congestion score: 323, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$299:reg_in[12] -> $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_out[12]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0093 (congestion score: 323, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_out[28] -> $extract$\reg_unit_tide_en_0_tide_rst_1$299:reg_in[28]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 1.0, scale: 1.00)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$299:reg_in[11] -> $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_out[11]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0093 (congestion score: 323, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$299:reg_in[11] -> $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_out[11]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0093 (congestion score: 323, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$299:reg_in[10] -> $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_out[10]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0093 (congestion score: 323, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$299:reg_in[10] -> $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_out[10]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0093 (congestion score: 323, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$299:reg_in[9] -> $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_out[9]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0093 (congestion score: 323, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$299:reg_in[9] -> $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_out[9]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0093 (congestion score: 323, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$299:reg_in[8] -> $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_out[8]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0093 (congestion score: 323, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$299:reg_in[8] -> $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_out[8]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0093 (congestion score: 323, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$299:reg_in[7] -> $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_out[7]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0093 (congestion score: 323, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$299:reg_in[7] -> $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_out[7]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0093 (congestion score: 323, VMR: 66.46)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$299:reg_in[28] -> $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_out[28]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 1.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0093 (congestion score: 323, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$299:reg_in[6] -> $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_out[6]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0093 (congestion score: 323, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0093 (congestion score: 323, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$299:reg_in[6] -> $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_out[6]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0093 (congestion score: 323, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$299:reg_in[5] -> $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_out[5]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_out[27] -> $extract$\reg_unit_tide_en_0_tide_rst_1$299:reg_in[27]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 1.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0093 (congestion score: 323, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$299:reg_in[5] -> $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_out[5]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0093 (congestion score: 323, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$299:reg_in[4] -> $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_out[4]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0093 (congestion score: 323, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$299:reg_in[4] -> $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_out[4]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0093 (congestion score: 323, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$299:reg_in[3] -> $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_out[3]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0093 (congestion score: 323, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$299:reg_in[3] -> $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_out[3]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0093 (congestion score: 323, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$299:reg_in[2] -> $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_out[2]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0093 (congestion score: 323, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$299:reg_in[2] -> $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_out[2]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0093 (congestion score: 323, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$299:reg_in[1] -> $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_out[1]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0093 (congestion score: 323, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$299:reg_in[1] -> $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_out[1]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0093 (congestion score: 323, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$299:reg_in[0] -> $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_out[0]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0093 (congestion score: 323, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0093 (congestion score: 323, VMR: 66.46)
+Info:   Final Weight: 0.0000
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$299:reg_in[0] -> $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_out[0]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0093 (congestion score: 323, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$299:reg_in[27] -> $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_out[27]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 1.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0093 (congestion score: 323, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_out[26] -> $extract$\reg_unit_tide_en_0_tide_rst_1$299:reg_in[26]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 1.0, scale: 1.00)
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_in[31] -> mem_0.mem.0.0:read_data[31]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0166 (congestion score: 181, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_in[31] -> mem_0.mem.0.0:read_data[31]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0166 (congestion score: 181, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_in[30] -> mem_0.mem.0.0:read_data[30]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0166 (congestion score: 181, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_in[30] -> mem_0.mem.0.0:read_data[30]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0166 (congestion score: 181, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_in[29] -> mem_0.mem.0.0:read_data[29]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0166 (congestion score: 181, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_in[29] -> mem_0.mem.0.0:read_data[29]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0166 (congestion score: 181, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_in[28] -> mem_0.mem.0.0:read_data[28]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0166 (congestion score: 181, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_in[28] -> mem_0.mem.0.0:read_data[28]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0166 (congestion score: 181, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_in[27] -> mem_0.mem.0.0:read_data[27]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0166 (congestion score: 181, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_in[27] -> mem_0.mem.0.0:read_data[27]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0166 (congestion score: 181, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_in[26] -> mem_0.mem.0.0:read_data[26]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0093 (congestion score: 323, VMR: 66.46)
+Info:   Final Weight: 0.0000
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0166 (congestion score: 181, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_in[26] -> mem_0.mem.0.0:read_data[26]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0166 (congestion score: 181, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$299:reg_in[26] -> $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_out[26]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 1.0, scale: 1.00)
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_in[25] -> mem_0.mem.0.0:read_data[25]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0166 (congestion score: 181, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0093 (congestion score: 323, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_in[25] -> mem_0.mem.0.0:read_data[25]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_out[25] -> $extract$\reg_unit_tide_en_0_tide_rst_1$299:reg_in[25]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 1.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0166 (congestion score: 181, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_in[24] -> mem_0.mem.0.0:read_data[24]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0166 (congestion score: 181, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_in[24] -> mem_0.mem.0.0:read_data[24]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0166 (congestion score: 181, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_in[23] -> mem_0.mem.0.0:read_data[23]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0166 (congestion score: 181, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_in[23] -> mem_0.mem.0.0:read_data[23]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0166 (congestion score: 181, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_in[22] -> mem_0.mem.0.0:read_data[22]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0166 (congestion score: 181, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_in[22] -> mem_0.mem.0.0:read_data[22]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0166 (congestion score: 181, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_in[21] -> mem_0.mem.0.0:read_data[21]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0166 (congestion score: 181, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_in[21] -> mem_0.mem.0.0:read_data[21]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0166 (congestion score: 181, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_in[20] -> mem_0.mem.0.0:read_data[20]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0166 (congestion score: 181, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_in[20] -> mem_0.mem.0.0:read_data[20]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0166 (congestion score: 181, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0093 (congestion score: 323, VMR: 66.46)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$299:reg_in[25] -> $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_out[25]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 1.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0093 (congestion score: 323, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_in[19] -> mem_0.mem.0.0:read_data[19]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_out[24] -> $extract$\reg_unit_tide_en_0_tide_rst_1$299:reg_in[24]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 1.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0166 (congestion score: 181, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_in[19] -> mem_0.mem.0.0:read_data[19]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0166 (congestion score: 181, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_in[18] -> mem_0.mem.0.0:read_data[18]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0166 (congestion score: 181, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_in[18] -> mem_0.mem.0.0:read_data[18]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0166 (congestion score: 181, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_in[17] -> mem_0.mem.0.0:read_data[17]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0166 (congestion score: 181, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_in[17] -> mem_0.mem.0.0:read_data[17]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0166 (congestion score: 181, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_in[16] -> mem_0.mem.0.0:read_data[16]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0166 (congestion score: 181, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_in[16] -> mem_0.mem.0.0:read_data[16]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0166 (congestion score: 181, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_in[15] -> mem_0.mem.0.0:read_data[15]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0166 (congestion score: 181, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_in[15] -> mem_0.mem.0.0:read_data[15]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0166 (congestion score: 181, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_in[14] -> mem_0.mem.0.0:read_data[14]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0166 (congestion score: 181, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_in[14] -> mem_0.mem.0.0:read_data[14]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0166 (congestion score: 181, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_in[13] -> mem_0.mem.0.0:read_data[13]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0093 (congestion score: 323, VMR: 66.46)
+Info:   Final Weight: 0.0000
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0166 (congestion score: 181, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$299:reg_in[24] -> $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_out[24]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 1.0, scale: 1.00)
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_in[13] -> mem_0.mem.0.0:read_data[13]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0166 (congestion score: 181, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_in[12] -> mem_0.mem.0.0:read_data[12]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0166 (congestion score: 181, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_in[12] -> mem_0.mem.0.0:read_data[12]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0166 (congestion score: 181, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_in[11] -> mem_0.mem.0.0:read_data[11]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0093 (congestion score: 323, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0166 (congestion score: 181, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_in[11] -> mem_0.mem.0.0:read_data[11]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0166 (congestion score: 181, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_in[10] -> mem_0.mem.0.0:read_data[10]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_out[23] -> $extract$\reg_unit_tide_en_0_tide_rst_1$299:reg_in[23]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 1.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0166 (congestion score: 181, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_in[10] -> mem_0.mem.0.0:read_data[10]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0166 (congestion score: 181, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_in[9] -> mem_0.mem.0.0:read_data[9]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0166 (congestion score: 181, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_in[9] -> mem_0.mem.0.0:read_data[9]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0166 (congestion score: 181, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_in[8] -> mem_0.mem.0.0:read_data[8]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0166 (congestion score: 181, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_in[8] -> mem_0.mem.0.0:read_data[8]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0166 (congestion score: 181, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_in[7] -> mem_0.mem.0.0:read_data[7]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0166 (congestion score: 181, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_in[7] -> mem_0.mem.0.0:read_data[7]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0166 (congestion score: 181, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_in[6] -> mem_0.mem.0.0:read_data[6]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0166 (congestion score: 181, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_in[6] -> mem_0.mem.0.0:read_data[6]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0166 (congestion score: 181, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_in[5] -> mem_0.mem.0.0:read_data[5]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0166 (congestion score: 181, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0093 (congestion score: 323, VMR: 66.46)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$299:reg_in[23] -> $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_out[23]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 1.0, scale: 1.00)
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_in[5] -> mem_0.mem.0.0:read_data[5]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0166 (congestion score: 181, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_in[4] -> mem_0.mem.0.0:read_data[4]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0093 (congestion score: 323, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0166 (congestion score: 181, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_in[4] -> mem_0.mem.0.0:read_data[4]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0166 (congestion score: 181, VMR: 66.46)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_out[22] -> $extract$\reg_unit_tide_en_0_tide_rst_1$299:reg_in[22]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 1.0, scale: 1.00)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_in[3] -> mem_0.mem.0.0:read_data[3]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0166 (congestion score: 181, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_in[3] -> mem_0.mem.0.0:read_data[3]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0166 (congestion score: 181, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_in[2] -> mem_0.mem.0.0:read_data[2]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0166 (congestion score: 181, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_in[2] -> mem_0.mem.0.0:read_data[2]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0166 (congestion score: 181, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_in[1] -> mem_0.mem.0.0:read_data[1]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0166 (congestion score: 181, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_in[1] -> mem_0.mem.0.0:read_data[1]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0166 (congestion score: 181, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_in[0] -> mem_0.mem.0.0:read_data[0]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0166 (congestion score: 181, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_in[0] -> mem_0.mem.0.0:read_data[0]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0166 (congestion score: 181, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\logic_op_conf_3$329:A -> $iopadmap$main.reset:to_fabric
+Info:   HPWL Base Weight: 0.3333 (users: 3.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0196 (congestion score: 153, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\logic_op_conf_3$329:A -> $iopadmap$main.reset:to_fabric
+Info:   HPWL Base Weight: 0.3333 (users: 3.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0196 (congestion score: 153, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$298:rst -> $iopadmap$main.reset:to_fabric
+Info:   HPWL Base Weight: 0.3333 (users: 3.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0090 (congestion score: 334, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$298:rst -> $iopadmap$main.reset:to_fabric
+Info:   HPWL Base Weight: 0.3333 (users: 3.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0090 (congestion score: 334, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0093 (congestion score: 323, VMR: 66.46)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$299:rst -> $iopadmap$main.reset:to_fabric
+Info:   HPWL Base Weight: 0.3333 (users: 3.000000, dist: 0.0, scale: 1.00)
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$299:reg_in[22] -> $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_out[22]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 1.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0093 (congestion score: 323, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0196 (congestion score: 153, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$299:rst -> $iopadmap$main.reset:to_fabric
+Info:   HPWL Base Weight: 0.3333 (users: 3.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0196 (congestion score: 153, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_out[21] -> $extract$\reg_unit_tide_en_0_tide_rst_1$299:reg_in[21]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 1.0, scale: 1.00)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_WIDTH_1_tide_en_1_tide_rst_0$297:reg_in -> $extract$\logic_op_conf_1$326:Y
+Info:   HPWL Base Weight: 0.5000 (users: 2.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0166 (congestion score: 181, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_WIDTH_1_tide_en_1_tide_rst_0$297:reg_in -> $extract$\logic_op_conf_1$326:Y
+Info:   HPWL Base Weight: 0.5000 (users: 2.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0166 (congestion score: 181, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc mem_0.mem.0.0:write_en -> $extract$\logic_op_conf_1$326:Y
+Info:   HPWL Base Weight: 0.5000 (users: 2.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0166 (congestion score: 181, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc mem_0.mem.0.0:write_en -> $extract$\logic_op_conf_1$326:Y
+Info:   HPWL Base Weight: 0.5000 (users: 2.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0166 (congestion score: 181, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\logic_op_conf_3$328:Y -> $extract$\logic_op_conf_0$324:B
+Info:   HPWL Base Weight: 0.3333 (users: 3.000000, dist: 1.0, scale: 1.00)
+Info:   Arch mult: 1.3333 (hops: 3)
+Info:   Congestion mult: 1.0133 (congestion score: 225, VMR: 66.46)
+Info:   Final Weight: 0.4504
+Info: Arc $extract$\logic_op_conf_0$324:B -> $extract$\logic_op_conf_3$328:Y
+Info:   HPWL Base Weight: 0.3333 (users: 3.000000, dist: 1.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0133 (congestion score: 225, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\logic_op_conf_1$326:A -> $extract$\logic_op_conf_0$324:B
+Info:   HPWL Base Weight: 0.3333 (users: 3.000000, dist: 1.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0133 (congestion score: 225, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\logic_op_conf_1$326:A -> $extract$\logic_op_conf_3$328:Y
+Info:   HPWL Base Weight: 0.3333 (users: 3.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0166 (congestion score: 181, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0093 (congestion score: 323, VMR: 66.46)
+Info:   Final Weight: 0.0000
+Info: Arc $iopadmap$main.done:from_fabric -> $extract$\logic_op_conf_0$324:B
+Info:   HPWL Base Weight: 0.3333 (users: 3.000000, dist: 0.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0390 (congestion score: 77, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $iopadmap$main.done:from_fabric -> $extract$\logic_op_conf_3$328:Y
+Info:   HPWL Base Weight: 0.3333 (users: 3.000000, dist: 1.0, scale: 1.00)
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$299:reg_in[21] -> $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_out[21]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 1.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0140 (congestion score: 214, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\logic_op_conf_3$329:Y -> $extract$\logic_op_conf_0$324:A
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 1.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0093 (congestion score: 323, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_out[20] -> $extract$\reg_unit_tide_en_0_tide_rst_1$299:reg_in[20]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 1.0, scale: 1.00)
+Info:   Arch mult: 1.2000 (hops: 5)
+Info:   Congestion mult: 1.0161 (congestion score: 186, VMR: 66.46)
+Info:   Final Weight: 1.2194
+Info: Arc $extract$\logic_op_conf_0$324:A -> $extract$\logic_op_conf_3$329:Y
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 1.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0161 (congestion score: 186, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\logic_op_conf_0$323:Y -> $extract$\logic_op_conf_1$326:B
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 1.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0163 (congestion score: 184, VMR: 66.46)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\logic_op_conf_1$326:B -> $extract$\logic_op_conf_0$323:Y
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 1.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0163 (congestion score: 184, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\logic_op_conf_0$324:Y -> $extract$\logic_op_conf_0$323:A
+Info:   HPWL Base Weight: 0.5000 (users: 1.000000, dist: 2.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0093 (congestion score: 323, VMR: 66.46)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$299:reg_in[20] -> $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_out[20]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 1.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0093 (congestion score: 323, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info:   Arch mult: 1.2000 (hops: 5)
+Info:   Congestion mult: 1.0132 (congestion score: 228, VMR: 66.46)
+Info:   Final Weight: 0.6079
+Info: Arc $extract$\logic_op_conf_0$323:A -> $extract$\logic_op_conf_0$324:Y
+Info:   HPWL Base Weight: 0.5000 (users: 1.000000, dist: 2.0, scale: 1.00)
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_out[19] -> $extract$\reg_unit_tide_en_0_tide_rst_1$299:reg_in[19]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 1.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0132 (congestion score: 228, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\ALU_ALU_func_6$312:data_out[3] -> mem_0.mem.0.0:addr0[3]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 1.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0133 (congestion score: 225, VMR: 66.46)
+Info:   Final Weight: 0.0000
+Info: Arc mem_0.mem.0.0:addr0[3] -> $extract$\ALU_ALU_func_6$312:data_out[3]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 1.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0133 (congestion score: 225, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\ALU_ALU_func_6$312:data_out[2] -> mem_0.mem.0.0:addr0[2]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 1.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0133 (congestion score: 225, VMR: 66.46)
+Info:   Final Weight: 0.0000
+Info: Arc mem_0.mem.0.0:addr0[2] -> $extract$\ALU_ALU_func_6$312:data_out[2]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 1.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0133 (congestion score: 225, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\ALU_ALU_func_6$312:data_out[1] -> mem_0.mem.0.0:addr0[1]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 1.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0133 (congestion score: 225, VMR: 66.46)
+Info:   Final Weight: 0.0000
+Info: Arc mem_0.mem.0.0:addr0[1] -> $extract$\ALU_ALU_func_6$312:data_out[1]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 1.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0133 (congestion score: 225, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\ALU_ALU_func_6$312:data_out[0] -> mem_0.mem.0.0:addr0[0]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 1.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0133 (congestion score: 225, VMR: 66.46)
+Info:   Final Weight: 0.0000
+Info: Arc mem_0.mem.0.0:addr0[0] -> $extract$\ALU_ALU_func_6$312:data_out[0]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 1.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0133 (congestion score: 225, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_WIDTH_1_tide_en_1_tide_rst_0$297:reg_out -> $extract$\ALU_ALU_func_6$312:data_in3
+Info:   HPWL Base Weight: 0.2000 (users: 5.000000, dist: 1.0, scale: 1.00)
+Info:   Arch mult: 1.3333 (hops: 3)
+Info:   Congestion mult: 1.0133 (congestion score: 225, VMR: 66.46)
+Info:   Final Weight: 0.2702
+Info: Arc $extract$\reg_unit_WIDTH_1_tide_en_1_tide_rst_0$297:reg_out -> $extract$\logic_op_conf_0$323:B
+Info:   HPWL Base Weight: 0.2000 (users: 5.000000, dist: 1.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0093 (congestion score: 323, VMR: 66.46)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$299:reg_in[19] -> $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_out[19]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 1.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0093 (congestion score: 323, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_out[18] -> $extract$\reg_unit_tide_en_0_tide_rst_1$299:reg_in[18]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 1.0, scale: 1.00)
+Info:   Arch mult: 1.3333 (hops: 3)
+Info:   Congestion mult: 1.0163 (congestion score: 184, VMR: 66.46)
+Info:   Final Weight: 0.2710
+Info: Arc $extract$\ALU_ALU_func_6$312:data_in3 -> $extract$\logic_op_conf_0$323:B
+Info:   HPWL Base Weight: 0.1000 (users: 5.000000, dist: 2.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0132 (congestion score: 228, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\logic_op_conf_0$323:B -> $extract$\ALU_ALU_func_6$312:data_in3
+Info:   HPWL Base Weight: 0.1000 (users: 5.000000, dist: 2.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0132 (congestion score: 228, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\logic_op_conf_3$328:A -> $extract$\ALU_ALU_func_6$312:data_in3
+Info:   HPWL Base Weight: 0.2000 (users: 5.000000, dist: 1.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0133 (congestion score: 225, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\logic_op_conf_3$328:A -> $extract$\logic_op_conf_0$323:B
+Info:   HPWL Base Weight: 0.2000 (users: 5.000000, dist: 1.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0163 (congestion score: 184, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$298:en -> $extract$\ALU_ALU_func_6$312:data_in3
+Info:   HPWL Base Weight: 0.2000 (users: 5.000000, dist: 1.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0133 (congestion score: 225, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$298:en -> $extract$\logic_op_conf_0$323:B
+Info:   HPWL Base Weight: 0.2000 (users: 5.000000, dist: 1.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0163 (congestion score: 184, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$299:en -> $extract$\ALU_ALU_func_6$312:data_in3
+Info:   HPWL Base Weight: 0.2000 (users: 5.000000, dist: 1.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0161 (congestion score: 186, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$299:en -> $extract$\logic_op_conf_0$323:B
+Info:   HPWL Base Weight: 0.2000 (users: 5.000000, dist: 1.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0207 (congestion score: 145, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\ALU_ALU_func_0$309:data_out[31] -> $extract$\ALU_ALU_func_6$312:data_in2[31]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 1.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0093 (congestion score: 323, VMR: 66.46)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$299:reg_in[18] -> $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_out[18]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 1.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0093 (congestion score: 323, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info:   Arch mult: 1.3333 (hops: 3)
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_out[17] -> $extract$\reg_unit_tide_en_0_tide_rst_1$299:reg_in[17]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 1.0, scale: 1.00)
+Info:   Congestion mult: 1.0133 (congestion score: 225, VMR: 66.46)
+Info:   Final Weight: 1.3511
+Info: Arc $extract$\ALU_ALU_func_6$312:data_in2[31] -> $extract$\ALU_ALU_func_0$309:data_out[31]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 1.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0133 (congestion score: 225, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\ALU_ALU_func_0$309:data_out[30] -> $extract$\ALU_ALU_func_6$312:data_in2[30]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 1.0, scale: 1.00)
+Info:   Arch mult: 1.3333 (hops: 3)
+Info:   Congestion mult: 1.0133 (congestion score: 225, VMR: 66.46)
+Info:   Final Weight: 1.3511
+Info: Arc $extract$\ALU_ALU_func_6$312:data_in2[30] -> $extract$\ALU_ALU_func_0$309:data_out[30]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 1.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0133 (congestion score: 225, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\ALU_ALU_func_0$309:data_out[29] -> $extract$\ALU_ALU_func_6$312:data_in2[29]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 1.0, scale: 1.00)
+Info:   Arch mult: 1.3333 (hops: 3)
+Info:   Congestion mult: 1.0133 (congestion score: 225, VMR: 66.46)
+Info:   Final Weight: 1.3511
+Info: Arc $extract$\ALU_ALU_func_6$312:data_in2[29] -> $extract$\ALU_ALU_func_0$309:data_out[29]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 1.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0133 (congestion score: 225, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\ALU_ALU_func_0$309:data_out[28] -> $extract$\ALU_ALU_func_6$312:data_in2[28]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 1.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Arch mult: 1.3333 (hops: 3)
+Info:   Congestion mult: 1.0093 (congestion score: 323, VMR: 66.46)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$299:reg_in[17] -> $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_out[17]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 1.0, scale: 1.00)
+Info:   Congestion mult: 1.0133 (congestion score: 225, VMR: 66.46)
+Info:   Final Weight: 1.3511
+Info: Arc $extract$\ALU_ALU_func_6$312:data_in2[28] -> $extract$\ALU_ALU_func_0$309:data_out[28]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 1.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0133 (congestion score: 225, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\ALU_ALU_func_0$309:data_out[27] -> $extract$\ALU_ALU_func_6$312:data_in2[27]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 1.0, scale: 1.00)
+Info:   Arch mult: 1.3333 (hops: 3)
+Info:   Congestion mult: 1.0133 (congestion score: 225, VMR: 66.46)
+Info:   Final Weight: 1.3511
+Info: Arc $extract$\ALU_ALU_func_6$312:data_in2[27] -> $extract$\ALU_ALU_func_0$309:data_out[27]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 1.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0133 (congestion score: 225, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\ALU_ALU_func_0$309:data_out[26] -> $extract$\ALU_ALU_func_6$312:data_in2[26]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 1.0, scale: 1.00)
+Info:   Arch mult: 1.3333 (hops: 3)
+Info:   Congestion mult: 1.0133 (congestion score: 225, VMR: 66.46)
+Info:   Final Weight: 1.3511
+Info: Arc $extract$\ALU_ALU_func_6$312:data_in2[26] -> $extract$\ALU_ALU_func_0$309:data_out[26]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 1.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0133 (congestion score: 225, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\ALU_ALU_func_0$309:data_out[25] -> $extract$\ALU_ALU_func_6$312:data_in2[25]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 1.0, scale: 1.00)
+Info:   Arch mult: 1.3333 (hops: 3)
+Info:   Congestion mult: 1.0133 (congestion score: 225, VMR: 66.46)
+Info:   Final Weight: 1.3511
+Info: Arc $extract$\ALU_ALU_func_6$312:data_in2[25] -> $extract$\ALU_ALU_func_0$309:data_out[25]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 1.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0133 (congestion score: 225, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\ALU_ALU_func_0$309:data_out[24] -> $extract$\ALU_ALU_func_6$312:data_in2[24]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 1.0, scale: 1.00)
+Info:   Arch mult: 1.3333 (hops: 3)
+Info:   Congestion mult: 1.0133 (congestion score: 225, VMR: 66.46)
+Info:   Final Weight: 1.3511
+Info: Arc $extract$\ALU_ALU_func_6$312:data_in2[24] -> $extract$\ALU_ALU_func_0$309:data_out[24]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 1.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0133 (congestion score: 225, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\ALU_ALU_func_0$309:data_out[23] -> $extract$\ALU_ALU_func_6$312:data_in2[23]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 1.0, scale: 1.00)
+Info:   Arch mult: 1.3333 (hops: 3)
+Info:   Congestion mult: 1.0133 (congestion score: 225, VMR: 66.46)
+Info:   Final Weight: 1.3511
+Info: Arc $extract$\ALU_ALU_func_6$312:data_in2[23] -> $extract$\ALU_ALU_func_0$309:data_out[23]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 1.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0133 (congestion score: 225, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\ALU_ALU_func_0$309:data_out[22] -> $extract$\ALU_ALU_func_6$312:data_in2[22]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 1.0, scale: 1.00)
+Info:   Arch mult: 1.3333 (hops: 3)
+Info:   Congestion mult: 1.0133 (congestion score: 225, VMR: 66.46)
+Info:   Final Weight: 1.3511
+Info: Arc $extract$\ALU_ALU_func_6$312:data_in2[22] -> $extract$\ALU_ALU_func_0$309:data_out[22]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 1.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0133 (congestion score: 225, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\ALU_ALU_func_0$309:data_out[21] -> $extract$\ALU_ALU_func_6$312:data_in2[21]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 1.0, scale: 1.00)
+Info:   Arch mult: 1.3333 (hops: 3)
+Info:   Congestion mult: 1.0133 (congestion score: 225, VMR: 66.46)
+Info:   Final Weight: 1.3511
+Info: Arc $extract$\ALU_ALU_func_6$312:data_in2[21] -> $extract$\ALU_ALU_func_0$309:data_out[21]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 1.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0133 (congestion score: 225, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\ALU_ALU_func_0$309:data_out[20] -> $extract$\ALU_ALU_func_6$312:data_in2[20]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 1.0, scale: 1.00)
+Info:   Arch mult: 1.3333 (hops: 3)
+Info:   Congestion mult: 1.0133 (congestion score: 225, VMR: 66.46)
+Info:   Final Weight: 1.3511
+Info: Arc $extract$\ALU_ALU_func_6$312:data_in2[20] -> $extract$\ALU_ALU_func_0$309:data_out[20]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 1.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0133 (congestion score: 225, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\ALU_ALU_func_0$309:data_out[19] -> $extract$\ALU_ALU_func_6$312:data_in2[19]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 1.0, scale: 1.00)
+Info:   Arch mult: 1.3333 (hops: 3)
+Info:   Congestion mult: 1.0133 (congestion score: 225, VMR: 66.46)
+Info:   Final Weight: 1.3511
+Info: Arc $extract$\ALU_ALU_func_6$312:data_in2[19] -> $extract$\ALU_ALU_func_0$309:data_out[19]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 1.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0133 (congestion score: 225, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\ALU_ALU_func_0$309:data_out[18] -> $extract$\ALU_ALU_func_6$312:data_in2[18]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 1.0, scale: 1.00)
+Info:   Arch mult: 1.3333 (hops: 3)
+Info:   Congestion mult: 1.0133 (congestion score: 225, VMR: 66.46)
+Info:   Final Weight: 1.3511
+Info: Arc $extract$\ALU_ALU_func_6$312:data_in2[18] -> $extract$\ALU_ALU_func_0$309:data_out[18]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 1.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0133 (congestion score: 225, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\ALU_ALU_func_0$309:data_out[17] -> $extract$\ALU_ALU_func_6$312:data_in2[17]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 1.0, scale: 1.00)
+Info:   Arch mult: 1.3333 (hops: 3)
+Info:   Congestion mult: 1.0133 (congestion score: 225, VMR: 66.46)
+Info:   Final Weight: 1.3511
+Info: Arc $extract$\ALU_ALU_func_6$312:data_in2[17] -> $extract$\ALU_ALU_func_0$309:data_out[17]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 1.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0133 (congestion score: 225, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\ALU_ALU_func_0$309:data_out[16] -> $extract$\ALU_ALU_func_6$312:data_in2[16]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 1.0, scale: 1.00)
+Info:   Arch mult: 1.3333 (hops: 3)
+Info:   Congestion mult: 1.0133 (congestion score: 225, VMR: 66.46)
+Info:   Final Weight: 1.3511
+Info: Arc $extract$\ALU_ALU_func_6$312:data_in2[16] -> $extract$\ALU_ALU_func_0$309:data_out[16]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 1.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0133 (congestion score: 225, VMR: 66.46)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Congestion mult: 1.0093 (congestion score: 323, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_out[16] -> $extract$\reg_unit_tide_en_0_tide_rst_1$299:reg_in[16]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 1.0, scale: 1.00)
+Info: Arc $extract$\ALU_ALU_func_0$309:data_out[15] -> $extract$\ALU_ALU_func_6$312:data_in2[15]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 1.0, scale: 1.00)
+Info:   Arch mult: 1.3333 (hops: 3)
+Info:   Congestion mult: 1.0133 (congestion score: 225, VMR: 66.46)
+Info:   Final Weight: 1.3511
+Info: Arc $extract$\ALU_ALU_func_6$312:data_in2[15] -> $extract$\ALU_ALU_func_0$309:data_out[15]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 1.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0133 (congestion score: 225, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\ALU_ALU_func_0$309:data_out[14] -> $extract$\ALU_ALU_func_6$312:data_in2[14]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 1.0, scale: 1.00)
+Info:   Arch mult: 1.3333 (hops: 3)
+Info:   Congestion mult: 1.0133 (congestion score: 225, VMR: 66.46)
+Info:   Final Weight: 1.3511
+Info: Arc $extract$\ALU_ALU_func_6$312:data_in2[14] -> $extract$\ALU_ALU_func_0$309:data_out[14]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 1.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0133 (congestion score: 225, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\ALU_ALU_func_0$309:data_out[13] -> $extract$\ALU_ALU_func_6$312:data_in2[13]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 1.0, scale: 1.00)
+Info:   Arch mult: 1.3333 (hops: 3)
+Info:   Congestion mult: 1.0133 (congestion score: 225, VMR: 66.46)
+Info:   Final Weight: 1.3511
+Info: Arc $extract$\ALU_ALU_func_6$312:data_in2[13] -> $extract$\ALU_ALU_func_0$309:data_out[13]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 1.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0093 (congestion score: 323, VMR: 66.46)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$299:reg_in[16] -> $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_out[16]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 1.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0093 (congestion score: 323, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0133 (congestion score: 225, VMR: 66.46)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\reg_unit_tide_en_0_tide_rst_1$298:reg_out[15] -> $extract$\reg_unit_tide_en_0_tide_rst_1$299:reg_in[15]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 1.0, scale: 1.00)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\ALU_ALU_func_0$309:data_out[12] -> $extract$\ALU_ALU_func_6$312:data_in2[12]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 1.0, scale: 1.00)
+Info:   Arch mult: 1.3333 (hops: 3)
+Info:   Congestion mult: 1.0133 (congestion score: 225, VMR: 66.46)
+Info:   Final Weight: 1.3511
+Info: Arc $extract$\ALU_ALU_func_6$312:data_in2[12] -> $extract$\ALU_ALU_func_0$309:data_out[12]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 1.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0133 (congestion score: 225, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\ALU_ALU_func_0$309:data_out[11] -> $extract$\ALU_ALU_func_6$312:data_in2[11]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 1.0, scale: 1.00)
+Info:   Arch mult: 1.3333 (hops: 3)
+Info:   Congestion mult: 1.0133 (congestion score: 225, VMR: 66.46)
+Info:   Final Weight: 1.3511
+Info: Arc $extract$\ALU_ALU_func_6$312:data_in2[11] -> $extract$\ALU_ALU_func_0$309:data_out[11]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 1.0, scale: 1.00)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+Info:   Congestion mult: 1.0133 (congestion score: 225, VMR: 66.46)
+Info:   Timing mult: 1.0000 (criticality: 0.0000)
+Info:   Final Weight: 0.0000
+Info: Arc $extract$\ALU_ALU_func_0$309:data_out[10] -> $extract$\ALU_ALU_func_6$312:data_in2[10]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 1.0, scale: 1.00)
+Info:   Arch mult: 1.3333 (hops: 3)
+Info:   Congestion mult: 1.0133 (congestion score: 225, VMR: 66.46)
+Info:   Final Weight: 1.3511
+Info: Arc $extract$\ALU_ALU_func_6$312:data_in2[10] -> $extract$\ALU_ALU_func_0$309:data_out[10]
+Info:   HPWL Base Weight: 1.0000 (users: 1.000000, dist: 1.0, scale: 1.00)
+double free or corruption (!prev)
+Info:   Arch mult: 0.0000 (hops: 2147483647)
+2025-06-10 09:20:39.420 | INFO     | FABulous.file_parser.file_parser_yaml:parseTileYAML:259 - Reading tile configuration: /home/kelvin/FABulous_fork/myProject/Tile/PE/PE.yaml
+2025-06-10 09:20:39.424 | INFO     | FABulous.file_parser.file_parser_HDL:parseBelFile:155 - Parsing bel file: /home/kelvin/FABulous_fork/myProject/Tile/PE/reg_unit.v
+2025-06-10 09:20:39.430 | INFO     | FABulous.file_parser.file_parser_HDL:parseBelFile:155 - Parsing bel file: /home/kelvin/FABulous_fork/myProject/Tile/PE/ALU.v
+2025-06-10 09:20:39.435 | INFO     | FABulous.file_parser.file_parser_HDL:parseBelFile:155 - Parsing bel file: /home/kelvin/FABulous_fork/myProject/Tile/PE/compare.v
+2025-06-10 09:20:39.440 | INFO     | FABulous.file_parser.file_parser_HDL:parseBelFile:155 - Parsing bel file: /home/kelvin/FABulous_fork/myProject/Tile/PE/reg_unit.v
+2025-06-10 09:20:39.444 | INFO     | FABulous.file_parser.file_parser_HDL:parseBelFile:155 - Parsing bel file: /home/kelvin/FABulous_fork/myProject/Tile/PE/reg_unit.v
+2025-06-10 09:20:39.450 | INFO     | FABulous.file_parser.file_parser_HDL:parseBelFile:155 - Parsing bel file: /home/kelvin/FABulous_fork/myProject/Tile/PE/const_unit.v
+2025-06-10 09:20:39.455 | INFO     | FABulous.file_parser.file_parser_HDL:parseBelFile:155 - Parsing bel file: /home/kelvin/FABulous_fork/myProject/Tile/PE/reg_unit.v
+2025-06-10 09:20:39.460 | INFO     | FABulous.file_parser.file_parser_HDL:parseBelFile:155 - Parsing bel file: /home/kelvin/FABulous_fork/myProject/Tile/PE/logic_op.v
+2025-06-10 09:20:39.466 | INFO     | FABulous.file_parser.file_parser_HDL:parseBelFile:155 - Parsing bel file: /home/kelvin/FABulous_fork/myProject/Tile/PE/reg_unit.v
+2025-06-10 09:20:39.471 | INFO     | FABulous.file_parser.file_parser_HDL:parseBelFile:155 - Parsing bel file: /home/kelvin/FABulous_fork/myProject/Tile/PE/reg_unit.v
+2025-06-10 09:20:39.480 | INFO     | FABulous.file_parser.file_parser_yaml:parseTileYAML:259 - Reading tile configuration: /home/kelvin/FABulous_fork/myProject/Tile/N_IO/N_IO.yaml
+2025-06-10 09:20:39.482 | INFO     | FABulous.file_parser.file_parser_HDL:parseBelFile:155 - Parsing bel file: /home/kelvin/FABulous_fork/myProject/Tile/N_IO/../include/IO.v
+2025-06-10 09:20:39.486 | INFO     | FABulous.file_parser.file_parser_HDL:parseBelFile:155 - Parsing bel file: /home/kelvin/FABulous_fork/myProject/Tile/N_IO/../include/IO.v
+2025-06-10 09:20:39.494 | INFO     | FABulous.file_parser.file_parser_yaml:parseTileYAML:259 - Reading tile configuration: /home/kelvin/FABulous_fork/myProject/Tile/E_Mem/E_Mem.yaml
+2025-06-10 09:20:39.495 | INFO     | FABulous.file_parser.file_parser_HDL:parseBelFile:155 - Parsing bel file: /home/kelvin/FABulous_fork/myProject/Tile/E_Mem/reg_unit.v
+2025-06-10 09:20:39.502 | INFO     | FABulous.file_parser.file_parser_HDL:parseBelFile:155 - Parsing bel file: /home/kelvin/FABulous_fork/myProject/Tile/E_Mem/Mem.v
+2025-06-10 09:20:39.507 | INFO     | FABulous.file_parser.file_parser_HDL:parseBelFile:155 - Parsing bel file: /home/kelvin/FABulous_fork/myProject/Tile/E_Mem/Mem.v
+2025-06-10 09:20:39.516 | INFO     | FABulous.file_parser.file_parser_yaml:parseTileYAML:259 - Reading tile configuration: /home/kelvin/FABulous_fork/myProject/Tile/S_IO/S_IO.yaml
+2025-06-10 09:20:39.517 | INFO     | FABulous.file_parser.file_parser_HDL:parseBelFile:155 - Parsing bel file: /home/kelvin/FABulous_fork/myProject/Tile/S_IO/../include/IO.v
+2025-06-10 09:20:39.521 | INFO     | FABulous.file_parser.file_parser_HDL:parseBelFile:155 - Parsing bel file: /home/kelvin/FABulous_fork/myProject/Tile/S_IO/../include/IO.v
+2025-06-10 09:20:39.528 | INFO     | FABulous.file_parser.file_parser_yaml:parseTileYAML:259 - Reading tile configuration: /home/kelvin/FABulous_fork/myProject/Tile/W_IO/W_IO.yaml
+2025-06-10 09:20:39.529 | INFO     | FABulous.file_parser.file_parser_HDL:parseBelFile:155 - Parsing bel file: /home/kelvin/FABulous_fork/myProject/Tile/W_IO/../include/IO.v
+2025-06-10 09:20:39.535 | INFO     | FABulous.file_parser.file_parser_HDL:parseBelFile:155 - Parsing bel file: /home/kelvin/FABulous_fork/myProject/Tile/W_IO/../include/IO.v
+2025-06-10 09:20:39.544 | INFO     | FABulous.file_parser.file_parser_yaml:parseFabricYAML:195 - Fabric YAML parsed successfully.

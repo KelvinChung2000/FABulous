@@ -25,4 +25,3 @@ class NodeWire:
     x: int
     y: int
     wire: str
-    wire: str

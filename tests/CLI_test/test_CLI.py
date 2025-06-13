@@ -1,6 +1,6 @@
 from pathlib import Path
-import pytest
-from tests.CLI_test.conftest import (
+
+from tests.conftest import (
     TILE,
     normalize_and_check_for_errors,
     run_cmd,
@@ -97,7 +97,11 @@ def test_gen_model_npnr(cli, caplog):
 
 def test_run_FABulous_bitstream(cli, caplog, mocker):
     """Test the run_FABulous_bitstream command"""
-    m = mocker.patch("subprocess.run", return_value=None)
+
+    class MockCompletedProcess:
+        returncode = 0
+
+    m = mocker.patch("subprocess.run", return_value=MockCompletedProcess())
     run_cmd(cli, "run_FABulous_fabric")
     Path(cli.projectDir / "user_design" / "sequential_16bit_en.json").touch()
     Path(cli.projectDir / "user_design" / "sequential_16bit_en.fasm").touch()
@@ -109,7 +113,11 @@ def test_run_FABulous_bitstream(cli, caplog, mocker):
 
 def test_run_simulation(cli, caplog, mocker):
     """Test running simulation"""
-    m = mocker.patch("subprocess.run", return_value=None)
+
+    class MockCompletedProcess:
+        returncode = 0
+
+    m = mocker.patch("subprocess.run", return_value=MockCompletedProcess())
     run_cmd(cli, "run_FABulous_fabric")
     Path(cli.projectDir / "user_design" / "sequential_16bit_en.json").touch()
     Path(cli.projectDir / "user_design" / "sequential_16bit_en.fasm").touch()
@@ -132,3 +140,18 @@ def test_run_tcl(cli, caplog, tmp_path):
     log = normalize_and_check_for_errors(caplog.text)
     assert f"Execute TCL script {str(tcl_script_path)}" in log[0]
     assert "TCL script executed" in log[-1]
+
+
+def test_multi_command_stop(cli, mocker):
+    m = mocker.patch("subprocess.run", side_effect=RuntimeError("Mocked error"))
+    run_cmd(cli, "run_FABulous_bitstream ./user_design/sequential_16bit_en.v")
+
+    m.assert_called_once()
+
+
+def test_multi_command_force(cli, mocker):
+    m = mocker.patch("subprocess.run", side_effect=RuntimeError("Mocked error"))
+    cli.force = True
+    run_cmd(cli, "run_FABulous_bitstream ./user_design/sequential_16bit_en.v")
+
+    assert m.call_count == 2

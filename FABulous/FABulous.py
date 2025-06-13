@@ -1,6 +1,5 @@
 import argparse
 import os
-from contextlib import redirect_stdout
 from pathlib import Path
 
 from loguru import logger
@@ -8,10 +7,10 @@ from loguru import logger
 from FABulous.FABulous_CLI.FABulous_CLI import FABulous_CLI
 from FABulous.FABulous_CLI.helper import (
     create_project,
+    install_oss_cad_suite,
     setup_global_env_vars,
     setup_logger,
     setup_project_env_vars,
-    install_oss_cad_suite,
 )
 
 
@@ -50,12 +49,9 @@ def main():
         description="The command line interface for FABulous"
     )
 
-    parser.add_argument(
-        "project_dir",
-        help="The directory to the project folder",
-    )
+    create_group = parser.add_mutually_exclusive_group()
 
-    parser.add_argument(
+    create_group.add_argument(
         "-c",
         "--createProject",
         default=False,
@@ -63,7 +59,28 @@ def main():
         help="Create a new project",
     )
 
+    create_group.add_argument(
+        "-iocs",
+        "--install_oss_cad_suite",
+        help="Install the oss-cad-suite in the directory."
+        "This will create a new directory called oss-cad-suite in the provided"
+        "directory and install the oss-cad-suite there."
+        "If there is already a directory called oss-cad-suite, it will be removed and replaced with a new one."
+        "This will also automatically add the FAB_OSS_CAD_SUITE env var in the global FABulous .env file. ",
+        action="store_true",
+        default=False,
+    )
+
+    script_group = parser.add_mutually_exclusive_group()
+
     parser.add_argument(
+        "project_dir",
+        default="",
+        nargs="?",
+        help="The directory to the project folder",
+    )
+
+    script_group.add_argument(
         "-fs",
         "--FABulousScript",
         default="",
@@ -71,7 +88,8 @@ def main():
         "This will automatically exit the CLI once the command finish execution, and the exit will always happen gracefully.",
         type=Path,
     )
-    parser.add_argument(
+
+    script_group.add_argument(
         "-ts",
         "--TCLScript",
         default="",
@@ -80,9 +98,16 @@ def main():
         type=Path,
     )
 
+    script_group.add_argument(
+        "-p",
+        "--commands",
+        help="execute <commands> (to chain commands, separate them with semicolon + whitespace: 'cmd1; cmd2')",
+    )
+
     parser.add_argument(
         "-log",
-        default=False,
+        default="",
+        type=Path,
         nargs="?",
         const="FABulous.log",
         help="Log all the output from the terminal",
@@ -127,38 +152,41 @@ def main():
     )
 
     parser.add_argument(
-        "-iocs",
-        "--install_oss_cad_suite",
-        help="Install the oss-cad-suite in the directory."
-        "This will create a new directory called oss-cad-suite in the provided"
-        "directory and install the oss-cad-suite there."
-        "If there is already a directory called oss-cad-suite, it will be removed and replaced with a new one."
-        "This will also automatically add the FAB_OSS_CAD_SUITE env var in the global FABulous .env file. ",
+        "--force",
         action="store_true",
-        default=False,
+        help="Force the command to run and ignore any errors. This feature does not work for the TCLScript argument",
     )
 
     parser.add_argument("--debug", action="store_true", help="Enable debug mode")
 
     args = parser.parse_args()
 
-    setup_logger(args.verbose)
+    setup_logger(args.verbose, args.debug, log_file=args.log)
 
+    # Start with default value
+    projectDir = Path().cwd()
+
+    # Setup global and project env vars to load .env files
     setup_global_env_vars(args)
+    setup_project_env_vars(args)
 
-    projectDir = Path(os.getenv("FAB_PROJ_DIR", args.project_dir)).absolute()
+    # Check if FAB_PROJ_DIR is set in environment (including from .env files)
+    if fab_proj_dir := os.getenv("FAB_PROJ_DIR", None):
+        projectDir = Path(fab_proj_dir).absolute().resolve()
 
-    args.top = projectDir.stem
-
-    if args.createProject and args.install_oss_cad_suite:
-        logger.error(
-            f"You cannot create a new project and install the oss-cad-suite at the same time."
-        )
-        exit(1)
+    # Finally, user provided argument takes highest priority
+    if args.project_dir:
+        projectDir = Path(args.project_dir).absolute().resolve()
 
     if args.createProject:
         create_project(projectDir, args.writer)
         exit(0)
+
+    if not (projectDir / ".FABulous").exists():
+        logger.error(
+            "The directory provided is not a FABulous project as it does not have a .FABulous folder"
+        )
+        exit(1)
 
     if not projectDir.exists():
         logger.error(f"The directory provided does not exist: {projectDir}")
@@ -168,40 +196,62 @@ def main():
         install_oss_cad_suite(projectDir, True)
         exit(0)
 
-    if not (projectDir / ".FABulous").exists():
-        logger.error(
-            "The directory provided is not a FABulous project as it does not have a .FABulous folder"
-        )
-        exit(1)
+    fab_CLI = FABulous_CLI(
+        os.getenv("FAB_PROJ_LANG"),
+        projectDir,
+        Path().cwd(),
+        force=args.force,
+    )
+    fab_CLI.debug = args.debug
+    fabScript: Path = args.FABulousScript.absolute()
+    tclScript: Path = args.TCLScript.absolute()
+    logger.info(f"Setting current working directory to: {projectDir}")
+    cwd = Path().cwd()
+    os.chdir(projectDir)
+    fab_CLI.onecmd_plus_hooks("load_fabric")
+
+    if commands := args.commands:
+        commands = commands.split("; ")
+        for c in commands:
+            fab_CLI.onecmd_plus_hooks(c)
+            if fab_CLI.exit_code and not args.force:
+                logger.error(
+                    f"Command '{c}' execution failed with exit code {fab_CLI.exit_code}"
+                )
+                exit(fab_CLI.exit_code)
+        else:
+            logger.info(
+                f'Commands "{"; ".join(i.strip() for i in commands)}" executed successfully'
+            )
+            exit(fab_CLI.exit_code)
+
+    elif fabScript != cwd:
+        fab_CLI.onecmd_plus_hooks(f"run_script {fabScript}")
+        if fab_CLI.exit_code:
+            logger.error(
+                f"FABulous script {args.FABulousScript} execution failed with exit code {fab_CLI.exit_code}"
+            )
+        else:
+            logger.info(f"FABulous script {args.FABulousScript} executed successfully")
+        exit(fab_CLI.exit_code)
+
+    elif tclScript != cwd:
+        fab_CLI.onecmd_plus_hooks(f"run_tcl {tclScript}")
+        if fab_CLI.exit_code:
+            logger.error(
+                f"TCL script {args.TCLScript} execution failed with exit code {fab_CLI.exit_code}"
+            )
+        else:
+            logger.info(f"TCL script {args.TCLScript} executed successfully")
+        exit(fab_CLI.exit_code)
+
     else:
-        setup_project_env_vars(args)
-
-        fab_CLI = FABulous_CLI(
-            os.getenv("FAB_PROJ_LANG"),
-            projectDir,
-            Path().cwd(),
-            FABulousScript=args.FABulousScript,
-            TCLScript=args.TCLScript,
-        )
-        fab_CLI.debug = args.debug
-
+        fab_CLI.interactive = True
         if args.verbose == 2:
             fab_CLI.verbose = True
-        if args.metaDataDir:
-            if Path(args.metaDataDir).exists():
-                metaDataDir = args.metaDataDir
 
-        if args.log:
-            with open(args.log, "w") as log:
-                with redirect_stdout(log):
-                    logger.info("Logging to file: " + args.log)
-                    logger.info(f"Setting current working directory to: {projectDir}")
-                    os.chdir(projectDir)
-                    fab_CLI.cmdloop()
-        else:
-            logger.info(f"Setting current working directory to: {projectDir}")
-            os.chdir(projectDir)
-            fab_CLI.cmdloop()
+        fab_CLI.cmdloop()
+        exit(0)
 
 
 if __name__ == "__main__":

@@ -84,7 +84,6 @@ def parseFabricYAML(fileName: Path) -> Fabric:
             tileDict[newTile.name] = newTile
             tileNameMap[subTile] = newTile.name
             wireDictUnprocessed.update(wireInfo)
-
     usedTile = set()
     fabricTiles: list[list[str | None]] = []
     for row in data["FABRIC"]:
@@ -111,11 +110,16 @@ def parseFabricYAML(fileName: Path) -> Fabric:
                 if tileName is not None:
                     yield (x, y), tileName
 
+
     wireDict: dict[Loc, list[Wire]] = defaultdict(list)
+    seenTile : set[str] = set()
     for (x, y), subTileName in tileIter():
         # TODO add empty tile that have contains crossing wires
         if subTileName is None:
             continue
+        if subTileName in seenTile:
+            continue
+        seenTile.add(subTileName)
         tileName = tileNameMap.get(subTileName, subTileName)
         wireEntries = wireDictUnprocessed[tileName][subTileName]
         for wireEntry in wireEntries:
@@ -192,6 +196,7 @@ def parseFabricYAML(fileName: Path) -> Fabric:
                     spanning=spanning,
                 ),
             )
+
     logger.info("Fabric YAML parsed successfully.")
     return Fabric(
         name=name,
@@ -461,6 +466,7 @@ def parseTileYAML(
         for tName in flatTileMap:
             wires[tileName][tName].extend(data.get("WIRES", {}).get(tName, []))
 
+
     for y, row in enumerate(reversed(tileMap)):
         for x, st in enumerate(row):
             if st is None:
@@ -478,6 +484,7 @@ def parseTileYAML(
                             "super": True,
                         }
                     )
+
     return (
         Tile(
             name=tileName,

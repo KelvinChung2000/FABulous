@@ -33,6 +33,9 @@ dependencies = [
     "pyosys<0.52",
     "schemdraw[svgmath]>=0.20",
     "matplotlib>=3.10.3",
+    "ipykernel>=6.29.5",
+    "pandas>=2.3.0",
+    "seaborn>=0.13.2",
 ]
 
 [project.urls]

@@ -78,6 +78,8 @@ class Fabric:
     superTileDict: dict[str, SuperTile] = field(default_factory=dict)
     wireDict: dict[Loc, list[Wire]] = field(default_factory=dict)
 
+    _subTileToTile: dict[str, Tile] = field(init=False, default_factory=dict)
+
     def __post_init__(self):
         for t in self.tileDict.values():
             if (
@@ -87,11 +89,24 @@ class Fabric:
                 raise ValueError(
                     f"Tile {t.name} has too many config bits. Tile have {self.frameBitsPerRow * self.maxFramesPerCol} but requires {t.configBits*self.contextCount}"
                 )
+            
+        for t in self.tileDict.values():
+            for subTile in t.getSubTiles():
+                if subTile not in self._subTileToTile:
+                    self._subTileToTile[subTile] = t
+                else:
+                    raise ValueError(
+                        f"Subtile {subTile} is defined in multiple tiles: {self._subTileToTile[subTile].name} and {t.name}"
+                    )
 
     def __getitem__(self, index: Any) -> Tile | None:
         if isinstance(index, tuple):
             if t := self.tiles[index[1]][index[0]]:
-                return self.tileDict[t]
+                if t in self.tileDict:
+                    return self.tileDict[t]
+                else:
+                    return self._subTileToTile[t]
+            
             return None
         if isinstance(index, str):
             if index in self.tileDict:
@@ -210,6 +225,18 @@ class Fabric:
             if tile.isPortInTile(p):
                 return tile.getBelByBelPort(p)
         raise ValueError(f"BelPort {p} not found in any tile")
+    
+    def isSubTile(self, name: str) -> bool:
+        """Check if the given name is a sub-tile in the fabric."""
+        return name in self._subTileToTile
+    
+    def isRootTile(self, name: str) -> bool:
+        for tile in self.tileDict.values():
+            if tile is not None and tile.partOfTile(name):
+                return tile.isRootTile(name)
+        return False
+
+    
 
 
     # def getFlattenFabric(self) -> Generator[tuple[Loc, Tile | None], None, None]:

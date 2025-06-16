@@ -13,35 +13,51 @@ from FABulous.fabric_generator.define import WriterType
 
 MAX_BITBYTES = 16384
 
-
-def error_callback(msg):
-    raise Exception
-
-
-def setup_logger(verbosity: int):
+def setup_logger(verbosity: int, debug: bool, log_file: Path = Path()):
     # Remove the default logger to avoid duplicate logs
     logger.remove()
 
-    # Define logger format
-    if verbosity >= 1:
-        log_format = (
-            "<level>{level:}</level> | "
-            "<cyan>[{time:DD-MM-YYYY HH:mm:ss]}</cyan> | "
-            "<green>[{name}</green>:<green>{function}</green>:<green>{line}]</green> - "
-            "<level>{message}</level>"
+    # Define a custom formatting function that has access to 'verbosity'
+    def custom_format_function(record):
+        # Construct the standard part of the log message based on verbosity
+        level = f"<level>{record['level'].name}</level> | "
+        time = f"<cyan>[{record['time']:DD-MM-YYYY HH:mm:ss}]</cyan> | "
+        name = f"<green>[{record['name']}</green>"
+        func = f"<green>{record['function']}</green>"
+        line = f"<green>{record['line']}</green>"
+        msg = f"<level>{record['message']}</level>"
+        exc = (
+            f"<bg red><white>{record['exception'].type.__name__}</white></bg red> | "
+            if record["exception"]
+            else ""
+        )
+
+        if verbosity >= 1:
+            final_log = f"{level}{time}{name}:{func}:{line} - {exc}{msg}\n"
+        else:
+            final_log = f"{level}{exc}{msg}\n"
+
+        if os.getenv("FABULOUS_TESTING", None):
+            final_log = f"{record['level'].name}: {record['message']}\n"
+
+        return final_log
+
+    # Determine the log level for the sink
+    log_level_to_set = "DEBUG" if debug else "INFO"
+
+    # Add logger to write logs to stdout using the custom formatter
+    if log_file != Path():
+        logger.add(
+            log_file, format=custom_format_function, level=log_level_to_set, catch=False
         )
     else:
-        log_format = "<level>{level:}</level> | <level>{message}</level>"
-
-    # Add logger to write logs to stdout
-    logger.add(sys.stdout, format=log_format, level="DEBUG", colorize=True, catch=False)
-    logger.add(
-        error_callback,
-        format=log_format,
-        colorize=True,
-        catch=False,
-        filter=lambda msg: msg["level"].name == "ERROR",
-    )
+        logger.add(
+            sys.stdout,
+            format=custom_format_function,
+            level=log_level_to_set,
+            colorize=True,
+            catch=False,
+        )
 
 
 def setup_global_env_vars(args: argparse.Namespace) -> None:

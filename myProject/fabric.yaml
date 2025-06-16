@@ -1,9 +1,9 @@
 FABRIC: [
     [None,  N_IO, N_IO, N_IO, N_IO, None       ],
-    [W_IO,  PE,   PE,   PE,   PE,   E_Mem_top  ],
-    [W_IO,  PE,   PE,   PE,   PE,   E_Mem_bot  ],
-    [W_IO,  PE,   PE,   PE,   PE,   E_Mem_top  ],
-    [W_IO,  PE,   PE,   PE,   PE,   E_Mem_bot  ],
+    [W_IO,  PE,   PE,   PE,   PE,   E_Mem_0  ],
+    [W_IO,  PE,   PE,   PE,   PE,   E_Mem_1  ],
+    [W_IO,  PE,   PE,   PE,   PE,   E_Mem_2  ],
+    [W_IO,  PE,   PE,   PE,   PE,   E_Mem_3  ],
     [None,  S_IO, S_IO, S_IO, S_IO, None       ]
 
     # [None,  N_IO, N_IO, N_IO, None  ],

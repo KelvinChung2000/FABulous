@@ -30,7 +30,7 @@ set my_FAB_ROOT /home/kelvin/FABulous_fork
 # cargo build
 # cd -
 
-# set clayx_flag "-p fsm-opt -x simplify-with-control:without-register -x static-inline:offload-pause=false -p lower --nested -d papercut  -d cell-share"
+set clayx_flag "-p fsm-opt -x simplify-with-control:without-register -x static-inline:offload-pause=false -p lower --nested -d papercut  -d cell-share"
 
 # calyx --dump-ir $clayx_flag $source_futil -o $source_hdl > $ir
 # check_status
@@ -41,9 +41,9 @@ FABulous --debug myProject -p \
         load_fabric; \
         gen_bitStream_spec; \
         gen_cells_and_techmaps; \
-        gen_chipdb -routing_graph $my_FAB_ROOT/myProject/.FABulous/routing_graph.dot -filter 1,1 2,1; \
+        gen_chipdb -routing_graph $my_FAB_ROOT/myProject/.FABulous/routing_graph.dot -filter 5,1 5,2 5,3 5,4; \
+        synthesis_script $source_hdl -tcl $my_FAB_ROOT/myProject/.FABulous/arch_synth.tcl; \
         "
-        # synthesis_script $source_hdl -tcl $my_FAB_ROOT/myProject/.FABulous/arch_synth.tcl; \
 # /home/kelvin/FABulous_fork/.venv/bin/python /home/kelvin/FABulous_fork/FABulous/fabric_cad/graph_draw2.py
 check_status
 cd -
@@ -57,7 +57,9 @@ nextpnr-himbaechel --chipdb "$my_FAB_ROOT/myProject/.FABulous/hycube.bit" --devi
                    -o fasm="$my_FAB_ROOT/myProject/user_design/router_test.fasm" \
                    -o fdc="$my_FAB_ROOT/myProject/user_design/test.fdc" \
                    --placer-heap-seed-placement-strategy graph_grid \
-                   --placer-heap-arch-connectivity-factor 1.0 \
+                   --placer-heap-beta 0.9 \
+                   --placer-heap-arch-connectivity-factor 0.0 \
+                   --placer-heap-congestion-aware-factor 0.0 \
                 #    --no-route \
                    -o placeTrial=10 --router1-timeout 20000 -f --debug-placer
                 #    --placer-heap-export-init-placement "$my_FAB_ROOT/myProject/user_design/test_init_placement.csv" \

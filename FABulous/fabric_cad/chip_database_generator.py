@@ -1,3 +1,4 @@
+from collections import defaultdict
 from itertools import islice
 from pathlib import Path
 from subprocess import run
@@ -11,6 +12,7 @@ from FABulous.fabric_cad.chip_database.database_tile import TileType
 from FABulous.fabric_cad.chip_database.database_timing import TimingValue
 from FABulous.fabric_cad.chip_database.define import NodeWire, PinType
 from FABulous.fabric_cad.graph_draw import genRoutingResourceGraph
+from FABulous.fabric_definition.Wire import WireType
 from FABulous.fabric_definition.define import IO, Loc
 from FABulous.fabric_definition.Fabric import Fabric
 from FABulous.fabric_definition.Port import BelPort, TilePort
@@ -249,36 +251,51 @@ def genTile(tile: Tile, subTile: str, chip: Chip, context=1) -> TileType:
     return tt
 
 
-# change to base on wire type
+# TODO: fix for terminal ports
 def genFabric(fabric: Fabric, chip: Chip, context=1):
     def clipX(value):
         return max(0, min(value, fabric.width - 1))
 
     def clipY(value):
         return max(0, min(value, fabric.height - 1))
-
-    # TODO fix terminal ports
-    for (x, y), wires in fabric.wireDict.items():
-        if not wires:
+    
+    for (x, y), tileName in fabric.tileNames_iter():
+        if tileName is None:
             continue
-        for c in range(context):
-            for wire in wires:
-                for src, dst in zip(wire.source.expand(), wire.destination.expand()):
-                    node = [
-                        NodeWire(
+        
+        tile = fabric.getTileByName(tileName)
+        print(tileName)
+        shareDest:dict[TilePort | BelPort, list[WireType]] = defaultdict(list) 
+        for wireType in tile.wireTypes[tileName]:
+            assert wireType.destinationPort.width == wireType.sourcePort.width
+            shareDest[wireType.sourcePort].append(wireType)
+            
+        print(shareDest)
+        for src, destList in shareDest.items():
+            nodes = []
+            for c in range(context):
+                for n in src.expand():
+                    nodes.append(
+                        [NodeWire(
                             clipX(x),
                             clipY(y),
-                            f"c{c}.{src}",
-                        ),
-                        NodeWire(
-                            clipX(x + wire.xOffset),
-                            clipY(y + wire.yOffset),
-                            f"c{c}.{dst}",
-                        ),
-                    ]
-                    chip.add_node(node, "DEFAULT")
+                            f"c{c}.{n}",
+                        )]
+                    )
+                print(destList)
+                for dest in destList:
+                    for i, n in enumerate(dest.destinationPort.expand()):
+                        nodes[i].append(
+                            NodeWire(
+                                clipX(x + dest.offsetX),
+                                clipY(y + dest.offsetY),
+                                f"c{c}.{n}",
+                            )
+                        )
+            for node in nodes:
+                print(node)
+                chip.add_node(node, "DEFAULT")
     setTiming(chip)
-
 
 def setTiming(chip: Chip):
     speed = "DEFAULT"

@@ -15,14 +15,19 @@ class WireType:
     spanning: int = 0
 
     def __repr__(self) -> str:
-        return f"{self.sourcePort.name}-X{self.offsetX}Y{self.offsetY}>{self.destinationPort.name}"
+        return f"{self.sourcePort}-X{self.offsetX}Y{self.offsetY}>{self.destinationPort}"
 
     def __eq__(self, __o: Any) -> bool:
         if __o is None or not isinstance(__o, WireType):
             return False
-        return (
+        return self is __o or (
             self.sourcePort == __o.sourcePort
             and self.destinationPort == __o.destinationPort
+            and self.offsetX == __o.offsetX
+            and self.offsetY == __o.offsetY
+            and self.wireCount == __o.wireCount
+            and self.cascadeWireCount == __o.cascadeWireCount
+            and self.spanning == __o.spanning
         )
 
 
@@ -58,6 +63,4 @@ class Wire:
     wireCount: int
 
     def __repr__(self) -> str:
-        return (
-            f"{self.source.name}-X{self.xOffset}Y{self.yOffset}>{self.destination.name}"
-        )
+        return f"{self.source.name}-X{self.xOffset}Y{self.yOffset}>{self.destination.name}"

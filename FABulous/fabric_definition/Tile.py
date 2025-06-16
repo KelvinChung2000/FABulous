@@ -39,9 +39,7 @@ class Tile:
     switchMatrix: SwitchMatrix
     configMems: ConfigurationMemory
     tileMap: list[list[str]]
-    wireTypes: dict[str, list[WireType]] = field(
-        default_factory=lambda: defaultdict(list)
-    )
+    wireTypes: dict[str, list[WireType]] = field(default_factory=lambda: defaultdict(list))
     withUserCLK: bool = False
     tileDir: Path = Path(".")
 
@@ -50,7 +48,7 @@ class Tile:
             return False
         return self.name == __o.name
 
-    @property    
+    @property
     def bels(self):
         """Retrieve all BELs in the tile."""
         return [bel for group in self.belGroups.values() for bel in group]
@@ -71,12 +69,7 @@ class Tile:
             list[TilePort]: A list of TilePort objects located on the west side of the tile.
         """
         if io is None:
-            return [
-                p
-                for st in [i[-1] for i in self.tileMap]
-                for p in self.ports[st]
-                if p.sideOfTile == Side.WEST
-            ]
+            return [p for st in [i[-1] for i in self.tileMap] for p in self.ports[st] if p.sideOfTile == Side.WEST]
         else:
             return [
                 p
@@ -97,12 +90,7 @@ class Tile:
            list[TilePort]: A list of TilePort objects located on the south side of the tile. If `io` is specified, only ports matching the IO type are returned.
         """
         if io is None:
-            return [
-                p
-                for st in self.tileMap[-1]
-                for p in self.ports[st]
-                if p.sideOfTile == Side.SOUTH
-            ]
+            return [p for st in self.tileMap[-1] for p in self.ports[st] if p.sideOfTile == Side.SOUTH]
         else:
             return [
                 p
@@ -123,12 +111,7 @@ class Tile:
            list[TilePort]: A list of TilePort objects located on the south side of the tile. If `io` is specified, only ports matching the IO type are returned.
         """
         if io is None:
-            return [
-                p
-                for st in [i[0] for i in self.tileMap]
-                for p in self.ports[st]
-                if p.sideOfTile == Side.EAST
-            ]
+            return [p for st in [i[0] for i in self.tileMap] for p in self.ports[st] if p.sideOfTile == Side.EAST]
         else:
             return [
                 p
@@ -149,12 +132,7 @@ class Tile:
            list[TilePort]: A list of TilePort objects located on the south side of the tile. If `io` is specified, only ports matching the IO type are returned.
         """
         if io is None:
-            return [
-                p
-                for st in self.tileMap[0]
-                for p in self.ports[st]
-                if p.sideOfTile == Side.NORTH
-            ]
+            return [p for st in self.tileMap[0] for p in self.ports[st] if p.sideOfTile == Side.NORTH]
         else:
             return [
                 p
@@ -164,52 +142,22 @@ class Tile:
             ]
 
     def getTileInputNames(self) -> list[str]:
-        return sorted(
-            [
-                p.name
-                for st in self.getSubTiles()
-                for p in self.ports[st]
-                if p.ioDirection == IO.INPUT
-            ]
-        )
+        return sorted([p.name for st in self.getSubTiles() for p in self.ports[st] if p.ioDirection == IO.INPUT])
 
     def getTileOutputNames(self) -> list[str]:
-        return sorted(
-            [
-                p.name
-                for st in self.getSubTiles()
-                for p in self.ports[st]
-                if p.ioDirection == IO.OUTPUT
-            ]
-        )
+        return sorted([p.name for st in self.getSubTiles() for p in self.ports[st] if p.ioDirection == IO.OUTPUT])
 
     def getTileInputPorts(self, subTile: str = "") -> list[TilePort]:
         if subTile:
             return sorted([p for p in self.ports[subTile] if p.ioDirection == IO.INPUT])
         else:
-            return sorted(
-                [
-                    p
-                    for st in self.getSubTiles()
-                    for p in self.ports[st]
-                    if p.ioDirection == IO.INPUT
-                ]
-            )
+            return sorted([p for st in self.getSubTiles() for p in self.ports[st] if p.ioDirection == IO.INPUT])
 
     def getTileOutputPorts(self, subTile: str = "") -> list[TilePort]:
         if subTile:
-            return sorted(
-                [p for p in self.ports[subTile] if p.ioDirection == IO.OUTPUT]
-            )
+            return sorted([p for p in self.ports[subTile] if p.ioDirection == IO.OUTPUT])
         else:
-            return sorted(
-                [
-                    p
-                    for st in self.getSubTiles()
-                    for p in self.ports[st]
-                    if p.ioDirection == IO.OUTPUT
-                ]
-            )
+            return sorted([p for st in self.getSubTiles() for p in self.ports[st] if p.ioDirection == IO.OUTPUT])
 
     def getTilePortGrouped(self, io: IO | None = None) -> dict[Side, list[TilePort]]:
         return {
@@ -225,9 +173,7 @@ class Tile:
                 if i.sourcePort == port or i.destinationPort == port:
                     return i
         else:
-            raise ValueError(
-                f"The given port {port} does not exist in tile {self.name}"
-            )
+            raise ValueError(f"The given port {port} does not exist in tile {self.name}")
 
     def getCascadeWireCount(self, port: TilePort) -> int:
         for subTile in self.wireTypes:
@@ -239,37 +185,29 @@ class Tile:
 
     def getEndPointPort(self, port: TilePort) -> TilePort:
         if port.ioDirection == IO.OUTPUT:
-            raise ValueError(
-                "The given port is an output port. Please provide an input port."
-            )
+            raise ValueError("The given port is an output port. Please provide an input port.")
         for subTile in self.wireTypes:
             for i in self.wireTypes[subTile]:
                 if i.sourcePort == port or i.destinationPort == port:
                     return cast(TilePort, i.destinationPort)
         else:
-            raise ValueError(
-                f"The given port {port} does not exist in tile {self.name}"
-            )
+            raise ValueError(f"The given port {port} does not exist in tile {self.name}")
 
     def getStartPointPort(self, port: TilePort) -> TilePort:
         if port.ioDirection == IO.INPUT:
-            raise ValueError(
-                "The given port is an input port. Please provide an output port."
-            )
+            raise ValueError("The given port is an input port. Please provide an output port.")
         for subTile in self.wireTypes:
             for i in self.wireTypes[subTile]:
                 if i.destinationPort.name == port.name:
                     return cast(TilePort, i.sourcePort)
         else:
-            raise ValueError(
-                f"The given port {port} does not exist in tile {self.name}"
-            )
+            raise ValueError(f"The given port {port} does not exist in tile {self.name}")
 
     def isPortInTile(self, port: GenericPort) -> bool:
         for portList in self.ports.values():
             if port in portList:
                 return True
-            
+
         for bel in self.bels:
             if port in bel.inputs or port in bel.outputs:
                 return True
@@ -304,9 +242,7 @@ class Tile:
             if belPort in i.inputs or belPort in i.outputs:
                 return i
         else:
-            raise ValueError(
-                f"The given port {belPort} does not exist in tile {self.name}"
-            )
+            raise ValueError(f"The given port {belPort} does not exist in tile {self.name}")
 
     def partOfTile(self, name: str) -> bool:
         """Check if the given name is part of the tile.
@@ -333,9 +269,18 @@ class Tile:
                 if name == subTile:
                     return (x, y)
         else:
-            raise ValueError(
-                f"The given subTile {subTile} does not exist in tile {self.name}"
-            )
+            raise ValueError(f"The given subTile {subTile} does not exist in tile {self.name}")
+
+    def isRootTile(self, name: str) -> bool:
+        """Check if the given name is the root tile.
+
+        Args:
+            name (str): The name to check.
+
+        Returns:
+            bool: True if the name is the root tile, False otherwise.
+        """
+        return self.tileMap[-1][0] == name
 
     def getBelSharedPort(self) -> list[SharedPort]:
         shared = []
@@ -365,8 +310,10 @@ class Tile:
 
         # Add Bels
         lines.append("Bels:")
-        for bel in self.bels:
-            lines.append(f"  {bel.prefix}{bel.name} (z={bel.z})")
+        for groupName, belList in self.belGroups.items():
+            lines.append(f"  Group: {groupName}")
+            for bel in belList:
+                lines.append(f"    {bel.prefix}{bel.name} (z={bel.z})")
 
         # Add Switch Matrix info
         lines.append(f"Switch Matrix: {self.switchMatrix}")
@@ -376,5 +323,13 @@ class Tile:
 
         # Add User CLK status
         lines.append(f"User CLK: {self.withUserCLK}")
+
+        # Draw sub-tile map
+        lines.append("Sub-tile Map:")
+        # Use a fixed width for each cell for alignment
+        cellWidth = max((len(str(name)) for row in self.tileMap for name in row if name is not None), default=3)
+        for row in self.tileMap:
+            rowStr = " | ".join(f"{(name if name is not None else '---'):^{cellWidth}}" for name in row)
+            lines.append(f"  {rowStr}")
 
         return "\n".join(lines)

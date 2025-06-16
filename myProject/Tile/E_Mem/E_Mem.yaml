@@ -3,31 +3,56 @@ TILE: E_Mem
 # {side: <>, source_name: <>, X-offset: <>, Y-offset: <>, destination_name: <>, wires: <>}
 INCLUDE:
 PORTS:
-  E_Mem_top:
+  E_Mem_0:
     - {side: WEST, name: in3, inOut: input, wires: 32, terminal: false}
     - {side: WEST, name: out3, inOut: output, wires: 32, terminal: false}
     - {side: WEST, name: pred_in3, inOut: input, wires: 1, terminal: true}
     
-  E_Mem_bot:
+  E_Mem_1:
     - {side: WEST, name: in3, inOut: input, wires: 32, terminal: false}
     - {side: WEST, name: out3, inOut: output, wires: 32, terminal: false}
     - {side: WEST, name: pred_in3, inOut: input, wires: 1, terminal: true}
 
+  E_Mem_2:
+    - {side: WEST, name: in3, inOut: input, wires: 32, terminal: false}
+    - {side: WEST, name: out3, inOut: output, wires: 32, terminal: false}
+    - {side: WEST, name: pred_in3, inOut: input, wires: 1, terminal: true}
+
+  E_Mem_3:
+      - {side: WEST, name: in3, inOut: input, wires: 32, terminal: false}
+      - {side: WEST, name: out3, inOut: output, wires: 32, terminal: false}
+      - {side: WEST, name: pred_in3, inOut: input, wires: 1, terminal: true}
+
 
 WIRES:
-  E_Mem_top:
+  E_Mem_0:
     - {source_name: out3, X-offset:  -1, Y-offset: 0, destination_name: in1}
-  E_Mem_bot:
+  E_Mem_1:
+    - {source_name: out3, X-offset:  -1, Y-offset: 0, destination_name: in1}
+  E_Mem_2:
+    - {source_name: out3, X-offset:  -1, Y-offset: 0, destination_name: in1}
+  E_Mem_3:
     - {source_name: out3, X-offset:  -1, Y-offset: 0, destination_name: in1}
 
 BELS:
-  - {BEL: ./reg_unit.v, prefix: }
-  - {BEL: ./Mem.v, prefix: A_}
-  - {BEL: ./Mem.v, prefix: B_}
+  MEM_A:
+    # - {BEL: ./reg_unit.v, prefix: A_}
+    - {BEL: ./Mem.v, prefix: A_}
+  MEM_B:
+    # - {BEL: ./reg_unit.v, prefix: B_}
+    - {BEL: ./Mem.v, prefix: B_}
+  MEM_C:
+    # - {BEL: ./reg_unit.v, prefix: C_}
+    - {BEL: ./Mem.v, prefix: C_}
+  MEM_D:
+    # - {BEL: ./reg_unit.v, prefix: D_}
+    - {BEL: ./Mem.v, prefix: D_}
 
 SUB_TILE_MAP: [
-  [E_Mem_top],
-  [E_Mem_bot],
+  [E_Mem_0],
+  [E_Mem_1],
+  [E_Mem_2],
+  [E_Mem_3],
 ]
 
 MATRIX: ./list.py

@@ -146,7 +146,7 @@ def main():
 
     args = parser.parse_args()
 
-    setup_logger(args.verbose)
+    setup_logger(args.verbose, True)
 
     setup_global_env_vars(args)
 

@@ -1,9 +1,0 @@
-connectivityFactor,congestionFactor,success,runtime,returnCode,stdout,stderr,outputJson,outputFasm,outputFdc,timestamp
-0,0,False,0.009502887725830078,255,"unrecognised option '--placer-heap-seed-placement-strategy'
-",,,,,20250616_165647
-1,0,False,0.009470224380493164,255,"unrecognised option '--placer-heap-seed-placement-strategy'
-",,,,,20250616_165648
-0,1,False,0.010200023651123047,255,"unrecognised option '--placer-heap-seed-placement-strategy'
-",,,,,20250616_165649
-1,1,False,0.009651422500610352,255,"unrecognised option '--placer-heap-seed-placement-strategy'
-",,,,,20250616_165650

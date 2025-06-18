@@ -1,0 +1,25 @@
+digraph "G" {
+const1 [opcode=const, constVal="3"];
+i3_mul [opcode=mul];
+const2 [opcode=const, constVal="5"];
+i4_add [opcode=add];
+i5_add [opcode=add];
+const3 [opcode=const, constVal="1"];
+i6_add [opcode=add];
+input0 [opcode=input];
+i7_icmp [opcode=icmp];
+i8_br [opcode="io_width_1", original_opcode=br];
+i5_output [opcode=output];
+const1 -> i3_mul [operand=any2input];
+i3_mul -> i4_add [operand=any2input];
+const2 -> i4_add [operand=any2input];
+i4_add -> i5_add [operand=any2input];
+i5_add -> i5_output;
+i5_add -> i5_add [operand=LHS];
+const3 -> i6_add [operand=any2input];
+i6_add -> i7_icmp [operand=LHS];
+i6_add -> i3_mul [operand=any2input];
+i6_add -> i6_add [operand=any2input];
+input0 -> i7_icmp [operand=RHS];
+i7_icmp -> i8_br [operand="branch_cond"];
+}

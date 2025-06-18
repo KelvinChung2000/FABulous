@@ -20,9 +20,11 @@ end
 set source_futil /home/kelvin/FABulous_fork/myProject/PnR/mac-pipelined/mac-pipelined.futil 
 # set source_hdl /home/kelvin/FABulous_fork/myProject/PnR/mac-pipelined/mac-pipelined.sv
 # set source_hdl /home/kelvin/FABulous_fork/benchmarks/userbench/loop_array/loop_array.sv
-set source_hdl /home/kelvin/FABulous_fork/benchmarks/userbench/loop_array_inner/loop_array_inner.sv
+# set source_hdl /home/kelvin/FABulous_fork/benchmarks/userbench/loop_array_inner/loop_array_inner.sv
 # set source_hdl /home/kelvin/FABulous_fork/myProject/PnR/test.v
 # set source_hdl /home/kelvin/FABulous_fork/myProject/user_design/synth_test_mod.v
+set source_hdl /home/kelvin/FABulous_fork/myProject/PnR/generated_verilog/mac.v
+set -x OUT_JSON_PATH /home/kelvin/FABulous_fork/myProject/user_design/synth_test.json
 set ir /home/kelvin/FABulous_fork/myProject/PnR/mac-pipelined/ir.log
 set my_FAB_ROOT /home/kelvin/FABulous_fork
 
@@ -66,4 +68,4 @@ nextpnr-himbaechel --chipdb "$my_FAB_ROOT/myProject/.FABulous/hycube.bit" --devi
 # successful seed:5743725230106451036 
 # python $my_FAB_ROOT/myProject/Test/test_fabric.py
 
-/home/kelvin/FABulous_fork/.venv/bin/python /home/kelvin/FABulous_fork/FABulous/fabric_cad/graph_draw2.py
+# /home/kelvin/FABulous_fork/.venv/bin/python /home/kelvin/FABulous_fork/FABulous/fabric_cad/graph_draw2.py

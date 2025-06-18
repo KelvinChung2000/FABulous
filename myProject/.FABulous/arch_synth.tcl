@@ -1,4 +1,5 @@
 set project_root $env(FAB_PROJECT_DIR)
+set output_json_path $env(OUT_JSON_PATH)
 
 yosys hierarchy -auto-top
 
@@ -192,5 +193,5 @@ yosys opt -full
 yosys clean -purge
 yosys fsm_info
 yosys show -enum -long -width -format dot -prefix $project_root/.FABulous/design
-yosys write_json $project_root/user_design/synth_test.json
+yosys write_json $output_json_path
 yosys stat

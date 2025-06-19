@@ -111,6 +111,29 @@ class DotToVerilogConverter:
         # Logic operation mapping
         self.logicOpcodeMap = {"and": 0, "&&": 0, "or": 1, "||": 1, "xor": 2, "^^": 2, "not": 3, "!": 3}
 
+    def sanitize_name(self, name: str) -> str:
+        """
+        Sanitize a node name to make it compatible with Verilog naming rules.
+        
+        Parameters
+        ----------
+        name : str
+            Original node name from the graph
+            
+        Returns
+        -------
+        str
+            Sanitized name with invalid characters replaced
+        """
+        # Replace invalid characters with safe substitutes
+        sanitized = name.replace('@', '_at_')
+        # Add more replacements for other invalid characters if needed
+        # sanitized = sanitized.replace('#', '_hash_')
+        # Ensure the name starts with a letter or underscore
+        if sanitized and not (sanitized[0].isalpha() or sanitized[0] == '_'):
+            sanitized = f"n_{sanitized}"
+        return sanitized
+
     def convertDotToVerilog(self, dotFile: Path, moduleName: Optional[str] = None) -> tuple[str, nx.DiGraph]:
         """
         Convert a DOT file to Verilog module using NetworkX and templates.
@@ -1016,11 +1039,12 @@ class DotToVerilogConverter:
 
         for s, d in G.edges():
             if s not in used:
+                sanitized_s = self.sanitize_name(s)
                 # Use width-1 wire for logic and compare operations
                 if self._outputsWidth1Signal(G, s):
-                    body += self.wireTemplate1.format(source=s)
+                    body += self.wireTemplate1.format(source=sanitized_s)
                 else:
-                    body += self.wireTemplate.format(source=s)
+                    body += self.wireTemplate.format(source=sanitized_s)
                 used.add(s)
 
         # Generate wires for ALU intermediate signals (for pipeline registers)
@@ -1037,7 +1061,8 @@ class DotToVerilogConverter:
                 and opcode not in self.logicOpcodeMap
                 and opcode != "io_width_1"
             ):
-                aluSignal = f"{node}_alu"
+                sanitized_node = self.sanitize_name(node)
+                aluSignal = f"{sanitized_node}_alu"
                 if aluSignal not in used:
                     body += self.wireTemplate.format(source=aluSignal)
                     used.add(aluSignal)
@@ -1045,11 +1070,12 @@ class DotToVerilogConverter:
         # Generate wires for output nodes (nodes with no outgoing edges)
         for node in G.nodes():
             if G.out_degree(node) == 0 and node not in used:
+                sanitized_node = self.sanitize_name(node)
                 # Use width-1 wire for logic and compare operations
                 if self._outputsWidth1Signal(G, node):
-                    body += self.wireTemplate1.format(source=node)
+                    body += self.wireTemplate1.format(source=sanitized_node)
                 else:
-                    body += self.wireTemplate.format(source=node)
+                    body += self.wireTemplate.format(source=sanitized_node)
 
         if used or any(G.out_degree(node) == 0 for node in G.nodes()):
             body += "\n"
@@ -1095,6 +1121,7 @@ class DotToVerilogConverter:
             Verilog instance string
         """
         inDegree = G.in_degree(node)
+        sanitized_node = self.sanitize_name(node)
 
         # Extract opcode and other attributes
         opcode = nodeData.get("opcode", nodeData.get("label", "unknown"))
@@ -1115,30 +1142,30 @@ class DotToVerilogConverter:
             nonSelfPredecessors = [pred for pred in predecessors if pred != node]
 
         # Handle output nodes (nodes with no outgoing edges and incoming edges)
-        if outDegree == 0 and inDegree > 0:
-            if nodeType == "external" or nodeType == "output" or opcode == "output":
-                inputA = nonSelfPredecessors[0] if len(nonSelfPredecessors) > 0 else ""
-                return self.outputOp.format(value=node, A=inputA)
-            # For nodes with specific output-like opcodes, treat as output
-            elif opcode in ["ret", "return", "output", "sink"] or node.endswith("_output"):
-                inputA = nonSelfPredecessors[0] if len(nonSelfPredecessors) > 0 else ""
-                return self.outputOp.format(value=node, A=inputA)
+            if outDegree == 0 and inDegree > 0:
+                if nodeType == "external" or nodeType == "output" or opcode == "output":
+                    inputA = self.sanitize_name(nonSelfPredecessors[0]) if len(nonSelfPredecessors) > 0 else ""
+                    return self.outputOp.format(value=sanitized_node, A=inputA)
+                # For nodes with specific output-like opcodes, treat as output
+                elif opcode in ["ret", "return", "output", "sink"] or node.endswith("_output"):
+                    inputA = self.sanitize_name(nonSelfPredecessors[0]) if len(nonSelfPredecessors) > 0 else ""
+                    return self.outputOp.format(value=sanitized_node, A=inputA)
 
         # Handle input nodes (no incoming edges)
         if inDegree == 0:
             if nodeType == "external" or nodeType == "input" or opcode == "input":
-                return self.inputOp.format(value=node, Y=node)
+                return self.inputOp.format(value=sanitized_node, Y=sanitized_node)
             elif nodeType == "constant" or opcode == "const":
                 try:
                     constValue = int(constVal) if constVal.isdigit() else 0
                 except (ValueError, AttributeError):
                     constValue = 0
-                return self.constOp.format(CONST=constValue, value=node, Y=node)
+                return self.constOp.format(CONST=constValue, value=sanitized_node, Y=sanitized_node)
             elif nodeType == "reg" or opcode == "reg":
-                return self.regOp.format(value=node, IN="", Y=node)
+                return self.regOp.format(value=sanitized_node, IN="", Y=sanitized_node)
             else:
                 # Default to constant 0 for unknown input types
-                return self.constOp.format(CONST=0, value=node, Y=node)
+                return self.constOp.format(CONST=0, value=sanitized_node, Y=sanitized_node)
 
         # Check if this node has more inputs than it should handle (only for nodes with incoming edges)
         if inDegree > 0:
@@ -1152,8 +1179,8 @@ class DotToVerilogConverter:
 
         # Special handling for IO_WIDTH_1 (transformed branch operations)
         if opcode == "io_width_1":
-            inputA = nonSelfPredecessors[0] if len(nonSelfPredecessors) > 0 else ""
-            return self.ioWidth1Op.format(value=node, A=inputA, Y="")
+            inputA = self.sanitize_name(nonSelfPredecessors[0]) if len(nonSelfPredecessors) > 0 else ""
+            return self.ioWidth1Op.format(value=sanitized_node, A=inputA, Y="")
 
         # For ALU operations with self-loops, handle feedback properly
         if hasSelfLoop and self._isAluOperation(G, node):
@@ -1163,82 +1190,84 @@ class DotToVerilogConverter:
                 # Only self-loop, create unary operation with self-feedback
                 opValue = self._getOpValue(opcode, self.aluOpcodeMap, 0)
                 aluInstance, regInstance = self._generateAluWithRegister(
-                    self.unOp, value=node, OP=f"{opcode}_op" if opcode in opSet else opValue, A=node, Y=node
+                    self.unOp, value=sanitized_node, OP=f"{opcode}_op" if opcode in opSet else opValue, A=sanitized_node, Y=sanitized_node
                 )
                 return aluInstance + regInstance
 
             elif len(nonSelfPredecessors) == 1:
                 # One external input + self-loop = binary operation
-                inputA = nonSelfPredecessors[0]
+                inputA = self.sanitize_name(nonSelfPredecessors[0])
                 opValue = self._getOpValue(opcode, self.aluOpcodeMap, 0)
                 aluInstance, regInstance = self._generateAluWithRegister(
                     self.binOp,
-                    value=node,
+                    value=sanitized_node,
                     OP=f"{opcode}_op" if opcode in opSet else opValue,
                     A=inputA,
-                    B=node,  # Self-loop as second input
-                    Y=node,
+                    B=sanitized_node,  # Self-loop as second input
+                    Y=sanitized_node,
                 )
                 return aluInstance + regInstance
 
             else:
                 # Multiple external inputs + self-loop
                 # Use first external input and self-loop
-                inputA = nonSelfPredecessors[0]
+                inputA = self.sanitize_name(nonSelfPredecessors[0])
                 opValue = self._getOpValue(opcode, self.aluOpcodeMap, 0)
                 aluInstance, regInstance = self._generateAluWithRegister(
                     self.binOp,
-                    value=node,
+                    value=sanitized_node,
                     OP=f"{opcode}_op" if opcode in opSet else opValue,
                     A=inputA,
-                    B=node,  # Self-loop as second input
-                    Y=node,
+                    B=sanitized_node,  # Self-loop as second input
+                    Y=sanitized_node,
                 )
                 return aluInstance + regInstance
 
         # Handle nodes without self-loops (original logic)
         if len(nonSelfPredecessors) == 1:
             # Unary operation
-            inputA = nonSelfPredecessors[0]
+            inputA = self.sanitize_name(nonSelfPredecessors[0])
 
             # Special handling for load operations - use Mem module
             if opcode == "load":
-                return self.memOp.format(BITS=0, value=node, ADDR=inputA, WDATA="", WEN="", Y=node)
+                return self.memOp.format(BITS=0, value=sanitized_node, ADDR=inputA, WDATA="", WEN="", Y=sanitized_node)
             else:
                 # Regular unary ALU operation with pipeline register
                 opValue = self._getOpValue(opcode, self.aluOpcodeMap, 0)
                 aluInstance, regInstance = self._generateAluWithRegister(
-                    self.unOp, value=node, OP=f"{opcode}_op" if opcode in opSet else opValue, A=inputA, Y=node
+                    self.unOp, value=sanitized_node, OP=f"{opcode}_op" if opcode in opSet else opValue, A=inputA, Y=sanitized_node
                 )
                 return aluInstance + regInstance
 
         elif len(nonSelfPredecessors) == 2:
             # Binary operation - need to determine correct operand order
             inputA, inputB = self._getOperandOrder(G, node, nonSelfPredecessors)
+            sanitized_inputA = self.sanitize_name(inputA)
+            sanitized_inputB = self.sanitize_name(inputB)
 
             # Special handling for load operations with 2 inputs (address + data) - use Mem module
             if opcode == "load":
-                return self.memOp.format(BITS=0, value=node, ADDR=inputA, WDATA=inputB, WEN="", Y=node)
+                return self.memOp.format(BITS=0, value=sanitized_node, ADDR=sanitized_inputA, WDATA=sanitized_inputB, WEN="", Y=sanitized_node)
             # Special handling for store operations - use Mem module for memory write
             elif opcode == "store":
-                return self.memOp.format(BITS=0, value=node, ADDR=inputA, WDATA=inputB, WEN="", Y=node)
+                return self.memOp.format(BITS=0, value=sanitized_node, ADDR=sanitized_inputA, WDATA=sanitized_inputB, WEN="", Y=sanitized_node)
             # Determine operation type
             elif opcode in self.compareOpcodeMap:
                 opValue = self.compareOpcodeMap[opcode]
-                return self.compareOp.format(OP=opValue, value=node, A=inputA, B=inputB, Y=node)
+                return self.compareOp.format(OP=opValue, value=sanitized_node, A=sanitized_inputA, B=sanitized_inputB, Y=sanitized_node)
             elif opcode in self.logicOpcodeMap:
                 opValue = self.logicOpcodeMap[opcode]
-                return self.logicOp.format(OP=opValue, value=node, A=inputA, B=inputB, Y=node)
+                return self.logicOp.format(OP=opValue, value=sanitized_node, A=sanitized_inputA, B=sanitized_inputB, Y=sanitized_node)
             else:
                 # Default to ALU binary operation with pipeline register
                 opValue = self._getOpValue(opcode, self.aluOpcodeMap, 0)
                 aluInstance, regInstance = self._generateAluWithRegister(
                     self.binOp,
-                    value=node,
+                    value=sanitized_node,
                     OP=f"{opcode}_op" if opcode in opSet else opValue,
-                    A=inputA,
-                    B=inputB,
-                    Y=node,
+                    A=sanitized_inputA,
+                    B=sanitized_inputB,
+                    Y=sanitized_node,
                 )
                 return aluInstance + regInstance
 
@@ -1246,31 +1275,33 @@ class DotToVerilogConverter:
             # More than 2 inputs or no inputs - handle appropriately
             if len(nonSelfPredecessors) >= 2:
                 inputA, inputB = nonSelfPredecessors[:2]
+                sanitized_inputA = self.sanitize_name(inputA)
+                sanitized_inputB = self.sanitize_name(inputB)
 
                 # Special handling for store operations with multiple inputs - use Mem module
                 if opcode == "store":
-                    return self.memOp.format(BITS=0, value=node, ADDR=inputA, WDATA=inputB, WEN="", Y=node)
+                    return self.memOp.format(BITS=0, value=sanitized_node, ADDR=sanitized_inputA, WDATA=sanitized_inputB, WEN="", Y=sanitized_node)
                 # Special handling for load operations with multiple inputs - use Mem module
                 elif opcode == "load":
-                    return self.memOp.format(BITS=0, value=node, ADDR=inputA, WDATA=inputB, WEN="", Y=node)
+                    return self.memOp.format(BITS=0, value=sanitized_node, ADDR=sanitized_inputA, WDATA=sanitized_inputB, WEN="", Y=sanitized_node)
                 else:
                     # Multi-input ALU operation with pipeline register (using first two inputs)
                     opValue = self._getOpValue(opcode, self.aluOpcodeMap, 0)
                     aluInstance, regInstance = self._generateAluWithRegister(
                         self.binOp,
-                        value=node,
+                        value=sanitized_node,
                         OP=f"{opcode}_op" if opcode in opSet else opValue,
-                        A=inputA,
-                        B=inputB,
-                        Y=node,
+                        A=sanitized_inputA,
+                        B=sanitized_inputB,
+                        Y=sanitized_node,
                     )
                     return aluInstance + regInstance
             elif len(nonSelfPredecessors) == 0 and not hasSelfLoop:
                 # No inputs at all - fallback to constant
-                return self.constOp.format(CONST=0, value=node, Y=node)
+                return self.constOp.format(CONST=0, value=sanitized_node, Y=sanitized_node)
             else:
                 # Fallback
-                return self.constOp.format(CONST=0, value=node, Y=node)
+                return self.constOp.format(CONST=0, value=sanitized_node, Y=sanitized_node)
 
     def _getOperandOrder(self, G: nx.DiGraph, node: str, predecessors: List[str]) -> Tuple[str, str]:
         """

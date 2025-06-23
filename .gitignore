@@ -11,3 +11,6 @@ cmake
 benchmarks/**
 *.json
 **/metadata/**
+
+myProject/PnR/results
+myProject/PnR/generated_verilog

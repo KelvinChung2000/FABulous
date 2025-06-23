@@ -37,6 +37,8 @@ dependencies = [
     "pandas>=2.3.0",
     "seaborn>=0.13.2",
     "networkx>=3.5",
+    "ipywidgets>=8.1.7",
+    "xdsl>=0.42.0",
 ]
 
 [project.urls]

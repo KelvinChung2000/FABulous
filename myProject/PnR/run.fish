@@ -20,10 +20,10 @@ end
 set source_futil /home/kelvin/FABulous_fork/myProject/PnR/mac-pipelined/mac-pipelined.futil 
 # set source_hdl /home/kelvin/FABulous_fork/myProject/PnR/mac-pipelined/mac-pipelined.sv
 # set source_hdl /home/kelvin/FABulous_fork/benchmarks/userbench/loop_array/loop_array.sv
-# set source_hdl /home/kelvin/FABulous_fork/benchmarks/userbench/loop_array_inner/loop_array_inner.sv
+set source_hdl /home/kelvin/FABulous_fork/benchmarks/userbench/loop_array_inner/loop_array_inner.sv
 # set source_hdl /home/kelvin/FABulous_fork/myProject/PnR/test.v
 # set source_hdl /home/kelvin/FABulous_fork/myProject/user_design/synth_test_mod.v
-set source_hdl /home/kelvin/FABulous_fork/myProject/PnR/generated_verilog/mac.v
+# set source_hdl /home/kelvin/FABulous_fork/myProject/PnR/generated_verilog/fft_transpose/Loop0_fft_transpose_dfg_0.v
 set -x OUT_JSON_PATH /home/kelvin/FABulous_fork/myProject/user_design/synth_test.json
 set ir /home/kelvin/FABulous_fork/myProject/PnR/mac-pipelined/ir.log
 set my_FAB_ROOT /home/kelvin/FABulous_fork

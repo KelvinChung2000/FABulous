@@ -127,8 +127,9 @@ class DotToVerilogConverter:
         """
         # Replace invalid characters with safe substitutes
         sanitized = name.replace('@', '_at_')
+        sanitized = sanitized.replace('#', '_hash_')
+        sanitized = sanitized.replace('!', '_exclaim_')
         # Add more replacements for other invalid characters if needed
-        # sanitized = sanitized.replace('#', '_hash_')
         # Ensure the name starts with a letter or underscore
         if sanitized and not (sanitized[0].isalpha() or sanitized[0] == '_'):
             sanitized = f"n_{sanitized}"
@@ -1160,7 +1161,7 @@ class DotToVerilogConverter:
                     constValue = int(constVal) if constVal.isdigit() else 0
                 except (ValueError, AttributeError):
                     constValue = 0
-                return self.constOp.format(CONST=constValue, value=sanitized_node, Y=sanitized_node)
+                return self.constOp.format(CONST=0, value=sanitized_node, Y=sanitized_node)
             elif nodeType == "reg" or opcode == "reg":
                 return self.regOp.format(value=sanitized_node, IN="", Y=sanitized_node)
             else:

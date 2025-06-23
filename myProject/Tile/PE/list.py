@@ -9,8 +9,8 @@ class MuxList(PE_ports):
         self.A_reg_in //= [self.in0, self.in1, self.in2, self.in3, self.RES_reg_out, self.data_out]
         self.B_reg_in //= [self.in0, self.in1, self.in2, self.in3, self.RES_reg_out, self.data_out]
 
-        self.c_A //= [self.A_reg_out, self.const_out]
-        self.c_B //= [self.B_reg_out, self.const_out]
+        self.c_A //= [self.A_reg_out, self.const_out, self.data_out, self.RES_reg_out, self.in0, self.in1, self.in2, self.in3,]
+        self.c_B //= [self.B_reg_out, self.const_out, self.data_out, self.RES_reg_out, self.in0, self.in1, self.in2, self.in3,]
 
         self.RES_reg_in //= self.data_out
 

@@ -1,0 +1,220 @@
+import "primitives/memories/seq.futil";
+import "primitives/core.futil";
+import "primitives/compile.futil";
+import "primitives/binary_operators.futil";
+component main<"toplevel"=1,>(in0: 32, in1: 64, in2: 32, @clk clk: 1, @reset reset: 1, @go go: 1) -> (@done done: 1) {
+  cells {
+    @external(1) mem_3 = seq_mem_d1(64, 256, 8);
+    @external(1) mem_2 = seq_mem_d1(64, 10, 4);
+    @external(1) mem_1 = seq_mem_d1(8, 256, 8);
+    @external(1) mem_0 = seq_mem_d1(64, 4096, 12);
+    bfs_queue_inner_loop_0_instance = bfs_queue_inner_loop_0();
+  }
+  wires {
+  }
+  control {
+    seq {
+      seq {
+        invoke bfs_queue_inner_loop_0_instance[arg_mem_0 = mem_0, arg_mem_1 = mem_1, arg_mem_2 = mem_2, arg_mem_3 = mem_3](in0 = in0, in1 = in1, in4 = in2)();
+      }
+    }
+  }
+}
+component bfs_queue_inner_loop_0(in0: 32, in1: 64, in4: 32, @clk clk: 1, @reset reset: 1, @go go: 1) -> (out0: 64, @done done: 1) {
+  cells {
+    std_slice_9 = std_slice(32, 12);
+    std_slice_8 = std_slice(32, 8);
+    std_slice_7 = std_slice(32, 8);
+    std_slice_6 = std_slice(32, 8);
+    std_slice_5 = std_slice(32, 4);
+    std_slice_4 = std_slice(32, 4);
+    std_slice_3 = std_slice(32, 8);
+    remsi_0_reg = std_reg(64);
+    std_rems_pipe_0 = std_sdiv_pipe(64);
+    std_add_3 = std_add(64);
+    std_slice_2 = std_slice(64, 32);
+    std_add_2 = std_add(64);
+    std_eq_1 = std_eq(64);
+    std_add_1 = std_add(64);
+    load_2_reg = std_reg(64);
+    std_pad_0 = std_pad(8, 32);
+    std_slice_1 = std_slice(32, 8);
+    std_add_0 = std_add(32);
+    std_signext_1 = std_signext(8, 32);
+    load_1_reg = std_reg(8);
+    std_eq_0 = std_eq(32);
+    std_signext_0 = std_signext(8, 32);
+    load_0_reg = std_reg(8);
+    std_slice_0 = std_slice(64, 32);
+    if_res_1_reg = std_reg(64);
+    if_res_0_reg = std_reg(64);
+    ret_arg0_reg = std_reg(64);
+    ref arg_mem_3 = seq_mem_d1(64, 256, 8);
+    ref arg_mem_2 = seq_mem_d1(64, 10, 4);
+    ref arg_mem_1 = seq_mem_d1(8, 256, 8);
+    ref arg_mem_0 = seq_mem_d1(64, 4096, 12);
+  }
+  wires {
+    out0 = ret_arg0_reg.out;
+    group then_br_0 {
+      if_res_0_reg.in = 64'd255;
+      if_res_0_reg.write_en = 1'b1;
+      then_br_0[done] = if_res_0_reg.done;
+    }
+    group else_br_0 {
+      if_res_0_reg.in = std_add_2.out;
+      if_res_0_reg.write_en = 1'b1;
+      std_add_2.left = in1;
+      std_add_2.right = 64'b1111111111111111111111111111111111111111111111111111111111111111;
+      else_br_0[done] = if_res_0_reg.done;
+    }
+    group then_br_1 {
+      if_res_1_reg.in = remsi_0_reg.out;
+      if_res_1_reg.write_en = 1'b1;
+      then_br_1[done] = if_res_1_reg.done;
+    }
+    group else_br_1 {
+      if_res_1_reg.in = in1;
+      if_res_1_reg.write_en = 1'b1;
+      else_br_1[done] = if_res_1_reg.done;
+    }
+    group bb0_0 {
+      std_slice_9.in = in0;
+      arg_mem_0.addr0 = std_slice_9.out;
+      arg_mem_0.content_en = 1'b1;
+      arg_mem_0.write_en = 1'd0;
+      bb0_0[done] = arg_mem_0.done;
+    }
+    group bb0_2 {
+      std_slice_8.in = std_slice_0.out;
+      arg_mem_1.addr0 = std_slice_8.out;
+      arg_mem_1.content_en = 1'b1;
+      arg_mem_1.write_en = 1'd0;
+      load_0_reg.in = arg_mem_1.read_data;
+      load_0_reg.write_en = arg_mem_1.done;
+      std_slice_0.in = arg_mem_0.read_data;
+      bb0_2[done] = load_0_reg.done;
+    }
+    comb group bb0_4 {
+      std_eq_0.left = std_signext_0.out;
+      std_eq_0.right = 32'd127;
+      std_signext_0.in = load_0_reg.out;
+    }
+    group bb0_5 {
+      std_slice_7.in = in4;
+      arg_mem_1.addr0 = std_slice_7.out;
+      arg_mem_1.content_en = 1'b1;
+      arg_mem_1.write_en = 1'd0;
+      load_1_reg.in = arg_mem_1.read_data;
+      load_1_reg.write_en = arg_mem_1.done;
+      bb0_5[done] = load_1_reg.done;
+    }
+    group bb0_9 {
+      std_slice_6.in = std_slice_0.out;
+      arg_mem_1.addr0 = std_slice_6.out;
+      arg_mem_1.write_data = std_slice_1.out;
+      arg_mem_1.write_en = 1'b1;
+      arg_mem_1.content_en = 1'b1;
+      std_slice_0.in = arg_mem_0.read_data;
+      std_slice_1.in = std_add_0.out;
+      std_add_0.left = std_signext_1.out;
+      std_signext_1.in = load_1_reg.out;
+      std_add_0.right = 32'd1;
+      bb0_9[done] = arg_mem_1.done;
+    }
+    group bb0_11 {
+      std_slice_5.in = std_pad_0.out;
+      arg_mem_2.addr0 = std_slice_5.out;
+      arg_mem_2.content_en = 1'b1;
+      arg_mem_2.write_en = 1'd0;
+      load_2_reg.in = arg_mem_2.read_data;
+      load_2_reg.write_en = arg_mem_2.done;
+      std_pad_0.in = std_slice_1.out;
+      std_slice_1.in = std_add_0.out;
+      std_add_0.left = std_signext_1.out;
+      std_signext_1.in = load_1_reg.out;
+      std_add_0.right = 32'd1;
+      bb0_11[done] = load_2_reg.done;
+    }
+    group bb0_13 {
+      std_slice_4.in = std_pad_0.out;
+      arg_mem_2.addr0 = std_slice_4.out;
+      arg_mem_2.write_data = std_add_1.out;
+      arg_mem_2.write_en = 1'b1;
+      arg_mem_2.content_en = 1'b1;
+      std_pad_0.in = std_slice_1.out;
+      std_slice_1.in = std_add_0.out;
+      std_add_0.left = std_signext_1.out;
+      std_signext_1.in = load_1_reg.out;
+      std_add_0.right = 32'd1;
+      std_add_1.left = load_2_reg.out;
+      std_add_1.right = 64'd1;
+      bb0_13[done] = arg_mem_2.done;
+    }
+    comb group bb0_14 {
+      std_eq_1.left = in1;
+      std_eq_1.right = 64'd0;
+    }
+    group bb0_17 {
+      std_slice_3.in = std_slice_2.out;
+      arg_mem_3.addr0 = std_slice_3.out;
+      arg_mem_3.write_data = arg_mem_0.read_data;
+      arg_mem_3.write_en = 1'b1;
+      arg_mem_3.content_en = 1'b1;
+      std_slice_2.in = if_res_0_reg.out;
+      bb0_17[done] = arg_mem_3.done;
+    }
+    group bb0_19 {
+      std_rems_pipe_0.left = std_add_3.out;
+      std_rems_pipe_0.right = 64'd256;
+      remsi_0_reg.in = std_rems_pipe_0.out_remainder;
+      remsi_0_reg.write_en = std_rems_pipe_0.done;
+      std_rems_pipe_0.go = !std_rems_pipe_0.done ? 1'b1;
+      std_add_3.left = in1;
+      std_add_3.right = 64'd1;
+      bb0_19[done] = remsi_0_reg.done;
+    }
+    group ret_assign_0 {
+      ret_arg0_reg.in = if_res_1_reg.out;
+      ret_arg0_reg.write_en = 1'b1;
+      ret_assign_0[done] = ret_arg0_reg.done;
+    }
+  }
+  control {
+    seq {
+      seq {
+        bb0_0;
+        bb0_2;
+        if std_eq_0.out with bb0_4 {
+          seq {
+            seq {
+              bb0_5;
+              bb0_9;
+              bb0_11;
+              bb0_13;
+              if std_eq_1.out with bb0_14 {
+                seq {
+                  then_br_0;
+                }
+              }
+              else {
+                seq {
+                  else_br_0;
+                }
+              }
+              bb0_17;
+              bb0_19;
+            }
+            then_br_1;
+          }
+        }
+        else {
+          seq {
+            else_br_1;
+          }
+        }
+        ret_assign_0;
+      }
+    }
+  }
+}

@@ -23,7 +23,7 @@ set source_futil /home/kelvin/FABulous_fork/myProject/PnR/mac-pipelined/mac-pipe
 set source_hdl /home/kelvin/FABulous_fork/benchmarks/userbench/loop_array_inner/loop_array_inner.sv
 # set source_hdl /home/kelvin/FABulous_fork/myProject/PnR/test.v
 # set source_hdl /home/kelvin/FABulous_fork/myProject/user_design/synth_test_mod.v
-# set source_hdl /home/kelvin/FABulous_fork/myProject/PnR/generated_verilog/fft_transpose/Loop0_fft_transpose_dfg_0.v
+set source_hdl /home/kelvin/FABulous_fork/myProject/PnR/mlir_trail/mlir_trail_test_bfs_queue_inner_loop_0.sv
 set -x OUT_JSON_PATH /home/kelvin/FABulous_fork/myProject/user_design/synth_test.json
 set ir /home/kelvin/FABulous_fork/myProject/PnR/mac-pipelined/ir.log
 set my_FAB_ROOT /home/kelvin/FABulous_fork
@@ -32,7 +32,7 @@ set my_FAB_ROOT /home/kelvin/FABulous_fork
 # cargo build
 # cd -
 
-set clayx_flag "-p fsm-opt -x simplify-with-control:without-register -x static-inline:offload-pause=false -p lower --nested -d papercut  -d cell-share"
+set clayx_flag "-p fsm-opt -x simplify-with-control:without-register -x static-inline:offload-pause=false -p lower --nested -d papercut -d cell-share"
 
 # calyx --dump-ir $clayx_flag $source_futil -o $source_hdl > $ir
 # check_status

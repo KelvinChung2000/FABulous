@@ -1,0 +1,55 @@
+import "primitives/memories/seq.futil";
+import "primitives/core.futil";
+import "primitives/compile.futil";
+import "primitives/binary_operators.futil";
+
+component main() -> (out: 64) {
+  cells {
+    a = std_add(64);
+  }
+  wires {
+    group save {
+      a.left = 64'd0;
+      // a.right = 64'b1111111111111111111111111111111111111111111111111111111111111111;
+      a.right = 64'd18446744073709551615;
+    }
+    out = a.out;
+  }
+  control {
+    save;
+  }
+}
+
+
+// component main() -> (out: 32) {
+//   cells {
+//     a = std_add(32);
+//   }
+//   wires {
+//     group save {
+//       a.left = 32'd0;
+//       a.right = 32'd4294967295;
+//     }
+//     out = a.out;
+//   }
+//   control {
+//     save;
+//   }
+// }
+
+
+// component main() -> (out: 1) {
+//   cells {
+//     a = std_add(1);
+//   }
+//   wires {
+//     group save {
+//       a.left = 1'd0;
+//       a.right = 1'd1;
+//     }
+//     out = a.out;
+//   }
+//   control {
+//     save;
+//   }
+// }

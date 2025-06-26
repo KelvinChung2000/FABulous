@@ -13,4 +13,4 @@ benchmarks/**
 **/metadata/**
 
 myProject/PnR/results
-myProject/PnR/generated_verilog
+myProject/PnR/compilation_result

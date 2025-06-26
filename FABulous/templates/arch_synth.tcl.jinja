@@ -3,8 +3,8 @@ set output_json_path $env(OUT_JSON_PATH)
 
 yosys hierarchy -auto-top
 
-yosys read_verilog -lib $project_root/.FABulous/libs.v
-yosys read_verilog -lib $project_root/.FABulous/build_in_lib.v
+yosys read_verilog -sv -lib $project_root/.FABulous/libs.v
+yosys read_verilog -sv -lib $project_root/.FABulous/build_in_lib.v
 yosys proc
 yosys flatten -noscopeinfo
 yosys opt_expr

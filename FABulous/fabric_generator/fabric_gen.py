@@ -35,9 +35,12 @@ from FABulous.fabric_definition.define import (
     MultiplexerStyle,
 )
 from FABulous.fabric_definition.Fabric import Fabric
+
 from FABulous.fabric_definition.Port import Port
 from FABulous.fabric_definition.SuperTile import SuperTile
 from FABulous.fabric_definition.Tile import Tile
+from FABulous.fabric_definition.Gen_IO import Gen_IO
+from FABulous.fabric_generator.fabric_automation import addBelsToPrim
 from FABulous.fabric_generator.code_generation_Verilog import VerilogWriter
 from FABulous.fabric_generator.code_generation_VHDL import VHDLWriter
 from FABulous.fabric_generator.code_generator import codeGenerator
@@ -46,6 +49,7 @@ from FABulous.fabric_generator.file_parser import (
     parseConfigMem,
     parseList,
     parseMatrix,
+    parseBelFile,
 )
 
 
@@ -86,6 +90,7 @@ class FabricGenerator:
         The order of the signal will be:
         - standard wire
         - BEL signal with prefix
+        - GEN_IO signals with prefix
         - jump wire
 
         The order is important as this order will be used during switch matrix generation.
@@ -1108,7 +1113,10 @@ class FabricGenerator:
             )
 
         # BEL component instantiations
-        self.writer.addComment("BEL component instantiations", onNewLine=True)
+        if tile.bels:
+            self.writer.addNewLine()
+            self.writer.addComment("BEL component instantiations", onNewLine=True)
+
         belCounter = 0
         belConfigBitsCounter = 0
         for bel in tile.bels:

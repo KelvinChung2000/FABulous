@@ -3,6 +3,7 @@ from enum import Enum
 from dataclasses import dataclass, field
 from FABulous.fabric_definition.define import IO, Direction, Side
 from FABulous.fabric_definition.Bel import Bel
+from FABulous.fabric_definition.Gen_IO import Gen_IO
 from FABulous.fabric_definition.Port import Port
 from FABulous.fabric_definition.Wire import Wire
 from typing import Any
@@ -21,8 +22,10 @@ class Tile:
         The list of ports of the tile
     matrixDir : str
         The directory of the tile matrix
-    globalConfigBits : int
-        The number of config bits the tile has
+    gen_ios : List[Gen_IO]
+        The list of GEN_IOs of the tile
+    matrixConfigBits : int
+        The number of config bits the tile switch matrix has
     withUserCLK : bool
         Whether the tile has a userCLK port. Default is False.
     wireList : list[Wire]
@@ -35,7 +38,8 @@ class Tile:
     portsInfo: list[Port]
     bels: list[Bel]
     matrixDir: pathlib.Path
-    globalConfigBits: int = 0
+    matrixConfigBits: int
+    gen_ios: list[Gen_IO]
     withUserCLK: bool = False
     wireList: list[Wire] = field(default_factory=list)
     tileDir: pathlib.Path = pathlib.Path(".")
@@ -48,20 +52,19 @@ class Tile:
         bels: list[Bel],
         tileDir: pathlib.Path,
         matrixDir: pathlib.Path,
+        gen_ios: list[Gen_IO],
         userCLK: bool,
         configBit: int = 0,
     ) -> None:
         self.name = name
         self.portsInfo = ports
         self.bels = bels
+        self.gen_ios = gen_ios
         self.matrixDir = matrixDir
         self.withUserCLK = userCLK
-        self.globalConfigBits = configBit
+        self.matrixConfigBits = configBit
         self.wireList = []
         self.tileDir = tileDir
-
-        for b in self.bels:
-            self.globalConfigBits += b.configBit
 
     def __eq__(self, __o: Any) -> bool:
         if __o is None or not isinstance(__o, Tile):
@@ -133,3 +136,14 @@ class Tile:
             and p.wireDirection != Direction.JUMP
             and p.inOut == IO.OUTPUT
         ]
+
+    @property
+    def globalConfigBits(self) -> int:
+        """Returns the number of global configuration bits."""
+
+        ret = self.matrixConfigBits
+
+        for b in self.bels:
+            ret += b.configBit
+
+        return ret

@@ -731,7 +731,7 @@ FABulous defines the following coding rules for BELs:
 
   * ``SHARED_PORT``: this directive can only be used together optionally with ``EXTERNAL``. If a port is set ``EXTERNAL`` but not ``SHARED_PORT``, then , a TODO ( shared  ports flagged with this directive are not connected to the switch matrix but are exported through the tile entity to the top-level fabric wrapper.
 
-.. _bitstream:
+-.. _bitstream:
 
 Bitstream remapping
 ~~~~~~~~~~~~~~~~~~~

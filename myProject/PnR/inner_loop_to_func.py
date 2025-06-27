@@ -15,18 +15,207 @@ from xdsl.dialects import builtin, func, affine, arith, memref, scf
 from xdsl.ir import SSAValue, Region
 
 
+def normalize_scf_while_loops(module: Operation) -> None:
+    """Transform scf.while loops into guarded simple loops for easier extraction."""
+    
+    # Find all scf.while operations in the module
+    while_loops = []
+    for op in module.walk():
+        if op.name == "scf.while":
+            while_loops.append(op)
+    
+    print(f"Found {len(while_loops)} scf.while loops to normalize")
+    
+    # Transform each scf.while loop - process in reverse order to avoid iterator invalidation
+    for i, while_op in enumerate(reversed(while_loops)):
+        try:
+            print(f"  Normalizing scf.while loop {len(while_loops)-i}/{len(while_loops)}")
+            _transform_scf_while_to_guarded_loop(while_op)
+        except Exception as e:
+            print(f"  Warning: Could not normalize scf.while loop {len(while_loops)-i}: {e}")
+
+
+def _transform_scf_while_to_guarded_loop(while_op: Operation) -> None:
+    """Transform scf.while into: initial_before_ops + scf.if(cond) { after_body } else { value }"""
+    
+    # Get the parent block and insertion point
+    parent_block = while_op.parent_block()
+    if not parent_block:
+        raise Exception("scf.while has no parent block")
+    
+    # Get the regions
+    if not hasattr(while_op, 'regions') or len(while_op.regions) < 2:
+        raise Exception(f"scf.while missing regions - has {len(while_op.regions) if hasattr(while_op, 'regions') else 0} regions")
+    
+    before_region = while_op.regions[0]
+    after_region = while_op.regions[1]
+    
+    if not before_region.blocks or not after_region.blocks:
+        raise Exception("scf.while regions missing blocks")
+    
+    before_block = before_region.blocks[0]
+    
+    # Get initial arguments and types
+    init_args = list(while_op.operands)
+    result_types = list(while_op.result_types) if hasattr(while_op, 'result_types') else []
+    
+    # Clone before region operations (excluding scf.condition) - these become the "first iteration"
+    initial_ops = []
+    first_iteration_results = []  # Track the results from the first iteration
+    value_mapping = {}
+    
+    # Map initial arguments to before block arguments
+    if before_block.args:
+        for init_arg, block_arg in zip(init_args, before_block.args):
+            value_mapping[block_arg] = init_arg
+    
+    # Clone operations and find condition
+    condition_op = None
+    for op in before_block.ops:
+        if op.name == "scf.condition":
+            condition_op = op
+            break
+        else:
+            cloned_op = _clone_operation_with_mapping(op, value_mapping)
+            initial_ops.append(cloned_op)
+            # Update mapping for results and track first iteration results
+            if hasattr(op, 'results') and hasattr(cloned_op, 'results'):
+                for orig_result, cloned_result in zip(op.results, cloned_op.results):
+                    value_mapping[orig_result] = cloned_result
+                    first_iteration_results.append(cloned_result)
+    
+    if not condition_op:
+        raise Exception("No scf.condition found in before region")
+    
+    # Get condition and values from the scf.condition operation
+    condition_operands = [value_mapping.get(operand, operand) for operand in condition_op.operands]
+    
+    if len(condition_operands) == 0:
+        raise Exception("scf.condition has no operands")
+        
+    guard_condition = condition_operands[0]
+    guard_values = condition_operands[1:] if len(condition_operands) > 1 else []
+    
+    # Insert initial operations before the while loop
+    for op in initial_ops:
+        parent_block.insert_op_before(op, while_op)
+    
+    # Create scf.if to guard the simplified while loop
+    try:
+        from xdsl.ir import Region, Block
+        
+        # Create the then region with the after region body
+        then_region = Region()
+        then_block = Block(arg_types=[])
+        then_region.add_block(then_block)
+        
+        # Create else region
+        else_region = Region()
+        else_block = Block(arg_types=[])
+        else_region.add_block(else_block)
+        
+        # Create a simple while loop that repeats the before region logic  
+        # This creates the structure from the example: while %condition { before_region_ops }
+        
+        # Create a simple while loop for the then branch
+        simple_while_before_region = Region()
+        simple_while_before_block = Block(arg_types=[arg.type for arg in before_block.args])
+        simple_while_before_region.add_block(simple_while_before_block)
+        
+        # Create a value mapping for the while loop's block arguments
+        while_value_mapping = {}
+        for i, block_arg in enumerate(simple_while_before_block.args):
+            if i < len(before_block.args):
+                while_value_mapping[before_block.args[i]] = block_arg
+        
+        # According to the updated example, we need to be more selective about what goes in the while loop
+        # We should clone operations but with more careful mapping of which values to use
+        
+        # For now, let's create a simple while loop that just continues the computation
+        # This needs to be implemented based on the specific pattern in the updated example
+        # The while loop should use the loop variable for some operations and original args for others
+        
+        # Clone the before region operations with proper value mapping for the while loop
+        for op in before_block.ops:
+            if op.name != "scf.condition":
+                # The key fix: operations in the while loop should use the while loop's block arguments
+                # Create a more comprehensive mapping that maps original args to while loop args
+                extended_mapping = dict(while_value_mapping)
+                
+                # Also map any values that were originally using init_args to use while loop args when appropriate
+                for i, init_arg in enumerate(init_args):
+                    if i < len(simple_while_before_block.args):
+                        extended_mapping[init_arg] = simple_while_before_block.args[i]
+                
+                cloned_op = _clone_operation_with_mapping(op, extended_mapping)
+                simple_while_before_block.add_op(cloned_op)
+                # Update mapping for results
+                if hasattr(op, 'results') and hasattr(cloned_op, 'results'):
+                    for orig_result, cloned_result in zip(op.results, cloned_op.results):
+                        while_value_mapping[orig_result] = cloned_result
+        
+        # Add the condition operation to the simple while loop
+        condition_operands_for_while = [while_value_mapping.get(operand, operand) for operand in condition_op.operands]
+        while_condition = scf.ConditionOp(condition_operands_for_while[0], *condition_operands_for_while[1:])
+        simple_while_before_block.add_op(while_condition)
+        
+        # The while loop should start with the values produced by the first iteration (now outside)  
+        # According to the corrected example, use the guard_values (results from first iteration condition)
+        simple_while = scf.WhileOp(guard_values, result_types, simple_while_before_region, after_region.clone())
+        then_block.add_op(simple_while)
+        
+        # Add yield to then region using the while loop results
+        then_yield = scf.YieldOp(*simple_while.results)
+        then_block.add_op(then_yield)
+        
+        # Add yield to else region  
+        else_yield = scf.YieldOp(*guard_values)
+        else_block.add_op(else_yield)
+        
+        # Create the if operation
+        if_op = scf.IfOp(guard_condition, result_types, then_region, else_region)
+        
+        # Insert the if operation and remove the original while
+        parent_block.insert_op_before(if_op, while_op)
+        
+        # Replace uses of original while results with if results
+        if hasattr(while_op, 'results') and hasattr(if_op, 'results'):
+            for orig_result, new_result in zip(while_op.results, if_op.results):
+                orig_result.replace_by(new_result)
+        
+        # Important: Also need to replace references to the scf.while block arguments
+        # The scf.while block arguments should be replaced with the init_args
+        if before_block.args and init_args:
+            for block_arg, init_arg in zip(before_block.args, init_args):
+                # Find all uses of the block argument and replace with the init_arg
+                try:
+                    block_arg.replace_by(init_arg)
+                except:
+                    # If direct replacement fails, we'll need to handle this during the walk
+                    pass
+        
+        # Remove original while
+        while_op.detach()
+        
+        print(f"    Successfully transformed scf.while into guarded if structure")
+        
+    except Exception as e:
+        # No fallback - raise the error to debug and fix the transformation
+        raise Exception(f"scf.while transformation failed: {e}")
+
+
 def find_innermost_loops(op: Operation) -> List[Operation]:
     """Find all loops that have no nested loops inside them (leaf loops)."""
     innermost_loops = []
     
     # Find all loops in the operation using xDSL's walk method
-    all_loops = [loop_op for loop_op in op.walk() if loop_op.name in ["affine.for", "scf.for"]]
+    all_loops = [loop_op for loop_op in op.walk() if loop_op.name in ["affine.for", "scf.for", "scf.while"]]
     
     # For each loop, check if it contains any nested loops
     for loop_op in all_loops:
         # Use walk to find any nested loops within this loop
         nested_loops = [nested for nested in loop_op.walk() 
-                       if nested.name in ["affine.for", "scf.for"] and nested != loop_op]
+                       if nested.name in ["affine.for", "scf.for", "scf.while"] and nested != loop_op]
         
         # If no nested loops found, this is an innermost loop
         if not nested_loops:
@@ -42,7 +231,12 @@ def create_extracted_function(loop_op: Operation, func_name: str, parent_func: O
     external_values = []
     
     # First, add loop arguments (induction variable and iter_args) as they'll be needed as function parameters
-    if hasattr(loop_op, 'body') and loop_op.body:
+    # For transformed scf.while loops that are now scf.if, we need to handle this differently
+    if loop_op.name == "scf.if":
+        # For scf.if (transformed from scf.while), we don't have traditional loop arguments
+        # The transformed scf.if uses the guard values from the original condition
+        pass
+    elif hasattr(loop_op, 'body') and loop_op.body:
         for block in loop_op.body.blocks:
             for block_arg in block.args:
                 external_values.append(block_arg)
@@ -402,6 +596,9 @@ def process_mlir_file(input_file: str, output_file: str):
         module = parser.parse_module()
         
         print(f"Successfully parsed with xDSL! Module has {len(module.ops)} operations")
+        
+        # Normalize scf.while loops before extraction
+        normalize_scf_while_loops(module)
         
         # Process using xDSL IR
         extracted_functions = []

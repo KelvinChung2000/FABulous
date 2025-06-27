@@ -246,6 +246,13 @@ def create_extracted_function(loop_op: Operation, func_name: str, parent_func: O
         # For scf.if (transformed from scf.while), we don't have traditional loop arguments
         # The transformed scf.if uses the guard values from the original condition
         pass
+    elif loop_op.name == "scf.while":
+        # For scf.while loops, get arguments from the "do" region (second region)
+        if hasattr(loop_op, "regions") and len(loop_op.regions) >= 2:
+            do_region = loop_op.regions[1]  # The "do" region contains the actual loop body
+            for block in do_region.blocks:
+                for block_arg in block.args:
+                    external_values.append(block_arg)
     elif hasattr(loop_op, "body") and loop_op.body:
         for block in loop_op.body.blocks:
             for block_arg in block.args:
@@ -312,7 +319,15 @@ def replace_loop_with_call(parent_func: Operation, loop_op: Operation, extracted
 
     # First, add loop arguments (induction variable and iter_args) - but when calling, pass the actual values
     loop_args_placeholders = []
-    if hasattr(loop_op, "body") and loop_op.body:
+    if loop_op.name == "scf.while":
+        # For scf.while loops, get arguments from the "do" region (second region)
+        if hasattr(loop_op, "regions") and len(loop_op.regions) >= 2:
+            do_region = loop_op.regions[1]  # The "do" region contains the actual loop body
+            for block in do_region.blocks:
+                for block_arg in block.args:
+                    loop_args_placeholders.append(block_arg)
+                    external_values.append(None)  # Placeholder, will be filled with actual values
+    elif hasattr(loop_op, "body") and loop_op.body:
         for block in loop_op.body.blocks:
             for block_arg in block.args:
                 loop_args_placeholders.append(block_arg)
@@ -337,17 +352,17 @@ def replace_loop_with_call(parent_func: Operation, loop_op: Operation, extracted
 
     # Replace placeholders with actual loop arguments
     # For scf.for: first arg is induction var, rest are iter_args
+    # For scf.while: args are the loop variables
     actual_call_args = []
     loop_arg_index = 0
-    for i, val in enumerate(external_values):
+    for val in external_values:
         if val is None:  # This was a loop argument placeholder
-            if loop_arg_index == 0:
-                # This should be the induction variable - pass the current iteration value
-                # For function call context, we'll use the block argument name
-                loop_block = loop_op.body.blocks[0]
-                actual_call_args.append(loop_block.args[loop_arg_index])
+            # Get the loop block based on loop type
+            if loop_op.name == "scf.while":
+                if hasattr(loop_op, "regions") and len(loop_op.regions) >= 2:
+                    loop_block = loop_op.regions[1].blocks[0]  # "do" region
+                    actual_call_args.append(loop_block.args[loop_arg_index])
             else:
-                # These are iter_args - pass the current iter values
                 loop_block = loop_op.body.blocks[0]
                 actual_call_args.append(loop_block.args[loop_arg_index])
             loop_arg_index += 1
@@ -369,8 +384,44 @@ def replace_loop_with_call(parent_func: Operation, loop_op: Operation, extracted
 
     # Replace the loop body with the function call
     try:
-        # Access the loop body region
-        if hasattr(loop_op, "body") and loop_op.body:
+        # Access the loop body region based on loop type
+        if loop_op.name == "scf.while":
+            # For scf.while loops, replace the "do" region (second region)
+            if hasattr(loop_op, "regions") and len(loop_op.regions) >= 2:
+                do_region = loop_op.regions[1]  # The "do" region contains the actual loop body
+                
+                # Replace the body contents
+                for block in do_region.blocks:
+                    # Find and preserve the yield operation
+                    yield_op = None
+                    for op in list(block.ops):
+                        if op.name in ["scf.yield", "affine.yield"]:
+                            yield_op = op
+                            break
+
+                    # Remove all operations from the block
+                    ops_to_remove = list(block.ops)
+                    for op in ops_to_remove:
+                        block.detach_op(op)
+
+                    # Add the function call
+                    block.add_op(call_op)
+
+                    # Create new yield operation using function call results
+                    if yield_types and len(yield_types) > 0:
+                        new_yield = scf.YieldOp(*call_op.results)
+                        block.add_op(new_yield)
+                    elif yield_op:
+                        # If there was a yield but no return types, recreate empty yield
+                        new_yield = scf.YieldOp()
+                        block.add_op(new_yield)
+
+                    print(f"  Replaced loop body of {loop_op.name} with call to {extracted_func_name}")
+                    break
+            else:
+                print(f"  Warning: scf.while loop missing do region")
+                
+        elif hasattr(loop_op, "body") and loop_op.body:
             loop_body = loop_op.body
 
             # Replace the body contents
@@ -408,7 +459,7 @@ def replace_loop_with_call(parent_func: Operation, loop_op: Operation, extracted
                 print(f"  Replaced loop body of {loop_op.name} with call to {extracted_func_name}")
                 break
         else:
-            print(f"  Warning: Could not access body of loop {loop_op.name}")
+            print(f"  Warning: Could not access body/regions of loop {loop_op.name}")
 
     except Exception as e:
         print(f"  Warning: Could not replace loop body {loop_op.name}: {e}")
@@ -461,14 +512,50 @@ def _clone_loop_body_to_function(
             print(f"      Warning: Could not create constant for {const_val}: {e}")
 
     # Get the loop body and clone operations
-    if hasattr(loop_op, "body") and loop_op.body:
-        # For scf.for loops, get the body region
+    cloned_operations = []
+    return_values = []
+    
+    # Handle different loop types
+    if loop_op.name == "scf.while":
+        # For scf.while loops, we need to extract from the "do" region (second region)
+        if hasattr(loop_op, "regions") and len(loop_op.regions) >= 2:
+            do_region = loop_op.regions[1]  # The "do" region contains the actual loop body
+            
+            for block in do_region.blocks:
+                for op in block.ops:
+                    if op.name not in ["scf.yield", "affine.yield"]:
+                        # Clone the operation with remapped operands
+                        try:
+                            cloned_op = _clone_operation_with_mapping(op, value_mapping)
+                            cloned_operations.append(cloned_op)
+                            new_func.body.blocks[0].add_op(cloned_op)
+
+                            # Update value mapping for results of this operation
+                            if hasattr(op, "results") and hasattr(cloned_op, "results"):
+                                for orig_result, cloned_result in zip(op.results, cloned_op.results):
+                                    value_mapping[orig_result] = cloned_result
+
+                            # Recursively process nested regions (e.g., scf.if blocks)
+                            if hasattr(op, "regions") and hasattr(cloned_op, "regions"):
+                                for orig_region, cloned_region in zip(op.regions, cloned_op.regions):
+                                    _clone_region_with_mapping(orig_region, cloned_region, value_mapping)
+
+                        except Exception as e:
+                            print(f"Warning: Could not clone operation {op.name}: {e}")
+                            continue
+                    else:
+                        # Handle yield operation - extract return values
+                        for operand in op.operands:
+                            mapped_operand = value_mapping.get(operand, operand)
+                            return_values.append(mapped_operand)
+        else:
+            print(f"Warning: scf.while loop missing do region")
+            
+    elif hasattr(loop_op, "body") and loop_op.body:
+        # For scf.for and affine.for loops, get the body region
         loop_body = loop_op.body
 
         # Clone each operation in the loop body (excluding yield operations)
-        cloned_operations = []
-        return_values = []
-
         for block in loop_body.blocks:
             for op in block.ops:
                 if op.name not in ["scf.yield", "affine.yield"]:
@@ -496,18 +583,16 @@ def _clone_loop_body_to_function(
                     for operand in op.operands:
                         mapped_operand = value_mapping.get(operand, operand)
                         return_values.append(mapped_operand)
-
-        # Add return operation with mapped values
-        if return_values:
-            return_op = func.ReturnOp(*return_values)
-        else:
-            return_op = func.ReturnOp()
-
-        new_func.body.blocks[0].add_op(return_op)
     else:
-        # Fallback: just add empty return
+        print(f"Warning: Could not access body/regions of loop {loop_op.name}")
+
+    # Add return operation with mapped values
+    if return_values:
+        return_op = func.ReturnOp(*return_values)
+    else:
         return_op = func.ReturnOp()
-        new_func.body.blocks[0].add_op(return_op)
+
+    new_func.body.blocks[0].add_op(return_op)
 
 
 def _clone_operation_with_mapping(op: Operation, value_mapping: dict) -> Operation:

@@ -5,6 +5,8 @@ Uses xDSL to parse and manipulate MLIR code.
 """
 
 import argparse
+from pathlib import Path
+import subprocess
 import sys
 from typing import List
 
@@ -100,9 +102,9 @@ def _transform_scf_while_to_guarded_loop(while_op: scf.WhileOp) -> None:
     guard_condition = condition_operands[0]
     guard_values = condition_operands[1:] if len(condition_operands) > 1 else []
 
-    print(f"    Original while: {len(init_args)} init_args, {len(result_types)} result_types")
-    print(f"    Condition operands: {len(condition_operands)} total, {len(guard_values)} guard_values")
-    print(f"    Before block args: {len(before_block.args) if before_block.args else 0}")
+    # print(f"    Original while: {len(init_args)} init_args, {len(result_types)} result_types")
+    # print(f"    Condition operands: {len(condition_operands)} total, {len(guard_values)} guard_values")
+    # print(f"    Before block args: {len(before_block.args) if before_block.args else 0}")
 
     # The guard_values from scf.condition represent what gets passed to the after region
     # We need to preserve all of them, but understand that the new while loop structure
@@ -142,7 +144,7 @@ def _transform_scf_while_to_guarded_loop(while_op: scf.WhileOp) -> None:
     pure_while_before_block = Block(arg_types=guard_value_types)
     pure_while_before_region.add_block(pure_while_before_block)
 
-    print(f"    Pure while before block: {len(pure_while_before_block.args)} args for {len(guard_values)} guard_values")
+    # print(f"    Pure while before block: {len(pure_while_before_block.args)} args for {len(guard_values)} guard_values")
 
     # Add only scf.condition to the before region - use the external guard condition
     pure_condition = scf.ConditionOp(guard_condition, *pure_while_before_block.args)
@@ -157,11 +159,11 @@ def _transform_scf_while_to_guarded_loop(while_op: scf.WhileOp) -> None:
     if after_block and after_block.args:
         # Use the argument types from the original after region
         after_arg_types = [arg.type for arg in after_block.args]
-        print(f"    After region arg types: {len(after_arg_types)} from original after block")
+        # print(f"    After region arg types: {len(after_arg_types)} from original after block")
     else:
         # Fallback: use the guard_values types if we can't get the original after region info
         after_arg_types = [val.type for val in guard_values]
-        print(f"    After region arg types: {len(after_arg_types)} from guard_values (fallback)")
+        # print(f"    After region arg types: {len(after_arg_types)} from guard_values (fallback)")
 
     new_after_region = Region()
     new_after_block = Block(arg_types=after_arg_types)
@@ -210,10 +212,10 @@ def _transform_scf_while_to_guarded_loop(while_op: scf.WhileOp) -> None:
         new_after_block.add_op(after_yield)
 
     # Create the pure while loop: while (guard_condition) { computation_in_after_region }
-    print(f"    Creating while loop: {len(guard_values)} guard_values, {len(result_types)} result_types")
-    print(
-        f"    Before region args: {len(pure_while_before_block.args)}, After region args: {len(new_after_block.args)}"
-    )
+    # print(f"    Creating while loop: {len(guard_values)} guard_values, {len(result_types)} result_types")
+    # print(
+    #     f"    Before region args: {len(pure_while_before_block.args)}, After region args: {len(new_after_block.args)}"
+    # )
     simple_while = scf.WhileOp(guard_values, result_types, pure_while_before_region, new_after_region)
     then_block.add_op(simple_while)
 
@@ -261,7 +263,7 @@ def _transform_scf_while_to_guarded_loop(while_op: scf.WhileOp) -> None:
     # Remove original while
     while_op.detach()
 
-    print("    Successfully transformed scf.while into guarded if structure")
+    # print("    Successfully transformed scf.while into guarded if structure")
 
 
 def find_innermost_loops(op: Operation) -> List[LoopOp]:
@@ -334,7 +336,7 @@ def create_extracted_function(loop_op: LoopOp, func_name: str) -> func.FuncOp:
     # Determine argument types from external values
     arg_types = [val.type for val in external_values]
 
-    print(f"    External values found: {len(external_values)}, Constants to recreate: {len(constants_to_recreate)}")
+    # print(f"    External values found: {len(external_values)}, Constants to recreate: {len(constants_to_recreate)}")
 
     # Find the yield operation to determine return types
     return_types = loop_op.result_types
@@ -469,7 +471,7 @@ def _clone_loop_body_to_function(
     """Clone the loop body operations into the new function, replacing external references with function arguments."""
 
     # Create a mapping from external values to function arguments
-    print(f"      External values: {len(external_values)}, Function args: {len(func_args)}")
+    # print(f"      External values: {len(external_values)}, Function args: {len(func_args)}")
     if len(external_values) != len(func_args):
         print("      WARNING: Mismatch in external values vs function args")
         print(f"      External values: {external_values}")
@@ -587,9 +589,14 @@ def _clone_region_with_mapping(orig_region: Region, cloned_region: Region, value
             for orig_nested_region, cloned_nested_region in zip(op.regions, cloned_op.regions, strict=True):
                 _clone_region_with_mapping(orig_nested_region, cloned_nested_region, value_mapping)
 
-def process_mlir_file(input_file: str, output_file: str):
+def process_mlir_file(input_file: str, output_dir: str) -> list[Path]:
     """Process MLIR file to extract innermost loops into separate functions using xDSL."""
+    import os
+    
     try:
+        # Create output directory if it doesn't exist
+        os.makedirs(output_dir, exist_ok=True)
+        
         # Read input file
         with open(input_file, "r") as f:
             content = f.read()
@@ -615,7 +622,7 @@ def process_mlir_file(input_file: str, output_file: str):
         normalize_scf_while_loops(module)
 
         # Process using xDSL IR
-        extracted_functions = []
+        extracted_functions: list[tuple[func.FuncOp, str]] = []
         for op in module.ops:
             if isinstance(op, func.FuncOp):
                 func_name = op.sym_name.data
@@ -626,45 +633,82 @@ def process_mlir_file(input_file: str, output_file: str):
                 print(f"  Found {len(innermost_loops)} innermost loops")
 
                 for i, loop in enumerate(innermost_loops):
-                    print(f"    Loop {i}: {loop.name}")
+                    # print(f"    Loop {i}:")
 
                     # Create extracted function
                     extracted_func_name = f"{func_name}_inner_loop_{i}"
                     extracted_func = create_extracted_function(loop, extracted_func_name)
-                    extracted_functions.append(extracted_func)
+                    extracted_functions.append((extracted_func, extracted_func_name))
 
                     # Replace loop with function call
                     replace_loop_with_call(loop, extracted_func_name)
 
-        # Add extracted functions to module
-        for extracted_func in extracted_functions:
-            module.body.block.add_op(extracted_func)
+        # output_file = Path(output_dir) / f"full_file/{func_name}.mlir"
+        # # Add extracted functions to module
+        # for extracted_func, _ in extracted_functions:
+        #     module.body.block.add_op(extracted_func)
+        # # Write output using xDSL printer
+        # with open(output_file, "w") as f:
+        #     printer = Printer(f)
+        #     printer.print(module)
 
-        # Write output using xDSL printer
-        with open(output_file, "w") as f:
-            printer = Printer(f)
-            printer.print(module)
+        out_files = []
+        # Write each extracted function to a separate file
+        for extracted_func, func_name in extracted_functions:
+            # Create a new module containing only this function
+            func_module = builtin.ModuleOp(ops=[extracted_func])
+            
+            # Write to separate file
+            output_file = Path(output_dir) / f"{func_name}.mlir"
+            tmp_output_file = output_file.with_suffix(".tmp")
+            with open(tmp_output_file, "w") as f:
+                printer = Printer(f)
+                printer.print(func_module)
 
-        print(f"Output written to {output_file} using xDSL")
+            optCmd = [
+                "mlir-opt",
+                str(tmp_output_file),
+                "-o", str(output_file)
+            ]
+    
+            result = subprocess.run(optCmd, capture_output=True, text=True, timeout=300)
+            if result.returncode != 0:
+                print(f"Error round tripping {tmp_output_file}: {result.stderr}")
+                raise Exception(f"mlir-opt failed for {tmp_output_file}")
+
+            print(f"  Extracted function written to {output_file}")
+            tmp_output_file.unlink()  # Remove temporary file
+
+            with open(output_file, "r") as f:
+                content = f.read()
+                content = content.replace("i64", "i32")
+                content = content.replace("f64", "f32")
+
+            with open(output_file, "w") as f:
+                f.write(content)
+            out_files.append(output_file)
+
+        print(f"Total extracted functions: {len(extracted_functions)}")
+        return out_files
 
     except Exception as e:
         import traceback
 
         print("Full traceback:")
-        traceback.print_exc()
+        print(traceback.format_exc())
         raise Exception(f"Failed to process MLIR: {e}")
 
 
 def main():
     parser = argparse.ArgumentParser(description="Extract innermost loops from MLIR functions")
     parser.add_argument("input", help="Input MLIR file")
-    parser.add_argument("output", help="Output MLIR file")
+    parser.add_argument("output_dir", help="Output directory for extracted functions")
 
     args = parser.parse_args()
 
     try:
-        process_mlir_file(args.input, args.output)
-        print(f"Successfully processed {args.input} -> {args.output}")
+        process_mlir_file(args.input, args.output_dir)
+        print(f"Successfully processed {args.input} -> {args.output_dir}")
     except Exception as e:
         print(f"Error processing MLIR file: {e}")
         sys.exit(1)

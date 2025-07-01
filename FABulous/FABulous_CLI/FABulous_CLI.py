@@ -218,13 +218,12 @@ class FABulous_CLI(Cmd):
         """Override the onecmd method to handle exceptions."""
         try:
             return super().onecmd(statement, add_to_history=add_to_history)
-        except Exception:
+        except Exception:  # noqa: BLE001 - Catching all exceptions is ok here
             logger.debug(traceback.format_exc())
             self.exit_code = 1
             if self.interactive:
                 return False
-            else:
-                return not self.force
+            return not self.force
 
     def do_exit(self, *ignored):
         """Exits the FABulous shell and logs info message."""
@@ -235,6 +234,7 @@ class FABulous_CLI(Cmd):
     do_quit = do_exit
     do_q = do_exit
 
+    # Import do_synthesis from cmd_synthesis
     do_synthesis = cmd_synthesis.do_synthesis
 
     filePathOptionalParser = Cmd2ArgumentParser()
@@ -344,7 +344,6 @@ class FABulous_CLI(Cmd):
             self.csvFile = args.file
 
         self.fabricLoaded = True
-        # self.projectDir = os.path.split(self.csvFile)[0]
         tileByPath = [
             f.stem for f in (self.projectDir / "Tile/").iterdir() if f.is_dir()
         ]
@@ -715,9 +714,6 @@ class FABulous_CLI(Cmd):
 
         logger.info("Generated npnr model")
 
-    # Import do_synthesis from cmd_synthesis
-    do_synthesis = cmd_synthesis.do_synthesis
-
     @with_category(CMD_USER_DESIGN_FLOW)
     @with_argparser(filePathRequireParser)
     def do_place_and_route(self, args):
@@ -1038,7 +1034,7 @@ class FABulous_CLI(Cmd):
 
         logger.info(f"Execute TCL script {args.file}")
 
-        with open(args.file, "r") as f:
+        with open(args.file) as f:
             script = f.read()
         self.tcl.eval(script)
 
@@ -1047,14 +1043,14 @@ class FABulous_CLI(Cmd):
     @with_category(CMD_SCRIPT)
     @with_argparser(filePathRequireParser)
     def do_run_script(self, args):
-        """Executes script"""
+        """Executes script."""
         if not args.file.exists():
             logger.opt(exception=FileNotFoundError()).error(f"Cannot find {args.file}")
 
         logger.info(f"Execute script {args.file}")
 
-        with open(args.file, "r") as f:
-            for i in f.readlines():
+        with open(args.file) as f:
+            for i in f:
                 self.onecmd_plus_hooks(i.strip())
                 if self.exit_code != 0:
                     logger.opt(exception=CommandError()).error(
@@ -1091,14 +1087,11 @@ class FABulous_CLI(Cmd):
     @with_category(CMD_TOOLS)
     @with_argparser(gen_tile_parser)
     def do_generate_custom_tile_config(self, args):
-        """
-        Generates a custom tile configuration for a given tile folder
-        or path to bel folder.
-        A tile .csv file and a switch matrix .list file will be generated.
+        """Generates a custom tile configuration for a given tile folder or path to bel
+        folder. A tile .csv file and a switch matrix .list file will be generated.
 
-        The provided path may contain bel files, which will be included
-        in the generated tile .csv file as well as the generated
-        switch matrix .list file.
+        The provided path may contain bel files, which will be included in the generated
+        tile .csv file as well as the generated switch matrix .list file.
         """
 
         if not args.tile_path.is_dir():

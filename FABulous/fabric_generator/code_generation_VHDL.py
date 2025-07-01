@@ -1,7 +1,8 @@
 import math
 import re
+
+from FABulous.fabric_definition.define import IO
 from FABulous.fabric_generator.code_generator import codeGenerator
-from FABulous.fabric_definition.define import Direction, IO, Side
 
 
 class VHDLWriter(codeGenerator):
@@ -14,9 +15,9 @@ class VHDLWriter(codeGenerator):
         if onNewLine:
             self._add("")
         if self._content:
-            self._content[-1] += f"{' ':<{indentLevel*4}}" + f"-- {comment}" f"{end}"
+            self._content[-1] += f"{' ':<{indentLevel * 4}}" + f"-- {comment}{end}"
         else:
-            self._add(f"{' ':<{indentLevel*4}}" + f"-- {comment}" f"{end}")
+            self._add(f"{' ':<{indentLevel * 4}}" + f"-- {comment}{end}")
 
     def addHeader(self, name, package="", indentLevel=0):
         #   library template
@@ -98,7 +99,7 @@ class VHDLWriter(codeGenerator):
         self._add(f"architecture Behavioral of {name} is", indentLevel)
 
     def addDesignDescriptionEnd(self, indentLevel=0):
-        self._add(f"end architecture Behavioral;", indentLevel)
+        self._add("end architecture Behavioral;", indentLevel)
 
     def addConstant(self, name, value, indentLevel=0):
         self._add(f"constant {name} : STD_LOGIC := '{value}';", indentLevel)
@@ -110,31 +111,31 @@ class VHDLWriter(codeGenerator):
         self, name, startIndex, reg=False, endIndex=0, indentLevel=0
     ):
         self._add(
-            f"signal {name} : STD_LOGIC_VECTOR( { startIndex } downto {endIndex} );",
+            f"signal {name} : STD_LOGIC_VECTOR( {startIndex} downto {endIndex} );",
             indentLevel,
         )
 
     def addLogicStart(self, indentLevel=0):
-        self._add("\n" f"begin" "\n", indentLevel)
+        self._add("\nbegin\n", indentLevel)
 
     def addLogicEnd(self, indentLevel=0):
-        self._add("\n" f"end" "\n", indentLevel)
+        self._add("\nend\n", indentLevel)
 
     def addRegister(self, reg, regIn, clk="UserCLK", inverted=False, indentLevel=0):
         inv = "not " if inverted else ""
         template = f"""
 process({clk})
 begin
-	if {clk}'event and {clk}='1' then
-		{reg} <= {inv}{regIn};
-	end if;
+    if {clk}'event and {clk}='1' then
+        {reg} <= {inv}{regIn};
+    end if;
 end process;
 """
         self._add(template, indentLevel)
 
     def addAssignScalar(self, left, right, delay=0, indentLevel=0, inverted=False):
         inv = "not " if inverted else ""
-        if type(right) == list:
+        if isinstance(right, list):
             self._add(
                 f"{left} <= {inv}{' & '.join(right)} after {delay} ps;", indentLevel
             )
@@ -158,23 +159,27 @@ end process;
         compName,
         compInsName,
         portsPairs,
-        paramPairs=[],
-        emulateParamPairs=[],
+        paramPairs=None,
+        emulateParamPairs=None,
         indentLevel=0,
     ):
+        if emulateParamPairs is None:
+            emulateParamPairs = []
+        if paramPairs is None:
+            paramPairs = []
         self._add(f"{compInsName} : {compName}", indentLevel=indentLevel)
         if paramPairs:
             connectPair = []
-            self._add(f"generic map (", indentLevel=indentLevel + 1)
+            self._add("generic map (", indentLevel=indentLevel + 1)
             for i in paramPairs:
                 connectPair.append(f"{i[0]} => {i[1]}")
             self._add(
-                (",\n" f"{' ':<{4*(indentLevel + 2)}}").join(connectPair),
+                (f",\n{' ':<{4 * (indentLevel + 2)}}").join(connectPair),
                 indentLevel=indentLevel + 2,
             )
-            self._add(f")", indentLevel=indentLevel + 1)
+            self._add(")", indentLevel=indentLevel + 1)
 
-        self._add(f"Port map(", indentLevel=indentLevel + 1)
+        self._add("Port map(", indentLevel=indentLevel + 1)
         connectPair = []
         for i in portsPairs:
             # NOTE: This is a temporary fix for the issue of curly braces in the port names and needs to be fixed properly a later refactoring of the code generation
@@ -189,7 +194,7 @@ end process;
             connectPair.append(f"{port} => {signal}")
 
         self._add(
-            (",\n" f"{' ':<{4*(indentLevel + 2)}}").join(connectPair),
+            (f",\n{' ':<{4 * (indentLevel + 2)}}").join(connectPair),
             indentLevel=indentLevel + 2,
         )
         self._add(");", indentLevel=indentLevel + 1)
@@ -197,7 +202,7 @@ end process;
 
     def addComponentDeclarationForFile(self, fileName):
         configPortUsed = 0  # 1 means is used
-        with open(fileName, "r") as f:
+        with open(fileName) as f:
             data = f.read()
 
         if result := re.search(
@@ -221,7 +226,7 @@ end process;
         template = f"""
 ConfigBitsInput <= ConfigBits(ConfigBitsInput'high-1 downto 0) & CONFin;
 -- for k in 0 to Conf/2 generate
-L: for k in 0 to {int(math.ceil(configBitCounter/2.0))-1} generate
+L: for k in 0 to {int(math.ceil(configBitCounter / 2.0)) - 1} generate
         inst_LHQD1a : LHQD1
         Port Map(
             D    => ConfigBitsInput(k*2),
@@ -254,16 +259,16 @@ CONFout <= ConfigBits(ConfigBits'high);
         self._add(template, indentLevel)
 
     def addPreprocIfDef(self, macro, indentLevel=0):
-        assert False, "preprocessor not supported in VHDL"
+        raise AssertionError("preprocessor not supported in VHDL")
 
     def addPreprocIfNotDef(self, macro, indentLevel=0):
-        assert False, "preprocessor not supported in VHDL"
+        raise AssertionError("preprocessor not supported in VHDL")
 
     def addPreprocElse(self, indentLevel=0):
-        assert False, "preprocessor not supported in VHDL"
+        raise AssertionError("preprocessor not supported in VHDL")
 
     def addPreprocEndif(self, indentLevel=0):
-        assert False, "preprocessor not supported in VHDL"
+        raise AssertionError("preprocessor not supported in VHDL")
 
     def addBelMapAttribute(self, configBitValues: list[tuple[str, int]], indentLevel=0):
         template = "-- (* FABulous, BelMap"

@@ -70,7 +70,7 @@ def parseFabricCSV(fileName: str) -> Fabric:
 
     filePath = fName.parent
 
-    with open(fName, "r") as f:
+    with open(fName) as f:
         file = f.read()
         file = re.sub(r"#.*", "", file)
 
@@ -111,7 +111,7 @@ def parseFabricCSV(fileName: str) -> Fabric:
     tileTypes += [new_tile.name for new_tile in new_tiles]
     tileDefs += new_tiles
     commonWirePair += new_commonWirePair
-    tileDic = dict(zip(tileTypes, tileDefs))
+    tileDic = dict(zip(tileTypes, tileDefs, strict=False))
 
     new_supertiles = parseSupertiles(fName, tileDic)
     for new_supertile in new_supertiles:
@@ -152,7 +152,7 @@ def parseFabricCSV(fileName: str) -> Fabric:
             tileTypes += [new_tile.name for new_tile in new_tiles]
             tileDefs += new_tiles
             commonWirePair += new_commonWirePair
-            tileDic = dict(zip(tileTypes, tileDefs))
+            tileDic = dict(zip(tileTypes, tileDefs, strict=False))
         elif i[0].startswith("Supertile"):
             new_supertiles = parseSupertiles(filePath.joinpath(i[1]), tileDic)
             for new_supertile in new_supertiles:
@@ -275,7 +275,7 @@ def parseMatrix(fileName: Path, tileName: str) -> dict[str, list[str]]:
     """
 
     connectionsDic = {}
-    with open(fileName, "r") as f:
+    with open(fileName) as f:
         file = f.read()
         file = re.sub(r"#.*", "", file)
         file = file.split("\n")
@@ -343,7 +343,7 @@ def parseList(
         raise ValueError
 
     resultList = []
-    with open(filePath, "r") as f:
+    with open(filePath) as f:
         file = f.read()
         file = re.sub(r"#.*", "", file)
     file = file.split("\n")
@@ -370,7 +370,7 @@ def parseList(
             raise ValueError(
                 f"List file {filePath} does not have the same number of source and sink ports."
             )
-        resultList += list(zip(leftList, rightList))
+        resultList += list(zip(leftList, rightList, strict=False))
 
     result = list(dict.fromkeys(resultList))
     resultDic = {}
@@ -496,7 +496,7 @@ def parseTiles(fileName: Path) -> tuple[list[Tile], list[tuple[str, str]]]:
 
     filePathParent = fileName.parent
 
-    with open(fileName, "r") as f:
+    with open(fileName) as f:
         file = f.read()
         file = re.sub(r"#.*", "", file)
 
@@ -580,6 +580,11 @@ def parseTiles(fileName: Path) -> tuple[list[Tile], list[tuple[str, str]]]:
                 elif temp[1].endswith(".v") or temp[1].endswith(".sv"):
                     bels.append(parseBelFile(belFilePath, bel_prefix, "verilog"))
                     if "ADD_AS_CUSTOM_PRIM" in temp[4:]:
+                        # local import to avoid circular import
+                        from FABulous.fabric_generator.fabric_automation import (
+                            addBelsToPrim,
+                        )
+
                         primsFile = proj_dir.joinpath("user_design/custom_prims.v")
                         logger.info(f"Adding bels to custom prims file: {primsFile}")
                         addBelsToPrim(primsFile, [bels[-1]])
@@ -705,7 +710,7 @@ def parseTiles(fileName: Path) -> tuple[list[Tile], list[tuple[str, str]]]:
                                 if muxSize >= 2:
                                     configBit += (muxSize - 1).bit_length()
                         case ".vhdl" | ".v":
-                            with open(matrixDir, "r") as f:
+                            with open(matrixDir) as f:
                                 f = f.read()
                                 if configBit := re.search(
                                     r"NumberOfConfigBits: (\d+)", f
@@ -796,7 +801,7 @@ def parseSupertiles(fileName: Path, tileDic: dict[str, Tile]) -> list[SuperTile]
 
     filePath = fileName.parent
 
-    with open(fileName, "r") as f:
+    with open(fileName) as f:
         file = f.read()
         file = re.sub(r"#.*", "", file)
 
@@ -959,9 +964,9 @@ def parseBelFile(
     individually_declared = False
     noConfigBits = 0
     belMapDic = {}
-    ports_vectors: dict[str, dict[str, tuple[IO, int]]] = (
-        {}
-    )  # {<porttype>:{porname:(IO, size)}}
+    ports_vectors: dict[
+        str, dict[str, tuple[IO, int]]
+    ] = {}  # {<porttype>:{porname:(IO, size)}}
     # define port types
     ports_vectors["internal"] = {}
     ports_vectors["external"] = {}
@@ -973,7 +978,7 @@ def parseBelFile(
         raise ValueError(f"Invalid filetype {filetype} for bel file {filename}")
 
     try:
-        with open(filename, "r") as f:
+        with open(filename) as f:
             file = f.read()
     except FileNotFoundError:
         logger.critical(f"File {filename} not found.")
@@ -1072,7 +1077,7 @@ def parseBelFile(
             if portName == "" or direction is None:
                 logger.warning(f"Invalid port definition in line {line}.")
                 continue
-            elif isExternal and not isShared:
+            if isExternal and not isShared:
                 external.append((portName, direction))
             elif isConfig:
                 config.append((portName, direction))
@@ -1123,7 +1128,7 @@ def parseBelFile(
                 "Failed to run yosys command: {e}"
             )
 
-        with open(f"{json_file}", "r") as f:
+        with open(f"{json_file}") as f:
             data_dict = json.load(f)
 
         modules = data_dict.get("modules", {})
@@ -1139,20 +1144,22 @@ def parseBelFile(
             )
 
         # Gathers port name and direction, filters out configbits as they show in ports.
-        for module_name, module_info in modules.items():
-            ports = module_info["ports"]
-            for port_name, details in ports.items():
-                if "ConfigBits" in port_name:
-                    continue
-                if "UserCLK" in port_name:
-                    userClk = True
-                if port_name[-1].isdigit():
-                    # FIXME:  This is a temporary fix for the issue where the ports are individually declared
-                    #         Check for the last charcter in portname is not really reliable and sould be handeled more rubust in the future.
-                    individually_declared = True
-                direction = IO[details["direction"].upper()]
-                bits = details.get("bits", [])
-                filtered_ports[port_name] = (direction, bits)
+        # modules should only contain one module
+        module_name = next(iter(modules))
+        module_info = modules[module_name]
+        ports = module_info["ports"]
+        for port_name, details in ports.items():
+            if "ConfigBits" in port_name:
+                continue
+            if "UserCLK" in port_name:
+                userClk = True
+            if port_name[-1].isdigit():
+                # FIXME:  This is a temporary fix for the issue where the ports are individually declared
+                #         Check for the last charcter in portname is not really reliable and sould be handeled more rubust in the future.
+                individually_declared = True
+            direction = IO[details["direction"].upper()]
+            bits = details.get("bits", [])
+            filtered_ports[port_name] = (direction, bits)
 
         param_defaults = module_info.get("parameter_default_values")
         if param_defaults and "NoConfigBits" in param_defaults:
@@ -1283,7 +1290,7 @@ def verilog_belMapProcessing(module_info):
         "src",
     }
     # match case for INIT. (may need modifying for other naming conventions.)
-    for key, value in attributes.items():
+    for key, _value in attributes.items():
         if key in exclude_attributes:
             continue
         match key:
@@ -1300,9 +1307,7 @@ def verilog_belMapProcessing(module_info):
         belMapDic[new_key] = {0: {0: "1"}}
 
     # yosys reverses belmap, reverse back to keep original belmap.
-    belMapDic = dict(reversed(list(belMapDic.items())))
-
-    return belMapDic
+    return dict(reversed(list(belMapDic.items())))
 
 
 def vhdl_belMapProcessing(file: str, filename: str) -> dict:
@@ -1389,7 +1394,7 @@ def vhdl_belMapProcessing(file: str, filename: str) -> dict:
                             belMapDic[bel[0]][i][v] = bitMap.pop(0)
                 else:
                     length = end - start + 1
-                    for i in range(0, 2**length):
+                    for i in range(2**length):
                         belMapDic[bel[0]][i] = {}
                         bitMap = list(f"{2**length - i - 1:0{length.bit_length()}b}")
                         for v in range(len(bitMap) - 1, -1, -1):

@@ -258,7 +258,6 @@ def remove_dir(path: Path):
     """
     try:
         shutil.rmtree(path)
-        pass
     except OSError as e:
         logger.error(f"{e}")
 
@@ -313,12 +312,11 @@ def check_if_application_exists(application: str, throw_exception: bool = True) 
     path = shutil.which(application)
     if path is not None:
         return Path(path)
-    else:
-        error_msg = f"{application} is not installed. Please install it or set FAB_<APPLICATION>_PATH in the .env file."
-        logger.error(error_msg)
-        # To satisfy the `-> Path` return type, an exception must be raised if no path is found.
-        # The throw_exception parameter's original intent might need review if non-exception paths were desired.
-        raise FileNotFoundError(error_msg)
+    error_msg = f"{application} is not installed. Please install it or set FAB_<APPLICATION>_PATH in the .env file."
+    logger.error(error_msg)
+    # To satisfy the `-> Path` return type, an exception must be raised if no path is found.
+    # The throw_exception parameter's original intent might need review if non-exception paths were desired.
+    raise FileNotFoundError(error_msg)
 
 
 def wrap_with_except_handling(fun_to_wrap):
@@ -343,11 +341,12 @@ def wrap_with_except_handling(fun_to_wrap):
         """
         try:
             fun_to_wrap(*args, **varargs)
-        except Exception:
+        except Exception:  # noqa: BLE001 - Catching all exceptions is ok here
             import traceback
 
             traceback.print_exc()
-            raise Exception("TCL command failed. Please check the logs for details.")
+            logger.error("TCL command failed. Please check the logs for details.")
+            raise Exception from Exception
 
     return inter
 
@@ -456,8 +455,7 @@ def install_oss_cad_suite(destination_folder: Path, update: bool = False):
 
     if response.status_code == 200:
         with open(ocs_archive, "wb") as file:
-            for chunk in response.iter_content(chunk_size=8192):
-                file.write(chunk)
+            file.writelines(response.iter_content(chunk_size=8192))
     else:
         raise Exception(f"Failed to download file: {response.status_code}")
 
@@ -479,7 +477,7 @@ def install_oss_cad_suite(destination_folder: Path, update: bool = False):
         logger.error(
             "FAB_ROOT environment variable is not set. Cannot update .env file for OSS CAD Suite."
         )
-        raise EnvironmentError(
+        raise OSError(
             "FAB_ROOT is not set, cannot determine .env file path for OSS CAD Suite."
         )
     env_file = Path(fab_root_env) / ".env"
@@ -499,6 +497,6 @@ def install_oss_cad_suite(destination_folder: Path, update: bool = False):
     env_file.write_text("\n".join(env_cont))
 
     # export oss-cad-suite to PATH
-    os.environ["PATH"] += os.pathsep + str((ocs_folder / "bin"))
+    os.environ["PATH"] += os.pathsep + str(ocs_folder / "bin")
 
     logger.info("OSS CAD Suite setup completed successfully.")

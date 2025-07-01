@@ -65,7 +65,7 @@ def genNextpnrModel(fabric: Fabric):
             pipStr.append(f"#Tile-external pips on tile X{x}Y{y}:")
             for wire in tile.wireList:
                 pipStr.append(
-                    f"X{x}Y{y},{wire.source},X{x+wire.xOffset}Y{y+wire.yOffset},{wire.destination},{8},{wire.source}.{wire.destination}"
+                    f"X{x}Y{y},{wire.source},X{x + wire.xOffset}Y{y + wire.yOffset},{wire.destination},{8},{wire.source}.{wire.destination}"
                 )
 
             # Old style bel definition
@@ -105,21 +105,15 @@ def genNextpnrModel(fabric: Fabric):
                 letter = string.ascii_uppercase[i]
                 belv2Str.append(f"BelBegin,X{x}Y{y},{letter},{cType},{bel.prefix}")
 
-                def strip_prefix(x):
-                    if x.startswith(bel.prefix):
-                        return x[len(bel.prefix) :]
-                    else:
-                        return x
-
                 for inp in bel.inputs:
                     belv2Str.append(
-                        f"I,{strip_prefix(inp)},X{x}Y{y}.{inp}"
+                        f"I,{inp.removeprefix(bel.prefix)},X{x}Y{y}.{inp}"
                     )  # I,<port>,<wire>
                 for outp in bel.outputs:
                     belv2Str.append(
-                        f"O,{strip_prefix(outp)},X{x}Y{y}.{outp}"
+                        f"O,{outp.removeprefix(bel.prefix)},X{x}Y{y}.{outp}"
                     )  # O,<port>,<wire>
-                for feat, cfg in sorted(bel.belFeatureMap.items(), key=lambda x: x[0]):
+                for feat, _cfg in sorted(bel.belFeatureMap.items(), key=lambda x: x[0]):
                     belv2Str.append(f"CFG,{feat}")
                 if bel.withUserCLK:
                     belv2Str.append("GlobalClk")

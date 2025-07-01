@@ -1,9 +1,9 @@
 from csv import writer as csvWriter
-from loguru import logger
-from typing import List
 
-from FABulous.fabric_definition.Tile import Tile
+from loguru import logger
+
 from FABulous.fabric_definition.define import Direction, Side
+from FABulous.fabric_definition.Tile import Tile
 from FABulous.geometry_generator.bel_geometry import BelGeometry
 from FABulous.geometry_generator.geometry_obj import Border, Location
 from FABulous.geometry_generator.port_geometry import PortGeometry
@@ -39,9 +39,9 @@ class TileGeometry:
     height: int
     border: Border
     smGeometry: SmGeometry
-    belGeomList: List[BelGeometry]
-    wireGeomList: List[WireGeometry]
-    stairWiresList: List[StairWires]
+    belGeomList: list[BelGeometry]
+    wireGeomList: list[WireGeometry]
+    stairWiresList: list[StairWires]
 
     def __init__(self):
         self.name = None
@@ -85,14 +85,12 @@ class TileGeometry:
         maxSmWidthInColumn: int,
         maxSmRelXInColumn: int,
     ) -> None:
-
         self.width = maxWidthInColumn
         self.height = maxHeightInRow
         self.smGeometry.width = maxSmWidthInColumn  # TODO: needed?
         self.smGeometry.relX = maxSmRelXInColumn
 
-        # TODO:
-        # dim.smWidth = dim.smWidth*2 if dim.smWidth*2 < maxSmWidths[j] else dim.smWidth
+        # TODO: dim.smWidth = dim.smWidth*2 if dim.smWidth*2 < maxSmWidths[j] else dim.smWidth
 
     def adjustSmPos(self, lowestSmYInRow: int, padding: int) -> None:
         """Ajusts the position of the switch matrix, using the lowest Y coordinate of

@@ -51,8 +51,12 @@ runs:
         cd ghdl-yosys-plugin
         # Set up environment for GHDL
         export PATH="/opt/ghdl/bin:$PATH"
+        export PKG_CONFIG_PATH="/opt/ghdl/lib/pkgconfig:$PKG_CONFIG_PATH"
         make
         sudo make install
+        # Ensure yosys can find the plugin
+        sudo mkdir -p /usr/share/yosys/plugins
+        sudo cp ghdl.so /usr/share/yosys/plugins/
     - name: Install additional ubuntu packages
       if: ${{ inputs.additional_system_packages != '' }}
       shell: bash

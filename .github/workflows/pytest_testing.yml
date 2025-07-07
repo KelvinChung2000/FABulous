@@ -9,5 +9,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/prepare_FABulous_container
+        with:
+          install_GHDL_mcode: true
       - name: Run pytest
-        run: pytest -v
+        run: pytest -v -x

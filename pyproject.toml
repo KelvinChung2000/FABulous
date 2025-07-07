@@ -40,6 +40,7 @@ bit_gen = "FABulous.fabric_cad.bit_gen:bit_gen"
 [tool.setuptools_scm]
 version_scheme = "post-release"
 local_scheme = "dirty-tag"
+fallback_version = "0.0.0"
 
 
 [tool.setuptools.packages.find]

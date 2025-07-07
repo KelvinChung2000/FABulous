@@ -7,7 +7,7 @@ inputs:
     required: false
     default: '3.12'
   additional_system_packages:
-    description: 'Additional ubunut packages to install'
+    description: 'Additional ubuntu packages to install'
     required: false
     default: ''
   additional_python_packages:
@@ -23,11 +23,14 @@ runs:
   using: 'composite'
   steps:
     - name: Set up Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ inputs.python_version }}
-    - name: Set up OSS CAD suite
-      uses: YosysHQ/setup-oss-cad-suite@v3
+    - name: Install iverilog, yosys, and GHDL from apt
+      shell: bash
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y iverilog yosys ghdl
     - name: Install GHDL mcode nightly
       # GHDL mcode is required to test our fabric.
       # The oss-cad-suite action installs GHDL, but with the LLVM backend, which is much slower for our simulation
@@ -37,7 +40,7 @@ runs:
         version: nightly
         backend: mcode
         investigate: true
-    - name: Install additional ubunutu packages
+    - name: Install additional ubuntu packages
       if: ${{ inputs.additional_system_packages != '' }}
       shell: bash
       run: |

@@ -1,10 +1,20 @@
 set project_root $env(FAB_PROJECT_DIR)
 set output_json_path $env(OUT_JSON_PATH)
 
-yosys hierarchy -auto-top
 
 yosys read_verilog -sv -lib $project_root/.FABulous/libs.v
 yosys read_verilog -sv -lib $project_root/.FABulous/build_in_lib.v
+
+# Handle TOP_MODULE environment variable - use auto-top if not set or empty
+if {[info exists env(TOP_MODULE)] && $env(TOP_MODULE) ne ""} {
+    set top_module $env(TOP_MODULE)
+    puts "using top module: $top_module"
+    yosys hierarchy -top $top_module
+} else {
+    puts "using auto-top for hierarchy"
+    yosys hierarchy -auto-top
+}
+
 yosys proc
 yosys flatten -noscopeinfo
 yosys opt_expr

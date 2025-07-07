@@ -19,6 +19,117 @@ from xdsl.printer import Printer
 LoopOp = scf.WhileOp | scf.ForOp | affine.ForOp
 
 
+def replace_types_i64_f64_to_i32(module: Operation) -> None:
+    """Replace all i64 and f64 types with i32 and f32 types throughout the module using xDSL."""
+    
+    # Use a simpler approach: walk through all operations and directly modify types
+    types_replaced = 0
+    
+    for op in module.walk():
+        # Handle function operations
+        if isinstance(op, func.FuncOp):
+            # Update function type
+            old_func_type = op.function_type
+            new_inputs = []
+            new_outputs = []
+            
+            # Replace input types
+            for input_type in old_func_type.inputs:
+                if isinstance(input_type, builtin.Float64Type) or str(input_type) == 'f64':
+                    new_inputs.append(builtin.i32)
+                elif isinstance(input_type, builtin.MemRefType) and (
+                    isinstance(input_type.element_type, builtin.Float64Type) or str(input_type.element_type) == 'f64'
+                ):
+                    # Create new memref type with f32 element
+                    shape_list = []
+                    for dim in input_type.shape.data:
+                        if hasattr(dim, 'data'):
+                            shape_list.append(dim.data)
+                        else:
+                            shape_list.append(int(dim))
+                    new_inputs.append(builtin.MemRefType(builtin.i32, shape_list))
+                elif isinstance(input_type, builtin.IntegerType) and input_type.width.data == 64:
+                    new_inputs.append(builtin.i32)
+                else:
+                    new_inputs.append(input_type)
+            
+            # Replace output types
+            for output_type in old_func_type.outputs:
+                if isinstance(output_type, builtin.Float64Type) or str(output_type) == 'f64':
+                    new_outputs.append(builtin.i32)
+                elif isinstance(output_type, builtin.IntegerType) and hasattr(output_type, 'width') and output_type.width.data == 64:
+                    new_outputs.append(builtin.i32)
+                else:
+                    new_outputs.append(output_type)
+            
+            # Update function type if needed
+            if new_inputs != list(old_func_type.inputs) or new_outputs != list(old_func_type.outputs):
+                # print(f"  Replacing function types: {len([t for t in old_func_type.inputs if 'f64' in str(t)])} f64 inputs, {len([t for t in old_func_type.outputs if 'f64' in str(t)])} f64 outputs")
+                new_func_type = builtin.FunctionType.from_lists(new_inputs, new_outputs)
+                op.function_type = new_func_type
+                types_replaced += 1
+                
+                # Update block argument types
+                if op.body.blocks:
+                    entry_block = op.body.blocks[0]
+                    for i, new_type in enumerate(new_inputs):
+                        if i < len(entry_block.args):
+                            entry_block.args[i]._type = new_type
+        
+        # Handle constant operations  
+        elif isinstance(op, arith.ConstantOp):
+            result_type = op.results[0].type
+            if isinstance(result_type, builtin.Float64Type) or str(result_type) == 'f64':
+                op.results[0]._type = builtin.i32
+                types_replaced += 1
+            elif isinstance(result_type, builtin.IntegerType) and hasattr(result_type, 'width') and result_type.width.data == 64:
+                op.results[0]._type = builtin.i32
+                types_replaced += 1
+        
+        # Handle all other operations - update result types
+        else:
+            for result in op.results:
+                if isinstance(result.type, builtin.Float64Type) or str(result.type) == 'f64':
+                    result._type = builtin.i32
+                    types_replaced += 1
+                elif isinstance(result.type, builtin.IntegerType) and hasattr(result.type, 'width') and result.type.width.data == 64:
+                    result._type = builtin.i32
+                    types_replaced += 1
+    
+    print(f"Total types replaced: {types_replaced}")
+    replace_floatOp_to_intOp(module)
+
+
+def replace_floatOp_to_intOp(module: Operation) -> None:
+    c = 0
+
+    def replace_op(op, new_op):
+        if b := op.parent_block():
+            b.insert_op_before(new_op, op)
+        op.result.replace_by(new_op.result)
+        op.detach()
+
+    for op in module.walk():
+        if isinstance(op, arith.AddfOp):
+            # Replace with integer operation
+            new_op = arith.AddiOp(op.lhs, op.rhs, op.result.type)
+            replace_op(op, new_op)
+            c += 1
+
+        elif isinstance(op, arith.SubfOp):
+            # Replace with integer operation
+            new_op = arith.SubiOp(op.lhs, op.rhs, op.result.type)
+            replace_op(op, new_op)
+            c += 1
+
+        elif isinstance(op, arith.MulfOp):
+            # Replace with integer operation
+            new_op = arith.MuliOp(op.lhs, op.rhs, op.result.type)
+            replace_op(op, new_op)
+            c += 1
+
+    print(f"Replaced {c} float operations with integer operations in the module")
+
 def normalize_scf_while_loops(module: Operation) -> None:
     """Transform scf.while loops into guarded simple loops for easier extraction."""
 
@@ -249,9 +360,8 @@ def _transform_scf_while_to_guarded_loop(while_op: scf.WhileOp) -> None:
     parent_block.insert_op_before(if_op, while_op)
 
     # Replace uses of original while results with if results
-    if hasattr(while_op, "results") and hasattr(if_op, "results"):
-        for orig_result, new_result in zip(while_op.results, if_op.results):
-            orig_result.replace_by(new_result)
+    for orig_result, new_result in zip(while_op.results, if_op.results):
+        orig_result.replace_by(new_result)
 
     # Important: Also need to replace references to the scf.while block arguments
     # The scf.while block arguments should be replaced with the init_args
@@ -618,6 +728,10 @@ def process_mlir_file(input_file: str, output_dir: str) -> list[Path]:
 
         print(f"Successfully parsed with xDSL! Module has {len(module.ops)} operations")
 
+        # Replace i64/f64 types with i32/f32 types before processing
+        print("Replacing i64/f64 types with i32/f32 types...")
+        replace_types_i64_f64_to_i32(module)
+
         # Normalize scf.while loops before extraction
         normalize_scf_while_loops(module)
 
@@ -658,6 +772,10 @@ def process_mlir_file(input_file: str, output_dir: str) -> list[Path]:
             # Create a new module containing only this function
             func_module = builtin.ModuleOp(ops=[extracted_func])
             
+            # Apply type replacement to the extracted function module
+            print(f"  Applying type replacement to extracted function {func_name}")
+            replace_types_i64_f64_to_i32(func_module)
+            
             # Write to separate file
             output_file = Path(output_dir) / f"{func_name}.mlir"
             tmp_output_file = output_file.with_suffix(".tmp")
@@ -679,13 +797,17 @@ def process_mlir_file(input_file: str, output_dir: str) -> list[Path]:
             print(f"  Extracted function written to {output_file}")
             tmp_output_file.unlink()  # Remove temporary file
 
-            with open(output_file, "r") as f:
-                content = f.read()
-                content = content.replace("i64", "i32")
-                content = content.replace("f64", "f32")
+            out_files.append(output_file)
 
+        # Write the transformed module even if no functions were extracted to verify type replacement
+        if not extracted_functions:
+            # Write the transformed module to see the type changes
+            output_file = Path(output_dir) / "transformed_module.mlir"
+            os.makedirs(output_dir, exist_ok=True)
             with open(output_file, "w") as f:
-                f.write(content)
+                printer = Printer(f)
+                printer.print(module)
+            print(f"  Transformed module written to {output_file}")
             out_files.append(output_file)
 
         print(f"Total extracted functions: {len(extracted_functions)}")

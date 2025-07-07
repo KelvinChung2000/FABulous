@@ -2,7 +2,7 @@
 module Mem #(
     parameter WIDTH = 32,
     parameter SIZE = 16,
-    parameter IDX_SIZE = 4
+    parameter IDX_SIZE = 16
 ) (
     input wire [WIDTH-1:0] addr0,
     input wire [WIDTH-1:0] write_data,

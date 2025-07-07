@@ -1,5 +1,5 @@
 ram distributed $__cell_Mem_config_bits_1 {
-    abits 4;
+    abits 16;
     width 32;
     cost 1;
     init any;
@@ -15,7 +15,7 @@ ram distributed $__cell_Mem_config_bits_1 {
     
 }
 ram distributed $__cell_Mem_config_bits_0 {
-    abits 4;
+    abits 16;
     width 32;
     cost 1;
     init any;

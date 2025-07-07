@@ -14,9 +14,37 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
       - uses: ./.github/actions/prepare_FABulous_container
         with:
-          inputs.additional_system_packages: iverilog
+          inputs.additional_system_packages: ""
+      - name: Install system iverilog properly
+        run: |
+          echo "Installing iverilog manually to ensure proper installation:"
+          sudo apt-get update
+          sudo apt-get install -y iverilog
+          echo "Checking iverilog installation:"
+          dpkg -L iverilog | grep bin || echo "No iverilog binaries found"
+          echo "All iverilog files installed:"
+          find /usr -name "*iverilog*" 2>/dev/null || echo "No iverilog found in /usr"
       - name: Run pytest
         run: |
-          export PATH="/usr/bin:/bin:$PATH"
-          echo "Using system iverilog from: $(which iverilog)"
+          echo "Finding system iverilog installation:"
+          SYSTEM_IVERILOG=$(dpkg -L iverilog | grep bin/iverilog$ | head -1)
+          echo "System iverilog found at: $SYSTEM_IVERILOG"
+          
+          if [ -n "$SYSTEM_IVERILOG" ] && [ -f "$SYSTEM_IVERILOG" ]; then
+            echo "Using system iverilog at: $SYSTEM_IVERILOG"
+            $SYSTEM_IVERILOG -V
+            
+            # Create override directory with system iverilog
+            mkdir -p /tmp/override-bin
+            ln -sf "$SYSTEM_IVERILOG" /tmp/override-bin/iverilog
+            export PATH="/tmp/override-bin:$PATH"
+            
+            echo "Final check - using iverilog from: $(which iverilog)"
+            iverilog -V
+          else
+            echo "System iverilog not found, using OSS-CAD version"
+            which iverilog
+            iverilog -V
+          fi
+          
           pytest -v -x

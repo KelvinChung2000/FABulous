@@ -14,17 +14,8 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
       - uses: ./.github/actions/prepare_FABulous_container
         with:
-          inputs.additional_system_packages: ""
+          inputs.additional_system_packages: "iverilog"
           github_token: ${{ secrets.GITHUB_TOKEN }}
-      - name: Install system iverilog properly
-        run: |
-          echo "Installing iverilog manually to ensure proper installation:"
-          sudo apt-get update
-          sudo apt-get install -y iverilog
-          echo "Checking iverilog installation:"
-          dpkg -L iverilog | grep bin || echo "No iverilog binaries found"
-          echo "All iverilog files installed:"
-          find /usr -name "*iverilog*" 2>/dev/null || echo "No iverilog found in /usr"
       - name: Run pytest
         run: |
           export PATH="/usr/bin:$PATH"

@@ -26,11 +26,11 @@ runs:
       uses: actions/setup-python@v5
       with:
         python-version: ${{ inputs.python_version }}
-    - name: Install iverilog, yosys, and GHDL from apt
+    - name: Install iverilog and yosys from apt
       shell: bash
       run: |
         sudo apt-get update
-        sudo apt-get install -y iverilog yosys ghdl
+        sudo apt-get install -y iverilog yosys
     - name: Install GHDL mcode nightly
       # GHDL mcode is required to test our fabric.
       # The oss-cad-suite action installs GHDL, but with the LLVM backend, which is much slower for our simulation
@@ -40,6 +40,19 @@ runs:
         version: nightly
         backend: mcode
         investigate: true
+    - name: Install GHDL-Yosys plugin
+      if: ${{ inputs.install_GHDL_mcode == true }}
+      shell: bash
+      run: |
+        # Install dependencies for building the plugin
+        sudo apt-get install -y build-essential
+        # Clone and build ghdl-yosys-plugin
+        git clone https://github.com/ghdl/ghdl-yosys-plugin.git
+        cd ghdl-yosys-plugin
+        # Set up environment for GHDL
+        export PATH="/opt/ghdl/bin:$PATH"
+        make
+        sudo make install
     - name: Install additional ubuntu packages
       if: ${{ inputs.additional_system_packages != '' }}
       shell: bash

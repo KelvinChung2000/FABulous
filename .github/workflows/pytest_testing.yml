@@ -15,6 +15,7 @@ jobs:
       - uses: ./.github/actions/prepare_FABulous_container
         with:
           inputs.additional_system_packages: ""
+          github_token: ${{ secrets.GITHUB_TOKEN }}
       - name: Install system iverilog properly
         run: |
           echo "Installing iverilog manually to ensure proper installation:"

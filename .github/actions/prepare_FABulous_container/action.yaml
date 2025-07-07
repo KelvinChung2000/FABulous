@@ -3,24 +3,27 @@ description: Composite action to prepare a container with everything needed to r
 
 inputs:
   python_version:
-    description: 'Python version to use'
+    description: "Python version to use"
     required: false
-    default: '3.12'
+    default: "3.12"
   additional_system_packages:
-    description: 'Additional ubunut packages to install'
+    description: "Additional ubunut packages to install"
     required: false
-    default: ''
+    default: ""
   additional_python_packages:
-    description: 'Additional python packages to install'
+    description: "Additional python packages to install"
     required: false
-    default: ''
+    default: ""
   install_GHDL_mcode:
-    description: 'Install GHDL with mcode backend'
+    description: "Install GHDL with mcode backend"
     required: false
     default: false
+  github_token:
+    description: "GitHub token for API access"
+    required: true
 
 runs:
-  using: 'composite'
+  using: "composite"
   steps:
     - name: Set up Python
       uses: actions/setup-python@v5
@@ -29,8 +32,8 @@ runs:
     - name: Set up OSS CAD suite
       uses: YosysHQ/setup-oss-cad-suite@v3
       with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-      
+        github-token: ${{ inputs.github_token }}
+
     - name: Install GHDL mcode nightly
       # GHDL mcode is required to test our fabric.
       # The oss-cad-suite action installs GHDL, but with the LLVM backend, which is much slower for our simulation

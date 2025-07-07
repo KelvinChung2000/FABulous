@@ -6,8 +6,12 @@ on: [push, pull_request]
 jobs:
   run_pytest:
     runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v4
+        with: 
+          token: ${{ secrets.GITHUB_TOKEN }}
       - uses: ./.github/actions/prepare_FABulous_container
         with:
           inputs.additional_system_packages: iverilog

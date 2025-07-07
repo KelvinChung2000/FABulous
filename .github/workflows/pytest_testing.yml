@@ -11,20 +11,8 @@ jobs:
       - uses: ./.github/actions/prepare_FABulous_container
         with:
           inputs.additional_system_packages: iverilog
-      - name: Use system iverilog
-        run: |
-          echo "Before PATH change:"
-          which iverilog
-          iverilog -V
-          echo "Checking if system iverilog exists:"
-          ls -la /usr/bin/iverilog || echo "System iverilog not found"
-          export PATH="/usr/bin:$PATH"
-          echo "After PATH change:"
-          which iverilog
-          iverilog -V
       - name: Run pytest
         run: |
-          export PATH="/usr/bin:$PATH"
-          echo "Using iverilog from: $(which iverilog)"
-          iverilog -V
+          export PATH="/usr/bin:/bin:$PATH"
+          echo "Using system iverilog from: $(which iverilog)"
           pytest -v -x

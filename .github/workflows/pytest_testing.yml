@@ -14,7 +14,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
       - uses: ./.github/actions/prepare_FABulous_container
         with:
-          inputs.additional_system_packages: "iverilog"
+          additional_system_packages: "iverilog"
           github_token: ${{ secrets.GITHUB_TOKEN }}
       - name: Run pytest
         run: |

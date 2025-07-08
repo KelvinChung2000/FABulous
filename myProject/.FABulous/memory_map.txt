@@ -1,9 +1,10 @@
 ram distributed $__Mem {
     abits 16;
     width 32;
+    init any;
+
     option "cell_Mem_config_bits_1" 0 {
         cost 1;
-        init any;
 
         port srsw "RW0" {
             clken;
@@ -17,7 +18,6 @@ ram distributed $__Mem {
     }
     option "cell_Mem_config_bits_0" 1 {
         cost 2;
-        init any;
 
         port arsw "RW0" {
             clken;

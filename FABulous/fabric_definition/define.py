@@ -1,9 +1,8 @@
-from collections import defaultdict
 import json
+import re
 from dataclasses import dataclass
 from enum import StrEnum
 from pathlib import Path
-import re
 from typing import Literal
 
 
@@ -212,3 +211,16 @@ class YosysJson:
             raise ValueError(f"Multiple driver found for net {net}: {src}")
 
         return src[0], sinks
+
+    def findNetWithAttribute(self, attribute: str) -> list[str] | None:
+        """Find the first net with the specified attribute in the Yosys JSON.
+
+        Returns the net name if found, otherwise raises ValueError.
+        """
+        nets_with_attribute = []
+        for module in self.modules.values():
+            for net_name, net_details in module.netnames.items():
+                if attribute in net_details.attributes:
+                    nets_with_attribute.append(net_name)
+
+        return nets_with_attribute if nets_with_attribute else None

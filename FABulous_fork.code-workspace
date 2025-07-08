@@ -5,6 +5,9 @@
         },
         {
             "path": "../nextpnr"
+        },
+        {
+            "path": "../HDLGen"
         }
     ],
     "settings": {

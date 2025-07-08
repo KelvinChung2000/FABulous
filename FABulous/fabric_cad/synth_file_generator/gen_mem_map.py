@@ -1,7 +1,6 @@
 """Memory mapping generation with object-oriented design and factory pattern."""
 
 import textwrap
-from dataclasses import field
 from pathlib import Path
 
 from hdlgen.code_gen import CodeGenerator
@@ -17,7 +16,8 @@ from FABulous.fabric_cad.synth_file_generator.memory_port import (
 from FABulous.fabric_definition.Bel import Bel
 from FABulous.fabric_definition.define import YosysJson, YosysModule
 
-from .memory_port_factory import MemoryConfigurationOption, MemoryPortFactory
+from .memory_port_factory import MemoryPortFactory
+from .MemoryConfigurationOption import MemoryConfigurationOption
 
 MemoryPort = ARPort | SRPort | SWPort | ARSWPort | SRSWPort
 
@@ -86,17 +86,30 @@ class MemoryMapping:
                 parameters, connections, address_bits, data_width
             )
 
+            config_name: str
+            value: int
+            n = yosys_json.findNetWithAttribute("CONFIG_BIT")
+            if n is not None:
+                if len(n) != 1:
+                    raise ValueError(
+                        f"Memory cell in {file_path} must have exactly one net with CONFIG_BIT attribute."
+                    )
+                config_name = n[0]
+                value = int(module.netnames[config_name].attributes["CONFIG_BIT"], 2)
+            else:
+                config_name = file_path.stem
+                value = 0  # Default value if no CONFIG_BIT found
+
             config_option = MemoryConfigurationOption(
-                name=file_path.stem,
-                value=idx,
+                name=config_name,
+                value=value,
                 init_value=init_value,
                 cost=cost,
                 port_options=ports,
                 signal_mapping=mapping,
+                data_width=data_width,
             )
             # Store per-config dimensions
-            config_option.address_bits = address_bits
-            config_option.data_width = data_width
 
             self.cell_config_options.append(config_option)
 
@@ -121,10 +134,19 @@ class MemoryMapping:
             0
         ]  # All configs must have same address bits
         self.data_widths = sorted(unique_data_widths)  # Support multiple widths
+        self.init_value = init_value
         self.cost = max(config.cost for config in self.cell_config_options)
         self.signal_mapping = first_config.signal_mapping
         self.bel = bel
         self.parameters = {}  # Will be populated from reference module if needed
+
+        # Store reference module from first configuration for port mapping
+        if cell_files:
+            first_file = cell_files[0]
+            yosys_json = YosysJson(first_file)
+            self.module = yosys_json.modules[next(iter(yosys_json.modules))]
+        else:
+            self.module = None
 
     def generate_memory_mapping(self, path: Path):
         """Generate the memory mapping string with options and portoptions."""
@@ -139,10 +161,11 @@ class MemoryMapping:
             widths_str = " ".join(str(w) for w in self.data_widths)
             lines.append(f"    widths {widths_str};")
 
+        lines.append(f"    init {self.init_value};")
+        lines.append("")
         for option in self.cell_config_options:
             lines.append(f'    option "{option.name}" {option.value} {{')
             lines.append(f"        cost {option.cost};")
-            lines.append(f"        init {option.init_value};")
 
             # Add width-specific information if this config has different width
             if len(self.data_widths) > 1:
@@ -196,8 +219,21 @@ class MemoryMapping:
                     f"PORT_{port.name}_DATA_WIDTH", str(port.data_width)
                 )
 
+    def _add_port_parameters(self, parameter_region) -> None:
+        """Add parameters from port configurations for techmap."""
+        # Add parameters from all port configurations
+        for option in self.cell_config_options:
+            for port in option.port_options:
+                port_configs = port.get_port_configurations()
+                for config_name, config in port_configs.items():
+                    if config.is_parameter:
+                        parameter_region.Parameter(
+                            config_name, config.parameter_value or "0"
+                        )
+
     def generate_verilog_mapping(self) -> None:
-        """Generate Verilog mapping for unified memory mapping with options."""
+        """Generate sophisticated Verilog mapping with conditional configuration
+        logic."""
         cg = CodeGenerator(
             Path(
                 f"{self.bel.src.parent}/metadata/{self.bel.name}/map_{self.bel.name}.v"
@@ -206,98 +242,108 @@ class MemoryMapping:
             writeMode="a",
         )
 
+        # Generate a main techmap module that uses conditional logic
         with cg.Module(self.module_name) as m:
             with m.ParameterRegion() as pr:
                 init = pr.Parameter("INIT", self.parameters.get("INIT", "0"))
                 # Add option parameters
                 self._add_option_parameters(pr)
+                # Add port-based parameters for techmap
+                self._add_port_parameters(pr)
 
+            # Create all possible ports from all configurations
             portDict = {}
             with m.PortRegion() as pr:
-                # Create ports from options
                 for option in self.cell_config_options:
                     for port in option.port_options:
-                        # Create ports based on memory port configurations
                         port_configs = port.get_port_configurations()
                         for port_name, config in port_configs.items():
                             if not config.is_parameter and port_name not in portDict:
-                                # Create actual Verilog ports (avoid duplicates)
                                 portDict[port_name] = pr.Port(
                                     port_name, config.direction, config.width
                                 )
 
             with m.LogicRegion() as lr:
-                # Initialize parameters
-                params = [lr.ConnectPair("INIT", init)]
+                # Generate conditional configuration logic using wire assignments
+                self._generate_conditional_wire_mapping(lr, portDict)
 
-                # Add option parameters as connections
-                for option in self.cell_config_options:
-                    params.append(lr.ConnectPair(f"OPTION_{option.name}", option.value))
+    def _generate_conditional_wire_mapping(self, lr, portDict: dict) -> None:
+        """Generate wire mapping logic using signal mapping from configurations."""
 
-                    # Add config-level dimensions
-                    params.append(
-                        lr.ConnectPair(
-                            f"OPTION_{option.name}_ADDRESS_BITS", option.address_bits
-                        )
-                    )
-                    params.append(
-                        lr.ConnectPair(
-                            f"OPTION_{option.name}_DATA_WIDTH", option.data_width
-                        )
-                    )
+        # Collect all parameters for all configurations
+        params = []
+        params.append(lr.ConnectPair("INIT", self.parameters.get("INIT", "0")))
 
-                    for port in option.port_options:
-                        # Add basic port parameters
-                        params.append(
-                            lr.ConnectPair(
-                                f"PORT_{port.name}_ADDRESS_BITS", port.address_bits
-                            )
-                        )
-                        params.append(
-                            lr.ConnectPair(
-                                f"PORT_{port.name}_DATA_WIDTH", port.data_width
-                            )
-                        )
-
-                # Add configuration bits from the reference module
-                if self.module:
-                    for idx, netname in self.module.netnames.items():
-                        if (
-                            hasattr(netname, "attributes")
-                            and "CONFIG_BIT" in netname.attributes
-                        ):
-                            v = int("".join([str(i) for i in netname.bits]), 2)
-                            params.append(lr.ConnectPair(idx, v))
-
-                # Create port connections using signal mapping
-                portConnect = []
-                if self.module:
-                    for module_port, port_detail in self.module.ports.items():
-                        # Skip user clock ports
-                        if (
-                            module_port in self.module.netnames
-                            and hasattr(self.module.netnames[module_port], "attributes")
-                            and "USER_CLK"
-                            in self.module.netnames[module_port].attributes
-                        ):
-                            continue
-
-                        # Find matching signal in our mapping
-                        for mapped_port, signal_bits in self.signal_mapping.items():
-                            if mapped_port in portDict:
-                                # Check if the signal bits match the module port bits
-                                if self._signals_match(signal_bits, port_detail.bits):
-                                    portConnect.append(
-                                        lr.ConnectPair(
-                                            module_port, portDict[mapped_port]
-                                        )
-                                    )
-                                    break
-
-                # Initialize the replacement module
-                lr.InitModule(
-                    f"{self.bel.name}", "_TECHMAP_REPLACE_", portConnect, params
+        # Add all option parameters
+        for option in self.cell_config_options:
+            params.append(lr.ConnectPair(f"OPTION_{option.name}", option.value))
+            params.append(
+                lr.ConnectPair(
+                    f"OPTION_{option.name}_ADDRESS_BITS", option.address_bits
                 )
+            )
+            params.append(
+                lr.ConnectPair(f"OPTION_{option.name}_DATA_WIDTH", option.data_width)
+            )
+
+            for port in option.port_options:
+                params.append(
+                    lr.ConnectPair(f"PORT_{port.name}_ADDRESS_BITS", port.address_bits)
+                )
+                params.append(
+                    lr.ConnectPair(f"PORT_{port.name}_DATA_WIDTH", port.data_width)
+                )
+
+                # Add port configuration parameters
+                port_configs = port.get_port_configurations()
+                for config_name, config in port_configs.items():
+                    if config.is_parameter:
+                        params.append(
+                            lr.ConnectPair(config_name, config.parameter_value or "0")
+                        )
+
+        # Add configuration bits from the reference module
+        if self.module:
+            for idx, netname in self.module.netnames.items():
+                if (
+                    hasattr(netname, "attributes")
+                    and "CONFIG_BIT" in netname.attributes
+                ):
+                    v = int("".join([str(i) for i in netname.bits]), 2)
+                    params.append(lr.ConnectPair(idx, v))
+
+        # Create port connections - use signal mapping from configurations
+        portConnect = []
+
+        # For multiple configurations, we need conditional logic
+        # For now, use the first configuration's signal mapping
+        # TODO: Implement proper conditional logic for multiple configurations
+        if self.cell_config_options:
+            primary_config = self.cell_config_options[0]
+            for mapped_port, signal_bits in primary_config.signal_mapping.items():
+                if mapped_port in portDict:
+                    # Find corresponding BEL port by matching signal bits
+                    if self.module:
+                        for bel_port, port_detail in self.module.ports.items():
+                            if (
+                                bel_port in self.module.netnames
+                                and hasattr(
+                                    self.module.netnames[bel_port], "attributes"
+                                )
+                                and "USER_CLK"
+                                in self.module.netnames[bel_port].attributes
+                            ):
+                                continue
+
+                            # Check if signal bits match
+                            if self._signals_match(signal_bits, port_detail.bits):
+                                portConnect.append(
+                                    lr.ConnectPair(bel_port, portDict[mapped_port])
+                                )
+                                break
+
+        # Initialize the replacement module
+        lr.InitModule(f"{self.bel.name}", "_TECHMAP_REPLACE_", portConnect, params)
 
     def _signals_match(self, signal_bits: tuple, port_bits: list) -> bool:
         """Check if signal bits match port bits for proper mapping."""
@@ -307,6 +353,39 @@ class MemoryMapping:
 
         # Check if signal bits are a subset of port bits (allowing for partial matches)
         return signal_set.issubset(port_set) or signal_set == port_set
+
+    def _port_name_matches(self, module_port: str, mapped_port: str) -> bool:
+        """Check if a module port name matches a mapped port name pattern."""
+        # Remove PORT_ prefix if present
+        mapped_port_clean = mapped_port.replace("PORT_", "")
+
+        # Check for direct match
+        if module_port == mapped_port_clean:
+            return True
+
+        # Check for common memory signal patterns
+        memory_mappings = {
+            "CLK": ["CLK", "CLOCK"],
+            "ADDR": ["ADDR", "ADDRESS"],
+            "DATA": ["DATA", "DATA_IN", "DATA_OUT"],
+            "WR_DATA": ["WR_DATA", "WRITE_DATA", "DIN"],
+            "RD_DATA": ["RD_DATA", "READ_DATA", "DOUT"],
+            "WR_EN": ["WR_EN", "WRITE_EN", "WEN"],
+            "RD_EN": ["RD_EN", "READ_EN", "REN"],
+            "CLK_EN": ["CLK_EN", "CLOCK_EN", "CE"],
+            "ARST": ["ARST", "ASYNC_RST", "RESET"],
+            "SRST": ["SRST", "SYNC_RST", "RST"],
+            "WR_BE": ["WR_BE", "WRITE_BE", "BE"],
+        }
+
+        # Check if the mapped port contains any of these patterns
+        for pattern, variations in memory_mappings.items():
+            if pattern in mapped_port_clean:
+                for variation in variations:
+                    if variation in module_port.upper():
+                        return True
+
+        return False
 
 
 def genMemMap(bel: Bel, dest: Path) -> None:

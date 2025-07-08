@@ -12,7 +12,7 @@ from FABulous.fabric_definition.define import IO
 
 
 @dataclass
-class PortConfig:
+class VerilogPortConfig:
     """Configuration for a single Verilog port."""
 
     name: str
@@ -39,6 +39,9 @@ class MemoryPortBase(ABC):
     name: str
     address_bits: int
     data_width: int
+
+    option_name: str | None = None  # Optional name for the port option
+
     clock_edge: Literal["posedge", "negedge", "anyedge"] = "anyedge"
     clock_enable: bool = False
 
@@ -47,10 +50,6 @@ class MemoryPortBase(ABC):
     width_values: list[int] | None = None
     rd_width_values: list[int] | None = None
     wr_width_values: list[int] | None = None
-
-    # Optional port configuration
-    optional: bool = False
-    optional_rw: bool = False
 
     signal_mapping: dict[str, tuple] = field(default_factory=dict)
 
@@ -61,39 +60,41 @@ class MemoryPortBase(ABC):
         pass
 
     @abstractmethod
-    def to_configs_list(self) -> str:
+    def to_configs_list(self) -> list[str]:
         """Generate the port configuration string for memory mapping file."""
-        pass
+        port_config = []
+
+        if isinstance(self, (SRPort, SWPort)):
+            port_config.append(f"clock {self.clock_edge}")
+            port_config.append("clken")
+
+        return port_config
 
     @abstractmethod
-    def get_port_configurations(self) -> dict[str, PortConfig]:
-        """Return port configurations with width, direction, and special attributes."""
-        pass
-
-    def _get_common_port_configurations(self) -> dict[str, PortConfig]:
+    def get_port_configurations(self) -> dict[str, VerilogPortConfig]:
         """Return common port configurations based on port type."""
         configs = {
-            f"PORT_{self.name}_ADDR": PortConfig(
+            f"PORT_{self.name}_ADDR": VerilogPortConfig(
                 f"PORT_{self.name}_ADDR", IO.INPUT, self.address_bits
             ),
         }
         if isinstance(self, (SRPort, SWPort, ARSWPort, SRSWPort)):
-            configs[f"PORT_{self.name}_CLK"] = PortConfig(
+            configs[f"PORT_{self.name}_CLK"] = VerilogPortConfig(
                 f"PORT_{self.name}_CLK", IO.INPUT, 1
             )
 
         # Add read data port for read-capable ports (ar, sr, arsw, srsw)
         if isinstance(self, (ARPort, SRPort, ARSWPort, SRSWPort)):
-            configs[f"PORT_{self.name}_RD_DATA"] = PortConfig(
+            configs[f"PORT_{self.name}_RD_DATA"] = VerilogPortConfig(
                 f"PORT_{self.name}_RD_DATA", IO.OUTPUT, self.data_width
             )
 
         # Add write data port for write-capable ports (sw, arsw, srsw)
         if isinstance(self, (SWPort, ARSWPort, SRSWPort)):
-            configs[f"PORT_{self.name}_WR_DATA"] = PortConfig(
+            configs[f"PORT_{self.name}_WR_DATA"] = VerilogPortConfig(
                 f"PORT_{self.name}_WR_DATA", IO.INPUT, self.data_width
             )
-            configs[f"PORT_{self.name}_WR_EN"] = PortConfig(
+            configs[f"PORT_{self.name}_WR_EN"] = VerilogPortConfig(
                 f"PORT_{self.name}_WR_EN", IO.INPUT, 1
             )
 
@@ -101,22 +102,12 @@ class MemoryPortBase(ABC):
         if self.width_mode == "tied" or (
             self.width_mode is None and not self.width_values
         ):
-            configs[f"PORT_{self.name}_WIDTH"] = PortConfig(
+            configs[f"PORT_{self.name}_WIDTH"] = VerilogPortConfig(
                 f"PORT_{self.name}_WIDTH",
                 IO.INPUT,
                 1,
                 is_parameter=True,
                 parameter_value=str(self.data_width),
-            )
-
-        # Add USED parameter only if optional flag is set
-        if self.optional:
-            configs[f"PORT_{self.name}_USED"] = PortConfig(
-                f"PORT_{self.name}_USED",
-                IO.INPUT,
-                1,
-                is_parameter=True,
-                parameter_value="1",
             )
 
         return configs
@@ -126,14 +117,12 @@ class MemoryPortBase(ABC):
         port_header = f'    port {self.port_type.value} "{self.name}" {{'
         port_config = []
 
-        if not isinstance(self, ARPort):
-            port_config.append(f"clock {self.clock_edge}")
-            port_config.append("clken")
-
         port_config.extend(self.to_configs_list())
 
         if not port_config:
-            raise ValueError("ARPort must have at least one configuration option set.")
+            raise ValueError(
+                f"{self.port_type} must have at least one configuration option set."
+            )
 
         lines = [port_header]
         lines.append(textwrap.indent(";\n".join(port_config) + ";", "        "))
@@ -153,6 +142,7 @@ class ARPort(MemoryPortBase):
     # Collision and wide port support
     wide_continuation: bool = False
     collision_write_ports: list[int] | None = None
+    optional: bool = False
 
     @property
     def port_type(self) -> MemoryPortType:
@@ -161,6 +151,7 @@ class ARPort(MemoryPortBase):
     def to_configs_list(self) -> list[str]:
         """Generate the port configuration string for memory mapping file."""
         config: list[str] = []
+        config.extend(super().to_configs_list())
 
         # Width configuration
         if self.width_mode:
@@ -176,21 +167,20 @@ class ARPort(MemoryPortBase):
         # Optional configuration
         if self.optional:
             config.append("optional")
-        if self.optional_rw:
-            config.append("optional_rw")
+        # Note: optional_rw should only be used in portoptions, not as a port configuration
 
         return config
 
-    def get_port_configurations(self) -> dict[str, PortConfig]:
+    def get_port_configurations(self) -> dict[str, VerilogPortConfig]:
         """Return port configurations with width, direction, and special attributes."""
-        configs = self._get_common_port_configurations()
+        configs = super().get_port_configurations()
 
         # Note: RD_DATA port is now handled in base class
 
         # Add separate read/write widths for mix mode
         if self.width_mode == "mix":
             if self.rd_width_values:
-                configs[f"PORT_{self.name}_RD_WIDTH"] = PortConfig(
+                configs[f"PORT_{self.name}_RD_WIDTH"] = VerilogPortConfig(
                     f"PORT_{self.name}_RD_WIDTH",
                     IO.INPUT,
                     1,
@@ -199,8 +189,8 @@ class ARPort(MemoryPortBase):
                 )
 
         # Add RD_USED parameter for optional_rw ports
-        if self.optional_rw:
-            configs[f"PORT_{self.name}_RD_USED"] = PortConfig(
+        if self.optional:
+            configs[f"PORT_{self.name}_RD_USED"] = VerilogPortConfig(
                 f"PORT_{self.name}_RD_USED",
                 IO.INPUT,
                 1,
@@ -210,7 +200,7 @@ class ARPort(MemoryPortBase):
 
         # Add RD_INIT_VALUE parameter if needed
         if self.read_init in ["any", "no_undef"]:
-            configs[f"PORT_{self.name}_RD_INIT_VALUE"] = PortConfig(
+            configs[f"PORT_{self.name}_RD_INIT_VALUE"] = VerilogPortConfig(
                 f"PORT_{self.name}_RD_INIT_VALUE",
                 IO.INPUT,
                 self.data_width,
@@ -220,7 +210,7 @@ class ARPort(MemoryPortBase):
 
         # Add RD_ARST_VALUE parameter if needed
         if self.read_arst in ["any", "no_undef"]:
-            configs[f"PORT_{self.name}_RD_ARST_VALUE"] = PortConfig(
+            configs[f"PORT_{self.name}_RD_ARST_VALUE"] = VerilogPortConfig(
                 f"PORT_{self.name}_RD_ARST_VALUE",
                 IO.INPUT,
                 self.data_width,
@@ -229,13 +219,23 @@ class ARPort(MemoryPortBase):
             )
 
         if self.read_enable:
-            configs[f"PORT_{self.name}_RD_EN"] = PortConfig(
+            configs[f"PORT_{self.name}_RD_EN"] = VerilogPortConfig(
                 f"PORT_{self.name}_RD_EN", IO.INPUT, 1
             )
 
         if self.read_arst != "none":
-            configs[f"PORT_{self.name}_RD_ARST"] = PortConfig(
+            configs[f"PORT_{self.name}_RD_ARST"] = VerilogPortConfig(
                 f"PORT_{self.name}_RD_ARST", IO.INPUT, 1
+            )
+
+        # Add USED parameter only if optional flag is set
+        if self.optional:
+            configs[f"PORT_{self.name}_USED"] = VerilogPortConfig(
+                f"PORT_{self.name}_USED",
+                IO.INPUT,
+                1,
+                is_parameter=True,
+                parameter_value="1",
             )
 
         return configs
@@ -250,11 +250,12 @@ class SRPort(MemoryPortBase):
     # Reset/initialization configurations
     read_init: Literal["none", "zero", "any", "no_undef"] = "none"
     read_srst: Literal["none", "zero", "any", "no_undef", "init"] = "none"
-    read_srst_gated: bool = False  # Whether sync reset is gated by clock enable
+    read_srst_gated: bool = False  # Whether sync reset is gated by read enable
     read_srst_priority: Literal["ungated", "gated_clken", "gated_rden"] = "ungated"
     # Collision and wide port support
     wide_continuation: bool = False
     collision_write_ports: list[int] | None = None
+    optional: bool = False  # Optional port configuration
 
     @property
     def port_type(self) -> MemoryPortType:
@@ -263,6 +264,8 @@ class SRPort(MemoryPortBase):
     def to_configs_list(self) -> list[str]:
         """Generate the port configuration string for memory mapping file."""
         config: list[str] = []
+
+        config.extend(super().to_configs_list())
 
         # Width configuration
         if self.width_mode:
@@ -284,19 +287,18 @@ class SRPort(MemoryPortBase):
         # Optional configuration
         if self.optional:
             config.append("optional")
-        if self.optional_rw:
-            config.append("optional_rw")
+        # Note: optional_rw should only be used in portoptions, not as a port configuration
 
         return config
 
-    def get_port_configurations(self) -> dict[str, PortConfig]:
+    def get_port_configurations(self) -> dict[str, VerilogPortConfig]:
         """Return port configurations with width, direction, and special attributes."""
-        configs = self._get_common_port_configurations()
+        configs = super().get_port_configurations()
 
         # Add synchronous read-specific configurations (RD_DATA handled in base)
         configs.update(
             {
-                f"PORT_{self.name}_CLK": PortConfig(
+                f"PORT_{self.name}_CLK": VerilogPortConfig(
                     f"PORT_{self.name}_CLK", IO.INPUT, 1
                 ),
             }
@@ -305,7 +307,7 @@ class SRPort(MemoryPortBase):
         # Add separate read/write widths for mix mode
         if self.width_mode == "mix":
             if self.rd_width_values:
-                configs[f"PORT_{self.name}_RD_WIDTH"] = PortConfig(
+                configs[f"PORT_{self.name}_RD_WIDTH"] = VerilogPortConfig(
                     f"PORT_{self.name}_RD_WIDTH",
                     IO.INPUT,
                     1,
@@ -314,8 +316,8 @@ class SRPort(MemoryPortBase):
                 )
 
         # Add RD_USED parameter for optional_rw ports
-        if self.optional_rw:
-            configs[f"PORT_{self.name}_RD_USED"] = PortConfig(
+        if self.optional:
+            configs[f"PORT_{self.name}_RD_USED"] = VerilogPortConfig(
                 f"PORT_{self.name}_RD_USED",
                 IO.INPUT,
                 1,
@@ -325,7 +327,7 @@ class SRPort(MemoryPortBase):
 
         # Add RD_INIT_VALUE parameter if needed
         if self.read_init in ["any", "no_undef"]:
-            configs[f"PORT_{self.name}_RD_INIT_VALUE"] = PortConfig(
+            configs[f"PORT_{self.name}_RD_INIT_VALUE"] = VerilogPortConfig(
                 f"PORT_{self.name}_RD_INIT_VALUE",
                 IO.INPUT,
                 self.data_width,
@@ -335,7 +337,7 @@ class SRPort(MemoryPortBase):
 
         # Add RD_SRST_VALUE parameter if needed
         if self.read_srst in ["any", "no_undef"]:
-            configs[f"PORT_{self.name}_RD_SRST_VALUE"] = PortConfig(
+            configs[f"PORT_{self.name}_RD_SRST_VALUE"] = VerilogPortConfig(
                 f"PORT_{self.name}_RD_SRST_VALUE",
                 IO.INPUT,
                 self.data_width,
@@ -344,7 +346,7 @@ class SRPort(MemoryPortBase):
             )
 
         if self.clock_edge == "anyedge":
-            configs[f"PORT_{self.name}_CLKPOL"] = PortConfig(
+            configs[f"PORT_{self.name}_CLKPOL"] = VerilogPortConfig(
                 f"PORT_{self.name}_CLKPOL",
                 IO.INPUT,
                 1,
@@ -353,18 +355,28 @@ class SRPort(MemoryPortBase):
             )
 
         if self.clock_enable:
-            configs[f"PORT_{self.name}_CLK_EN"] = PortConfig(
+            configs[f"PORT_{self.name}_CLK_EN"] = VerilogPortConfig(
                 f"PORT_{self.name}_CLK_EN", IO.INPUT, 1
             )
 
         if self.read_enable:
-            configs[f"PORT_{self.name}_RD_EN"] = PortConfig(
+            configs[f"PORT_{self.name}_RD_EN"] = VerilogPortConfig(
                 f"PORT_{self.name}_RD_EN", IO.INPUT, 1
             )
 
         if self.read_srst != "none":
-            configs[f"PORT_{self.name}_RD_SRST"] = PortConfig(
+            configs[f"PORT_{self.name}_RD_SRST"] = VerilogPortConfig(
                 f"PORT_{self.name}_RD_SRST", IO.INPUT, 1
+            )
+
+        # Add USED parameter only if optional flag is set
+        if self.optional:
+            configs[f"PORT_{self.name}_USED"] = VerilogPortConfig(
+                f"PORT_{self.name}_USED",
+                IO.INPUT,
+                1,
+                is_parameter=True,
+                parameter_value="1",
             )
 
         return configs
@@ -383,6 +395,7 @@ class SWPort(MemoryPortBase):
     wide_continuation: bool = False
     # Write priority configuration
     write_priority_names: list[str] = field(default_factory=list)
+    optional: bool = False  # Optional port configuration
 
     @property
     def port_type(self) -> MemoryPortType:
@@ -391,6 +404,8 @@ class SWPort(MemoryPortBase):
     def to_configs_list(self) -> list[str]:
         """Generate the port configuration string for memory mapping file."""
         config = []
+
+        config.extend(super().to_configs_list())
 
         # Width configuration
         if self.width_mode:
@@ -423,19 +438,18 @@ class SWPort(MemoryPortBase):
         # Optional configuration
         if self.optional:
             config.append("optional")
-        if self.optional_rw:
-            config.append("optional_rw")
+        # Note: optional_rw should only be used in portoptions, not as a port configuration
 
         return config
 
-    def get_port_configurations(self) -> dict[str, PortConfig]:
+    def get_port_configurations(self) -> dict[str, VerilogPortConfig]:
         """Return port configurations with width, direction, and special attributes."""
-        configs = self._get_common_port_configurations()
+        configs = super().get_port_configurations()
 
         # Add separate read/write widths for mix mode
         if self.width_mode == "mix":
             if self.wr_width_values:
-                configs[f"PORT_{self.name}_WR_WIDTH"] = PortConfig(
+                configs[f"PORT_{self.name}_WR_WIDTH"] = VerilogPortConfig(
                     f"PORT_{self.name}_WR_WIDTH",
                     IO.INPUT,
                     1,
@@ -443,18 +457,8 @@ class SWPort(MemoryPortBase):
                     parameter_value=str(self.wr_width_values[0]),
                 )
 
-        # Add WR_USED parameter for optional_rw ports
-        if self.optional_rw:
-            configs[f"PORT_{self.name}_WR_USED"] = PortConfig(
-                f"PORT_{self.name}_WR_USED",
-                IO.INPUT,
-                1,
-                is_parameter=True,
-                parameter_value="1",
-            )
-
         if self.clock_edge == "anyedge":
-            configs[f"PORT_{self.name}_CLKPOL"] = PortConfig(
+            configs[f"PORT_{self.name}_CLKPOL"] = VerilogPortConfig(
                 f"PORT_{self.name}_CLKPOL",
                 IO.INPUT,
                 1,
@@ -463,14 +467,24 @@ class SWPort(MemoryPortBase):
             )
 
         if self.clock_enable:
-            configs[f"PORT_{self.name}_CLK_EN"] = PortConfig(
+            configs[f"PORT_{self.name}_CLK_EN"] = VerilogPortConfig(
                 f"PORT_{self.name}_CLK_EN", IO.INPUT, 1
             )
 
         if self.wrbe_separate:
             be_width = (self.data_width + 7) // 8  # Byte enable width
-            configs[f"PORT_{self.name}_WR_BE"] = PortConfig(
+            configs[f"PORT_{self.name}_WR_BE"] = VerilogPortConfig(
                 f"PORT_{self.name}_WR_BE", IO.INPUT, be_width
+            )
+
+        # Add USED parameter only if optional flag is set
+        if self.optional:
+            configs[f"PORT_{self.name}_USED"] = VerilogPortConfig(
+                f"PORT_{self.name}_USED",
+                IO.INPUT,
+                1,
+                is_parameter=True,
+                parameter_value="1",
             )
 
         return configs
@@ -480,24 +494,48 @@ class SWPort(MemoryPortBase):
 class ARSWPort(ARPort, SWPort):
     """Asynchronous read + synchronous write port."""
 
+    optional_rw: bool = False  # Optional read/write functionality
+
     @property
     def port_type(self) -> MemoryPortType:
         return MemoryPortType.ARSW
 
     def to_configs_list(self) -> list[str]:
-        """Generate the port configuration string for memory mapping file."""
+        """Generate the port configuration string for memory mapping file without
+        duplicates."""
         config: list[str] = []
-        config.extend(ARPort.to_configs_list(self))
-        config.extend(SWPort.to_configs_list(self))
+        seen: set[str] = set()
+        for entry in ARPort.to_configs_list(self) + SWPort.to_configs_list(self):
+            if entry not in seen:
+                config.append(entry)
+                seen.add(entry)
 
+        if self.optional_rw:
+            config.append("optional_rw")
         return config
 
-    def get_port_configurations(self) -> dict[str, PortConfig]:
+    def get_port_configurations(self) -> dict[str, VerilogPortConfig]:
         """Return port configurations with width, direction, and special attributes."""
         ar_configs = ARPort.get_port_configurations(self)
         sw_configs = SWPort.get_port_configurations(self)
         # Merge configurations, SW takes precedence for overlapping keys
         configs = {**ar_configs, **sw_configs}
+        configs.pop(f"PORT_{self.name}_USED", None)
+        if self.optional_rw:
+            configs[f"PORT_{self.name}_RD_USED"] = VerilogPortConfig(
+                f"PORT_{self.name}_RD_USED",
+                IO.INPUT,
+                1,
+                is_parameter=True,
+                parameter_value="1",
+            )
+            configs[f"PORT_{self.name}_WR_USED"] = VerilogPortConfig(
+                f"PORT_{self.name}_WR_USED",
+                IO.INPUT,
+                1,
+                is_parameter=True,
+                parameter_value="1",
+            )
         return configs
 
 
@@ -509,6 +547,7 @@ class SRSWPort(SRPort, SWPort):
     rdwr: Literal["no_change", "undefined", "old", "new", "new_only"] = "undefined"
     # Write transparency configuration (specific to SRSW ports)
     write_transparency: dict[str, Literal["old", "new"]] = field(default_factory=dict)
+    optional_rw: bool = False
 
     def __post_init__(self):
         """Validate SRSW port configuration."""
@@ -526,9 +565,11 @@ class SRSWPort(SRPort, SWPort):
     def to_configs_list(self) -> list[str]:
         """Generate the port configuration string for memory mapping file."""
         config: list[str] = []
-
-        config.extend(SRPort.to_configs_list(self))
-        config.extend(SWPort.to_configs_list(self))
+        seen: set[str] = set()
+        for entry in SRPort.to_configs_list(self) + SWPort.to_configs_list(self):
+            if entry not in seen:
+                config.append(entry)
+                seen.add(entry)
 
         # Add rdwr configuration
         if self.rdwr != "undefined":
@@ -538,12 +579,31 @@ class SRSWPort(SRPort, SWPort):
         for port_name, transparency in self.write_transparency.items():
             config.append(f'wrtrans "{port_name}" {transparency}')
 
+        if self.optional_rw:
+            config.append("optional_rw")
+
         return config
 
-    def get_port_configurations(self) -> dict[str, PortConfig]:
+    def get_port_configurations(self) -> dict[str, VerilogPortConfig]:
         """Return port configurations with width, direction, and special attributes."""
         sr_configs = SRPort.get_port_configurations(self)
         sw_configs = SWPort.get_port_configurations(self)
         # Merge configurations, combining read and write widths
         configs = {**sr_configs, **sw_configs}
+        configs.pop(f"PORT_{self.name}_USED", None)
+        if self.optional_rw:
+            configs[f"PORT_{self.name}_RD_USED"] = VerilogPortConfig(
+                f"PORT_{self.name}_RD_USED",
+                IO.INPUT,
+                1,
+                is_parameter=True,
+                parameter_value="1",
+            )
+            configs[f"PORT_{self.name}_WR_USED"] = VerilogPortConfig(
+                f"PORT_{self.name}_WR_USED",
+                IO.INPUT,
+                1,
+                is_parameter=True,
+                parameter_value="1",
+            )
         return configs

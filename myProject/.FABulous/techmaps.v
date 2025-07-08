@@ -1,6 +1,11 @@
-module $__cell_Mem_config_bits_1 #(
-    parameter INIT = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
-    parameter PORT_RW0_WIDTH = "32"
+module $__Mem #(
+    parameter INIT = "0",
+    parameter OPTION_cell_Mem_config_bits_1 = "0",
+    parameter PORT_RW0_ADDRESS_BITS = "16",
+    parameter PORT_RW0_DATA_WIDTH = "32",
+    parameter OPTION_cell_Mem_config_bits_0 = "1",
+    parameter PORT_RW0_ADDRESS_BITS = "16",
+    parameter PORT_RW0_DATA_WIDTH = "32"
 )
 (
     input wire[15:0] PORT_RW0_ADDR,
@@ -14,32 +19,13 @@ module $__cell_Mem_config_bits_1 #(
 
 Mem #(
     .INIT(INIT),
+    .OPTION_cell_Mem_config_bits_1(1'd0),
+    .PORT_RW0_ADDRESS_BITS(5'd16),
+    .PORT_RW0_DATA_WIDTH(6'd32),
+    .OPTION_cell_Mem_config_bits_0(1'd1),
+    .PORT_RW0_ADDRESS_BITS(5'd16),
+    .PORT_RW0_DATA_WIDTH(6'd32),
     .config_bits(1'd1)
-) _TECHMAP_REPLACE_ (
-    .addr0(PORT_RW0_ADDR),
-    .write_data(PORT_RW0_WR_DATA),
-    .write_en(PORT_RW0_WR_EN),
-    .read_data(PORT_RW0_RD_DATA)
-);
-
-endmodule
-
-module $__cell_Mem_config_bits_0 #(
-    parameter INIT = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
-    parameter PORT_RW0_WIDTH = "32"
-)
-(
-    input wire[15:0] PORT_RW0_ADDR,
-    input wire PORT_RW0_CLK,
-    output reg[31:0] PORT_RW0_RD_DATA,
-    input wire[31:0] PORT_RW0_WR_DATA,
-    input wire PORT_RW0_WR_EN,
-    input wire PORT_RW0_CLK_EN
-);
-
-Mem #(
-    .INIT(INIT),
-    .config_bits(1'd0)
 ) _TECHMAP_REPLACE_ (
     .addr0(PORT_RW0_ADDR),
     .write_data(PORT_RW0_WR_DATA),

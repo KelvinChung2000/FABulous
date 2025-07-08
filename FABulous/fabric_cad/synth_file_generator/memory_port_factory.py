@@ -1,5 +1,7 @@
 """Factory for creating memory ports with embedded configuration logic."""
 
+from dataclasses import dataclass, field
+
 from typing_extensions import Literal
 
 from FABulous.fabric_cad.synth_file_generator.memory_port import (
@@ -133,7 +135,7 @@ class MemoryPortFactory:
         cost = 1 if is_async_read else 0
 
         # Extract transparency between this read and write port
-        rdwr_value = self._extract_transparency(rd_idx, wr_idx, parameters)
+        rdwr_value = self._get_transparency(rd_idx, wr_idx, parameters)
 
         if is_async_read:
             port = ARSWPort(
@@ -153,6 +155,8 @@ class MemoryPortFactory:
                 byte_width=self._get_byte_width(parameters),
                 wrbe_separate=self._get_wrbe_separate(wr_idx, connections, parameters),
                 write_priority=self._get_write_priority(wr_idx, parameters),
+                optional=self._get_port_optional(rd_idx, wr_idx, parameters),
+                optional_rw=self._get_port_optional_rw(rd_idx, wr_idx, parameters),
             )
         else:
             port = SRSWPort(
@@ -177,6 +181,8 @@ class MemoryPortFactory:
                 wrbe_separate=self._get_wrbe_separate(wr_idx, connections, parameters),
                 write_priority=self._get_write_priority(wr_idx, parameters),
                 rdwr=rdwr_value,
+                optional=self._get_port_optional(rd_idx, wr_idx, parameters),
+                optional_rw=self._get_port_optional_rw(rd_idx, wr_idx, parameters),
             )
 
         # Create signal mapping
@@ -216,6 +222,9 @@ class MemoryPortFactory:
                 collision_write_ports=self._get_collision_write_ports(
                     rd_idx, parameters
                 ),
+                optional=self._get_port_optional_single(
+                    rd_idx, parameters, is_read=True
+                ),
             )
         else:
             port = SRPort(
@@ -232,6 +241,9 @@ class MemoryPortFactory:
                 wide_continuation=self._get_read_wide_continuation(rd_idx, parameters),
                 collision_write_ports=self._get_collision_write_ports(
                     rd_idx, parameters
+                ),
+                optional=self._get_port_optional_single(
+                    rd_idx, parameters, is_read=True
                 ),
             )
 
@@ -268,6 +280,7 @@ class MemoryPortFactory:
             wrbe_separate=self._get_wrbe_separate(wr_idx, connections, parameters),
             write_priority=self._get_write_priority(wr_idx, parameters),
             wide_continuation=self._get_write_wide_continuation(wr_idx, parameters),
+            optional=self._get_port_optional_single(wr_idx, parameters, is_read=False),
         )
 
         # Create signal mapping
@@ -277,10 +290,25 @@ class MemoryPortFactory:
 
         return port, signal_mapping, 0
 
-    def _extract_transparency(
+    def _get_transparency(
         self, rd_idx: int, wr_idx: int, parameters: dict[str, str]
     ) -> Literal["no_change", "undefined", "old", "new", "new_only"]:
-        """Extract read-write transparency setting for specific read/write port pair."""
+        """Extract read-write transparency setting for specific read/write port pair.
+
+        Uses RD_TRANSPARENCY_MASK parameter from Yosys $mem_v2 cell.
+
+        Behavior:
+        - Defines what happens when reading and writing the same address simultaneously
+        - "new": Read returns the newly written value (write-through behavior)
+        - "old": Read returns the value before the write (write-back behavior)
+        - "undefined": Behavior is unspecified (may return old, new, or undefined)
+        - "no_change": Read data doesn't change during write (rare)
+        - "new_only": Only new value is valid (write must complete first)
+
+        The mask is indexed as: mask[read_port * WR_PORTS + write_port]
+        A '1' bit enables transparency (read-during-write returns new value).
+        A '0' bit disables transparency (read-during-write returns old value).
+        """
         transparency_mask = parameters.get("RD_TRANSPARENCY_MASK", "")
         wr_ports = int(parameters.get("WR_PORTS", 0))
 
@@ -520,14 +548,22 @@ class MemoryPortFactory:
 
     # Individual extraction methods for direct parameter access
     def _get_read_enable(self, rd_idx: int, connections: dict[str, BitVector]) -> bool:
-        """Get read enable setting for a specific read port."""
+        """Get read enable setting for a specific read port.
+
+        Uses RD_EN connection from Yosys $mem_v2 cell.
+        """
         rd_en = connections.get("RD_EN", "")
         return rd_idx < len(rd_en) and rd_en[rd_idx] not in ["0", "1"]
 
     def _get_read_clock_edge(
         self, rd_idx: int, parameters: dict[str, str]
     ) -> Literal["posedge", "negedge", "anyedge"]:
-        """Get clock edge setting for a specific read port."""
+        """Get clock edge setting for a specific read port.
+
+        Uses RD_CLK_POLARITY parameter from Yosys $mem_v2 cell:
+        - '1': positive edge (posedge)
+        - '0': negative edge (negedge)
+        """
         rd_clk_polarity = parameters.get("RD_CLK_POLARITY", "")
         if rd_idx < len(rd_clk_polarity):
             polarity_bit = rd_clk_polarity[rd_idx]
@@ -538,21 +574,37 @@ class MemoryPortFactory:
         return "posedge"  # Default to posedge if not specified
 
     def _get_read_clock_enable(self, rd_idx: int, parameters: dict[str, str]) -> bool:
-        """Get clock enable setting for a specific read port."""
+        """Get clock enable setting for a specific read port.
+
+        Uses RD_CLK_ENABLE parameter from Yosys $mem_v2 cell.
+        """
         rd_clk_en = parameters.get("RD_CLK_ENABLE", "")
         return rd_idx < len(rd_clk_en) and rd_clk_en[rd_idx] == "1"
 
     def _get_read_wide_continuation(
         self, rd_idx: int, parameters: dict[str, str]
     ) -> bool:
-        """Get wide continuation setting for a specific read port."""
+        """Get wide continuation setting for a specific read port.
+
+        Uses RD_WIDE_CONTINUATION parameter from Yosys $mem_v2 cell.
+        """
         rd_wide_cont = parameters.get("RD_WIDE_CONTINUATION", "")
         return rd_idx < len(rd_wide_cont) and rd_wide_cont[rd_idx] == "1"
 
     def _get_read_init(
         self, rd_idx: int, parameters: dict[str, str], data_width: int
     ) -> Literal["none", "zero", "any", "no_undef"]:
-        """Get read init value for a specific read port."""
+        """Get read init value for a specific read port.
+
+        Uses RD_INIT_VALUE parameter from Yosys $mem_v2 cell.
+
+        Behavior:
+        - Determines the initial value of read data when the memory is first created
+        - "none": No specific initialization (undefined behavior)
+        - "zero": Initialize to all zeros
+        - "any": Any value is acceptable for initialization
+        - "no_undef": Initialize to any defined value (no 'x' or 'z' states)
+        """
         init_val = parameters.get("RD_INIT_VALUE", "")
         if init_val:
             value = self._get_mem_value_string(init_val, data_width, rd_idx)
@@ -565,7 +617,20 @@ class MemoryPortFactory:
     def _get_read_arst(
         self, rd_idx: int, parameters: dict[str, str], data_width: int
     ) -> Literal["none", "zero", "any", "no_undef", "init"]:
-        """Get read async reset value for a specific read port."""
+        """Get read async reset value for a specific read port.
+
+        Uses RD_ARST_VALUE parameter from Yosys $mem_v2 cell.
+
+        Behavior:
+        - Defines what value the read port outputs when asynchronous reset is asserted
+        - "none": No async reset capability
+        - "zero": Reset to all zeros
+        - "any": Any specific reset value is acceptable
+        - "no_undef": Reset to any defined value (no 'x' or 'z' states)
+        - "init": Reset to the same value as RD_INIT_VALUE
+
+        Note: Only applies to asynchronous read ports (ARPort, ARSWPort).
+        """
         arst_val = parameters.get("RD_ARST_VALUE", "")
         init_val = parameters.get("RD_INIT_VALUE", "")
         if arst_val:
@@ -579,7 +644,21 @@ class MemoryPortFactory:
     def _get_read_srst(
         self, rd_idx: int, parameters: dict[str, str], data_width: int
     ) -> Literal["none", "zero", "any", "no_undef", "init"]:
-        """Get read sync reset value for a specific read port."""
+        """Get read sync reset value for a specific read port.
+
+        Uses RD_SRST_VALUE parameter from Yosys $mem_v2 cell.
+
+        Behavior:
+        - Defines what value the read port outputs when synchronous reset is asserted
+        - "none": No sync reset capability
+        - "zero": Reset to all zeros on clock edge
+        - "any": Any specific reset value is acceptable
+        - "no_undef": Reset to any defined value (no 'x' or 'z' states)
+        - "init": Reset to the same value as RD_INIT_VALUE
+
+        Note: Only applies to synchronous read ports (SRPort, SRSWPort).
+        Sync reset occurs on the active clock edge when reset signal is asserted.
+        """
         srst_val = parameters.get("RD_SRST_VALUE", "")
         init_val = parameters.get("RD_INIT_VALUE", "")
         if srst_val:
@@ -591,14 +670,25 @@ class MemoryPortFactory:
         return "none"
 
     def _get_read_srst_gated(self, rd_idx: int, parameters: dict[str, str]) -> bool:
-        """Get read sync reset gated setting for a specific read port."""
+        """Get read sync reset gated setting for a specific read port.
+
+        Returns True if sync reset is gated by read enable (RD_CE_OVER_SRST = 1).
+        Note: This is equivalent to checking if _get_read_srst_priority() returns "gated_rden".
+        """
         ce_over_srst = parameters.get("RD_CE_OVER_SRST", "0")
         return rd_idx < len(ce_over_srst) and ce_over_srst[rd_idx] == "1"
 
     def _get_read_srst_priority(
         self, rd_idx: int, parameters: dict[str, str]
     ) -> Literal["ungated", "gated_clken", "gated_rden"]:
-        """Get read sync reset priority for a specific read port."""
+        """Get read sync reset priority for a specific read port.
+
+        Based on Yosys $mem_v2 cell RD_CE_OVER_SRST parameter:
+        - RD_CE_OVER_SRST = 0: Sync reset recognized regardless of read enable → "ungated"
+        - RD_CE_OVER_SRST = 1: Sync reset only recognized when read enable is true → "gated_rden"
+
+        Note: "gated_clken" case is not directly supported by current Yosys parameters.
+        """
         srst_val = parameters.get("RD_SRST_VALUE", "")
         if not srst_val:
             return "ungated"  # Default if no sync reset
@@ -606,15 +696,29 @@ class MemoryPortFactory:
         ce_over_srst = parameters.get("RD_CE_OVER_SRST", "0")
         if rd_idx < len(ce_over_srst):
             if ce_over_srst[rd_idx] == "1":
-                return "gated_clken"
+                # When RD_CE_OVER_SRST = 1, sync reset is gated by read enable
+                return "gated_rden"
             else:
+                # When RD_CE_OVER_SRST = 0, sync reset works regardless of enables
                 return "ungated"
         return "ungated"  # Default
 
     def _get_collision_write_ports(
         self, rd_idx: int, parameters: dict[str, str]
     ) -> list[int] | None:
-        """Get collision write ports for a specific read port."""
+        """Get collision write ports for a specific read port.
+
+        Uses RD_COLLISION_X_MASK parameter from Yosys $mem_v2 cell.
+
+        Behavior:
+        - Defines which write ports cause undefined (X) values when reading from the same address
+        - Returns list of write port indices that collide with this read port
+        - When a collision occurs, the read port outputs undefined values
+        - None means no collision detection (read-write operations work transparently)
+
+        The mask is indexed as: mask[read_port * WR_PORTS + write_port]
+        A '1' bit indicates that a collision between the read and write port produces undefined values.
+        """
         collision_mask = parameters.get("RD_COLLISION_X_MASK", "")
         wr_ports = int(parameters.get("WR_PORTS", 0))
 
@@ -632,7 +736,18 @@ class MemoryPortFactory:
     def _get_write_clock_edge(
         self, wr_idx: int, parameters: dict[str, str]
     ) -> Literal["posedge", "negedge", "anyedge"]:
-        """Get clock edge setting for a specific write port."""
+        """Get clock edge setting for a specific write port.
+
+        Uses WR_CLK_POLARITY parameter from Yosys $mem_v2 cell.
+
+        Behavior:
+        - Determines which clock edge triggers write operations
+        - '1': positive edge (posedge) - write occurs on rising clock edge
+        - '0': negative edge (negedge) - write occurs on falling clock edge
+        - Default: posedge if not specified
+
+        Note: Only applies to synchronous write ports (SWPort, ARSWPort, SRSWPort).
+        """
         wr_clk_polarity = parameters.get("WR_CLK_POLARITY", "")
         if wr_idx < len(wr_clk_polarity):
             polarity_bit = wr_clk_polarity[wr_idx]
@@ -643,12 +758,33 @@ class MemoryPortFactory:
         return "posedge"  # Default to posedge if not specified
 
     def _get_write_clock_enable(self, wr_idx: int, parameters: dict[str, str]) -> bool:
-        """Get clock enable setting for a specific write port."""
+        """Get clock enable setting for a specific write port.
+
+        Uses WR_CLK_ENABLE parameter from Yosys $mem_v2 cell.
+
+        Behavior:
+        - Determines if the write port has clock enable functionality
+        - True: Write port has clock enable input (write only occurs when enabled)
+        - False: Write port always operates on clock edge (no gating)
+
+        When enabled, write operations are gated by both the clock edge and enable signal.
+        """
         wr_clk_en = parameters.get("WR_CLK_ENABLE", "")
         return wr_idx < len(wr_clk_en) and wr_clk_en[wr_idx] == "1"
 
     def _get_write_enable(self, wr_idx: int, connections: dict[str, BitVector]) -> bool:
-        """Get write enable setting for a specific write port."""
+        """Get write enable setting for a specific write port.
+
+        Uses WR_EN connection from Yosys $mem_v2 cell.
+
+        Behavior:
+        - Determines if the write port has per-bit or global write enable signals
+        - True: Write port has write enable inputs (fine-grained write control)
+        - False: Write port always writes when triggered by clock
+
+        Write enable allows selective writing - when disabled, no memory update occurs
+        even if clock edge is triggered. Essential for conditional write operations.
+        """
         # Write enable is implicit if WR_EN signal exists for this port
         wr_en = connections.get("WR_EN", [])
         return len(wr_en) > wr_idx
@@ -656,19 +792,56 @@ class MemoryPortFactory:
     def _get_write_wide_continuation(
         self, wr_idx: int, parameters: dict[str, str]
     ) -> bool:
-        """Get wide continuation setting for a specific write port."""
+        """Get wide continuation setting for a specific write port.
+
+        Uses WR_WIDE_CONTINUATION parameter from Yosys $mem_v2 cell.
+
+        Behavior:
+        - Indicates if this write port is part of a wide port implementation
+        - True: This port is a continuation of a wider port (extra data bits)
+        - False: This port is a standalone write port
+
+        Wide continuation ports share control signals with the main port but handle
+        additional data bits for memories wider than the native cell width.
+        """
         wr_wide_cont = parameters.get("WR_WIDE_CONTINUATION", "")
         return wr_idx < len(wr_wide_cont) and wr_wide_cont[wr_idx] == "1"
 
     def _get_byte_width(self, parameters: dict[str, str]) -> int | None:
-        """Get byte width setting from parameters."""
+        """Get byte width setting from parameters.
+
+        Uses BYTE_WIDTH parameter from Yosys $mem_v2 cell.
+
+        Behavior:
+        - Defines the granularity of byte-level write enables
+        - Returns the number of data bits per byte enable signal
+        - None: No byte-level write enable capability
+        - Typical values: 8 (for 8-bit bytes), 9 (for 9-bit bytes with parity)
+
+        When set, enables byte-level write masking for partial word updates.
+        """
         byte_width = parameters.get("BYTE_WIDTH")
         return int(byte_width) if byte_width else None
 
     def _get_wrbe_separate(
         self, wr_idx: int, connections: dict[str, BitVector], parameters: dict[str, str]
     ) -> bool:
-        """Get separate write byte enable setting for a specific write port."""
+        """Get separate write byte enable setting for a specific write port.
+
+        Uses WR_BE connection and BYTE_WIDTH parameter from Yosys $mem_v2 cell.
+
+        Behavior:
+        - Determines if write port has separate byte enable signals
+        - True: Port has individual byte enable inputs for fine-grained writes
+        - False: Port uses word-level write enable only
+
+        Requirements for separate byte enables:
+        1. Memory must have WR_BE signals defined
+        2. Memory must have valid BYTE_WIDTH parameter
+        3. The specific write port must have byte enable connections
+
+        Enables partial word updates by controlling which bytes are written.
+        """
         # Only enable wrbe_separate if:
         # 1. Memory has byte-level write enables (WR_BE signals)
         # 2. Memory has a valid BYTE_WIDTH parameter
@@ -679,7 +852,22 @@ class MemoryPortFactory:
         return has_wr_be and has_byte_width and port_has_be
 
     def _get_write_priority(self, wr_idx: int, parameters: dict[str, str]) -> int:
-        """Get write priority for a specific write port."""
+        """Get write priority for a specific write port.
+
+        Uses WR_PRIORITY_MASK parameter from Yosys $mem_v2 cell.
+
+        Behavior:
+        - Determines this port's priority relative to other write ports
+        - Returns the number of other write ports this port has priority over
+        - Higher values indicate higher priority in conflict resolution
+        - 0: Lowest priority (or no conflicts defined)
+
+        The mask is indexed as: mask[this_port * WR_PORTS + other_port]
+        A '1' bit indicates this port has priority over the other port when both
+        write to the same address simultaneously.
+
+        Priority resolution ensures deterministic behavior in multi-port memories.
+        """
         wr_priority_mask = parameters.get("WR_PRIORITY_MASK", "")
         wr_ports = int(parameters.get("WR_PORTS", 0))
 
@@ -697,3 +885,130 @@ class MemoryPortFactory:
                     priority_count += 1
 
         return priority_count
+
+    def _get_port_optional(
+        self, rd_idx: int, wr_idx: int, parameters: dict[str, str]
+    ) -> bool:
+        """Determine if this port should be marked as optional.
+
+        Based on Yosys mem_v2 documentation, a port can be optional if:
+        - It's part of a multi-port memory where not all ports are always used
+        - The memory supports dynamic port configuration
+
+        For now, we'll mark compound ports (ARSW/SRSW) as potentially optional
+        since they can be used in different modes.
+        """
+        # For compound ports, they could be optional if there are multiple ports
+        # and the memory supports flexible port usage
+        rd_ports = int(parameters.get("RD_PORTS", 0))
+        wr_ports = int(parameters.get("WR_PORTS", 0))
+
+        # If there are multiple read or write ports, individual ports could be optional
+        return rd_ports > 1 or wr_ports > 1
+
+    def _get_port_optional_rw(
+        self, rd_idx: int, wr_idx: int, parameters: dict[str, str]
+    ) -> bool:
+        """Determine if this compound port supports optional_rw (flexible read/write
+        usage).
+
+        Based on Yosys mem_v2 documentation, optional_rw allows a compound port
+        to be used in read-only or write-only mode by disabling part of its functionality.
+
+        This is particularly useful for ARSW and SRSW ports that can operate as:
+        - Full read-write port (default)
+        - Read-only port (write functionality disabled)
+        - Write-only port (read functionality disabled)
+        """
+        # Always return True for compound ports as they inherently support
+        # being used in different modes (read-only, write-only, or full)
+        return True
+
+    def _get_port_optional_single(
+        self, port_idx: int, parameters: dict[str, str], is_read: bool
+    ) -> bool:
+        """Determine if a single-purpose port (read-only or write-only) should be
+        optional.
+
+        Based on Yosys mem_v2 documentation, a port can be optional if there are
+        multiple ports of the same type and not all need to be used simultaneously.
+        """
+        if is_read:
+            total_ports = int(parameters.get("RD_PORTS", 0))
+        else:
+            total_ports = int(parameters.get("WR_PORTS", 0))
+
+        # Mark as optional if there are multiple ports of this type
+        return total_ports > 1
+
+
+@dataclass
+class MemoryConfigurationOption:
+    """Represents an option block for unified memory mapping."""
+
+    name: str
+    value: int
+    init_value: str
+    cost: int
+    port_options: list[MemoryPort] = field(default_factory=list)
+    signal_mapping: dict[str, tuple] = field(default_factory=dict)
+    address_bits: int = 0  # Store per-config address bits
+    data_width: int = 0  # Store per-config data width
+
+    def get_ports_settings_str(self) -> str:
+        """Get string representation of port options for this configuration."""
+        return ", ".join(
+            f"{port.name}({port.address_bits}, {port.data_width})"
+            for port in self.port_options
+        )
+
+    def get_port_options_str(self) -> str:
+        """Generate port options string with portoptions for memory mapping file."""
+        if not self.port_options:
+            return ""
+
+        lines = []
+
+        # Group ports by name and port type (since multiple ports can have the same name with different option_names)
+        from collections import defaultdict
+
+        port_groups = defaultdict(list)
+
+        for port in self.port_options:
+            key = (port.name, port.port_type.value)
+            port_groups[key].append(port)
+
+        # Find shared configuration among all ports
+        shared_config = set(self.port_options[0].to_configs_list())
+        for port in self.port_options[1:]:
+            shared_config &= set(port.to_configs_list())
+
+        # Generate port blocks for each unique port name/type combination
+        for (port_name, port_type), ports in port_groups.items():
+            lines.append(f'port {port_type} "{port_name}" {{')
+
+            # Add shared configurations
+            for config in sorted(shared_config):
+                lines.append(f"    {config};")
+
+            # Add portoptions based on the different option names
+            if len(ports) > 1:
+                lines.append("")
+                # Create portoptions for each unique configuration
+                unique_configs = {}
+                for port in ports:
+                    option_name = port.option_name
+                    port_specific_configs = set(port.to_configs_list()) - shared_config
+                    unique_configs[option_name] = port_specific_configs
+
+                # Generate portoptions
+                for option_name, configs in unique_configs.items():
+                    lines.append(f'    portoption "{option_name}" {option_name} {{')
+                    for config in sorted(configs):
+                        lines.append(f"        {config};")
+                    lines.append("    }")
+
+            lines.append("}")
+            lines.append("")
+
+        return "\n".join(lines[:-1])  # Remove last empty line

@@ -44,7 +44,9 @@ def genSwitchMatrix(tile: Tile, subTile: str, tileType: TileType, context=1):
             if p.terminal and p.ioDirection == IO.OUTPUT:
                 for wtc in range(tile.getWireType(p).spanning):
                     for pName in p.expand():
-                        tileType.create_wire(f"c{c}.{pName}_{wtc}", "src", z=zIn, flags=c + 1)
+                        tileType.create_wire(
+                            f"c{c}.{pName}_{wtc}", "src", z=zIn, flags=c + 1
+                        )
             else:
                 for pName in p.expand():
                     tileType.create_wire(f"c{c}.{pName}", "src", z=zIn, flags=c + 1)
@@ -53,17 +55,25 @@ def genSwitchMatrix(tile: Tile, subTile: str, tileType: TileType, context=1):
             if p.terminal:
                 for wtc in range(tile.getWireType(p).spanning):
                     for pName in p.expand():
-                        tileType.create_wire(f"c{c}.{pName}_internal_{wtc}", "dst", z=zOut, flags=c + 1)
-                        tileType.create_wire(f"c{c}.{pName}_{wtc}", "dst", z=zOut, flags=c + 1)
+                        tileType.create_wire(
+                            f"c{c}.{pName}_internal_{wtc}", "dst", z=zOut, flags=c + 1
+                        )
+                        tileType.create_wire(
+                            f"c{c}.{pName}_{wtc}", "dst", z=zOut, flags=c + 1
+                        )
                         tileType.create_pip(
                             f"c{c}.{pName}_internal_{wtc}",
                             f"c{c}.{pName}_{wtc}",
                             timing_class="SWNEIGH",
                         )
-                        outputMapping[f"c{c}.{pName}_{wtc}"] = f"c{c}.{pName}_internal_{wtc}"
+                        outputMapping[f"c{c}.{pName}_{wtc}"] = (
+                            f"c{c}.{pName}_internal_{wtc}"
+                        )
             else:
                 for pName in p.expand():
-                    tileType.create_wire(f"c{c}.{pName}_internal", "dst", z=zOut, flags=c + 1)
+                    tileType.create_wire(
+                        f"c{c}.{pName}_internal", "dst", z=zOut, flags=c + 1
+                    )
                     tileType.create_wire(f"c{c}.{pName}", "dst", z=zOut, flags=c + 1)
                     tileType.create_pip(
                         f"c{c}.{pName}_internal",
@@ -81,7 +91,9 @@ def genSwitchMatrix(tile: Tile, subTile: str, tileType: TileType, context=1):
                     tileType.create_pip(
                         f"c{c}.{i}",
                         outTarget,
-                        flags=(NORMAL if "internal" not in outTarget else PSEUDO_PIP_START),
+                        flags=(
+                            NORMAL if "internal" not in outTarget else PSEUDO_PIP_START
+                        ),
                     )
     for c in range(context - 1):
         for i, p in enumerate(sorted(tile.getTileOutputPorts())):
@@ -103,7 +115,9 @@ def genSwitchMatrix(tile: Tile, subTile: str, tileType: TileType, context=1):
                 tileType.create_pip(
                     output,
                     f"{mux.output.name}_{c}_to_{c + 1}_NextCycle[{wc}]",
-                    flags=(PSEUDO_PIP_MID if "internal" not in output else PSEUDO_PIP_START),
+                    flags=(
+                        PSEUDO_PIP_MID if "internal" not in output else PSEUDO_PIP_START
+                    ),
                 )
                 tileType.create_pip(
                     f"{mux.output.name}_{c}_to_{c + 1}_NextCycle[{wc}]",
@@ -150,11 +164,15 @@ def genBel(t: Tile, tile: TileType, wireOnly: bool, context=1):
         for z, bel in enumerate(bels):
             for i in bel.externalInputs + bel.inputs:
                 for pName in i.expand():
-                    tile.create_wire(f"c{c}.{pName}", f"{bel.name}_{i.name}", flags=c + 1)
+                    tile.create_wire(
+                        f"c{c}.{pName}", f"{bel.name}_{i.name}", flags=c + 1
+                    )
 
             for i in bel.externalOutputs + bel.outputs:
                 for pName in i.expand():
-                    tile.create_wire(f"c{c}.{pName}", f"{bel.name}_{i.name}", flags=c + 1)
+                    tile.create_wire(
+                        f"c{c}.{pName}", f"{bel.name}_{i.name}", flags=c + 1
+                    )
 
             if wireOnly:
                 continue
@@ -215,7 +233,9 @@ def genBel(t: Tile, tile: TileType, wireOnly: bool, context=1):
                     )
 
             if bel.userCLK:
-                tile.create_wire(f"c{c}.{bel.prefix}{bel.name}_clk_i", "CLK", flags=c + 1)
+                tile.create_wire(
+                    f"c{c}.{bel.prefix}{bel.name}_clk_i", "CLK", flags=c + 1
+                )
                 tile.add_bel_pin(
                     belData,
                     bel.userCLK.name,
@@ -258,31 +278,30 @@ def genFabric(fabric: Fabric, chip: Chip, context=1):
 
     def clipY(value):
         return max(0, min(value, fabric.height - 1))
-    
+
     for (x, y), tileName in fabric.tileNames_iter():
         if tileName is None:
             continue
-        
+
         tile = fabric.getTileByName(tileName)
-        print(tileName)
-        shareDest:dict[TilePort | BelPort, list[WireType]] = defaultdict(list) 
+        shareDest: dict[TilePort | BelPort, list[WireType]] = defaultdict(list)
         for wireType in tile.wireTypes[tileName]:
             assert wireType.destinationPort.width == wireType.sourcePort.width
             shareDest[wireType.sourcePort].append(wireType)
-            
-        print(shareDest)
+
         for src, destList in shareDest.items():
             nodes = []
             for c in range(context):
                 for n in src.expand():
                     nodes.append(
-                        [NodeWire(
-                            clipX(x),
-                            clipY(y),
-                            f"c{c}.{n}",
-                        )]
+                        [
+                            NodeWire(
+                                clipX(x),
+                                clipY(y),
+                                f"c{c}.{n}",
+                            )
+                        ]
                     )
-                print(destList)
                 for dest in destList:
                     for i, n in enumerate(dest.destinationPort.expand()):
                         nodes[i].append(
@@ -293,9 +312,9 @@ def genFabric(fabric: Fabric, chip: Chip, context=1):
                             )
                         )
             for node in nodes:
-                print(node)
                 chip.add_node(node, "DEFAULT")
     setTiming(chip)
+
 
 def setTiming(chip: Chip):
     speed = "DEFAULT"
@@ -530,7 +549,9 @@ def generateChipDatabase(
 
     logger.info(f"Writing the chip database to {filePath / f'{fabric.name}.bba'}")
     ch.write_bba(str(filePath / f"{fabric.name}.bba"))
-    logger.info(f"Writing Constant String IDs to {filePath / f'{fabric.name}_constids.inc'}")
+    logger.info(
+        f"Writing Constant String IDs to {filePath / f'{fabric.name}_constids.inc'}"
+    )
 
     try:
         logger.info("Compiling the bba file to bit file")
@@ -548,7 +569,9 @@ def generateChipDatabase(
         logger.error("Failed to compile the bba file to bit file.")
         raise e
 
-    logger.info(f"Writing the constrain pair file to {filePath / fabric.name}_constrain_pair.inc")
+    logger.info(
+        f"Writing the constrain pair file to {filePath / fabric.name}_constrain_pair.inc"
+    )
     # generateConstrainPair(fabric, filePath / f"{fabric.name}_constrain_pair.inc")
 
     if dotDir != Path():

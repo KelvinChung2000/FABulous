@@ -3,25 +3,11 @@ ram distributed $__cell_Mem_config_bits_1 {
     width 32;
     cost 1;
     init any;
-    
     port srsw "RW0" {
         clock posedge;
         clken;
         rden;
         rdinit none;
-        rdarst none;
-        rdsrst none;
+        rdwr old;
     }
-    
-}
-ram distributed $__cell_Mem_config_bits_0 {
-    abits 16;
-    width 32;
-    cost 1;
-    init any;
-    
-    port arsw "RW0" {
-        clock posedge;
-    }
-    
 }

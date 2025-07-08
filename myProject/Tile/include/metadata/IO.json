@@ -8,7 +8,7 @@
         "hdlname": "IO",
         "dynports": 1,
         "top": 1,
-        "src": "/home/kelvin/FABulous_fork/myProject/Tile/W_IO/../include/IO.v:2.1-14.10"
+        "src": "myProject/Tile/W_IO/../include/IO.v:2.1-14.10"
       },
       "parameter_default_values": {
         "WIDTH": 32
@@ -40,7 +40,7 @@
           "attributes": {
             "DATA": 1,
             "FABulous": 1,
-            "src": "/home/kelvin/FABulous_fork/myProject/Tile/W_IO/../include/IO.v:5.44-5.55"
+            "src": "myProject/Tile/W_IO/../include/IO.v:5.44-5.55"
           }
         },
         "in": {
@@ -49,7 +49,7 @@
           "attributes": {
             "EXTERNAL": 1,
             "FABulous": 1,
-            "src": "/home/kelvin/FABulous_fork/myProject/Tile/W_IO/../include/IO.v:7.48-7.50"
+            "src": "myProject/Tile/W_IO/../include/IO.v:7.48-7.50"
           }
         },
         "out": {
@@ -58,7 +58,7 @@
           "attributes": {
             "EXTERNAL": 1,
             "FABulous": 1,
-            "src": "/home/kelvin/FABulous_fork/myProject/Tile/W_IO/../include/IO.v:8.49-8.52"
+            "src": "myProject/Tile/W_IO/../include/IO.v:8.49-8.52"
           }
         },
         "to_fabric": {
@@ -67,7 +67,7 @@
           "attributes": {
             "DATA": 1,
             "FABulous": 1,
-            "src": "/home/kelvin/FABulous_fork/myProject/Tile/W_IO/../include/IO.v:6.45-6.54"
+            "src": "myProject/Tile/W_IO/../include/IO.v:6.45-6.54"
           }
         }
       }

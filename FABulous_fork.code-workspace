@@ -116,9 +116,15 @@
         "cmake.ctestPath": "${workspaceFolder}/../nextpnr",
         "cmake.buildDirectory": "${workspaceFolder}/../nextpnr/build",
         "cSpell.words": [
+            "arst",
+            "arsw",
+            "ARSW",
             "chipdb",
+            "rdwr",
             "SHIFTX",
             "SRST",
+            "srsw",
+            "SRSW",
             "xnor",
             "XNOR"
         ],

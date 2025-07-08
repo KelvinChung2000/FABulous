@@ -1,5 +1,4 @@
 from pathlib import Path
-from time import sleep
 
 from hdlgen.code_gen import CodeGenerator
 from hdlgen.define import WriterType as CodeGenWriterType
@@ -8,19 +7,16 @@ from loguru import logger
 import FABulous.fabric_cad.model_generation_npnr as model_gen_npnr
 from FABulous.fabric_cad.bitstreamSpec_generator import generateBitsStreamSpec
 from FABulous.fabric_cad.chip_database_generator import generateChipDatabase
+from FABulous.fabric_cad.gen_synth_file import genCellsAndMaps, genSynthScript
 from FABulous.fabric_cad.helper import mergeFiles
-from FABulous.fabric_cad.synth_file_generator import (
-    genCellsAndMaps,
-    genPrims,
-    genSynthScript,
-)
+from FABulous.fabric_cad.synth_file_generator.gen_prims_file import genPrims
 
 # Importing Modules from FABulous Framework.
 from FABulous.fabric_definition.Bel import Bel
+from FABulous.fabric_definition.define import Loc
 from FABulous.fabric_definition.Fabric import Fabric
 from FABulous.fabric_definition.SuperTile import SuperTile
 from FABulous.fabric_definition.Tile import Tile
-from FABulous.fabric_definition.define import Loc
 from FABulous.fabric_generator.ConfigMem_genenrator import generateConfigMem
 from FABulous.fabric_generator.define import WriterType
 from FABulous.fabric_generator.fabric_generator import generateFabric

@@ -1,0 +1,21 @@
+name: Testing with pytest and cocotb
+
+on: [push, pull_request]
+
+
+jobs:
+  run_pytest:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+        with: 
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - uses: ./.github/actions/prepare_FABulous_container
+        with:
+          additional_system_packages: "iverilog"
+      - name: Run pytest
+        run: |
+          echo "Running pytest with PATH=$PATH"
+          pytest -v -x

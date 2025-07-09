@@ -23,11 +23,11 @@ runs:
   using: 'composite'
   steps:
     - name: Set up Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ inputs.python_version }}
     - name: Set up OSS CAD suite
-      uses: YosysHQ/setup-oss-cad-suite@v2
+      uses: YosysHQ/setup-oss-cad-suite@v3
     - name: Install GHDL mcode nightly
       # GHDL mcode is required to test our fabric.
       # The oss-cad-suite action installs GHDL, but with the LLVM backend, which is much slower for our simulation
@@ -60,3 +60,8 @@ runs:
       shell: bash
       run: |
         pip3 install -e .
+    - name: Set PATH
+      shell: bash
+      run: |
+        echo "/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin:$PATH" >> "$GITHUB_PATH"
+

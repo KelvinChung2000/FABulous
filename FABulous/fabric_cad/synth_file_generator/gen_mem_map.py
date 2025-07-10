@@ -82,7 +82,7 @@ class MemoryMapping:
                 init_value = "any"
 
             # Determine port types by creating actual ports
-            ports, mapping, cost = MemoryPortFactory().create_memory_ports(
+            ports, cost = MemoryPortFactory().create_memory_ports(
                 parameters, connections, address_bits, data_width
             )
 
@@ -95,7 +95,10 @@ class MemoryMapping:
                         f"Memory cell in {file_path} must have exactly one net with CONFIG_BIT attribute."
                     )
                 config_name = n[0]
-                value = int(module.netnames[config_name].attributes["CONFIG_BIT"], 2)
+                value = int(
+                    "".join([str(i) for i in module.netnames[config_name].bits]), 2
+                )
+                print(config_name, value)
             else:
                 config_name = file_path.stem
                 value = 0  # Default value if no CONFIG_BIT found
@@ -106,9 +109,15 @@ class MemoryMapping:
                 init_value=init_value,
                 cost=cost,
                 port_options=ports,
-                signal_mapping=mapping,
                 data_width=data_width,
+                yosys_json=yosys_json,
+                _parameters=parameters,
+                _connections=connections,
+                _address_bits=address_bits,
             )
+
+            # Generate signal mapping for this configuration
+            config_option.generate_signal_mapping()
             # Store per-config dimensions
 
             self.cell_config_options.append(config_option)
@@ -163,73 +172,37 @@ class MemoryMapping:
 
         lines.append(f"    init {self.init_value};")
         lines.append("")
-        for option in self.cell_config_options:
-            lines.append(f'    option "{option.name}" {option.value} {{')
-            lines.append(f"        cost {option.cost};")
+
+        if len(self.cell_config_options) == 1:
+            # Single option - skip the option wrapper
+            option = self.cell_config_options[0]
+            lines.append(f"    cost {option.cost};")
 
             # Add width-specific information if this config has different width
             if len(self.data_widths) > 1:
-                lines.append(f"        width {option.data_width};")
+                lines.append(f"    width {option.data_width};")
 
             lines.append("")
-            lines.append(textwrap.indent(option.get_port_options_str(), " " * 8))
-            lines.append("")
-            lines.append("    }")
+            lines.append(textwrap.indent(option.get_port_options_str(), " " * 4))
+        else:
+            # Multiple options - use option wrapper
+            for option in self.cell_config_options:
+                lines.append(f'    option "{option.name}" {option.value} {{')
+                lines.append(f"        cost {option.cost};")
+
+                # Add width-specific information if this config has different width
+                if len(self.data_widths) > 1:
+                    lines.append(f"        width {option.data_width};")
+
+                lines.append("")
+                lines.append(textwrap.indent(option.get_port_options_str(), " " * 8))
+                lines.append("")
+                lines.append("    }")
 
         lines.append("}")
 
         with open(path, "w") as f:
             f.write("\n".join(lines))
-
-    def _add_forbid_constraints(self, lines: list[str], port_options) -> None:
-        """Add forbid constraints for mutually exclusive port types."""
-        # Get compound port types that should be mutually exclusive
-        compound_ports = [po for po in port_options if po.port_type in ["srsw", "arsw"]]
-
-        if len(compound_ports) > 1:
-            # Create forbid constraint for compound port types
-            port_type_names = [f'"{po.port_type}"' for po in compound_ports]
-            forbid_line = f"        portoption {' '.join(port_type_names)} {{"
-            lines.append(forbid_line)
-            lines.append("            forbid;")
-            lines.append("        }")
-            lines.append("")
-
-    def _add_option_parameters(self, parameter_region) -> None:
-        """Add option-related parameters to the parameter region."""
-        for option in self.cell_config_options:
-            # Add RAM-level option parameter
-            parameter_region.Parameter(f"OPTION_{option.name}", str(option.value))
-
-            # Add config-level dimensions
-            parameter_region.Parameter(
-                f"OPTION_{option.name}_ADDRESS_BITS", str(option.address_bits)
-            )
-            parameter_region.Parameter(
-                f"OPTION_{option.name}_DATA_WIDTH", str(option.data_width)
-            )
-
-            # Add port-level parameters from memory ports
-            for port in option.port_options:
-                # Add basic port parameters
-                parameter_region.Parameter(
-                    f"PORT_{port.name}_ADDRESS_BITS", str(port.address_bits)
-                )
-                parameter_region.Parameter(
-                    f"PORT_{port.name}_DATA_WIDTH", str(port.data_width)
-                )
-
-    def _add_port_parameters(self, parameter_region) -> None:
-        """Add parameters from port configurations for techmap."""
-        # Add parameters from all port configurations
-        for option in self.cell_config_options:
-            for port in option.port_options:
-                port_configs = port.get_port_configurations()
-                for config_name, config in port_configs.items():
-                    if config.is_parameter:
-                        parameter_region.Parameter(
-                            config_name, config.parameter_value or "0"
-                        )
 
     def generate_verilog_mapping(self) -> None:
         """Generate sophisticated Verilog mapping with conditional configuration
@@ -245,11 +218,26 @@ class MemoryMapping:
         # Generate a main techmap module that uses conditional logic
         with cg.Module(self.module_name) as m:
             with m.ParameterRegion() as pr:
-                init = pr.Parameter("INIT", self.parameters.get("INIT", "0"))
+                pr.Parameter("INIT", self.parameters.get("INIT", "0"))
                 # Add option parameters
-                self._add_option_parameters(pr)
+                for option in self.cell_config_options:
+                    # Add RAM-level option parameter
+                    pr.Parameter(f"OPTION_{option.name}", str(option.value))
+
+                    # Add config-level dimensions
+                    pr.Parameter(
+                        f"OPTION_{option.name}_ADDRESS_BITS", str(self.address_bits)
+                    )
+                    pr.Parameter(
+                        f"OPTION_{option.name}_DATA_WIDTH", str(option.data_width)
+                    )
                 # Add port-based parameters for techmap
-                self._add_port_parameters(pr)
+                for option in self.cell_config_options:
+                    for port in option.port_options:
+                        port_configs = port.get_port_configurations()
+                        for config_name, config in port_configs.items():
+                            if config.is_parameter:
+                                pr.Parameter(config_name, config.parameter_value or "0")
 
             # Create all possible ports from all configurations
             portDict = {}
@@ -265,127 +253,88 @@ class MemoryMapping:
 
             with m.LogicRegion() as lr:
                 # Generate conditional configuration logic using wire assignments
-                self._generate_conditional_wire_mapping(lr, portDict)
 
-    def _generate_conditional_wire_mapping(self, lr, portDict: dict) -> None:
-        """Generate wire mapping logic using signal mapping from configurations."""
+                # Collect all parameters for internal cell matching (techmap module signature)
+                params = []
+                params.append(lr.ConnectPair("INIT", self.parameters.get("INIT", "0")))
 
-        # Collect all parameters for all configurations
-        params = []
-        params.append(lr.ConnectPair("INIT", self.parameters.get("INIT", "0")))
+                # Use a set to track unique parameters and avoid duplicates
+                unique_params = set()
+                unique_params.add("INIT")
 
-        # Add all option parameters
-        for option in self.cell_config_options:
-            params.append(lr.ConnectPair(f"OPTION_{option.name}", option.value))
-            params.append(
-                lr.ConnectPair(
-                    f"OPTION_{option.name}_ADDRESS_BITS", option.address_bits
-                )
-            )
-            params.append(
-                lr.ConnectPair(f"OPTION_{option.name}_DATA_WIDTH", option.data_width)
-            )
+                # Add parameters from each configuration for internal cell matching
+                for option in self.cell_config_options:
+                    for param_name, param_value in option.get_techmap_parameters(
+                        self.address_bits
+                    ):
+                        if param_name not in unique_params:
+                            params.append(lr.ConnectPair(param_name, param_value))
+                            unique_params.add(param_name)
 
-            for port in option.port_options:
-                params.append(
-                    lr.ConnectPair(f"PORT_{port.name}_ADDRESS_BITS", port.address_bits)
-                )
-                params.append(
-                    lr.ConnectPair(f"PORT_{port.name}_DATA_WIDTH", port.data_width)
-                )
+                # Add configuration bit parameters from each configuration for internal cell matching
+                for option in self.cell_config_options:
+                    for (
+                        config_name,
+                        default_value,
+                    ) in option.get_config_bit_parameters():
+                        if config_name not in unique_params:
+                            params.append(lr.ConnectPair(config_name, default_value))
+                            unique_params.add(config_name)
 
-                # Add port configuration parameters
-                port_configs = port.get_port_configurations()
-                for config_name, config in port_configs.items():
-                    if config.is_parameter:
-                        params.append(
-                            lr.ConnectPair(config_name, config.parameter_value or "0")
+                # Create port connections - handle multiple configurations
+                portConnect = []
+
+                # Generate connections for each configuration
+                if len(self.cell_config_options) == 1:
+                    # Single configuration - direct connection
+                    config = self.cell_config_options[0]
+                    connections = config.get_port_connections(portDict)
+                    for bel_port, port_obj in connections:
+                        portConnect.append(lr.ConnectPair(bel_port, port_obj))
+                else:
+                    # Multiple configurations - use conditional logic
+                    # For each unique port that appears in any configuration
+                    all_ports = set()
+                    for config in self.cell_config_options:
+                        all_ports.update(config.signal_mapping.keys())
+
+                    for port_name in all_ports:
+                        if port_name in portDict:
+                            # Find which configurations use this port
+                            config_connections = []
+                            for config in self.cell_config_options:
+                                if port_name in config.signal_mapping:
+                                    connections = config.get_port_connections(
+                                        {port_name: portDict[port_name]}
+                                    )
+                                    if connections:
+                                        config_connections.append(
+                                            (config, connections[0])
+                                        )
+
+                            # Use the first available connection for now
+                            # TODO: Implement proper conditional multiplexing based on configuration bits
+                            if config_connections:
+                                bel_port, port_obj = config_connections[0][1]
+                                portConnect.append(lr.ConnectPair(bel_port, port_obj))
+
+                # Create primitive parameters for hardware instantiation (only what primitive accepts)
+                primitive_params = []
+
+                # Add configuration bit values for primitive instantiation
+                for option in self.cell_config_options:
+                    for config_name, config_value in option.get_config_bit_values():
+                        primitive_params.append(
+                            lr.ConnectPair(config_name, config_value)
                         )
 
-        # Add configuration bits from the reference module
-        if self.module:
-            for idx, netname in self.module.netnames.items():
-                if (
-                    hasattr(netname, "attributes")
-                    and "CONFIG_BIT" in netname.attributes
-                ):
-                    v = int("".join([str(i) for i in netname.bits]), 2)
-                    params.append(lr.ConnectPair(idx, v))
-
-        # Create port connections - use signal mapping from configurations
-        portConnect = []
-
-        # For multiple configurations, we need conditional logic
-        # For now, use the first configuration's signal mapping
-        # TODO: Implement proper conditional logic for multiple configurations
-        if self.cell_config_options:
-            primary_config = self.cell_config_options[0]
-            for mapped_port, signal_bits in primary_config.signal_mapping.items():
-                if mapped_port in portDict:
-                    # Find corresponding BEL port by matching signal bits
-                    if self.module:
-                        for bel_port, port_detail in self.module.ports.items():
-                            if (
-                                bel_port in self.module.netnames
-                                and hasattr(
-                                    self.module.netnames[bel_port], "attributes"
-                                )
-                                and "USER_CLK"
-                                in self.module.netnames[bel_port].attributes
-                            ):
-                                continue
-
-                            # Check if signal bits match
-                            if self._signals_match(signal_bits, port_detail.bits):
-                                portConnect.append(
-                                    lr.ConnectPair(bel_port, portDict[mapped_port])
-                                )
-                                break
-
-        # Initialize the replacement module
-        lr.InitModule(f"{self.bel.name}", "_TECHMAP_REPLACE_", portConnect, params)
-
-    def _signals_match(self, signal_bits: tuple, port_bits: list) -> bool:
-        """Check if signal bits match port bits for proper mapping."""
-        # Convert both to sets for comparison
-        signal_set = set(signal_bits)
-        port_set = set(port_bits)
-
-        # Check if signal bits are a subset of port bits (allowing for partial matches)
-        return signal_set.issubset(port_set) or signal_set == port_set
-
-    def _port_name_matches(self, module_port: str, mapped_port: str) -> bool:
-        """Check if a module port name matches a mapped port name pattern."""
-        # Remove PORT_ prefix if present
-        mapped_port_clean = mapped_port.replace("PORT_", "")
-
-        # Check for direct match
-        if module_port == mapped_port_clean:
-            return True
-
-        # Check for common memory signal patterns
-        memory_mappings = {
-            "CLK": ["CLK", "CLOCK"],
-            "ADDR": ["ADDR", "ADDRESS"],
-            "DATA": ["DATA", "DATA_IN", "DATA_OUT"],
-            "WR_DATA": ["WR_DATA", "WRITE_DATA", "DIN"],
-            "RD_DATA": ["RD_DATA", "READ_DATA", "DOUT"],
-            "WR_EN": ["WR_EN", "WRITE_EN", "WEN"],
-            "RD_EN": ["RD_EN", "READ_EN", "REN"],
-            "CLK_EN": ["CLK_EN", "CLOCK_EN", "CE"],
-            "ARST": ["ARST", "ASYNC_RST", "RESET"],
-            "SRST": ["SRST", "SYNC_RST", "RST"],
-            "WR_BE": ["WR_BE", "WRITE_BE", "BE"],
-        }
-
-        # Check if the mapped port contains any of these patterns
-        for pattern, variations in memory_mappings.items():
-            if pattern in mapped_port_clean:
-                for variation in variations:
-                    if variation in module_port.upper():
-                        return True
-
-        return False
+                # Initialize the replacement module with primitive parameters
+                lr.InitModule(
+                    f"{self.bel.name}",
+                    "_TECHMAP_REPLACE_",
+                    portConnect,
+                    primitive_params,
+                )
 
 
 def genMemMap(bel: Bel, dest: Path) -> None:

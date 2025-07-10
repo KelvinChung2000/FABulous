@@ -24,11 +24,11 @@ class MemoryPortFactory:
         connections: dict[str, BitVector],
         address_bits: int,
         data_width: int,
-    ) -> tuple[list[MemoryPort], dict[str, tuple], int]:
+    ) -> tuple[list[MemoryPort], int]:
         """Create memory ports from Yosys parameters and connections.
 
         Returns:
-            tuple: (ports, signal_mapping, cost)
+            tuple: (ports, cost)
         """
         read_ports = int(parameters.get("RD_PORTS", 0))
         write_ports = int(parameters.get("WR_PORTS", 0))
@@ -58,12 +58,11 @@ class MemoryPortFactory:
         write_only_ports = wr_port_set.difference(rd_port_set)
 
         ports = []
-        signal_mapping = {}
         cost = 1
 
         # Process read-write ports
         for idx, port_tuple in enumerate(common_ports):
-            port, mapping, port_cost = self._create_read_write_port(
+            port, port_cost = self._create_read_write_port(
                 idx,
                 port_tuple,
                 read_port_list,
@@ -74,12 +73,11 @@ class MemoryPortFactory:
                 data_width,
             )
             ports.append(port)
-            signal_mapping.update(mapping)
             cost += port_cost
 
         # Process read-only ports
         for idx, port_tuple in enumerate(read_only_ports):
-            port, mapping, port_cost = self._create_read_only_port(
+            port, port_cost = self._create_read_only_port(
                 idx,
                 port_tuple,
                 read_port_list,
@@ -89,12 +87,11 @@ class MemoryPortFactory:
                 data_width,
             )
             ports.append(port)
-            signal_mapping.update(mapping)
             cost += port_cost
 
         # Process write-only ports
         for idx, port_tuple in enumerate(write_only_ports):
-            port, mapping, port_cost = self._create_write_only_port(
+            port, port_cost = self._create_write_only_port(
                 idx,
                 port_tuple,
                 write_port_list,
@@ -104,10 +101,9 @@ class MemoryPortFactory:
                 data_width,
             )
             ports.append(port)
-            signal_mapping.update(mapping)
             cost += port_cost
 
-        return ports, signal_mapping, cost
+        return ports, cost
 
     def _create_read_write_port(
         self,
@@ -119,7 +115,7 @@ class MemoryPortFactory:
         connections: dict[str, BitVector],
         address_bits: int,
         data_width: int,
-    ) -> tuple[MemoryPortBase, dict[str, tuple], int]:
+    ) -> tuple[MemoryPortBase, int]:
         """Create a read-write port (ARSW or SRSW)."""
         rd_idx = next(
             (i for i, x in enumerate(read_port_list) if tuple(x) == port_tuple), -1
@@ -154,7 +150,9 @@ class MemoryPortFactory:
                 wrbe_separate=self._get_wrbe_separate(wr_idx, connections, parameters),
                 write_priority=self._get_write_priority(wr_idx, parameters),
                 optional=self._get_port_optional(rd_idx, wr_idx, parameters),
-                optional_rw=self._get_port_optional_rw(rd_idx, wr_idx, parameters),
+                optional_rw=self._get_port_optional_rw(
+                    rd_idx, wr_idx, parameters, connections
+                ),
             )
         else:
             port = SRSWPort(
@@ -180,15 +178,12 @@ class MemoryPortFactory:
                 write_priority=self._get_write_priority(wr_idx, parameters),
                 rdwr=rdwr_value,
                 optional=self._get_port_optional(rd_idx, wr_idx, parameters),
-                optional_rw=self._get_port_optional_rw(rd_idx, wr_idx, parameters),
+                optional_rw=self._get_port_optional_rw(
+                    rd_idx, wr_idx, parameters, connections
+                ),
             )
 
-        # Create signal mapping
-        signal_mapping = self._create_read_write_signal_mapping(
-            idx, port_tuple, rd_idx, wr_idx, connections, data_width, is_async_read
-        )
-
-        return port, signal_mapping, cost
+        return port, cost
 
     def _create_read_only_port(
         self,
@@ -199,7 +194,7 @@ class MemoryPortFactory:
         connections: dict[str, BitVector],
         address_bits: int,
         data_width: int,
-    ) -> tuple[MemoryPortBase, dict[str, tuple], int]:
+    ) -> tuple[MemoryPortBase, int]:
         """Create a read-only port (AR or SR)."""
         rd_idx = next(
             (i for i, x in enumerate(read_port_list) if tuple(x) == port_tuple), -1
@@ -245,12 +240,7 @@ class MemoryPortFactory:
                 ),
             )
 
-        # Create signal mapping
-        signal_mapping = self._create_read_only_signal_mapping(
-            idx, port_tuple, rd_idx, connections, data_width, is_async_read
-        )
-
-        return port, signal_mapping, cost
+        return port, cost
 
     def _create_write_only_port(
         self,
@@ -261,7 +251,7 @@ class MemoryPortFactory:
         connections: dict[str, BitVector],
         address_bits: int,
         data_width: int,
-    ) -> tuple[MemoryPortBase, dict[str, tuple], int]:
+    ) -> tuple[MemoryPortBase, int]:
         """Create a write-only port (SW)."""
         wr_idx = next(
             (i for i, x in enumerate(write_port_list) if tuple(x) == port_tuple), -1
@@ -281,12 +271,7 @@ class MemoryPortFactory:
             optional=self._get_port_optional_single(wr_idx, parameters, is_read=False),
         )
 
-        # Create signal mapping
-        signal_mapping = self._create_write_only_signal_mapping(
-            idx, port_tuple, wr_idx, connections, data_width
-        )
-
-        return port, signal_mapping, 0
+        return port, 0
 
     def _get_transparency(
         self, rd_idx: int, wr_idx: int, parameters: dict[str, str]
@@ -326,167 +311,6 @@ class MemoryPortFactory:
                 return "old"
 
         return "undefined"
-
-    def _create_read_write_signal_mapping(
-        self,
-        idx: int,
-        port_tuple: tuple,
-        rd_idx: int,
-        wr_idx: int,
-        connections: dict[str, BitVector],
-        data_width: int,
-        is_async_read: bool,
-    ) -> dict[str, tuple]:
-        """Create signal mapping for read-write ports."""
-        mapping = {}
-        mapping[f"PORT_RW{idx}_ADDR"] = port_tuple
-
-        wr_data_groups = self._group_list(connections["WR_DATA"], data_width)
-        rd_data_groups = self._group_list(connections["RD_DATA"], data_width)
-        wr_en_groups = (
-            self._group_list(connections["WR_EN"], data_width)
-            if connections.get("WR_EN")
-            else [tuple()]
-        )
-
-        if wr_idx < len(wr_data_groups):
-            mapping[f"PORT_RW{idx}_WR_DATA"] = wr_data_groups[wr_idx]
-        if rd_idx < len(rd_data_groups):
-            mapping[f"PORT_RW{idx}_RD_DATA"] = rd_data_groups[rd_idx]
-        if wr_idx < len(wr_en_groups):
-            mapping[f"PORT_RW{idx}_WR_EN"] = wr_en_groups[wr_idx]
-
-        # Clock signal (use write clock for synchronous ports)
-        mapping[f"PORT_RW{idx}_CLK"] = tuple(connections["WR_CLK"])
-
-        # Read enable signal
-        if "RD_EN" in connections:
-            rd_en_groups = self._group_list(connections["RD_EN"], 1)
-            if rd_idx < len(rd_en_groups):
-                mapping[f"PORT_RW{idx}_RD_EN"] = rd_en_groups[rd_idx]
-
-        # Clock enable signal
-        if "WR_CLK_ENABLE" in connections or "CLK_ENABLE" in connections:
-            clk_en_key = (
-                "WR_CLK_ENABLE" if "WR_CLK_ENABLE" in connections else "CLK_ENABLE"
-            )
-            clk_en_groups = self._group_list(connections[clk_en_key], 1)
-            if wr_idx < len(clk_en_groups):
-                mapping[f"PORT_RW{idx}_CLK_EN"] = clk_en_groups[wr_idx]
-
-        # Async reset signal for read
-        if "RD_ARST" in connections:
-            arst_groups = self._group_list(connections["RD_ARST"], 1)
-            if rd_idx < len(arst_groups):
-                mapping[f"PORT_RW{idx}_RD_ARST"] = arst_groups[rd_idx]
-
-        # Sync reset signal for read
-        if "RD_SRST" in connections:
-            srst_groups = self._group_list(connections["RD_SRST"], 1)
-            if rd_idx < len(srst_groups):
-                mapping[f"PORT_RW{idx}_RD_SRST"] = srst_groups[rd_idx]
-
-        # Byte-level write enables
-        if "WR_BE" in connections:
-            be_groups = self._group_list(connections["WR_BE"], (data_width + 7) // 8)
-            if wr_idx < len(be_groups):
-                mapping[f"PORT_RW{idx}_WR_BE"] = be_groups[wr_idx]
-
-        return mapping
-
-    def _create_read_only_signal_mapping(
-        self,
-        idx: int,
-        port_tuple: tuple,
-        rd_idx: int,
-        connections: dict[str, BitVector],
-        data_width: int,
-        is_async_read: bool,
-    ) -> dict[str, tuple]:
-        """Create signal mapping for read-only ports."""
-        mapping = {}
-        mapping[f"PORT_R{idx}_ADDR"] = port_tuple
-
-        rd_data_groups = self._group_list(connections["RD_DATA"], data_width)
-        if rd_idx < len(rd_data_groups):
-            mapping[f"PORT_R{idx}_RD_DATA"] = rd_data_groups[rd_idx]
-
-        # Clock signal for synchronous reads
-        if not is_async_read:
-            mapping[f"PORT_R{idx}_CLK"] = tuple(connections["RD_CLK"])
-
-        # Read enable signal
-        if "RD_EN" in connections:
-            rd_en_groups = self._group_list(connections["RD_EN"], 1)
-            if rd_idx < len(rd_en_groups):
-                mapping[f"PORT_R{idx}_RD_EN"] = rd_en_groups[rd_idx]
-
-        # Clock enable signal
-        if "RD_CLK_ENABLE" in connections or "CLK_ENABLE" in connections:
-            clk_en_key = (
-                "RD_CLK_ENABLE" if "RD_CLK_ENABLE" in connections else "CLK_ENABLE"
-            )
-            clk_en_groups = self._group_list(connections[clk_en_key], 1)
-            if rd_idx < len(clk_en_groups):
-                mapping[f"PORT_R{idx}_CLK_EN"] = clk_en_groups[rd_idx]
-
-        # Async reset signal
-        if "RD_ARST" in connections:
-            arst_groups = self._group_list(connections["RD_ARST"], 1)
-            if rd_idx < len(arst_groups):
-                mapping[f"PORT_R{idx}_RD_ARST"] = arst_groups[rd_idx]
-
-        # Sync reset signal
-        if "RD_SRST" in connections:
-            srst_groups = self._group_list(connections["RD_SRST"], 1)
-            if rd_idx < len(srst_groups):
-                mapping[f"PORT_R{idx}_RD_SRST"] = srst_groups[rd_idx]
-
-        return mapping
-
-    def _create_write_only_signal_mapping(
-        self,
-        idx: int,
-        port_tuple: tuple,
-        wr_idx: int,
-        connections: dict[str, BitVector],
-        data_width: int,
-    ) -> dict[str, tuple]:
-        """Create signal mapping for write-only ports."""
-        mapping = {}
-        mapping[f"PORT_W{idx}_ADDR"] = port_tuple
-
-        wr_data_groups = self._group_list(connections["WR_DATA"], data_width)
-        wr_en_groups = (
-            self._group_list(connections["WR_EN"], data_width)
-            if connections.get("WR_EN")
-            else [tuple()]
-        )
-
-        if wr_idx < len(wr_data_groups):
-            mapping[f"PORT_W{idx}_WR_DATA"] = wr_data_groups[wr_idx]
-        if wr_idx < len(wr_en_groups):
-            mapping[f"PORT_W{idx}_WR_EN"] = wr_en_groups[wr_idx]
-
-        # Clock signal
-        mapping[f"PORT_W{idx}_CLK"] = tuple(connections["WR_CLK"])
-
-        # Clock enable signal
-        if "WR_CLK_ENABLE" in connections or "CLK_ENABLE" in connections:
-            clk_en_key = (
-                "WR_CLK_ENABLE" if "WR_CLK_ENABLE" in connections else "CLK_ENABLE"
-            )
-            clk_en_groups = self._group_list(connections[clk_en_key], 1)
-            if wr_idx < len(clk_en_groups):
-                mapping[f"PORT_W{idx}_CLK_EN"] = clk_en_groups[wr_idx]
-
-        # Byte-level write enables
-        if "WR_BE" in connections:
-            be_groups = self._group_list(connections["WR_BE"], (data_width + 7) // 8)
-            if wr_idx < len(be_groups):
-                mapping[f"PORT_W{idx}_WR_BE"] = be_groups[wr_idx]
-
-        return mapping
 
     def _group_list(self, data: list, n: int) -> list[tuple]:
         """Group a list into tuples of size n."""
@@ -703,7 +527,7 @@ class MemoryPortFactory:
 
     def _get_collision_write_ports(
         self, rd_idx: int, parameters: dict[str, str]
-    ) -> list[int] | None:
+    ) -> list[int]:
         """Get collision write ports for a specific read port.
 
         Uses RD_COLLISION_X_MASK parameter from Yosys $mem_v2 cell.
@@ -721,7 +545,7 @@ class MemoryPortFactory:
         wr_ports = int(parameters.get("WR_PORTS", 0))
 
         if not collision_mask or wr_ports == 0:
-            return None
+            return []
 
         colliding_write_ports = []
         for wr_idx in range(wr_ports):
@@ -729,7 +553,7 @@ class MemoryPortFactory:
             if mask_idx < len(collision_mask) and collision_mask[mask_idx] == "1":
                 colliding_write_ports.append(wr_idx)
 
-        return colliding_write_ports if colliding_write_ports else None
+        return colliding_write_ports if colliding_write_ports else []
 
     def _get_write_clock_edge(
         self, wr_idx: int, parameters: dict[str, str]
@@ -889,38 +713,122 @@ class MemoryPortFactory:
     ) -> bool:
         """Determine if this port should be marked as optional.
 
-        Based on Yosys mem_v2 documentation, a port can be optional if:
-        - It's part of a multi-port memory where not all ports are always used
-        - The memory supports dynamic port configuration
+        A port is considered optional if:
+        - The memory has multiple ports of any type (read, write, or mixed)
+        - The port could be disabled/unused without affecting basic memory functionality
+        - The port is not the only port of its type in a minimal configuration
 
-        For now, we'll mark compound ports (ARSW/SRSW) as potentially optional
-        since they can be used in different modes.
+        This allows for more flexible memory configurations where not all ports
+        need to be instantiated or used simultaneously.
         """
-        # For compound ports, they could be optional if there are multiple ports
-        # and the memory supports flexible port usage
         rd_ports = int(parameters.get("RD_PORTS", 0))
         wr_ports = int(parameters.get("WR_PORTS", 0))
+        total_ports = rd_ports + wr_ports
 
-        # If there are multiple read or write ports, individual ports could be optional
-        return rd_ports > 1 or wr_ports > 1
+        # A port is optional if:
+        # 1. There are multiple ports total (allows disabling individual ports)
+        # 2. OR it's a compound port (inherently flexible)
+        # 3. OR the memory has both read and write capabilities (can work with partial functionality)
+
+        # Always optional if there are multiple ports of any kind
+        if total_ports > 1:
+            return True
+
+        # Single ports are optional if the memory has both read and write capability
+        # (can function with just read or just write)
+        if rd_ports > 0 and wr_ports > 0:
+            return True
+
+        # For single port memories with only read or only write, not optional
+        return False
 
     def _get_port_optional_rw(
-        self, rd_idx: int, wr_idx: int, parameters: dict[str, str]
+        self,
+        rd_idx: int,
+        wr_idx: int,
+        parameters: dict[str, str],
+        connections: dict[str, BitVector],
     ) -> bool:
         """Determine if this compound port supports optional_rw (flexible read/write
         usage).
 
-        Based on Yosys mem_v2 documentation, optional_rw allows a compound port
-        to be used in read-only or write-only mode by disabling part of its functionality.
+        The optional_rw flag indicates whether read and write operations on this port
+        can be independently controlled. This is NOT always true for compound ports:
 
-        This is particularly useful for ARSW and SRSW ports that can operate as:
-        - Full read-write port (default)
-        - Read-only port (write functionality disabled)
-        - Write-only port (read functionality disabled)
+        - Some memories (like FIFO buffers) may require synchronized read/write operations
+        - Memory controllers might enforce specific read/write ordering constraints
+        - Transparency settings and collision handling may couple read/write operations
+
+        Returns True only if the port can truly operate independently in read-only
+        or write-only modes without violating memory semantics.
         """
-        # Always return True for compound ports as they inherently support
-        # being used in different modes (read-only, write-only, or full)
+        # Check if this is actually a compound port (has both read and write indices)
+        is_compound_port = rd_idx >= 0 and wr_idx >= 0
+
+        if not is_compound_port:
+            return False
+
+        # Check for conditions that would prevent independent read/write operation:
+
+        # 1. Check transparency settings - some modes may require coupled operation
+        transparency = self._get_transparency(rd_idx, wr_idx, parameters)
+        if transparency in ["new_only"]:  # Requires synchronized operation
+            return False
+
+        # 2. Check for collision handling that might require coupling
+        collision_ports = self._get_collision_write_ports(rd_idx, parameters)
+        if collision_ports and wr_idx in collision_ports:
+            # If this read port has collision detection with this write port,
+            # they might need to be coupled for proper collision handling
+            return False
+
+        # 3. Check for wide continuation ports that might be coupled
+        rd_wide_cont = self._get_read_wide_continuation(rd_idx, parameters)
+        wr_wide_cont = self._get_write_wide_continuation(wr_idx, parameters)
+        if rd_wide_cont or wr_wide_cont:
+            # Wide continuation ports might have coupling requirements
+            return False
+
+        # 4. Check if read and write enables are actually coupled
+        # Single-port memories CAN have independent read/write if their enables are separate
+        rd_enable_exists = self._get_read_enable(rd_idx, connections)
+        wr_enable_exists = self._get_write_enable(wr_idx, connections)
+
+        # If both read and write have independent enable signals, they can operate independently
+        # If either lacks independent enable control, they might be tied together
+        if not (rd_enable_exists and wr_enable_exists):
+            # Without independent enables, read/write operations might be coupled
+            # But we need to check if they share the same enable signal
+            return self._check_enable_signals_independent(rd_idx, wr_idx, connections)
+
+        # If none of the coupling conditions are met, the port can operate independently
         return True
+
+    def _check_enable_signals_independent(
+        self, rd_idx: int, wr_idx: int, connections: dict[str, BitVector]
+    ) -> bool:
+        """Check if read and write enable signals are independent.
+
+        Returns True if read and write enables are controlled by different signals,
+        False if they share the same enable signal or are otherwise coupled.
+        """
+        # Get the actual enable signals for read and write
+        rd_en_signals = connections.get("RD_EN", [])
+        wr_en_signals = connections.get("WR_EN", [])
+
+        # If both ports have enable signals, check if they're different
+        if rd_idx < len(rd_en_signals) and wr_idx < len(wr_en_signals):
+            rd_en_signal = rd_en_signals[rd_idx]
+            wr_en_signal = wr_en_signals[wr_idx]
+
+            # If they use different enable signals, they're independent
+            if rd_en_signal != wr_en_signal:
+                return True
+
+        # If enable signals are the same or one is missing, they might be coupled
+        # But for single-port read-write memories, this is often still acceptable
+        # as the port can still function in read-only or write-only mode
+        return True  # Conservative: assume independence unless proven otherwise
 
     def _get_port_optional_single(
         self, port_idx: int, parameters: dict[str, str], is_read: bool

@@ -1,0 +1,25 @@
+# Memory map file for testing - similar to your FABulous configuration
+ram distributed $__Mem {
+    abits 16;
+    width 32;
+    init none;
+    cost 1;
+
+    port srsw "RW0" {
+        clken;
+        clock posedge;
+        optional_rw;
+        rdinit none;
+        rdsrst none;
+    }
+    #port sr "r0" {
+    #    clken;
+    #    clock posedge;
+    #    rdinit none;
+    #    rdsrst none;
+    #}
+    #port sw "w0" {
+    #    clken;
+    #    clock posedge;
+    #}
+}

@@ -27,8 +27,8 @@ module Mem #(
   always_ff @(posedge clk) begin
     if (write_en)
       mem[addr0[IDX_SIZE-1:0]] <= write_data;
-    else
-      read_data_sync <= mem[addr0[IDX_SIZE-1:0]];
+
+    read_data_sync <= mem[addr0[IDX_SIZE-1:0]];
   end
 
   assign read_data = config_bits ? read_data_sync : read_data_comb;

@@ -1,0 +1,71 @@
+# Yosys synthesis script to reproduce the memory_libmap flaw
+# This script demonstrates the issue where memories with all-zero WR_EN cannot be mapped
+
+# Read the Verilog file
+read_verilog -sv <<EOF
+module Mem #(
+    parameter WIDTH = 32,
+    parameter SIZE = 16,
+    parameter IDX_SIZE = 16
+) (
+    input wire [WIDTH-1:0] addr0,
+    input wire [WIDTH-1:0] write_data,
+    input wire write_en,
+    
+    input wire clk,
+    
+    output reg [WIDTH-1:0] read_data,
+
+);
+  logic [WIDTH-1:0] mem[SIZE-1:0];
+
+  always_ff @(posedge clk) begin
+    if (write_en)
+      mem[addr0[IDX_SIZE-1:0]] <= write_data;
+
+    read_data <= mem[addr0[IDX_SIZE-1:0]];
+  end
+
+endmodule
+
+module test (
+    input wire clk,
+    input wire [15:0] addr,
+    output wire [31:0] data_out,
+    input wire [31:0] data_in
+);
+Mem mem (
+    .clk(clk),
+    .write_en(1'b0),
+    .write_data(data_in),
+    .read_data(data_out),
+    .addr0(addr)
+);
+endmodule
+
+EOF
+
+hierarchy -auto-top
+flatten
+proc
+
+opt_mem_priority
+opt_mem_feedback
+memory_bmux2rom
+memory_dff
+opt_clean
+memory_share
+opt_mem_widen
+opt_clean
+memory_collect
+
+# Show the memory cells before libmap
+select -assert-any t:$mem*
+
+# Try to map using memory_libmap
+memory_libmap -lib memory_map.txt
+
+stat
+
+# Show what happened after libmap
+select -assert-any t:$__Mem*

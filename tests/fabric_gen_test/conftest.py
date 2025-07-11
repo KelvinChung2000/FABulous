@@ -296,10 +296,10 @@ def cocotb_runner(tmp_path: Path):
             hdl_top_level = hdl_top_level.lower()
             runner.build(vhdl_sources=sources, hdl_toplevel=hdl_top_level, always=True, build_dir=build_dir)
 
-            # Copy the elaborated binary to the test directory
-            binary_file = build_dir / hdl_top_level
-            if binary_file.exists():
-                shutil.copy(binary_file, test_dir / binary_file.name)
+            # Copy all files from build_dir to test_dir
+            for file in build_dir.iterdir():
+                if file.is_file():
+                    shutil.copy(file, test_dir / file.name)
 
         runner.test(
             hdl_toplevel=hdl_top_level,
@@ -309,3 +309,4 @@ def cocotb_runner(tmp_path: Path):
         )
 
     return _create_runner
+

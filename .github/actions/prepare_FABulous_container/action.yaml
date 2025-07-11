@@ -3,41 +3,72 @@ description: Composite action to prepare a container with everything needed to r
 
 inputs:
   python_version:
-    description: 'Python version to use'
+    description: "Python version to use"
     required: false
-    default: '3.12'
+    default: "3.12"
   additional_system_packages:
-    description: 'Additional ubunut packages to install'
+    description: "Additional ubuntu packages to install"
     required: false
-    default: ''
+    default: ""
   additional_python_packages:
-    description: 'Additional python packages to install'
+    description: "Additional python packages to install"
     required: false
-    default: ''
-  install_GHDL_mcode:
-    description: 'Install GHDL with mcode backend'
+    default: ""
+  github_token:
+    description: "GitHub token for API access"
     required: false
-    default: false
+    default: ""
 
 runs:
-  using: 'composite'
+  using: "composite"
   steps:
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
         python-version: ${{ inputs.python_version }}
+        cache: "pip"
+        cache-dependency-path: |
+          requirements.txt
+          pyproject.toml
+    - name: Get OSS CAD Suite version
+      id: oss-cad-version
+      shell: bash
+      run: |
+        # Get the latest release info from YosysHQ/oss-cad-suite-build
+        if [ -n "${{ inputs.github_token }}" ]; then
+          VERSION=$(curl -s -H "Authorization: token ${{ inputs.github_token }}" \
+            "https://api.github.com/repos/YosysHQ/oss-cad-suite-build/releases/latest" | \
+            jq -r '.tag_name // "unknown"')
+        else
+          VERSION=$(curl -s "https://api.github.com/repos/YosysHQ/oss-cad-suite-build/releases/latest" | \
+            jq -r '.tag_name // "unknown"')
+        fi
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
+    - name: Cache OSS CAD Suite
+      id: cache-oss-cad
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.local/share/oss-cad-suite
+          ~/bin
+        key: oss-cad-suite-${{ runner.os }}-${{ steps.oss-cad-version.outputs.version }}
+        restore-keys: |
+          oss-cad-suite-${{ runner.os }}-${{ steps.oss-cad-version.outputs.version }}-
+          oss-cad-suite-${{ runner.os }}-
     - name: Set up OSS CAD suite
+      if: steps.cache-oss-cad.outputs.cache-hit != 'true'
       uses: YosysHQ/setup-oss-cad-suite@v3
+      with:
+        github-token: ${{ inputs.github_token }}
     - name: Install GHDL mcode nightly
       # GHDL mcode is required to test our fabric.
       # The oss-cad-suite action installs GHDL, but with the LLVM backend, which is much slower for our simulation
-      if: ${{ inputs.install_GHDL_mcode == true }}
       uses: ghdl/setup-ghdl@v1
       with:
         version: nightly
         backend: mcode
         investigate: true
-    - name: Install additional ubunutu packages
+    - name: Install additional ubuntu packages
       if: ${{ inputs.additional_system_packages != '' }}
       shell: bash
       run: |
@@ -63,5 +94,5 @@ runs:
     - name: Set PATH
       shell: bash
       run: |
-        echo "/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin:$PATH" >> "$GITHUB_PATH"
+        echo "/home/runner/work/FABulous/FABulous/install/bin:/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin:$PATH" >> "$GITHUB_PATH"
 

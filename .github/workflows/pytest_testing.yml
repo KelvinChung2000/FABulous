@@ -2,20 +2,150 @@ name: Testing with pytest and cocotb
 
 on: [push, pull_request]
 
+# copy and modified based on https://github.com/jerry-git/pytest-split/issues/20#issuecomment-2576031836
 
 jobs:
-  run_pytest:
+  restore_test_durations:
+    name: Restore test durations
+    runs-on: ubuntu-latest
+    steps:
+      # It's mandatory to use the exact same path when saving/restoring cache, otherwise it won't work
+      - name: Restore test durations
+        id: restore-test-durations
+        uses: actions/cache/restore@v4
+        with:
+          path: /tmp/.test_durations_cached
+          key: tests-durations-${{ github.sha }}
+          restore-keys: |
+            tests-durations-${{ github.sha }}
+            tests-durations-
+          fail-on-cache-miss: false
+          
+      # Then we upload the restored test durations as an artifact. This way, each matrix job will download
+      # it when it starts. When a matrix job will be manually retried, it will also reuse the artifact (to
+      # retry the exact same tests, even if the cache has been updated in the meantime).
+      - name: Upload test durations
+        if: steps.restore-test-durations.outputs.cache-hit != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-durations-before
+          path: /tmp/.test_durations_cached
+          include-hidden-files: true
+    outputs:
+      # This output will be used to know if we had a cache hit (exact match or not), or no cache hit at all.
+      # > cache-hit - A string value to indicate an exact match was found for the key.
+      # > If there's a cache hit, this will be 'true' or 'false' to indicate if there's an exact match for key.
+      # > If there's a cache miss, this will be an empty string.
+      restored: ${{ steps.restore-test-durations.outputs.cache-hit == '' && 'false' || 'true' }}
+
+  pytest_testing:
+    needs: restore_test_durations
     runs-on: ubuntu-latest
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    strategy:
+      fail-fast: false
+      matrix:
+        job-index: [ 1, 2, 3, 4, 5, 6, 7, 8 ]
     steps:
+      # These two steps will be executed only when there IS a cache hit (exact match or not). 
+      # When a matrix job is retried, it will reuse the same artifact, to execute the exact same split.
       - uses: actions/checkout@v4
         with: 
           token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Download test durations
+        if: needs.restore_test_durations.outputs.restored == 'true'
+        uses: actions/download-artifact@v4
+        with:
+          name: test-durations-before
+      - name: Use cached test durations
+        if: needs.restore_test_durations.outputs.restored == 'true'
+        run: mv .test_durations_cached .test_durations
+        
+      # This step will be executed only when there is NO cache hit.
+      # You need to commit file `.test_durations_fallback`.
+      # You can also refresh it manually from time to time to keep an up-to-date fallback
+      # (see step "Upload final test durations" below).
+      - name: Use fallback test durations
+        if: needs.restore_test_durations.outputs.restored == 'false' 
+        run: |
+          if [ -f .test_durations_fallback ]; then
+            mv .test_durations_fallback .test_durations
+          else
+            echo ".test_durations_fallback does not exist! Run with default even splits."
+          fi
+
       - uses: ./.github/actions/prepare_FABulous_container
         with:
           additional_system_packages: "iverilog"
+          github_token: ${{ secrets.GITHUB_TOKEN }}[]
+
+      # When running pytest, we write the new test durations using options
+      # `--store-durations --clean-durations`.
+      # Option `--clean-durations` is undocumented
+      # Removes the test duration info for tests which are not present 
+      # while running the suite with '--store-durations'.
       - name: Run pytest
         run: |
-          echo "Running pytest with PATH=$PATH"
-          pytest -v -x
+          echo "Running at PATH=$PATH"
+          which ghdl
+          which iverilog
+          pytest \
+            --splits ${{ strategy.job-total }} --group ${{ matrix.job-index }} \
+            --store-durations --clean-durations -v -x || {
+            exit_code=$?
+            if [ $exit_code -eq 5 ]; then
+              echo "No tests were collected (exit code 5). This is expected for some groups."
+              exit 0
+            else
+              echo "pytest failed with exit code $exit_code"
+              exit $exit_code
+            fi
+          }
+
+      # Each matrix job uploads its freshly updated partial test durations. We regroup them all
+      # within one final file in the "Merge all partial test durations" step below.
+      - name: Upload test durations
+        if: github.run_attempt == 1
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-durations-after-partial-${{ matrix.job-index }}
+          path: .test_durations
+          if-no-files-found: error
+          include-hidden-files: true
+
+  cache_test_durations:
+    name: Cache test durations
+    needs: pytest_testing
+    if: github.run_attempt == 1 && (success() || failure())
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download all partial test durations
+        uses: actions/download-artifact@v4
+        with:
+          pattern: test-durations-after-partial-*
+          
+      # This step regroups the 8 partial files and sorts keys alphabetically:
+      - name: Merge all partial test durations
+        run: |
+          jq -s 'add' test-durations-after-partial-*/.test_durations \
+          | jq 'to_entries | sort_by(.key) | from_entries' \
+          > /tmp/.test_durations_cached
+
+      # This step uploads the final file as an artifact. You can then download it from the Github GUI,
+      # and use it to manually commit file `.test_durations_fallback` from time to time,
+      # to keep an up-to-date fallback:
+      - name: Upload final test durations
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-durations-after
+          path: /tmp/.test_durations_cached
+          if-no-files-found: error
+          include-hidden-files: true
+
+      # Finally, we cache the new test durations. This file will be restored in next CI execution
+      - name: Cache final test durations
+        uses: actions/cache/save@v4
+        with:
+          path: /tmp/.test_durations_cached
+          key: tests-durations-${{ github.sha }}

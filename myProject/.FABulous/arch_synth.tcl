@@ -15,8 +15,9 @@ if {[info exists env(TOP_MODULE)] && $env(TOP_MODULE) ne ""} {
     yosys hierarchy -auto-top
 }
 
-yosys proc
 yosys flatten -noscopeinfo
+yosys proc
+# yosys setattr -set keep 1 t:\$mem*
 yosys opt_expr
 yosys opt_clean
 yosys check
@@ -40,20 +41,13 @@ yosys opt -full
 yosys clean -purge
 
 # memory opt
-yosys opt_mem_priority
-yosys opt_mem_feedback
-yosys memory_bmux2rom
-yosys memory_dff
-yosys opt_clean
-yosys memory_share
-yosys opt_mem_widen
-yosys opt_clean
-yosys memory_collect
-
-yosys opt -full
+yosys debug memory -nomap -external-init
 yosys memory_libmap -lib $project_root/.FABulous/memory_map.txt
-# yosys techmap -map $project_root/.FABulous/techmaps.v
+yosys techmap -map $project_root/.FABulous/techmaps.v
 yosys clean -purge
+# yosys setattr -unset keep_hierarchy -mod
+# yosys flatten -noscopeinfo
+# yosys opt -full
 
 proc extract {cell wrapperPath} {
 # wrapping for mapping
@@ -186,12 +180,12 @@ yosys clean -purge
 
 
 # cell techmapping
-# yosys techmap -map $project_root/.FABulous/techmaps.v
+yosys techmap -map $project_root/.FABulous/techmaps.v
 
 # const unit mapping
-# yosys constmap -cell \$__const O VALUE
-# yosys techmap -map $project_root/.FABulous/const_map.v
-# yosys opt -full
+yosys constmap -cell \$__const O VALUE
+yosys techmap -map $project_root/.FABulous/const_map.v
+yosys opt -full
 
 # io mapping
 yosys iopadmap -widthparam WIDTH -outpad \$__external_out I:O -inpad \$__external_in O:I

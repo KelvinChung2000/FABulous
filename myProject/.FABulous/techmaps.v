@@ -28,8 +28,8 @@ Mem #(
 ) _TECHMAP_REPLACE_ (
     .write_data(PORT_RW0_WR_DATA),
     .write_en(PORT_RW0_WR_EN),
-    .read_data(PORT_RW0_RD_DATA),
-    .addr0(PORT_RW0_ADDR)
+    .addr0(PORT_RW0_ADDR),
+    .read_data(PORT_RW0_RD_DATA)
 );
 
 endmodule

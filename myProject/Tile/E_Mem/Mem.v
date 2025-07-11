@@ -15,7 +15,9 @@ module Mem #(
     output reg [WIDTH-1:0] read_data,
 
     (* FABulous, CONFIG_BIT, FEATURE="AR;SR"*)
-    input wire config_bits
+    input wire read_mode,
+    (* FABulous, CONFIG_BIT, FEATURE_TYPE="INIT", FEATURE="INIT_MEM" *)
+    input wire [WIDTH-1:0] config_data
 );
 
   logic [WIDTH-1:0] mem[SIZE-1:0];
@@ -31,6 +33,6 @@ module Mem #(
     read_data_sync <= mem[addr0[IDX_SIZE-1:0]];
   end
 
-  assign read_data = config_bits ? read_data_sync : read_data_comb;
+  assign read_data = read_mode ? read_data_sync : read_data_comb;
 
 endmodule

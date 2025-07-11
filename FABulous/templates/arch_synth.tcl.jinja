@@ -15,8 +15,11 @@ if {[info exists env(TOP_MODULE)] && $env(TOP_MODULE) ne ""} {
     yosys hierarchy -auto-top
 }
 
-yosys proc
+yosys setattr -set keep_hierarchy 1 -mod m:*
+
 yosys flatten -noscopeinfo
+yosys proc
+yosys setattr -set keep 1 m:*
 yosys opt_expr
 yosys opt_clean
 yosys check
@@ -40,17 +43,7 @@ yosys opt -full
 yosys clean -purge
 
 # memory opt
-yosys opt_mem_priority
-yosys opt_mem_feedback
-yosys memory_bmux2rom
-yosys memory_dff
-yosys opt_clean
-yosys memory_share
-yosys opt_mem_widen
-yosys opt_clean
-yosys memory_collect
-
-yosys opt -full
+yosys memory -nomap
 yosys memory_libmap -lib $project_root/.FABulous/memory_map.txt
 yosys techmap -map $project_root/.FABulous/techmaps.v
 yosys clean -purge

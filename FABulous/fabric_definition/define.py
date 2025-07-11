@@ -3,7 +3,7 @@ import re
 from dataclasses import dataclass
 from enum import StrEnum
 from pathlib import Path
-from typing import Literal
+from typing import Literal, NamedTuple
 
 
 class IO(StrEnum):
@@ -66,6 +66,19 @@ class FeatureType(StrEnum):
     FEATURE_MAP = "FEATURE_MAP"
 
 
+class FeatureValue(NamedTuple):
+    name: str
+    value: int | None
+
+    def value_as_bitstring(self) -> str:
+        if self.value is None:
+            return "x"
+        elif isinstance(self.value, int):
+            return f"{self.value:01b}"
+        else:
+            raise ValueError(f"Invalid value type: {type(self.value)} for {self.name}")
+
+
 Loc = tuple[int, int]
 
 BitVector = list[int | Literal["0", "1", "x", "z"]]
@@ -79,6 +92,20 @@ class YosysPortDetails:
     upto: int = 0
     signed: int = 0
 
+    def __str__(self) -> str:
+        bits_str = (
+            str(self.bits)[:30] + "..." if len(str(self.bits)) > 30 else str(self.bits)
+        )
+        return (
+            f"YosysPortDetails(\n"
+            f"  direction={self.direction},\n"
+            f"  bits={bits_str},\n"
+            f"  offset={self.offset},\n"
+            f"  upto={self.upto},\n"
+            f"  signed={self.signed}\n"
+            f")"
+        )
+
 
 @dataclass
 class YosysCellDetails:
@@ -90,6 +117,19 @@ class YosysCellDetails:
     connections: dict[str, BitVector]
     model: str = ""
 
+    def __str__(self) -> str:
+        return (
+            f"YosysCellDetails(\n"
+            f"  hide_name={self.hide_name},\n"
+            f"  type={self.type},\n"
+            f"  parameters={dict(list(self.parameters.items())[:3])}{' ...' if len(self.parameters) > 3 else ''},\n"
+            f"  attributes={dict(list(self.attributes.items())[:3])}{' ...' if len(self.attributes) > 3 else ''},\n"
+            f"  port_directions={dict(list(self.port_directions.items())[:3])}{' ...' if len(self.port_directions) > 3 else ''},\n"
+            f"  connections={{... {len(self.connections)} items}},\n"
+            f"  model={self.model}\n"
+            f")"
+        )
+
 
 @dataclass
 class YosysMemoryDetails:
@@ -98,6 +138,17 @@ class YosysMemoryDetails:
     width: int
     start_offset: int
     size: int
+
+    def __str__(self) -> str:
+        return (
+            f"YosysMemoryDetails(\n"
+            f"  hide_name={self.hide_name},\n"
+            f"  attributes={dict(list(self.attributes.items())[:3])}{' ...' if len(self.attributes) > 3 else ''},\n"
+            f"  width={self.width},\n"
+            f"  start_offset={self.start_offset},\n"
+            f"  size={self.size}\n"
+            f")"
+        )
 
 
 @dataclass
@@ -108,6 +159,21 @@ class YosysNetDetails:
     offset: int = 0
     upto: int = 0
     signed: int = 0
+
+    def __str__(self) -> str:
+        bits_str = (
+            str(self.bits)[:30] + "..." if len(str(self.bits)) > 30 else str(self.bits)
+        )
+        return (
+            f"YosysNetDetails(\n"
+            f"  hide_name={self.hide_name},\n"
+            f"  bits={bits_str},\n"
+            f"  attributes={dict(list(self.attributes.items())[:3])}{' ...' if len(self.attributes) > 3 else ''},\n"
+            f"  offset={self.offset},\n"
+            f"  upto={self.upto},\n"
+            f"  signed={self.signed}\n"
+            f")"
+        )
 
 
 @dataclass
@@ -129,6 +195,18 @@ class YosysModule:
         self.memories = {k: YosysMemoryDetails(**v) for k, v in memories.items()}
         self.netnames = {k: YosysNetDetails(**v) for k, v in netnames.items()}
 
+    def __str__(self) -> str:
+        return (
+            f"YosysModule(\n"
+            f"  attributes={dict(list(self.attributes.items())[:3])}{' ...' if len(self.attributes) > 3 else ''},\n"
+            f"  parameter_default_values={dict(list(self.parameter_default_values.items())[:3])}{' ...' if len(self.parameter_default_values) > 3 else ''},\n"
+            f"  ports={{... {len(self.ports)} items}},\n"
+            f"  cells={{... {len(self.cells)} items}},\n"
+            f"  memories={{... {len(self.memories)} items}},\n"
+            f"  netnames={{... {len(self.netnames)} items}}\n"
+            f")"
+        )
+
 
 @dataclass
 class YosysJson:
@@ -136,6 +214,22 @@ class YosysJson:
     creator: str
     modules: dict[str, YosysModule]
     models: dict
+
+    def __str__(self) -> str:
+        modules_preview = {
+            k: f"YosysModule({len(v.ports)} ports, {len(v.cells)} cells)"
+            for k, v in list(self.modules.items())[:3]
+        }
+        if len(self.modules) > 3:
+            modules_preview["..."] = f"and {len(self.modules) - 3} more"
+        return (
+            f"YosysJson(\n"
+            f"  srcPath={self.srcPath},\n"
+            f"  creator={self.creator},\n"
+            f"  modules={modules_preview},\n"
+            f"  models={{... {len(self.models)} items}}\n"
+            f")"
+        )
 
     def __init__(self, path: Path):
         self.srcPath = path

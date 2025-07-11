@@ -1,5 +1,6 @@
 from dataclasses import dataclass, field
 from pathlib import Path
+import pprint
 
 from FABulous.fabric_definition.define import IO, BelType
 from FABulous.fabric_definition.Port import (
@@ -83,7 +84,6 @@ class Bel:
         externalOutputs: list[BelPort],
         configPort: list[ConfigPort],
         sharedPort: list[SharedPort],
-        belFeatureMap: dict[str, int],
         userCLK: Port | None = None,
         z: int = 0,
         paramOverride: dict[str, str] = {},
@@ -99,7 +99,6 @@ class Bel:
         self.externalOutputs = externalOutputs
         self.configPort = configPort
         self.sharedPort = sharedPort
-        self.belFeatureMap = belFeatureMap
         self.userCLK = userCLK
         self.z = z
         self.paramOverride = paramOverride
@@ -173,53 +172,31 @@ class Bel:
         str
             A well-formatted string representation of the Bel.
         """
-        ports_str = []
+        # Create a dictionary of all attributes for cleaner formatting
+        data = {
+            "src": self.src,
+            "jsonPath": self.jsonPath,
+            "prefix": self.prefix,
+            "name": self._name,
+            "belType": self.belType,
+            "inputs": self.inputs,
+            "outputs": self.outputs,
+            "externalInputs": self.externalInputs,
+            "externalOutputs": self.externalOutputs,
+            "configPort": self.configPort,
+            "sharedPort": self.sharedPort,
+            "paramOverride": self.paramOverride,
+            "configBits": self.configBits,
+            "userCLK": self.userCLK,
+            "constantBel": self.constantBel,
+            "z": self.z,
+        }
 
-        # Format all port types using a helper function
-        port_attrs = [
-            ("inputs", self.inputs),
-            ("outputs", self.outputs),
-            ("externalInputs", self.externalInputs),
-            ("externalOutputs", self.externalOutputs),
-            ("configPort", self.configPort),
-            ("sharedPort", self.sharedPort),
-        ]
+        # Use pprint to format the dictionary nicely
+        formatted_data = pprint.pformat(data, width=80, indent=2)
 
-        # Add formatted port strings
-        for attr_name, attr_value in port_attrs:
-            port_items = (
-                ", ".join([f"{item}" for item in attr_value]) if attr_value else ""
-            )
-            ports_str.append(f"  {attr_name}=[{port_items}]")
+        # Replace the outer braces with Bel() constructor syntax
+        formatted_data = formatted_data.replace("{", "Bel(", 1)
+        formatted_data = formatted_data.rsplit("}", 1)[0] + ")"
 
-        # Format dictionaries
-        dict_attrs = [
-            ("belFeatureMap", self.belFeatureMap, lambda k, v: f"'{k}': {v}"),
-            ("paramOverride", self.paramOverride, lambda k, v: f"'{k}': '{v}'"),
-        ]
-
-        # Add formatted dictionary strings
-        for attr_name, attr_value, formatter in dict_attrs:
-            if attr_value:
-                dict_items = ", ".join([formatter(k, v) for k, v in attr_value.items()])
-                ports_str.append(f"  {attr_name}={{{dict_items}}}")
-            else:
-                ports_str.append(f"  {attr_name}={{}}")
-
-        # Build the full string
-        result = [
-            "Bel(",
-            f"  src={self.src},",
-            f"  jsonPath={self.jsonPath},",
-            f"  prefix='{self.prefix}',",
-            f"  name='{self._name}',",
-            f"  belType={self.belType},",
-            *ports_str,
-            f"  configBits={self.configBits},",
-            f"  userCLK={self.userCLK},",
-            f"  constantBel={self.constantBel},",
-            f"  z={self.z}",
-            ")",
-        ]
-
-        return "\n".join(result)
+        return formatted_data

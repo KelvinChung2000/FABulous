@@ -11,14 +11,14 @@ wire [WIDTH-1:0] O_WIDTH;
 assign I_WIDTH = I;
 assign O = O_WIDTH;
 
-if (WIDTH == 1)
+if (WIDTH <= 1)
     IO_WIDTH_1 #(.WIDTH(WIDTH)) _TECHMAP_REPLACE_ (
         .from_fabric(),
         .to_fabric(O_WIDTH),
         .in(I_WIDTH),
         .out()
     );
-else if (WIDTH == 32)
+else if (WIDTH <= 32)
     IO #(.WIDTH(WIDTH)) _TECHMAP_REPLACE_ (
         .from_fabric(),
         .to_fabric(O_WIDTH),
@@ -42,14 +42,14 @@ wire [WIDTH-1:0] O_WIDTH;
 assign I_WIDTH = I;
 assign O = O_WIDTH;
 
-if (WIDTH == 1)
+if (WIDTH <= 1)
     IO_WIDTH_1 #(.WIDTH(WIDTH)) _TECHMAP_REPLACE_ (
         .from_fabric(I_WIDTH),
         .to_fabric(),
         .in(),
         .out(O_WIDTH)
     );
-else if (WIDTH == 32)
+else if (WIDTH <= 32)
     IO #(.WIDTH(WIDTH)) _TECHMAP_REPLACE_ (
         .from_fabric(I_WIDTH),
         .to_fabric(),

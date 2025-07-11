@@ -4,13 +4,13 @@ from pathlib import Path
 from pprint import pprint
 
 from loguru import logger
-from pyosys import libyosys as ys
 
 from FABulous.fabric_definition.Bel import Bel
 from FABulous.fabric_definition.define import (
     IO,
     BelType,
     FABulousPortType,
+    FeatureValue,
     FeatureType,
     YosysJson,
     YosysModule,
@@ -108,7 +108,6 @@ def parseBelFile(
     configPort: list[ConfigPort] = []
     sharedPort: list[SharedPort] = []
     internalPort: list[BelPort] = []
-    belFeatureMap: dict[str, int] = {}
     userClk: Port | None = None
 
     if not filename.exists():
@@ -197,7 +196,13 @@ def parseBelFile(
         elif FABulousPortType.CONFIG_BIT in attributes:
             features = details.attributes.get("FEATURE", "")
             features = list(filter(lambda x: x != "", features.split(";")))
-            featureType = attributes - set(["FABulous", "CONFIG_BIT", "src", "FEATURE"])
+            if details.attributes.get("FEATURE_TYPE", "ENUMERATE") not in FeatureType:
+                raise ValueError(
+                    f"FEATURE_TYPE {details.attributes.get('FEATURE_TYPE', '')} in file {filename} is not a valid FeatureType."
+                )
+            featureType = FeatureType[
+                details.attributes.get("FEATURE_TYPE", "ENUMERATE")
+            ]
             if len(features) == 0:
                 raise ValueError(
                     f"CONFIG_BIT port and {net} in file {filename} must have at least one feature."
@@ -206,17 +211,32 @@ def parseBelFile(
                 raise ValueError(
                     f"CONFIG_BIT port {net} in file {filename} must be an input port."
                 )
-
-            for i, feature in enumerate(features):
-                belFeatureMap[feature] = i
+            featureList: list[FeatureValue] = []
+            match featureType:
+                case FeatureType.INIT:
+                    if len(features) > 1:
+                        raise ValueError(
+                            f"In file {filename}, the INIT feature type can only have one feature, but found {len(features)} features."
+                        )
+                    featureList.append(FeatureValue(name=features[0], value=None))
+                case FeatureType.ONE_HOT:
+                    if len(features) != netBitWidth:
+                        raise ValueError(
+                            f"In file {filename}, the ONE_HOT feature type must have the same number of features as the port width, but found {len(features)} features and port width is {netBitWidth}."
+                        )
+                    for i, name in enumerate(features):
+                        featureList.append(FeatureValue(name=name, value=(1 << i)))
+                case FeatureType.ENUMERATE:
+                    for i, name in enumerate(features):
+                        featureList.append(FeatureValue(name=name, value=i))
 
             configPort.append(
                 ConfigPort(
                     name=f"{net}",
                     ioDirection=IO.INPUT,
                     width=netBitWidth,
-                    features=[(feature, i) for i, feature in enumerate(features)],
-                    featureType=FeatureType.INIT,
+                    features=featureList,
+                    featureType=featureType,
                 )
             )
         elif FABulousPortType.USER_CLK in attributes:
@@ -271,7 +291,6 @@ def parseBelFile(
         externalOutputs=externalOutputs,
         configPort=configPort,
         sharedPort=sharedPort,
-        belFeatureMap=belFeatureMap,
         userCLK=userClk,
         paramOverride=paramOverride,
     )

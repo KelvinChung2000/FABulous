@@ -89,6 +89,7 @@ class MemoryMapping:
             config_name: str
             value: int
             n = yosys_json.findNetWithAttribute("CONFIG_BIT")
+            print(yosys_json)
             if n is not None:
                 if len(n) != 1:
                     raise ValueError(

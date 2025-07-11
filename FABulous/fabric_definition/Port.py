@@ -1,6 +1,6 @@
 from typing import Any
 
-from FABulous.fabric_definition.define import IO, FeatureType, Side
+from FABulous.fabric_definition.define import IO, FeatureType, Side, FeatureValue
 
 
 class Port:
@@ -271,7 +271,7 @@ class BelPort(Port):
 
 
 class ConfigPort(Port):
-    _features: list[tuple[str, int]]
+    _features: list[FeatureValue]
     _featureType: FeatureType
 
     __slots__ = ("_features", "_featureType")
@@ -281,15 +281,15 @@ class ConfigPort(Port):
         name: str,
         ioDirection: IO,
         width: int,
-        features: list[tuple[str, int]] = [],
-        featureType: FeatureType = FeatureType.INIT,
+        features: list[FeatureValue] = [],
+        featureType: FeatureType = FeatureType.ENUMERATE,
     ) -> None:
         super().__init__(name, ioDirection, width)
         self._features = features
         self._featureType = featureType
 
     @property
-    def features(self) -> list[tuple[str, int]]:
+    def features(self) -> list[FeatureValue]:
         return self._features
 
     @property
@@ -297,7 +297,7 @@ class ConfigPort(Port):
         return self._featureType
 
     def __repr__(self) -> str:
-        return f"ConfigPort({self.ioDirection.value} {self.name}[{self.width - 1}:0])"
+        return f"ConfigPort({self.ioDirection.value} {self.name}[{self.width - 1}:0], features={self.features})"
 
     def __hash__(self) -> int:
         return super().__hash__()

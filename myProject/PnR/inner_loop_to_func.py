@@ -376,6 +376,297 @@ def _transform_scf_while_to_guarded_loop(while_op: scf.WhileOp) -> None:
     # print("    Successfully transformed scf.while into guarded if structure")
 
 
+def find_scf_if_statements(loop_op: LoopOp) -> List[scf.IfOp]:
+    """Find all scf.if statements within a loop operation."""
+    if_statements = []
+    
+    # Walk through all operations in the loop
+    for op in loop_op.walk():
+        if isinstance(op, scf.IfOp) and op != loop_op:
+            if_statements.append(op)
+    
+    return if_statements
+
+
+def enumerate_if_paths(if_statements: List[scf.IfOp]) -> List[tuple]:
+    """Generate all possible true/false combinations for the if statements.
+    
+    Args:
+        if_statements: List of scf.IfOp operations
+        
+    Returns:
+        List of tuples where each tuple represents a path through the conditionals.
+        For N if statements, returns 2^N combinations.
+    """
+    from itertools import product
+    
+    if not if_statements:
+        return [()]  # Empty path if no if statements
+    
+    # Generate all combinations of True/False for each if statement
+    num_ifs = len(if_statements)
+    paths = list(product([True, False], repeat=num_ifs))
+    
+    return paths
+
+
+def create_if_variants(loop_op: LoopOp, func_name: str, if_statements: List[scf.IfOp], if_paths: List[tuple]) -> List[func.FuncOp]:
+    """Create multiple function variants, each representing a different path through the if statements.
+    
+    Args:
+        loop_op: The loop operation containing if statements
+        func_name: Base name for the functions
+        if_statements: List of scf.IfOp operations found in the loop
+        if_paths: List of paths (True/False combinations) through the if statements
+        
+    Returns:
+        List of function operations, one for each path
+    """
+    variants = []
+    
+    for i, path in enumerate(if_paths):
+        variant_name = f"{func_name}_variant_{i}"
+        
+        # Create a mapping from if_statements to their chosen paths
+        if_path_mapping = dict(zip(if_statements, path))
+        
+        # Create the variant function
+        variant_func = _create_single_variant(loop_op, variant_name, if_path_mapping)
+        variants.append(variant_func)
+    
+    return variants
+
+
+def _create_single_variant(loop_op: LoopOp, func_name: str, if_path_mapping: dict) -> func.FuncOp:
+    """Create a single function variant for a specific path through the if statements.
+    
+    Args:
+        loop_op: The loop operation
+        func_name: Name for the variant function
+        if_path_mapping: Mapping from scf.IfOp to boolean (True for then branch, False for else branch)
+        
+    Returns:
+        A function operation representing this variant
+    """
+    # Start with the same logic as create_extracted_function
+    # Find all values used in the loop body that are defined outside the loop
+    external_values = []
+
+    # First, add loop arguments (induction variable and iter_args) as they'll be needed as function parameters
+    # For transformed scf.while loops that are now scf.if, we need to handle this differently
+    if loop_op.name == "scf.if":
+        # For scf.if (transformed from scf.while), we don't have traditional loop arguments
+        # The transformed scf.if uses the guard values from the original condition
+        pass
+    elif isinstance(loop_op, scf.WhileOp):
+        for block in loop_op.after_region.blocks:
+            for block_arg in block.args:
+                external_values.append(block_arg)
+    elif isinstance(loop_op, (scf.ForOp, affine.ForOp)):
+        for block in loop_op.body.blocks:
+            for block_arg in block.args:
+                external_values.append(block_arg)
+
+    # Separate constants from other external values
+    constants_to_recreate = []
+
+    # Walk through all operations in the loop body
+    for op in loop_op.walk():
+        if op != loop_op:  # Skip the loop operation itself
+            for operand in op.operands:
+                # Check if this operand is an SSAValue and defined outside the loop
+                if isinstance(operand, SSAValue):
+                    if hasattr(operand, "owner") and operand.owner:
+                        if not _is_operation_within(operand.owner, loop_op):
+                            # Check if this is a constant operation
+                            if hasattr(operand.owner, "name") and operand.owner.name == "arith.constant":
+                                # Store constant for recreation instead of passing as argument
+                                if operand not in [c[0] for c in constants_to_recreate]:
+                                    constants_to_recreate.append((operand, operand.owner))
+                            else:
+                                # Non-constant external value - pass as argument
+                                if operand not in external_values:
+                                    external_values.append(operand)
+                    else:
+                        # This might be a block argument from outside the loop
+                        if operand not in external_values:
+                            external_values.append(operand)
+
+    # Determine argument types from external values
+    arg_types = [val.type for val in external_values]
+
+    # Find the yield operation to determine return types
+    return_types = loop_op.result_types
+
+    # Create function type
+    func_type = builtin.FunctionType.from_lists(arg_types, return_types)
+
+    # Create the new function operation (entry block is automatically created)
+    new_func = func.FuncOp(func_name, func_type, visibility=None)
+
+    # Clone the loop body operations into the new function, applying the if path mapping
+    _clone_loop_body_to_variant(loop_op, new_func, external_values, new_func.args, constants_to_recreate, if_path_mapping)
+
+    return new_func
+
+
+def _clone_loop_body_to_variant(
+    loop_op: Operation, 
+    new_func: func.FuncOp, 
+    external_values: List[SSAValue], 
+    func_args, 
+    constants_to_recreate,
+    if_path_mapping: dict
+):
+    """Clone the loop body operations into the new function, applying the if path mapping.
+    
+    This function transforms scf.if operations according to the path mapping:
+    - Keeps the condition computation (for side effects)
+    - Replaces the scf.if with direct execution of the chosen branch
+    """
+    # Create a mapping from external values to function arguments
+    if len(external_values) != len(func_args):
+        print("      WARNING: Mismatch in external values vs function args")
+        print(f"      External values: {external_values}")
+        print(f"      Function args: {func_args}")
+        # Take the minimum to avoid zip error
+        min_len = min(len(external_values), len(func_args))
+        value_mapping = dict(zip(external_values[:min_len], func_args[:min_len]))
+        # Add any remaining external values as identity mapping
+        for i in range(min_len, len(external_values)):
+            value_mapping[external_values[i]] = external_values[i]
+    else:
+        value_mapping = dict(zip(external_values, func_args))
+
+    # Recreate constants in the function and add to value mapping
+    entry_block = new_func.body.blocks[0]
+    for const_val, const_op in constants_to_recreate:
+        try:
+            # Clone the constant operation
+            cloned_const = const_op.clone()
+            entry_block.add_op(cloned_const)
+            # Map the original constant value to the new one
+            value_mapping[const_val] = cloned_const.result
+        except Exception as e:
+            print(f"      Warning: Could not create constant for {const_val}: {e}")
+
+    # Get the loop body and clone operations
+    return_values = []
+
+    loop_body: RegionBlocks
+    if isinstance(loop_op, scf.WhileOp):
+        loop_body = loop_op.after_region.blocks
+    elif isinstance(loop_op, (scf.ForOp, affine.ForOp)):
+        loop_body = loop_op.body.blocks
+
+    for block in loop_body:
+        for op in block.ops:
+            if isinstance(op, (scf.YieldOp, affine.YieldOp)):
+                # Handle yield operation - extract return values
+                for operand in op.operands:
+                    mapped_operand = value_mapping.get(operand, operand)
+                    return_values.append(mapped_operand)
+                continue
+            else:
+                # Check if this is an scf.if operation that needs to be transformed
+                if isinstance(op, scf.IfOp) and op in if_path_mapping:
+                    # Transform the scf.if according to the path mapping
+                    _transform_if_for_variant(op, if_path_mapping[op], value_mapping, entry_block)
+                else:
+                    # Regular operation - clone normally
+                    cloned_op = _clone_operation_with_mapping(op, value_mapping)
+                    entry_block.add_op(cloned_op)
+
+                    # Update value mapping for results
+                    for orig_result, cloned_result in zip(op.results, cloned_op.results, strict=True):
+                        value_mapping[orig_result] = cloned_result
+
+                    # Handle regions recursively
+                    for orig_region, cloned_region in zip(op.regions, cloned_op.regions, strict=True):
+                        _clone_region_with_mapping_and_if_transform(orig_region, cloned_region, value_mapping, if_path_mapping)
+
+    return_op = func.ReturnOp(*return_values)
+    new_func.body.blocks[0].add_op(return_op)
+
+
+def _transform_if_for_variant(if_op: scf.IfOp, take_then_branch: bool, value_mapping: dict, target_block: Block):
+    """Transform an scf.if operation by choosing one branch and computing the condition.
+    
+    Args:
+        if_op: The scf.if operation to transform
+        take_then_branch: True to take the then branch, False for else branch
+        value_mapping: Current value mapping for operands
+        target_block: The block to add the transformed operations to
+    """
+    # First, compute the condition (to preserve side effects)
+    condition_operand = if_op.operands[0]
+    mapped_condition = value_mapping.get(condition_operand, condition_operand)
+    
+    # Choose the appropriate region based on the path
+    if take_then_branch:
+        chosen_region = if_op.true_region
+    else:
+        chosen_region = if_op.false_region if if_op.false_region else None
+    
+    # If there's no else region and we're taking the false path, we don't execute anything
+    if chosen_region is None:
+        # Create yield operations with appropriate values (typically the if operation's result types)
+        # This handles the case where scf.if has no else branch
+        for result in if_op.results:
+            # Need to provide a default value - this is tricky without more context
+            # For now, we'll skip this case and assume all scf.if operations have else branches
+            pass
+        return
+    
+    # Clone the chosen region's operations
+    for block in chosen_region.blocks:
+        for op in block.ops:
+            if isinstance(op, scf.YieldOp):
+                # Handle yield from the chosen branch
+                for i, operand in enumerate(op.operands):
+                    mapped_operand = value_mapping.get(operand, operand)
+                    # Map the if operation's result to this operand
+                    if i < len(if_op.results):
+                        value_mapping[if_op.results[i]] = mapped_operand
+            else:
+                # Clone the operation
+                cloned_op = _clone_operation_with_mapping(op, value_mapping)
+                target_block.add_op(cloned_op)
+                
+                # Update value mapping
+                for orig_result, cloned_result in zip(op.results, cloned_op.results, strict=True):
+                    value_mapping[orig_result] = cloned_result
+
+
+def _clone_region_with_mapping_and_if_transform(orig_region: Region, cloned_region: Region, value_mapping: dict, if_path_mapping: dict):
+    """Recursively clone region contents with value mapping and if transformation."""
+    
+    if len(orig_region.blocks) != len(cloned_region.blocks):
+        print(f"WARNING: Block count mismatch in region: orig={len(orig_region.blocks)}, cloned={len(cloned_region.blocks)}")
+        raise ValueError("Region block count mismatch during cloning")
+
+    for orig_block, cloned_block in zip(orig_region.blocks, cloned_region.blocks, strict=True):
+        # Clear the cloned block and rebuild it with mapped values
+        ops_to_remove = list(cloned_block.ops)
+        for op in ops_to_remove:
+            cloned_block.detach_op(op)
+
+        # Clone each operation in the original block
+        for op in orig_block.ops:
+            if isinstance(op, scf.IfOp) and op in if_path_mapping:
+                # Transform the scf.if according to the path mapping
+                _transform_if_for_variant(op, if_path_mapping[op], value_mapping, cloned_block)
+            else:
+                cloned_op = _clone_operation_with_mapping(op, value_mapping)
+                cloned_block.add_op(cloned_op)
+
+                for orig_result, cloned_result in zip(op.results, cloned_op.results, strict=True):
+                    value_mapping[orig_result] = cloned_result
+
+                for orig_nested_region, cloned_nested_region in zip(op.regions, cloned_op.regions, strict=True):
+                    _clone_region_with_mapping_and_if_transform(orig_nested_region, cloned_nested_region, value_mapping, if_path_mapping)
+
+
 def find_innermost_loops(op: Operation) -> List[LoopOp]:
     """Find all loops that have no nested loops inside them (leaf loops).
     After normalization, look for scf.while loops that are now nested inside scf.if operations."""
@@ -397,9 +688,31 @@ def find_innermost_loops(op: Operation) -> List[LoopOp]:
     return innermost_loops
 
 
-def create_extracted_function(loop_op: LoopOp, func_name: str) -> func.FuncOp:
-    """Create a new function containing the loop body with proper arguments and return types."""
-
+def create_extracted_function(loop_op: LoopOp, func_name: str, split_if: bool = False) -> List[func.FuncOp]:
+    """Create a new function containing the loop body with proper arguments and return types.
+    
+    Args:
+        loop_op: The loop operation to extract
+        func_name: Base name for the function(s)
+        split_if: If True, split scf.if statements into separate function variants
+        
+    Returns:
+        List of function operations. If split_if is False, returns a single function.
+        If split_if is True, returns multiple function variants.
+    """
+    
+    # Check if splitting is requested and there are scf.if statements
+    if split_if:
+        if_statements = find_scf_if_statements(loop_op)
+        if if_statements:
+            print(f"    Found {len(if_statements)} scf.if statements, creating variants")
+            if_paths = enumerate_if_paths(if_statements)
+            print(f"    Creating {len(if_paths)} function variants")
+            return create_if_variants(loop_op, func_name, if_statements, if_paths)
+        else:
+            print("    No scf.if statements found, creating single function")
+    
+    # Original single function creation logic
     # Find all values used in the loop body that are defined outside the loop
     external_values = []
 
@@ -463,12 +776,26 @@ def create_extracted_function(loop_op: LoopOp, func_name: str) -> func.FuncOp:
     # Clone the loop body operations into the new function
     _clone_loop_body_to_function(loop_op, new_func, external_values, new_func.args, constants_to_recreate)
 
-    return new_func
+    return [new_func]  # Return as list for consistency
 
 
-def replace_loop_with_call(loop_op: LoopOp, extracted_func_name: str):
-    """Replace the loop body with a function call to the extracted function."""
-
+def replace_loop_with_call(loop_op: LoopOp, extracted_func_names: List[str], split_if: bool = False):
+    """Replace the loop body with a function call to the extracted function(s).
+    
+    Args:
+        loop_op: The loop operation to replace
+        extracted_func_names: List of function names (single for normal extraction, multiple for split-if)
+        split_if: If True, generate variant selection logic
+    """
+    
+    # Handle split-if case differently
+    if split_if and len(extracted_func_names) > 1:
+        _replace_loop_with_variant_selection(loop_op, extracted_func_names)
+        return
+    
+    # Original single function call logic
+    extracted_func_name = extracted_func_names[0]
+    
     # Find all external values that need to be passed as arguments (same logic as create_extracted_function)
     external_values = []
 
@@ -560,6 +887,177 @@ def replace_loop_with_call(loop_op: LoopOp, extracted_func_name: str):
             raise ValueError(f"Unsupported loop operation type for yield: {loop_op.name}")
 
         print(f"  Replaced loop body of {loop_op.name} with call to {extracted_func_name}")
+
+
+def _replace_loop_with_variant_selection(loop_op: LoopOp, extracted_func_names: List[str]):
+    """Replace the loop body with variant selection logic that evaluates conditions and calls the appropriate variant.
+    
+    Args:
+        loop_op: The loop operation to replace
+        extracted_func_names: List of function names for the variants
+    """
+    
+    # Find all scf.if statements in the loop to create the selection logic
+    if_statements = find_scf_if_statements(loop_op)
+    if_paths = enumerate_if_paths(if_statements)
+    
+    if len(if_paths) != len(extracted_func_names):
+        print(f"  Warning: Path count ({len(if_paths)}) doesn't match function count ({len(extracted_func_names)})")
+        return
+    
+    # Find external values that need to be passed as arguments
+    external_values = []
+    
+    # First, add loop arguments (induction variable and iter_args) - but when calling, pass the actual values
+    loop_args_placeholders = []
+    
+    blocks: RegionBlocks
+    if isinstance(loop_op, scf.WhileOp):
+        blocks = loop_op.after_region.blocks  # "do" region
+    elif isinstance(loop_op, (scf.ForOp, affine.ForOp)):
+        blocks = loop_op.body.blocks
+    else:
+        raise ValueError(f"Unsupported loop operation type: {loop_op.name}")
+
+    for block in blocks:
+        for block_arg in block.args:
+            loop_args_placeholders.append(block_arg)
+            external_values.append(None)  # Placeholder, will be filled with actual values
+
+    # Separate constants from other external values (constants will be recreated in function)
+    for op in loop_op.walk():
+        if op != loop_op:  # Skip the loop operation itself
+            for operand in op.operands:
+                # Check if this operand is an SSAValue and defined outside the loop
+                if isinstance(operand, SSAValue):
+                    if hasattr(operand, "owner") and operand.owner:
+                        if not _is_operation_within(operand.owner, loop_op):
+                            # Skip constants - they will be recreated in the function, not passed as arguments
+                            if not (hasattr(operand.owner, "name") and operand.owner.name == "arith.constant"):
+                                if operand not in external_values:
+                                    external_values.append(operand)
+                    else:
+                        # This might be a block argument from outside the loop
+                        if operand not in external_values:
+                            external_values.append(operand)
+
+    # Replace placeholders with actual loop arguments
+    actual_call_args = []
+    loop_arg_index = 0
+    for val in external_values:
+        if val is None:  # This was a loop argument placeholder
+            # Get the loop block based on loop type
+            if isinstance(loop_op, scf.WhileOp):
+                loop_block = loop_op.after_region.blocks[0]  # "do" region
+                actual_call_args.append(loop_block.args[loop_arg_index])
+            elif isinstance(loop_op, (scf.ForOp, affine.ForOp)):
+                loop_block = loop_op.body.blocks[0]
+                actual_call_args.append(loop_block.args[loop_arg_index])
+            loop_arg_index += 1
+        else:
+            actual_call_args.append(val)
+
+    external_values = actual_call_args
+
+    # Get return types from the loop results
+    yield_types = loop_op.result_types
+
+    # Access the loop body region based on loop type
+    loop_body_blocks: RegionBlocks
+    if isinstance(loop_op, scf.WhileOp):
+        loop_body_blocks = loop_op.after_region.blocks
+    elif isinstance(loop_op, (scf.ForOp, affine.ForOp)):
+        loop_body_blocks = loop_op.body.blocks
+
+    # Generate the variant selection logic
+    for block in loop_body_blocks:
+        # Remove all operations from the block
+        ops_to_remove = list(block.ops)
+        for op in ops_to_remove:
+            block.detach_op(op)
+
+        # Create the variant selection logic
+        _create_variant_selection_logic(block, if_statements, if_paths, extracted_func_names, external_values, yield_types, loop_op)
+
+    print(f"  Replaced loop body of {loop_op.name} with variant selection logic for {len(extracted_func_names)} functions")
+
+
+def _create_variant_selection_logic(block: Block, if_statements: List[scf.IfOp], if_paths: List[tuple], 
+                                   extracted_func_names: List[str], external_values: List[SSAValue], 
+                                   yield_types: List, loop_op: LoopOp):
+    """Create the logic that evaluates conditions and selects the appropriate variant to call.
+    
+    This creates a series of nested scf.if statements that evaluate the original conditions
+    and call the appropriate variant function.
+    """
+    
+    # If there are no if statements, just call the first (and only) function
+    if not if_statements:
+        call_op = func.CallOp(extracted_func_names[0], external_values, yield_types)
+        block.add_op(call_op)
+        
+        # Add appropriate yield
+        if isinstance(loop_op, affine.ForOp):
+            new_yield = affine.YieldOp.get(*call_op.results)
+            block.add_op(new_yield)
+        elif isinstance(loop_op, (scf.ForOp, scf.WhileOp)):
+            new_yield = scf.YieldOp(*call_op.results)
+            block.add_op(new_yield)
+        return
+    
+    # Create nested if statements for variant selection
+    # For now, we'll create a simple if-else chain
+    # TODO: This could be optimized to a more efficient decision tree
+    
+    # Start with the first condition
+    first_condition = if_statements[0].operands[0]
+    
+    # Create the main if statement
+    then_region = Region()
+    then_block = Block(arg_types=[])
+    then_region.add_block(then_block)
+    
+    else_region = Region()
+    else_block = Block(arg_types=[])
+    else_region.add_block(else_block)
+    
+    # For simplicity, we'll create a basic binary selection
+    # This assumes 2 variants (one for true, one for false)
+    if len(extracted_func_names) >= 2:
+        # True path - call first variant
+        true_call = func.CallOp(extracted_func_names[0], external_values, yield_types)
+        then_block.add_op(true_call)
+        then_yield = scf.YieldOp(*true_call.results)
+        then_block.add_op(then_yield)
+        
+        # False path - call second variant
+        false_call = func.CallOp(extracted_func_names[1], external_values, yield_types)
+        else_block.add_op(false_call)
+        else_yield = scf.YieldOp(*false_call.results)
+        else_block.add_op(else_yield)
+    else:
+        # Fallback - just call the first variant in both cases
+        true_call = func.CallOp(extracted_func_names[0], external_values, yield_types)
+        then_block.add_op(true_call)
+        then_yield = scf.YieldOp(*true_call.results)
+        then_block.add_op(then_yield)
+        
+        false_call = func.CallOp(extracted_func_names[0], external_values, yield_types)
+        else_block.add_op(false_call)
+        else_yield = scf.YieldOp(*false_call.results)
+        else_block.add_op(else_yield)
+    
+    # Create the main if operation
+    main_if = scf.IfOp(first_condition, yield_types, then_region, else_region)
+    block.add_op(main_if)
+    
+    # Add final yield
+    if isinstance(loop_op, affine.ForOp):
+        final_yield = affine.YieldOp.get(*main_if.results)
+        block.add_op(final_yield)
+    elif isinstance(loop_op, (scf.ForOp, scf.WhileOp)):
+        final_yield = scf.YieldOp(*main_if.results)
+        block.add_op(final_yield)
 
 def _is_operation_within(defining_op: Operation, container_op: Operation) -> bool:
     """Check if an operation is defined within a container operation."""
@@ -699,7 +1197,7 @@ def _clone_region_with_mapping(orig_region: Region, cloned_region: Region, value
             for orig_nested_region, cloned_nested_region in zip(op.regions, cloned_op.regions, strict=True):
                 _clone_region_with_mapping(orig_nested_region, cloned_nested_region, value_mapping)
 
-def process_mlir_file(input_file: str, output_dir: str) -> list[Path]:
+def process_mlir_file(input_file: str, output_dir: str, split_if: bool = False) -> list[Path]:
     """Process MLIR file to extract innermost loops into separate functions using xDSL."""
     import os
     
@@ -749,13 +1247,24 @@ def process_mlir_file(input_file: str, output_dir: str) -> list[Path]:
                 for i, loop in enumerate(innermost_loops):
                     # print(f"    Loop {i}:")
 
-                    # Create extracted function
+                    # Create extracted function(s) - may be multiple if split_if is enabled
                     extracted_func_name = f"{func_name}_inner_loop_{i}"
-                    extracted_func = create_extracted_function(loop, extracted_func_name)
-                    extracted_functions.append((extracted_func, extracted_func_name))
+                    extracted_funcs = create_extracted_function(loop, extracted_func_name, split_if)
+                    
+                    # Collect function names for the loop replacement
+                    func_names = []
+                    for j, extracted_func in enumerate(extracted_funcs):
+                        if len(extracted_funcs) == 1:
+                            # Single function - use the base name
+                            final_func_name = extracted_func_name
+                        else:
+                            # Multiple functions - use variant names
+                            final_func_name = f"{extracted_func_name}_variant_{j}"
+                        func_names.append(final_func_name)
+                        extracted_functions.append((extracted_func, final_func_name))
 
-                    # Replace loop with function call
-                    replace_loop_with_call(loop, extracted_func_name)
+                    # Replace loop with function call(s)
+                    replace_loop_with_call(loop, func_names, split_if)
 
         # output_file = Path(output_dir) / f"full_file/{func_name}.mlir"
         # # Add extracted functions to module
@@ -825,11 +1334,12 @@ def main():
     parser = argparse.ArgumentParser(description="Extract innermost loops from MLIR functions")
     parser.add_argument("input", help="Input MLIR file")
     parser.add_argument("output_dir", help="Output directory for extracted functions")
+    parser.add_argument("--split-if", action="store_true", help="Split scf.if statements in extracted loops into separate function variants")
 
     args = parser.parse_args()
 
     try:
-        process_mlir_file(args.input, args.output_dir)
+        process_mlir_file(args.input, args.output_dir, args.split_if)
         print(f"Successfully processed {args.input} -> {args.output_dir}")
     except Exception as e:
         print(f"Error processing MLIR file: {e}")

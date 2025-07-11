@@ -44,8 +44,8 @@ FABulous --debug myProject -p \
         gen_bitStream_spec; \
         gen_cells_and_techmaps; \
         gen_chipdb -routing_graph $my_FAB_ROOT/myProject/.FABulous/routing_graph.dot -filter 5,1 5,2 5,3 5,4; \
-        synthesis_script $source_hdl -tcl $my_FAB_ROOT/myProject/.FABulous/arch_synth.tcl; \
         "
+        # synthesis_script $source_hdl -tcl $my_FAB_ROOT/myProject/.FABulous/arch_synth.tcl; \
 # /home/kelvin/FABulous_fork/.venv/bin/python /home/kelvin/FABulous_fork/FABulous/fabric_cad/graph_draw2.py
 check_status
 cd -

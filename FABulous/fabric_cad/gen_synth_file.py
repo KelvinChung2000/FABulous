@@ -14,6 +14,7 @@ from FABulous.fabric_definition.Bel import Bel
 from FABulous.fabric_definition.define import (
     IO,
     BelType,
+    FeatureType,
     YosysJson,
     YosysModule,
 )
@@ -143,15 +144,22 @@ def genCellsAndMaps(bel: Bel):
     for wire in module.selected_wires():
         p = bel.findPortByName(wire.name.str()[1:])
         if isinstance(p, ConfigPort):
-            ranges.append(range(1 << p.width))
-            # if p.width == 1:
-            #     ranges.append(range(2))
-            # else:
+            if p.featureType == FeatureType.INIT:
+                continue
+            ranges.append([i.value for i in p.features])
         else:
-            ranges.append(list(range(wire.width + 1)) + ["z"])
+            raise ValueError(
+                f"Port {wire.name.str()} in {bel.name} is not a ConfigPort, but a {type(p)}."
+            )
 
     keys = [i.name.str().removeprefix("\\") for i in module.selected_wires()]
     combinations = [tuple(zip(keys, values)) for values in product(*ranges)]
+    print(bel)
+    print(keys)
+    print(ranges)
+    print(combinations)
+    if bel.name == "Mem":
+        raise
     runPass("cd")
 
     cellDict = {}

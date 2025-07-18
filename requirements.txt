@@ -3,11 +3,9 @@ loguru>=0.7.0
 fasm>=0.0.2
 cmd2>=2,<3
 requests>=2.0.0
-pytest>=8.3.5
-pytest-mock
-bitarray
-pytest>=8.4.1,
-pytest-mock>=3.14.1,
-cocotb>=1.9.2
+bitarray>=3.4.3
+pytest>=8.4.0
+pytest-mock>=3.14.0
+cocotb>=1.9.0
 cocotb-test>=0.2.6
-pytest-split
+pytest-split>=0.10.0

@@ -37,6 +37,7 @@ from cmd2 import (
 from loguru import logger
 
 from FABulous.custom_exception import CommandError, EnvironmentNotSet, FileTypeError
+from FABulous.fabric_cad.bit_gen import genBitstream
 from FABulous.fabric_generator.code_generation_Verilog import VerilogWriter
 from FABulous.fabric_generator.code_generation_VHDL import VHDLWriter
 from FABulous.fabric_generator.fabric_automation import generateCustomTileConfig
@@ -830,16 +831,15 @@ class FABulous_CLI(Cmd):
 
         logger.info(f"Generating Bitstream for design {self.projectDir}/{args.file}")
         logger.info(f"Outputting to {self.projectDir}/{parent}/{bitstream_file}")
-        runCmd = [
-            "bit_gen",
-            "-genBitstream",
-            f"{self.projectDir}/{parent}/{fasm_file}",
-            f"{self.projectDir}/.FABulous/bitStreamSpec.bin",
-            f"{self.projectDir}/{parent}/{bitstream_file}",
-        ]
+
         try:
-            sp.run(runCmd, check=True)
-        except sp.CalledProcessError as e:
+            genBitstream(
+                f"{self.projectDir}/{parent}/{fasm_file}",
+                f"{self.projectDir}/.FABulous/bitStreamSpec.bin",
+                f"{self.projectDir}/{parent}/{bitstream_file}",
+            )
+
+        except Exception as e:  # noqa: BLE001
             logger.opt(exception=e).error("Bitstream generation failed")
 
         logger.info("Bitstream generated")

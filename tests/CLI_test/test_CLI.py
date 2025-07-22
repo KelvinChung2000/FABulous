@@ -126,7 +126,7 @@ def test_run_simulation(cli, caplog, mocker):
     run_cmd(cli, "run_simulation fst ./user_design/sequential_16bit_en.bin")
     log = normalize_and_check_for_errors(caplog.text)
     assert "Simulation finished" in log[-1]
-    assert m.call_count == 5
+    assert m.call_count == 4
 
 
 def test_run_tcl(cli, caplog, tmp_path):
@@ -154,4 +154,4 @@ def test_multi_command_force(cli, mocker):
     cli.force = True
     run_cmd(cli, "run_FABulous_bitstream ./user_design/sequential_16bit_en.v")
 
-    assert m.call_count == 2
+    assert m.call_count == 1

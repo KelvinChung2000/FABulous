@@ -1,7 +1,6 @@
 import string
 
-from loguru import logger
-
+from FABulous.custom_exception import InvalidFileType
 from FABulous.fabric_definition.Fabric import Fabric
 from FABulous.fabric_generator.file_parser import parseList, parseMatrix
 
@@ -57,10 +56,9 @@ def genNextpnrModel(fabric: Fabric):
                         f"X{x}Y{y},{source},X{x}Y{y},{sink},{8},{source}.{sink}"
                     )
             else:
-                logger.error(
-                    f"For model generation {tile.matrixDir} need to a csv or list file"
+                raise InvalidFileType(
+                    f"File {tile.matrixDir} is not a .csv or .list file"
                 )
-                raise ValueError
 
             pipStr.append(f"#Tile-external pips on tile X{x}Y{y}:")
             for wire in tile.wireList:

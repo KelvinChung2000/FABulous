@@ -6,12 +6,14 @@ import re
 import shutil
 import sys
 import tarfile
+from importlib.metadata import version
 from pathlib import Path
 from typing import Literal
 
 import requests
-from dotenv import load_dotenv
+from dotenv import get_key, load_dotenv, set_key
 from loguru import logger
+from packaging.version import Version
 
 MAX_BITBYTES = 16384
 
@@ -224,8 +226,10 @@ def create_project(project_dir: Path, lang: Literal["verilog", "vhdl"] = "verilo
         new_content = re.sub(r"\{HDL_SUFFIX\}", new_suffix, content)
         file_path.write_text(new_content)
 
-    with open(os.path.join(project_dir, ".FABulous/.env"), "w") as env_file:
-        env_file.write(f"FAB_PROJ_LANG={lang}\n")
+    env_file = project_dir / ".FABulous" / ".env"
+    set_key(env_file, "FAB_PROJ_LANG", lang)
+    set_key(env_file, "FAB_PROJ_VERSION", version("FABulous-FPGA"))
+    set_key(env_file, "FAB_PROJ_VERSION_CREATED", version("FABulous-FPGA"))
 
     logger.info(f"New FABulous project created in {project_dir} with {lang} language.")
 
@@ -500,3 +504,24 @@ def install_oss_cad_suite(destination_folder: Path, update: bool = False):
     os.environ["PATH"] += os.pathsep + str(ocs_folder / "bin")
 
     logger.info("OSS CAD Suite setup completed successfully.")
+
+
+def update_project_version(project_dir: Path) -> bool:
+    env_file = project_dir / ".FABulous" / ".env"
+
+    project_version = get_key(env_file, "FAB_PROJ_VERSION")
+
+    if project_version is None:
+        logger.error("VERSION not found in .env file.")
+        return False
+
+    project_version = Version(project_version)
+    package_version = Version(version("FABulous-FPGA"))
+    if package_version.major != project_version.major:
+        logger.error(
+            "There is a major version mismatch, cannot update project version."
+        )
+        return False
+
+    set_key(env_file, "FAB_PROJ_VERSION", str(package_version))
+    return True

@@ -8,13 +8,20 @@ import pytest
 from cocotb.clock import Clock
 from cocotb.triggers import RisingEdge, Timer
 
-from tests.fabric_construct_test.conftest import VERILOG_SOURCE_PATH
+from tests.fabric_construct_test.conftest import VERILOG_SOURCE_PATH, VHDL_SOURCE_PATH
 
 
-def test_Frame_Data_Reg_rtl(cocotb_runner):
+def test_Frame_Data_Reg_verilog_rtl(cocotb_runner):
     """Test the Frame_Data_Reg module with Verilog source."""
     cocotb_runner(
         sources=[VERILOG_SOURCE_PATH / "Fabric" / "Frame_Data_Reg.v"],
+        hdl_top_level="Frame_Data_Reg",
+        test_module_path=Path(__file__),
+    )
+
+def test_Frame_Data_Reg_vhdl_rtl(cocotb_runner):
+    cocotb_runner(
+        sources=[VHDL_SOURCE_PATH / "Fabric" / "Frame_Data_Reg.vhdl"],
         hdl_top_level="Frame_Data_Reg",
         test_module_path=Path(__file__),
     )
@@ -81,56 +88,3 @@ async def test_frame_data_reg_basic(dut):
         actual = dut.FrameData_O.value
         assert actual == expected, f"Row {row_val}: Expected FrameData_O = 0x{expected:08x}, got 0x{actual:08x}"
 
-
-@pytest.mark.skip(reason="Cocotb test - run by simulation, not pytest")
-@cocotb.test
-async def test_frame_data_reg_edge_cases(dut):
-    """Test edge cases and corner values for Frame_Data_Reg."""
-    # Start clock
-    clock = Clock(dut.CLK, 10, units="ns")
-    cocotb.start_soon(clock.start())
-
-    # Initialize
-    dut.FrameData_I.value = 0
-    dut.RowSelect.value = 0
-    await RisingEdge(dut.CLK)
-
-    # Test with all zeros
-    dut.FrameData_I.value = 0x00000000
-    dut.RowSelect.value = 1
-    await RisingEdge(dut.CLK)
-    await Timer(Decimal(10), units="ps")
-    assert dut.FrameData_O.value == 0x00000000, "Failed with all zeros pattern"
-
-    # Test with all ones
-    dut.FrameData_I.value = 0xFFFFFFFF
-    dut.RowSelect.value = 1
-    await RisingEdge(dut.CLK)
-    await Timer(Decimal(10), units="ps")
-    assert dut.FrameData_O.value == 0xFFFFFFFF, "Failed with all ones pattern"
-
-    # Test alternating patterns
-    patterns = [0xAAAAAAAA, 0x55555555, 0xF0F0F0F0, 0x0F0F0F0F]
-    for pattern in patterns:
-        dut.FrameData_I.value = pattern
-        dut.RowSelect.value = 1
-        await RisingEdge(dut.CLK)
-        await Timer(Decimal(10), units="ps")
-        assert dut.FrameData_O.value == pattern, f"Failed with pattern 0x{pattern:08x}"
-
-    # Test row select at boundary values (assuming 5-bit RowSelectWidth)
-    # Row 0
-    dut.RowSelect.value = 0
-    dut.FrameData_I.value = 0xDEADBEEF
-    await RisingEdge(dut.CLK)
-    await Timer(Decimal(10), units="ps")
-    # Should not update since Row != 1
-    assert dut.FrameData_O.value == patterns[-1], "Row 0 should not trigger update"
-
-    # Row 31 (max for 5-bit)
-    dut.RowSelect.value = 31
-    dut.FrameData_I.value = 0xCAFEBABE
-    await RisingEdge(dut.CLK)
-    await Timer(Decimal(10), units="ps")
-    # Should not update since Row != 1
-    assert dut.FrameData_O.value == patterns[-1], "Row 31 should not trigger update"

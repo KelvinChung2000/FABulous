@@ -13,13 +13,13 @@ module BlockRAM_1KB (
 );
 
   //default 24 means bits wr_data[25:24] will become bits [9:8] of read address
-  parameter Integer ReadAddressMSBFromDataLSB = 24;
+  parameter integer ReadAddressMSBFromDataLSB = 24;
 
   //default 16 means bits wr_data[17:16] will become bits [9:8] of write address
-  parameter Integer WriteAddressMSBFromDataLSB = 16;
+  parameter integer WriteAddressMSBFromDataLSB = 16;
 
   //default 20 means bit wr_data[20] will become the dynamic writeEnable input
-  parameter Integer WriteEnableFromData = 20;
+  parameter integer WriteEnableFromData = 20;
 
   input clk;
   input [7:0] rd_addr;

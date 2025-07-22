@@ -14,10 +14,6 @@ inputs:
     description: "Additional python packages to install"
     required: false
     default: ""
-  github_token:
-    description: "GitHub token for API access"
-    required: false
-    default: ""
 
 runs:
   using: "composite"
@@ -35,31 +31,44 @@ runs:
       shell: bash
       run: |
         # Get the latest release info from YosysHQ/oss-cad-suite-build
-        if [ -n "${{ inputs.github_token }}" ]; then
-          VERSION=$(curl -s -H "Authorization: token ${{ inputs.github_token }}" \
+        # Use authenticated API call to avoid rate limits
+        if [ -n "${{ github.token }}" ]; then
+          VERSION=$(curl -s -H "Authorization: Bearer ${{ github.token }}" \
             "https://api.github.com/repos/YosysHQ/oss-cad-suite-build/releases/latest" | \
             jq -r '.tag_name // "unknown"')
         else
           VERSION=$(curl -s "https://api.github.com/repos/YosysHQ/oss-cad-suite-build/releases/latest" | \
             jq -r '.tag_name // "unknown"')
         fi
+
+        # Fallback to a fixed version if API call fails
+        if [ "$VERSION" = "unknown" ] || [ "$VERSION" = "null" ] || [ -z "$VERSION" ]; then
+          echo "Warning: Failed to get OSS CAD Suite version from API, using fallback"
+          VERSION="2024-10-15"  # Use a recent stable version as fallback
+        fi
+
+        echo "Using OSS CAD Suite version: $VERSION"
         echo "version=$VERSION" >> $GITHUB_OUTPUT
     - name: Cache OSS CAD Suite
       id: cache-oss-cad
       uses: actions/cache@v4
       with:
         path: |
-          ~/.local/share/oss-cad-suite
-          ~/bin
+          ${{ runner.temp }}/oss-cad-suite
         key: oss-cad-suite-${{ runner.os }}-${{ steps.oss-cad-version.outputs.version }}
         restore-keys: |
           oss-cad-suite-${{ runner.os }}-${{ steps.oss-cad-version.outputs.version }}-
           oss-cad-suite-${{ runner.os }}-
+    - name: set up OSS CAD path
+      if: steps.cache-oss-cad.outputs.cache-hit == 'true'
+      shell: bash
+      run: |
+        echo "${{ runner.temp }}/oss-cad-suite/bin:$PATH" >> "$GITHUB_PATH"
     - name: Set up OSS CAD suite
       if: steps.cache-oss-cad.outputs.cache-hit != 'true'
       uses: YosysHQ/setup-oss-cad-suite@v3
       with:
-        github-token: ${{ inputs.github_token }}
+        github-token: ${{ github.token }}
     - name: Install GHDL mcode nightly
       # GHDL mcode is required to test our fabric.
       # The oss-cad-suite action installs GHDL, but with the LLVM backend, which is much slower for our simulation
@@ -95,4 +104,3 @@ runs:
       shell: bash
       run: |
         echo "/home/runner/work/FABulous/FABulous/install/bin:/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin:$PATH" >> "$GITHUB_PATH"
-

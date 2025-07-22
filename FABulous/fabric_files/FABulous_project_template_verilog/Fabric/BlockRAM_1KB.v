@@ -167,12 +167,12 @@ module sram_1rw1r_32_256_8_sky130 (
     dout1
 );
 
-  parameter integer NUM_WMASKS = 4; // verilog_lint: waive parameter-name-style
-  parameter integer DATA_WIDTH = 32; // verilog_lint: waive parameter-name-style
-  parameter integer ADDR_WIDTH = 8; // verilog_lint: waive parameter-name-style
-  parameter integer RAM_DEPTH = 1 << ADDR_WIDTH; // verilog_lint: waive parameter-name-style
+  parameter integer NUM_WMASKS = 4;  // verilog_lint: waive parameter-name-style
+  parameter integer DATA_WIDTH = 32;  // verilog_lint: waive parameter-name-style
+  parameter integer ADDR_WIDTH = 8;  // verilog_lint: waive parameter-name-style
+  parameter integer RAM_DEPTH = 1 << ADDR_WIDTH;  // verilog_lint: waive parameter-name-style
   // FIXME: This delay is arbitrary.
-  parameter integer DELAY = 3; // verilog_lint: waive parameter-name-style
+  parameter integer DELAY = 3;  // verilog_lint: waive parameter-name-style
   //`ifdef USE_POWER_PINS
   // inout vdd;
   // inout gnd;

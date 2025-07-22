@@ -11,7 +11,7 @@ module ConfigFSM (
   parameter integer NumberOfRows = 16;
   parameter integer RowSelectWidth = 5;
   parameter integer FrameBitsPerRow = 32;
-  parameter integer desync_flag = 20; // verilog_lint: waive parameter-name-style
+  parameter integer desync_flag = 20;  // verilog_lint: waive parameter-name-style
 
   input CLK;
   input resetn;

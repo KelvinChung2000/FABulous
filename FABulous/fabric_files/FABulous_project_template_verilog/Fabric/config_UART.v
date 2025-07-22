@@ -67,9 +67,9 @@ module config_UART #(
   reg ComTick;
   //typedef enum{WAIT_FOR_START_BIT, DELAY_AFTER_START_BIT, GET_BIT_0, GET_BIT_1, GET_BIT_2, GET_BIT_3, GET_BIT_4, GET_BIT_5, GET_BIT_6, GET_BIT_7, GET_STOP_BIT} ComStateType;
   //ComStateType ComState;
-  localparam integer WAIT_FOR_START_BIT=0, DELAY_AFTER_START_BIT=1;
-  localparam integer GET_BIT_0=2, GET_BIT_1=3, GET_BIT_2=4, GET_BIT_3=5, GET_BIT_4=6;
-  localparam integer GET_BIT_5=7, GET_BIT_6=8, GET_BIT_7=9, GET_STOP_BIT=10;
+  localparam integer WAIT_FOR_START_BIT = 0, DELAY_AFTER_START_BIT = 1;
+  localparam integer GET_BIT_0 = 2, GET_BIT_1 = 3, GET_BIT_2 = 4, GET_BIT_3 = 5, GET_BIT_4 = 6;
+  localparam integer GET_BIT_5 = 7, GET_BIT_6 = 8, GET_BIT_7 = 9, GET_STOP_BIT = 10;
 
   reg [3:0] ComState;
   reg [7:0] ReceivedWord;
@@ -207,9 +207,9 @@ module config_UART #(
             ComState <= WAIT_FOR_START_BIT;
           end
         end
-      default: begin
-        ComState <= WAIT_FOR_START_BIT;
-      end
+        default: begin
+          ComState <= WAIT_FOR_START_BIT;
+        end
       endcase
       // scan order:
       // <-to_modules_scan_in <- LSB_W0..MSB_W0 <- LSB_W1.... <- LSB_W7 <- from_modules_scan_out
@@ -441,7 +441,7 @@ module config_UART #(
 
   //ComLoaderActive <= 1'b0;
   // mode [0:auto|1:hex|2:bin]
-  assign ReceivedByte = (Mode==2 || (Mode==0 && Command_Reg[7]==1'b0)) ? Data_Reg : HexData;
+  assign ReceivedByte = (Mode == 2 || (Mode == 0 && Command_Reg[7] == 1'b0)) ? Data_Reg : HexData;
   // if binary mode or if auto mode with detected binary mode in the command register
   // ReceivedWordDebug <= Data_Reg when (Mode="bin" OR (Mode="auto" && Command_Reg(7)=1'b0)) else HexData;
   assign ComActive = (PresentState == GET_DATA) ? 1'b1 : 1'b0;

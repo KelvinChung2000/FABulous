@@ -7,8 +7,8 @@ module bitbang (
     clk,
     resetn
 );
-  localparam reg[15:0] ON_PATTERN = 16'hFAB1;
-  localparam reg[15:0] OFF_PATTERN = 16'hFAB0;
+  localparam reg [15:0] ON_PATTERN = 16'hFAB1;
+  localparam reg [15:0] OFF_PATTERN = 16'hFAB0;
   input s_clk;
   input s_data;
   output reg strobe;

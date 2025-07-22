@@ -108,7 +108,7 @@ def test_run_FABulous_bitstream(cli, caplog, mocker):
     run_cmd(cli, "run_FABulous_bitstream ./user_design/sequential_16bit_en.v")
     log = normalize_and_check_for_errors(caplog.text)
     assert "Bitstream generated" in log[-1]
-    assert m.call_count == 3
+    assert m.call_count == 2
 
 
 def test_run_simulation(cli, caplog, mocker):

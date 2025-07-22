@@ -8,6 +8,9 @@ VERILOG_SOURCE_PATH = (
     Path(__file__).parent.parent.parent / "FABulous" / "fabric_files" / "FABulous_project_template_verilog"
 )
 
+VHDL_SOURCE_PATH = (
+    Path(__file__).parent.parent.parent / "FABulous" / "fabric_files" / "FABulous_project_template_vhdl"
+)
 
 @pytest.fixture
 def cocotb_runner(tmp_path: Path):
@@ -20,16 +23,16 @@ def cocotb_runner(tmp_path: Path):
             raise ValueError("All source files must have the same HDL language suffix")
 
         hdl_toplevel_lang = lang.pop()  # Get the single language suffix
-        if hdl_toplevel_lang not in {".v", ".vhd"}:
+        if hdl_toplevel_lang not in {".v", ".vhdl"}:
             raise ValueError(f"Unsupported HDL language: {hdl_toplevel_lang}")
 
         if hdl_toplevel_lang == ".v":
             sim = "icarus"
-        elif hdl_toplevel_lang == ".vhd":
+        elif hdl_toplevel_lang == ".vhdl":
             sim = "ghdl"
         runner = get_runner(sim)
 
-        sources.insert(0, Path(__file__).parent / "testdata" / f"models{hdl_toplevel_lang}")
+        sources.insert(0, Path(__file__).parent.parent / "testdata" / f"models{hdl_toplevel_lang}")
         # Copy test module and models to temp directory for cocotb
         test_dir = tmp_path / "tests"
         test_dir.mkdir(exist_ok=True)
@@ -43,7 +46,7 @@ def cocotb_runner(tmp_path: Path):
         # Configure sources based on HDL language
         if hdl_toplevel_lang == ".v":
             runner.build(verilog_sources=sources, hdl_toplevel=hdl_top_level, always=True, build_dir=build_dir)
-        elif hdl_toplevel_lang == ".vhd":
+        elif hdl_toplevel_lang == ".vhdl":
             # GHDL converts identifiers to lowercase for elaboration and execution
             hdl_top_level = hdl_top_level.lower()
             runner.build(vhdl_sources=sources, hdl_toplevel=hdl_top_level, always=True, build_dir=build_dir)

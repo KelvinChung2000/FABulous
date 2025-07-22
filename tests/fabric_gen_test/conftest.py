@@ -277,7 +277,7 @@ def cocotb_runner(tmp_path: Path):
             sim = "ghdl"
         runner = get_runner(sim)
 
-        sources.insert(0, Path(__file__).parent / "testdata" / f"models{hdl_toplevel_lang}")
+        sources.insert(0, Path(__file__).parent.parent / "testdata" / f"models{hdl_toplevel_lang}")
         # Copy test module and models to temp directory for cocotb
         test_dir = tmp_path / "tests"
         test_dir.mkdir(exist_ok=True)

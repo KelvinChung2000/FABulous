@@ -23,7 +23,7 @@ set source_futil /home/kelvin/FABulous_fork/myProject/PnR/mac-pipelined/mac-pipe
 set source_hdl /home/kelvin/FABulous_fork/benchmarks/userbench/loop_array_inner/loop_array_inner.sv
 # set source_hdl /home/kelvin/FABulous_fork/myProject/PnR/test.v
 # set source_hdl /home/kelvin/FABulous_fork/myProject/user_design/synth_test_mod.v
-set source_hdl /home/kelvin/FABulous_fork/myProject/PnR/mlir_trail/mlir_trail_test_bfs_queue_inner_loop_0.sv
+set source_hdl /home/kelvin/FABulous_fork/myProject/PnR/compilation_result/04_verilog/spmv_crs_inner_loop_0.sv
 set -x OUT_JSON_PATH /home/kelvin/FABulous_fork/myProject/user_design/synth_test.json
 set ir /home/kelvin/FABulous_fork/myProject/PnR/mac-pipelined/ir.log
 set my_FAB_ROOT /home/kelvin/FABulous_fork
@@ -38,12 +38,12 @@ set clayx_flag "-p fsm-opt -x simplify-with-control:without-register -x static-i
 # check_status
 cd ../..
 # FABulous --debug myProject -p "load_fabric; gen_FABulous_CAD_tool_files"
-FABulous --debug myProject -p \
+uv run FABulous --debug myProject -p \
         "\
         load_fabric; \
         gen_bitStream_spec; \
         gen_cells_and_techmaps; \
-        gen_chipdb -routing_graph $my_FAB_ROOT/myProject/.FABulous/routing_graph.dot -filter 5,1 5,2 5,3 5,4; \
+        gen_chipdb -routing_graph $my_FAB_ROOT/myProject/.FABulous/routing_graph.dot -filter 3,5 3,4; \
         "
         # synthesis_script $source_hdl -tcl $my_FAB_ROOT/myProject/.FABulous/arch_synth.tcl; \
 # /home/kelvin/FABulous_fork/.venv/bin/python /home/kelvin/FABulous_fork/FABulous/fabric_cad/graph_draw2.py
@@ -53,7 +53,7 @@ cd -
 # # # xdot /home/kelvin/FABulous_fork/myProject/.FABulous/routing_graph.dot &
 # gdb -args \
 nextpnr-himbaechel --chipdb "$my_FAB_ROOT/myProject/.FABulous/hycube.bit" --device "FABulous" \
-                   --json "$my_FAB_ROOT/myProject/user_design/synth_test.json" \
+                   --json "$OUT_JSON_PATH" \
                    --write "$my_FAB_ROOT/myProject/user_design/router_test.json" \
                    -o constrain-pair="$my_FAB_ROOT/myProject/.FABulous/hycube_constrain_pair.inc" \
                    -o fasm="$my_FAB_ROOT/myProject/user_design/router_test.fasm" \

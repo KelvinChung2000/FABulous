@@ -1,11 +1,11 @@
 module $__Mem #(
     parameter INIT = "0",
-    parameter OPTION_config_bits = "1",
-    parameter OPTION_config_bits_ADDRESS_BITS = "16",
-    parameter OPTION_config_bits_DATA_WIDTH = "32",
-    parameter OPTION_config_bits = "0",
-    parameter OPTION_config_bits_ADDRESS_BITS = "16",
-    parameter OPTION_config_bits_DATA_WIDTH = "32",
+    parameter OPTION_cell_Mem_config_data_None_read_mode_1 = "0",
+    parameter OPTION_cell_Mem_config_data_None_read_mode_1_ADDRESS_BITS = "16",
+    parameter OPTION_cell_Mem_config_data_None_read_mode_1_DATA_WIDTH = "32",
+    parameter OPTION_cell_Mem_config_data_None_read_mode_0 = "1",
+    parameter OPTION_cell_Mem_config_data_None_read_mode_0_ADDRESS_BITS = "16",
+    parameter OPTION_cell_Mem_config_data_None_read_mode_0_DATA_WIDTH = "32",
     parameter PORT_RW0_WIDTH = "32",
     parameter PORT_RW0_RD_USED = "1",
     parameter PORT_RW0_WR_USED = "1",
@@ -23,12 +23,12 @@ module $__Mem #(
 );
 
 Mem #(
-    .config_bits(1'd1),
-    .config_bits(1'd0)
+    .read_mode(1'd1),
+    .read_mode(1'd0)
 ) _TECHMAP_REPLACE_ (
-    .write_data(PORT_RW0_WR_DATA),
     .write_en(PORT_RW0_WR_EN),
     .addr0(PORT_RW0_ADDR),
+    .write_data(PORT_RW0_WR_DATA),
     .read_data(PORT_RW0_RD_DATA)
 );
 

@@ -1,0 +1,28 @@
+ram distributed $__Mem {
+    abits 16;
+    width 32;
+    init any;
+
+    option "cell_Mem_config_data_None_read_mode_1" 0 {
+        cost 1;
+
+        port srsw "RW0" {
+            clken;
+            clock posedge;
+            optional_rw;
+            rdinit none;
+            rdwr old;
+        }
+
+    }
+    option "cell_Mem_config_data_None_read_mode_0" 1 {
+        cost 2;
+
+        port arsw "RW0" {
+            clken;
+            clock posedge;
+            optional_rw;
+        }
+
+    }
+}

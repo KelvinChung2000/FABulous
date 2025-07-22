@@ -10,8 +10,8 @@ from FABulous.fabric_definition.define import (
     IO,
     BelType,
     FABulousPortType,
-    FeatureValue,
     FeatureType,
+    FeatureValue,
     YosysJson,
     YosysModule,
 )
@@ -227,8 +227,27 @@ def parseBelFile(
                     for i, name in enumerate(features):
                         featureList.append(FeatureValue(name=name, value=(1 << i)))
                 case FeatureType.ENUMERATE:
-                    for i, name in enumerate(features):
-                        featureList.append(FeatureValue(name=name, value=i))
+                    if netBitWidth == 1 and len(features) == 1:
+                        featureList.append(
+                            FeatureValue(name=f"{features[0]}_off", value=0)
+                        )
+                        featureList.append(
+                            FeatureValue(name=f"{features[0]}_on", value=1)
+                        )
+                    elif 1 <= netBitWidth < 8:
+                        maxFeatureValue = 2**netBitWidth
+                        if len(features) > maxFeatureValue:
+                            raise ValueError(
+                                f"In file {filename}, the ENUMERATE feature type can only have {maxFeatureValue} features, but found {len(features)} features."
+                            )
+                        for i, name in enumerate(features):
+                            featureList.append(FeatureValue(name=name, value=i))
+                    else:
+                        raise ValueError(
+                            f"In file {filename}, the ENUMERATE feature type must have a port width between 1 and 7 "
+                            f"but found {netBitWidth}. You are trying to set more than 256 features,"
+                            "are you missing the FEATURE_TYPE=INIT attribute?"
+                        )
 
             configPort.append(
                 ConfigPort(

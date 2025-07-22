@@ -15,14 +15,16 @@ if {[info exists env(TOP_MODULE)] && $env(TOP_MODULE) ne ""} {
     yosys hierarchy -auto-top
 }
 
+yosys setattr -set keep_hierarchy 1 -mod m:*
+
 yosys flatten -noscopeinfo
 yosys proc
-# yosys setattr -set keep 1 t:\$mem*
+yosys setattr -set keep 1 m:*
 yosys opt_expr
 yosys opt_clean
 yosys check
 yosys opt -nodffe -nosdff
-yosys fsm -expand -nomap
+yosys fsm -expand -nomap -encoding binary
 yosys opt -full
 yosys techmap -map $project_root/.FABulous/logic_to_std.v
 
@@ -32,7 +34,7 @@ yosys opt_clean
 yosys share
 yosys opt_expr
 yosys opt_clean
-yosys fsm -encoding binary
+yosys fsm
 yosys techmap -map $project_root/.FABulous/reduce_or_to_or.v
 yosys techmap -map $project_root/.FABulous/reduce_and_to_and.v
 yosys techmap -map $project_root/.FABulous/eq_to_logic.v
@@ -41,13 +43,10 @@ yosys opt -full
 yosys clean -purge
 
 # memory opt
-yosys debug memory -nomap -external-init
+yosys memory -nomap -external-init
 yosys memory_libmap -lib $project_root/.FABulous/memory_map.txt
 yosys techmap -map $project_root/.FABulous/techmaps.v
 yosys clean -purge
-# yosys setattr -unset keep_hierarchy -mod
-# yosys flatten -noscopeinfo
-# yosys opt -full
 
 proc extract {cell wrapperPath} {
 # wrapping for mapping
@@ -63,51 +62,51 @@ yosys design -delete xmap
 }
 
 # wrapping base design
-yosys techmap -map /home/kelvin/FABulous_fork/myProject/Tile/PE/metadata/reg_unit_WIDTH_1/wrap_map_reg_unit_WIDTH_1.v
+yosys techmap -map myProject/Tile/PE/metadata/reg_unit_WIDTH_1/wrap_map_reg_unit_WIDTH_1.v
 yosys connwrappers -unsigned \$__sdff_wrapper Q WIDTH
 yosys connwrappers -unsigned \$__dffe_wrapper Q WIDTH
 yosys connwrappers -unsigned \$__sdffe_wrapper Q WIDTH
 yosys connwrappers -unsigned \$__dff_wrapper Q WIDTH
 
 # extract cells
-extract "/home/kelvin/FABulous_fork/myProject/Tile/PE/metadata/reg_unit_WIDTH_1/cell_reg_unit_WIDTH_1_tide_en_1_tide_rst_1.json" \
-"/home/kelvin/FABulous_fork/myProject/Tile/PE/metadata/reg_unit_WIDTH_1/wrap_map_reg_unit_WIDTH_1.v"
-extract "/home/kelvin/FABulous_fork/myProject/Tile/PE/metadata/reg_unit_WIDTH_1/cell_reg_unit_WIDTH_1_tide_en_0_tide_rst_0.json" \
-"/home/kelvin/FABulous_fork/myProject/Tile/PE/metadata/reg_unit_WIDTH_1/wrap_map_reg_unit_WIDTH_1.v"
-extract "/home/kelvin/FABulous_fork/myProject/Tile/PE/metadata/reg_unit_WIDTH_1/cell_reg_unit_WIDTH_1_tide_en_0_tide_rst_1.json" \
-"/home/kelvin/FABulous_fork/myProject/Tile/PE/metadata/reg_unit_WIDTH_1/wrap_map_reg_unit_WIDTH_1.v"
-extract "/home/kelvin/FABulous_fork/myProject/Tile/PE/metadata/reg_unit_WIDTH_1/cell_reg_unit_WIDTH_1_tide_en_1_tide_rst_0.json" \
-"/home/kelvin/FABulous_fork/myProject/Tile/PE/metadata/reg_unit_WIDTH_1/wrap_map_reg_unit_WIDTH_1.v"
+extract "myProject/Tile/PE/metadata/reg_unit_WIDTH_1/cell_reg_unit_WIDTH_1_tide_en_1_tide_rst_1.json" \
+"myProject/Tile/PE/metadata/reg_unit_WIDTH_1/wrap_map_reg_unit_WIDTH_1.v"
+extract "myProject/Tile/PE/metadata/reg_unit_WIDTH_1/cell_reg_unit_WIDTH_1_tide_en_0_tide_rst_0.json" \
+"myProject/Tile/PE/metadata/reg_unit_WIDTH_1/wrap_map_reg_unit_WIDTH_1.v"
+extract "myProject/Tile/PE/metadata/reg_unit_WIDTH_1/cell_reg_unit_WIDTH_1_tide_en_0_tide_rst_1.json" \
+"myProject/Tile/PE/metadata/reg_unit_WIDTH_1/wrap_map_reg_unit_WIDTH_1.v"
+extract "myProject/Tile/PE/metadata/reg_unit_WIDTH_1/cell_reg_unit_WIDTH_1_tide_en_1_tide_rst_0.json" \
+"myProject/Tile/PE/metadata/reg_unit_WIDTH_1/wrap_map_reg_unit_WIDTH_1.v"
 
 # unwrapping
-yosys techmap -map /home/kelvin/FABulous_fork/myProject/Tile/PE/metadata/reg_unit_WIDTH_1/unwrap_map_reg_unit_WIDTH_1.v
+yosys techmap -map myProject/Tile/PE/metadata/reg_unit_WIDTH_1/unwrap_map_reg_unit_WIDTH_1.v
 yosys opt -full
 yosys clean -purge
 
 # wrapping base design
-yosys techmap -map /home/kelvin/FABulous_fork/myProject/Tile/PE/metadata/reg_unit/wrap_map_reg_unit.v
+yosys techmap -map myProject/Tile/PE/metadata/reg_unit/wrap_map_reg_unit.v
 yosys connwrappers -unsigned \$__sdffe_wrapper Q WIDTH
 yosys connwrappers -unsigned \$__sdff_wrapper Q WIDTH
 yosys connwrappers -unsigned \$__dff_wrapper Q WIDTH
 yosys connwrappers -unsigned \$__dffe_wrapper Q WIDTH
 
 # extract cells
-extract "/home/kelvin/FABulous_fork/myProject/Tile/PE/metadata/reg_unit/cell_reg_unit_tide_en_0_tide_rst_1.json" \
-"/home/kelvin/FABulous_fork/myProject/Tile/PE/metadata/reg_unit/wrap_map_reg_unit.v"
-extract "/home/kelvin/FABulous_fork/myProject/Tile/PE/metadata/reg_unit/cell_reg_unit_tide_en_1_tide_rst_1.json" \
-"/home/kelvin/FABulous_fork/myProject/Tile/PE/metadata/reg_unit/wrap_map_reg_unit.v"
-extract "/home/kelvin/FABulous_fork/myProject/Tile/PE/metadata/reg_unit/cell_reg_unit_tide_en_1_tide_rst_0.json" \
-"/home/kelvin/FABulous_fork/myProject/Tile/PE/metadata/reg_unit/wrap_map_reg_unit.v"
-extract "/home/kelvin/FABulous_fork/myProject/Tile/PE/metadata/reg_unit/cell_reg_unit_tide_en_0_tide_rst_0.json" \
-"/home/kelvin/FABulous_fork/myProject/Tile/PE/metadata/reg_unit/wrap_map_reg_unit.v"
+extract "myProject/Tile/PE/metadata/reg_unit/cell_reg_unit_tide_en_0_tide_rst_1.json" \
+"myProject/Tile/PE/metadata/reg_unit/wrap_map_reg_unit.v"
+extract "myProject/Tile/PE/metadata/reg_unit/cell_reg_unit_tide_en_1_tide_rst_1.json" \
+"myProject/Tile/PE/metadata/reg_unit/wrap_map_reg_unit.v"
+extract "myProject/Tile/PE/metadata/reg_unit/cell_reg_unit_tide_en_1_tide_rst_0.json" \
+"myProject/Tile/PE/metadata/reg_unit/wrap_map_reg_unit.v"
+extract "myProject/Tile/PE/metadata/reg_unit/cell_reg_unit_tide_en_0_tide_rst_0.json" \
+"myProject/Tile/PE/metadata/reg_unit/wrap_map_reg_unit.v"
 
 # unwrapping
-yosys techmap -map /home/kelvin/FABulous_fork/myProject/Tile/PE/metadata/reg_unit/unwrap_map_reg_unit.v
+yosys techmap -map myProject/Tile/PE/metadata/reg_unit/unwrap_map_reg_unit.v
 yosys opt -full
 yosys clean -purge
 
 # wrapping base design
-yosys techmap -map /home/kelvin/FABulous_fork/myProject/Tile/PE/metadata/ALU/wrap_map_ALU.v
+yosys techmap -map myProject/Tile/PE/metadata/ALU/wrap_map_ALU.v
 yosys connwrappers -unsigned \$__xor_wrapper Y Y_WIDTH
 yosys connwrappers -unsigned \$__mul_wrapper Y Y_WIDTH
 yosys connwrappers -unsigned \$__add_wrapper Y Y_WIDTH
@@ -115,63 +114,63 @@ yosys connwrappers -unsigned \$__sub_wrapper Y Y_WIDTH
 yosys connwrappers -unsigned \$__mux_wrapper Y WIDTH
 
 # extract cells
-extract "/home/kelvin/FABulous_fork/myProject/Tile/PE/metadata/ALU/cell_ALU_ALU_func_4.json" \
-"/home/kelvin/FABulous_fork/myProject/Tile/PE/metadata/ALU/wrap_map_ALU.v"
-extract "/home/kelvin/FABulous_fork/myProject/Tile/PE/metadata/ALU/cell_ALU_ALU_func_5.json" \
-"/home/kelvin/FABulous_fork/myProject/Tile/PE/metadata/ALU/wrap_map_ALU.v"
-extract "/home/kelvin/FABulous_fork/myProject/Tile/PE/metadata/ALU/cell_ALU_ALU_func_0.json" \
-"/home/kelvin/FABulous_fork/myProject/Tile/PE/metadata/ALU/wrap_map_ALU.v"
-extract "/home/kelvin/FABulous_fork/myProject/Tile/PE/metadata/ALU/cell_ALU_ALU_func_1.json" \
-"/home/kelvin/FABulous_fork/myProject/Tile/PE/metadata/ALU/wrap_map_ALU.v"
-extract "/home/kelvin/FABulous_fork/myProject/Tile/PE/metadata/ALU/cell_ALU_ALU_func_6.json" \
-"/home/kelvin/FABulous_fork/myProject/Tile/PE/metadata/ALU/wrap_map_ALU.v"
+extract "myProject/Tile/PE/metadata/ALU/cell_ALU_ALU_func_4.json" \
+"myProject/Tile/PE/metadata/ALU/wrap_map_ALU.v"
+extract "myProject/Tile/PE/metadata/ALU/cell_ALU_ALU_func_5.json" \
+"myProject/Tile/PE/metadata/ALU/wrap_map_ALU.v"
+extract "myProject/Tile/PE/metadata/ALU/cell_ALU_ALU_func_0.json" \
+"myProject/Tile/PE/metadata/ALU/wrap_map_ALU.v"
+extract "myProject/Tile/PE/metadata/ALU/cell_ALU_ALU_func_1.json" \
+"myProject/Tile/PE/metadata/ALU/wrap_map_ALU.v"
+extract "myProject/Tile/PE/metadata/ALU/cell_ALU_ALU_func_6.json" \
+"myProject/Tile/PE/metadata/ALU/wrap_map_ALU.v"
 
 # unwrapping
-yosys techmap -map /home/kelvin/FABulous_fork/myProject/Tile/PE/metadata/ALU/unwrap_map_ALU.v
+yosys techmap -map myProject/Tile/PE/metadata/ALU/unwrap_map_ALU.v
 yosys opt -full
 yosys clean -purge
 
 # wrapping base design
-yosys techmap -map /home/kelvin/FABulous_fork/myProject/Tile/PE/metadata/compare/wrap_map_compare.v
+yosys techmap -map myProject/Tile/PE/metadata/compare/wrap_map_compare.v
 yosys connwrappers -unsigned \$__lt_wrapper Y Y_WIDTH
 yosys connwrappers -unsigned \$__ne_wrapper Y Y_WIDTH
 yosys connwrappers -unsigned \$__le_wrapper Y Y_WIDTH
 yosys connwrappers -unsigned \$__eq_wrapper Y Y_WIDTH
 
 # extract cells
-extract "/home/kelvin/FABulous_fork/myProject/Tile/PE/metadata/compare/cell_compare_conf_0.json" \
-"/home/kelvin/FABulous_fork/myProject/Tile/PE/metadata/compare/wrap_map_compare.v"
-extract "/home/kelvin/FABulous_fork/myProject/Tile/PE/metadata/compare/cell_compare_conf_3.json" \
-"/home/kelvin/FABulous_fork/myProject/Tile/PE/metadata/compare/wrap_map_compare.v"
-extract "/home/kelvin/FABulous_fork/myProject/Tile/PE/metadata/compare/cell_compare_conf_1.json" \
-"/home/kelvin/FABulous_fork/myProject/Tile/PE/metadata/compare/wrap_map_compare.v"
-extract "/home/kelvin/FABulous_fork/myProject/Tile/PE/metadata/compare/cell_compare_conf_2.json" \
-"/home/kelvin/FABulous_fork/myProject/Tile/PE/metadata/compare/wrap_map_compare.v"
+extract "myProject/Tile/PE/metadata/compare/cell_compare_conf_0.json" \
+"myProject/Tile/PE/metadata/compare/wrap_map_compare.v"
+extract "myProject/Tile/PE/metadata/compare/cell_compare_conf_3.json" \
+"myProject/Tile/PE/metadata/compare/wrap_map_compare.v"
+extract "myProject/Tile/PE/metadata/compare/cell_compare_conf_1.json" \
+"myProject/Tile/PE/metadata/compare/wrap_map_compare.v"
+extract "myProject/Tile/PE/metadata/compare/cell_compare_conf_2.json" \
+"myProject/Tile/PE/metadata/compare/wrap_map_compare.v"
 
 # unwrapping
-yosys techmap -map /home/kelvin/FABulous_fork/myProject/Tile/PE/metadata/compare/unwrap_map_compare.v
+yosys techmap -map myProject/Tile/PE/metadata/compare/unwrap_map_compare.v
 yosys opt -full
 yosys clean -purge
 
 # wrapping base design
-yosys techmap -map /home/kelvin/FABulous_fork/myProject/Tile/PE/metadata/logic_op/wrap_map_logic_op.v
+yosys techmap -map myProject/Tile/PE/metadata/logic_op/wrap_map_logic_op.v
 yosys connwrappers -unsigned \$__and_wrapper Y Y_WIDTH
 yosys connwrappers -unsigned \$__or_wrapper Y Y_WIDTH
 yosys connwrappers -unsigned \$__not_wrapper Y Y_WIDTH
 yosys connwrappers -unsigned \$__xor_wrapper Y Y_WIDTH
 
 # extract cells
-extract "/home/kelvin/FABulous_fork/myProject/Tile/PE/metadata/logic_op/cell_logic_op_conf_0.json" \
-"/home/kelvin/FABulous_fork/myProject/Tile/PE/metadata/logic_op/wrap_map_logic_op.v"
-extract "/home/kelvin/FABulous_fork/myProject/Tile/PE/metadata/logic_op/cell_logic_op_conf_1.json" \
-"/home/kelvin/FABulous_fork/myProject/Tile/PE/metadata/logic_op/wrap_map_logic_op.v"
-extract "/home/kelvin/FABulous_fork/myProject/Tile/PE/metadata/logic_op/cell_logic_op_conf_3.json" \
-"/home/kelvin/FABulous_fork/myProject/Tile/PE/metadata/logic_op/wrap_map_logic_op.v"
-extract "/home/kelvin/FABulous_fork/myProject/Tile/PE/metadata/logic_op/cell_logic_op_conf_2.json" \
-"/home/kelvin/FABulous_fork/myProject/Tile/PE/metadata/logic_op/wrap_map_logic_op.v"
+extract "myProject/Tile/PE/metadata/logic_op/cell_logic_op_conf_0.json" \
+"myProject/Tile/PE/metadata/logic_op/wrap_map_logic_op.v"
+extract "myProject/Tile/PE/metadata/logic_op/cell_logic_op_conf_1.json" \
+"myProject/Tile/PE/metadata/logic_op/wrap_map_logic_op.v"
+extract "myProject/Tile/PE/metadata/logic_op/cell_logic_op_conf_3.json" \
+"myProject/Tile/PE/metadata/logic_op/wrap_map_logic_op.v"
+extract "myProject/Tile/PE/metadata/logic_op/cell_logic_op_conf_2.json" \
+"myProject/Tile/PE/metadata/logic_op/wrap_map_logic_op.v"
 
 # unwrapping
-yosys techmap -map /home/kelvin/FABulous_fork/myProject/Tile/PE/metadata/logic_op/unwrap_map_logic_op.v
+yosys techmap -map myProject/Tile/PE/metadata/logic_op/unwrap_map_logic_op.v
 yosys opt -full
 yosys clean -purge
 

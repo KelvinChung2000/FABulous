@@ -1,6 +1,7 @@
 from collections import defaultdict
 from itertools import islice
 from pathlib import Path
+from pprint import pprint
 from subprocess import run
 from typing import cast
 
@@ -290,8 +291,8 @@ def genFabric(fabric: Fabric, chip: Chip, context=1):
             shareDest[wireType.sourcePort].append(wireType)
 
         for src, destList in shareDest.items():
-            nodes = []
             for c in range(context):
+                nodes = []
                 for n in src.expand():
                     nodes.append(
                         [
@@ -311,8 +312,10 @@ def genFabric(fabric: Fabric, chip: Chip, context=1):
                                 f"c{c}.{n}",
                             )
                         )
-            for node in nodes:
-                chip.add_node(node, "DEFAULT")
+                for node in nodes:
+                    if x == 3 and y == 5:
+                        print(node)
+                    chip.add_node(node, "DEFAULT")
     setTiming(chip)
 
 
@@ -446,7 +449,6 @@ def generateConstrainPair(fabric: Fabric, dest: Path):
 def addPackingRule(chip: Chip, fabric: Fabric):
     for group, bels in fabric.getAllBelGroups():
         for belIndex, userBel in enumerate(bels):
-            print(userBel.name)
             for userPort in userBel.inputs:
                 for driverPort in fabric.getPortDrivers(userPort):
                     if not isinstance(driverPort, BelPort):

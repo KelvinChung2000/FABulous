@@ -152,7 +152,7 @@ class MemoryConfigurationOption:
         config_params = []
 
         for idx, netname in self.module.netnames.items():
-            if hasattr(netname, "attributes") and "CONFIG_BIT" in netname.attributes:
+            if "CONFIG_BIT" in netname.attributes:
                 # For techmap module parameters, use default value "0"
                 # The actual value will be determined during synthesis
                 config_params.append((idx, "0"))
@@ -164,7 +164,10 @@ class MemoryConfigurationOption:
         config_values = []
 
         for idx, netname in self.module.netnames.items():
-            if hasattr(netname, "attributes") and "CONFIG_BIT" in netname.attributes:
+            if (
+                "CONFIG_BIT" in netname.attributes
+                and netname.attributes.get("FEATURE_TYPE") != "INIT"
+            ):
                 v = int("".join([str(i) for i in netname.bits]), 2)
                 config_values.append((idx, v))
 

@@ -65,7 +65,6 @@ class Bel:
     externalOutputs: list[BelPort]
     configPort: list[ConfigPort]
     sharedPort: list[SharedPort]
-    belFeatureMap: dict[str, int]
     userCLK: Port | None
     z: int = 0
     baseBel: bool = False

@@ -1,6 +1,7 @@
 (* blackbox *)
 module Mem #(
-    parameter config_bits = 0
+    parameter config_data = 0,
+    parameter read_mode = 0
 )
 (
     input wire[31:0] addr0,

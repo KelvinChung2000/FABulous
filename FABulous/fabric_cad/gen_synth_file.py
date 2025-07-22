@@ -144,8 +144,6 @@ def genCellsAndMaps(bel: Bel):
     for wire in module.selected_wires():
         p = bel.findPortByName(wire.name.str()[1:])
         if isinstance(p, ConfigPort):
-            if p.featureType == FeatureType.INIT:
-                continue
             ranges.append([i.value for i in p.features])
         else:
             raise ValueError(
@@ -154,12 +152,6 @@ def genCellsAndMaps(bel: Bel):
 
     keys = [i.name.str().removeprefix("\\") for i in module.selected_wires()]
     combinations = [tuple(zip(keys, values)) for values in product(*ranges)]
-    print(bel)
-    print(keys)
-    print(ranges)
-    print(combinations)
-    if bel.name == "Mem":
-        raise
     runPass("cd")
 
     cellDict = {}
@@ -176,7 +168,7 @@ def genCellsAndMaps(bel: Bel):
             [f"{cKey.removeprefix('\\')}_{cValue}" for cKey, cValue in c]
         )
         for cKey, cValue in c:
-            if cValue != "z":
+            if cValue is not None:
                 runPass(f"connect -set {cKey} {cValue}")
         runPass("opt -full;")
         # runPass("clean -purge")

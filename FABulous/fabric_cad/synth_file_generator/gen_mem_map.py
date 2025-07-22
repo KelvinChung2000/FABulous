@@ -86,27 +86,9 @@ class MemoryMapping:
                 parameters, connections, address_bits, data_width
             )
 
-            config_name: str
-            value: int
-            n = yosys_json.findNetWithAttribute("CONFIG_BIT")
-            print(yosys_json)
-            if n is not None:
-                if len(n) != 1:
-                    raise ValueError(
-                        f"Memory cell in {file_path} must have exactly one net with CONFIG_BIT attribute."
-                    )
-                config_name = n[0]
-                value = int(
-                    "".join([str(i) for i in module.netnames[config_name].bits]), 2
-                )
-                print(config_name, value)
-            else:
-                config_name = file_path.stem
-                value = 0  # Default value if no CONFIG_BIT found
-
             config_option = MemoryConfigurationOption(
-                name=config_name,
-                value=value,
+                name=file_path.stem,
+                value=idx,
                 init_value=init_value,
                 cost=cost,
                 port_options=ports,

@@ -24,7 +24,7 @@ yosys opt_expr
 yosys opt_clean
 yosys check
 yosys opt -nodffe -nosdff
-yosys fsm -expand -nomap
+yosys fsm -expand -nomap -encoding binary
 yosys opt -full
 yosys techmap -map $project_root/.FABulous/logic_to_std.v
 
@@ -34,7 +34,7 @@ yosys opt_clean
 yosys share
 yosys opt_expr
 yosys opt_clean
-yosys fsm -encoding binary
+yosys fsm
 yosys techmap -map $project_root/.FABulous/reduce_or_to_or.v
 yosys techmap -map $project_root/.FABulous/reduce_and_to_and.v
 yosys techmap -map $project_root/.FABulous/eq_to_logic.v
@@ -43,7 +43,7 @@ yosys opt -full
 yosys clean -purge
 
 # memory opt
-yosys memory -nomap
+yosys memory -nomap -external-init
 yosys memory_libmap -lib $project_root/.FABulous/memory_map.txt
 yosys techmap -map $project_root/.FABulous/techmaps.v
 yosys clean -purge

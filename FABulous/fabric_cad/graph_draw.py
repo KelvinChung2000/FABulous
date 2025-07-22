@@ -161,7 +161,7 @@ def genRoutingResourceGraph(
                     continue
                 globalPairs.add((srcName, dstName))
                 globalPairs.add((dstName, srcName))
-
+                print(f"Adding edge {srcName} -> {dstName}")
                 graph.add_edge(pydot.Edge(srcName, dstName, dir="none", color="blue"))
 
     # Add neato layout engine hint

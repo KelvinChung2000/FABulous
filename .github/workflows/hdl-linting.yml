@@ -15,6 +15,10 @@ jobs:
       with:
         config_file: 'config.rule'
         github_token: ${{ secrets.GITHUB_TOKEN }}
+    - name: Run Verilog Linter
+      run: |
+        FABulous -c demo
+        verilator --lint-only demo/**/*.v
 
   lint-vhdl:
     runs-on: ubuntu-latest

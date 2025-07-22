@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING
 
 from loguru import logger
 
+from FABulous.custom_exception import InvalidFileType, InvalidPortType, SpecMissMatch
 from FABulous.fabric_definition.Bel import Bel
 from FABulous.fabric_definition.define import IO, MultiplexerStyle
 from FABulous.fabric_definition.Gen_IO import Gen_IO
@@ -302,10 +303,9 @@ def generateSwitchmatrixList(
             if len(carryports[prefix][IO.INPUT]) is not len(
                 carryports[prefix][IO.OUTPUT]
             ):
-                logger.error(
+                raise ValueError(
                     f"Carryports mismatch! There are {len(carryports[prefix][IO.INPUT])} INPUTS and {len(carryports[prefix][IO.OUTPUT])} outputs!"
                 )
-                raise ValueError
 
             listfile.append(f"# Connect carry chain {prefix}")
             for cin, cout in zip(
@@ -381,7 +381,6 @@ def addBelsToPrim(
         with open(primsFile) as f:
             prims = f.read()
     else:
-        logger.error(f"Prims file {primsFile} not found.")
         raise FileNotFoundError(f"Prims file {primsFile} not found.")
 
     # remove all duplicate bels in list.
@@ -573,10 +572,9 @@ def genIOBel(
     elif language in ["vhdl", "vhd"]:
         language = "vhdl"
     else:
-        logger.error(
+        raise InvalidFileType(
             f"File suffix {language} of file {bel_path} is not supported for genIOBel generation"
         )
-        raise ValueError
 
     writer: codeGenerator = VHDLWriter() if language == "vhdl" else VerilogWriter()
     writer.outFileName = bel_path
@@ -629,8 +627,9 @@ def genIOBel(
             j = "" if gio.pins == 1 else f"{i}"
             if gio.IO == IO.INPUT:
                 if gio.configAccess:
-                    logger.error("Generative IO cannot be an INPUT with config access!")
-                    raise ValueError
+                    raise ValueError(
+                        "Generative IO cannot be an INPUT with config access!"
+                    )
                 internalPorts.append((f"{gio.prefix}{j}", IO.INPUT, False))
                 if gio.clockedComb:  # clocked combinatorial also has a Q signal
                     # But only inputs produce a Q signal to the fabric top
@@ -657,8 +656,7 @@ def genIOBel(
                     externalPorts.append((f"{gio.prefix}{j}", IO.OUTPUT, False))
                     configAccessPorts.append((f"{gio.prefix}{j}", gio.inverted))
             else:
-                logger.error("Invalid IO type for generative IO")
-                raise ValueError
+                raise InvalidPortType("Invalid IO type for generative IO")
 
     for port, direction, reg in internalPorts:
         writer.addPortScalar(port, direction, reg, indentLevel=2)
@@ -698,10 +696,9 @@ def genIOBel(
         writer.addNewLine()
         writer.addComment("gen_io config access", onNewLine=True)
         if len(configAccessPorts) != configBits:
-            logger.error(
+            raise SpecMissMatch(
                 f"Config access ports ({len(configAccessPorts)}) do not match the number of config bits ({configBits})"
             )
-            raise ValueError
         for i in range(configBits):
             port, inverted = configAccessPorts[i]
             writer.addAssignScalar(

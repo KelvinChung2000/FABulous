@@ -6,6 +6,8 @@ import sys
 
 from loguru import logger
 
+from FABulous.custom_exception import SpecMissMatch
+
 try:
     from fasm import (
         fasm_tuple_to_string,
@@ -51,8 +53,9 @@ def genBitstream(fasmFile: str, specFile: str, bitstreamFile: str):
             tileLoc = tileVals[0]
             featureName = ".".join((tileVals[1], tileVals[2]))
             if tileLoc not in specDict["TileMap"].keys():
-                logger.critical("Tile found in fasm file not found in bitstream spec")
-                raise Exception
+                raise SpecMissMatch(
+                    f"Tile location {tileLoc} not found in the bitstream spec"
+                )
             # Set the necessary bits high
             tileType = specDict["TileMap"][tileLoc]
             if featureName in specDict["TileSpecs"][tileLoc].keys():
@@ -71,13 +74,12 @@ def genBitstream(fasmFile: str, specFile: str, bitstreamFile: str):
                         )
 
             else:
-                logger.debug(f"tileType: {tileType}")
-                logger.debug(f"tileLoc {tileLoc}")
-                logger.debug(f"featureName: {featureName}")
-                logger.critical(
-                    "Feature found in fasm file was not found in the bitstream spec"
+                raise SpecMissMatch(
+                    f"Tile type: {tileType}\n"
+                    "with location {tileLoc} and \n"
+                    f"Feature: {featureName}\n"
+                    "found in fasm file was not found in the bitstream spec"
                 )
-                raise Exception
 
     # Write output string and introduce mask
     coordsRE = re.compile(r"X(\d*)Y(\d*)")

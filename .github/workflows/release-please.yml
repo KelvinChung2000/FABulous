@@ -19,7 +19,6 @@ jobs:
         token: ${{ secrets.RELEASE_PLEASE_TOKEN }}
         release-type: python
         config-file: release-please-config.json
-        manifest-file: .release-please-manifest.json
     - uses: actions/checkout@v4
 
     - name: tag major and minor versions

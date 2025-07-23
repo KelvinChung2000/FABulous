@@ -50,7 +50,9 @@ def default_tile(mocker) -> Tile:
 @pytest.fixture(
     params=[
         # Standard configurations
-        FabricConfig(frame_bits_per_row=32, max_frames_per_col=20, name="StandardFabric"),
+        FabricConfig(
+            frame_bits_per_row=32, max_frames_per_col=20, name="StandardFabric"
+        ),
         FabricConfig(frame_bits_per_row=8, max_frames_per_col=5, name="SmallFabric"),
         # Boundary conditions
         FabricConfig(frame_bits_per_row=1, max_frames_per_col=1, name="MinimalFabric"),
@@ -58,10 +60,14 @@ def default_tile(mocker) -> Tile:
         FabricConfig(frame_bits_per_row=64, max_frames_per_col=1, name="WideFabric"),
         # Non-power-of-2 configurations
         FabricConfig(frame_bits_per_row=5, max_frames_per_col=7, name="IrregularSmall"),
-        FabricConfig(frame_bits_per_row=33, max_frames_per_col=21, name="IrregularLarge"),
+        FabricConfig(
+            frame_bits_per_row=33, max_frames_per_col=21, name="IrregularLarge"
+        ),
         FabricConfig(frame_bits_per_row=7, max_frames_per_col=13, name="PrimeFabric"),
         # Large-scale configurations
-        FabricConfig(frame_bits_per_row=256, max_frames_per_col=100, name="VeryLargeFabric"),
+        FabricConfig(
+            frame_bits_per_row=256, max_frames_per_col=100, name="VeryLargeFabric"
+        ),
     ],
     ids=lambda config: config.name,
 )
@@ -144,7 +150,9 @@ def verify_csv_content(file_path: Path, expected_rows: int | None = None) -> lis
     }, f"CSV file {file_path} has unexpected headers"
 
     if expected_rows is not None:
-        assert len(rows) == expected_rows, f"Expected {expected_rows} rows, got {len(rows)}"
+        assert len(rows) == expected_rows, (
+            f"Expected {expected_rows} rows, got {len(rows)}"
+        )
 
     return rows
 
@@ -168,7 +176,11 @@ def configmem_list(request):
         random.seed(request.param)
 
         # Generate all possible (frame_index, bits_used) combinations
-        poss = list(itertools.product(range(fabric.maxFramesPerCol), range(fabric.frameBitsPerRow + 1)))
+        poss = list(
+            itertools.product(
+                range(fabric.maxFramesPerCol), range(fabric.frameBitsPerRow + 1)
+            )
+        )
         shuffle(poss)
         config_final = poss[: tile.globalConfigBits]
 
@@ -217,7 +229,9 @@ def configmem_list(request):
             bits_used = min(total_bits_in_frame, fabric.frameBitsPerRow)
 
             if bits_used > 0:
-                bit_ranges = list(range(total_bits_assigned, total_bits_assigned + bits_used))
+                bit_ranges = list(
+                    range(total_bits_assigned, total_bits_assigned + bits_used)
+                )
                 random.shuffle(bit_ranges)
                 configmems.append(
                     ConfigMem(
@@ -277,7 +291,9 @@ def cocotb_runner(tmp_path: Path):
             sim = "ghdl"
         runner = get_runner(sim)
 
-        sources.insert(0, Path(__file__).parent / "testdata" / f"models{hdl_toplevel_lang}")
+        sources.insert(
+            0, Path(__file__).parent / "testdata" / f"models{hdl_toplevel_lang}"
+        )
         # Copy test module and models to temp directory for cocotb
         test_dir = tmp_path / "tests"
         test_dir.mkdir(exist_ok=True)
@@ -290,11 +306,21 @@ def cocotb_runner(tmp_path: Path):
 
         # Configure sources based on HDL language
         if hdl_toplevel_lang == ".v":
-            runner.build(verilog_sources=sources, hdl_toplevel=hdl_top_level, always=True, build_dir=build_dir)
+            runner.build(
+                verilog_sources=sources,
+                hdl_toplevel=hdl_top_level,
+                always=True,
+                build_dir=build_dir,
+            )
         elif hdl_toplevel_lang == ".vhd":
             # GHDL converts identifiers to lowercase for elaboration and execution
             hdl_top_level = hdl_top_level.lower()
-            runner.build(vhdl_sources=sources, hdl_toplevel=hdl_top_level, always=True, build_dir=build_dir)
+            runner.build(
+                vhdl_sources=sources,
+                hdl_toplevel=hdl_top_level,
+                always=True,
+                build_dir=build_dir,
+            )
 
             # Copy all files from build_dir to test_dir
             for file in build_dir.iterdir():
@@ -309,4 +335,3 @@ def cocotb_runner(tmp_path: Path):
         )
 
     return _create_runner
-

@@ -48,3 +48,7 @@ class InvalidSupertileDefinition(Exception):
 
 class InvalidBelDefinition(Exception):
     """Exception raised for invalid BEL definitions."""
+
+
+class PipelineCommandError(Exception):
+    """Exception raised for errors in command line arguments."""

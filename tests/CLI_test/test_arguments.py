@@ -211,6 +211,7 @@ def test_force_flag(project, tmp_path):
     )
     assert result.returncode == 1
 
+    # force flag with multiple commands
     result = run(
         [
             "FABulous",
@@ -226,6 +227,7 @@ def test_force_flag(project, tmp_path):
     assert result.stdout.count("non_exist") == 2
     assert result.returncode == 1
 
+    # force flag with FABulous script
     with open(tmp_path / "test.fs", "w") as f:
         f.write("load_fabric non_exist.csv\n")
         f.write("load_fabric non_exist.csv\n")

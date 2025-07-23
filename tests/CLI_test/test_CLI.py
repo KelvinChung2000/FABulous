@@ -107,7 +107,7 @@ def test_run_FABulous_bitstream(cli, caplog, mocker):
     Path(cli.projectDir / "user_design" / "sequential_16bit_en.fasm").touch()
     run_cmd(cli, "run_FABulous_bitstream ./user_design/sequential_16bit_en.v")
     log = normalize_and_check_for_errors(caplog.text)
-    assert "Bitstream generated" in log[-1]
+    assert "bitstream generation complete" in log[-1]
     assert m.call_count == 2
 
 

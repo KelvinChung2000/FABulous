@@ -206,7 +206,7 @@ class FABulous_CLI(Cmd):
             return super().onecmd(statement, add_to_history=add_to_history)
         except Exception as e:  # noqa: BLE001 - Catching all exceptions is ok here
             logger.debug(traceback.format_exc())
-            logger.opt(exception=e).error(str(e))
+            logger.opt(exception=e).error(str(e).replace("<", "\<"))
             self.exit_code = 1
             if self.interactive:
                 return False

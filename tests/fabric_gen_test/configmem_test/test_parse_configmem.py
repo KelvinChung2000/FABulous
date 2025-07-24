@@ -430,7 +430,12 @@ class ParseConfigTestCase(NamedTuple):
         pytest.param(
             ParseConfigTestCase(
                 csv_data=[
-                    {"frame_name": "Frame0", "frame_index": "0", "used_bits_mask": "1000", "ConfigBits_ranges": ""}
+                    {
+                        "frame_name": "Frame0",
+                        "frame_index": "0",
+                        "used_bits_mask": "1000",
+                        "ConfigBits_ranges": "",
+                    }
                 ],
                 max_frames=1,
                 frame_bits=4,
@@ -479,7 +484,12 @@ class ParseConfigTestCase(NamedTuple):
         pytest.param(
             ParseConfigTestCase(
                 csv_data=[
-                    {"frame_name": "Frame0", "frame_index": "0", "used_bits_mask": "1000", "ConfigBits_ranges": "a"}
+                    {
+                        "frame_name": "Frame0",
+                        "frame_index": "0",
+                        "used_bits_mask": "1000",
+                        "ConfigBits_ranges": "a",
+                    }
                 ],
                 max_frames=1,
                 frame_bits=4,
@@ -528,7 +538,12 @@ class ParseConfigTestCase(NamedTuple):
         pytest.param(
             ParseConfigTestCase(
                 csv_data=[
-                    {"frame_name": "Frame0", "frame_index": "0", "used_bits_mask": "1000", "ConfigBits_ranges": ":"}
+                    {
+                        "frame_name": "Frame0",
+                        "frame_index": "0",
+                        "used_bits_mask": "1000",
+                        "ConfigBits_ranges": ":",
+                    }
                 ],
                 max_frames=1,
                 frame_bits=4,
@@ -566,10 +581,17 @@ def test_parsing_scenarios(tmp_path, test_case: ParseConfigTestCase):
     if test_case.expected_error:
         # This is an error case - expect ValueError to be raised
         with pytest.raises(ValueError, match=test_case.expected_error):
-            parseConfigMem(csv_file, test_case.max_frames, test_case.frame_bits, test_case.global_bits)
+            parseConfigMem(
+                csv_file,
+                test_case.max_frames,
+                test_case.frame_bits,
+                test_case.global_bits,
+            )
     else:
         # This is a success case
-        result = parseConfigMem(csv_file, test_case.max_frames, test_case.frame_bits, test_case.global_bits)
+        result = parseConfigMem(
+            csv_file, test_case.max_frames, test_case.frame_bits, test_case.global_bits
+        )
 
         assert len(result) == test_case.expected_result_len
 
@@ -579,7 +601,11 @@ def test_parsing_scenarios(tmp_path, test_case: ParseConfigTestCase):
             assert len(result) == test_case.expected_result_len
 
             # Create a mapping of expected non-NULL frames for validation
-            expected_frames = [frame for frame in test_case.csv_data if frame["ConfigBits_ranges"].upper() != "NULL"]
+            expected_frames = [
+                frame
+                for frame in test_case.csv_data
+                if frame["ConfigBits_ranges"].upper() != "NULL"
+            ]
 
             # Verify each returned frame matches the expected data
             for i, frame_result in enumerate(result):

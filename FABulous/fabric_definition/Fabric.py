@@ -1,7 +1,5 @@
 from dataclasses import dataclass, field
 
-from loguru import logger
-
 from FABulous.fabric_definition.Bel import Bel
 from FABulous.fabric_definition.define import (
     ConfigBitMode,
@@ -258,8 +256,7 @@ class Fabric:
         if ret is None:
             ret = self.unusedTileDic.get(name)
         if ret is None:
-            logger.error(f"Tile {name} not found in fabric.")
-            raise KeyError
+            raise KeyError(f"Tile {name} not found in fabric.")
 
         return ret
 
@@ -268,8 +265,7 @@ class Fabric:
         if ret is None:
             ret = self.unusedSuperTileDic.get(name)
         if ret is None:
-            logger.error(f"Tile {name} not found in fabric.")
-            raise KeyError
+            raise KeyError(f"SuperTile {name} not found in fabric.")
         return ret
 
     def getAllUniqueBels(self) -> list[Bel]:
@@ -299,10 +295,9 @@ class Fabric:
             Tile coordinates are out of range.
         """
         if x < 0 or x >= self.numberOfColumns or y < 0 or y >= self.numberOfRows:
-            logger.error(
-                f"Invalid tile coordinates: ({x}, {y}) for a Fabric of size ({self.numberOfRows}, {self.numberOfColumns})"
+            raise ValueError(
+                f"Invalid tile coordinates: ({x}, {y}) max (0, 0) - ({self.numberOfRows}, {self.numberOfColumns})"
             )
-            raise ValueError
         if self.tile[y][x] is None:
             return []
         return self.tile[y][x].bels

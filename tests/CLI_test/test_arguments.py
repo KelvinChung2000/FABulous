@@ -104,7 +104,9 @@ def test_tcl_script_execution(tmp_path, project, monkeypatch):
     """Test TCL script execution on a valid project"""
     # Create a TCL script
     tcl_script = tmp_path / "test_script.tcl"
-    tcl_script.write_text('# TCL script with FABulous commands\nputs "Hello from TCL"\n')
+    tcl_script.write_text(
+        '# TCL script with FABulous commands\nputs "Hello from TCL"\n'
+    )
 
     test_args = ["FABulous", str(project), "--TCLScript", str(tcl_script)]
     monkeypatch.setattr(sys, "argv", test_args)
@@ -211,6 +213,7 @@ def test_force_flag(project, tmp_path):
     )
     assert result.returncode == 1
 
+    # force flag with multiple commands
     result = run(
         [
             "FABulous",
@@ -226,6 +229,7 @@ def test_force_flag(project, tmp_path):
     assert result.stdout.count("non_exist") == 2
     assert result.returncode == 1
 
+    # force flag with FABulous script
     with open(tmp_path / "test.fs", "w") as f:
         f.write("load_fabric non_exist.csv\n")
         f.write("load_fabric non_exist.csv\n")
@@ -254,7 +258,14 @@ def test_install_oss_cad_suite(project, mocker, monkeypatch):
         status_code = 200
 
         def json(self):
-            return {"assets": [{"name": ".tar.gz x64 linux", "browser_download_url": "./something.tgz"}]}
+            return {
+                "assets": [
+                    {
+                        "name": ".tar.gz x64 linux",
+                        "browser_download_url": "./something.tgz",
+                    }
+                ]
+            }
 
         def iter_content(self, chunk_size=1024):
             return []
@@ -273,7 +284,9 @@ def test_install_oss_cad_suite(project, mocker, monkeypatch):
         return MockTarFile()
 
     monkeypatch.setattr(tarfile, "open", mock_open)
-    m = mocker.patch("requests.get", return_value=MockRequest())  # Mock network request for testing
+    m = mocker.patch(
+        "requests.get", return_value=MockRequest()
+    )  # Mock network request for testing
 
     test_args = ["FABulous", str(project), "--install_oss_cad_suite"]
     monkeypatch.setattr(sys, "argv", test_args)
@@ -342,7 +355,12 @@ def test_nonexistent_script_file(project, monkeypatch):
     """Test error handling for nonexistent script files"""
 
     # Try to run nonexistent FABulous script
-    test_args = ["FABulous", str(project), "--FABulousScript", "/nonexistent/script.fab"]
+    test_args = [
+        "FABulous",
+        str(project),
+        "--FABulousScript",
+        "/nonexistent/script.fab",
+    ]
     monkeypatch.setattr(sys, "argv", test_args)
 
     with pytest.raises(SystemExit) as exc_info:
@@ -373,7 +391,13 @@ def test_create_project_with_invalid_writer(tmp_path, monkeypatch):
     """Test project creation with an invalid writer"""
     project_dir = tmp_path / "test_invalid_writer_project"
 
-    test_args = ["FABulous", "--createProject", str(project_dir), "--writer", "invalid_writer"]
+    test_args = [
+        "FABulous",
+        "--createProject",
+        str(project_dir),
+        "--writer",
+        "invalid_writer",
+    ]
     monkeypatch.setattr(sys, "argv", test_args)
 
     with pytest.raises(SystemExit) as exc_info:
@@ -413,7 +437,10 @@ def test_project_directory_priority_order(tmp_path, monkeypatch):
     )
 
     # The log should show the user provided directory being used
-    assert f"INFO: Setting current working directory to: {str(user_provided_dir)}" in result.stdout
+    assert (
+        f"INFO: Setting current working directory to: {str(user_provided_dir)}"
+        in result.stdout
+    )
 
     # Test 2: Environment variable should be used when no user argument provided
     env_with_fab_proj = os.environ.copy()
@@ -426,7 +453,10 @@ def test_project_directory_priority_order(tmp_path, monkeypatch):
         env=env_with_fab_proj,
     )
     # Should use the environment variable directory
-    assert f"INFO: Setting current working directory to: {str(env_var_dir)}" in result.stdout
+    assert (
+        f"INFO: Setting current working directory to: {str(env_var_dir)}"
+        in result.stdout
+    )
 
     # Test 3: Default directory (cwd) should be used when no argument or env var
     env_without_fab_proj = os.environ.copy()
@@ -440,7 +470,10 @@ def test_project_directory_priority_order(tmp_path, monkeypatch):
         env=env_without_fab_proj,
     )
 
-    assert f"INFO: Setting current working directory to: {str(default_dir)}" in result.stdout
+    assert (
+        f"INFO: Setting current working directory to: {str(default_dir)}"
+        in result.stdout
+    )
 
 
 def test_command_flag_with_stop_on_first_error(project):

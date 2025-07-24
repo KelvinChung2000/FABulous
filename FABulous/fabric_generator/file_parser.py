@@ -8,7 +8,18 @@ from typing import Literal, overload
 
 from loguru import logger
 
-from FABulous.custom_exception import FabricParsingError
+from FABulous.custom_exception import (
+    FabricParsingError,
+    InvalidBelDefinition,
+    InvalidFabricDefinition,
+    InvalidFabricParameter,
+    InvalidFileType,
+    InvalidListFileDefinition,
+    InvalidPortType,
+    InvalidSupertileDefinition,
+    InvalidSwitchMatrixDefinition,
+    InvalidTileDefinition,
+)
 from FABulous.fabric_definition.Bel import Bel
 from FABulous.fabric_definition.define import (
     IO,
@@ -59,12 +70,10 @@ def parseFabricCSV(fileName: str) -> Fabric:
 
     fName = Path(fileName)
     if fName.suffix != ".csv":
-        logger.error("File must be a csv file")
-        raise ValueError
+        raise InvalidFileType("File must be a csv file")
 
     if not fName.exists():
-        logger.error(f"File {fName} does not exist.")
-        raise ValueError
+        raise FileNotFoundError(f"File {fName} does not exist.")
 
     filePath = fName.parent
 
@@ -78,16 +87,18 @@ def parseFabricCSV(fileName: str) -> Fabric:
     ):
         fabricDescription = fabricDescription.group(1)
     else:
-        logger.error("Cannot find FabricBegin and FabricEnd in csv file.")
-        raise ValueError
+        raise InvalidFabricDefinition(
+            "Cannot find FabricBegin and FabricEnd in csv file."
+        )
 
     if parameters := re.search(
         r"ParametersBegin(.*?)ParametersEnd", file, re.MULTILINE | re.DOTALL
     ):
         parameters = parameters.group(1)
     else:
-        logger.error("Cannot find ParametersBegin and ParametersEnd in csv file.")
-        raise ValueError
+        raise InvalidFabricDefinition(
+            "Cannot find ParametersBegin and ParametersEnd in csv file."
+        )
 
     fabricDescription = fabricDescription.split("\n")
     parameters = parameters.split("\n")
@@ -161,10 +172,9 @@ def parseFabricCSV(fileName: str) -> Fabric:
             elif i[1] == "FlipFlopChain":
                 configBitMode = ConfigBitMode.FLIPFLOP_CHAIN
             else:
-                logger.error(
+                raise InvalidFabricParameter(
                     f"Invalid config bit mode {i[1]} in parameters. Valid options are frame_based and FlipFlopChain."
                 )
-                raise ValueError
         elif i[0].startswith("FrameBitsPerRow"):
             frameBitsPerRow = int(i[1])
         elif i[0].startswith("MaxFramesPerCol"):
@@ -179,15 +189,13 @@ def parseFabricCSV(fileName: str) -> Fabric:
             elif i[1] == "generic":
                 multiplexerStyle = MultiplexerStyle.GENERIC
             else:
-                logger.error(
+                raise InvalidFabricParameter(
                     f"Invalid multiplexer style {i[1]} in parameters. Valid options are custom and generic."
                 )
-                raise ValueError
         elif i[0].startswith("SuperTileEnable"):
             superTileEnable = i[1] == "TRUE"
         else:
-            logger.error(f"The following parameter is not valid: {i}")
-            raise ValueError
+            raise InvalidFabricParameter(f"The following parameter is not valid: {i}")
 
     # form the fabric data structure
     usedTile = set()
@@ -204,8 +212,9 @@ def parseFabricCSV(fileName: str) -> Fabric:
             elif i == "Null" or i == "NULL" or i == "None":
                 fabricLine.append(None)
             else:
-                logger.error(f"Unknown tile {i}.")
-                raise ValueError
+                raise InvalidFabricDefinition(
+                    f"Unknown tile {i} in fabric description. Please check the tile definitions."
+                )
         fabricTiles.append(fabricLine)
 
     for i in list(tileDic.keys()):
@@ -279,11 +288,10 @@ def parseMatrix(fileName: Path, tileName: str) -> dict[str, list[str]]:
         file = file.split("\n")
 
     if file[0].split(",")[0] != tileName:
-        logger.error(f"{fileName} {file[0].split(',')} {tileName}")
-        logger.error(
-            "Tile name (top left element) in csv file does not match tile name in tile object"
+        raise InvalidSwitchMatrixDefinition(
+            f"{fileName} {file[0].split(',')} {tileName}\n"
+            f"Tile name (top left element) in csv file does not match tile name in tile object"
         )
-        raise ValueError
     destList = file[0].split(",")[1:]
 
     for i in file[1:]:
@@ -337,8 +345,7 @@ def parseList(
         Return either a list of connection pairs or a dictionary of lists which is collected by the specified option, source or sink.
     """
     if not filePath.exists():
-        logger.error(f"The file {filePath} does not exist.")
-        raise ValueError
+        raise FileNotFoundError(f"The file {filePath} does not exist.")
 
     resultList = []
     with open(filePath) as f:
@@ -351,9 +358,9 @@ def parseList(
         if not line:
             continue
         if len(line) != 2:
-            logger.error(f"Invalid list formatting in file: {filePath} at line {i}")
-            logger.error(f"Line: {line}")
-            raise ValueError
+            raise InvalidListFileDefinition(
+                f"Invalid list formatting in file: {filePath} at line {i}: {line}"
+            )
         left, right = line[0], line[1]
 
         if left == "INCLUDE":
@@ -365,8 +372,8 @@ def parseList(
         expandListPorts(left, leftList)
         expandListPorts(right, rightList)
         if len(leftList) != len(rightList):
-            raise ValueError(
-                f"List file {filePath} does not have the same number of source and sink ports."
+            raise InvalidListFileDefinition(
+                f"List file {filePath} does not have the same number of source and sink ports at line {i}: {line}"
             )
         resultList += list(zip(leftList, rightList, strict=False))
 
@@ -453,8 +460,7 @@ def parsePortLine(line: str) -> tuple[list[Port], tuple[str, str] | None]:
         )
         commonWirePair = None
     else:
-        logger.error(f"Unknown port type: {temp[0]}")
-        raise ValueError("Unknown port type.")
+        raise InvalidPortType(f"Unknown port type: {temp[0]}")
     return (ports, commonWirePair)
 
 
@@ -485,12 +491,10 @@ def parseTiles(fileName: Path) -> tuple[list[Tile], list[tuple[str, str]]]:
     logger.info(f"Reading tile configuration: {fileName}")
 
     if fileName.suffix != ".csv":
-        logger.error("File must be a CSV file.")
-        raise ValueError
+        raise InvalidFileType("File must be a CSV file.")
 
     if not fileName.exists():
-        logger.error(f"File {fileName} does not exist.")
-        raise ValueError
+        raise FileExistsError(f"File {fileName} does not exist.")
 
     filePathParent = fileName.parent
 
@@ -542,26 +546,22 @@ def parseTiles(fileName: Path) -> tuple[list[Tile], list[tuple[str, str]]]:
                         )
                 if "SHARED_" in temp[6]:
                     if "JUMP" not in temp[0]:
-                        logger.error(
+                        raise InvalidTileDefinition(
                             "LOCAL SHARED_ Ports can only be used with JUMP ports."
                         )
-                        raise ValueError
                     localShared = temp[6].split("_")[1]
                     if localShared is None or localShared == "":
-                        logger.error("SHARED_ cannot be empty.")
-                        raise ValueError
+                        raise InvalidTileDefinition("SHARED_ cannot be empty.")
                     if localShared not in ["RESET", "ENABLE"]:
-                        logger.error(
+                        raise InvalidTileDefinition(
                             f"LOCAL SHARED_ port {localShared} is not supported. Only SHARED_RESET and SHARED_ENABLE are supported."
                         )
-                        raise ValueError
                     if localShared not in localSharedPorts:
                         localSharedPorts[localShared] = port
                     else:
-                        logger.error(
+                        raise InvalidTileDefinition(
                             f"LOCAL SHARED_ port {localShared} already exists."
                         )
-                        raise ValueError
 
                 ports.extend(port)
                 if commonWirePair:
@@ -587,10 +587,9 @@ def parseTiles(fileName: Path) -> tuple[list[Tile], list[tuple[str, str]]]:
                         logger.info(f"Adding bels to custom prims file: {primsFile}")
                         addBelsToPrim(primsFile, [bels[-1]])
                 else:
-                    logger.error(
-                        f"Invalid file type in {belFilePath} only .vhdl and .v are supported."
+                    raise InvalidFileType(
+                        f"File {belFilePath} is not a .vhdl or .v file. Please check the BEL file."
                     )
-                    raise ValueError
             elif temp[0] == "GEN_IO":
                 configBit = 0
                 configAccess = False
@@ -600,19 +599,22 @@ def parseTiles(fileName: Path) -> tuple[list[Tile], list[tuple[str, str]]]:
                 clockedMux = False
                 pins = int(temp[1])
                 if pins <= 0:
-                    logger.error(f"GEN_IO pins must be greater than 0, but is {pins}")
-                    raise ValueError
-                # Additional params can be added
+                    raise InvalidTileDefinition(
+                        f"GEN_IO pins must be greater than 0, but is {pins}"
+                    )  # Additional params can be added
                 for param in temp[4:]:
                     param = param.strip()
                     param = param.upper()
 
                     if param == "CONFIGACCESS":
                         if temp[2] != "OUTPUT":
-                            logger.error(
-                                "CONFIGACCESS GEN_IO can only be used with OUTPUT"
+                            raise InvalidTileDefinition(
+                                f"CONFIGACCESS GEN_IO can only be used with OUTPUT, but is {temp[2]}"
                             )
-                            raise ValueError
+                        if not configAccess and temp[2] != "OUTPUT":
+                            raise InvalidTileDefinition(
+                                f"CONFIGACCESS GEN_IO can only be used with OUTPUT, but is {temp[2]}"
+                            )
                         configAccess = True
                         configBit = int(temp[1])
                     elif param == "INVERTED":
@@ -627,17 +629,18 @@ def parseTiles(fileName: Path) -> tuple[list[Tile], list[tuple[str, str]]]:
                     elif param is None or param == "":
                         continue
                     else:
-                        logger.error(f"Unknown parameter {param} in GEN_IO")
-                        raise ValueError
+                        raise InvalidTileDefinition(
+                            f"Unknown parameter {param} in GEN_IO. Valid parameters are CONFIGACCESS, INVERTED, CLOCKED, CLOCKED_COMB, CLOCKED_MUX."
+                        )
 
                     if configAccess and (clocked or clockedComb or clockedMux):
-                        logger.error("CONFIGACCESS GEN_IO can not be clocked")
-                        raise ValueError
+                        raise InvalidTileDefinition(
+                            "CONFIGACCESS GEN_IO can not be clocked"
+                        )
                     if sum([clocked, clockedComb, clockedMux]) > 1:
-                        logger.error(
+                        raise InvalidTileDefinition(
                             "CLOCKED, CLOCKED_COMB or CLOCKED_MUX can not be combined for one GEN_IO"
                         )
-                        raise ValueError
 
                 if temp[3] not in (gio.prefix for gio in gen_ios):
                     gen_ios.append(
@@ -654,10 +657,9 @@ def parseTiles(fileName: Path) -> tuple[list[Tile], list[tuple[str, str]]]:
                         )
                     )
                 else:
-                    logger.error(
+                    raise InvalidTileDefinition(
                         f"GEN_IO with prefix {temp[3]} already exists in tile {tileName}."
                     )
-                    raise ValueError
             elif temp[0] == "MATRIX":
                 configBit = 0
 
@@ -720,14 +722,14 @@ def parseTiles(fileName: Path) -> tuple[list[Tile], list[tuple[str, str]]]:
                                         f"Cannot find NumberOfConfigBits in {matrixDir} assume 0 config bits."
                                     )
                         case _:
-                            logger.error("Unknown file extension for matrix.")
-                            raise ValueError("Unknown file extension for matrix.")
+                            raise InvalidFileType("Unknown file extension for matrix.")
 
             elif temp[0] == "INCLUDE":
                 p = fileName.parent.joinpath(temp[1])
                 if not p.exists():
-                    logger.error(f"Cannot find {str(p)} in tile {tileName}")
-                    raise ValueError
+                    raise InvalidTileDefinition(
+                        f"Cannot find {str(p)} in tile {tileName}"
+                    )
                 with open(p) as f:
                     iFile = f.read()
                     iFile = re.sub(r"#.*", "", iFile)
@@ -742,8 +744,10 @@ def parseTiles(fileName: Path) -> tuple[list[Tile], list[tuple[str, str]]]:
                         commonWirePairs.append(commonWirePair)
 
             else:
-                logger.error(f"Unknown tile description {temp[0]} in tile {t}.")
-                raise ValueError
+                raise InvalidTileDefinition(
+                    f"Unknown tile description {temp[0]} in tile {tileName}. "
+                    "Valid descriptions are NORTH, SOUTH, EAST, WEST, JUMP, BEL, GEN_IO, MATRIX, and INCLUDE."
+                )
 
             withUserCLK = any(bel.withUserCLK for bel in bels)
 
@@ -790,12 +794,10 @@ def parseSupertiles(fileName: Path, tileDic: dict[str, Tile]) -> list[SuperTile]
     logger.info(f"Reading supertile configuration: {fileName}")
 
     if not fileName.suffix == ".csv":
-        logger.error("File must be a csv file.")
-        raise ValueError
+        raise InvalidFileType("File must be a csv file.")
 
     if not fileName.exists():
-        logger.error(f"File {fileName} does not exist.")
-        raise ValueError
+        raise FileNotFoundError(f"File {fileName} does not exist.")
 
     filePath = fileName.parent
 
@@ -829,8 +831,8 @@ def parseSupertiles(fileName: Path, tileDic: dict[str, Tile]) -> list[SuperTile]
                 elif line[1].endswith(".v") or line[1].endswith(".sv"):
                     bels.append(parseBelFile(belFilePath, line[2], "verilog"))
                 else:
-                    raise ValueError(
-                        f"Invalid file type in {belFilePath} only .vhdl and .v are supported."
+                    raise InvalidFileType(
+                        f"File {belFilePath} is not a .vhdl or .v file. Please check the BEL file."
                     )
                 continue
 
@@ -845,10 +847,9 @@ def parseSupertiles(fileName: Path, tileDic: dict[str, Tile]) -> list[SuperTile]
                 elif j == "Null" or j == "NULL" or j == "None":
                     row.append(None)
                 else:
-                    logger.error(
+                    raise InvalidSupertileDefinition(
                         f"The super tile {name} contains definitions that are not tiles or Null."
                     )
-                    raise ValueError
             tileMap.append(row)
 
         withUserCLK = any(bel.withUserCLK for bel in bels)
@@ -997,10 +998,9 @@ def parseBelFile(
             logger.warning("Assume the number of configBits is 0")
             noConfigBits = 0
         if len(belMapDic) != noConfigBits:
-            logger.error(
+            raise InvalidBelDefinition(
                 f"NoConfigBits does not match with the BEL map in file {filename}, length of BelMap is {len(belMapDic)}, but with {noConfigBits} config bits"
             )
-            raise ValueError
 
         # FIXME: This is a temporary fix for the issue, that our vhdl parser can't handle vectors
         portmatch = file.split("-- GLOBAL")[0].lower()
@@ -1009,9 +1009,8 @@ def parseBelFile(
             s in portmatch
             for s in ["std_logic_vector", "bit_vector", "integer", "signed", "unsigned"]
         ):
-            raise ValueError(
-                f"Unsupported port type in {filename}. \
-                 Currtently only std_logic ports are supported for VHDL bels."
+            raise InvalidPortType(
+                f"Unsupported port type in {filename}. Currently only std_logic ports are supported for VHDL bels."
             )
 
         if result := re.search(
@@ -1038,10 +1037,9 @@ def parseBelFile(
                 elif result.group(2).upper() == "INOUT":
                     direction = IO["INOUT"]
                 else:
-                    logger.error(
+                    raise InvalidPortType(
                         f"Invalid or Unknown port direction {result.group(2).upper()} in line {line}."
                     )
-                    raise ValueError
             else:
                 continue
             if line:
@@ -1060,10 +1058,9 @@ def parseBelFile(
                         carryPrefix = carryPrefix.group(1)
                 if "SHARED_ENABLE" in line or "SHARED_RESET" in line:
                     if direction is not IO["INPUT"]:
-                        logger.error(
-                            "SHARED_ENABLE or SHARED_RESET can only be used with INPUT ports."
+                        raise InvalidBelDefinition(
+                            f"SHARED_ENABLE or SHARED_RESET can only be used with INPUT ports in line {line}."
                         )
-                        raise ValueError
                     if "SHARED_ENABLE" in line:
                         localSharedPorts["ENABLE"] = (portName, direction)
                     elif "SHARED_RESET" in line:
@@ -1094,7 +1091,7 @@ def parseBelFile(
 
             if carryPrefix:
                 if direction is IO["INOUT"]:
-                    raise ValueError(
+                    raise InvalidBelDefinition(
                         f"CARRY can't be used with INOUT ports for port {portName}!"
                     )
                 if carryPrefix not in carry:
@@ -1102,9 +1099,9 @@ def parseBelFile(
                 if direction not in carry[carryPrefix]:
                     carry[carryPrefix][direction] = portName
                 else:
-                    raise ValueError(
-                        f"Port {portName} with prefix {carryPrefix} can't be a carry {direction}, \
-                        since port {carry[carryPrefix][direction]} already is!"
+                    raise InvalidBelDefinition(
+                        f"Port {portName} with prefix {carryPrefix} can't be a carry {direction},"
+                        f" since port {carry[carryPrefix][direction]} already is!"
                     )
 
             isExternal = False
@@ -1184,10 +1181,9 @@ def parseBelFile(
 
                 if "SHARED_ENABLE" in attributes or "SHARED_RESET" in attributes:
                     if direction is not IO["INPUT"]:
-                        logger.error(
-                            "SHARED_ENABLE or SHARED_RESET can only be used with INPUT ports."
+                        raise InvalidBelDefinition(
+                            f"SHARED_ENABLE or SHARED_RESET can only be used with INPUT ports in line {line}."
                         )
-                        raise ValueError
                     if "SHARED_ENABLE" in attributes:
                         localSharedPorts["ENABLE"] = (
                             f"{belPrefix}{new_port_name}",
@@ -1345,8 +1341,9 @@ def vhdl_belMapProcessing(file: str, filename: str) -> dict:
                 start = int(enumParse.group(2))
                 end = int(enumParse.group(3))
             else:
-                logger.error(f"Invalid enum {enums[0]} in file {filename}")
-                raise ValueError
+                raise InvalidBelDefinition(
+                    f"Invalid enum {enums[0]} in file {filename}"
+                )
             belEnumsDic[name] = {}
             for i in enums[1:]:
                 key, value = i.split("=")

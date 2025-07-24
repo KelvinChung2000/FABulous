@@ -36,7 +36,8 @@ from cmd2 import (
 )
 from loguru import logger
 
-from FABulous.custom_exception import CommandError, EnvironmentNotSet, FileTypeError
+from FABulous.custom_exception import CommandError, EnvironmentNotSet, InvalidFileType
+from FABulous.fabric_cad.bit_gen import genBitstream
 from FABulous.fabric_generator.code_generation_Verilog import VerilogWriter
 from FABulous.fabric_generator.code_generation_VHDL import VHDLWriter
 from FABulous.fabric_generator.fabric_automation import generateCustomTileConfig
@@ -44,6 +45,7 @@ from FABulous.fabric_generator.file_parser import parseTiles
 from FABulous.FABulous_API import FABulous_API
 from FABulous.FABulous_CLI import cmd_synthesis
 from FABulous.FABulous_CLI.helper import (
+    CommandPipeline,
     allow_blank,
     check_if_application_exists,
     copy_verilog_files,
@@ -218,8 +220,9 @@ class FABulous_CLI(Cmd):
         """Override the onecmd method to handle exceptions."""
         try:
             return super().onecmd(statement, add_to_history=add_to_history)
-        except Exception:  # noqa: BLE001 - Catching all exceptions is ok here
+        except Exception as e:  # noqa: BLE001 - Catching all exceptions is ok here
             logger.debug(traceback.format_exc())
+            logger.opt(exception=e).error(str(e).replace("<", r"\<"))
             self.exit_code = 1
             if self.interactive:
                 return False
@@ -337,7 +340,7 @@ class FABulous_CLI(Cmd):
                 )
                 self.fabulousAPI.loadFabric(self.csvFile)
             else:
-                logger.opt(exception=FileExistsError()).error(
+                raise FileNotFoundError(
                     "No argument is given and the csv file is set but the file does not exist"
                 )
         else:
@@ -360,17 +363,17 @@ class FABulous_CLI(Cmd):
     def do_print_bel(self, args):
         """Prints a Bel object to the console."""
         if len(args) != 1:
-            logger.opt(exception=CommandError()).error("Please provide a Bel name")
+            raise CommandError("Please provide a Bel name")
 
         if not self.fabricLoaded:
-            logger.opt(exception=CommandError()).error("Need to load fabric first")
+            raise CommandError("Need to load fabric first")
 
         bels = self.fabulousAPI.getBels()
         for i in bels:
             if i.name == args[0]:
                 logger.info(f"\n{pprint.pformat(i, width=200)}")
                 return
-        logger.opt(exception=CommandError()).error("Bel not found")
+        raise CommandError(f"Bel {args[0]} not found in fabric")
 
     @with_category(CMD_HELPER)
     @with_argparser(tile_single_parser)
@@ -378,15 +381,14 @@ class FABulous_CLI(Cmd):
         """Prints a tile object to the console."""
 
         if not self.fabricLoaded:
-            logger.opt(exception=CommandError()).error("Need to load fabric first")
-            return
+            raise CommandError("Need to load fabric first")
 
         if tile := self.fabulousAPI.getTile(args.tile):
             logger.info(f"\n{pprint.pformat(tile, width=200)}")
         elif tile := self.fabulousAPI.getSuperTile(args[0]):
             logger.info(f"\n{pprint.pformat(tile, width=200)}")
         else:
-            logger.opt(exception=CommandError()).error("Tile not found")
+            raise CommandError(f"Tile {args.tile} not found in fabric")
 
     @with_category(CMD_FABRIC_FLOW)
     @with_argparser(tile_list_parser)
@@ -514,10 +516,7 @@ class FABulous_CLI(Cmd):
         logger.info(f"Generating fabric {self.fabulousAPI.fabric.name}")
         self.onecmd_plus_hooks("gen_all_tile")
         if self.exit_code != 0:
-            logger.opt(exception=CommandError()).error(
-                "Tile generation failed. Please check the logs for more details."
-            )
-            return
+            raise CommandError("Tile generation failed")
         self.fabulousAPI.setWriterOutputFile(
             f"{self.projectDir}/Fabric/{self.fabulousAPI.fabric.name}.{self.extension}"
         )
@@ -572,10 +571,9 @@ class FABulous_CLI(Cmd):
             return
 
         if not os.path.exists(fabulatorRoot):
-            logger.opt(exception=EnvironmentNotSet()).error(
+            raise EnvironmentNotSet(
                 f"FABULATOR_ROOT environment variable set to {fabulatorRoot} but the directory does not exist."
             )
-            return
 
         logger.info(f"Found FABulator installation at {fabulatorRoot}")
         logger.info("Trying to start FABulator...")
@@ -590,7 +588,10 @@ class FABulous_CLI(Cmd):
                 sp.Popen(startupCmd, stdout=sp.DEVNULL, stderr=sp.DEVNULL)
 
         except sp.SubprocessError as e:
-            logger.opt(exception=e).error("Startup of FABulator failed.")
+            raise CommandError(
+                "Failed to start FABulator. Please ensure that the FABULATOR_ROOT environment variable is set correctly "
+                "and that FABulator is installed."
+            ) from e
 
     @with_category(CMD_FABRIC_FLOW)
     def do_gen_bitStream_spec(self, *ignored):
@@ -636,55 +637,20 @@ class FABulous_CLI(Cmd):
         Does this by calling the respective functions 'do_gen_[function]'.
         """
         logger.info("Running FABulous")
-        self.onecmd_plus_hooks("gen_io_fabric")
-        if self.exit_code != 0:
-            logger.opt(exception=CommandError()).error(
-                "GEN_IO IO generation failed. Please check the logs for more details."
-            )
-            if not self.force:
-                return
 
-        self.onecmd_plus_hooks("gen_fabric")
-        if self.exit_code != 0:
-            logger.opt(exception=CommandError()).error(
-                "Fabric generation failed. Please check the logs for more details."
-            )
-            if not self.force:
-                return
+        success = (
+            CommandPipeline(self)
+            .add_step("gen_io_fabric")
+            .add_step("gen_fabric", "Fabric generation failed")
+            .add_step("gen_bitStream_spec", "Bitstream specification generation failed")
+            .add_step("gen_top_wrapper", "Top wrapper generation failed")
+            .add_step("gen_model_npnr", "Nextpnr model generation failed")
+            .add_step("gen_geometry", "Geometry generation failed")
+            .execute()
+        )
 
-        self.onecmd_plus_hooks("gen_bitStream_spec")
-        if self.exit_code != 0:
-            logger.opt(exception=CommandError()).error(
-                "Bitstream specification generation failed. Please check the logs for more details."
-            )
-            if not self.force:
-                return
-
-        self.onecmd_plus_hooks("gen_top_wrapper")
-        if self.exit_code != 0:
-            logger.opt(exception=CommandError()).error(
-                "Top wrapper generation failed. Please check the logs for more details."
-            )
-            if not self.force:
-                return
-
-        self.onecmd_plus_hooks("gen_model_npnr")
-        if self.exit_code != 0:
-            logger.opt(exception=CommandError()).error(
-                "Nextpnr model generation failed. Please check the logs for more details."
-            )
-            if not self.force:
-                return
-
-        self.onecmd_plus_hooks("gen_geometry")
-        if self.exit_code != 0:
-            logger.opt(exception=CommandError()).error(
-                "Geometry generation failed. Please check the logs for more details."
-            )
-            if not self.force:
-                return
-
-        logger.info("FABulous fabric flow complete")
+        if success:
+            logger.info("FABulous fabric flow complete")
 
     @with_category(CMD_FABRIC_FLOW)
     def do_gen_model_npnr(self, *ignored):
@@ -732,11 +698,8 @@ class FABulous_CLI(Cmd):
         top_module_name = path.stem
 
         if path.suffix != ".json":
-            logger.opt(exception=FileTypeError()).error(
-                """
-                No json file provided.
-                Usage: place_and_route <json_file> (<json_file> is generated by Yosys. Generate it by running `synthesis`.)
-                """
+            raise InvalidFileType(
+                "No json file provided. Usage: place_and_route <json_file>"
             )
 
         fasm_file = top_module_name + ".fasm"
@@ -748,7 +711,7 @@ class FABulous_CLI(Cmd):
         if not os.path.exists(
             f"{self.projectDir}/.FABulous/pips.txt"
         ) or not os.path.exists(f"{self.projectDir}/.FABulous/bel.txt"):
-            logger.opt(exception=FileNotFoundError()).error(
+            raise FileNotFoundError(
                 "Pips and Bel files are not found, please run model_gen_npnr first"
             )
 
@@ -779,19 +742,18 @@ class FABulous_CLI(Cmd):
                     shell=True,
                 )
                 if result.returncode != 0:
-                    logger.opt(exception=CommandError()).error(
-                        "Nextpnr failed. Please check the logs for more details."
-                    )
+                    raise CommandError("Nextpnr failed with non-zero exit code")
 
             else:
-                logger.opt(exception=FileNotFoundError()).error(
-                    f'Cannot find file "{json_file}" in path "./{parent}/", which is generated by running Yosys with Nextpnr backend (e.g. synthesis).'
+                raise FileNotFoundError(
+                    f'Cannot find file "{json_file}" in path "{self.projectDir}/{parent}/". '
+                    "This file is generated by running Yosys with Nextpnr backend (e.g. synthesis)."
                 )
 
             logger.info("Placement and Routing completed")
         else:
-            logger.opt(exception=FileNotFoundError()).error(
-                f"Directory {self.projectDir}/{parent} does not exist."
+            raise FileNotFoundError(
+                f"Directory {self.projectDir}/{parent} does not exist. Please check the path and try again."
             )
 
     @with_category(CMD_USER_DESIGN_FLOW)
@@ -810,38 +772,38 @@ class FABulous_CLI(Cmd):
         top_module_name = args.file.stem
 
         if args.file.suffix != ".fasm":
-            logger.opt(exception=FileTypeError()).error(
-                """
-                No fasm file provided.
-                Usage: gen_bitStream_binary <fasm_file>
-                """
+            raise InvalidFileType(
+                "No fasm file provided. Usage: gen_bitStream_binary <fasm_file>"
             )
 
         bitstream_file = top_module_name + ".bin"
 
         if not (self.projectDir / ".FABulous/bitStreamSpec.bin").exists():
-            logger.opt(exception=FileNotFoundError()).error(
+            raise FileNotFoundError(
                 "Cannot find bitStreamSpec.bin file, which is generated by running gen_bitStream_spec"
             )
 
         if not (self.projectDir / f"{parent}/{fasm_file}").exists():
-            logger.opt(exception=FileNotFoundError()).error(
-                f"Cannot find {self.projectDir}/{parent}/{fasm_file} file which is generated by running place_and_route. Potentially Place and Route Failed."
+            raise FileNotFoundError(
+                f"Cannot find {self.projectDir}/{parent}/{fasm_file} file which is generated by running place_and_route. "
+                "Potentially Place and Route Failed."
             )
 
         logger.info(f"Generating Bitstream for design {self.projectDir}/{args.file}")
         logger.info(f"Outputting to {self.projectDir}/{parent}/{bitstream_file}")
-        runCmd = [
-            "bit_gen",
-            "-genBitstream",
-            f"{self.projectDir}/{parent}/{fasm_file}",
-            f"{self.projectDir}/.FABulous/bitStreamSpec.bin",
-            f"{self.projectDir}/{parent}/{bitstream_file}",
-        ]
+
         try:
-            sp.run(runCmd, check=True)
-        except sp.CalledProcessError as e:
-            logger.opt(exception=e).error("Bitstream generation failed")
+            genBitstream(
+                f"{self.projectDir}/{parent}/{fasm_file}",
+                f"{self.projectDir}/.FABulous/bitStreamSpec.bin",
+                f"{self.projectDir}/{parent}/{bitstream_file}",
+            )
+
+        except Exception as e:  # noqa: BLE001
+            raise CommandError(
+                f"Bitstream generation failed for {self.projectDir}/{parent}/{fasm_file}. "
+                "Please check the logs for more details."
+            ) from e
 
         logger.info("Bitstream generated")
 
@@ -878,11 +840,14 @@ class FABulous_CLI(Cmd):
             bitstreamPath = args.file
         topModule = bitstreamPath.stem
         if bitstreamPath.suffix != ".bin":
-            logger.opt(exception=FileTypeError()).error("No bitstream file specified.")
+            raise InvalidFileType(
+                "No bitstream file specified. Usage: run_simulation <format> <bitstream_file>"
+            )
 
         if not bitstreamPath.exists():
-            logger.opt(exception=FileNotFoundError()).error(
-                f"Cannot find {bitstreamPath} file which is generated by running gen_bitStream_binary. Potentially the bitstream generation failed."
+            raise FileNotFoundError(
+                f"Cannot find {bitstreamPath} file which is generated by running gen_bitStream_binary. "
+                "Potentially the bitstream generation failed."
             )
 
         waveform_format = args.format
@@ -927,8 +892,8 @@ class FABulous_CLI(Cmd):
 
         result = sp.run(runCmd, check=True)
         if result.returncode != 0:
-            logger.opt(exception=CommandError()).error(
-                "Simulation failed. Please check the logs for more details."
+            raise CommandError(
+                f"Simulation failed for {designFile}. Please check the logs for more details."
             )
 
         # bitstream hex file is used for simulation so it'll be created in the test directory
@@ -954,8 +919,8 @@ class FABulous_CLI(Cmd):
         result = sp.run(runCmd, check=True)
         remove_dir(buildDir)
         if result.returncode != 0:
-            logger.opt(exception=CommandError()).error(
-                "Simulation failed. Please check the logs for more details."
+            raise CommandError(
+                f"Simulation failed for {designFile}. Please check the logs for more details."
             )
 
         logger.info("Simulation finished")
@@ -975,11 +940,8 @@ class FABulous_CLI(Cmd):
         file_path_no_suffix = args.file.parent / args.file.stem
 
         if args.file.suffix != ".v":
-            logger.opt(exception=FileTypeError()).error(
-                """
-                No verilog file provided.
-                Usage: run_FABulous_bitstream <top_module_file>
-                """
+            raise InvalidFileType(
+                "No verilog file provided. Usage: run_FABulous_bitstream <top_module_file>"
             )
 
         json_file_path = file_path_no_suffix.with_suffix(".json")
@@ -993,29 +955,15 @@ class FABulous_CLI(Cmd):
         else:
             logger.info("No external primsLib found.")
 
-        self.onecmd_plus_hooks(f"synthesis {do_synth_args}")
-        if self.exit_code != 0:
-            logger.opt(exception=CommandError()).error(
-                "Synthesis failed. Please check the logs for more details."
-            )
-            if not self.force:
-                return
-
-        self.onecmd_plus_hooks(f"place_and_route {json_file_path}")
-        if self.exit_code != 0:
-            logger.opt(exception=CommandError()).error(
-                "Place and Route failed. Please check the logs for more details."
-            )
-            if not self.force:
-                return
-
-        self.onecmd_plus_hooks(f"gen_bitStream_binary {fasm_file_path}")
-        if self.exit_code != 0:
-            logger.opt(exception=CommandError()).error(
-                "Bitstream generation failed. Please check the logs for more details."
-            )
-            if not self.force:
-                return
+        success = (
+            CommandPipeline(self)
+            .add_step(f"synthesis {do_synth_args}")
+            .add_step(f"place_and_route {json_file_path}")
+            .add_step(f"gen_bitStream_binary {fasm_file_path}")
+            .execute()
+        )
+        if success:
+            logger.info("FABulous bitstream generation complete")
 
     @with_category(CMD_SCRIPT)
     @with_argparser(filePathRequireParser)
@@ -1026,7 +974,9 @@ class FABulous_CLI(Cmd):
         Also logs usage errors and file not found errors.
         """
         if not args.file.exists():
-            logger.opt(exception=FileNotFoundError()).error(f"Cannot find {args.file}")
+            raise FileNotFoundError(
+                f"Cannot find {args.file} file, please check the path and try again."
+            )
 
         if self.force:
             logger.warning(
@@ -1046,7 +996,9 @@ class FABulous_CLI(Cmd):
     def do_run_script(self, args):
         """Executes script."""
         if not args.file.exists():
-            logger.opt(exception=FileNotFoundError()).error(f"Cannot find {args.file}")
+            raise FileNotFoundError(
+                f"Cannot find {args.file} file, please check the path and try again."
+            )
 
         logger.info(f"Execute script {args.file}")
 
@@ -1054,8 +1006,12 @@ class FABulous_CLI(Cmd):
             for i in f:
                 self.onecmd_plus_hooks(i.strip())
                 if self.exit_code != 0:
-                    logger.opt(exception=CommandError()).error(
-                        f"Script execution failed at line: {i.strip()}"
+                    if not self.force:
+                        raise CommandError(
+                            f"Script execution failed at line: {i.strip()}"
+                        )
+                    logger.error(
+                        f"Script execution failed at line: {i.strip()} but continuing due to force mode"
                     )
 
         logger.info("Script executed")
@@ -1064,7 +1020,7 @@ class FABulous_CLI(Cmd):
     @with_argparser(userDesignRequireParser)
     def do_gen_user_design_wrapper(self, args):
         if not self.fabricLoaded:
-            logger.opt(exception=CommandError()).error("Need to load fabric first")
+            raise CommandError("Need to load fabric first")
 
         self.fabulousAPI.generateUserDesignTopWrapper(
             args.user_design, args.user_design_top_wrapper

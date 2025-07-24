@@ -1,8 +1,6 @@
 import pathlib
 from dataclasses import dataclass, field
 
-from loguru import logger
-
 from FABulous.fabric_definition.define import IO
 
 
@@ -125,7 +123,6 @@ class Bel:
         elif self.src.suffix in [".vhd", ".vhdl"]:
             self.language = "vhdl"
         else:
-            logger.error(f"Unknown file type {self.src.suffix} for BEL {self.src}")
-            raise ValueError
+            raise ValueError(f"Unknown file type {self.src.suffix} for BEL {self.src}")
         self.carry = carry
         self.localShared = localShared

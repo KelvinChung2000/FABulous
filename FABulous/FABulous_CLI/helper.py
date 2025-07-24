@@ -15,6 +15,8 @@ from dotenv import get_key, load_dotenv, set_key
 from loguru import logger
 from packaging.version import Version
 
+from FABulous.custom_exception import PipelineCommandError
+
 MAX_BITBYTES = 16384
 
 
@@ -525,3 +527,27 @@ def update_project_version(project_dir: Path) -> bool:
 
     set_key(env_file, "FAB_PROJ_VERSION", str(package_version))
     return True
+
+
+class CommandPipeline:
+    """Helper class to manage command execution with error handling."""
+
+    def __init__(self, cli_instance):
+        self.cli = cli_instance
+        self.steps = []
+
+    def add_step(self, command, error_message="Command failed"):
+        """Add a command step to the pipeline."""
+        self.steps.append((command, error_message))
+        return self
+
+    def execute(self, stop_on_error=None):
+        """Execute all steps in the pipeline."""
+        if stop_on_error is None:
+            stop_on_error = not self.cli.force
+
+        for command, error_message in self.steps:
+            self.cli.onecmd_plus_hooks(command)
+            if self.cli.exit_code != 0:
+                raise PipelineCommandError(error_message)
+        return True

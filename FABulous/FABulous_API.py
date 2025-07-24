@@ -16,9 +16,6 @@ from FABulous.fabric_definition.SuperTile import SuperTile
 from FABulous.fabric_definition.Tile import Tile
 from FABulous.fabric_generator.code_generation_VHDL import VHDLWriter
 from FABulous.fabric_generator.fabric_automation import genIOBel
-from FABulous.fabric_generator.fabric_gen import (
-    FabricGenerator,
-)
 from FABulous.fabric_generator.gen_fabric.gen_configmem import generateConfigMem
 from FABulous.fabric_generator.gen_fabric.gen_fabric import generateFabric
 from FABulous.fabric_generator.gen_fabric.gen_helper import (
@@ -53,7 +50,6 @@ class FABulous_API:
         Default file extension for generated output files ('.v' or '.vhdl').
     """
 
-    fabricGenerator: FabricGenerator
     geometryGenerator: GeometryGenerator
     fabric: Fabric
     fileExtension: str = ".v"
@@ -76,7 +72,6 @@ class FABulous_API:
         self.writer = writer
         if fabricCSV != "":
             self.fabric = fileParser.parseFabricCSV(fabricCSV)
-            self.fabricGenerator = FabricGenerator(self.fabric, self.writer)
             self.geometryGenerator = GeometryGenerator(self.fabric)
 
         if isinstance(self.writer, VHDLWriter):
@@ -108,7 +103,6 @@ class FABulous_API:
         """
         if dir.suffix == ".csv":
             self.fabric = fileParser.parseFabricCSV(dir)
-            self.fabricGenerator = FabricGenerator(self.fabric, self.writer)
             self.geometryGenerator = GeometryGenerator(self.fabric)
         else:
             logger.error("Only .csv files are supported for fabric loading")

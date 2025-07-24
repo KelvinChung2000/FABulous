@@ -8,7 +8,7 @@ module sequential_16bit_en_tb;
   reg CLK = 1'b0;
   reg resetn = 1'b1;
   reg SelfWriteStrobe = 1'b0;
-  reg [31:0] SelfWriteData = 1'b0;
+  reg [31:0] SelfWriteData = 32'b0;
   reg Rx = 1'b1;
   wire ComActive;
   wire ReceiveLED;

@@ -8,8 +8,10 @@ from loguru import logger
 from FABulous.fabric_definition.define import IO
 from FABulous.fabric_definition.Fabric import Fabric
 from FABulous.fabric_definition.Tile import Tile
-from FABulous.fabric_generator.code_generation_Verilog import VerilogWriter
-from FABulous.fabric_generator.code_generator import codeGenerator
+from FABulous.fabric_generator.code_generator.code_generator import CodeGenerator
+from FABulous.fabric_generator.code_generator.code_generator_Verilog import (
+    VerilogCodeGenerator,
+)
 from FABulous.fabric_generator.parser.parse_configmem import parseConfigMem
 
 if TYPE_CHECKING:
@@ -78,7 +80,7 @@ def generateConfigMemInit(fabric: Fabric, file: Path, tileConfigBitsCount: int) 
 
 
 def generateConfigMem(
-    writer: codeGenerator, fabric: Fabric, tile: Tile, configMemCsv: Path
+    writer: CodeGenerator, fabric: Fabric, tile: Tile, configMemCsv: Path
 ) -> None:
     """This function will generate the RTL code for configuration memory of the given
     tile. If the given configMemCsv file does not exist, it will be created using
@@ -152,7 +154,7 @@ def generateConfigMem(
     logger.info(f"Generating {writer.outFileName} for tile {tile.name}")
     writer.addHeader(f"{tile.name}_ConfigMem")
     writer.addParameterStart(indentLevel=1)
-    if isinstance(writer, VerilogWriter):  # emulation only in Verilog
+    if isinstance(writer, VerilogCodeGenerator):  # emulation only in Verilog
         maxBits = fabric.frameBitsPerRow * fabric.maxFramesPerCol
         writer.addPreprocIfDef("EMULATION")
         writer.addParameter(
@@ -184,7 +186,7 @@ def generateConfigMem(
     # declare architecture
     writer.addDesignDescriptionStart(f"{tile.name}_ConfigMem")
 
-    if isinstance(writer, VerilogWriter):  # emulation only in Verilog
+    if isinstance(writer, VerilogCodeGenerator):  # emulation only in Verilog
         writer.addPreprocIfDef("EMULATION")
         for i in configMemList:
             counter = 0
@@ -219,7 +221,7 @@ def generateConfigMem(
                     ],
                 )
                 counter += 1
-    if isinstance(writer, VerilogWriter):  # emulation only in Verilog
+    if isinstance(writer, VerilogCodeGenerator):  # emulation only in Verilog
         writer.addPreprocEndif()
     writer.addDesignDescriptionEnd()
     writer.writeToFile()

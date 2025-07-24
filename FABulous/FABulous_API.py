@@ -1,23 +1,35 @@
+import os
 from pathlib import Path
 
 from loguru import logger
 
-import FABulous.fabric_cad.model_generation_npnr as model_gen_npnr
-import FABulous.fabric_generator.code_generator as codeGen
-import FABulous.fabric_generator.file_parser as fileParser
+import FABulous.fabric_cad.gen_npnr_model as model_gen_npnr
+import FABulous.fabric_generator.code_generator.code_generator as codeGen
+import FABulous.fabric_generator.parser.parse_csv as fileParser
+from FABulous.fabric_cad.gen_bitstream_spec import generateBitstreamSpec
+from FABulous.fabric_cad.gen_design_top_wrapper import generateUserDesignTopWrapper
 
 # Importing Modules from FABulous Framework.
 from FABulous.fabric_definition.Bel import Bel
 from FABulous.fabric_definition.Fabric import Fabric
 from FABulous.fabric_definition.SuperTile import SuperTile
 from FABulous.fabric_definition.Tile import Tile
-from FABulous.fabric_generator.code_generation_VHDL import VHDLWriter
-from FABulous.fabric_generator.fabric_automation import genIOBel
-from FABulous.fabric_generator.fabric_gen import (
-    FabricGenerator,
-    generateUserDesignTopWrapper,
+from FABulous.fabric_generator.code_generator.code_generator_VHDL import (
+    VHDLCodeGenerator,
 )
+from FABulous.fabric_generator.gen_fabric.fabric_automation import genIOBel
 from FABulous.fabric_generator.gen_fabric.gen_configmem import generateConfigMem
+from FABulous.fabric_generator.gen_fabric.gen_fabric import generateFabric
+from FABulous.fabric_generator.gen_fabric.gen_helper import (
+    bootstrapSwitchMatrix,
+    list2CSV,
+)
+from FABulous.fabric_generator.gen_fabric.gen_switchmatrix import genTileSwitchMatrix
+from FABulous.fabric_generator.gen_fabric.gen_tile import (
+    generateSuperTile,
+    generateTile,
+)
+from FABulous.fabric_generator.gen_fabric.gen_top_wrapper import generateTopWrapper
 from FABulous.geometry_generator.geometry_gen import GeometryGenerator
 
 
@@ -40,12 +52,11 @@ class FABulous_API:
         Default file extension for generated output files ('.v' or '.vhdl').
     """
 
-    fabricGenerator: FabricGenerator
     geometryGenerator: GeometryGenerator
     fabric: Fabric
     fileExtension: str = ".v"
 
-    def __init__(self, writer: codeGen.codeGenerator, fabricCSV: str = ""):
+    def __init__(self, writer: codeGen.CodeGenerator, fabricCSV: str = ""):
         """Initialises FABulous object.
 
         If 'fabricCSV' is provided, parses fabric data and initialises
@@ -63,10 +74,9 @@ class FABulous_API:
         self.writer = writer
         if fabricCSV != "":
             self.fabric = fileParser.parseFabricCSV(fabricCSV)
-            self.fabricGenerator = FabricGenerator(self.fabric, self.writer)
             self.geometryGenerator = GeometryGenerator(self.fabric)
 
-        if isinstance(self.writer, VHDLWriter):
+        if isinstance(self.writer, VHDLCodeGenerator):
             self.fileExtension = ".vhdl"
 
     def setWriterOutputFile(self, outputDir):
@@ -95,13 +105,12 @@ class FABulous_API:
         """
         if dir.suffix == ".csv":
             self.fabric = fileParser.parseFabricCSV(dir)
-            self.fabricGenerator = FabricGenerator(self.fabric, self.writer)
             self.geometryGenerator = GeometryGenerator(self.fabric)
         else:
             logger.error("Only .csv files are supported for fabric loading")
             raise ValueError
 
-    def bootstrapSwitchMatrix(self, tileName: str, outputDir: str):
+    def bootstrapSwitchMatrix(self, tileName: str, outputDir: Path):
         """Bootstraps the switch matrix for the specified tile via
         'bootstrapSwitchMatrix' defined in 'fabric_gen.py'.
 
@@ -113,9 +122,11 @@ class FABulous_API:
             Directory path where the switch matrix will be generated.
         """
         tile = self.fabric.getTileByName(tileName)
-        self.fabricGenerator.bootstrapSwitchMatrix(tile, outputDir)
+        if not tile:
+            raise ValueError(f"Tile {tileName} not found in fabric.")
+        bootstrapSwitchMatrix(tile, outputDir)
 
-    def addList2Matrix(self, list: str, matrix: str):
+    def addList2Matrix(self, list: Path, matrix: Path):
         """Converts list into CSV matrix via 'list2CSV' defined in 'fabric_gen.py' and
         saves it.
 
@@ -126,7 +137,7 @@ class FABulous_API:
         matrix : str
             File path where the matrix data will be saved.
         """
-        self.fabricGenerator.list2CSV(list, matrix)
+        list2CSV(list, matrix)
 
     def genConfigMem(self, tileName: str, configMem: Path):
         """Generate configuration memory for specified tile.
@@ -152,8 +163,19 @@ class FABulous_API:
         tileName : str
             Name of the tile for which the switch matrix will be generated.
         """
-        tile = self.fabric.getTileByName(tileName)
-        self.fabricGenerator.genTileSwitchMatrix(tile)
+        if tile := self.fabric.getTileByName(tileName):
+            sm_dbg = os.getenv("FAB_SWITCH_MATRIX_DEBUG_SIGNAL", "True")
+            switch_matrix_debug_signal = (
+                False if sm_dbg.lower().strip() == "false" else True
+            )
+            logger.info(
+                f"Generate switch matrix debug signals: {switch_matrix_debug_signal}"
+            )
+            genTileSwitchMatrix(
+                self.writer, self.fabric, tile, switch_matrix_debug_signal
+            )
+        else:
+            raise ValueError(f"Tile {tileName} not found")
 
     def genTile(self, tileName: str):
         """Generates a tile based on its name via 'generateTile' defined in
@@ -165,7 +187,7 @@ class FABulous_API:
             Name of the tile generated.
         """
         if tile := self.fabric.getTileByName(tileName):
-            self.fabricGenerator.generateTile(tile)
+            generateTile(self.writer, self.fabric, tile)
         else:
             raise ValueError(f"Tile {tileName} not found")
 
@@ -178,13 +200,15 @@ class FABulous_API:
         tileName : str
             Name of the super tile generated.
         """
-        tile = self.fabric.getSuperTileByName(tileName)
-        self.fabricGenerator.generateSuperTile(tile)
+        if tile := self.fabric.getSuperTileByName(tileName):
+            generateSuperTile(self.writer, self.fabric, tile)
+        else:
+            raise ValueError(f"SuperTile {tileName} not found")
 
     def genFabric(self):
         """Generates the entire fabric layout via 'generatreFabric' defined in
         'fabric_gen.py'."""
-        self.fabricGenerator.generateFabric()
+        generateFabric(self.writer, self.fabric)
 
     def genGeometry(self, geomPadding: int = 8):
         """Generates geometry based on the fabric data and saves it to CSV.
@@ -200,7 +224,7 @@ class FABulous_API:
     def genTopWrapper(self):
         """Generates the top wrapper for the fabric via 'generateTopWrapper' defined in
         'fabric_gen.py'."""
-        self.fabricGenerator.generateTopWrapper()
+        generateTopWrapper(self.writer, self.fabric)
 
     def genBitStreamSpec(self):
         """Generates the bitsream specification object.
@@ -210,7 +234,7 @@ class FABulous_API:
         Object
             Bitstream specification object generated by 'fabricGenerator'.
         """
-        return self.fabricGenerator.generateBitsStreamSpec()
+        return generateBitstreamSpec(self.fabric)
 
     def genRoutingModel(self):
         """Generates model for Nextpnr based on fabric data.
@@ -324,7 +348,7 @@ class FABulous_API:
             logger.error(f"Tile {tile_name} not found in fabric.")
             raise ValueError
 
-        suffix = "vhdl" if isinstance(self.writer, VHDLWriter) else "v"
+        suffix = "vhdl" if isinstance(self.writer, VHDLCodeGenerator) else "v"
 
         gios = [gio for gio in tile.gen_ios if not gio.configAccess]
         gio_config_access = [gio for gio in tile.gen_ios if gio.configAccess]

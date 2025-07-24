@@ -38,10 +38,16 @@ from loguru import logger
 
 from FABulous.custom_exception import CommandError, EnvironmentNotSet, InvalidFileType
 from FABulous.fabric_cad.bit_gen import genBitstream
-from FABulous.fabric_generator.code_generation_Verilog import VerilogWriter
-from FABulous.fabric_generator.code_generation_VHDL import VHDLWriter
-from FABulous.fabric_generator.fabric_automation import generateCustomTileConfig
-from FABulous.fabric_generator.file_parser import parseTiles
+from FABulous.fabric_generator.code_generator.code_generator_Verilog import (
+    VerilogCodeGenerator,
+)
+from FABulous.fabric_generator.code_generator.code_generator_VHDL import (
+    VHDLCodeGenerator,
+)
+from FABulous.fabric_generator.gen_fabric.fabric_automation import (
+    generateCustomTileConfig,
+)
+from FABulous.fabric_generator.parser.parse_csv import parseTilesCSV
 from FABulous.FABulous_API import FABulous_API
 from FABulous.FABulous_CLI import cmd_synthesis
 from FABulous.FABulous_CLI.helper import (
@@ -143,9 +149,9 @@ class FABulous_CLI(Cmd):
         self.enteringDir = enteringDir
 
         if writerType == "verilog":
-            self.fabulousAPI = FABulous_API(VerilogWriter())
+            self.fabulousAPI = FABulous_API(VerilogCodeGenerator())
         elif writerType == "vhdl":
-            self.fabulousAPI = FABulous_API(VHDLWriter())
+            self.fabulousAPI = FABulous_API(VHDLCodeGenerator())
         else:
             logger.critical(
                 f"Invalid writer type: {writerType}\n Valid options are 'verilog' or 'vhdl'"
@@ -174,7 +180,7 @@ class FABulous_CLI(Cmd):
 
         self.interactive = interactive
 
-        if isinstance(self.fabulousAPI.writer, VHDLWriter):
+        if isinstance(self.fabulousAPI.writer, VHDLCodeGenerator):
             self.extension = "vhdl"
         else:
             self.extension = "v"
@@ -1058,7 +1064,7 @@ class FABulous_CLI(Cmd):
         tile_csv = generateCustomTileConfig(args.tile_path)
 
         if not args.no_switch_matrix:
-            parseTiles(tile_csv)
+            parseTilesCSV(tile_csv)
 
     @with_category(CMD_FABRIC_FLOW)
     @with_argparser(tile_list_parser)

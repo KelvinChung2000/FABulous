@@ -2,7 +2,7 @@ import string
 
 from FABulous.custom_exception import InvalidFileType
 from FABulous.fabric_definition.Fabric import Fabric
-from FABulous.fabric_generator.file_parser import parseList, parseMatrix
+from FABulous.fabric_generator.parser.parse_switchmatrix import parseList, parseMatrix
 
 
 def genNextpnrModel(fabric: Fabric):

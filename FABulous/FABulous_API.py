@@ -19,6 +19,7 @@ from FABulous.fabric_generator.fabric_gen import (
     generateUserDesignTopWrapper,
 )
 from FABulous.fabric_generator.gen_fabric.gen_configmem import generateConfigMem
+from FABulous.fabric_generator.gen_fabric.gen_fabric import generateFabric
 from FABulous.fabric_generator.gen_fabric.gen_helper import (
     bootstrapSwitchMatrix,
     list2CSV,
@@ -209,7 +210,7 @@ class FABulous_API:
     def genFabric(self):
         """Generates the entire fabric layout via 'generatreFabric' defined in
         'fabric_gen.py'."""
-        self.fabricGenerator.generateFabric()
+        generateFabric(self.writer, self.fabric)
 
     def genGeometry(self, geomPadding: int = 8):
         """Generates geometry based on the fabric data and saves it to CSV.

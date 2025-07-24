@@ -253,8 +253,8 @@ def code_generator_factory(tmp_path: Path):
     """Factory fixture to create code generators with temporary output files."""
 
     def _create_generator(extension: str, name="test_output"):
-        from FABulous.fabric_generator.code_generation_Verilog import VerilogWriter
-        from FABulous.fabric_generator.code_generation_VHDL import VHDLWriter
+        from FABulous.fabric_generator.code_generator.code_generation_Verilog import VerilogWriter
+        from FABulous.fabric_generator.code_generator.code_generation_VHDL import VHDLWriter
 
         output_file = tmp_path / f"{name}{extension}"
 

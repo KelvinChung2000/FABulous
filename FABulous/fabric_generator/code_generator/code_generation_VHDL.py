@@ -2,7 +2,7 @@ import math
 import re
 
 from FABulous.fabric_definition.define import IO
-from FABulous.fabric_generator.code_generator import codeGenerator
+from FABulous.fabric_generator.code_generator.code_generator import codeGenerator
 
 
 class VHDLWriter(codeGenerator):

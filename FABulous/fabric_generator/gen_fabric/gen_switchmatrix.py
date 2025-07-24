@@ -11,8 +11,8 @@ from FABulous.fabric_definition.define import (
 )
 from FABulous.fabric_definition.Fabric import Fabric
 from FABulous.fabric_definition.Tile import Tile
-from FABulous.fabric_generator.code_generation_VHDL import VHDLWriter
-from FABulous.fabric_generator.code_generator import codeGenerator
+from FABulous.fabric_generator.code_generator.code_generation_VHDL import VHDLWriter
+from FABulous.fabric_generator.code_generator.code_generator import codeGenerator
 from FABulous.fabric_generator.gen_fabric.gen_helper import (
     bootstrapSwitchMatrix,
     list2CSV,

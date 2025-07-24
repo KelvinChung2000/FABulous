@@ -38,8 +38,10 @@ from loguru import logger
 
 from FABulous.custom_exception import CommandError, EnvironmentNotSet, InvalidFileType
 from FABulous.fabric_cad.bit_gen import genBitstream
-from FABulous.fabric_generator.code_generation_Verilog import VerilogWriter
-from FABulous.fabric_generator.code_generation_VHDL import VHDLWriter
+from FABulous.fabric_generator.code_generator.code_generation_Verilog import (
+    VerilogWriter,
+)
+from FABulous.fabric_generator.code_generator.code_generation_VHDL import VHDLWriter
 from FABulous.fabric_generator.fabric_automation import generateCustomTileConfig
 from FABulous.fabric_generator.parser.parse_csv import parseTilesCSV
 from FABulous.FABulous_API import FABulous_API

@@ -8,8 +8,10 @@ from loguru import logger
 from FABulous.fabric_definition.define import IO
 from FABulous.fabric_definition.Fabric import Fabric
 from FABulous.fabric_definition.Tile import Tile
-from FABulous.fabric_generator.code_generation_Verilog import VerilogWriter
-from FABulous.fabric_generator.code_generator import codeGenerator
+from FABulous.fabric_generator.code_generator.code_generation_Verilog import (
+    VerilogWriter,
+)
+from FABulous.fabric_generator.code_generator.code_generator import codeGenerator
 from FABulous.fabric_generator.parser.parse_configmem import parseConfigMem
 
 if TYPE_CHECKING:

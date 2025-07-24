@@ -7,6 +7,7 @@ import FABulous.fabric_cad.model_generation_npnr as model_gen_npnr
 import FABulous.fabric_generator.code_generator as codeGen
 import FABulous.fabric_generator.parser.parse_csv as fileParser
 from FABulous.fabric_cad.gen_bitstream_spec import generateBitsStreamSpec
+from FABulous.fabric_cad.gen_design_top_wrapper import generateUserDesignTopWrapper
 
 # Importing Modules from FABulous Framework.
 from FABulous.fabric_definition.Bel import Bel
@@ -17,7 +18,6 @@ from FABulous.fabric_generator.code_generation_VHDL import VHDLWriter
 from FABulous.fabric_generator.fabric_automation import genIOBel
 from FABulous.fabric_generator.fabric_gen import (
     FabricGenerator,
-    generateUserDesignTopWrapper,
 )
 from FABulous.fabric_generator.gen_fabric.gen_configmem import generateConfigMem
 from FABulous.fabric_generator.gen_fabric.gen_fabric import generateFabric

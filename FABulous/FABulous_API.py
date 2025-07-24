@@ -29,6 +29,7 @@ from FABulous.fabric_generator.gen_fabric.gen_tile import (
     generateSuperTile,
     generateTile,
 )
+from FABulous.fabric_generator.gen_fabric.gen_top_wrapper import generateTopWrapper
 from FABulous.geometry_generator.geometry_gen import GeometryGenerator
 
 
@@ -226,7 +227,7 @@ class FABulous_API:
     def genTopWrapper(self):
         """Generates the top wrapper for the fabric via 'generateTopWrapper' defined in
         'fabric_gen.py'."""
-        self.fabricGenerator.generateTopWrapper()
+        generateTopWrapper(self.writer, self.fabric)
 
     def genBitStreamSpec(self):
         """Generates the bitsream specification object.

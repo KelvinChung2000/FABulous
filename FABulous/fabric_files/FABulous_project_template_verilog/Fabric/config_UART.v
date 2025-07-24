@@ -17,10 +17,8 @@ module config_UART #(
     output reg ReceiveLED
 );
 
-  //constant TIME_TO_SEND_VALUE : integer := 16777216-1; //200000000;
   localparam integer TIME_TO_SEND_VALUE = 16777 - 1;  //200000000;
 
-  //localparam CRC_InitValue = 16'b1111111111111111;
   localparam integer TEST_FILE_CHECKSUM = 20'h4FB00;
 
   function reg [4:0] ASCII2HEX;
@@ -54,9 +52,7 @@ module config_UART #(
     end
   endfunction
 
-  //typedef enum{HIGH_NIBBLE, LOW_NIBBLE} ReceiveStateType; //systemverilog
   localparam integer HIGH_NIBBLE = 1, LOW_NIBBLE = 0;
-  //ReceiveStateType ReceiveState;
   reg ReceiveState;
   reg [3:0] HighReg;
   wire [4:0] HexValue;  // a 1'b0 MSB indicates a valid value on [3..0]
@@ -65,8 +61,6 @@ module config_UART #(
 
   reg [11:0] ComCount;
   reg ComTick;
-  //typedef enum{WAIT_FOR_START_BIT, DELAY_AFTER_START_BIT, GET_BIT_0, GET_BIT_1, GET_BIT_2, GET_BIT_3, GET_BIT_4, GET_BIT_5, GET_BIT_6, GET_BIT_7, GET_STOP_BIT} ComStateType;
-  //ComStateType ComState;
   localparam integer WAIT_FOR_START_BIT = 0, DELAY_AFTER_START_BIT = 1;
   localparam integer GET_BIT_0 = 2, GET_BIT_1 = 3, GET_BIT_2 = 4, GET_BIT_3 = 5, GET_BIT_4 = 6;
   localparam integer GET_BIT_5 = 7, GET_BIT_6 = 8, GET_BIT_7 = 9, GET_STOP_BIT = 10;
@@ -74,8 +68,6 @@ module config_UART #(
   reg [3:0] ComState;
   reg [7:0] ReceivedWord;
   reg RxLocal;
-
-  //signal W0, W1, W2, W3, W4, W5, W6, W7 : std_logic_vector(7 downto 0);
 
   reg [23:0] ID_Reg;
   reg [31:0] Start_Reg;
@@ -89,13 +81,9 @@ module config_UART #(
   reg TimeToSend;
   reg [14:0] TimeToSendCounter;
 
-  //typedef enum{IDLE, GET_ID_00, GET_ID_AA, GET_ID_FF, GET_COMMAND, EVAL_COMMAND, GET_DATA} PresentType;
-  //PresentType PresentState;
   localparam integer IDLE=0, GET_ID_00=1, GET_ID_AA=2, GET_ID_FF=3, GET_COMMAND=4, EVAL_COMMAND=5, GET_DATA=6;
   reg [2:0] PresentState;
 
-  //typedef enum{WORD_0, WORD_1, WORD_2, WORD_3} GetWordType;
-  //GetWordType GetWordState;
   localparam integer WORD_0 = 0, WORD_1 = 1, WORD_2 = 2, WORD_3 = 3;
   reg [1:0] GetWordState;
 
@@ -103,12 +91,8 @@ module config_UART #(
 
   reg ByteWriteStrobe;
 
-  //wire [31:0] Data_Reg32;
-
-  //wire [15:0] Word_Count;
-
   reg [19:0] CRCReg, b_counter;
-  //wire [7:0] ReceivedWordDebug;
+
   reg [22:0] blink;
 
   always @(posedge CLK, negedge resetn) begin : P_sync
@@ -219,10 +203,6 @@ module config_UART #(
           GET_ID_00: ID_Reg[23:16] <= ReceivedWord;
           GET_ID_AA: ID_Reg[15:8] <= ReceivedWord;
           GET_ID_FF: ID_Reg[7:0] <= ReceivedWord;
-          //         when GetSize0 => Size_Reg(15 downto 8) <= ReceivedWord;
-          //         when GetSize1 => Size_Reg(7 downto 0) <= ReceivedWord;
-          //         when GetCRC_H => CRC_Reg(15 downto 8) <= ReceivedWord;
-          //         when GetCRC_L => CRC_Reg(7 downto 0) <= ReceivedWord;
           GET_COMMAND: Command_Reg <= ReceivedWord;
           GET_DATA: Data_Reg <= ReceivedWord;
           default: begin
@@ -264,12 +244,6 @@ module config_UART #(
             PresentState <= GET_COMMAND;
           end
         end
-        //      GetSize1:
-        //        if TimeToSend=1'b1 begin PresentState<=IDLE;
-        //        elsif ComState=GET_STOP_BIT && ComTick=1'b1 begin PresentState <= GetSize0; end if;
-        //      GetSize0:
-        //        if TimeToSend=1'b1 begin PresentState<=IDLE;
-        //        elsif ComState=GET_STOP_BIT && ComTick=1'b1 begin PresentState <= GET_COMMAND; end if;
         GET_COMMAND: begin
           if (TimeToSend == 1'b1) begin
             PresentState <= IDLE;
@@ -315,7 +289,6 @@ module config_UART #(
         end else begin
           ReceiveState <= HIGH_NIBBLE;
         end
-        //end// CLK
         if (ComState == GET_STOP_BIT && ComTick == 1'b1 && HexValue[4] == 1'b0) begin
           if (ReceiveState == HIGH_NIBBLE) begin
             HighReg <= HexValue[3:0];
@@ -357,7 +330,6 @@ module config_UART #(
       if (PresentState == GET_DATA) begin
         ReceiveLED <= 1'b1;  // receive process in progress
       end else if ((PresentState == IDLE) && (CRCReg != TEST_FILE_CHECKSUM)) begin
-        //ReceiveLED <= blink(blink'high);
         ReceiveLED <= blink[22];
       end else begin
         ReceiveLED <= 1'b0;  // receive process was OK
@@ -439,11 +411,9 @@ module config_UART #(
     end
   end  // CLK
 
-  //ComLoaderActive <= 1'b0;
   // mode [0:auto|1:hex|2:bin]
   assign ReceivedByte = (Mode == 2 || (Mode == 0 && Command_Reg[7] == 1'b0)) ? Data_Reg : HexData;
   // if binary mode or if auto mode with detected binary mode in the command register
-  // ReceivedWordDebug <= Data_Reg when (Mode="bin" OR (Mode="auto" && Command_Reg(7)=1'b0)) else HexData;
   assign ComActive = (PresentState == GET_DATA) ? 1'b1 : 1'b0;
 
   always @(posedge CLK, negedge resetn) begin : P_TimeOut

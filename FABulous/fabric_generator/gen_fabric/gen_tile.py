@@ -6,14 +6,16 @@ from FABulous.fabric_definition.define import IO, ConfigBitMode, Direction
 from FABulous.fabric_definition.Fabric import Fabric
 from FABulous.fabric_definition.SuperTile import SuperTile
 from FABulous.fabric_definition.Tile import Tile
-from FABulous.fabric_generator.code_generator.code_generation_Verilog import (
-    VerilogWriter,
+from FABulous.fabric_generator.code_generator.code_generator import CodeGenerator
+from FABulous.fabric_generator.code_generator.code_generator_Verilog import (
+    VerilogCodeGenerator,
 )
-from FABulous.fabric_generator.code_generator.code_generation_VHDL import VHDLWriter
-from FABulous.fabric_generator.code_generator.code_generator import codeGenerator
+from FABulous.fabric_generator.code_generator.code_generator_VHDL import (
+    VHDLCodeGenerator,
+)
 
 
-def generateTile(writer: codeGenerator, fabric: Fabric, tile: Tile) -> None:
+def generateTile(writer: CodeGenerator, fabric: Fabric, tile: Tile) -> None:
     """Generate the RTL code for a tile given the tile object.
 
     Parameters
@@ -33,7 +35,7 @@ def generateTile(writer: codeGenerator, fabric: Fabric, tile: Tile) -> None:
 
     writer.addHeader(f"{tile.name}")
     writer.addParameterStart(indentLevel=1)
-    if isinstance(writer, VerilogWriter):  # emulation only in Verilog
+    if isinstance(writer, VerilogCodeGenerator):  # emulation only in Verilog
         maxBits = fabric.frameBitsPerRow * fabric.maxFramesPerCol
         writer.addPreprocIfDef("EMULATION")
         writer.addParameter(
@@ -123,7 +125,7 @@ def generateTile(writer: codeGenerator, fabric: Fabric, tile: Tile) -> None:
     writer.addDesignDescriptionStart(f"{tile.name}")
 
     # insert switch matrix and config_mem component declaration
-    if isinstance(writer, VHDLWriter):
+    if isinstance(writer, VHDLCodeGenerator):
         # insert CLB, I/O (or whatever BEL) component declaration
         # specified in the fabric csv file after the 'BEL' key word
         # we use this list to check if we have seen a BEL description before so we only insert one component declaration
@@ -508,7 +510,7 @@ def generateTile(writer: codeGenerator, fabric: Fabric, tile: Tile) -> None:
 
 
 def generateSuperTile(
-    writer: codeGenerator, fabric: Fabric, superTile: SuperTile
+    writer: CodeGenerator, fabric: Fabric, superTile: SuperTile
 ) -> None:
     """Generate a super tile wrapper for given super tile.
 
@@ -520,7 +522,7 @@ def generateSuperTile(
 
     writer.addHeader(f"{superTile.name}")
     writer.addParameterStart(indentLevel=1)
-    if isinstance(writer, VerilogWriter):
+    if isinstance(writer, VerilogCodeGenerator):
         writer.addPreprocIfDef("EMULATION")
         maxBits = fabric.frameBitsPerRow * fabric.maxFramesPerCol
         for y, row in enumerate(superTile.tileMap):
@@ -635,7 +637,7 @@ def generateSuperTile(
     writer.addDesignDescriptionStart(f"{superTile.name}")
     writer.addNewLine()
 
-    if isinstance(writer, VHDLWriter):
+    if isinstance(writer, VHDLCodeGenerator):
         for t in superTile.tiles:
             # This is only relevant to VHDL code generation, will not affect Verilog code generation
             writer.addComponentDeclarationForFile(

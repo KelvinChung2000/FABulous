@@ -6,7 +6,7 @@ from loguru import logger
 from FABulous.fabric_definition.define import IO
 
 
-class codeGenerator(abc.ABC):
+class CodeGenerator(abc.ABC):
     """The base class for all code generators."""
 
     @property

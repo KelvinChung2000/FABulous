@@ -11,8 +11,10 @@ from FABulous.fabric_definition.define import (
 )
 from FABulous.fabric_definition.Fabric import Fabric
 from FABulous.fabric_definition.Tile import Tile
-from FABulous.fabric_generator.code_generator.code_generation_VHDL import VHDLWriter
-from FABulous.fabric_generator.code_generator.code_generator import codeGenerator
+from FABulous.fabric_generator.code_generator.code_generator import CodeGenerator
+from FABulous.fabric_generator.code_generator.code_generator_VHDL import (
+    VHDLCodeGenerator,
+)
 from FABulous.fabric_generator.gen_fabric.gen_helper import (
     bootstrapSwitchMatrix,
     list2CSV,
@@ -21,7 +23,7 @@ from FABulous.fabric_generator.parser.parse_switchmatrix import parseMatrix
 
 
 def genTileSwitchMatrix(
-    writer: codeGenerator, fabric: Fabric, tile: Tile, switch_matrix_debug_signal: bool
+    writer: CodeGenerator, fabric: Fabric, tile: Tile, switch_matrix_debug_signal: bool
 ) -> None:
     """This function will generate the RTL code for the tile switch matrix of the given
     tile. The switch matrix generated will be based on the `matrixDir` attribute of the
@@ -141,7 +143,7 @@ def genTileSwitchMatrix(
 
     # constant declaration
     # we may use the following in the switch matrix for providing '0' and '1' to a mux input:
-    if isinstance(writer, VHDLWriter):
+    if isinstance(writer, VHDLCodeGenerator):
         writer.addConstant("GND0", "0")
         writer.addConstant("GND", "0")
         writer.addConstant("VCC0", "1")

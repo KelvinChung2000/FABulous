@@ -13,7 +13,7 @@ if TYPE_CHECKING:
     from FABulous.fabric_definition.ConfigMem import ConfigMem
 
 
-def generateBitsStreamSpec(fabric: Fabric) -> dict[str, dict]:
+def generateBitstreamSpec(fabric: Fabric) -> dict[str, dict]:
     """Generate the bitstream specification of the fabric. This is needed and will be
     further parsed by the bit_gen.py.
 

@@ -11,15 +11,17 @@ from FABulous.fabric_definition.Bel import Bel
 from FABulous.fabric_definition.define import IO, MultiplexerStyle
 from FABulous.fabric_definition.Gen_IO import Gen_IO
 from FABulous.fabric_definition.Port import Port
-from FABulous.fabric_generator.code_generator.code_generation_Verilog import (
-    VerilogWriter,
+from FABulous.fabric_generator.code_generator.code_generator_Verilog import (
+    VerilogCodeGenerator,
 )
-from FABulous.fabric_generator.code_generator.code_generation_VHDL import VHDLWriter
+from FABulous.fabric_generator.code_generator.code_generator_VHDL import (
+    VHDLCodeGenerator,
+)
 from FABulous.fabric_generator.parser.parse_hdl import parseBelFile
 from FABulous.fabric_generator.parser.parse_switchmatrix import parseList
 
 if TYPE_CHECKING:
-    from FABulous.fabric_generator.code_generator.code_generator import codeGenerator
+    from FABulous.fabric_generator.code_generator.code_generator import CodeGenerator
 
 
 def generateCustomTileConfig(tile_path: Path) -> Path:
@@ -579,7 +581,9 @@ def genIOBel(
             f"File suffix {language} of file {bel_path} is not supported for genIOBel generation"
         )
 
-    writer: codeGenerator = VHDLWriter() if language == "vhdl" else VerilogWriter()
+    writer: CodeGenerator = (
+        VHDLCodeGenerator() if language == "vhdl" else VerilogCodeGenerator()
+    )
     writer.outFileName = bel_path
 
     logger.info(f"Generating Gen_IO BEL {bel_name} in {bel_path}")

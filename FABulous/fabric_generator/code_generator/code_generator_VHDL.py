@@ -2,10 +2,10 @@ import math
 import re
 
 from FABulous.fabric_definition.define import IO
-from FABulous.fabric_generator.code_generator.code_generator import codeGenerator
+from FABulous.fabric_generator.code_generator.code_generator import CodeGenerator
 
 
-class VHDLWriter(codeGenerator):
+class VHDLCodeGenerator(CodeGenerator):
     """The VHDL writer class.
 
     This is the template for generating VHDL code.

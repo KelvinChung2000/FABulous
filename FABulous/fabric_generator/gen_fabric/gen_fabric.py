@@ -2,11 +2,13 @@ from pathlib import Path
 
 from FABulous.fabric_definition.define import IO, ConfigBitMode, Direction
 from FABulous.fabric_definition.Fabric import Fabric
-from FABulous.fabric_generator.code_generator.code_generation_VHDL import VHDLWriter
-from FABulous.fabric_generator.code_generator.code_generator import codeGenerator
+from FABulous.fabric_generator.code_generator.code_generator import CodeGenerator
+from FABulous.fabric_generator.code_generator.code_generator_VHDL import (
+    VHDLCodeGenerator,
+)
 
 
-def generateFabric(writer: codeGenerator, fabric: Fabric) -> None:
+def generateFabric(writer: CodeGenerator, fabric: Fabric) -> None:
     """Generate the fabric.
 
     The fabric description will be a flat description.
@@ -70,7 +72,7 @@ def generateFabric(writer: codeGenerator, fabric: Fabric) -> None:
     writer.addDesignDescriptionStart(fabricName)
     writer.addNewLine()
 
-    if isinstance(writer, VHDLWriter):
+    if isinstance(writer, VHDLCodeGenerator):
         added = set()
         for t in fabric.tileDic:
             name = t.split("_")[0]

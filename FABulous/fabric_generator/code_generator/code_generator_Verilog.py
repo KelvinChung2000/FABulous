@@ -2,10 +2,10 @@ import math
 import re
 
 from FABulous.fabric_definition.define import IO
-from FABulous.fabric_generator.code_generator.code_generator import codeGenerator
+from FABulous.fabric_generator.code_generator.code_generator import CodeGenerator
 
 
-class VerilogWriter(codeGenerator):
+class VerilogCodeGenerator(CodeGenerator):
     """The writer class for generating Verilog code."""
 
     def addComment(self, comment, onNewLine=False, end="", indentLevel=0) -> None:

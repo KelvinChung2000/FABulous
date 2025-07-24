@@ -38,10 +38,12 @@ from loguru import logger
 
 from FABulous.custom_exception import CommandError, EnvironmentNotSet, InvalidFileType
 from FABulous.fabric_cad.bit_gen import genBitstream
-from FABulous.fabric_generator.code_generator.code_generation_Verilog import (
-    VerilogWriter,
+from FABulous.fabric_generator.code_generator.code_generator_Verilog import (
+    VerilogCodeGenerator,
 )
-from FABulous.fabric_generator.code_generator.code_generation_VHDL import VHDLWriter
+from FABulous.fabric_generator.code_generator.code_generator_VHDL import (
+    VHDLCodeGenerator,
+)
 from FABulous.fabric_generator.gen_fabric.fabric_automation import (
     generateCustomTileConfig,
 )
@@ -147,9 +149,9 @@ class FABulous_CLI(Cmd):
         self.enteringDir = enteringDir
 
         if writerType == "verilog":
-            self.fabulousAPI = FABulous_API(VerilogWriter())
+            self.fabulousAPI = FABulous_API(VerilogCodeGenerator())
         elif writerType == "vhdl":
-            self.fabulousAPI = FABulous_API(VHDLWriter())
+            self.fabulousAPI = FABulous_API(VHDLCodeGenerator())
         else:
             logger.critical(
                 f"Invalid writer type: {writerType}\n Valid options are 'verilog' or 'vhdl'"
@@ -178,7 +180,7 @@ class FABulous_CLI(Cmd):
 
         self.interactive = interactive
 
-        if isinstance(self.fabulousAPI.writer, VHDLWriter):
+        if isinstance(self.fabulousAPI.writer, VHDLCodeGenerator):
             self.extension = "vhdl"
         else:
             self.extension = "v"

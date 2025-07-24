@@ -3,14 +3,16 @@ from pathlib import Path
 
 from FABulous.fabric_definition.define import IO
 from FABulous.fabric_definition.Fabric import Fabric
-from FABulous.fabric_generator.code_generator.code_generation_Verilog import (
-    VerilogWriter,
+from FABulous.fabric_generator.code_generator.code_generator import CodeGenerator
+from FABulous.fabric_generator.code_generator.code_generator_Verilog import (
+    VerilogCodeGenerator,
 )
-from FABulous.fabric_generator.code_generator.code_generation_VHDL import VHDLWriter
-from FABulous.fabric_generator.code_generator.code_generator import codeGenerator
+from FABulous.fabric_generator.code_generator.code_generator_VHDL import (
+    VHDLCodeGenerator,
+)
 
 
-def generateTopWrapper(writer: codeGenerator, fabric: Fabric) -> None:
+def generateTopWrapper(writer: CodeGenerator, fabric: Fabric) -> None:
     """Generate the top wrapper of the fabric including features that are not located
     inside the fabric such as BRAM."""
 
@@ -141,7 +143,7 @@ def generateTopWrapper(writer: codeGenerator, fabric: Fabric) -> None:
     writer.addConnectionScalar("LocalWriteStrobe")
     writer.addConnectionVector("RowSelect", "RowSelectWidth-1")
 
-    if isinstance(writer, VHDLWriter):
+    if isinstance(writer, VHDLCodeGenerator):
         basePath = Path(writer.outFileName).parent
         if not (basePath / "Frame_Data_Reg.vhdl").exists():
             raise FileExistsError(
@@ -169,7 +171,7 @@ def generateTopWrapper(writer: codeGenerator, fabric: Fabric) -> None:
 
     writer.addLogicStart()
 
-    if isinstance(writer, VerilogWriter):
+    if isinstance(writer, VerilogCodeGenerator):
         writer.addPreprocIfNotDef("EMULATION")
 
     # the config module
@@ -249,7 +251,7 @@ def generateTopWrapper(writer: codeGenerator, fabric: Fabric) -> None:
         )
     writer.addNewLine()
 
-    if isinstance(writer, VerilogWriter):
+    if isinstance(writer, VerilogCodeGenerator):
         writer.addPreprocEndif()
 
     # the fabric module
@@ -307,7 +309,7 @@ def generateTopWrapper(writer: codeGenerator, fabric: Fabric) -> None:
                 compInsName=f"Inst_BlockRAM_{i}",
                 portsPairs=portsPairs,
             )
-    if isinstance(writer, VHDLWriter):
+    if isinstance(writer, VHDLCodeGenerator):
         writer.addAssignScalar(
             "FrameData", ['X"12345678"', "FrameRegister", 'X"12345678"']
         )

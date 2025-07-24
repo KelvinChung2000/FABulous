@@ -18,6 +18,10 @@ from FABulous.fabric_generator.fabric_gen import (
     generateUserDesignTopWrapper,
 )
 from FABulous.fabric_generator.gen_fabric.gen_configmem import generateConfigMem
+from FABulous.fabric_generator.gen_fabric.gen_helper import (
+    bootstrapSwitchMatrix,
+    list2CSV,
+)
 from FABulous.geometry_generator.geometry_gen import GeometryGenerator
 
 
@@ -101,7 +105,7 @@ class FABulous_API:
             logger.error("Only .csv files are supported for fabric loading")
             raise ValueError
 
-    def bootstrapSwitchMatrix(self, tileName: str, outputDir: str):
+    def bootstrapSwitchMatrix(self, tileName: str, outputDir: Path):
         """Bootstraps the switch matrix for the specified tile via
         'bootstrapSwitchMatrix' defined in 'fabric_gen.py'.
 
@@ -113,9 +117,11 @@ class FABulous_API:
             Directory path where the switch matrix will be generated.
         """
         tile = self.fabric.getTileByName(tileName)
-        self.fabricGenerator.bootstrapSwitchMatrix(tile, outputDir)
+        if not tile:
+            raise ValueError(f"Tile {tileName} not found in fabric.")
+        bootstrapSwitchMatrix(tile, outputDir)
 
-    def addList2Matrix(self, list: str, matrix: str):
+    def addList2Matrix(self, list: Path, matrix: Path):
         """Converts list into CSV matrix via 'list2CSV' defined in 'fabric_gen.py' and
         saves it.
 
@@ -126,7 +132,7 @@ class FABulous_API:
         matrix : str
             File path where the matrix data will be saved.
         """
-        self.fabricGenerator.list2CSV(list, matrix)
+        list2CSV(list, matrix)
 
     def genConfigMem(self, tileName: str, configMem: Path):
         """Generate configuration memory for specified tile.

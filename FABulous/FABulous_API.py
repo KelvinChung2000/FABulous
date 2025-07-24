@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 
 from loguru import logger
@@ -22,6 +23,7 @@ from FABulous.fabric_generator.gen_fabric.gen_helper import (
     bootstrapSwitchMatrix,
     list2CSV,
 )
+from FABulous.fabric_generator.gen_fabric.gen_switchmatrix import genTileSwitchMatrix
 from FABulous.geometry_generator.geometry_gen import GeometryGenerator
 
 
@@ -158,8 +160,19 @@ class FABulous_API:
         tileName : str
             Name of the tile for which the switch matrix will be generated.
         """
-        tile = self.fabric.getTileByName(tileName)
-        self.fabricGenerator.genTileSwitchMatrix(tile)
+        if tile := self.fabric.getTileByName(tileName):
+            sm_dbg = os.getenv("FAB_SWITCH_MATRIX_DEBUG_SIGNAL", "True")
+            switch_matrix_debug_signal = (
+                False if sm_dbg.lower().strip() == "false" else True
+            )
+            logger.info(
+                f"Generate switch matrix debug signals: {switch_matrix_debug_signal}"
+            )
+            genTileSwitchMatrix(
+                self.writer, self.fabric, tile, switch_matrix_debug_signal
+            )
+        else:
+            raise ValueError(f"Tile {tileName} not found")
 
     def genTile(self, tileName: str):
         """Generates a tile based on its name via 'generateTile' defined in

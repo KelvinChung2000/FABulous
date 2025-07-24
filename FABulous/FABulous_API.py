@@ -4,7 +4,7 @@ from loguru import logger
 
 import FABulous.fabric_cad.model_generation_npnr as model_gen_npnr
 import FABulous.fabric_generator.code_generator as codeGen
-import FABulous.fabric_generator.file_parser as fileParser
+import FABulous.fabric_generator.parser.parse_csv as fileParser
 
 # Importing Modules from FABulous Framework.
 from FABulous.fabric_definition.Bel import Bel

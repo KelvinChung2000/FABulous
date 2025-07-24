@@ -39,12 +39,12 @@ from FABulous.fabric_definition.Tile import Tile
 from FABulous.fabric_generator.code_generation_Verilog import VerilogWriter
 from FABulous.fabric_generator.code_generation_VHDL import VHDLWriter
 from FABulous.fabric_generator.code_generator import codeGenerator
-from FABulous.fabric_generator.file_parser import (
-    parseBelFile,
+from FABulous.fabric_generator.parser.parse_configmem import parseConfigMem
+from FABulous.fabric_generator.parser.parse_hdl import parseBelFile
+from FABulous.fabric_generator.parser.parse_switchmatrix import (
     parseList,
     parseMatrix,
 )
-from FABulous.fabric_generator.parser.parse_configmem import parseConfigMem
 
 if TYPE_CHECKING:
     from FABulous.fabric_definition.ConfigMem import ConfigMem

@@ -13,7 +13,8 @@ from FABulous.fabric_definition.Gen_IO import Gen_IO
 from FABulous.fabric_definition.Port import Port
 from FABulous.fabric_generator.code_generation_Verilog import VerilogWriter
 from FABulous.fabric_generator.code_generation_VHDL import VHDLWriter
-from FABulous.fabric_generator.file_parser import parseBelFile, parseList
+from FABulous.fabric_generator.parser.parse_hdl import parseBelFile
+from FABulous.fabric_generator.parser.parse_switchmatrix import parseList
 
 if TYPE_CHECKING:
     from FABulous.fabric_generator.code_generator import codeGenerator

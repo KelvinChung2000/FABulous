@@ -41,7 +41,7 @@ from FABulous.fabric_cad.bit_gen import genBitstream
 from FABulous.fabric_generator.code_generation_Verilog import VerilogWriter
 from FABulous.fabric_generator.code_generation_VHDL import VHDLWriter
 from FABulous.fabric_generator.fabric_automation import generateCustomTileConfig
-from FABulous.fabric_generator.file_parser import parseTiles
+from FABulous.fabric_generator.parser.parse_csv import parseTilesCSV
 from FABulous.FABulous_API import FABulous_API
 from FABulous.FABulous_CLI import cmd_synthesis
 from FABulous.FABulous_CLI.helper import (
@@ -1058,7 +1058,7 @@ class FABulous_CLI(Cmd):
         tile_csv = generateCustomTileConfig(args.tile_path)
 
         if not args.no_switch_matrix:
-            parseTiles(tile_csv)
+            parseTilesCSV(tile_csv)
 
     @with_category(CMD_FABRIC_FLOW)
     @with_argparser(tile_list_parser)

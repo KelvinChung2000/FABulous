@@ -15,7 +15,7 @@ from FABulous.fabric_definition.Fabric import Fabric
 from FABulous.fabric_definition.SuperTile import SuperTile
 from FABulous.fabric_definition.Tile import Tile
 from FABulous.fabric_generator.code_generator.code_generation_VHDL import VHDLWriter
-from FABulous.fabric_generator.fabric_automation import genIOBel
+from FABulous.fabric_generator.gen_fabric.fabric_automation import genIOBel
 from FABulous.fabric_generator.gen_fabric.gen_configmem import generateConfigMem
 from FABulous.fabric_generator.gen_fabric.gen_fabric import generateFabric
 from FABulous.fabric_generator.gen_fabric.gen_helper import (

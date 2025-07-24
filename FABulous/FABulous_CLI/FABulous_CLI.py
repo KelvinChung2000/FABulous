@@ -42,7 +42,9 @@ from FABulous.fabric_generator.code_generator.code_generation_Verilog import (
     VerilogWriter,
 )
 from FABulous.fabric_generator.code_generator.code_generation_VHDL import VHDLWriter
-from FABulous.fabric_generator.fabric_automation import generateCustomTileConfig
+from FABulous.fabric_generator.gen_fabric.fabric_automation import (
+    generateCustomTileConfig,
+)
 from FABulous.fabric_generator.parser.parse_csv import parseTilesCSV
 from FABulous.FABulous_API import FABulous_API
 from FABulous.FABulous_CLI import cmd_synthesis

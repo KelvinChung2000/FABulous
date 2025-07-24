@@ -145,7 +145,7 @@ def parseTilesCSV(fileName: Path) -> tuple[list[Tile], list[tuple[str, str]]]:
                     bels.append(parseBelFile(belFilePath, bel_prefix, "verilog"))
                     if "ADD_AS_CUSTOM_PRIM" in temp[4:]:
                         # local import to avoid circular import
-                        from FABulous.fabric_generator.fabric_automation import (
+                        from FABulous.fabric_generator.gen_fabric.fabric_automation import (
                             addBelsToPrim,
                         )
 
@@ -231,7 +231,7 @@ def parseTilesCSV(fileName: Path) -> tuple[list[Tile], list[tuple[str, str]]]:
 
                 if "GENERATE" in temp:
                     # import here to avoid circular import
-                    from FABulous.fabric_generator.fabric_automation import (
+                    from FABulous.fabric_generator.gen_fabric.fabric_automation import (
                         generateSwitchmatrixList,
                     )
 
@@ -536,7 +536,7 @@ def parseFabricCSV(fileName: str) -> Fabric:
         if i[0].startswith("Tile"):
             if "GENERATE" in i:
                 # import here to avoid circular import
-                from FABulous.fabric_generator.fabric_automation import (
+                from FABulous.fabric_generator.gen_fabric.fabric_automation import (
                     generate_custom_tile_config,
                 )
 

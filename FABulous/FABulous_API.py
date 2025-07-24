@@ -24,6 +24,10 @@ from FABulous.fabric_generator.gen_fabric.gen_helper import (
     list2CSV,
 )
 from FABulous.fabric_generator.gen_fabric.gen_switchmatrix import genTileSwitchMatrix
+from FABulous.fabric_generator.gen_fabric.gen_tile import (
+    generateSuperTile,
+    generateTile,
+)
 from FABulous.geometry_generator.geometry_gen import GeometryGenerator
 
 
@@ -184,7 +188,7 @@ class FABulous_API:
             Name of the tile generated.
         """
         if tile := self.fabric.getTileByName(tileName):
-            self.fabricGenerator.generateTile(tile)
+            generateTile(self.writer, self.fabric, tile)
         else:
             raise ValueError(f"Tile {tileName} not found")
 
@@ -197,8 +201,10 @@ class FABulous_API:
         tileName : str
             Name of the super tile generated.
         """
-        tile = self.fabric.getSuperTileByName(tileName)
-        self.fabricGenerator.generateSuperTile(tile)
+        if tile := self.fabric.getSuperTileByName(tileName):
+            generateSuperTile(self.writer, self.fabric, tile)
+        else:
+            raise ValueError(f"SuperTile {tileName} not found")
 
     def genFabric(self):
         """Generates the entire fabric layout via 'generatreFabric' defined in

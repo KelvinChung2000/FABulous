@@ -79,18 +79,18 @@ class FABulous_API:
         if isinstance(self.writer, VHDLCodeGenerator):
             self.fileExtension = ".vhdl"
 
-    def setWriterOutputFile(self, outputDir):
+    def setWriterOutputFile(self, outputDir: Path):
         """Sets the output file directory for the write object.
 
         Parameters
         ----------
-        outputDir : str
+        outputDir : Path
             Directory path where output files will be saved.
         """
         logger.info(f"Output file: {outputDir}")
         self.writer.outFileName = outputDir
 
-    def loadFabric(self, dir: Path):
+    def loadFabric(self, fabric_dir: Path):
         """Loads fabric data from 'fabric.csv'.
 
         Parameters
@@ -103,8 +103,8 @@ class FABulous_API:
         ValueError
             If 'dir' does not end with '.csv'
         """
-        if dir.suffix == ".csv":
-            self.fabric = fileParser.parseFabricCSV(dir)
+        if fabric_dir.suffix == ".csv":
+            self.fabric = fileParser.parseFabricCSV(fabric_dir)
             self.geometryGenerator = GeometryGenerator(self.fabric)
         else:
             logger.error("Only .csv files are supported for fabric loading")
@@ -126,7 +126,7 @@ class FABulous_API:
             raise ValueError(f"Tile {tileName} not found in fabric.")
         bootstrapSwitchMatrix(tile, outputDir)
 
-    def addList2Matrix(self, list: Path, matrix: Path):
+    def addList2Matrix(self, listFile: Path, matrix: Path):
         """Converts list into CSV matrix via 'list2CSV' defined in 'fabric_gen.py' and
         saves it.
 
@@ -137,7 +137,7 @@ class FABulous_API:
         matrix : str
             File path where the matrix data will be saved.
         """
-        list2CSV(list, matrix)
+        list2CSV(listFile, matrix)
 
     def genConfigMem(self, tileName: str, configMem: Path):
         """Generate configuration memory for specified tile.
@@ -165,9 +165,7 @@ class FABulous_API:
         """
         if tile := self.fabric.getTileByName(tileName):
             sm_dbg = os.getenv("FAB_SWITCH_MATRIX_DEBUG_SIGNAL", "True")
-            switch_matrix_debug_signal = (
-                False if sm_dbg.lower().strip() == "false" else True
-            )
+            switch_matrix_debug_signal = sm_dbg.lower().strip() != "false"
             logger.info(
                 f"Generate switch matrix debug signals: {switch_matrix_debug_signal}"
             )

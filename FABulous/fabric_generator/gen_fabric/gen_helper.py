@@ -30,15 +30,15 @@ def bootstrapSwitchMatrix(tile: Tile, outputDir: Path) -> None:
         The output directory to write the switch matrix to
     """
     logger.info(f"Generate matrix csv for {tile.name} # filename: {outputDir}")
-    with open(outputDir, "w") as f:
+    with outputDir.open("w") as f:
         writer = csv.writer(f)
         sourceName, destName = [], []
         # normal wire
         for i in tile.portsInfo:
             if i.wireDirection != Direction.JUMP:
-                input, output = i.expandPortInfo("AutoSwitchMatrix")
-                sourceName += input
-                destName += output
+                portInput, portOutput = i.expandPortInfo("AutoSwitchMatrix")
+                sourceName += portInput
+                destName += portOutput
         # bel wire
         for b in tile.bels:
             for p in b.inputs:
@@ -49,9 +49,9 @@ def bootstrapSwitchMatrix(tile: Tile, outputDir: Path) -> None:
         # jump wire
         for i in tile.portsInfo:
             if i.wireDirection == Direction.JUMP:
-                input, output = i.expandPortInfo("AutoSwitchMatrix")
-                sourceName += input
-                destName += output
+                portInput, portOutput = i.expandPortInfo("AutoSwitchMatrix")
+                sourceName += portInput
+                destName += portOutput
         sourceName = list(dict.fromkeys(sourceName))
         destName = list(dict.fromkeys(destName))
         writer.writerow([tile.name] + destName)
@@ -81,7 +81,7 @@ def list2CSV(InFileName: Path, OutFileName: Path) -> None:
 
     connectionPair = parseList(InFileName)
 
-    with open(OutFileName) as f:
+    with Path(OutFileName).open() as f:
         file = f.read()
         file = re.sub(r"#.*", "", file)
         file = file.split("\n")
@@ -125,7 +125,7 @@ def list2CSV(InFileName: Path, OutFileName: Path) -> None:
         matrix[s_index][d_index] = 1
 
     # writing the matrix back to the given out file
-    with open(OutFileName, "w") as f:
+    with Path(OutFileName).open("w") as f:
         f.write(file[0] + "\n")
         for i in range(len(source)):
             f.write(f"{source[i]},")
@@ -157,8 +157,10 @@ def CSV2list(InFileName: str, OutFileName: str):
     OutFileName : str
         The directory of the list file to be written
     """
-    InFile = [i.strip("\n").split(",") for i in open(InFileName)]
-    with open(OutFileName, "w") as f:
+    with Path(InFileName).open() as f:
+        inFile = f.readlines()
+    InFile = [i.strip("\n").split(",") for i in inFile]
+    with Path(OutFileName).open("w") as f:
         # get the number of tiles in horizontal direction
         cols = len(InFile[0])
         # top-left should be the name

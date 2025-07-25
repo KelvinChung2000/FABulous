@@ -118,7 +118,7 @@ def test_tcl_script_execution(tmp_path, project, monkeypatch):
     # If no exception is raised, the test passes
 
 
-def test_commands_execution(tmp_path, project, monkeypatch):
+def test_commands_execution(project, monkeypatch):
     """Test direct command execution with -p/--commands"""
     test_args = ["FABulous", str(project), "--commands", "help; help"]
     monkeypatch.setattr(sys, "argv", test_args)
@@ -230,7 +230,7 @@ def test_force_flag(project, tmp_path):
     assert result.returncode == 1
 
     # force flag with FABulous script
-    with open(tmp_path / "test.fs", "w") as f:
+    with (tmp_path / "test.fs").open("w") as f:
         f.write("load_fabric non_exist.csv\n")
         f.write("load_fabric non_exist.csv\n")
 
@@ -267,7 +267,7 @@ def test_install_oss_cad_suite(project, mocker, monkeypatch):
                 ]
             }
 
-        def iter_content(self, chunk_size=1024):
+        def iter_content(self, chunk_size=1024):  # noqa: ARG002
             return []
 
     class MockTarFile:
@@ -280,7 +280,7 @@ def test_install_oss_cad_suite(project, mocker, monkeypatch):
         def extractall(self, path):
             pass
 
-    def mock_open(*args, **kwargs):
+    def mock_open(*_args, **_kwargs):
         return MockTarFile()
 
     monkeypatch.setattr(tarfile, "open", mock_open)

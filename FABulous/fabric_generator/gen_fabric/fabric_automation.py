@@ -114,9 +114,9 @@ def generateCustomTileConfig(tile_path: Path) -> Path:
             bel = parseBelFile(file, "", "verilog")
         else:
             bel = parseBelFile(file, "", "vhdl")
-        if "RESET" in bel.localShared.keys():
+        if "RESET" in bel.localShared:
             has_reset = True
-        if "ENABLE" in bel.localShared.keys():
+        if "ENABLE" in bel.localShared:
             has_enable = True
         for carry in bel.carry:
             if carry not in tile_carrys:
@@ -211,11 +211,11 @@ def generateSwitchmatrixList(
 
     # Remove local shared ports from bel ports for further processing
     for bel in belLocalSharedPorts:
-        for type in bel:
-            if bel[type][0] in belIns:
-                belIns.remove(bel[type][0])
-            if bel[type][0] in belOuts:
-                belOuts.remove(bel[type][0])
+        for belType in bel:
+            if bel[belType][0] in belIns:
+                belIns.remove(bel[belType][0])
+            if bel[belType][0] in belOuts:
+                belOuts.remove(bel[belType][0])
 
     if len(belIns) > 32:
         raise ValueError(
@@ -346,9 +346,8 @@ def generateSwitchmatrixList(
                     f"{{2}}{bel_enable[0]},[{sharedResetTile[1].name}0|VCC0]"
                 )
 
-    f = open(outFile, "w")
-    f.write("\n".join(str(line) for line in listfile))
-    f.close()
+    with outFile.open("w") as f:
+        f.write("\n".join(str(line) for line in listfile))
 
     primsFile = projdir.joinpath("user_design/custom_prims.v")
     if not primsFile.is_file():
@@ -383,7 +382,7 @@ def addBelsToPrim(
     primsAdd: list[str] = []  # append to prims.v
 
     if primsFile.is_file():
-        with open(primsFile) as f:
+        with primsFile.open() as f:
             prims = f.read()
     else:
         raise FileNotFoundError(f"Prims file {primsFile} not found.")
@@ -428,7 +427,7 @@ def addBelsToPrim(
             if support_vectors:
                 # Find all ports with their directions
                 # need to parse the json file again, since port width is not known in BEL object
-                with open(bel.src.with_suffix(".json")) as f:
+                with bel.src.with_suffix(".json").open() as f:
                     bel_dict = json.load(f)
                 module_ports = bel_dict["modules"][bel.module_name]["ports"]
 
@@ -437,7 +436,7 @@ def addBelsToPrim(
                     module_ports["CLK"] = module_ports["UserCLK"]
                     del module_ports["UserCLK"]
                 # ConfigBits are not needed in the prims file
-                if "ConfigBits" in module_ports.keys():
+                if "ConfigBits" in module_ports:
                     del module_ports["ConfigBits"]
 
                 ports_dict = {}
@@ -461,11 +460,9 @@ def addBelsToPrim(
                         if port in external_ports:
                             # add pad attribute to external ports
                             modline += "    (* iopad_external_pin *)\n"
-                        if port in shared_ports:
-                            # Rename UserCLK to CLK
-                            # Otherwise Yosys can't map the CLK
-                            if port == "UserCLK":
-                                port = "CLK"
+                        if port in shared_ports and port == "UserCLK":
+                            port = "CLK"
+
                         modline += f"    {direction} {port}"
             else:  # No vector support
                 ports = bel.inputs + bel.outputs + external_ports + shared_ports
@@ -524,7 +521,7 @@ def addBelsToPrim(
             continue
 
     # write to prims file, line by line
-    with open(primsFile, "a") as f:
+    with primsFile.open("a") as f:
         f.write("\n".join(str(i) for i in primsAdd))
 
 

@@ -1,5 +1,6 @@
 import math
 import re
+from pathlib import Path
 
 from FABulous.fabric_definition.define import IO
 from FABulous.fabric_generator.code_generator.code_generator import CodeGenerator
@@ -16,7 +17,7 @@ class VerilogCodeGenerator(CodeGenerator):
         else:
             self._add(f"{' ':<{indentLevel * 4}}" + f"// {comment}{end}")
 
-    def addHeader(self, name, package="", indentLevel=0):
+    def addHeader(self, name, _package="", indentLevel=0):
         self._add(f"module {name}", indentLevel)
 
     def addHeaderEnd(self, name, indentLevel=0):
@@ -35,9 +36,9 @@ class VerilogCodeGenerator(CodeGenerator):
             self._add(temp[:-1])
         self._add(")", indentLevel)
 
-    def addParameter(self, name, type, value, indentLevel=0):
-        if type.startswith("["):
-            self._add(f"parameter {type} {name}={value},", indentLevel)
+    def addParameter(self, name, storageType, value, indentLevel=0):
+        if storageType.startswith("["):
+            self._add(f"parameter {storageType} {name}={value},", indentLevel)
         else:
             self._add(f"parameter {name}={value},", indentLevel)
 
@@ -146,10 +147,7 @@ class VerilogCodeGenerator(CodeGenerator):
 
         connectPair = []
         for i in portsPairs:
-            if "(" in i[1]:
-                tmp = i[1].replace("(", "[").replace(")", "]")
-            else:
-                tmp = i[1]
+            tmp = i[1].replace("(", "[").replace(")", "]")
             connectPair.append(f".{i[0]}({tmp})")
 
         self._add(
@@ -161,7 +159,7 @@ class VerilogCodeGenerator(CodeGenerator):
 
     def addComponentDeclarationForFile(self, fileName):
         configPortUsed = 0  # 1 means is used
-        with open(fileName) as f:
+        with Path(fileName).open() as f:
             data = f.read()
 
         if result := re.search(
@@ -219,7 +217,7 @@ end
 """
         self._add(template, indentLevel)
 
-    def addAssignScalar(self, left, right, delay=0, indentLevel=0, inverted=False):
+    def addAssignScalar(self, left, right, delay=0, indentLevel=0, inverted=False):  # noqa: ARG002
         inv = "~" if inverted else ""
         if isinstance(right, list):
             self._add(f"assign {left} = {inv}{{{','.join(right)}}};", indentLevel)

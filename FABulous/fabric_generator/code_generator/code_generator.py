@@ -25,7 +25,7 @@ class CodeGenerator(abc.ABC):
         if self._outFileName == Path():
             logger.critical("OutFileName is not set")
             exit(-1)
-        with open(self._outFileName, "w") as f:
+        with Path(self._outFileName).open("w") as f:
             self._content = [i for i in self._content if i is not None]
             f.write("\n".join(self._content))
         self._content = []
@@ -151,14 +151,14 @@ class CodeGenerator(abc.ABC):
         """
 
     @abc.abstractmethod
-    def addParameter(self, name: str, type, value, indentLevel=0):
+    def addParameter(self, name: str, storageType, value, indentLevel=0):
         """Add a parameter.
 
         Parameters
         ----------
         name : str
             Name of the parameter.
-        type : str
+        storageType : str
             Type of the parameter. Only useful with VHDL.
         value : str
             Value of the parameter.

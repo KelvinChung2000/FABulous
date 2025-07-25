@@ -234,7 +234,7 @@ class FABulous_CLI(Cmd):
                 return False
             return not self.force
 
-    def do_exit(self, *ignored):
+    def do_exit(self, *_ignored):
         """Exits the FABulous shell and logs info message."""
         logger.info("Exiting FABulous shell")
         os.chdir(self.enteringDir)
@@ -389,9 +389,9 @@ class FABulous_CLI(Cmd):
         if not self.fabricLoaded:
             raise CommandError("Need to load fabric first")
 
-        if tile := self.fabulousAPI.getTile(args.tile):
-            logger.info(f"\n{pprint.pformat(tile, width=200)}")
-        elif tile := self.fabulousAPI.getSuperTile(args[0]):
+        if (tile := self.fabulousAPI.getTile(args.tile)) or (
+            tile := self.fabulousAPI.getSuperTile(args[0])
+        ):
             logger.info(f"\n{pprint.pformat(tile, width=200)}")
         else:
             raise CommandError(f"Tile {args.tile} not found in fabric")
@@ -506,14 +506,14 @@ class FABulous_CLI(Cmd):
         logger.info("Tile generation complete")
 
     @with_category(CMD_FABRIC_FLOW)
-    def do_gen_all_tile(self, *ignored):
+    def do_gen_all_tile(self, *_ignored):
         """Generates all tiles by calling 'do_gen_tile'."""
         logger.info("Generating all tiles")
         self.do_gen_tile(" ".join(self.allTile))
         logger.info("All tiles generation complete")
 
     @with_category(CMD_FABRIC_FLOW)
-    def do_gen_fabric(self, *ignored):
+    def do_gen_fabric(self, *_ignored):
         """Generates fabric based on the loaded fabric by calling 'do_gen_all_tile' and
         'genFabric'.
 
@@ -560,7 +560,7 @@ class FABulous_CLI(Cmd):
         logger.info(f"{geomFile} can now be imported into FABulator")
 
     @with_category(CMD_GUI)
-    def do_start_FABulator(self, *ignored):
+    def do_start_FABulator(self, *_ignored):
         """Starts FABulator if an installation can be found.
 
         If no installation can be found, a warning is produced.
@@ -576,7 +576,7 @@ class FABulous_CLI(Cmd):
             )
             return
 
-        if not os.path.exists(fabulatorRoot):
+        if not Path(fabulatorRoot).exists():
             raise EnvironmentNotSet(
                 f"FABULATOR_ROOT environment variable set to {fabulatorRoot} but the directory does not exist."
             )
@@ -600,7 +600,7 @@ class FABulous_CLI(Cmd):
             ) from e
 
     @with_category(CMD_FABRIC_FLOW)
-    def do_gen_bitStream_spec(self, *ignored):
+    def do_gen_bitStream_spec(self, *_ignored):
         """Generates bitstream specification of the fabric by calling 'genBitStreamspec'
         and saving the specification to a binary and CSV file.
 
@@ -610,13 +610,15 @@ class FABulous_CLI(Cmd):
         specObject = self.fabulousAPI.genBitStreamSpec()
 
         logger.info(f"output file: {self.projectDir}/{META_DATA_DIR}/bitStreamSpec.bin")
-        with open(
-            f"{self.projectDir}/{META_DATA_DIR}/bitStreamSpec.bin", "wb"
+        with Path(f"{self.projectDir}/{META_DATA_DIR}/bitStreamSpec.bin").open(
+            "wb"
         ) as outFile:
             pickle.dump(specObject, outFile)
 
         logger.info(f"output file: {self.projectDir}/{META_DATA_DIR}/bitStreamSpec.csv")
-        with open(f"{self.projectDir}/{META_DATA_DIR}/bitStreamSpec.csv", "w") as f:
+        with Path(f"{self.projectDir}/{META_DATA_DIR}/bitStreamSpec.csv").open(
+            "w"
+        ) as f:
             w = csv.writer(f)
             for key1 in specObject["TileSpecs"]:
                 w.writerow([key1])
@@ -625,7 +627,7 @@ class FABulous_CLI(Cmd):
         logger.info("Bitstream specification generation complete")
 
     @with_category(CMD_FABRIC_FLOW)
-    def do_gen_top_wrapper(self, *ignored):
+    def do_gen_top_wrapper(self, *_ignored):
         """Generates top wrapper of the fabric by calling 'genTopWrapper'."""
         logger.info("Generating top wrapper")
         self.fabulousAPI.setWriterOutputFile(
@@ -635,7 +637,7 @@ class FABulous_CLI(Cmd):
         logger.info("Top wrapper generation complete")
 
     @with_category(CMD_FABRIC_FLOW)
-    def do_run_FABulous_fabric(self, *ignored):
+    def do_run_FABulous_fabric(self, *_ignored):
         """Generates the fabric based on the CSV file, creates bitstream specification
         of the fabric, top wrapper of the fabric, Nextpnr model of the fabric and
         geometry information of the fabric.
@@ -659,7 +661,7 @@ class FABulous_CLI(Cmd):
             logger.info("FABulous fabric flow complete")
 
     @with_category(CMD_FABRIC_FLOW)
-    def do_gen_model_npnr(self, *ignored):
+    def do_gen_model_npnr(self, *_ignored):
         """Generates Nextpnr model of fabric by parsing various required files for place
         and route such as 'pips.txt', 'bel.txt', 'bel.v2.txt' and 'templace.pcf'. Output
         files are written to the directory specified by 'metaDataDir' within
@@ -670,19 +672,19 @@ class FABulous_CLI(Cmd):
         logger.info("Generating npnr model")
         npnrModel = self.fabulousAPI.genRoutingModel()
         logger.info(f"output file: {self.projectDir}/{META_DATA_DIR}/pips.txt")
-        with open(f"{self.projectDir}/{META_DATA_DIR}/pips.txt", "w") as f:
+        with Path(f"{self.projectDir}/{META_DATA_DIR}/pips.txt").open("w") as f:
             f.write(npnrModel[0])
 
         logger.info(f"output file: {self.projectDir}/{META_DATA_DIR}/bel.txt")
-        with open(f"{self.projectDir}/{META_DATA_DIR}/bel.txt", "w") as f:
+        with Path(f"{self.projectDir}/{META_DATA_DIR}/bel.txt").open("w") as f:
             f.write(npnrModel[1])
 
         logger.info(f"output file: {self.projectDir}/{META_DATA_DIR}/bel.v2.txt")
-        with open(f"{self.projectDir}/{META_DATA_DIR}/bel.v2.txt", "w") as f:
+        with Path(f"{self.projectDir}/{META_DATA_DIR}/bel.v2.txt").open("w") as f:
             f.write(npnrModel[2])
 
         logger.info(f"output file: {self.projectDir}/{META_DATA_DIR}/template.pcf")
-        with open(f"{self.projectDir}/{META_DATA_DIR}/template.pcf", "w") as f:
+        with Path(f"{self.projectDir}/{META_DATA_DIR}/template.pcf").open("w") as f:
             f.write(npnrModel[3])
 
         logger.info("Generated npnr model")
@@ -714,19 +716,22 @@ class FABulous_CLI(Cmd):
         if parent == "":
             parent = "."
 
-        if not os.path.exists(
-            f"{self.projectDir}/.FABulous/pips.txt"
-        ) or not os.path.exists(f"{self.projectDir}/.FABulous/bel.txt"):
+        if (
+            not Path(f"{self.projectDir}/.FABulous/pips.txt").exists()
+            or not Path(f"{self.projectDir}/.FABulous/bel.txt").exists()
+        ):
             raise FileNotFoundError(
                 "Pips and Bel files are not found, please run model_gen_npnr first"
             )
 
-        if os.path.exists(f"{self.projectDir}/{parent}"):
+        if Path(f"{self.projectDir}/{parent}").exists():
             # TODO rewriting the fab_arch script so no need to copy file for work around
             npnr = check_if_application_exists(
                 os.getenv("FAB_NEXTPNR_PATH", "nextpnr-generic")
             )
-            if f"{json_file}" in os.listdir(f"{self.projectDir}/{parent}"):
+            if f"{json_file}" in [
+                str(i.name) for i in Path(f"{self.projectDir}/{parent}").iterdir()
+            ]:
                 runCmd = [
                     f"FAB_ROOT={self.projectDir}",
                     f"{npnr}",
@@ -956,7 +961,7 @@ class FABulous_CLI(Cmd):
         do_synth_args = str(args.file)
 
         primsLib = f"{self.projectDir}/user_design/custom_prims.v"
-        if os.path.exists(primsLib):
+        if Path(primsLib).exists():
             do_synth_args += f" -extra-plib {primsLib}"
         else:
             logger.info("No external primsLib found.")
@@ -991,7 +996,7 @@ class FABulous_CLI(Cmd):
 
         logger.info(f"Execute TCL script {args.file}")
 
-        with open(args.file) as f:
+        with Path(args.file).open() as f:
             script = f.read()
         self.tcl.eval(script)
 
@@ -1008,7 +1013,7 @@ class FABulous_CLI(Cmd):
 
         logger.info(f"Execute script {args.file}")
 
-        with open(args.file) as f:
+        with Path(args.file).open() as f:
             for i in f:
                 self.onecmd_plus_hooks(i.strip())
                 if self.exit_code != 0:
@@ -1075,5 +1080,5 @@ class FABulous_CLI(Cmd):
 
     @with_category(CMD_FABRIC_FLOW)
     @allow_blank
-    def do_gen_io_fabric(self, args):
+    def do_gen_io_fabric(self, _args):
         self.fabulousAPI.genFabricIOBels()

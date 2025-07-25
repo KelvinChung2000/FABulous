@@ -15,7 +15,7 @@ from dotenv import get_key, load_dotenv, set_key
 from loguru import logger
 from packaging.version import Version
 
-from FABulous.custom_exception import PipelineCommandError
+from FABulous.custom_exception import EnvironmentNotSet, PipelineCommandError
 
 MAX_BITBYTES = 16384
 
@@ -100,7 +100,7 @@ def setup_global_env_vars(args: argparse.Namespace) -> None:
     if p := os.getenv("FAB_ROOT"):
         fabDir = Path(p)
     else:
-        raise Exception("FAB_ROOT environment variable not set")
+        raise EnvironmentNotSet("FAB_ROOT environment variable not set")
     if args.globalDotEnv:
         gde = Path(args.globalDotEnv)
         if gde.is_file():
@@ -145,7 +145,7 @@ def setup_project_env_vars(args: argparse.Namespace) -> None:
     if p := os.getenv("FAB_PROJ_DIR"):
         fabDir = Path(p) / ".FABulous"
     else:
-        raise Exception("FAB_PROJ_DIR environment variable not set")
+        raise EnvironmentNotSet("FAB_PROJ_DIR environment variable not set")
 
     if args.projectDotEnv:
         pde = Path(args.projectDotEnv)
@@ -280,14 +280,14 @@ def make_hex(binfile: Path, outfile: Path):
     outfile : str
         Path to ouput hex file.
     """
-    with open(binfile, "rb") as f:
+    with Path(binfile).open("rb") as f:
         bindata = f.read()
 
     if len(bindata) > MAX_BITBYTES:
         logger.error("Binary file too big.")
         return
 
-    with open(outfile, "w") as f:
+    with Path(outfile).open("w") as f:
         for i in range(MAX_BITBYTES):
             if i < len(bindata):
                 print(f"{bindata[i]:02x}", file=f)
@@ -295,7 +295,7 @@ def make_hex(binfile: Path, outfile: Path):
                 print("0", file=f)
 
 
-def check_if_application_exists(application: str, throw_exception: bool = True) -> Path:
+def check_if_application_exists(application: str) -> Path:
     """Checks if an application is installed on the system.
 
     Parameters
@@ -352,7 +352,7 @@ def wrap_with_except_handling(fun_to_wrap):
 
             traceback.print_exc()
             logger.error("TCL command failed. Please check the logs for details.")
-            raise Exception from Exception
+            raise Exception from Exception  # noqa: TRY002 - Raising a new exception with the original traceback
 
     return inter
 
@@ -412,13 +412,13 @@ def install_oss_cad_suite(destination_folder: Path, update: bool = False):
                     (root / name).rmdir()
             ocs_folder.rmdir()
         else:
-            raise Exception(
+            raise FileExistsError(
                 f"The folder {ocs_folder} already exists. Please set the update flag, remove it or choose a different folder."
             )
     else:
         if not destination_folder.is_dir():
             logger.info(f"Creating folder {destination_folder.absolute()}")
-            os.makedirs(destination_folder, exist_ok=True)
+            Path.mkdir(destination_folder, exist_ok=True)
         else:
             logger.info(
                 f"Installing OSS-CAD-Suite to folder {destination_folder.absolute()}"
@@ -441,16 +441,17 @@ def install_oss_cad_suite(destination_folder: Path, update: bool = False):
     if response.status_code == 200:
         latest_release = response.json()
     else:
-        raise Exception(
+        raise ConnectionError(
             f"Failed to fetch latest OSS-CAD-Suite release: {response.status_code}"
         )
 
     # find the right release for the current system
     for asset in latest_release.get("assets", []):
-        if "tar.gz" in asset["name"] or "tgz" in asset["name"]:
-            if machine in asset["name"].lower() and system in asset["name"].lower():
-                url = asset["browser_download_url"]
-                break  # we assume that the first match is the right one
+        if ("tar.gz" in asset["name"] or "tgz" in asset["name"]) and (
+            machine in asset["name"].lower() and system in asset["name"].lower()
+        ):
+            url = asset["browser_download_url"]
+            break  # we assume that the first match is the right one
     if url is None or url == "":  # Changed == None to is None
         raise ValueError("No valid archive found in the latest release.")
 
@@ -460,10 +461,10 @@ def install_oss_cad_suite(destination_folder: Path, update: bool = False):
     response = requests.get(url, stream=True)
 
     if response.status_code == 200:
-        with open(ocs_archive, "wb") as file:
+        with Path(ocs_archive).open("wb") as file:
             file.writelines(response.iter_content(chunk_size=8192))
     else:
-        raise Exception(f"Failed to download file: {response.status_code}")
+        raise ConnectionError(f"Failed to download file: {response.status_code}")
 
     # Extract the archive
     logger.info(f"Extracting OSS-CAD-Suite to {destination_folder.absolute()}")

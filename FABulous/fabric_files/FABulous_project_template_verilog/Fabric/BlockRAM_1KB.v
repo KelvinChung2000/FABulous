@@ -1,4 +1,3 @@
-`timescale 1ps / 1ps
 module BlockRAM_1KB (
     clk,
     rd_addr,

@@ -1,4 +1,3 @@
-`timescale 1ps / 1ps
 module Frame_Select (
     FrameStrobe_I,
     FrameStrobe_O,

@@ -8,7 +8,7 @@ import pytest
 from cocotb.clock import Clock
 from cocotb.triggers import RisingEdge, Timer
 
-from tests.fabric_construct_test.conftest import VERILOG_SOURCE_PATH, VHDL_SOURCE_PATH
+from tests.conftest import VERILOG_SOURCE_PATH, VHDL_SOURCE_PATH
 
 
 def test_Frame_Data_Reg_verilog_rtl(cocotb_runner):
@@ -18,6 +18,7 @@ def test_Frame_Data_Reg_verilog_rtl(cocotb_runner):
         hdl_top_level="Frame_Data_Reg",
         test_module_path=Path(__file__),
     )
+
 
 def test_Frame_Data_Reg_vhdl_rtl(cocotb_runner):
     cocotb_runner(
@@ -86,5 +87,6 @@ async def test_frame_data_reg_basic(dut):
             expected = dut.FrameData_O.value  # Should remain unchanged
 
         actual = dut.FrameData_O.value
-        assert actual == expected, f"Row {row_val}: Expected FrameData_O = 0x{expected:08x}, got 0x{actual:08x}"
-
+        assert actual == expected, (
+            f"Row {row_val}: Expected FrameData_O = 0x{expected:08x}, got 0x{actual:08x}"
+        )

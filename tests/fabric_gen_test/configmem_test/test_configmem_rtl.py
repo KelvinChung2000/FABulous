@@ -205,7 +205,7 @@ def test_configmem_rtl_with_generated_configmem_simulation(
     )
 
 
-@pytest.mark.parametrize("hdl_lang", [".v", ".vhd"])
+@pytest.mark.parametrize("hdl_lang", [".v", ".vhdl"])
 def test_configmem_rtl_with_custom_configmem_simulation(
     hdl_lang: str,
     tmp_path: Path,

@@ -1,8 +1,6 @@
 // Essential modules for ConfigMem RTL simulation
 // Extracted from FABulous fabric models
 
-`timescale 1ps/1ps
-
 // LHQD1 Latch - used in configuration memory
 module LHQD1 (input D, E, output reg Q, QN);
     always @(*)

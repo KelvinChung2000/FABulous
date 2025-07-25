@@ -4,13 +4,10 @@ from pathlib import Path
 import pytest
 from cocotb.runner import get_runner
 
-VERILOG_SOURCE_PATH = (
-    Path(__file__).parent.parent.parent / "FABulous" / "fabric_files" / "FABulous_project_template_verilog"
-)
+VERILOG_SOURCE_PATH = Path(__file__).parent.parent / "FABulous" / "fabric_files" / "FABulous_project_template_verilog"
 
-VHDL_SOURCE_PATH = (
-    Path(__file__).parent.parent.parent / "FABulous" / "fabric_files" / "FABulous_project_template_vhdl"
-)
+VHDL_SOURCE_PATH = Path(__file__).parent.parent / "FABulous" / "fabric_files" / "FABulous_project_template_vhdl"
+
 
 @pytest.fixture
 def cocotb_runner(tmp_path: Path):
@@ -32,7 +29,9 @@ def cocotb_runner(tmp_path: Path):
             sim = "ghdl"
         runner = get_runner(sim)
 
-        sources.insert(0, Path(__file__).parent.parent / "testdata" / f"models{hdl_toplevel_lang}")
+        timescales = ("1ps", "1ps")
+
+        sources.insert(0, Path(__file__).parent / "testdata" / f"models{hdl_toplevel_lang}")
         # Copy test module and models to temp directory for cocotb
         test_dir = tmp_path / "tests"
         test_dir.mkdir(exist_ok=True)
@@ -45,11 +44,25 @@ def cocotb_runner(tmp_path: Path):
 
         # Configure sources based on HDL language
         if hdl_toplevel_lang == ".v":
-            runner.build(verilog_sources=sources, hdl_toplevel=hdl_top_level, always=True, build_dir=build_dir)
+            runner.build(
+                verilog_sources=sources,
+                hdl_toplevel=hdl_top_level,
+                always=True,
+                build_dir=build_dir,
+                defines={"NOTIMESCALE": 1},
+                timescale=timescales,
+            )
         elif hdl_toplevel_lang == ".vhdl":
             # GHDL converts identifiers to lowercase for elaboration and execution
             hdl_top_level = hdl_top_level.lower()
-            runner.build(vhdl_sources=sources, hdl_toplevel=hdl_top_level, always=True, build_dir=build_dir)
+            runner.build(
+                vhdl_sources=sources,
+                hdl_toplevel=hdl_top_level,
+                always=True,
+                build_dir=build_dir,
+                defines={"NOTIMESCALE": 1},
+                timescale=timescales,
+            )
 
             # Copy all files from build_dir to test_dir
             for file in build_dir.iterdir():
@@ -61,6 +74,7 @@ def cocotb_runner(tmp_path: Path):
             test_module=test_module_path.stem,
             build_dir=build_dir,
             test_dir=test_dir,
+            timescale=timescales,
         )
 
     return _create_runner

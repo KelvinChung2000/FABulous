@@ -8,7 +8,7 @@ import pytest
 from cocotb.clock import Clock
 from cocotb.triggers import RisingEdge, Timer
 
-from tests.fabric_construct_test.conftest import VERILOG_SOURCE_PATH, VHDL_SOURCE_PATH
+from tests.conftest import VERILOG_SOURCE_PATH, VHDL_SOURCE_PATH
 
 
 def test_Frame_Data_Reg_verilog_rtl(cocotb_runner):

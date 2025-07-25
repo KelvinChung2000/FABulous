@@ -1,4 +1,3 @@
-`timescale 1ps / 1ps
 // Models for the embedded FPGA fabric
 
 // verilog_lint: waive-start module-filename

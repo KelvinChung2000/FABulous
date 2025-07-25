@@ -1,4 +1,3 @@
-`timescale 1ps / 1ps
 module bitbang (
     s_clk,
     s_data,

@@ -20,13 +20,13 @@ except ImportError:
     logger.critical("Could not import fasm. Bitstream generation not supported.")
 
 
-def bitstring_to_bytes(s):
+def bitstring_to_bytes(s: str) -> bytes:
     return int(s, 2).to_bytes((len(s) + 7) // 8, byteorder="big")
 
 
 # CAD methods from summer vacation project 2020
 # Method to generate bitstream in the output format - more detail at the end
-def genBitstream(fasmFile: str, specFile: str, bitstreamFile: str):
+def genBitstream(fasmFile: str, specFile: str, bitstreamFile: str) -> None:
     lGen = parse_fasm_filename(fasmFile)
     canonStr = fasm_tuple_to_string(lGen, True)
     canonList = list(parse_fasm_string(canonStr))
@@ -197,7 +197,7 @@ def genBitstream(fasmFile: str, specFile: str, bitstreamFile: str):
 #####################################################################################
 # Main
 #####################################################################################
-def bit_gen():
+def bit_gen() -> None:
     # Strip arguments
     caseProcessedArguments = list(map(lambda x: x.strip(), sys.argv))
     processedArguments = list(map(lambda x: x.lower(), caseProcessedArguments))

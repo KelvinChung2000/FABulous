@@ -6,9 +6,10 @@ import re
 import shutil
 import sys
 import tarfile
+from collections.abc import Callable, Sequence
 from importlib.metadata import version
 from pathlib import Path
-from typing import Literal
+from typing import TYPE_CHECKING, Any, Literal
 
 import requests
 from dotenv import get_key, load_dotenv, set_key
@@ -17,15 +18,20 @@ from packaging.version import Version
 
 from FABulous.custom_exception import EnvironmentNotSet, PipelineCommandError
 
+if TYPE_CHECKING:
+    from loguru import Record
+
+    from FABulous.FABulous_CLI.FABulous_CLI import FABulous_CLI
+
 MAX_BITBYTES = 16384
 
 
-def setup_logger(verbosity: int, debug: bool, log_file: Path = Path()):
+def setup_logger(verbosity: int, debug: bool, log_file: Path = Path()) -> None:
     # Remove the default logger to avoid duplicate logs
     logger.remove()
 
     # Define a custom formatting function that has access to 'verbosity'
-    def custom_format_function(record):
+    def custom_format_function(record: "Record") -> str:
         # Construct the standard part of the log message based on verbosity
         level = f"<level>{record['level'].name}</level> | "
         time = f"<cyan>[{record['time']:DD-MM-YYYY HH:mm:ss}]</cyan> | "
@@ -33,16 +39,13 @@ def setup_logger(verbosity: int, debug: bool, log_file: Path = Path()):
         func = f"<green>{record['function']}</green>"
         line = f"<green>{record['line']}</green>"
         msg = f"<level>{record['message']}</level>"
-        exc = (
-            f"<bg red><white>{record['exception'].type.__name__}</white></bg red> | "
-            if record["exception"]
-            else ""
-        )
+        exc = ""
+        if record["exception"] and record["exception"].type:
+            exc = f"<bg red><white>{record['exception'].type.__name__}</white></bg red> | "
 
+        final_log = f"{level}{exc}{msg}\n"
         if verbosity >= 1:
             final_log = f"{level}{time}{name}:{func}:{line} - {exc}{msg}\n"
-        else:
-            final_log = f"{level}{exc}{msg}\n"
 
         if os.getenv("FABULOUS_TESTING", None):
             final_log = f"{record['level'].name}: {record['message']}\n"
@@ -172,7 +175,9 @@ def setup_project_env_vars(args: argparse.Namespace) -> None:
         os.environ["FAB_PROJ_LANG"] = args.writer
 
 
-def create_project(project_dir: Path, lang: Literal["verilog", "vhdl"] = "verilog"):
+def create_project(
+    project_dir: Path, lang: Literal["verilog", "vhdl"] = "verilog"
+) -> None:
     """Creates a FABulous project containing all required files by copying the common
     files and the appropriate project template. Replces the {HDL_SUFFIX} placeholder in
     all tile csv files with the appropriate file extension. Creates a .FABulous
@@ -236,7 +241,7 @@ def create_project(project_dir: Path, lang: Literal["verilog", "vhdl"] = "verilo
     logger.info(f"New FABulous project created in {project_dir} with {lang} language.")
 
 
-def copy_verilog_files(src: Path, dst: Path):
+def copy_verilog_files(src: Path, dst: Path) -> None:
     """Copies all Verilog files from source directory to the destination directory.
 
     Parameters
@@ -252,7 +257,7 @@ def copy_verilog_files(src: Path, dst: Path):
         shutil.copy(file_path, destination_path)
 
 
-def remove_dir(path: Path):
+def remove_dir(path: Path) -> None:
     """Removes a directory and all its contents.
 
     If the directory cannot be removed, logs OS error.
@@ -268,7 +273,7 @@ def remove_dir(path: Path):
         logger.error(f"{e}")
 
 
-def make_hex(binfile: Path, outfile: Path):
+def make_hex(binfile: Path, outfile: Path) -> None:
     """Converts a binary file into hex file.
 
     If the binary file exceeds MAX_BITBYTES, logs error.
@@ -319,13 +324,12 @@ def check_if_application_exists(application: str) -> Path:
     if path is not None:
         return Path(path)
     error_msg = f"{application} is not installed. Please install it or set FAB_<APPLICATION>_PATH in the .env file."
-    logger.error(error_msg)
     # To satisfy the `-> Path` return type, an exception must be raised if no path is found.
     # The throw_exception parameter's original intent might need review if non-exception paths were desired.
     raise FileNotFoundError(error_msg)
 
 
-def wrap_with_except_handling(fun_to_wrap):
+def wrap_with_except_handling(fun_to_wrap: Callable) -> Callable:
     """Decorator function that wraps 'fun_to_wrap' with exception handling.
 
     Parameters
@@ -334,7 +338,7 @@ def wrap_with_except_handling(fun_to_wrap):
         The function to be wrapped with exception handling.
     """
 
-    def inter(*args, **varargs):
+    def inter(*args: Any, **varargs: Any) -> None:  # noqa: ANN401
         """Wrapped function that executes 'fun_to_wrap' with arguments and exception
         handling.
 
@@ -357,9 +361,9 @@ def wrap_with_except_handling(fun_to_wrap):
     return inter
 
 
-def allow_blank(func):
+def allow_blank(func: Callable) -> Callable:
     @functools.wraps(func)
-    def _check_blank(*args):
+    def _check_blank(*args: Sequence[str]) -> None:
         if len(args) == 1:
             func(*args, "")
         else:
@@ -368,7 +372,7 @@ def allow_blank(func):
     return _check_blank
 
 
-def install_oss_cad_suite(destination_folder: Path, update: bool = False):
+def install_oss_cad_suite(destination_folder: Path, update: bool = False) -> None:
     """Downloads and extracts the latest OSS CAD Suite. Sets the the FAB_OSS_CAD_SUITE
     environment variable in the .env file.
 
@@ -533,19 +537,19 @@ def update_project_version(project_dir: Path) -> bool:
 class CommandPipeline:
     """Helper class to manage command execution with error handling."""
 
-    def __init__(self, cli_instance):
+    def __init__(self, cli_instance: "FABulous_CLI") -> None:
         self.cli = cli_instance
         self.steps = []
 
-    def add_step(self, command, error_message="Command failed"):
+    def add_step(
+        self, command: str, error_message: str = "Command failed"
+    ) -> "CommandPipeline":
         """Add a command step to the pipeline."""
         self.steps.append((command, error_message))
         return self
 
-    def execute(self, stop_on_error=None):
+    def execute(self) -> bool:
         """Execute all steps in the pipeline."""
-        if stop_on_error is None:
-            stop_on_error = not self.cli.force
 
         for command, error_message in self.steps:
             self.cli.onecmd_plus_hooks(command)

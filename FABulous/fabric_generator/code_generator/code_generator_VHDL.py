@@ -1,6 +1,7 @@
 import math
 import re
 from pathlib import Path
+from typing import Never
 
 from FABulous.fabric_definition.define import IO
 from FABulous.fabric_generator.code_generator.code_generator import CodeGenerator
@@ -12,7 +13,9 @@ class VHDLCodeGenerator(CodeGenerator):
     This is the template for generating VHDL code.
     """
 
-    def addComment(self, comment, onNewLine=False, end="", indentLevel=0) -> None:
+    def addComment(
+        self, comment: str, onNewLine: bool = False, end: str = "", indentLevel: int = 0
+    ) -> None:
         if onNewLine:
             self._add("")
         if self._content:
@@ -20,7 +23,7 @@ class VHDLCodeGenerator(CodeGenerator):
         else:
             self._add(f"{' ':<{indentLevel * 4}}" + f"-- {comment}{end}")
 
-    def addHeader(self, name, package="", indentLevel=0):
+    def addHeader(self, name: str, package: str = "", indentLevel: int = 0) -> None:
         #   library template
         self._add("library IEEE;", indentLevel)
         self._add("use IEEE.STD_LOGIC_1164.ALL;", indentLevel)
@@ -30,13 +33,13 @@ class VHDLCodeGenerator(CodeGenerator):
             self._add(package, indentLevel)
         self._add(f"entity {name} is", indentLevel)
 
-    def addHeaderEnd(self, name, indentLevel=0):
+    def addHeaderEnd(self, name: str, indentLevel: int = 0) -> None:
         self._add(f"end entity {name};", indentLevel)
 
-    def addParameterStart(self, indentLevel=0):
+    def addParameterStart(self, indentLevel: int = 0) -> None:
         self._add("Generic(", indentLevel)
 
-    def addParameterEnd(self, indentLevel=0):
+    def addParameterEnd(self, indentLevel: int = 0) -> None:
         temp = self._content.pop()
         if "--" in temp:
             temp2 = self._content.pop()[:-1]
@@ -46,14 +49,16 @@ class VHDLCodeGenerator(CodeGenerator):
             self._add(temp[:-1])
         self._add(");", indentLevel)
 
-    def addParameter(self, name, storageType, value, indentLevel=0):
+    def addParameter(
+        self, name: str, storageType: str, value: str, indentLevel: int = 0
+    ) -> None:
         self._add(f"{name} : {storageType} := {value};", indentLevel)
 
-    def addPortStart(self, indentLevel=0):
+    def addPortStart(self, indentLevel: int = 0) -> None:
         self._add("Port (", indentLevel)
 
-    def addPortEnd(self, indentLevel=0):
-        def deSemiColon(x):
+    def addPortEnd(self, indentLevel: int = 0) -> None:
+        def deSemiColon(x: str) -> str:
             cpos = x.rfind(";")
             assert cpos != -1, x
             return x[:cpos] + x[cpos + 1 :]
@@ -68,8 +73,13 @@ class VHDLCodeGenerator(CodeGenerator):
         self._add(");", indentLevel)
 
     def addPortScalar(
-        self, name, io: IO, _reg=False, attribute: str = "", indentLevel=0
-    ):
+        self,
+        name: str,
+        io: IO,
+        _reg: bool = False,
+        attribute: str = "",
+        indentLevel: int = 0,
+    ) -> None:
         ioVHDL = ""
         if io.value.lower() == "input":
             ioVHDL = "in"
@@ -82,8 +92,14 @@ class VHDLCodeGenerator(CodeGenerator):
         )
 
     def addPortVector(
-        self, name, io: IO, msbIndex, _reg=False, attribute: str = "", indentLevel=0
-    ):
+        self,
+        name: str,
+        io: IO,
+        msbIndex: int,
+        _reg: bool = False,
+        attribute: str = "",
+        indentLevel: int = 0,
+    ) -> None:
         ioVHDL = ""
         if io.value.lower() == "input":
             ioVHDL = "in"
@@ -96,33 +112,47 @@ class VHDLCodeGenerator(CodeGenerator):
             indentLevel=indentLevel,
         )
 
-    def addDesignDescriptionStart(self, name, indentLevel=0):
+    def addDesignDescriptionStart(self, name: str, indentLevel: int = 0) -> None:
         self._add(f"architecture Behavioral of {name} is", indentLevel)
 
-    def addDesignDescriptionEnd(self, indentLevel=0):
+    def addDesignDescriptionEnd(self, indentLevel: int = 0) -> None:
         self._add("end architecture Behavioral;", indentLevel)
 
-    def addConstant(self, name, value, indentLevel=0):
+    def addConstant(self, name: str, value: str, indentLevel: int = 0) -> None:
         self._add(f"constant {name} : STD_LOGIC := '{value}';", indentLevel)
 
-    def addConnectionScalar(self, name, _reg=False, indentLevel=0):
+    def addConnectionScalar(
+        self, name: str, _reg: bool = False, indentLevel: int = 0
+    ) -> None:
         self._add(f"signal {name} : STD_LOGIC;", indentLevel)
 
     def addConnectionVector(
-        self, name, startIndex, _reg=False, endIndex=0, indentLevel=0
-    ):
+        self,
+        name: str,
+        startIndex: int,
+        _reg: bool = False,
+        endIndex: int = 0,
+        indentLevel: int = 0,
+    ) -> None:
         self._add(
             f"signal {name} : STD_LOGIC_VECTOR( {startIndex} downto {endIndex} );",
             indentLevel,
         )
 
-    def addLogicStart(self, indentLevel=0):
+    def addLogicStart(self, indentLevel: int = 0) -> None:
         self._add("\nbegin\n", indentLevel)
 
-    def addLogicEnd(self, indentLevel=0):
+    def addLogicEnd(self, indentLevel: int = 0) -> None:
         self._add("\nend\n", indentLevel)
 
-    def addRegister(self, reg, regIn, clk="UserCLK", inverted=False, indentLevel=0):
+    def addRegister(
+        self,
+        reg: str,
+        regIn: str,
+        clk: str = "UserCLK",
+        inverted: bool = False,
+        indentLevel: int = 0,
+    ) -> None:
         inv = "not " if inverted else ""
         template = f"""
 process({clk})
@@ -134,7 +164,14 @@ end process;
 """
         self._add(template, indentLevel)
 
-    def addAssignScalar(self, left, right, delay=0, indentLevel=0, inverted=False):
+    def addAssignScalar(
+        self,
+        left: str,
+        right: str,
+        delay: int = 0,
+        indentLevel: int = 0,
+        inverted: bool = False,
+    ) -> None:
         inv = "not " if inverted else ""
         if isinstance(right, list):
             self._add(
@@ -150,20 +187,26 @@ end process;
             self._add(f"{left} <= {inv}{right} after {delay} ps;", indentLevel)
 
     def addAssignVector(
-        self, left, right, widthL, widthR, indentLevel=0, inverted=False
-    ):
+        self,
+        left: str,
+        right: str,
+        widthL: str | int,
+        widthR: str | int,
+        indentLevel: int = 0,
+        inverted: bool = False,
+    ) -> None:
         inv = "not " if inverted else ""
         self._add(f"{left} <= {inv}{right}( {widthL} downto {widthR} );", indentLevel)
 
     def addInstantiation(
         self,
-        compName,
-        compInsName,
-        portsPairs,
-        paramPairs=None,
-        emulateParamPairs=None,
-        indentLevel=0,
-    ):
+        compName: str,
+        compInsName: str,
+        portsPairs: list[tuple[str, str]],
+        paramPairs: list[tuple[str, str]] | None = None,
+        emulateParamPairs: list[tuple[str, str]] | None = None,
+        indentLevel: int = 0,
+    ) -> None:
         if emulateParamPairs is None:
             emulateParamPairs = []
         if paramPairs is None:
@@ -201,7 +244,7 @@ end process;
         self._add(");", indentLevel=indentLevel + 1)
         self.addNewLine()
 
-    def addComponentDeclarationForFile(self, fileName):
+    def addComponentDeclarationForFile(self, fileName: str | Path) -> int:
         configPortUsed = 0  # 1 means is used
         with Path(fileName).open() as f:
             data = f.read()
@@ -223,7 +266,7 @@ end process;
         self.addNewLine()
         return configPortUsed
 
-    def addFlipFlopChain(self, configBitCounter):
+    def addFlipFlopChain(self, configBitCounter: int) -> None:
         template = f"""
 ConfigBitsInput <= ConfigBits(ConfigBitsInput'high-1 downto 0) & CONFin;
 -- for k in 0 to Conf/2 generate
@@ -243,7 +286,7 @@ CONFout <= ConfigBits(ConfigBits'high);
     """
         self._add(template)
 
-    def addShiftRegister(self, indentLevel=0):
+    def addShiftRegister(self, indentLevel: int = 0) -> None:
         template = """
 -- the configuration bits shift register
 process(CLK)
@@ -259,19 +302,21 @@ CONFout <= ConfigBits(ConfigBits'high);
     """
         self._add(template, indentLevel)
 
-    def addPreprocIfDef(self, _macro, _indentLevel=0):
+    def addPreprocIfDef(self, _macro: str, _indentLevel: int = 0) -> Never:
         raise AssertionError("preprocessor not supported in VHDL")
 
-    def addPreprocIfNotDef(self, _macro, _indentLevel=0):
+    def addPreprocIfNotDef(self, _macro: str, _indentLevel: int = 0) -> Never:
         raise AssertionError("preprocessor not supported in VHDL")
 
-    def addPreprocElse(self, _indentLevel=0):
+    def addPreprocElse(self, _indentLevel: int = 0) -> Never:
         raise AssertionError("preprocessor not supported in VHDL")
 
-    def addPreprocEndif(self, _indentLevel=0):
+    def addPreprocEndif(self, _indentLevel: int = 0) -> Never:
         raise AssertionError("preprocessor not supported in VHDL")
 
-    def addBelMapAttribute(self, configBitValues: list[tuple[str, int]], indentLevel=0):
+    def addBelMapAttribute(
+        self, configBitValues: list[tuple[str, int]], indentLevel: int = 0
+    ) -> None:
         template = "-- (* FABulous, BelMap"
         bit_count = 0
         for key, count in configBitValues:

@@ -9,15 +9,33 @@ class MuxList(PE_ports):
         self.A_reg_in //= [self.in0, self.in1, self.in2, self.in3, self.RES_reg_out, self.data_out]
         self.B_reg_in //= [self.in0, self.in1, self.in2, self.in3, self.RES_reg_out, self.data_out]
 
-        self.c_A //= [self.A_reg_out, self.const_out, self.data_out, self.RES_reg_out, self.in0, self.in1, self.in2, self.in3,]
-        self.c_B //= [self.B_reg_out, self.const_out, self.data_out, self.RES_reg_out, self.in0, self.in1, self.in2, self.in3,]
+        self.c_A //= [
+            self.A_reg_out,
+            self.const_out,
+            self.data_out,
+            self.RES_reg_out,
+            self.in0,
+            self.in1,
+            self.in2,
+            self.in3,
+        ]
+        self.c_B //= [
+            self.B_reg_out,
+            self.const_out,
+            self.data_out,
+            self.RES_reg_out,
+            self.in0,
+            self.in1,
+            self.in2,
+            self.in3,
+        ]
 
         self.RES_reg_in //= self.data_out
 
-        self.out0 //= [self.in0, self.in1, self.in2, self.in3, self.RES_reg_out, self.data_out]
-        self.out1 //= [self.in0, self.in1, self.in2, self.in3, self.RES_reg_out, self.data_out]
-        self.out2 //= [self.in0, self.in1, self.in2, self.in3, self.RES_reg_out, self.data_out]
-        self.out3 //= [self.in0, self.in1, self.in2, self.in3, self.RES_reg_out, self.data_out]
+        self.out0 //= [self.in0, self.in1, self.in2, self.in3, self.RES_reg_out, self.data_out, self.const_out]
+        self.out1 //= [self.in0, self.in1, self.in2, self.in3, self.RES_reg_out, self.data_out, self.const_out]
+        self.out2 //= [self.in0, self.in1, self.in2, self.in3, self.RES_reg_out, self.data_out, self.const_out]
+        self.out3 //= [self.in0, self.in1, self.in2, self.in3, self.RES_reg_out, self.data_out, self.const_out]
 
         # Pred network
         self.data_in3 //= [
@@ -85,6 +103,8 @@ class MuxList(PE_ports):
                 self.RES_pred_reg_out,
                 self.l_Y,
                 self.c_Y,
+                self.VCC,
+                self.GND,
             ]
 
         # self.spanOut[1] //= self.spanIn[0]

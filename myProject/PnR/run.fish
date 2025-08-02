@@ -44,8 +44,8 @@ uv run FABulous --debug myProject -p \
         gen_bitStream_spec; \
         gen_cells_and_techmaps; \
         gen_chipdb -routing_graph $my_FAB_ROOT/myProject/.FABulous/routing_graph.dot -filter 3,5 3,4; \
+        synthesis_script $source_hdl -tcl $my_FAB_ROOT/myProject/.FABulous/arch_synth.tcl; \
         "
-        # synthesis_script $source_hdl -tcl $my_FAB_ROOT/myProject/.FABulous/arch_synth.tcl; \
 # /home/kelvin/FABulous_fork/.venv/bin/python /home/kelvin/FABulous_fork/FABulous/fabric_cad/graph_draw2.py
 check_status
 cd -
@@ -62,7 +62,7 @@ nextpnr-himbaechel --chipdb "$my_FAB_ROOT/myProject/.FABulous/hycube.bit" --devi
                    --placer-heap-beta 0.9 \
                    --placer-heap-arch-connectivity-factor 0.0 \
                    --placer-heap-congestion-aware-factor 0.0 \
-                #    --no-route \
+                   --no-route \
                    -o placeTrial=10 --router1-timeout 20000 -f --debug-placer
                 #    --placer-heap-export-init-placement "$my_FAB_ROOT/myProject/user_design/test_init_placement.csv" \
 # successful seed:5743725230106451036 

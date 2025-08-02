@@ -313,8 +313,6 @@ def genFabric(fabric: Fabric, chip: Chip, context=1):
                             )
                         )
                 for node in nodes:
-                    if x == 3 and y == 5:
-                        print(node)
                     chip.add_node(node, "DEFAULT")
     setTiming(chip)
 

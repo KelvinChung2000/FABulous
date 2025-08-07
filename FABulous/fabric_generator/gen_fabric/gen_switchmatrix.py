@@ -66,7 +66,9 @@ def genTileSwitchMatrix(
         )
         return
     else:
-        raise InvalidFileType("Invalid matrix file format.")
+        raise InvalidFileType(
+            f"Invalid matrix file format. Received: {tile.matrixDir.suffix}"
+        )
 
     noConfigBits = 0
     for port_name in connections:

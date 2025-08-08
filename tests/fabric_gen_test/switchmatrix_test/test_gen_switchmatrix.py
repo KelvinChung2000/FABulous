@@ -1,13 +1,18 @@
-from typing import NamedTuple
+from pathlib import Path
+from typing import Callable, NamedTuple
 
 import pytest
 
 from FABulous.custom_exception import InvalidFileType
+from FABulous.fabric_definition.Fabric import Fabric
+from FABulous.fabric_definition.Tile import Tile
 from FABulous.fabric_definition.define import (
     ConfigBitMode,
     MultiplexerStyle,
 )
+from FABulous.fabric_generator.code_generator.code_generator import CodeGenerator
 from FABulous.fabric_generator.gen_fabric.gen_switchmatrix import genTileSwitchMatrix
+from tests.fabric_gen_test.conftest import SwitchMatrixConfig
 
 
 class MuxTestCase(NamedTuple):
@@ -23,14 +28,14 @@ class TestGenTileSwitchMatrix:
 
     def test_basic_matrix_generation(
         self,
-        switchmatrix_config,
-        default_fabric,
-        default_tile,
-        sample_connections,
-        code_generator_factory,
-        tmp_path,
-        monkeypatch,
-    ):
+        switchmatrix_config: SwitchMatrixConfig,
+        default_fabric: Fabric,
+        default_tile: Tile,
+        sample_connections: dict[str, list[str]],
+        code_generator_factory: Callable[..., CodeGenerator],
+        tmp_path: Path,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
         """Test switch matrix generation from CSV files."""
         # Setup test case configuration
         default_fabric.configBitMode = switchmatrix_config.fabric_config_bits
@@ -40,7 +45,7 @@ class TestGenTileSwitchMatrix:
         # Create CSV matrix file
         default_tile.matrixDir.touch()
         # Test both Verilog and VHDL generation
-        writer = code_generator_factory(".v")
+        writer: CodeGenerator = code_generator_factory(".v")
 
         monkeypatch.setattr(
             "FABulous.fabric_generator.gen_fabric.gen_switchmatrix.parseMatrix",
@@ -59,7 +64,7 @@ class TestGenTileSwitchMatrix:
         assert writer.outFileName.exists()
 
         # Read and verify the generated content
-        content = writer.outFileName.read_text()
+        content: str = writer.outFileName.read_text()
 
         # Basic structure checks
         assert "NumberOfConfigBits:" in content
@@ -101,8 +106,13 @@ class TestGenTileSwitchMatrix:
         [".v", ".vhdl"],
     )
     def test_existing_hdl_file_skips_generation(
-        self, default_fabric, default_tile, code_generator_factory, tmp_path, extension
-    ):
+        self, 
+        default_fabric: Fabric, 
+        default_tile: Tile, 
+        code_generator_factory: Callable[..., CodeGenerator], 
+        tmp_path: Path, 
+        extension: str
+    ) -> None:
         """Test that existing HDL files skip matrix generation."""
 
         # Setup HDL file
@@ -110,7 +120,7 @@ class TestGenTileSwitchMatrix:
         default_tile.matrixDir = hdl_file
         hdl_file.write_text("// Existing HDL content")
 
-        writer = code_generator_factory(extension)
+        writer: CodeGenerator = code_generator_factory(extension)
 
         # Execute the function
         genTileSwitchMatrix(writer, default_fabric, default_tile, False)
@@ -119,29 +129,40 @@ class TestGenTileSwitchMatrix:
         assert not writer.outFileName.exists()
         assert "// Existing HDL content" in hdl_file.read_text()
 
-    def test_invalid_file_format_raises_error(self, default_fabric, default_tile, code_generator_factory, tmp_path):
+    def test_invalid_file_format_raises_error(
+        self, 
+        default_fabric: Fabric, 
+        default_tile: Tile, 
+        code_generator_factory: Callable[..., CodeGenerator], 
+        tmp_path: Path
+    ) -> None:
         """Test that invalid file formats raise InvalidFileType."""
         # Setup invalid file
         invalid_file = tmp_path / "test_matrix.txt"
         default_tile.matrixDir = invalid_file
         invalid_file.write_text("Invalid content")
 
-        writer = code_generator_factory(".v")
+        writer: CodeGenerator = code_generator_factory(".v")
 
         # Execute and verify error
         with pytest.raises(InvalidFileType, match="Invalid matrix file format"):
             genTileSwitchMatrix(writer, default_fabric, default_tile, False)
 
     def test_unconnected_port_raises_error(
-        self, default_fabric, default_tile, code_generator_factory, tmp_path, monkeypatch
-    ):
+        self, 
+        default_fabric: Fabric, 
+        default_tile: Tile, 
+        code_generator_factory: Callable[..., CodeGenerator], 
+        tmp_path: Path, 
+        monkeypatch: pytest.MonkeyPatch
+    ) -> None:
         """Test that unconnected ports raise ValueError."""
         # Setup CSV with unconnected port
         csv_file = tmp_path / "test_matrix.csv"
         csv_file.touch()
         default_tile.matrixDir = csv_file
 
-        writer = code_generator_factory(".v")
+        writer: CodeGenerator = code_generator_factory(".v")
 
         monkeypatch.setattr(
             "FABulous.fabric_generator.gen_fabric.gen_switchmatrix.parseMatrix",
@@ -152,14 +173,19 @@ class TestGenTileSwitchMatrix:
             genTileSwitchMatrix(writer, default_fabric, default_tile, False)
 
     def test_no_config_bits_generation(
-        self, default_fabric, default_tile, code_generator_factory, tmp_path, monkeypatch
-    ):
+        self, 
+        default_fabric: Fabric, 
+        default_tile: Tile, 
+        code_generator_factory: Callable[..., CodeGenerator], 
+        tmp_path: Path, 
+        monkeypatch: pytest.MonkeyPatch
+    ) -> None:
         """Test switch matrix generation when no configuration bits are needed."""
         # Setup simple direct connections (no muxes)
         csv_file = tmp_path / "test_matrix.csv"
         default_tile.matrixDir = csv_file
 
-        writer = code_generator_factory(".v")
+        writer: CodeGenerator = code_generator_factory(".v")
 
         monkeypatch.setattr(
             "FABulous.fabric_generator.gen_fabric.gen_switchmatrix.parseMatrix",
@@ -171,7 +197,7 @@ class TestGenTileSwitchMatrix:
 
         genTileSwitchMatrix(writer, default_fabric, default_tile, False)
 
-        content = writer.outFileName.read_text()
+        content: str = writer.outFileName.read_text()
 
         # Should have no config bits
         assert "NumberOfConfigBits: 0" in content
@@ -251,13 +277,19 @@ class TestGenTileSwitchMatrix:
         ids=lambda case: case.test_name,
     )
     def test_mux_size_calculations(
-        self, default_fabric, default_tile, code_generator_factory, tmp_path, monkeypatch, mux_test_case
-    ):
+        self, 
+        default_fabric: Fabric, 
+        default_tile: Tile, 
+        code_generator_factory: Callable[..., CodeGenerator], 
+        tmp_path: Path, 
+        monkeypatch: pytest.MonkeyPatch, 
+        mux_test_case: MuxTestCase
+    ) -> None:
         """Test proper calculation of multiplexer sizes and config bits."""
         csv_file = tmp_path / f"test_matrix_{mux_test_case.test_name}.csv"
         default_tile.matrixDir = csv_file
 
-        writer = code_generator_factory(".v")
+        writer: CodeGenerator = code_generator_factory(".v")
 
         monkeypatch.setattr(
             "FABulous.fabric_generator.gen_fabric.gen_switchmatrix.parseMatrix",
@@ -266,17 +298,24 @@ class TestGenTileSwitchMatrix:
 
         genTileSwitchMatrix(writer, default_fabric, default_tile, False)
 
-        content = writer.outFileName.read_text()
+        content: str = writer.outFileName.read_text()
 
         # Check config bits calculation
         assert f"NumberOfConfigBits: {mux_test_case.expected_config_bits}" in content
 
-    def test_vhdl_specific_features(self, default_fabric, default_tile, code_generator_factory, tmp_path, monkeypatch):
+    def test_vhdl_specific_features(
+        self, 
+        default_fabric: Fabric, 
+        default_tile: Tile, 
+        code_generator_factory: Callable[..., CodeGenerator], 
+        tmp_path: Path, 
+        monkeypatch: pytest.MonkeyPatch
+    ) -> None:
         """Test VHDL-specific code generation features."""
         csv_file = tmp_path / "test_matrix.csv"
         default_tile.matrixDir = csv_file
 
-        writer = code_generator_factory(".vhdl")
+        writer: CodeGenerator = code_generator_factory(".vhdl")
 
         monkeypatch.setattr(
             "FABulous.fabric_generator.gen_fabric.gen_switchmatrix.parseMatrix",
@@ -285,7 +324,7 @@ class TestGenTileSwitchMatrix:
 
         genTileSwitchMatrix(writer, default_fabric, default_tile, False)
 
-        content = writer.outFileName.read_text()
+        content: str = writer.outFileName.read_text()
 
         # VHDL should use different constant syntax
         assert "GND0" in content
@@ -293,14 +332,21 @@ class TestGenTileSwitchMatrix:
         # VHDL constants should be defined without 1'b prefix
         assert "1'b0" not in content
 
-    def test_debug_signal_generation(self, default_fabric, default_tile, code_generator_factory, tmp_path, monkeypatch):
+    def test_debug_signal_generation(
+        self, 
+        default_fabric: Fabric, 
+        default_tile: Tile, 
+        code_generator_factory: Callable[..., CodeGenerator], 
+        tmp_path: Path, 
+        monkeypatch: pytest.MonkeyPatch
+    ) -> None:
         """Test generation of debug signals for switch matrix."""
         csv_file = tmp_path / "test_matrix.csv"
         default_tile.matrixDir = csv_file
 
-        writer = code_generator_factory(".v")
+        writer: CodeGenerator = code_generator_factory(".v")
 
-        connections = {
+        connections: dict[str, list[str]] = {
             "mux4": ["in0", "in1", "in2", "in3"],  # 4 inputs -> needs debug signal
             "mux2": ["in0", "in1"],  # 2 inputs -> needs debug signal
             "single": ["in0"],  # 1 input -> no debug signal needed
@@ -313,7 +359,7 @@ class TestGenTileSwitchMatrix:
 
         genTileSwitchMatrix(writer, default_fabric, default_tile, True)
 
-        content = writer.outFileName.read_text()
+        content: str = writer.outFileName.read_text()
 
         # Check for debug signals
         assert "DEBUG_select_mux4" in content
@@ -321,17 +367,22 @@ class TestGenTileSwitchMatrix:
         assert "DEBUG_select_single" not in content  # Single connections don't need debug
 
     def test_different_config_bit_modes(
-        self, default_fabric, default_tile, code_generator_factory, tmp_path, monkeypatch
-    ):
+        self, 
+        default_fabric: Fabric, 
+        default_tile: Tile, 
+        code_generator_factory: Callable[..., CodeGenerator], 
+        tmp_path: Path, 
+        monkeypatch: pytest.MonkeyPatch
+    ) -> None:
         """Test different configuration bit modes."""
         csv_file = tmp_path / "test_matrix.csv"
         default_tile.matrixDir = csv_file
 
-        connections = {"mux2": ["in0", "in1"]}
+        connections: dict[str, list[str]] = {"mux2": ["in0", "in1"]}
 
         # Test FRAME_BASED mode
         default_fabric.configBitMode = ConfigBitMode.FRAME_BASED
-        writer = code_generator_factory(".v", "frame_based")
+        writer: CodeGenerator = code_generator_factory(".v", "frame_based")
 
         monkeypatch.setattr(
             "FABulous.fabric_generator.gen_fabric.gen_switchmatrix.parseMatrix",
@@ -340,35 +391,42 @@ class TestGenTileSwitchMatrix:
 
         genTileSwitchMatrix(writer, default_fabric, default_tile, False)
 
-        content = writer.outFileName.read_text()
+        content: str = writer.outFileName.read_text()
         assert "ConfigBits" in content
         assert "ConfigBits_N" in content
 
         # Test FLIPFLOP_CHAIN mode
         default_fabric.configBitMode = ConfigBitMode.FLIPFLOP_CHAIN
-        writer = code_generator_factory(".v", "flipflop_chain")
+        writer_ff: CodeGenerator = code_generator_factory(".v", "flipflop_chain")
 
         monkeypatch.setattr(
             "FABulous.fabric_generator.gen_fabric.gen_switchmatrix.parseMatrix",
             lambda x, y: connections,
         )
 
-        genTileSwitchMatrix(writer, default_fabric, default_tile, False)
+        genTileSwitchMatrix(writer_ff, default_fabric, default_tile, False)
 
-        content = writer.outFileName.read_text()
+        content: str = writer_ff.outFileName.read_text()
         assert "MODE" in content
         assert "CONFin" in content
         assert "CONFout" in content
 
-    def test_edge_cases(self, default_fabric, default_tile, code_generator_factory, tmp_path, monkeypatch):
+    def test_edge_cases(
+        self, 
+        default_fabric: Fabric, 
+        default_tile: Tile, 
+        code_generator_factory: Callable[..., CodeGenerator], 
+        tmp_path: Path, 
+        monkeypatch: pytest.MonkeyPatch
+    ) -> None:
         """Test edge cases and boundary conditions."""
         csv_file = tmp_path / "test_matrix.csv"
         default_tile.matrixDir = csv_file
 
-        writer = code_generator_factory(".v")
+        writer: CodeGenerator = code_generator_factory(".v")
 
         # Test edge cases
-        edge_connections = {
+        edge_connections: dict[str, list[str]] = {
             "empty_connections": [],  # Should raise error
             "single_connection": ["input0"],  # No config bits
             "two_connections": ["input0", "input1"],  # 1 config bit
@@ -386,7 +444,7 @@ class TestGenTileSwitchMatrix:
             genTileSwitchMatrix(writer, default_fabric, default_tile, False)
 
         # Test valid edge cases
-        valid_connections = {k: v for k, v in edge_connections.items() if v}
+        valid_connections: dict[str, list[str]] = {k: v for k, v in edge_connections.items() if v}
 
         monkeypatch.setattr(
             "FABulous.fabric_generator.gen_fabric.gen_switchmatrix.parseMatrix",
@@ -395,7 +453,7 @@ class TestGenTileSwitchMatrix:
 
         genTileSwitchMatrix(writer, default_fabric, default_tile, False)
 
-        content = writer.outFileName.read_text()
+        content: str = writer.outFileName.read_text()
 
         # Verify large mux handling
         assert "large_mux" in content

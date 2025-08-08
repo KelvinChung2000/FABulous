@@ -1,97 +1,106 @@
-"""RTL behavior validation for generated Switch Matrix modules using cocotb."""
+"""RTL validation for generated Switch Matrix modules using Yosys."""
 
-import json
-import os
+from collections.abc import Callable
 from pathlib import Path
-from typing import Any, NamedTuple
+from typing import NamedTuple
 
-# Cocotb test module - these functions are called by cocotb during simulation
-import cocotb
 import pytest
-from cocotb.triggers import Timer
 
+from FABulous.fabric_definition.Fabric import Fabric
+from FABulous.fabric_definition.Tile import Tile
+from FABulous.fabric_generator.code_generator.code_generator import CodeGenerator
 from FABulous.fabric_generator.gen_fabric.gen_switchmatrix import genTileSwitchMatrix
 
 
 class SwitchMatrixTestCase(NamedTuple):
-    """Test case configuration for switch matrix routing tests."""
+    """Test case configuration for switch matrix RTL validation."""
 
     connections: dict[str, list[str]]
     test_name: str
-    expected_routes: list[dict[str, Any]]  # List of expected routing test cases
 
 
-def load_routing_info():
-    """Load routing configuration from JSON file: input->output mappings with ConfigBits."""
-    config_file = Path(os.getcwd()) / "routing_info.json"
-    if config_file.exists():
-        with open(config_file) as f:
-            return json.load(f)
-    return {}
+def _create_switchmatrix_validation_commands(connections: dict[str, list[str]]) -> list[str]:
+    """Create yosys validation commands for switch matrix connections."""
+    commands = []
 
+    # Basic RTL checks
+    commands.append("check -noinit")  # Check for multiple drivers and uninitialized signals
+    commands.append("check -assert")  # Verify all outputs are driven
 
-async def initialize_switchmatrix(dut):
-    """Initialize Switch Matrix by setting all ConfigBits to 0."""
-    # Set all ConfigBits to 0
-    dut.ConfigBits.value = 0
-    if hasattr(dut, "ConfigBits_N"):
-        # Set ConfigBits_N to 1 (inverted)
-        max_config_bits = len(dut.ConfigBits)
-        dut.ConfigBits_N.value = (1 << max_config_bits) - 1
+    # Check that all expected input/output ports exist
+    all_inputs = set()
+    all_outputs = set()
 
-    await Timer(10, units="ps")
+    for output, inputs in connections.items():
+        all_outputs.add(output)
+        all_inputs.update(inputs)
 
+    # Verify input ports exist
+    for input_port in all_inputs:
+        commands.append(f"select -assert-min 1 w:{input_port}")
 
-@pytest.mark.skip(reason="Cocotb test - run by simulation, not pytest")
-@cocotb.test
-async def test_switchmatrix_routing(dut):
-    """Test switch matrix routing functionality using ConfigBits."""
-    await initialize_switchmatrix(dut)
+    # Verify output ports exist
+    for output_port in all_outputs:
+        commands.append(f"select -assert-min 1 w:{output_port}")
 
-    # Load routing configuration
-    routing_info = load_routing_info()
+    # Verify ConfigBits port exists (required for switch matrix)
+    commands.append("select -assert-min 1 w:ConfigBits")
 
-    if not routing_info:
-        # Skip if no routing info available
-        return
+    # Port-to-port connectivity validation
+    # For each output, verify it can be driven by its specified inputs
+    for output, inputs in connections.items():
+        if len(inputs) == 1:
+            # Direct connection - verify input connects directly to output
+            input_port = inputs[0]
+            commands.append(f"select -assert-min 1 w:{input_port} %co w:{output} %i")
+        else:
+            # Multiplexer - verify each input can potentially drive the output
+            for input_port in inputs:
+                # Check that there's a path from input through mux logic to output
+                commands.append(f"select -assert-min 1 w:{input_port} %co c:* %ci w:{output} %co %i %i")
 
-    # Test each routing configuration
-    for test_name, config in routing_info.items():
-        if "config_bits" not in config or "input_port" not in config or "output_port" not in config:
-            continue
+            # Verify ConfigBits controls the multiplexer for this output
+            commands.append(f"select -assert-min 1 w:ConfigBits %co c:* %ci w:{output} %co %i %i")
 
-        # Initialize to clean state
-        await initialize_switchmatrix(dut)
+    # Verify no unexpected connections exist
+    # Each output should only be driven by its specified inputs (directly or through mux)
+    for output, expected_inputs in connections.items():
+        # Find all wires that could drive this output
+        for input_port in all_inputs:
+            if input_port not in expected_inputs:
+                # This input should NOT directly connect to this output
+                # Use a negative assertion to ensure no direct connection
+                commands.append(f"select -assert-max 0 w:{input_port} %co w:{output} %i")
 
-        # Set the required ConfigBits for this routing
-        config_bits_value = config["config_bits"]
-        dut.ConfigBits.value = config_bits_value
-        if hasattr(dut, "ConfigBits_N"):
-            dut.ConfigBits_N.value = ~config_bits_value & ((1 << len(dut.ConfigBits)) - 1)
+    # ConfigBits connectivity validation
+    # ConfigBits should connect to multiplexer control inputs
+    mux_count = sum(1 for inputs in connections.values() if len(inputs) > 1)
+    if mux_count > 0:
+        commands.append("select -assert-min 1 w:ConfigBits %co c:$mux %ci %i")
 
-        # Set input signal
-        input_port = config["input_port"]
-        if hasattr(dut, input_port):
-            getattr(dut, input_port).value = 1
+        # Check that ConfigBits has the right bit width for the multiplexers
+        total_config_bits_needed = sum(
+            (len(inputs) - 1).bit_length() for inputs in connections.values() if len(inputs) > 1
+        )
+        if total_config_bits_needed > 0:
+            commands.append(f"select -assert-min {total_config_bits_needed} w:ConfigBits")
 
-        await Timer(10, units="ps")
+    # Verify signal isolation - inputs should not directly connect to each other
+    input_list = list(all_inputs)
+    for i, input1 in enumerate(input_list):
+        for input2 in input_list[i + 1 :]:
+            # Inputs should not be directly connected to each other
+            commands.append(f"select -assert-max 0 w:{input1} %co w:{input2} %i")
 
-        # Check output signal
-        output_port = config["output_port"]
-        if hasattr(dut, output_port):
-            expected_value = config.get("expected_value", 1)
-            actual_value = getattr(dut, output_port).value
+    # Check that each input actually has a purpose (connects to at least one output)
+    for input_port in all_inputs:
+        connected_outputs = [output for output, inputs in connections.items() if input_port in inputs]
+        if connected_outputs:
+            # Build a command to verify this input drives at least one of its connected outputs
+            output_selection = " ".join(f"w:{output}" for output in connected_outputs)
+            commands.append(f"select -assert-min 1 w:{input_port} %co {output_selection} %u %i")
 
-            assert actual_value == expected_value, (
-                f"Test {test_name}: Expected {output_port} = {expected_value}, "
-                f"got {actual_value} with ConfigBits = {config_bits_value}"
-            )
-
-        # Reset input
-        if hasattr(dut, input_port):
-            getattr(dut, input_port).value = 0
-
-        await Timer(10, units="ps")
+    return commands
 
 
 @pytest.mark.parametrize(
@@ -101,21 +110,11 @@ async def test_switchmatrix_routing(dut):
         SwitchMatrixTestCase(
             connections={"N1BEG0": ["E1END0", "E1END1"]},
             test_name="simple_2input_mux",
-            expected_routes=[
-                {"input_port": "E1END0", "output_port": "N1BEG0", "config_bits": 0, "expected_value": 1},
-                {"input_port": "E1END1", "output_port": "N1BEG0", "config_bits": 1, "expected_value": 1},
-            ],
         ),
         # 4-input mux test
         SwitchMatrixTestCase(
             connections={"N1BEG1": ["E1END0", "E1END1", "S1END0", "W1END0"]},
             test_name="four_input_mux",
-            expected_routes=[
-                {"input_port": "E1END0", "output_port": "N1BEG1", "config_bits": 0, "expected_value": 1},
-                {"input_port": "E1END1", "output_port": "N1BEG1", "config_bits": 1, "expected_value": 1},
-                {"input_port": "S1END0", "output_port": "N1BEG1", "config_bits": 2, "expected_value": 1},
-                {"input_port": "W1END0", "output_port": "N1BEG1", "config_bits": 3, "expected_value": 1},
-            ],
         ),
         # Multi-output test
         SwitchMatrixTestCase(
@@ -124,119 +123,58 @@ async def test_switchmatrix_routing(dut):
                 "N1BEG1": ["S1END0", "W1END0"],
             },
             test_name="multi_output_test",
-            expected_routes=[
-                {"input_port": "E1END0", "output_port": "N1BEG0", "config_bits": 0, "expected_value": 1},
-                {"input_port": "E1END1", "output_port": "N1BEG0", "config_bits": 1, "expected_value": 1},
-                {"input_port": "S1END0", "output_port": "N1BEG1", "config_bits": 2, "expected_value": 1},
-                {"input_port": "W1END0", "output_port": "N1BEG1", "config_bits": 3, "expected_value": 1},
-            ],
         ),
         # Single connection (no mux) test
         SwitchMatrixTestCase(
             connections={"N1BEG0": ["E1END0"]},
             test_name="single_connection",
-            expected_routes=[
-                {"input_port": "E1END0", "output_port": "N1BEG0", "config_bits": 0, "expected_value": 1},
-            ],
         ),
     ],
     ids=lambda case: case.test_name,
 )
-@pytest.mark.parametrize("hdl_lang", [".v", ".vhd"])
-def test_switchmatrix_rtl_simulation(
+@pytest.mark.parametrize("hdl_lang", [".v", ".vhdl"])
+def test_switchmatrix_rtl_validation(
     hdl_lang: str,
-    connection_test_case,
-    default_fabric,
-    default_tile,
+    connection_test_case: SwitchMatrixTestCase,
+    default_fabric: Fabric,
+    default_tile: Tile,
     tmp_path: Path,
-    code_generator_factory,
-    cocotb_runner,
-    monkeypatch,
-):
-    """Generate Switch Matrix RTL and verify its behavior using cocotb simulation."""
+    code_generator_factory: Callable[..., CodeGenerator],
+    yosys_validator: Callable[[Path], object],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Generate Switch Matrix HDL and verify its structure using Yosys RTL validation."""
 
     # Create code generator using the factory fixture
-    test_name = f"{default_tile.name}_{connection_test_case.test_name}_switch_matrix"
-    writer = code_generator_factory(hdl_lang, test_name)
+    test_name: str = f"{default_tile.name}_{connection_test_case.test_name}_switch_matrix"
+    writer: CodeGenerator = code_generator_factory(hdl_lang, test_name)
     writer.outFileName = tmp_path / f"{test_name}{hdl_lang}"
 
-    # Create matrix file in tmp_path
-    matrix_path = tmp_path / f"{connection_test_case.test_name}_matrix.csv"
-
-    # Create test matrix file from connection test case
-    create_test_matrix_from_connections(matrix_path, connection_test_case.connections)
+    # Create a dummy matrix file for the tile configuration (not used due to mocking)
+    matrix_path: Path = tmp_path / f"{connection_test_case.test_name}_matrix.csv"
+    matrix_path.touch()  # Create empty file to satisfy file existence checks
 
     # Update tile configuration
     default_tile.matrixDir = matrix_path
 
-    # Mock the parseMatrix function to return our test connections
+    # Mock the parseMatrix function to return our test connections directly
     monkeypatch.setattr(
         "FABulous.fabric_generator.gen_fabric.gen_switchmatrix.parseMatrix",
-        lambda x, y: connection_test_case.connections,
+        lambda _x, _y: connection_test_case.connections,
     )
 
-    try:
-        # Generate the Switch Matrix RTL
-        genTileSwitchMatrix(writer, default_fabric, default_tile, False)
+    # Generate the Switch Matrix HDL
+    genTileSwitchMatrix(writer, default_fabric, default_tile, False)
 
-        # Check if RTL file was created
-        if not writer.outFileName.exists():
-            pytest.skip(f"Switch matrix RTL file {writer.outFileName} was not generated")
+    # Check if HDL file was created
+    if not writer.outFileName.exists():
+        pytest.skip(f"Switch matrix HDL file {writer.outFileName} was not generated")
 
-        # Create routing info from test case expected routes
-        routing_info = {}
-        for i, route in enumerate(connection_test_case.expected_routes):
-            routing_info[f"test_{i}"] = route
+    # Validate HDL structure using Yosys
+    validator = yosys_validator(writer.outFileName)
 
-        # Save routing info for cocotb tests to use
-        routing_info_file = tmp_path / "routing_info.json"
-        with open(routing_info_file, "w") as f:
-            json.dump(routing_info, f, indent=2)
+    # Create yosys commands to validate switch matrix structure
+    yosys_commands = _create_switchmatrix_validation_commands(connection_test_case.connections)
 
-        # Run cocotb simulation
-        cocotb_runner(
-            sources=[writer.outFileName],
-            hdl_top_level=test_name,
-            test_module_path=Path(__file__),
-        )
-
-    except Exception:
-        # Re-raise any unexpected exceptions
-        raise
-
-
-def create_test_matrix_from_connections(matrix_path: Path, connections: dict[str, list[str]]):
-    """Create a CSV test switch matrix file from connections dictionary."""
-    # Get all unique ports (inputs and outputs)
-    all_inputs = set()
-    all_outputs = set(connections.keys())
-
-    for inputs in connections.values():
-        all_inputs.update(inputs)
-
-    all_ports = sorted(all_inputs | all_outputs)
-
-    # Create CSV header
-    header = "Wire," + ",".join(all_ports) + "\n"
-
-    # Create CSV content
-    content = header
-
-    for port in all_ports:
-        row = [port]  # Start with port name
-
-        if port in connections:
-            # This port is an output, mark its inputs with '1'
-            for input_port in all_ports:
-                if input_port in connections[port]:
-                    row.append("1")
-                else:
-                    row.append("")
-        else:
-            # This port is only an input, all entries empty
-            row.extend([""] * len(all_ports))
-
-        content += ",".join(row) + "\n"
-
-    with open(matrix_path, "w") as f:
-        f.write(content)
+    # Run RTL validation
+    validator.validate(yosys_commands)

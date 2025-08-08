@@ -2,7 +2,7 @@
 
 import os
 import shutil
-from collections.abc import Generator
+from collections.abc import Callable
 from pathlib import Path
 
 import pytest
@@ -30,10 +30,12 @@ VHDL_SOURCE_PATH = (
 
 
 @pytest.fixture
-def cocotb_runner(tmp_path: Path):
+def cocotb_runner(tmp_path: Path) -> Callable[[list[Path], str, Path], None]:
     """Factory fixture to create cocotb runners for RTL simulation."""
 
-    def _create_runner(sources: list[Path], hdl_top_level, test_module_path):
+    def _create_runner(
+        sources: list[Path], hdl_top_level: str, test_module_path: Path
+    ) -> None:
         lang = set([i.suffix for i in sources])
 
         if len(lang) > 1:

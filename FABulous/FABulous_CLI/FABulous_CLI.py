@@ -60,6 +60,7 @@ from FABulous.FABulous_CLI.helper import (
     remove_dir,
     wrap_with_except_handling,
 )
+from FABulous.FABulous_settings import FABulousSettings
 
 META_DATA_DIR = ".FABulous"
 
@@ -143,7 +144,7 @@ class FABulous_CLI(Cmd):
             Path to optional Tcl script to be executed, by default ""
         """
         super().__init__(
-            persistent_history_file=f"{os.getenv('FAB_PROJ_DIR')}/{META_DATA_DIR}/.fabulous_history",
+            persistent_history_file=f"{FABulousSettings().proj_dir}/{META_DATA_DIR}/.fabulous_history",
             allow_cli_args=False,
         )
         self.enteringDir = enteringDir
@@ -318,7 +319,7 @@ class FABulous_CLI(Cmd):
         Sets the the FAB_OSS_CAD_SUITE environment variable in the .env file.
         """
         if args.destination_folder == "":
-            dest_dir = (Path(os.getenv("FAB_ROOT")),)
+            dest_dir = FABulousSettings().root
         else:
             dest_dir = args.destination_folder
 
@@ -566,7 +567,7 @@ class FABulous_CLI(Cmd):
         If no installation can be found, a warning is produced.
         """
         logger.info("Checking for FABulator installation")
-        fabulatorRoot = os.getenv("FABULATOR_ROOT")
+        fabulatorRoot = FABulousSettings().fabulator_root
 
         if fabulatorRoot is None:
             logger.warning("FABULATOR_ROOT environment variable not set.")
@@ -726,15 +727,13 @@ class FABulous_CLI(Cmd):
 
         if Path(f"{self.projectDir}/{parent}").exists():
             # TODO rewriting the fab_arch script so no need to copy file for work around
-            npnr = check_if_application_exists(
-                os.getenv("FAB_NEXTPNR_PATH", "nextpnr-generic")
-            )
+            npnr = FABulousSettings().nextpnr_path
             if f"{json_file}" in [
                 str(i.name) for i in Path(f"{self.projectDir}/{parent}").iterdir()
             ]:
                 runCmd = [
                     f"FAB_ROOT={self.projectDir}",
-                    f"{npnr}",
+                    f"{npnr!s}",
                     "--uarch",
                     "fabulous",
                     "--json",
@@ -912,7 +911,7 @@ class FABulous_CLI(Cmd):
         if self.verbose or self.debug:
             logger.info(f"Make hex file {bitstreamHexPath}")
         make_hex(bitstreamPath, bitstreamHexPath)
-        vvp = check_if_application_exists(os.getenv("FAB_VVP_PATH", "vvp"))
+        vvp = FABulousSettings().vvp_path
 
         # $plusargs is used to pass the bitstream hex and waveform path to the testbench
         vvpArgs = [
@@ -922,7 +921,7 @@ class FABulous_CLI(Cmd):
         if waveform_format == "fst":
             vvpArgs.append("-fst")
 
-        runCmd = [f"{vvp}", f"{buildDir}/{vvpFile}"]
+        runCmd = [f"{vvp!s}", f"{buildDir}/{vvpFile}"]
         runCmd.extend(vvpArgs)
         if self.verbose or self.debug:
             logger.info(f"Running command: {' '.join(runCmd)}")

@@ -1,5 +1,4 @@
 import argparse
-import os
 import subprocess as sp
 from pathlib import Path
 from typing import TYPE_CHECKING
@@ -8,7 +7,7 @@ from cmd2 import Cmd, Cmd2ArgumentParser, with_argparser, with_category
 from loguru import logger
 
 from FABulous.custom_exception import CommandError
-from FABulous.FABulous_CLI.helper import check_if_application_exists
+from FABulous.FABulous_settings import FABulousSettings
 
 if TYPE_CHECKING:
     from FABulous.FABulous_CLI.FABulous_CLI import FABulous_CLI
@@ -257,7 +256,7 @@ def do_synthesis(self: "FABulous_CLI", args: argparse.Namespace) -> None:
             return
 
     json_file = paths[0].with_suffix(".json")
-    yosys = check_if_application_exists(os.getenv("FAB_YOSYS_PATH", "yosys"))
+    yosys = FABulousSettings().yosys_path
 
     cmd = [
         "synth_fabulous",
@@ -289,7 +288,7 @@ def do_synthesis(self: "FABulous_CLI", args: argparse.Namespace) -> None:
     cmd = " ".join([i for i in cmd if i != ""])
 
     runCmd = [
-        f"{yosys}",
+        f"{yosys!s}",
         "-p",
         f"{cmd}",
         f"{self.projectDir}/user_design/top_wrapper.v",

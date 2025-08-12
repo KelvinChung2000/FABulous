@@ -1,4 +1,3 @@
-import os
 import re
 from copy import deepcopy
 from pathlib import Path
@@ -24,6 +23,7 @@ from FABulous.fabric_generator.parser.parse_switchmatrix import (
     parseMatrix,
     parsePortLine,
 )
+from FABulous.FABulous_settings import FABulousSettings
 
 if TYPE_CHECKING:
     from FABulous.fabric_definition.Bel import Bel
@@ -72,7 +72,7 @@ def parseTilesCSV(fileName: Path) -> tuple[list[Tile], list[tuple[str, str]]]:
 
     new_tiles = []
     commonWirePairs = []
-    proj_dir = Path(os.getenv("FAB_PROJ_DIR"))
+    proj_dir = FABulousSettings().proj_dir
 
     # Parse each tile config
     for t in tilesData:

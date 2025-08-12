@@ -1,6 +1,5 @@
 import json
 import math
-import os
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -19,6 +18,7 @@ from FABulous.fabric_generator.code_generator.code_generator_VHDL import (
 )
 from FABulous.fabric_generator.parser.parse_hdl import parseBelFile
 from FABulous.fabric_generator.parser.parse_switchmatrix import parseList
+from FABulous.FABulous_settings import FABulousSettings
 
 if TYPE_CHECKING:
     from FABulous.fabric_generator.code_generator.code_generator import CodeGenerator
@@ -45,7 +45,7 @@ def generateCustomTileConfig(tile_path: Path) -> Path:
         Path to the generated tile .csv file.
     """
     tile_name: str = ""
-    project_tile_dir: Path = Path(os.getenv("FAB_PROJ_DIR")).absolute() / "Tile"
+    project_tile_dir: Path = FABulousSettings().proj_dir / "Tile"
 
     tile_files = {}
     tile_csv: Path
@@ -183,8 +183,8 @@ def generateSwitchmatrixList(
          ValueError
              Number of carry ins and carry outs do not match.
     """
-    projdir = Path(os.getenv("FAB_PROJ_DIR"))
-    fab_root = Path(os.getenv("FAB_ROOT"))
+    projdir = FABulousSettings().proj_dir
+    fab_root = FABulousSettings().root
     CLBDummyFile = (
         fab_root / "fabric_files" / "dummy_files" / "DUMMY_switch_matrix.list"
     )
@@ -837,7 +837,7 @@ def genIOBel(
     else:  # Verilog
         bel = parseBelFile(writer.outFileName, "", "verilog")
 
-    prims_file = Path(os.getenv("FAB_PROJ_DIR", ".")) / "user_design" / "custom_prims.v"
+    prims_file = FABulousSettings().proj_dir / "user_design" / "custom_prims.v"
     if not prims_file.exists():
         logger.info(f"Creating {prims_file}")
         prims_file.touch()

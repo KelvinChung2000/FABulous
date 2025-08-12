@@ -6,15 +6,13 @@ from pathlib import Path
 from loguru import logger
 from packaging.version import Version
 
-from FABulous.FABulous_CLI.FABulous_CLI import FABulous_CLI
 from FABulous.FABulous_CLI.helper import (
     create_project,
     install_oss_cad_suite,
-    setup_global_env_vars,
     setup_logger,
-    setup_project_env_vars,
     update_project_version,
 )
+from FABulous.FABulous_settings import setup_global_env_vars, setup_project_env_vars
 
 
 def main() -> None:
@@ -188,9 +186,7 @@ def main() -> None:
     setup_global_env_vars(args)
     setup_project_env_vars(args)
 
-    # Check if FAB_PROJ_DIR is set in environment (including from .env files)
-    if fab_proj_dir := os.getenv("FAB_PROJ_DIR", None):
-        projectDir = Path(fab_proj_dir).absolute().resolve()
+    projectDir = Path(os.getenv("FAB_PROJ_DIR"))
 
     # Finally, user provided argument takes highest priority
     if args.project_dir:
@@ -220,7 +216,10 @@ def main() -> None:
         )
         exit(1)
 
-    project_version = Version(os.getenv("FAB_PROJ_VERSION", "1.0.0"))
+    # init the settings right before we start the CLI
+    from FABulous.FABulous_settings import FABulousSettings
+
+    project_version = FABulousSettings().proj_version
     package_version = Version(version("FABulous-FPGA"))
     if package_version < project_version:
         logger.error(
@@ -234,8 +233,10 @@ def main() -> None:
             "This may lead to compatibility issues. Please ensure the project is compatible with the current FABulous-FPGA version."
         )
 
+    from FABulous.FABulous_CLI.FABulous_CLI import FABulous_CLI
+
     fab_CLI = FABulous_CLI(
-        os.getenv("FAB_PROJ_LANG"),
+        FABulousSettings().proj_lang,
         projectDir,
         Path().cwd(),
         force=args.force,

@@ -1,4 +1,3 @@
-import os
 from collections.abc import Iterable
 from pathlib import Path
 
@@ -31,6 +30,7 @@ from FABulous.fabric_generator.gen_fabric.gen_tile import (
     generateTile,
 )
 from FABulous.fabric_generator.gen_fabric.gen_top_wrapper import generateTopWrapper
+from FABulous.FABulous_settings import FABulousSettings
 from FABulous.geometry_generator.geometry_gen import GeometryGenerator
 
 
@@ -163,8 +163,7 @@ class FABulous_API:
             Name of the tile for which the switch matrix will be generated.
         """
         if tile := self.fabric.getTileByName(tileName):
-            sm_dbg = os.getenv("FAB_SWITCH_MATRIX_DEBUG_SIGNAL", "True")
-            switch_matrix_debug_signal = sm_dbg.lower().strip() != "false"
+            switch_matrix_debug_signal = FABulousSettings().switch_matrix_debug_signal
             logger.info(
                 f"Generate switch matrix debug signals: {switch_matrix_debug_signal}"
             )

@@ -1,6 +1,6 @@
+import pprint
 from dataclasses import dataclass, field
 from pathlib import Path
-import pprint
 
 from FABulous.fabric_definition.define import IO, BelType
 from FABulous.fabric_definition.Port import (
@@ -199,3 +199,23 @@ class Bel:
         formatted_data = formatted_data.rsplit("}", 1)[0] + ")"
 
         return formatted_data
+
+    def serialize(self) -> dict:
+        return {
+            "src": str(self.src),
+            "jsonPath": str(self.jsonPath),
+            "prefix": self.prefix,
+            "name": self._name,
+            "belType": self.belType,
+            "inputs": [port.serialize() for port in self.inputs],
+            "outputs": [port.serialize() for port in self.outputs],
+            "externalInputs": [port.serialize() for port in self.externalInputs],
+            "externalOutputs": [port.serialize() for port in self.externalOutputs],
+            "configPort": [port.serialize() for port in self.configPort],
+            "sharedPort": [port.serialize() for port in self.sharedPort],
+            "paramOverride": self.paramOverride,
+            "configBits": self.configBits,
+            "userCLK": self.userCLK.serialize() if self.userCLK else None,
+            "constantBel": self.constantBel,
+            "z": self.z,
+        }

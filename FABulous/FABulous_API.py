@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 
 from hdlgen.code_gen import CodeGenerator
@@ -370,3 +371,16 @@ class FABulous_API:
         genSynthScript(self.fabric, Path(f"{dest}/arch_synth.tcl"))
         mergeFiles(sorted(list(maps)), Path(f"{dest}/techmaps.v"))
         mergeFiles(sorted(list(libs)), Path(f"{dest}/libs.v"))
+
+    def serialize_fabric(self, path: Path):
+        """Serialize the fabric to a JSON file.
+
+        Args:
+            path (Path): The path to the output JSON file.
+
+        Returns:
+            None
+        """
+        fabric_data = self.fabric.serialize()
+        with open(path, "w") as f:
+            json.dump(fabric_data, f, indent=4)

@@ -4,14 +4,14 @@ from pathlib import Path
 from typing import Any, Generator, Iterable
 
 from FABulous.fabric_definition.Bel import Bel
-from FABulous.fabric_definition.Port import BelPort, GenericPort
 from FABulous.fabric_definition.define import ConfigBitMode, Loc, MultiplexerStyle
+from FABulous.fabric_definition.Port import BelPort, GenericPort
 from FABulous.fabric_definition.SuperTile import SuperTile
 from FABulous.fabric_definition.Tile import Tile
 from FABulous.fabric_definition.Wire import Wire
 
-
 GroupName = str
+
 
 @dataclass
 class Fabric:
@@ -87,9 +87,9 @@ class Fabric:
                 > self.frameBitsPerRow * self.maxFramesPerCol
             ):
                 raise ValueError(
-                    f"Tile {t.name} has too many config bits. Tile have {self.frameBitsPerRow * self.maxFramesPerCol} but requires {t.configBits*self.contextCount}"
+                    f"Tile {t.name} has too many config bits. Tile have {self.frameBitsPerRow * self.maxFramesPerCol} but requires {t.configBits * self.contextCount}"
                 )
-            
+
         for t in self.tileDict.values():
             for subTile in t.getSubTiles():
                 if subTile not in self._subTileToTile:
@@ -106,7 +106,7 @@ class Fabric:
                     return self.tileDict[t]
                 else:
                     return self._subTileToTile[t]
-            
+
             return None
         if isinstance(index, str):
             if index in self.tileDict:
@@ -204,13 +204,13 @@ class Fabric:
             for g in tile.belGroups.items():
                 belGroups.append(g)
         return belGroups
-    
+
     def getPortDrivers(self, p: GenericPort) -> list[GenericPort]:
         for tile in self.tileDict.values():
             if tile.isPortInTile(p):
                 return tile.switchMatrix.getPortDrivers(p)
         raise ValueError(f"Port {p} not found in any tile")
-    
+
     def getPortUsers(self, p: GenericPort) -> list[GenericPort]:
         """Get all users of the given port in the fabric."""
         for tile in self.tileDict.values():
@@ -218,26 +218,52 @@ class Fabric:
                 return tile.switchMatrix.getPortUsers(p)
         raise ValueError(f"Port {p} not found in any tile")
 
-
     def getBelByBelPort(self, p: BelPort) -> Bel:
         """Get the Bel that contains the given BelPort."""
         for tile in self.tileDict.values():
             if tile.isPortInTile(p):
                 return tile.getBelByBelPort(p)
         raise ValueError(f"BelPort {p} not found in any tile")
-    
+
     def isSubTile(self, name: str) -> bool:
         """Check if the given name is a sub-tile in the fabric."""
         return name in self._subTileToTile
-    
+
     def isRootTile(self, name: str) -> bool:
         for tile in self.tileDict.values():
             if tile is not None and tile.partOfTile(name):
                 return tile.isRootTile(name)
         return False
 
-    
-
+    def serialize(self) -> dict:
+        return {
+            "name": self.name,
+            "fabricDir": str(self.fabricDir),
+            "height": self.height,
+            "width": self.width,
+            "frameBitsPerRow": self.frameBitsPerRow,
+            "maxFramesPerCol": self.maxFramesPerCol,
+            "contextCount": self.contextCount,
+            "configBitMode": str(self.configBitMode),
+            "multiplexerStyle": str(self.multiplexerStyle),
+            "package": self.package,
+            "generateDelayInSwitchMatrix": self.generateDelayInSwitchMatrix,
+            "frameSelectWidth": self.frameSelectWidth,
+            "rowSelectWidth": self.rowSelectWidth,
+            "desync_flag": self.desync_flag,
+            "numberOfBRAMs": self.numberOfBRAMs,
+            "superTileEnable": self.superTileEnable,
+            "tiles": [
+                [tile if tile is None else str(tile) for tile in row]
+                for row in self.tiles
+            ],
+            "tileDict": {k: v.serialize() for k, v in self.tileDict.items()},
+            "wireDict": {
+                str(loc): [w.serialize() for w in wires]
+                for loc, wires in self.wireDict.items()
+            },
+            "_subTileToTile": {k: str(v.name) for k, v in self._subTileToTile.items()},
+        }
 
     # def getFlattenFabric(self) -> Generator[tuple[Loc, Tile | None], None, None]:
     #     for y, row in enumerate(self.tiles):

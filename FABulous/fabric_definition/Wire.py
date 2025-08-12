@@ -15,7 +15,9 @@ class WireType:
     spanning: int = 0
 
     def __repr__(self) -> str:
-        return f"{self.sourcePort}-X{self.offsetX}Y{self.offsetY}>{self.destinationPort}"
+        return (
+            f"{self.sourcePort}-X{self.offsetX}Y{self.offsetY}>{self.destinationPort}"
+        )
 
     def __eq__(self, __o: Any) -> bool:
         if __o is None or not isinstance(__o, WireType):
@@ -29,6 +31,17 @@ class WireType:
             and self.cascadeWireCount == __o.cascadeWireCount
             and self.spanning == __o.spanning
         )
+
+    def serialize(self) -> dict:
+        return {
+            "sourcePort": self.sourcePort.serialize(),
+            "destinationPort": self.destinationPort.serialize(),
+            "offsetX": self.offsetX,
+            "offsetY": self.offsetY,
+            "wireCount": self.wireCount,
+            "cascadeWireCount": self.cascadeWireCount,
+            "spanning": self.spanning,
+        }
 
 
 @dataclass(frozen=True, eq=True)
@@ -63,4 +76,17 @@ class Wire:
     wireCount: int
 
     def __repr__(self) -> str:
-        return f"{self.source.name}-X{self.xOffset}Y{self.yOffset}>{self.destination.name}"
+        return (
+            f"{self.source.name}-X{self.xOffset}Y{self.yOffset}>{self.destination.name}"
+        )
+
+    def serialize(self) -> dict:
+        return {
+            "source": self.source.serialize(),
+            "xOffset": self.xOffset,
+            "yOffset": self.yOffset,
+            "destination": self.destination.serialize(),
+            "sourceTile": self.sourceTile,
+            "destinationTile": self.destinationTile,
+            "wireCount": self.wireCount,
+        }

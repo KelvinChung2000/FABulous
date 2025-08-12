@@ -32,6 +32,15 @@ class ConfigMemFrame:
     usedBitMask: str
     configBitRanges: list[int] = field(default_factory=list)
 
+    def serialize(self) -> dict:
+        return {
+            "frameIndex": self.frameIndex,
+            "frameName": self.frameName,
+            "bitsUsedInFrame": self.bitsUsedInFrame,
+            "usedBitMask": self.usedBitMask,
+            "configBitRanges": self.configBitRanges,
+        }
+
 
 @dataclass
 class ConfigurationMemory:
@@ -49,3 +58,9 @@ class ConfigurationMemory:
                 raise KeyError(f"Key {key} does not exist in the configuration memory")
         else:
             raise KeyError(f"Key {key} is not an int")
+
+    def serialize(self) -> dict:
+        return {
+            "configMappings": self.configMappings,
+            "configMemEntries": [entry.serialize() for entry in self.configMemEntries],
+        }

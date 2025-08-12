@@ -24,6 +24,12 @@ class SlicedSignal:
     port: GenericPort
     sliceRange: SliceRange
 
+    def serialize(self) -> dict:
+        return {
+            "port": self.port.serialize(),
+            "sliceRange": self.sliceRange._asdict(),
+        }
+
 
 class Mux:
     _output: GenericPort
@@ -103,6 +109,12 @@ class Mux:
             return list(zip(self.output.shareExpand(), groupedInputs))
         else:
             return list(zip(self.output.expand(), groupedInputs))
+
+    def serialize(self) -> dict:
+        return {
+            "output": self.output.serialize(),
+            "inputs": [input.serialize() for input in self.inputs],
+        }
 
 
 class MuxPack:
@@ -251,3 +263,9 @@ class SwitchMatrix:
             str: A formatted string showing the switch matrix's multiplexers and their connections.
         """
         return self.__repr__()
+
+    def serialize(self) -> dict:
+        return {
+            "muxes": [mux.serialize() for mux in self.muxes],
+            "configBits": self.configBits,
+        }

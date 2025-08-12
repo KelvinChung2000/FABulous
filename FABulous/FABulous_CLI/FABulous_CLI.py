@@ -492,6 +492,11 @@ class FABulous_CLI(Cmd):
         logger.info("Geometry generation complete")
         logger.info(f"{geomFile} can now be imported into FABulator")
 
+    @with_category(CMD_FABRIC_FLOW)
+    @with_argparser(filePathRequireParser)
+    def do_serialize_fabric(self, args):
+        self.fabulousAPI.serialize_fabric(Path(args.file))
+
     @with_category(CMD_GUI)
     def do_start_FABulator(self, *ignored):
         """Starts FABulator if an installation can be found.

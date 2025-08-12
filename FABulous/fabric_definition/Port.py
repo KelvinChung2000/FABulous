@@ -1,6 +1,6 @@
 from typing import Any
 
-from FABulous.fabric_definition.define import IO, FeatureType, Side, FeatureValue
+from FABulous.fabric_definition.define import IO, FeatureType, FeatureValue, Side
 
 
 class Port:
@@ -57,6 +57,14 @@ class Port:
 
     def __hash__(self) -> int:
         return id(self)
+
+    def serialize(self) -> dict:
+        """Serialize the port to a dictionary."""
+        return {
+            "name": self.name,
+            "ioDirection": self.ioDirection.value,
+            "width": self.width,
+        }
 
 
 class TilePort(Port):
@@ -161,6 +169,13 @@ class TilePort(Port):
             self.__io[__o.ioDirection],
         )
 
+    def serialize(self) -> dict:
+        return super().serialize() | {
+            "sideOfTile": self.sideOfTile.value,
+            "terminal": self.terminal,
+            "tileType": self.tileType,
+        }
+
 
 class SlicedPort(Port):
     _sliceRange: tuple[int, int]
@@ -213,6 +228,12 @@ class SlicedPort(Port):
 
     def __repr__(self) -> str:
         return f"SlicedPort({self.ioDirection.value} {self.name}[{self.sliceRange[0]}:{self.sliceRange[1]}] from {self.originalPort.name})"
+
+    def serialize(self) -> dict:
+        return super().serialize() | {
+            "sliceRange": self.sliceRange,
+            "originalPort": self.originalPort.name,
+        }
 
 
 class BelPort(Port):
@@ -269,6 +290,13 @@ class BelPort(Port):
     def __hash__(self) -> int:
         return super().__hash__()
 
+    def serialize(self) -> dict:
+        return super().serialize() | {
+            "prefix": self.prefix,
+            "external": self.external,
+            "control": self.control,
+        }
+
 
 class ConfigPort(Port):
     _features: list[FeatureValue]
@@ -301,6 +329,12 @@ class ConfigPort(Port):
 
     def __hash__(self) -> int:
         return super().__hash__()
+
+    def serialize(self) -> dict:
+        return super().serialize() | {
+            "features": self.features,
+            "featureType": self.featureType.value,
+        }
 
 
 class SharedPort(Port):
@@ -339,6 +373,9 @@ class SharedPort(Port):
 
     def __hash__(self) -> int:
         return super().__hash__()
+
+    def serialize(self) -> dict:
+        return super().serialize() | {"sharedWith": self.sharedWith}
 
 
 GenericPort = Port | TilePort | SlicedPort | BelPort | ConfigPort | SharedPort

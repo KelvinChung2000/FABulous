@@ -77,7 +77,7 @@ def parseTilesCSV(fileName: Path) -> tuple[list[Tile], list[tuple[str, str]]]:
     # Parse each tile config
     for t in tilesData:
         t = t.split("\n")
-        tileName = t[0].split(",")[1]
+        tileName = t[0].split(",")[1].strip()
         ports: list[Port] = []
         bels: list[Bel] = []
         matrixDir: Path | None = None
@@ -90,6 +90,7 @@ def parseTilesCSV(fileName: Path) -> tuple[list[Tile], list[tuple[str, str]]]:
 
         for item in t:
             temp: list[str] = item.split(",")
+            temp = [i.strip() for i in temp]
             if not temp or temp[0] == "":
                 continue
             if temp[0] in ["NORTH", "SOUTH", "EAST", "WEST", "JUMP"]:
@@ -528,17 +529,18 @@ def parseFabricCSV(fileName: str) -> Fabric:
     for i in parameters:
         i = i.split(",")
         i = [j for j in i if j != ""]
+        i = [i.strip() for i in i]
         if not i:
             continue
         if i[0].startswith("Tile"):
             if "GENERATE" in i:
                 # import here to avoid circular import
                 from FABulous.fabric_generator.gen_fabric.fabric_automation import (
-                    generate_custom_tile_config,
+                    generateCustomTileConfig,
                 )
 
                 # we generate the tile right before we parse everything
-                i[1] = str(generate_custom_tile_config(filePath.joinpath(i[1])))
+                i[1] = str(generateCustomTileConfig(filePath.joinpath(i[1])))
 
             new_tiles, new_commonWirePair = parseTilesCSV(filePath.joinpath(i[1]))
             tileTypes += [new_tile.name for new_tile in new_tiles]
@@ -585,6 +587,7 @@ def parseFabricCSV(fileName: str) -> Fabric:
     for f in fabricDescription:
         fabricLineTmp = f.split(",")
         fabricLineTmp = [i for i in fabricLineTmp if i != ""]
+        fabricLineTmp = [i.strip() for i in fabricLineTmp]
         if not fabricLineTmp:
             continue
         fabricLine = []

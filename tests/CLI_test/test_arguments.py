@@ -18,6 +18,7 @@ from FABulous.FABulous_settings import init_context, reset_context
 
 def test_create_project(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     """Test project creation  to mock sys.argv."""
+    """Test project creation  to mock sys.argv."""
     # Mock sys.argv
     test_args = ["FABulous", "--createProject", str(tmp_path / "test_prj")]
     monkeypatch.setattr(sys, "argv", test_args)

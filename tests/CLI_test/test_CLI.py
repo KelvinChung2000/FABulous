@@ -19,6 +19,7 @@ from tests.conftest import (
 
 def test_load_fabric(cli: FABulous_CLI, caplog: pytest.LogCaptureFixture) -> None:
     """Test loading fabric from CSV file."""
+    """Test loading fabric from CSV file."""
     run_cmd(cli, "load_fabric")
     log = normalize_and_check_for_errors(caplog.text)
     assert "Loading fabric" in log[0]

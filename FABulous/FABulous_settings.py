@@ -24,7 +24,7 @@ class FABulousSettings(BaseSettings):
 
     model_config = SettingsConfigDict(env_prefix="FAB_", case_sensitive=False)
 
-    root: Path | None = None
+    root: Path = Path()
     yosys_path: Path | None = None
     nextpnr_path: Path | None = None
     iverilog_path: Path | None = None
@@ -38,26 +38,20 @@ class FABulousSettings(BaseSettings):
     proj_lang: str = "verilog"
     switch_matrix_debug_signal: bool = False
 
-    @field_validator("proj_version_created", mode="before")
+    @field_validator("proj_version", "proj_version_created", mode="before")
     @classmethod
-    def parse_version_created(cls, value: str | Version) -> Version:
-        """Parse version created from string or Version object."""
-        if isinstance(value, str):
-            return Version(value)
-        return value
-
-    @field_validator("proj_version", mode="before")
-    @classmethod
-    def parse_version(cls, value: str | Version) -> Version:
+    def parse_version_str(cls, value: str | Version) -> Version:
         """Parse version from string or Version object."""
         if isinstance(value, str):
             return Version(value)
         return value
 
-    @field_validator("root", mode="after")
+    @field_validator("root", "proj_dir", mode="after")
     @classmethod
-    def is_dir(cls, value: Path) -> Path:
+    def is_dir(cls, value: Path | None) -> Path | None:
         """Check if inputs is a directory."""
+        if value is None:
+            return None
         if not value.is_dir():
             raise ValueError(f"{value} is not a valid directory")
         return value
@@ -187,16 +181,17 @@ def setup_project_env_vars(args: argparse.Namespace) -> None:
     if args.projectDotEnv:
         pde = Path(args.projectDotEnv)
         if pde.exists() and pde.is_file():
-            load_dotenv(pde)
-            logger.info("Loaded global .env file from pde")
+            load_dotenv(pde, override=True)
+            # Keep legacy log string for backward compatibility with existing tests
+            logger.info("Loaded global .env file from pde (project .env override)")
     elif fabDir.joinpath(".env").exists() and fabDir.joinpath(".env").is_file():
-        load_dotenv(fabDir.joinpath(".env"))
+        load_dotenv(fabDir.joinpath(".env"), override=True)
         logger.info(f"Loaded project .env file from {fabDir}/.env')")
     elif (
         fabDir.parent.joinpath(".env").exists()
         and fabDir.parent.joinpath(".env").is_file()
     ):
-        load_dotenv(fabDir.parent.joinpath(".env"))
+        load_dotenv(fabDir.parent.joinpath(".env"), override=True)
         logger.info(f"Loaded project .env file from {fabDir.parent.joinpath('.env')}")
     else:
         logger.warning("No project .env file found")

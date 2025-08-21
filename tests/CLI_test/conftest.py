@@ -52,8 +52,14 @@ def cli(tmp_path: Path) -> Generator[FABulous_CLI]:
     os.environ["FAB_PROJ_DIR"] = str(projectDir)
     create_project(projectDir)
     setup_logger(0, False)
-    cli = FABulous_CLI(writerType="verilog", projectDir=projectDir, enteringDir=tmp_path)
-    cli.debug = True
+    cli = FABulous_CLI(
+        "verilog",
+        projectDir=projectDir,
+        force=False,
+        interactive=False,
+        verbose=False,
+        debug=True,
+    )
     run_cmd(cli, "load_fabric")
     yield cli
     os.environ.pop("FAB_ROOT", None)
@@ -102,7 +108,13 @@ def project_directories(tmp_path: Path) -> dict[str, Path]:
     default_dir = tmp_path / "default_project"
 
     # Create all directories with .FABulous folders
-    for project_dir in [user_provided_dir, env_var_dir, project_dotenv_dir, global_dotenv_dir, default_dir]:
+    for project_dir in [
+        user_provided_dir,
+        env_var_dir,
+        project_dotenv_dir,
+        global_dotenv_dir,
+        default_dir,
+    ]:
         project_dir.mkdir()
         (project_dir / ".FABulous").mkdir()
         env_file = project_dir / ".FABulous" / ".env"

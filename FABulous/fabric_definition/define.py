@@ -1,4 +1,4 @@
-from enum import Enum
+from enum import Enum, StrEnum
 
 
 class IO(Enum):
@@ -32,3 +32,9 @@ class MultiplexerStyle(Enum):
 class ConfigBitMode(Enum):
     FRAME_BASED = "FRAME_BASED"
     FLIPFLOP_CHAIN = "FLIPFLOP_CHAIN"
+
+
+class HDLType(StrEnum):
+    VERILOG = "verilog"
+    VHDL = "vhdl"
+    SYSTEM_VERILOG = "system_verilog"

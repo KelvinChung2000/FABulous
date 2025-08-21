@@ -5,13 +5,12 @@ from shutil import which
 
 from loguru import logger
 from packaging.version import Version
-from pydantic import field_validator
-from pydantic_core.core_schema import FieldValidationInfo  # type: ignore
+from pydantic import ValidationInfo, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class FABulousSettings(BaseSettings):
-    """Application settings.
+    """FABulous settings.
 
     Tool paths are resolved lazily during validation so that environment variable setup
     (including PATH updates for oss-cad-suite) can occur beforehand.
@@ -34,27 +33,6 @@ class FABulousSettings(BaseSettings):
 
     proj_lang: str = "verilog"
     switch_matrix_debug_signal: bool = False
-
-    # CLI-specific options (previously in FABulousCliSettings)
-    verbose: int = 0
-    debug: bool = False
-    log_file: Path | None = None
-    force: bool = False
-
-    # Script execution options
-    fabulous_script: Path | None = None
-    tcl_script: Path | None = None
-    commands: str | None = None
-
-    # Project creation options
-    create_project: bool = False
-    install_oss_cad_suite: bool = False
-
-    # Version and help options
-    update_project_version: bool = False
-
-    # Output directory for metadata
-    metadata_dir: str = ".FABulous"
 
     @field_validator("proj_version", "proj_version_created", mode="before")
     @classmethod
@@ -88,7 +66,7 @@ class FABulousSettings(BaseSettings):
     )
     @classmethod
     def resolve_tool_paths(
-        cls, value: Path | None, info: FieldValidationInfo
+        cls, value: Path | None, info: ValidationInfo
     ) -> Path | None:  # type: ignore[override]
         if value is not None:
             return value
@@ -110,40 +88,13 @@ class FABulousSettings(BaseSettings):
         )
         return None
 
-    # CLI-specific validators
-    @field_validator("fabulous_script", "tcl_script", mode="before")
-    @classmethod
-    def validate_script_paths(cls, value: str | Path | None) -> Path | None:
-        """Convert script paths to Path objects but don't validate existence yet.
-
-        File existence will be validated at execution time to maintain backward
-        compatibility with legacy argument handling.
-        """
-        if value is None:
-            return None
-        if isinstance(value, str):
-            value = Path(value)
-        return value.absolute()
-
-    @field_validator("log_file", mode="before")
-    @classmethod
-    def validate_log_file(cls, value: str | Path | None) -> Path | None:
-        """Validate log file path, creating parent directories if needed."""
-        if value is None:
-            return None
-        if isinstance(value, str):
-            value = Path(value)
-        # Ensure parent directory exists
-        value.parent.mkdir(parents=True, exist_ok=True)
-        return value.absolute()
-
 
 # Module-level singleton pattern for settings management
 _context_instance: FABulousSettings | None = None
 
 
 def init_context(
-    project_dir: Path | None = None,
+    project_dir: Path | None,
     global_dot_env: Path | None = None,
     project_dot_env: Path | None = None,
 ) -> FABulousSettings:
@@ -152,12 +103,12 @@ def init_context(
     This should be called once at application startup to configure the global settings.
     Subsequent calls will override the existing context.
 
+    This will also resolve the project directory and environment variables.
+
     Args:
-        model: Pydantic model with settings (preferred approach)
-        project_dir: Project directory path (legacy approach)
-        global_dot_env: Global .env file path (legacy approach)
-        project_dot_env: Project .env file path (legacy approach)
-        **kwargs: Additional settings parameters (legacy approach)
+        project_dir: Project directory path
+        global_dot_env: Global .env file path
+        project_dot_env: Project .env file path
 
     Returns:
         The initialized FABulousSettings instance
@@ -173,38 +124,49 @@ def init_context(
     # Check FABulous directory first
     if fab_root.joinpath(".env").exists():
         env_files.append(fab_root.joinpath(".env"))
-    # Check parent directory as fallback
-    elif fab_root.parent.joinpath(".env").exists():
-        env_files.append(fab_root.parent.joinpath(".env"))
 
     # 2. User-provided global .env file
-    if global_dot_env:
-        if global_dot_env.exists():
-            env_files.append(global_dot_env)
-        else:
+    if global_dot_env and global_dot_env.exists():
+        env_files.append(global_dot_env)
+    else:
+        if global_dot_env is not None and not global_dot_env.exists():
             logger.warning(
                 f"Global .env file not found: {global_dot_env} this is ignored"
             )
 
     # 3. Default project .env files
-    if project_dir:
-        fab_proj_dir = os.getenv("FAB_PROJ_DIR", str(project_dir))
-        if fab_proj_dir:
-            fab_project_dir = Path(fab_proj_dir) / ".FABulous"
+    fab_proj_dir = os.getenv("FAB_PROJ_DIR")
+    if fab_proj_dir:
+        fab_project_dir = Path(fab_proj_dir) / ".FABulous" / ".env"
 
-            # project_dir/.env (lower priority)
-            if fab_project_dir.parent.joinpath(".env").exists():
-                env_files.append(fab_project_dir.parent.joinpath(".env"))
+        # .FABulous/.env (higher priority)
+        if fab_project_dir.exists():
+            env_files.append(fab_project_dir)
 
-            # .FABulous/.env (higher priority)
-            if fab_project_dir.joinpath(".env").exists():
-                env_files.append(fab_project_dir.joinpath(".env"))
+    if project_dir and (project_dir / ".FABulous" / ".env").exists():
+        env_files.append(project_dir / ".FABulous" / ".env")
+    else:
+        if project_dir is not None and (project_dir / ".FABulous" / ".env").exists():
+            logger.warning(
+                f"Project directory not found: {project_dir} this is ignored"
+            )
 
     # 4. User-provided project .env file (highest .env priority)
     if project_dot_env and project_dot_env.exists():
         env_files.append(project_dot_env)
+    else:
+        if project_dot_env is None:
+            logger.warning(
+                f"Project .env file not found: {project_dot_env} this is ignored"
+            )
 
-    _context_instance = FABulousSettings(_env_file=tuple(env_files), root=fab_root)
+    if project_dir:
+        _context_instance = FABulousSettings(
+            _env_file=tuple(env_files), root=fab_root, proj_dir=project_dir
+        )
+    else:
+        _context_instance = FABulousSettings(_env_file=tuple(env_files), root=fab_root)
+
     logger.debug("FABulous context initialized")
     return _context_instance
 

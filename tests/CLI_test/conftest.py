@@ -8,6 +8,7 @@ from loguru import logger
 
 from FABulous.FABulous_CLI.FABulous_CLI import FABulous_CLI
 from FABulous.FABulous_CLI.helper import create_project, setup_logger
+from FABulous.FABulous_settings import reset_context
 
 
 def normalize(block: str) -> list[str]:
@@ -38,18 +39,14 @@ TILE = "LUT4AB"
 
 @pytest.fixture(autouse=True)
 def env() -> Generator[None]:
-    fabulousRoot = str(Path(__file__).resolve().parent.parent.parent / "FABulous")
-    os.environ["FAB_ROOT"] = fabulousRoot
     os.environ["FABULOUS_TESTING"] = "TRUE"
     yield
-    os.environ.pop("FAB_ROOT", None)
     os.environ.pop("FABULOUS_TESTING", None)
 
 
 @pytest.fixture
 def cli(tmp_path: Path) -> Generator[FABulous_CLI]:
     projectDir = tmp_path / "test_project"
-    os.environ["FAB_PROJ_DIR"] = str(projectDir)
     create_project(projectDir)
     setup_logger(0, False)
     cli = FABulous_CLI(
@@ -62,17 +59,23 @@ def cli(tmp_path: Path) -> Generator[FABulous_CLI]:
     )
     run_cmd(cli, "load_fabric")
     yield cli
-    os.environ.pop("FAB_ROOT", None)
-    os.environ.pop("FAB_PROJ_DIR", None)
+    reset_context()
 
 
 @pytest.fixture
 def project(tmp_path: Path) -> Generator[Path]:
+    from FABulous.FABulous_settings import init_context
+
+    # Initialize context before creating project (fab_root is auto-resolved)
     project_dir = tmp_path / "test_project"
-    os.environ["FAB_PROJ_DIR"] = str(project_dir)
+    init_context(None)
     create_project(project_dir)
+    init_context(project_dir)
+
     yield project_dir
-    os.environ.pop("FAB_PROJ_DIR", None)
+
+    # Cleanup
+    reset_context()  # Reset context after each test to avoid state leakage
 
 
 @pytest.fixture(autouse=True)

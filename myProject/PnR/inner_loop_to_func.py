@@ -48,6 +48,17 @@ def replace_types_i64_f64_to_i32(module: Operation) -> None:
                         else:
                             shape_list.append(int(dim))
                     new_inputs.append(builtin.MemRefType(builtin.i32, shape_list))
+                elif isinstance(input_type, builtin.MemRefType) and (
+                    isinstance(input_type.element_type, builtin.IntegerType) or str(input_type.element_type) == 'i64'
+                ):
+                    # Create new memref type with f32 element
+                    shape_list = []
+                    for dim in input_type.shape.data:
+                        if hasattr(dim, 'data'):
+                            shape_list.append(dim.data)
+                        else:
+                            shape_list.append(int(dim))
+                    new_inputs.append(builtin.MemRefType(builtin.i32, shape_list))
                 elif isinstance(input_type, builtin.IntegerType) and input_type.width.data == 64:
                     new_inputs.append(builtin.i32)
                 else:
@@ -127,6 +138,13 @@ def replace_floatOp_to_intOp(module: Operation) -> None:
             new_op = arith.MuliOp(op.lhs, op.rhs, op.result.type)
             replace_op(op, new_op)
             c += 1
+
+        elif isinstance(op, arith.ConstantOp):
+            # Replace with integer operation
+            new_op = arith.ConstantOp(value=int(op.operands[0]), value_type=builtin.i32)
+            replace_op(op, new_op)
+            c += 1
+        
 
     print(f"Replaced {c} float operations with integer operations in the module")
 

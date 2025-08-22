@@ -30,6 +30,7 @@ extensions = [
 intersphinx_mapping = {
     "python": ("https://docs.python.org/3/", None),
     "sphinx": ("https://www.sphinx-doc.org/en/master/", None),
+    "cmd2": ("https://cmd2.readthedocs.io/en/latest/", None),
 }
 intersphinx_disabled_domains = ["std"]
 
@@ -59,6 +60,7 @@ autodoc_type_aliases = {
     'Object': 'object',
     'optional': 'typing.Optional',
     'Path': 'pathlib.Path',
+    'Statement': 'cmd2.parsing.Statement',
 }
 
 # Suppress warnings for missing references in type annotations
@@ -66,7 +68,9 @@ nitpicky = False
 nitpick_ignore = [
     ('py:class', 'Object'),
     ('py:class', 'optional'),
-    ('py:class', 'Path')
+    ('py:class', 'Path'),
+    # Some cmd2 versions expose Statement under cmd2.parsing
+    ('py:class', 'cmd2.parsing.Statement'),
 ]
 
 autodoc_mock_imports = ['FABulous.FABulous_settings']

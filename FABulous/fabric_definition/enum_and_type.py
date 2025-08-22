@@ -1,4 +1,7 @@
+from collections.abc import Mapping
 from enum import Enum
+
+from FABulous.fabric_cad.define import FeatureValue
 
 
 class IO(Enum):
@@ -32,3 +35,11 @@ class MultiplexerStyle(Enum):
 class ConfigBitMode(Enum):
     FRAME_BASED = "FRAME_BASED"
     FLIPFLOP_CHAIN = "FLIPFLOP_CHAIN"
+
+
+Loc = tuple[int, int]
+
+FrameIdx = int
+BitIdx = int
+
+FeatureMap = Mapping[str, FeatureValue]

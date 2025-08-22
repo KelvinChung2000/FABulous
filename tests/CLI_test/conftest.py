@@ -9,7 +9,7 @@ from loguru import logger
 
 from FABulous.FABulous_CLI.FABulous_CLI import FABulous_CLI
 from FABulous.FABulous_CLI.helper import create_project, setup_logger
-from FABulous.FABulous_settings import reset_context
+from FABulous.FABulous_settings import init_context, reset_context
 
 
 def normalize(block: str) -> list[str]:
@@ -50,6 +50,7 @@ def cli(tmp_path: Path) -> Generator[FABulous_CLI]:
     projectDir = tmp_path / "test_project"
     create_project(projectDir)
     setup_logger(0, False)
+    init_context(projectDir)
     cli = FABulous_CLI(
         "verilog",
         force=False,

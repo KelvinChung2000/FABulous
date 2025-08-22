@@ -63,18 +63,6 @@ def cli(tmp_path: Path) -> Generator[FABulous_CLI]:
     reset_context()
 
 
-@pytest.fixture
-def project(tmp_path: Path) -> Generator[Path]:
-    # Initialize context before creating project (fab_root is auto-resolved)
-    project_dir = tmp_path / "test_project"
-    create_project(project_dir)
-
-    yield project_dir
-
-    # Cleanup
-    reset_context()  # Reset context after each test to avoid state leakage
-
-
 @pytest.fixture(autouse=True)
 def cleanup_logger() -> Generator[None]:
     """Ensure logger is properly cleaned up after each test to prevent

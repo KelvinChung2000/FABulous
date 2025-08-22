@@ -4,6 +4,7 @@ from pathlib import Path
 
 import pytest
 from _pytest.logging import LogCaptureFixture
+from dotenv import set_key
 from loguru import logger
 
 from FABulous.FABulous_CLI.FABulous_CLI import FABulous_CLI
@@ -51,7 +52,6 @@ def cli(tmp_path: Path) -> Generator[FABulous_CLI]:
     setup_logger(0, False)
     cli = FABulous_CLI(
         "verilog",
-        projectDir=projectDir,
         force=False,
         interactive=False,
         verbose=False,
@@ -64,13 +64,9 @@ def cli(tmp_path: Path) -> Generator[FABulous_CLI]:
 
 @pytest.fixture
 def project(tmp_path: Path) -> Generator[Path]:
-    from FABulous.FABulous_settings import init_context
-
     # Initialize context before creating project (fab_root is auto-resolved)
     project_dir = tmp_path / "test_project"
-    init_context(None)
     create_project(project_dir)
-    init_context(project_dir)
 
     yield project_dir
 
@@ -121,19 +117,24 @@ def project_directories(tmp_path: Path) -> dict[str, Path]:
         project_dir.mkdir()
         (project_dir / ".FABulous").mkdir()
         env_file = project_dir / ".FABulous" / ".env"
-        env_file.write_text("FAB_PROJ_LANG=verilog\nVERSION=1.0.0\n")
+        env_file.touch()
+        set_key(env_file, "FAB_PROJ_LANG", "verilog")
+        set_key(env_file, "FAB_PROJ_VERSION", "1.0.0")
 
     # Create project-specific .env file for testing
     project_dotenv_file = tmp_path / "project_specific.env"
-    project_dotenv_file.write_text(f"FAB_PROJ_DIR={str(project_dotenv_dir)}\n")
+    project_dotenv_file.touch()
+    set_key(project_dotenv_file, "FAB_PROJ_DIR", str(project_dotenv_dir))
 
     # Create project-specific .env file that doesn't set FAB_PROJ_DIR (for fallback tests)
     project_dotenv_fallback_file = tmp_path / "project_fallback.env"
-    project_dotenv_fallback_file.write_text("FAB_PROJ_LANG=verilog\n")
+    project_dotenv_fallback_file.touch()
+    set_key(project_dotenv_fallback_file, "FAB_PROJ_LANG", "verilog")
 
     # Create global .env file for testing
     global_dotenv_file = tmp_path / "global.env"
-    global_dotenv_file.write_text(f"FAB_PROJ_DIR={str(global_dotenv_dir)}\n")
+    global_dotenv_file.touch()
+    set_key(global_dotenv_file, "FAB_PROJ_DIR", str(global_dotenv_dir))
 
     return {
         "user_provided_dir": user_provided_dir,

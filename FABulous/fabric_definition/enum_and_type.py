@@ -1,7 +1,7 @@
 from collections.abc import Mapping
 from enum import Enum
 
-from FABulous.fabric_cad.define import FeatureValue
+from FABulous.fabric_definition.fasm import FeatureValue
 
 
 class IO(Enum):

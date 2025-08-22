@@ -1,7 +1,4 @@
-from collections.abc import Mapping
 from enum import Enum
-
-from FABulous.fabric_definition.fasm import FeatureValue
 
 
 class IO(Enum):
@@ -41,5 +38,3 @@ Loc = tuple[int, int]
 
 FrameIdx = int
 BitIdx = int
-
-FeatureMap = Mapping[str, FeatureValue]

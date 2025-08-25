@@ -31,13 +31,14 @@ from FABulous.fabric_generator.gen_fabric.gen_tile import (
 )
 from FABulous.fabric_generator.gen_fabric.gen_top_wrapper import generateTopWrapper
 from FABulous.FABulous_settings import FABulousSettings
+from FABulous.file_parser.file_parser_yaml import parseFabricYAML
 from FABulous.geometry_generator.geometry_gen import GeometryGenerator
 
 
 class FABulous_API:
     """Class for managing fabric and geometry generation.
 
-    This class parses fabric data from 'fabric.csv', generates fabric layouts,
+    This class parses fabric data from 'fabric.csv' or 'fabric.yaml', generates fabric layouts,
     geometries, models for nextpnr, as well as
     other fabric-related functions.
 
@@ -68,11 +69,15 @@ class FABulous_API:
         writer : CodeGenerator
             Object responsible for generating code from code_generator.py
         fabricCSV : str, optional
-            Path to the CSV file containing fabric data, by default ""
+            Path to the CSV or YAML file containing fabric data, by default ""
         """
         self.writer = writer
         if fabricCSV != "":
-            self.fabric = fileParser.parseFabricCSV(fabricCSV)
+            fabric_path = Path(fabricCSV)
+            if fabric_path.suffix == ".yaml":
+                self.fabric = parseFabricYAML(fabric_path)
+            else:
+                self.fabric = fileParser.parseFabricCSV(fabricCSV)
             self.geometryGenerator = GeometryGenerator(self.fabric)
 
         if isinstance(self.writer, VHDLCodeGenerator):
@@ -90,23 +95,26 @@ class FABulous_API:
         self.writer.outFileName = outputDir
 
     def loadFabric(self, fabric_dir: Path) -> None:
-        """Loads fabric data from 'fabric.csv'.
+        """Loads fabric data from 'fabric.csv' or 'fabric.yaml'.
 
         Parameters
         ----------
-        dir : str
-            Path to CSV file containing fabric data.
+        fabric_dir : Path
+            Path to CSV or YAML file containing fabric data.
 
         Raises
         ----------
         ValueError
-            If 'dir' does not end with '.csv'
+            If 'fabric_dir' does not end with '.csv' or '.yaml'
         """
         if fabric_dir.suffix == ".csv":
             self.fabric = fileParser.parseFabricCSV(fabric_dir)
             self.geometryGenerator = GeometryGenerator(self.fabric)
+        elif fabric_dir.suffix == ".yaml":
+            self.fabric = parseFabricYAML(fabric_dir)
+            self.geometryGenerator = GeometryGenerator(self.fabric)
         else:
-            logger.error("Only .csv files are supported for fabric loading")
+            logger.error("Only .csv and .yaml files are supported for fabric loading")
             raise ValueError
 
     def bootstrapSwitchMatrix(self, tileName: str, outputDir: Path) -> None:

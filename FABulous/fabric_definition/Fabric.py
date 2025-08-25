@@ -1,14 +1,17 @@
+from collections import defaultdict
+from collections.abc import Generator, Iterable
 from dataclasses import dataclass, field
+from pathlib import Path
+from typing import Any
 
 from FABulous.fabric_definition.Bel import Bel
-from FABulous.fabric_definition.define import (
-    ConfigBitMode,
-    Direction,
-    MultiplexerStyle,
-)
+from FABulous.fabric_definition.define import ConfigBitMode, Loc, MultiplexerStyle
+from FABulous.fabric_definition.Port import BelPort, GenericPort
 from FABulous.fabric_definition.SuperTile import SuperTile
 from FABulous.fabric_definition.Tile import Tile
 from FABulous.fabric_definition.Wire import Wire
+
+GroupName = str
 
 
 @dataclass
@@ -22,9 +25,9 @@ class Fabric:
         The tile map of the fabric
     name : str
         The name of the fabric
-    numberOfRows : int
+    numberOfRow : int
         The number of rows of the fabric
-    numberOfColumns : int
+    numberOfColumn : int
         The number of columns of the fabric
     configMitMode : ConfigBitMode
         The configuration bit mode of the fabric. Currently supports frame based or ff chain
@@ -52,227 +55,239 @@ class Fabric:
         A dictionary of tiles used in the fabric. The key is the name of the tile and the value is the tile.
     superTileDic : dict[str, SuperTile]
         A dictionary of super tiles used in the fabric. The key is the name of the super tile and the value is the super tile.
-    unusedTileDic: dict[str, Tile]
-        A dictionary of tiles that are not used in the fabric, but defined in the fabric.csv.
-        The key is the name of the tile and the value is the tile.
-    unusedSuperTileDic: dict[str, Tile]
-        A dictionary of super tiles that are not used in the fabric, but defined in the fabric.csv.
-        The key is the name of the tile and the value is the tile.
     """
 
-    tile: list[list[Tile]] = field(default_factory=list)
-
-    name: str = "eFPGA"
-    numberOfRows: int = 15
-    numberOfColumns: int = 15
+    name: str
+    fabricDir: Path
+    height: int
+    width: int
+    frameBitsPerRow: int
+    maxFramesPerCol: int
+    contextCount: int = 1
     configBitMode: ConfigBitMode = ConfigBitMode.FRAME_BASED
-    frameBitsPerRow: int = 32
-    maxFramesPerCol: int = 20
+    multiplexerStyle: MultiplexerStyle = MultiplexerStyle.CUSTOM
     package: str = "use work.my_package.all"
     generateDelayInSwitchMatrix: int = 80
-    multiplexerStyle: MultiplexerStyle = MultiplexerStyle.CUSTOM
     frameSelectWidth: int = 5
     rowSelectWidth: int = 5
     desync_flag: int = 20
     numberOfBRAMs: int = 10
     superTileEnable: bool = True
 
-    tileDic: dict[str, Tile] = field(default_factory=dict)
-    superTileDic: dict[str, SuperTile] = field(default_factory=dict)
-    unusedTileDic: dict[str, Tile] = field(default_factory=dict)
-    unusedSuperTileDic: dict[str, SuperTile] = field(default_factory=dict)
-    commonWirePair: list[tuple[str, str]] = field(default_factory=list)
+    tiles: list[list[str | None]] = field(default_factory=list)
+    tileDict: dict[str, Tile] = field(default_factory=dict)
+    superTileDict: dict[str, SuperTile] = field(default_factory=dict)
+    wireDict: dict[Loc, list[Wire]] = field(default_factory=dict)
 
-    def __post_init__(self) -> None:
-        """Generate all the wire pairs in the fabric and get all the wires in the
-        fabric.
+    _subTileToTile: dict[str, Tile] = field(init=False, default_factory=dict)
 
-        The wire pair are used during model generation when some of the signals have
-        source or destination of "NULL".
+    def __post_init__(self):
+        for t in self.tileDict.values():
+            if (
+                t.configBits * self.contextCount
+                > self.frameBitsPerRow * self.maxFramesPerCol
+            ):
+                raise ValueError(
+                    f"Tile {t.name} has too many config bits. Tile have {self.frameBitsPerRow * self.maxFramesPerCol} but requires {t.configBits * self.contextCount}"
+                )
 
-        The wires are used during model generation to work with wire that going cross
-        tile.
-        """
-        for row in self.tile:
-            for tile in row:
-                if tile is None:
-                    continue
-                for port in tile.portsInfo:
-                    self.commonWirePair.append((port.sourceName, port.destinationName))
+        for t in self.tileDict.values():
+            for subTile in t.getSubTiles():
+                if subTile not in self._subTileToTile:
+                    self._subTileToTile[subTile] = t
+                else:
+                    raise ValueError(
+                        f"Subtile {subTile} is defined in multiple tiles: {self._subTileToTile[subTile].name} and {t.name}"
+                    )
 
-        self.commonWirePair = list(dict.fromkeys(self.commonWirePair))
-        self.commonWirePair = [
-            (i, j) for i, j in self.commonWirePair if i != "NULL" and j != "NULL"
-        ]
+    def __getitem__(self, index: Any) -> Tile | None:
+        if isinstance(index, tuple):
+            if t := self.tiles[index[1]][index[0]]:
+                if t in self.tileDict:
+                    return self.tileDict[t]
+                return self._subTileToTile[t]
 
-        for y, row in enumerate(self.tile):
-            for x, tile in enumerate(row):
-                if tile is None:
-                    continue
-                for port in tile.portsInfo:
-                    if (
-                        abs(port.xOffset) <= 1
-                        and abs(port.yOffset) <= 1
-                        and port.sourceName != "NULL"
-                        and port.destinationName != "NULL"
-                    ):
-                        for i in range(port.wireCount):
-                            tile.wireList.append(
-                                Wire(
-                                    direction=port.wireDirection,
-                                    source=f"{port.sourceName}{i}",
-                                    xOffset=port.xOffset,
-                                    yOffset=port.yOffset,
-                                    destination=f"{port.destinationName}{i}",
-                                    sourceTile="",
-                                    destinationTile="",
-                                )
-                            )
-                    elif port.sourceName != "NULL" and port.destinationName != "NULL":
-                        # clamp the xOffset to 1 or -1
-                        value = min(max(port.xOffset, -1), 1)
-                        cascadedI = 0
-                        for i in range(port.wireCount * abs(port.xOffset)):
-                            if i < port.wireCount:
-                                cascadedI = i + port.wireCount * (abs(port.xOffset) - 1)
-                            else:
-                                cascadedI = i - port.wireCount
-                                tile.wireList.append(
-                                    Wire(
-                                        direction=Direction.JUMP,
-                                        source=f"{port.destinationName}{i}",
-                                        xOffset=0,
-                                        yOffset=0,
-                                        destination=f"{port.sourceName}{i}",
-                                        sourceTile=f"X{x}Y{y}",
-                                        destinationTile=f"X{x}Y{y}",
-                                    )
-                                )
-                            tile.wireList.append(
-                                Wire(
-                                    direction=port.wireDirection,
-                                    source=f"{port.sourceName}{i}",
-                                    xOffset=value,
-                                    yOffset=port.yOffset,
-                                    destination=f"{port.destinationName}{cascadedI}",
-                                    sourceTile=f"X{x}Y{y}",
-                                    destinationTile=f"X{x + value}Y{y + port.yOffset}",
-                                )
-                            )
-
-                        # clamp the yOffset to 1 or -1
-                        value = min(max(port.yOffset, -1), 1)
-                        cascadedI = 0
-                        for i in range(port.wireCount * abs(port.yOffset)):
-                            if i < port.wireCount:
-                                cascadedI = i + port.wireCount * (abs(port.yOffset) - 1)
-                            else:
-                                cascadedI = i - port.wireCount
-                                tile.wireList.append(
-                                    Wire(
-                                        direction=Direction.JUMP,
-                                        source=f"{port.destinationName}{i}",
-                                        xOffset=0,
-                                        yOffset=0,
-                                        destination=f"{port.sourceName}{i}",
-                                        sourceTile=f"X{x}Y{y}",
-                                        destinationTile=f"X{x}Y{y}",
-                                    )
-                                )
-                            tile.wireList.append(
-                                Wire(
-                                    direction=port.wireDirection,
-                                    source=f"{port.sourceName}{i}",
-                                    xOffset=port.xOffset,
-                                    yOffset=value,
-                                    destination=f"{port.destinationName}{cascadedI}",
-                                    sourceTile=f"X{x}Y{y}",
-                                    destinationTile=f"X{x + port.xOffset}Y{y + value}",
-                                )
-                            )
-                    elif port.sourceName != "NULL" and port.destinationName == "NULL":
-                        sourceName = port.sourceName
-                        destName = port.sourceName
-                        # if sourcename is not in a common pair wire we assume
-                        # the source name is the same as destination name
-                        wire_pair = dict(self.commonWirePair)
-                        if sourceName in wire_pair:
-                            destName = wire_pair[sourceName]
-
-                        value = min(max(port.xOffset, -1), 1)
-                        for i in range(port.wireCount * abs(port.xOffset)):
-                            tile.wireList.append(
-                                Wire(
-                                    direction=port.wireDirection,
-                                    source=f"{sourceName}{i}",
-                                    xOffset=value,
-                                    yOffset=port.yOffset,
-                                    destination=f"{destName}{i}",
-                                    sourceTile=f"X{x}Y{y}",
-                                    destinationTile=f"X{x + value}Y{y + port.yOffset}",
-                                )
-                            )
-
-                        value = min(max(port.yOffset, -1), 1)
-                        for i in range(port.wireCount * abs(port.yOffset)):
-                            tile.wireList.append(
-                                Wire(
-                                    direction=port.wireDirection,
-                                    source=f"{sourceName}{i}",
-                                    xOffset=port.xOffset,
-                                    yOffset=value,
-                                    destination=f"{destName}{i}",
-                                    sourceTile=f"X{x}Y{y}",
-                                    destinationTile=f"X{x + port.xOffset}Y{y + value}",
-                                )
-                            )
-                tile.wireList = list(dict.fromkeys(tile.wireList))
+            return None
+        if isinstance(index, str):
+            if index in self.tileDict:
+                return self.tileDict[index]
+            raise ValueError(f"Cannot find '{index}' in Fabric")
+        raise ValueError("Invalid index for Fabric")
 
     def __repr__(self) -> str:
         fabric = ""
-        for i in range(self.numberOfRows):
-            for j in range(self.numberOfColumns):
-                if self.tile[i][j] is None:
+        for i in range(self.height):
+            for j in range(self.width):
+                if self.tiles[i][j] is None:
                     fabric += "Null".ljust(15) + "\t"
                 else:
-                    fabric += f"{str(self.tile[i][j].name).ljust(15)}\t"
+                    fabric += f"{str(self.tiles[i][j]).ljust(15)}\t"
             fabric += "\n"
 
-        fabric += "\n"
-        fabric += f"numberOfColumns: {self.numberOfColumns}\n"
-        fabric += f"numberOfRows: {self.numberOfRows}\n"
-        fabric += f"configBitMode: {self.configBitMode}\n"
-        fabric += f"frameBitsPerRow: {self.frameBitsPerRow}\n"
-        fabric += f"maxFramesPerCol: {self.maxFramesPerCol}\n"
-        fabric += f"package: {self.package}\n"
-        fabric += f"generateDelayInSwitchMatrix: {self.generateDelayInSwitchMatrix}\n"
-        fabric += f"multiplexerStyle: {self.multiplexerStyle}\n"
-        fabric += f"superTileEnable: {self.superTileEnable}\n"
-        fabric += f"tileDic: {list(self.tileDic.keys())}\n"
+        fabric += (
+            "\n"
+            f"numberOfColumns: {self.width}\n"
+            f"numberOfRows: {self.height}\n"
+            f"configBitMode: {self.configBitMode}\n"
+            f"frameBitsPerRow: {self.frameBitsPerRow}\n"
+            f"maxFramesPerCol: {self.maxFramesPerCol}\n"
+            f"package: {self.package}\n"
+            f"generateDelayInSwitchMatrix: {self.generateDelayInSwitchMatrix}\n"
+            f"multiplexerStyle: {self.multiplexerStyle}\n"
+            f"superTileEnable: {self.superTileEnable}\n"
+            f"tileDic: {list(self.tileDict.keys())}\n"
+        )
+
         return fabric
 
-    def getTileByName(self, name: str) -> Tile | None:
-        ret = self.tileDic.get(name)
-        if ret is None:
-            ret = self.unusedTileDic.get(name)
-        if ret is None:
-            raise KeyError(f"Tile {name} not found in fabric.")
-
-        return ret
+    def getTileByName(self, name: str) -> Tile:
+        for i in self.tileDict.values():
+            for j in i.getSubTiles():
+                if j == name:
+                    return i
+        raise ValueError(f"Cannot find tile '{name}' in Fabric")
 
     def getSuperTileByName(self, name: str) -> SuperTile | None:
-        ret = self.superTileDic.get(name)
-        if ret is None:
-            ret = self.unusedSuperTileDic.get(name)
-        if ret is None:
-            raise KeyError(f"SuperTile {name} not found in fabric.")
-        return ret
+        return self.superTileDict.get(name)
 
-    def getAllUniqueBels(self) -> list[Bel]:
+    def getAllUniqueBels(self) -> Iterable[Bel]:
         bels = list()
-        for tile in self.tileDic.values():
-            bels.extend(tile.bels)
+        belSet = set()
+        for tile in self.tileDict.values():
+            for i in tile.bels:
+                if i.name not in belSet:
+                    bels.append(i)
+                    belSet.add(i.name)
         return bels
+
+    def getTotalBelCount(self) -> int:
+        tileCountDict = defaultdict(int)
+        for row in self.tiles:
+            for tile in row:
+                if tile is not None:
+                    tileCountDict[tile] += 1
+
+        return sum(
+            len(self.getTileByName(tile).bels) * count
+            for tile, count in tileCountDict.items()
+        )
+
+    def __iter__(self) -> Generator[tuple[Loc, Tile | None], None, None]:
+        for y, row in enumerate(reversed(self.tiles)):
+            for x, tile in enumerate(row):
+                loc = (x, y)
+                if tile is not None:
+                    t: Tile
+                    for i in self.tileDict.values():
+                        if i.partOfTile(tile):
+                            t = i
+                            break
+                    else:
+                        raise ValueError(f"Cannot find tile {tile} in Fabric")
+                    yield (loc, t)
+
+                else:
+                    yield (loc, None)
+
+    def tileNames_iter(self) -> Generator[tuple[Loc, str | None], None, None]:
+        for y, row in enumerate(self.tiles):
+            for x, tile in enumerate(row):
+                loc = (x, self.height - y - 1)
+                yield (loc, tile)
+
+    def getAllBelGroups(self) -> Iterable[tuple[GroupName, list[Bel]]]:
+        """Get all unique Bel groups in the fabric."""
+        belGroups = []
+        for tile in self.tileDict.values():
+            for g in tile.belGroups.items():
+                belGroups.append(g)
+        return belGroups
+
+    def getPortDrivers(self, p: GenericPort) -> list[GenericPort]:
+        for tile in self.tileDict.values():
+            if tile.isPortInTile(p):
+                return tile.switchMatrix.getPortDrivers(p)
+        raise ValueError(f"Port {p} not found in any tile")
+
+    def getPortUsers(self, p: GenericPort) -> list[GenericPort]:
+        """Get all users of the given port in the fabric."""
+        for tile in self.tileDict.values():
+            if tile.isPortInTile(p):
+                return tile.switchMatrix.getPortUsers(p)
+        raise ValueError(f"Port {p} not found in any tile")
+
+    def getBelByBelPort(self, p: BelPort) -> Bel:
+        """Get the Bel that contains the given BelPort."""
+        for tile in self.tileDict.values():
+            if tile.isPortInTile(p):
+                return tile.getBelByBelPort(p)
+        raise ValueError(f"BelPort {p} not found in any tile")
+
+    def isSubTile(self, name: str) -> bool:
+        """Check if the given name is a sub-tile in the fabric."""
+        return name in self._subTileToTile
+
+    def isRootTile(self, name: str) -> bool:
+        for tile in self.tileDict.values():
+            if tile is not None and tile.partOfTile(name):
+                return tile.isRootTile(name)
+        return False
+
+    def serialize(self) -> dict:
+        return {
+            "name": self.name,
+            "fabricDir": str(self.fabricDir),
+            "height": self.height,
+            "width": self.width,
+            "frameBitsPerRow": self.frameBitsPerRow,
+            "maxFramesPerCol": self.maxFramesPerCol,
+            "contextCount": self.contextCount,
+            "configBitMode": str(self.configBitMode),
+            "multiplexerStyle": str(self.multiplexerStyle),
+            "package": self.package,
+            "generateDelayInSwitchMatrix": self.generateDelayInSwitchMatrix,
+            "frameSelectWidth": self.frameSelectWidth,
+            "rowSelectWidth": self.rowSelectWidth,
+            "desync_flag": self.desync_flag,
+            "numberOfBRAMs": self.numberOfBRAMs,
+            "superTileEnable": self.superTileEnable,
+            "tiles": [
+                [tile if tile is None else str(tile) for tile in row]
+                for row in self.tiles
+            ],
+            "tileDict": {k: v.serialize() for k, v in self.tileDict.items()},
+            "wireDict": {
+                str(loc): [w.serialize() for w in wires]
+                for loc, wires in self.wireDict.items()
+            },
+            "_subTileToTile": {k: str(v.name) for k, v in self._subTileToTile.items()},
+        }
+
+    # Legacy compatibility methods
+    @property
+    def numberOfColumns(self) -> int:
+        """Legacy compatibility property."""
+        return self.width
+
+    @property
+    def numberOfRows(self) -> int:
+        """Legacy compatibility property."""
+        return self.height
+
+    @property
+    def tileDic(self) -> dict[str, Tile]:
+        """Legacy compatibility property."""
+        return self.tileDict
+
+    @property
+    def superTileDic(self) -> dict[str, SuperTile]:
+        """Legacy compatibility property."""
+        return self.superTileDict
+
+    @property
+    def tile(self) -> list[list[str | None]]:
+        """Legacy compatibility property."""
+        return self.tiles
 
     def getBelsByTileXY(self, x: int, y: int) -> list[Bel]:
         """Get all the Bels of a tile.
@@ -294,10 +309,13 @@ class Fabric:
         ValueError
             Tile coordinates are out of range.
         """
-        if x < 0 or x >= self.numberOfColumns or y < 0 or y >= self.numberOfRows:
+        if x < 0 or x >= self.width or y < 0 or y >= self.height:
             raise ValueError(
-                f"Invalid tile coordinates: ({x}, {y}) max (0, 0) - ({self.numberOfRows}, {self.numberOfColumns})"
+                f"Invalid tile coordinates: ({x}, {y}) max (0, 0) - ({self.height}, {self.width})"
             )
-        if self.tile[y][x] is None:
+        if self.tiles[y][x] is None:
             return []
-        return self.tile[y][x].bels
+
+        tile_name = self.tiles[y][x]
+        tile = self.getTileByName(tile_name)
+        return tile.bels

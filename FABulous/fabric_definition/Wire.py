@@ -1,7 +1,46 @@
-import re
 from dataclasses import dataclass
 
-from FABulous.fabric_definition.define import Direction
+from FABulous.fabric_definition.Port import BelPort, Port, TilePort
+
+
+@dataclass(frozen=True, eq=True)
+class WireType:
+    sourcePort: TilePort | BelPort
+    destinationPort: TilePort | BelPort
+    offsetX: int
+    offsetY: int
+    wireCount: int
+    cascadeWireCount: int
+    spanning: int = 0
+
+    def __repr__(self) -> str:
+        return (
+            f"{self.sourcePort}-X{self.offsetX}Y{self.offsetY}>{self.destinationPort}"
+        )
+
+    def __eq__(self, __o: object) -> bool:
+        if __o is None or not isinstance(__o, WireType):
+            return False
+        return self is __o or (
+            self.sourcePort == __o.sourcePort
+            and self.destinationPort == __o.destinationPort
+            and self.offsetX == __o.offsetX
+            and self.offsetY == __o.offsetY
+            and self.wireCount == __o.wireCount
+            and self.cascadeWireCount == __o.cascadeWireCount
+            and self.spanning == __o.spanning
+        )
+
+    def serialize(self) -> dict:
+        return {
+            "sourcePort": self.sourcePort.serialize(),
+            "destinationPort": self.destinationPort.serialize(),
+            "offsetX": self.offsetX,
+            "offsetY": self.offsetY,
+            "wireCount": self.wireCount,
+            "cascadeWireCount": self.cascadeWireCount,
+            "spanning": self.spanning,
+        }
 
 
 @dataclass(frozen=True, eq=True)
@@ -13,8 +52,6 @@ class Wire:
 
     Attributes
     ----------
-    direction : Direction
-        The direction of the wire
     source : str
         The source name of the wire
     xOffset : int
@@ -29,37 +66,26 @@ class Wire:
         The destination tile name of the wire
     """
 
-    direction: Direction
-    source: str
+    source: Port | TilePort
     xOffset: int
     yOffset: int
-    destination: str
+    destination: Port | TilePort
     sourceTile: str
     destinationTile: str
+    wireCount: int
 
     def __repr__(self) -> str:
-        return f"{self.source}-X{self.xOffset}Y{self.yOffset}>{self.destination}"
+        return (
+            f"{self.source.name}-X{self.xOffset}Y{self.yOffset}>{self.destination.name}"
+        )
 
-    def __eq__(self, __o: object) -> bool:
-        if __o is None or not isinstance(__o, Wire):
-            return False
-        return self.source == __o.source and self.destination == __o.destination
-
-    def __post_init__(self) -> None:
-        def validSourceDestination(name: str) -> bool:
-            if self.xOffset == 0 and self.yOffset == 0:
-                return True
-            if not name:
-                return True
-            return re.match(r"^X\d+Y\d+$", name) is not None
-
-        if not validSourceDestination(self.sourceTile):
-            raise ValueError(
-                f"Invalid source tile name: {self.sourceTile} for wire {self}, "
-                "your source is located out side of the fabric, please check the source and destination port offset."
-            )
-        if not validSourceDestination(self.destinationTile):
-            raise ValueError(
-                f"Invalid destination tile name: {self.destinationTile} for wire {self}, "
-                "your destination is located out side of the fabric, please check the source and destination port offset."
-            )
+    def serialize(self) -> dict:
+        return {
+            "source": self.source.serialize(),
+            "xOffset": self.xOffset,
+            "yOffset": self.yOffset,
+            "destination": self.destination.serialize(),
+            "sourceTile": self.sourceTile,
+            "destinationTile": self.destinationTile,
+            "wireCount": self.wireCount,
+        }

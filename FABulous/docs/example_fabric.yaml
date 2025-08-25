@@ -1,0 +1,23 @@
+# Example YAML Fabric Definition
+# This demonstrates the basic structure of a YAML fabric configuration
+
+PARAM:
+  Name: "ExampleFPGA"
+  ConfigBitMode: "FRAME_BASED"
+  FrameBitsPerRow: 32
+  MaxFramesPerCol: 32
+  ContextCount: 1
+  MultiplexerStyle: "CUSTOM"
+  Package: "use work.my_package.all"
+  GenerateDelayInSwitchMatrix: 80
+  FrameSelectWidth: 5
+  RowSelectWidth: 5
+  SuperTileEnable: true
+
+# List of tile definition files (relative to this file)
+TILES: []
+
+# Fabric layout - 2x2 grid with NULL tiles for this example
+FABRIC:
+  - ["NULL", "NULL"]
+  - ["NULL", "NULL"]

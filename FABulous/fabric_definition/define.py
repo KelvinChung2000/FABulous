@@ -1,14 +1,15 @@
-from enum import Enum
+from enum import StrEnum
+from typing import NamedTuple
 
 
-class IO(Enum):
-    INPUT = "INPUT"
-    OUTPUT = "OUTPUT"
-    INOUT = "INOUT"
-    NULL = "NULL"
+class IO(StrEnum):
+    INPUT = "input"
+    OUTPUT = "output"
+    INOUT = "inout"
+    NULL = "null"
 
 
-class Direction(Enum):
+class Direction(StrEnum):
     NORTH = "NORTH"
     SOUTH = "SOUTH"
     EAST = "EAST"
@@ -16,7 +17,7 @@ class Direction(Enum):
     JUMP = "JUMP"
 
 
-class Side(Enum):
+class Side(StrEnum):
     NORTH = "NORTH"
     SOUTH = "SOUTH"
     EAST = "EAST"
@@ -24,11 +25,33 @@ class Side(Enum):
     ANY = "ANY"
 
 
-class MultiplexerStyle(Enum):
+class MultiplexerStyle(StrEnum):
     CUSTOM = "CUSTOM"
     GENERIC = "GENERIC"
 
 
-class ConfigBitMode(Enum):
+class ConfigBitMode(StrEnum):
     FRAME_BASED = "FRAME_BASED"
     FLIPFLOP_CHAIN = "FLIPFLOP_CHAIN"
+
+
+class FeatureType(StrEnum):
+    ENUMERATE = "ENUMERATE"
+    INIT = "INIT"
+    ONE_HOT = "ONE_HOT"
+    FEATURE_MAP = "FEATURE_MAP"
+
+
+class FeatureValue(NamedTuple):
+    name: str
+    value: int | None
+
+    def value_as_bitstring(self) -> str:
+        if self.value is None:
+            return "x"
+        if isinstance(self.value, int):
+            return f"{self.value:01b}"
+        raise ValueError(f"Invalid value type: {type(self.value)} for {self.name}")
+
+
+Loc = tuple[int, int]

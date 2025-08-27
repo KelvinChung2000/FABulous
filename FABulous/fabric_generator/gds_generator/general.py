@@ -1,20 +1,27 @@
-import os
+import logging
 import re
 import shutil
+from collections.abc import Iterable
+from pathlib import Path
+from typing import Protocol
 
 
 # extract pin info out of synthesis file and config
-def initialRunCombinDict(synthesisFile, frameBitsPerRow, maxFramesPerCol,
-                         pinSides, isSuperTile):
+def initialRunCombinDict(
+    synthesisFile: str,
+    frameBitsPerRow: int,
+    maxFramesPerCol: int,
+    pinSides: dict[str, str],
+    isSuperTile: bool,
+) -> dict[str, dict[int, list[str]]]:
     pinWires = {}
     pinDict = {}
-    f = open(synthesisFile)
-    data = f.read()
-    f.close()
-    unprocessedPinsSynthesis = re.findall("\w+ \[(\d+)\:(\d+)\] (\w+)", data)
+    with Path(synthesisFile).open() as f:
+        data = f.read()
+    unprocessedPinsSynthesis = re.findall(r"\w+ \[(\d+)\:(\d+)\] (\w+)", data)
     for pin in unprocessedPinsSynthesis:
         pinWires[pin[2]] = int(pin[0]) - int(pin[1]) + 1
-    
+
     if isSuperTile:
         matches = [pin for pin in pinSides if "FrameData" in pin]
         for pin in matches:
@@ -67,24 +74,41 @@ def initialRunCombinDict(synthesisFile, frameBitsPerRow, maxFramesPerCol,
 
 
 # generates list of how pins are interconnected
-def generate_pin_pairs(synthesisFile, fabricGen, tileName):
+# Narrow duck-typed protocol for the fabric generator used here
+class _TileProtocol(Protocol):
+    def getPortPairs(self) -> list[list[object]]: ...
+
+
+class _FabricProtocol(Protocol):
+    frameBitsPerRow: int
+    maxFramesPerCol: int
+
+    def getTileByName(self, name: str) -> _TileProtocol: ...
+
+
+class _FabricGenProtocol(Protocol):
+    fabric: _FabricProtocol
+
+
+def generate_pin_pairs(
+    synthesisFile: str, fabricGen: _FabricGenProtocol, tileName: str
+) -> tuple[dict[str, str], list[str]]:
     pairNameBuf = ""
     pinsSynthesis = {}
     portPairs = {}
     noConnectionPin = []
 
-    f = open(synthesisFile)
-    data = f.read()
-    f.close()
+    with Path(synthesisFile).open() as f:
+        data = f.read()
 
-    unprocessedPinsSynthesis = re.findall("\w+ \[(\d+)\:(\d+)\] (\w+)", data)
+    unprocessedPinsSynthesis = re.findall(r"\w+ \[(\d+)\:(\d+)\] (\w+)", data)
     for pin in unprocessedPinsSynthesis:
         pinsSynthesis[pin[2]] = int(pin[0]) - int(pin[1]) + 1
 
     # get all pin pairs
     internPins = fabricGen.fabric.getTileByName(tileName).getPortPairs()
     for pair in internPins:
-        if 'NULL' not in pair:
+        if "NULL" not in pair:
             if pair[0] == pairNameBuf:
                 tempA = pair[0]
                 tempB = pair[1]
@@ -98,26 +122,12 @@ def generate_pin_pairs(synthesisFile, fabricGen, tileName):
                 for i in range(pinsSynthesis[pair[0]]):
                     nameSource = f"{pair[0]}[{i}]"
                     portPairs[nameSource] = f"{pair[1]}[{i}]"
-        elif ('NULL' in pair and pair[3] != 'NULL'):
+        elif "NULL" in pair and pair[3] != "NULL":
             if pair[2] == 1:
-                # portPairs[pair[3]] = "NULL"
                 noConnectionPin.append(f"{pair[3]}")
             else:
                 for i in range(pinsSynthesis[pair[3]]):
-                    # nameSource = f"{pair[3]}[{i}]"
-                    # portPairs[nameSource] = "NULL"
                     noConnectionPin.append(f"{pair[3]}[{i}]")
-    # pairTemp = ""
-    # for pair in pairsToPair:
-    #     if pairTemp:
-    #         for i in range(pinsSynthesis[pair]):
-    #             nameSource = f"{pair}[{i}]"
-    #             portPairs[nameSource] = f"{pairTemp}[{i}]"
-    #             nameSource = f"{pairTemp}[{i}]"
-    #             portPairs[nameSource] = f"{pair}[{i}]"
-    #         pairTemp = ""
-    #     else:
-    #         pairTemp = pair
 
     # add strobe and data
     for i in range(fabricGen.fabric.frameBitsPerRow):
@@ -131,92 +141,96 @@ def generate_pin_pairs(synthesisFile, fabricGen, tileName):
 
 
 # check for string in textfile
-def check_string(datafile, keyword):
-    for line in datafile:
-        if keyword in line:
-            return True
-    return False
+def check_string(datafile: Iterable[str], keyword: str) -> bool:
+    return any(keyword in line for line in datafile)
 
 
 # log for tile resizing steps
-def writeLog(lines, file, mode):
-    f = open(file, mode)
-    for line in lines:
-        f.write(line)
-    f.close()
+def writeLog(lines: Iterable[str], file: str, mode: str) -> None:
+    with Path(file).open(mode) as f:
+        f.writelines(lines)
 
 
 # copy and overwrite a file
-def copyAndOverwrite(src, dest):
-    if os.path.exists(dest):
+def copyAndOverwrite(src: str, dest: str) -> None:
+    dest_path = Path(dest)
+    if dest_path.exists():
         shutil.rmtree(dest)
     shutil.copytree(src, dest)
 
 
 # returns False when no error in area/sizing and True when area to small
-def check_flow(openlaneDir, tileName, interruptFlow, logger, olRun):
-    if os.path.exists(
-            f"{openlaneDir}/designs/{tileName}/runs/{olRun}/warning.log"):
-        with open(f"{openlaneDir}/designs/{tileName}/runs/{olRun}/warning.log", "r") as f:
+def check_flow(
+    openlaneDir: str,
+    tileName: str,
+    interruptFlow: bool,
+    logger: logging.Logger,
+    olRun: str,
+) -> tuple[bool, bool]:
+    warn_path = Path(f"{openlaneDir}/designs/{tileName}/runs/{olRun}/warning.log")
+    if warn_path.exists():
+        with warn_path.open() as f:
             datafile = f.readlines()
             if check_string(datafile, "Hold violations found in the following corners"):
                 return True, False
             if check_string(datafile, "core area is too small"):
                 if not interruptFlow:
                     return True, False
-                else:
+                raise ValueError(
+                    f"Tile {tileName} is sized wrong in fabric.csv. Try making your floorplan larger or run gen_openlane_fab with '-r' or '-resize'."
+                )
+
+    err_path = Path(f"{openlaneDir}/designs/{tileName}/runs/{olRun}/error.log")
+    if err_path.exists():
+        if err_path.stat().st_size > 0:
+            with err_path.open() as f:
+                datafile = f.readlines()
+                if (
+                    check_string(datafile, "resizer_routing_design")
+                    or check_string(datafile, "Try making your floorplan area larger")
+                    or check_string(datafile, "Routing congestion too high")
+                    or check_string(datafile, "resizer_routing_timing.tcl")
+                    or check_string(datafile, "floorplan")
+                    or check_string(datafile, "Step 26 (routing)")
+                    or check_string(datafile, "quit_on_magic_drc")
+                    or check_string(datafile, "exceeds 100%")
+                ):
+                    if not interruptFlow:
+                        return True, False
                     raise ValueError(
                         f"Tile {tileName} is sized wrong in fabric.csv. Try making your floorplan larger or run gen_openlane_fab with '-r' or '-resize'."
                     )
-
-    if os.path.exists(
-            f"{openlaneDir}/designs/{tileName}/runs/{olRun}/error.log"):
-        if os.stat(f"{openlaneDir}/designs/{tileName}/runs/{olRun}/error.log").st_size > 0:
-            with open(f"{openlaneDir}/designs/{tileName}/runs/{olRun}/error.log",
-                      "r") as f:
-                datafile = f.readlines()
                 if check_string(
-                        datafile, "resizer_routing_design") or check_string(
-                            datafile, "Try making your floorplan area larger"
-                        ) or check_string(
-                            datafile,
-                            "Routing congestion too high") or check_string(
-                                datafile,
-                                "resizer_routing_timing.tcl") or check_string(
-                                    datafile, "floorplan") or check_string(
-                                        datafile, "Step 26 (routing)") or check_string(datafile, "quit_on_magic_drc") or check_string(datafile, "exceeds 100%"):
-                    if not interruptFlow:
-                        return True, False
-                    else:
-                        raise ValueError(
-                            f"Tile {tileName} is sized wrong in fabric.csv. Try making your floorplan larger or run gen_openlane_fab with '-r' or '-resize'."
-                        )
-                elif check_string(
-                        datafile,
-                        "There are setup violations in the design at the Typical corner."
+                    datafile,
+                    "There are setup violations in the design at the Typical corner.",
                 ):
                     logger.warning(
                         "There are setup violations in the design at the Typical corner"
                     )
                     return False, False
-                elif check_string(
-                    datafile,
-                    "Use a higher -density"
-                ):
+                if check_string(datafile, "Use a higher -density"):
                     return False, True
-                else:
-                    raise ValueError(
-                        f"Unknown error in running OpenLane flow for tile {tileName}. Check OpenLane error logs for the tile."
-                    )
-        else:
-            logger.info(f"{tileName} OpenLane flow succeeded.")
-            return False, False
+                raise ValueError(
+                    f"Unknown error in running OpenLane flow for tile {tileName}. Check OpenLane error logs for the tile."
+                )
+    else:
+        logger.info("%s OpenLane flow succeeded.", tileName)
+        return False, False
+    # default: no issues detected
+    return False, False
 
 
 # keep initial order for not resized pin sides and take new calculated ones
 # for resized pin sides
-def fixUpdateOrder(combinDict, initCombinDict, prevTilePinOrderChange,
-                   resizeDim, ioSide, cornerPos, lastTermLoop):
+def fixUpdateOrder(
+    combinDict: dict,
+    initCombinDict: dict,
+    prevTilePinOrderChange: dict,
+    resizeDim: str | None,
+    ioSide: str | None,
+    cornerPos: str | None,
+    lastTermLoop: bool,
+) -> tuple[dict, dict]:
     pinOrderChangeTemp = {}
     pinOrderChange = {}
     fixedCombinDict = {}
@@ -228,7 +242,7 @@ def fixUpdateOrder(combinDict, initCombinDict, prevTilePinOrderChange,
         init[side] = {}
         for layer in initCombinDict[side]:
             init[side][layer] = []
-            for index, pin in enumerate(initCombinDict[side][layer]):
+            for index, _pin in enumerate(initCombinDict[side][layer]):
                 init[side][layer].append(index)
 
     # for start tile only
@@ -236,16 +250,29 @@ def fixUpdateOrder(combinDict, initCombinDict, prevTilePinOrderChange,
         prevTile = init
     else:
         # Super tile pin extend or decrease if previous tile was super tile
-        if len(prevTilePinOrderChange["Left"]) < len(init["Left"]) or (len(prevTilePinOrderChange["Right"]) < len(init["Right"])):
-            sizeFactor = len(init["Left"]) / len(prevTilePinOrderChange["Left"])
+        if len(prevTilePinOrderChange["Left"]) < len(init["Left"]) or (
+            len(prevTilePinOrderChange["Right"]) < len(init["Right"])
+        ):
+            sizeFactor = int(
+                len(init["Left"]) / max(1, len(prevTilePinOrderChange["Left"]))
+            )
             for side in prevTilePinOrderChange:
                 prevTile[side] = prevTilePinOrderChange[side]
-                for i in range(0, sizeFactor - 1):
-                    prevTile[side].extend([(len(prevTilePinOrderChange[side]) * i + 1) + x for x in prevTilePinOrderChange[side]])
-        elif len(prevTilePinOrderChange["Left"]) > len(init["Left"]) or (len(prevTilePinOrderChange["Right"]) > len(init["Right"])):
-            sizeFactor = len(prevTilePinOrderChange["Left"]) / len(init["Left"])
+                for i in range(max(0, sizeFactor - 1)):
+                    prevTile[side].extend(
+                        [
+                            (len(prevTilePinOrderChange[side]) * i + 1) + x
+                            for x in prevTilePinOrderChange[side]
+                        ]
+                    )
+        elif len(prevTilePinOrderChange["Left"]) > len(init["Left"]) or (
+            len(prevTilePinOrderChange["Right"]) > len(init["Right"])
+        ):
+            sizeFactor = int(
+                len(prevTilePinOrderChange["Left"]) / max(1, len(init["Left"]))
+            )
             for side in prevTilePinOrderChange:
-                x = int(len(prevTilePinOrderChange[side])/ sizeFactor)
+                x = int(len(prevTilePinOrderChange[side]) / max(1, sizeFactor))
                 prevTile[side] = prevTilePinOrderChange[side][:x]
         else:
             prevTile = prevTilePinOrderChange
@@ -283,17 +310,10 @@ def fixUpdateOrder(combinDict, initCombinDict, prevTilePinOrderChange,
             pinOrderChange["Top"] = init["Top"]
             pinOrderChange["Bottom"] = init["Bottom"]
         else:
-            # if isSuperTile:
-            #    pinOrderChange["Top"] = pinOrderChangeTemp["Bottom"]
-            #    pinOrderChange["Bottom"] = pinOrderChangeTemp["Top"]
             pinOrderChange["Top"] = pinOrderChangeTemp["Top"]
             pinOrderChange["Bottom"] = pinOrderChangeTemp["Bottom"]
 
     elif resizeDim == "Height":
-        #if isSuperTile:
-        #    pinOrderChange["Top"] = pinOrderChangeTemp["Bottom"]
-        #    pinOrderChange["Bottom"] = pinOrderChangeTemp["Top"]
-        #else:
         pinOrderChange["Top"] = pinOrderChangeTemp["Top"]
         pinOrderChange["Bottom"] = pinOrderChangeTemp["Bottom"]
 
@@ -310,11 +330,6 @@ def fixUpdateOrder(combinDict, initCombinDict, prevTilePinOrderChange,
             pinOrderChange["Left"] = pinOrderChangeTemp["Left"]
 
     elif not resizeDim:
-        #if isSuperTile:
-        #    pinOrderChange["Top"] = pinOrderChangeTemp["Bottom"]
-        #    pinOrderChange["Bottom"] = pinOrderChangeTemp["Top"]
-        #    pinOrderChange["Right"] = pinOrderChangeTemp["Right"]
-        #    pinOrderChange["Left"] = pinOrderChangeTemp["Left"]
         if ioSide:
             pinOrderChange = init
             if ioSide == "Top" or cornerPos == "Top":
@@ -323,9 +338,12 @@ def fixUpdateOrder(combinDict, initCombinDict, prevTilePinOrderChange,
                 pinOrderChange["Top"] = pinOrderChangeTemp["Top"]
         else:
             pinOrderChange = pinOrderChangeTemp
-    
+
     # update pin order in combinDict
-    if (lastTermLoop or ioSide in ["Right", "Left"]):        # ((isSuperTile and ioSide) or lastTermLoop or ioSide in ["Right", "Left"]):
+    if lastTermLoop or ioSide in [
+        "Right",
+        "Left",
+    ]:  # ((isSuperTile and ioSide) or lastTermLoop or ioSide in ["Right", "Left"]):
         for side in pinOrderChange:
             fixedCombinDict[side] = {}
             for layer in pinOrderChange[side]:
@@ -335,7 +353,8 @@ def fixUpdateOrder(combinDict, initCombinDict, prevTilePinOrderChange,
                         fixedCombinDict[side][layer].append("NULL")
                     else:
                         fixedCombinDict[side][layer].append(
-                            initCombinDict[side][layer][pinIndex])
+                            initCombinDict[side][layer][pinIndex]
+                        )
     else:
         for side in pinOrderChange:
             fixedCombinDict[side] = {}
@@ -343,6 +362,7 @@ def fixUpdateOrder(combinDict, initCombinDict, prevTilePinOrderChange,
                 fixedCombinDict[side][layer] = []
                 for pinIndex in pinOrderChange[side][layer]:
                     fixedCombinDict[side][layer].append(
-                        initCombinDict[side][layer][pinIndex])
+                        initCombinDict[side][layer][pinIndex]
+                    )
 
     return fixedCombinDict, pinOrderChange

@@ -2,7 +2,7 @@
 
 from collections.abc import Callable
 from pathlib import Path
-from typing import NamedTuple
+from typing import Any, NamedTuple, Protocol
 
 import pytest
 
@@ -10,6 +10,63 @@ from FABulous.fabric_definition.Fabric import Fabric
 from FABulous.fabric_definition.Tile import Tile
 from FABulous.fabric_generator.code_generator.code_generator import CodeGenerator
 from FABulous.fabric_generator.gen_fabric.gen_switchmatrix import genTileSwitchMatrix
+
+
+class SwitchMatrixDUT(Protocol):
+    """Protocol defining the Switch Matrix module interface."""
+    
+    # Configuration Interface
+    ConfigBits: Any  # [NoConfigBits-1:0] Configuration bits for multiplexer control
+    
+    # Routing Signal Inputs (examples - actual signals depend on tile configuration)
+    # North Direction
+    N1END0: Any  # North 1-wire end signal 0
+    N1END1: Any  # North 1-wire end signal 1
+    N2END0: Any  # North 2-wire end signal 0
+    N2END1: Any  # North 2-wire end signal 1
+    
+    # East Direction  
+    E1END0: Any  # East 1-wire end signal 0
+    E1END1: Any  # East 1-wire end signal 1
+    E2END0: Any  # East 2-wire end signal 0
+    E2END1: Any  # East 2-wire end signal 1
+    
+    # South Direction
+    S1END0: Any  # South 1-wire end signal 0
+    S1END1: Any  # South 1-wire end signal 1
+    S2END0: Any  # South 2-wire end signal 0
+    S2END1: Any  # South 2-wire end signal 1
+    
+    # West Direction
+    W1END0: Any  # West 1-wire end signal 0
+    W1END1: Any  # West 1-wire end signal 1
+    W2END0: Any  # West 2-wire end signal 0
+    W2END1: Any  # West 2-wire end signal 1
+    
+    # Routing Signal Outputs (examples - actual signals depend on tile configuration)
+    # North Direction
+    N1BEG0: Any  # North 1-wire begin signal 0
+    N1BEG1: Any  # North 1-wire begin signal 1
+    N2BEG0: Any  # North 2-wire begin signal 0
+    N2BEG1: Any  # North 2-wire begin signal 1
+    
+    # East Direction
+    E1BEG0: Any  # East 1-wire begin signal 0
+    E1BEG1: Any  # East 1-wire begin signal 1
+    E2BEG0: Any  # East 2-wire begin signal 0
+    E2BEG1: Any  # East 2-wire begin signal 1
+    
+    # South Direction
+    S1BEG0: Any  # South 1-wire begin signal 0
+    S1BEG1: Any  # South 1-wire begin signal 1
+    S2BEG0: Any  # South 2-wire begin signal 0
+    S2BEG1: Any  # South 2-wire begin signal 1
+    
+    # West Direction
+    W1BEG0: Any  # West 1-wire begin signal 0
+    W1BEG1: Any  # West 1-wire begin signal 1
+    W2BEG0: Any  # West 2-wire begin signal 0
+    W2BEG1: Any  # West 2-wire begin signal 1
 
 
 class SwitchMatrixTestCase(NamedTuple):

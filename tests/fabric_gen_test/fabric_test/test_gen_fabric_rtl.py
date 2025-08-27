@@ -2,7 +2,7 @@
 
 from collections.abc import Callable
 from pathlib import Path
-from typing import NamedTuple
+from typing import Any, NamedTuple, Protocol
 
 import pytest
 
@@ -10,6 +10,28 @@ from FABulous.fabric_definition.define import ConfigBitMode
 from FABulous.fabric_definition.Fabric import Fabric
 from FABulous.fabric_generator.code_generator.code_generator import CodeGenerator
 from FABulous.fabric_generator.gen_fabric.gen_fabric import generateFabric
+
+
+class FabricDUT(Protocol):
+    """Protocol defining the eFPGA Fabric module interface."""
+    
+    # Clock and Reset
+    UserCLK: Any  # System clock
+    
+    # Frame-based Configuration Interface
+    FrameData: Any  # [FrameBitsPerRow-1:0] Frame configuration data
+    FrameStrobe: Any  # [MaxFramesPerCol-1:0] Frame strobe signals
+    FrameData_O: Any  # [FrameBitsPerRow-1:0] Frame data output (chain)
+    FrameStrobe_O: Any  # [MaxFramesPerCol-1:0] Frame strobe output (chain)
+    
+    # FlipFlop Chain Configuration Interface (alternative)
+    conf_data: Any  # Configuration data input
+    conf_clk: Any  # Configuration clock
+    
+    # External I/O (when present)
+    Tile_X0Y0_A_I: Any  # Example tile I/O - actual ports depend on fabric configuration
+    Tile_X0Y0_A_O: Any
+    Tile_X0Y0_A_T: Any
 
 
 class FabricTestCase(NamedTuple):
@@ -244,3 +266,7 @@ def test_minimal_fabric_rtl_validation(
 
     yosys_commands = _create_fabric_validation_commands(ConfigBitMode.FRAME_BASED, fabric_config, expected_ports)
     validator.validate(yosys_commands)
+
+
+# Note: Fabric tests focus on structural RTL validation using Yosys
+# For behavioral validation, see configmem_test which tests actual hardware behavior

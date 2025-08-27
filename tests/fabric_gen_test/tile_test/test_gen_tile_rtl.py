@@ -2,7 +2,7 @@
 
 from collections.abc import Callable
 from pathlib import Path
-from typing import NamedTuple
+from typing import Any, NamedTuple, Protocol
 
 import pytest
 
@@ -11,6 +11,36 @@ from FABulous.fabric_definition.Fabric import Fabric
 from FABulous.fabric_definition.Tile import Tile
 from FABulous.fabric_generator.code_generator.code_generator import CodeGenerator
 from FABulous.fabric_generator.gen_fabric.gen_tile import generateTile
+
+
+class TileDUT(Protocol):
+    """Protocol defining the Tile module interface."""
+    
+    # Clock and Reset
+    UserCLK: Any  # System clock input
+    UserCLKo: Any  # System clock output (chained)
+    
+    # Frame-based Configuration Interface
+    FrameData: Any  # [FrameBitsPerRow-1:0] Frame configuration data input
+    FrameStrobe: Any  # [MaxFramesPerCol-1:0] Frame strobe signals input
+    FrameData_O: Any  # [FrameBitsPerRow-1:0] Frame data output (chain)
+    FrameStrobe_O: Any  # [MaxFramesPerCol-1:0] Frame strobe output (chain)
+    
+    # FlipFlop Chain Configuration Interface (alternative)
+    conf_data: Any  # Configuration data input
+    conf_clk: Any  # Configuration clock
+    
+    # Routing Interface (tile-to-tile connections)
+    # Note: Actual routing signals depend on tile configuration
+    # Examples of common routing signals:
+    N1BEG0: Any  # North 1-wire begin signal 0
+    E1BEG0: Any  # East 1-wire begin signal 0
+    S1BEG0: Any  # South 1-wire begin signal 0
+    W1BEG0: Any  # West 1-wire begin signal 0
+    N1END0: Any  # North 1-wire end signal 0
+    E1END0: Any  # East 1-wire end signal 0
+    S1END0: Any  # South 1-wire end signal 0
+    W1END0: Any  # West 1-wire end signal 0
 
 
 class TileTestCase(NamedTuple):
@@ -238,3 +268,7 @@ def test_minimal_tile_rtl_validation(
 
     yosys_commands = _create_tile_validation_commands(ConfigBitMode.FRAME_BASED, 0, expected_ports)
     validator.validate(yosys_commands)
+
+
+# Note: Tile tests focus on structural RTL validation using Yosys
+# For behavioral validation, see configmem_test which tests actual hardware behavior

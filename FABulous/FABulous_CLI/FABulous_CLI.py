@@ -54,6 +54,7 @@ from FABulous.fabric_generator.gen_fabric.fabric_automation import (
     generateCustomTileConfig,
 )
 from FABulous.fabric_generator.parser.parse_csv import parseTilesCSV
+from FABulous.fabric_generator.gds_generator.gds_generator import gdsGenerator
 from FABulous.FABulous_API import FABulous_API
 from FABulous.FABulous_CLI import cmd_synthesis
 from FABulous.FABulous_CLI.helper import (
@@ -1240,3 +1241,9 @@ class FABulous_CLI(Cmd):
             Command arguments (unused for this command).
         """
         self.fabulousAPI.genFabricIOBels()
+    
+    @with_category(CMD_FABRIC_FLOW)    
+    def do_gen_gds(self, args):
+        print(self.csvFile)
+        gdsFAB = gdsGenerator(self, args, self.fabulousAPI, self.allTile, self.csvFile, self.projectDir)
+        gdsFAB.run()

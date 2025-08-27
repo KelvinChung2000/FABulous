@@ -282,3 +282,16 @@ class Tile:
             ret += b.configBit
 
         return ret
+    
+    def getUserCLK(self):
+        return self.withUserCLK
+    
+    def getPortPairs(self) -> list[str]:
+        return [[p.sourceName, p.destinationName, p.wireCount, p.name] for p in self.portsInfo if p.wireDirection != Direction.JUMP]
+    
+    def getExternalTileIONames(self) -> list[str]:
+        return [p for p in self.bels if p.name != "NULL"]
+    
+    def portInfo(self):
+        return self.bels
+    

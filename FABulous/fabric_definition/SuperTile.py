@@ -99,3 +99,16 @@ class SuperTile:
                 ):
                     internalConnections.append((tile.getWestSidePorts(), x, y))
         return internalConnections
+
+    def getExternalTileIONames(self):
+        ports = {}
+        userCLK = []
+
+        for index, tile in enumerate(self.tiles):
+            ports[f"0,{index}"] = []
+            for port in tile.portsInfo:
+                if port.name != "NULL" and port.name != "VDD" and port.name != "GND":
+                    ports[f"0,{index}"].append(port)
+            index += 1
+            userCLK.append(tile.withUserCLK)
+        return ports, userCLK

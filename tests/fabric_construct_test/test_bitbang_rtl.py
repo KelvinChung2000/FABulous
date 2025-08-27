@@ -1,6 +1,5 @@
 """RTL behavior validation for bitbang module using cocotb."""
 
-from collections.abc import Callable
 from decimal import Decimal
 from pathlib import Path
 from typing import Any, Protocol
@@ -10,25 +9,25 @@ import pytest
 from cocotb.clock import Clock
 from cocotb.triggers import RisingEdge, Timer
 
-from tests.conftest import VERILOG_SOURCE_PATH, VHDL_SOURCE_PATH
+from tests.conftest import VERILOG_SOURCE_PATH, VHDL_SOURCE_PATH, CocotbRunner
 
 
 class BitbangProtocol(Protocol):
     """Protocol defining the bitbang module interface."""
 
     # Inputs
-    s_clk: Any
-    s_data: Any
-    clk: Any
-    resetn: Any
+    s_clk: Any  # Serial clock
+    s_data: Any  # Serial data
+    clk: Any  # System clock
+    resetn: Any  # Reset (active low)
 
     # Outputs
-    strobe: Any
-    data: Any  # [31:0]
-    active: Any
+    strobe: Any  # Data strobe output
+    data: Any  # [31:0] Parallel data output
+    active: Any  # Module active flag
 
 
-def test_bitbang_verilog_rtl(cocotb_runner: Callable[..., None]) -> None:
+def test_bitbang_verilog_rtl(cocotb_runner: CocotbRunner) -> None:
     """Test the bitbang module with Verilog source."""
     cocotb_runner(
         sources=[VERILOG_SOURCE_PATH / "Fabric" / "bitbang.v"],
@@ -37,7 +36,7 @@ def test_bitbang_verilog_rtl(cocotb_runner: Callable[..., None]) -> None:
     )
 
 
-def test_bitbang_vhdl_rtl(cocotb_runner: Callable[..., None]) -> None:
+def test_bitbang_vhdl_rtl(cocotb_runner: CocotbRunner) -> None:
     """Test the bitbang module with VHDL source."""
     cocotb_runner(
         sources=[VHDL_SOURCE_PATH / "Fabric" / "bitbang.vhdl"],
@@ -83,7 +82,9 @@ async def test_bitbang_basic(dut: BitbangProtocol) -> None:
     await Timer(Decimal(100), units="ps")
 
     # Check that strobe was generated and data is correct
-    assert dut.data.value == test_data, f"Expected data = 0x{test_data:08x}, got 0x{dut.data.value:08x}"
+    assert dut.data.value == test_data, (
+        f"Expected data = 0x{test_data:08x}, got 0x{dut.data.value:08x}"
+    )
 
     # Test case 3: Send OFF_PATTERN (0xFAB0) to deactivate
     await _send_serial_control_word(dut, 0xFAB0)
@@ -121,7 +122,9 @@ async def test_bitbang_multiple_data(dut: BitbangProtocol) -> None:
         await _send_serial_data_word(dut, word)
         await Timer(Decimal(100), units="ps")
 
-        assert dut.data.value == word, f"Word {i}: Expected data = 0x{word:08x}, got 0x{dut.data.value:08x}"
+        assert dut.data.value == word, (
+            f"Word {i}: Expected data = 0x{word:08x}, got 0x{dut.data.value:08x}"
+        )
 
 
 @pytest.mark.skip(reason="Cocotb test - run by simulation, not pytest")
@@ -145,7 +148,9 @@ async def test_bitbang_activation_deactivation(dut: BitbangProtocol) -> None:
         # Activate
         await _send_serial_control_word(dut, 0xFAB1)
         await Timer(Decimal(100), units="ps")
-        assert dut.active.value == 1, f"Cycle {cycle}: Should be active after ON_PATTERN"
+        assert dut.active.value == 1, (
+            f"Cycle {cycle}: Should be active after ON_PATTERN"
+        )
 
         # Send a test data word
         test_data = 0xDEADBEEF + cycle
@@ -156,7 +161,9 @@ async def test_bitbang_activation_deactivation(dut: BitbangProtocol) -> None:
         # Deactivate
         await _send_serial_control_word(dut, 0xFAB0)
         await Timer(Decimal(100), units="ps")
-        assert dut.active.value == 0, f"Cycle {cycle}: Should be inactive after OFF_PATTERN"
+        assert dut.active.value == 0, (
+            f"Cycle {cycle}: Should be inactive after OFF_PATTERN"
+        )
 
 
 @pytest.mark.skip(reason="Cocotb test - run by simulation, not pytest")

@@ -2,17 +2,38 @@
 
 from decimal import Decimal
 from pathlib import Path
-from typing import Any
+from typing import Any, Protocol
 
 import cocotb
 import pytest
 from cocotb.clock import Clock
 from cocotb.triggers import RisingEdge, Timer
 
-from tests.conftest import VERILOG_SOURCE_PATH, VHDL_SOURCE_PATH
+from tests.conftest import VERILOG_SOURCE_PATH, VHDL_SOURCE_PATH, CocotbRunner
 
 
-def test_RegFile_verilog_rtl(cocotb_runner: Any) -> None:
+class RegFileProtocol(Protocol):
+    """Protocol defining the RegFile_32x4 module interface."""
+
+    # Inputs
+    D: Any  # [3:0] Register File write port data
+    W_ADR: Any  # [4:0] Write address
+    W_en: Any  # Write enable
+    A_ADR: Any  # [4:0] Read port A address
+    B_ADR: Any  # [4:0] Read port B address
+    UserCLK: Any  # Clock
+    ConfigBits: Any  # [NoConfigBits-1:0]
+
+    # Outputs
+    AD: Any  # [3:0] Register File read port A data
+    BD: Any  # [3:0] Register File read port B data
+
+    # Internal registers (accessible for testing)
+    AD_reg: Any  # [3:0] Registered read port A
+    BD_reg: Any  # [3:0] Registered read port B
+
+
+def test_RegFile_verilog_rtl(cocotb_runner: CocotbRunner) -> None:
     """Test the RegFile_32x4 module with Verilog source."""
     cocotb_runner(
         sources=[VERILOG_SOURCE_PATH / "Tile" / "RegFile" / "RegFile_32x4.v"],
@@ -22,7 +43,7 @@ def test_RegFile_verilog_rtl(cocotb_runner: Any) -> None:
 
 
 @pytest.mark.skip(reason="Need update VHDL source")
-def test_RegFile_vhdl_rtl(cocotb_runner: Any) -> None:
+def test_RegFile_vhdl_rtl(cocotb_runner: CocotbRunner) -> None:
     """Test the RegFile_32x4 module with VHDL source."""
     cocotb_runner(
         sources=[VHDL_SOURCE_PATH / "Tile" / "RegFile" / "RegFile_32x4.vhdl"],
@@ -100,7 +121,7 @@ class RegFileModel:
         self.bd_reg = 0
 
 
-async def setup_dut(dut: Any) -> None:
+async def setup_dut(dut: RegFileProtocol) -> None:
     """Common setup for all tests."""
     # Start clock
     clock = Clock(dut.UserCLK, 10, "ns")
@@ -121,7 +142,7 @@ async def setup_dut(dut: Any) -> None:
 
 @pytest.mark.skip(reason="Cocotb test - run by simulation, not pytest")
 @cocotb.test
-async def test_regfile_basic_write_read(dut: Any) -> None:
+async def test_regfile_basic_write_read(dut: RegFileProtocol) -> None:
     """Test basic write and read functionality."""
     await setup_dut(dut)
 
@@ -155,7 +176,7 @@ async def test_regfile_basic_write_read(dut: Any) -> None:
 
 @pytest.mark.skip(reason="Cocotb test - run by simulation, not pytest")
 @cocotb.test
-async def test_regfile_dual_port_read(dut: Any) -> None:
+async def test_regfile_dual_port_read(dut: RegFileProtocol) -> None:
     """Test dual port read functionality."""
     await setup_dut(dut)
 
@@ -191,7 +212,7 @@ async def test_regfile_dual_port_read(dut: Any) -> None:
 
 @pytest.mark.skip(reason="Cocotb test - run by simulation, not pytest")
 @cocotb.test
-async def test_regfile_registered_output_port_a(dut: Any) -> None:
+async def test_regfile_registered_output_port_a(dut: RegFileProtocol) -> None:
     """Test registered output functionality for port A."""
     await setup_dut(dut)
 
@@ -231,7 +252,7 @@ async def test_regfile_registered_output_port_a(dut: Any) -> None:
 
 @pytest.mark.skip(reason="Cocotb test - run by simulation, not pytest")
 @cocotb.test
-async def test_regfile_registered_output_port_b(dut: Any) -> None:
+async def test_regfile_registered_output_port_b(dut: RegFileProtocol) -> None:
     """Test registered output functionality for port B."""
     await setup_dut(dut)
 
@@ -261,7 +282,7 @@ async def test_regfile_registered_output_port_b(dut: Any) -> None:
 
 @pytest.mark.skip(reason="Cocotb test - run by simulation, not pytest")
 @cocotb.test
-async def test_regfile_address_independence(dut: Any) -> None:
+async def test_regfile_address_independence(dut: RegFileProtocol) -> None:
     """Test that different addresses store independent data."""
     await setup_dut(dut)
 
@@ -299,7 +320,7 @@ async def test_regfile_address_independence(dut: Any) -> None:
 
 @pytest.mark.skip(reason="Cocotb test - run by simulation, not pytest")
 @cocotb.test
-async def test_regfile_write_enable_control(dut: Any) -> None:
+async def test_regfile_write_enable_control(dut: RegFileProtocol) -> None:
     """Test write enable control functionality."""
     await setup_dut(dut)
 
@@ -338,12 +359,14 @@ async def test_regfile_write_enable_control(dut: Any) -> None:
     dut.W_en.value = 0
 
     await Timer(Decimal(100), units="ps")
-    assert dut.AD.value.integer == 0x2, f"Write with W_en=1 failed: Expected 0x2, got {dut.AD.value.integer}"
+    assert dut.AD.value.integer == 0x2, (
+        f"Write with W_en=1 failed: Expected 0x2, got {dut.AD.value.integer}"
+    )
 
 
 @pytest.mark.skip(reason="Cocotb test - run by simulation, not pytest")
 @cocotb.test
-async def test_regfile_both_ports_registered(dut: Any) -> None:
+async def test_regfile_both_ports_registered(dut: RegFileProtocol) -> None:
     """Test functionality with both ports in registered mode."""
     await setup_dut(dut)
 

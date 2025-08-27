@@ -1,6 +1,5 @@
 """RTL behavior validation for BlockRAM_1KB module using cocotb."""
 
-from collections.abc import Callable
 from decimal import Decimal
 from pathlib import Path
 from typing import Any, Protocol
@@ -10,7 +9,7 @@ import pytest
 from cocotb.clock import Clock
 from cocotb.triggers import RisingEdge, Timer
 
-from tests.conftest import VERILOG_SOURCE_PATH, VHDL_SOURCE_PATH
+from tests.conftest import VERILOG_SOURCE_PATH, VHDL_SOURCE_PATH, CocotbRunner
 
 
 class BlockRAM1KBProtocol(Protocol):
@@ -32,7 +31,7 @@ class BlockRAM1KBProtocol(Protocol):
     rd_data: Any  # [31:0]
 
 
-def test_BlockRAM_1KB_verilog_rtl(cocotb_runner: Callable[..., None]) -> None:
+def test_BlockRAM_1KB_verilog_rtl(cocotb_runner: CocotbRunner) -> None:
     """Test the BlockRAM_1KB module with Verilog source."""
     cocotb_runner(
         sources=[VERILOG_SOURCE_PATH / "Fabric" / "BlockRAM_1KB.v"],
@@ -41,7 +40,7 @@ def test_BlockRAM_1KB_verilog_rtl(cocotb_runner: Callable[..., None]) -> None:
     )
 
 
-def test_BlockRAM_1KB_vhdl_rtl(cocotb_runner: Callable[..., None]) -> None:
+def test_BlockRAM_1KB_vhdl_rtl(cocotb_runner: CocotbRunner) -> None:
     """Test the BlockRAM_1KB module with VHDL source."""
     cocotb_runner(
         sources=[VHDL_SOURCE_PATH / "Fabric" / "BlockRAM_1KB.vhdl"],
@@ -200,7 +199,9 @@ async def test_blockram_write_enable_control(dut: BlockRAM1KBProtocol) -> None:
     dut.rd_addr.value = test_addr
     await RisingEdge(dut.clk)
     await Timer(Decimal(10), units="ps")
-    assert dut.rd_data.value == original_data, "Write should succeed with alwaysWriteEnable=1"
+    assert dut.rd_data.value == original_data, (
+        "Write should succeed with alwaysWriteEnable=1"
+    )
 
     # Test Case 2: Try to write with alwaysWriteEnable = 0 and no dynamic enable
     dut.C4.value = 0  # alwaysWriteEnable = 0

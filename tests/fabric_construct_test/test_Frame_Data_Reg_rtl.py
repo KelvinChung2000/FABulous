@@ -1,6 +1,5 @@
 """RTL behavior validation for Frame_Data_Reg module using cocotb."""
 
-from collections.abc import Callable
 from decimal import Decimal
 from pathlib import Path
 from typing import Any, Protocol
@@ -10,22 +9,22 @@ import pytest
 from cocotb.clock import Clock
 from cocotb.triggers import RisingEdge, Timer
 
-from tests.conftest import VERILOG_SOURCE_PATH, VHDL_SOURCE_PATH
+from tests.conftest import VERILOG_SOURCE_PATH, VHDL_SOURCE_PATH, CocotbRunner
 
 
 class FrameDataRegProtocol(Protocol):
     """Protocol defining the Frame_Data_Reg module interface."""
 
     # Inputs
-    CLK: Any
     FrameData_I: Any  # [FrameBitsPerRow-1:0]
     RowSelect: Any  # [RowSelectWidth-1:0]
+    CLK: Any
 
     # Outputs
     FrameData_O: Any  # [FrameBitsPerRow-1:0]
 
 
-def test_Frame_Data_Reg_verilog_rtl(cocotb_runner: Callable[..., None]) -> None:
+def test_Frame_Data_Reg_verilog_rtl(cocotb_runner: CocotbRunner) -> None:
     """Test the Frame_Data_Reg module with Verilog source."""
     cocotb_runner(
         sources=[VERILOG_SOURCE_PATH / "Fabric" / "Frame_Data_Reg.v"],
@@ -34,7 +33,7 @@ def test_Frame_Data_Reg_verilog_rtl(cocotb_runner: Callable[..., None]) -> None:
     )
 
 
-def test_Frame_Data_Reg_vhdl_rtl(cocotb_runner: Callable[..., None]) -> None:
+def test_Frame_Data_Reg_vhdl_rtl(cocotb_runner: CocotbRunner) -> None:
     cocotb_runner(
         sources=[VHDL_SOURCE_PATH / "Fabric" / "Frame_Data_Reg.vhdl"],
         hdl_top_level="Frame_Data_Reg",

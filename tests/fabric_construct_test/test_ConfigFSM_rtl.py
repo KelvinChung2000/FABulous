@@ -1,6 +1,5 @@
 """RTL behavior validation for ConfigFSM module using cocotb."""
 
-from collections.abc import Callable
 from decimal import Decimal
 from pathlib import Path
 from typing import Any, Protocol
@@ -10,26 +9,26 @@ import pytest
 from cocotb.clock import Clock
 from cocotb.triggers import RisingEdge, Timer
 
-from tests.conftest import VERILOG_SOURCE_PATH, VHDL_SOURCE_PATH
+from tests.conftest import VERILOG_SOURCE_PATH, VHDL_SOURCE_PATH, CocotbRunner
 
 
 class ConfigFSMProtocol(Protocol):
     """Protocol defining the ConfigFSM module interface."""
 
     # Inputs
-    CLK: Any
-    resetn: Any
-    WriteData: Any  # [31:0]
-    WriteStrobe: Any
-    FSM_Reset: Any
+    CLK: Any  # System clock
+    resetn: Any  # Reset (active low)
+    WriteData: Any  # [31:0] Configuration write data
+    WriteStrobe: Any  # Configuration write strobe
+    FSM_Reset: Any  # FSM reset signal
 
     # Outputs
-    FrameAddressRegister: Any  # [FrameBitsPerRow-1:0]
-    LongFrameStrobe: Any
-    RowSelect: Any  # [RowSelectWidth-1:0]
+    FrameAddressRegister: Any  # [FrameBitsPerRow-1:0] Frame address register
+    LongFrameStrobe: Any  # Long frame strobe
+    RowSelect: Any  # [RowSelectWidth-1:0] Row select
 
 
-def test_ConfigFSM_verilog_rtl(cocotb_runner: Callable[..., None]) -> None:
+def test_ConfigFSM_verilog_rtl(cocotb_runner: CocotbRunner) -> None:
     """Test the ConfigFSM module with Verilog source."""
     cocotb_runner(
         sources=[VERILOG_SOURCE_PATH / "Fabric" / "ConfigFSM.v"],
@@ -38,7 +37,7 @@ def test_ConfigFSM_verilog_rtl(cocotb_runner: Callable[..., None]) -> None:
     )
 
 
-def test_ConfigFSM_vhdl_rtl(cocotb_runner: Callable[..., None]) -> None:
+def test_ConfigFSM_vhdl_rtl(cocotb_runner: CocotbRunner) -> None:
     """Test the ConfigFSM module with VHDL source."""
     cocotb_runner(
         sources=[VHDL_SOURCE_PATH / "Fabric" / "ConfigFSM.vhdl"],
@@ -69,7 +68,9 @@ async def test_configfsm_basic(dut: ConfigFSMProtocol) -> None:
 
     # Check initial state
     assert dut.LongFrameStrobe.value == 0, "LongFrameStrobe should be 0 initially"
-    assert dut.FrameAddressRegister.value == 0, "FrameAddressRegister should be 0 initially"
+    assert dut.FrameAddressRegister.value == 0, (
+        "FrameAddressRegister should be 0 initially"
+    )
 
     # Test case 1: Send sync pattern 0xFAB0FAB1 to enter synched state
     dut.WriteData.value = 0xFAB0FAB1
@@ -113,11 +114,17 @@ async def test_configfsm_basic(dut: ConfigFSMProtocol) -> None:
             await Timer(Decimal(10), units="ps")
             # LongFrameStrobe should be high for 2 clock cycles
             await RisingEdge(dut.CLK)
-            assert dut.LongFrameStrobe.value == 1, "LongFrameStrobe should be high after last frame"
+            assert dut.LongFrameStrobe.value == 1, (
+                "LongFrameStrobe should be high after last frame"
+            )
             await RisingEdge(dut.CLK)
-            assert dut.LongFrameStrobe.value == 1, "LongFrameStrobe should stay high for 2 cycles"
+            assert dut.LongFrameStrobe.value == 1, (
+                "LongFrameStrobe should stay high for 2 cycles"
+            )
             await RisingEdge(dut.CLK)
-            assert dut.LongFrameStrobe.value == 0, "LongFrameStrobe should go low after 2 cycles"
+            assert dut.LongFrameStrobe.value == 0, (
+                "LongFrameStrobe should go low after 2 cycles"
+            )
 
 
 @pytest.mark.skip(reason="Cocotb test - run by simulation, not pytest")

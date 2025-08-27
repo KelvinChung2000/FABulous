@@ -1,7 +1,9 @@
 """RTL behavior validation for MULADD module using cocotb."""
 
+from collections.abc import Callable
 from decimal import Decimal
 from pathlib import Path
+from typing import Any, Protocol
 
 import cocotb
 import pytest
@@ -11,7 +13,28 @@ from cocotb.triggers import RisingEdge, Timer
 from tests.conftest import VERILOG_SOURCE_PATH, VHDL_SOURCE_PATH
 
 
-def test_MULADD_verilog_rtl(cocotb_runner):
+class MULADDProtocol(Protocol):
+    """Protocol defining the MULADD module interface."""
+
+    # Inputs
+    A: Any  # [7:0] operand A
+    B: Any  # [7:0] operand B
+    C: Any  # [19:0] operand C
+    clr: Any  # Clear signal
+    UserCLK: Any  # External clock
+    ConfigBits: Any  # [NoConfigBits-1:0] Configuration bits
+
+    # Outputs
+    Q: Any  # [19:0] result
+
+    # Internal registers (accessible for testing)
+    A_reg: Any  # [7:0]
+    B_reg: Any  # [7:0]
+    C_reg: Any  # [19:0]
+    ACC: Any  # [19:0] accumulator
+
+
+def test_MULADD_verilog_rtl(cocotb_runner: Callable[..., None]) -> None:
     """Test the MULADD module with Verilog source."""
     cocotb_runner(
         sources=[VERILOG_SOURCE_PATH / "Tile" / "DSP" / "DSP_bot" / "MULADD.v"],
@@ -21,7 +44,9 @@ def test_MULADD_verilog_rtl(cocotb_runner):
 
 
 @pytest.mark.skip(reason="Need update VHDL source")
-def test_MULADD_vhdl_rtl(cocotb_runner):
+def test_MULADD_vhdl_rtl(
+    cocotb_runner: Callable[..., None],
+) -> None:
     cocotb_runner(
         sources=[VHDL_SOURCE_PATH / "Tile" / "DSP" / "DSP_bot" / "MULADD.vhd"],
         hdl_top_level="MULADD",
@@ -40,13 +65,13 @@ BIT_5 = 0b100000
 class MULADDModel:
     """Software model for MULADD module functionality."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.A_reg = 0
         self.B_reg = 0
         self.C_reg = 0
         self.ACC = 0
 
-    def clock_cycle(self, A, B, C, clr, ConfigBits) -> int:
+    def clock_cycle(self, A: int, B: int, C: int, clr: int, ConfigBits: int) -> int:
         """
         Simulate one clock cycle of the MULADD module.
 
@@ -109,7 +134,7 @@ class MULADDModel:
 
         return Q & 0xFFFFF  # Ensure 20-bit output
 
-    def reset(self):
+    def reset(self) -> None:
         """Reset the model state."""
         self.A_reg = 0
         self.B_reg = 0
@@ -117,12 +142,7 @@ class MULADDModel:
         self.ACC = 0
 
 
-def create_muladd_model():
-    """Create a fresh MULADD model instance."""
-    return MULADDModel()
-
-
-async def setup_dut(dut):
+async def setup_dut(dut: MULADDProtocol) -> None:
     """Common setup for all tests."""
     # Start clock
     clock = Clock(dut.UserCLK, 10, "ns")
@@ -144,12 +164,12 @@ async def setup_dut(dut):
 
 @pytest.mark.skip(reason="Cocotb test - run by simulation, not pytest")
 @cocotb.test
-async def test_muladd_configbit0_a_register(dut):
+async def test_muladd_configbit0_a_register(dut: MULADDProtocol) -> None:
     """Test ConfigBits[0] - A register functionality."""
     await setup_dut(dut)
 
     # Create software model for comparison
-    model = create_muladd_model()
+    model = MULADDModel()
 
     # Test without A register (ConfigBits[0] = 0) - combinational mode
     dut.A.value = 5
@@ -190,12 +210,12 @@ async def test_muladd_configbit0_a_register(dut):
 
 @pytest.mark.skip(reason="Cocotb test - run by simulation, not pytest")
 @cocotb.test
-async def test_muladd_configbit1_b_register(dut):
+async def test_muladd_configbit1_b_register(dut: MULADDProtocol) -> None:
     """Test ConfigBits[1] - B register functionality."""
     await setup_dut(dut)
 
     # Create software model for comparison
-    model = create_muladd_model()
+    model = MULADDModel()
 
     # Test without B register (ConfigBits[1] = 0)
     dut.A.value = 4
@@ -234,12 +254,12 @@ async def test_muladd_configbit1_b_register(dut):
 
 @pytest.mark.skip(reason="Cocotb test - run by simulation, not pytest")
 @cocotb.test
-async def test_muladd_configbit2_c_register(dut):
+async def test_muladd_configbit2_c_register(dut: MULADDProtocol) -> None:
     """Test ConfigBits[2] - C register functionality."""
     await setup_dut(dut)
 
     # Create software model for comparison
-    model = create_muladd_model()
+    model = MULADDModel()
 
     # Test without C register (ConfigBits[2] = 0)
     dut.A.value = 3
@@ -278,12 +298,12 @@ async def test_muladd_configbit2_c_register(dut):
 
 @pytest.mark.skip(reason="Cocotb test - run by simulation, not pytest")
 @cocotb.test
-async def test_muladd_configbit3_accumulator_mode(dut):
+async def test_muladd_configbit3_accumulator_mode(dut: MULADDProtocol) -> None:
     """Test ConfigBits[3] - Accumulator mode functionality."""
     await setup_dut(dut)
 
     # Create software model for comparison
-    model = create_muladd_model()
+    model = MULADDModel()
 
     # Test without accumulator (ConfigBits[3] = 0) - uses C input
     dut.A.value = 2
@@ -325,12 +345,12 @@ async def test_muladd_configbit3_accumulator_mode(dut):
 
 @pytest.mark.skip(reason="Cocotb test - run by simulation, not pytest")
 @cocotb.test
-async def test_muladd_configbit4_sign_extension(dut):
+async def test_muladd_configbit4_sign_extension(dut: MULADDProtocol) -> None:
     """Test ConfigBits[4] - Sign extension functionality."""
     await setup_dut(dut)
 
     # Create software model for comparison
-    model = create_muladd_model()
+    model = MULADDModel()
 
     # Test without sign extension (ConfigBits[4] = 0)
     dut.A.value = (
@@ -378,12 +398,12 @@ async def test_muladd_configbit4_sign_extension(dut):
 
 @pytest.mark.skip(reason="Cocotb test - run by simulation, not pytest")
 @cocotb.test
-async def test_muladd_configbit5_output_select(dut):
+async def test_muladd_configbit5_output_select(dut: MULADDProtocol) -> None:
     """Test ConfigBits[5] - Output selection (ACC vs sum)."""
     await setup_dut(dut)
 
     # Create software model for comparison
-    model = create_muladd_model()
+    model = MULADDModel()
 
     # Setup accumulator mode to have meaningful ACC value
     dut.A.value = 3
@@ -429,12 +449,12 @@ async def test_muladd_configbit5_output_select(dut):
 
 @pytest.mark.skip(reason="Cocotb test - run by simulation, not pytest")
 @cocotb.test
-async def test_muladd_clear_functionality(dut):
+async def test_muladd_clear_functionality(dut: MULADDProtocol) -> None:
     """Test clear functionality."""
     await setup_dut(dut)
 
     # Create software model for comparison
-    model = create_muladd_model()
+    model = MULADDModel()
 
     # Build up some accumulator value
     dut.A.value = 5

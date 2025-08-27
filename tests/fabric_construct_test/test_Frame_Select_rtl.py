@@ -1,6 +1,5 @@
 """RTL behavior validation for Frame_Select module using cocotb."""
 
-from collections.abc import Callable
 from decimal import Decimal
 from pathlib import Path
 from typing import Any, Protocol
@@ -8,8 +7,10 @@ from typing import Any, Protocol
 import cocotb
 import pytest
 from cocotb.triggers import Timer
+# NOTE: cocotb-coverage integration prepared but not active due to environment dependency
+# from cocotb_coverage.coverage import coverage_section, CoverPoint, CoverCross
 
-from tests.conftest import VERILOG_SOURCE_PATH, VHDL_SOURCE_PATH
+from tests.conftest import VERILOG_SOURCE_PATH, VHDL_SOURCE_PATH, CocotbRunner
 
 
 class FrameSelectProtocol(Protocol):
@@ -24,7 +25,7 @@ class FrameSelectProtocol(Protocol):
     FrameStrobe_O: Any  # [MaxFramesPerCol-1:0]
 
 
-def test_Frame_Select_verilog_rtl(cocotb_runner: Callable[..., None]) -> None:
+def test_Frame_Select_verilog_rtl(cocotb_runner: CocotbRunner) -> None:
     """Test the Frame_Select module with Verilog source."""
     cocotb_runner(
         sources=[VERILOG_SOURCE_PATH / "Fabric" / "Frame_Select.v"],
@@ -33,7 +34,7 @@ def test_Frame_Select_verilog_rtl(cocotb_runner: Callable[..., None]) -> None:
     )
 
 
-def test_Frame_Select_vhdl_rtl(cocotb_runner: Callable[..., None]) -> None:
+def test_Frame_Select_vhdl_rtl(cocotb_runner: CocotbRunner) -> None:
     """Test the Frame_Select module with VHDL source."""
     cocotb_runner(
         sources=[VHDL_SOURCE_PATH / "Fabric" / "Frame_Select.vhdl"],
@@ -43,6 +44,10 @@ def test_Frame_Select_vhdl_rtl(cocotb_runner: Callable[..., None]) -> None:
 
 
 @pytest.mark.skip(reason="Cocotb test - run by simulation, not pytest")
+# NOTE: Coverage decorators prepared but commented out due to environment dependency
+# @CoverPoint("frame_select.frame_select_value", xf=lambda dut: dut.FrameSelect.value, bins=list(range(32)))
+# @CoverPoint("frame_select.frame_strobe", xf=lambda dut: dut.FrameStrobe.value, bins=[0, 1])
+# @CoverPoint("frame_select.strobe_input_pattern", xf=lambda dut: dut.FrameStrobe_I.value & 0xFF, bins=list(range(0, 256, 32)))
 @cocotb.test
 async def test_frame_select_basic(dut: FrameSelectProtocol) -> None:
     """Test basic functionality of Frame_Select."""
@@ -115,7 +120,9 @@ async def test_frame_select_col_sweep(dut: FrameSelectProtocol) -> None:
 
     # Test various FrameSelect values
     # Only FrameSelect = 18 (default Col) should pass through the pattern
-    for frame_select in range(32):  # Test wider range than FrameSelectWidth=5 (32 values)
+    for frame_select in range(
+        32
+    ):  # Test wider range than FrameSelectWidth=5 (32 values)
         dut.FrameSelect.value = frame_select
         await Timer(Decimal(10), units="ps")
 
@@ -167,7 +174,9 @@ async def test_frame_select_edge_cases(dut: FrameSelectProtocol) -> None:
     dut.FrameStrobe.value = 1
     await Timer(Decimal(10), units="ps")
 
-    assert dut.FrameStrobe_O.value == 0, "All zeros input should produce all zeros output"
+    assert dut.FrameStrobe_O.value == 0, (
+        "All zeros input should produce all zeros output"
+    )
 
     # Test case 2: All ones (within MaxFramesPerCol)
     max_frames = 20  # Default MaxFramesPerCol
@@ -191,8 +200,12 @@ async def test_frame_select_edge_cases(dut: FrameSelectProtocol) -> None:
 
     dut.FrameStrobe.value = 1
     await Timer(Decimal(5), units="ps")
-    assert dut.FrameStrobe_O.value == test_pattern, "Output should follow input when FrameStrobe is high"
+    assert dut.FrameStrobe_O.value == test_pattern, (
+        "Output should follow input when FrameStrobe is high"
+    )
 
     dut.FrameStrobe.value = 0
     await Timer(Decimal(5), units="ps")
-    assert dut.FrameStrobe_O.value == 0, "Output should be 0 when FrameStrobe goes low again"
+    assert dut.FrameStrobe_O.value == 0, (
+        "Output should be 0 when FrameStrobe goes low again"
+    )

@@ -1,6 +1,5 @@
 """RTL behavior validation for LUT4c_frame_config_dffesr module using cocotb."""
 
-from collections.abc import Callable
 from decimal import Decimal
 from pathlib import Path
 from typing import Any, Protocol
@@ -10,7 +9,7 @@ import pytest
 from cocotb.clock import Clock
 from cocotb.triggers import RisingEdge, Timer
 
-from tests.conftest import VERILOG_SOURCE_PATH, VHDL_SOURCE_PATH
+from tests.conftest import VERILOG_SOURCE_PATH, VHDL_SOURCE_PATH, CocotbRunner
 
 
 class LUT4cProtocol(Protocol):
@@ -25,24 +24,29 @@ class LUT4cProtocol(Protocol):
     ConfigBits: Any  # Configuration bits
 
     # Outputs
-    O: Any  # LUT output  # noqa: E741
+    O: Any  # LUT output (can be combinational or registered based on config)  # noqa: E741
     Co: Any  # Carry output
 
 
-def test_LUT4c_verilog_rtl(cocotb_runner: Callable[..., None]) -> None:
+def test_LUT4c_verilog_rtl(cocotb_runner: CocotbRunner) -> None:
     """Test the LUT4c_frame_config_dffesr module with Verilog source."""
     cocotb_runner(
-        sources=[VERILOG_SOURCE_PATH / "Tile" / "LUT4AB" / "LUT4c_frame_config_dffesr.v"],
+        sources=[
+            VERILOG_SOURCE_PATH / "Fabric" / "models_pack.v",  # Include custom modules
+            VERILOG_SOURCE_PATH / "Tile" / "LUT4AB" / "LUT4c_frame_config_dffesr.v"
+        ],
         hdl_top_level="LUT4c_frame_config_dffesr",
         test_module_path=Path(__file__),
     )
 
 
 @pytest.mark.skip(reason="Need update VHDL source")
-def test_LUT4c_vhdl_rtl(cocotb_runner: Callable[..., None]) -> None:
+def test_LUT4c_vhdl_rtl(cocotb_runner: CocotbRunner) -> None:
     """Test the LUT4c_frame_config_dffesr module with VHDL source."""
     cocotb_runner(
-        sources=[VHDL_SOURCE_PATH / "Tile" / "LUT4AB" / "LUT4c_frame_config_dffesr.vhdl"],
+        sources=[
+            VHDL_SOURCE_PATH / "Tile" / "LUT4AB" / "LUT4c_frame_config_dffesr.vhdl"
+        ],
         hdl_top_level="lut4c_frame_config_dffesr",  # GHDL converts to lowercase
         test_module_path=Path(__file__),
     )
@@ -74,7 +78,9 @@ class LUT4cModel:
         # Return the bit at position input_index
         return (lut_init >> input_index) & 1
 
-    def clock_cycle(self, I: int, Ci: int, SR: int, EN: int, ConfigBits: int) -> tuple[int, int]:  # noqa: E741
+    def clock_cycle(
+        self, I: int, Ci: int, SR: int, EN: int, ConfigBits: int
+    ) -> tuple[int, int]:  # noqa: E741
         """
         Simulate one clock cycle of the LUT4c module.
 
@@ -118,7 +124,7 @@ class LUT4cModel:
 
         return output, carry_out
 
-    def reset(self) ->None:
+    def reset(self) -> None:
         """Reset the model state."""
         self.ff_out = 0
 
@@ -153,17 +159,23 @@ async def test_lut4c_basic_lut_functionality(dut: LUT4cProtocol) -> None:
     # Test all 0s input
     dut.I.value = 0b0000
     await Timer(Decimal(100), units="ps")
-    assert dut.O.value == 0, f"AND gate with input 0000 should output 0, got {dut.O.value}"
+    assert dut.O.value == 0, (
+        f"AND gate with input 0000 should output 0, got {dut.O.value}"
+    )
 
     # Test all 1s input
     dut.I.value = 0b1111  # Index 15
     await Timer(Decimal(100), units="ps")
-    assert dut.O.value == 1, f"AND gate with input 1111 should output 1, got {dut.O.value}"
+    assert dut.O.value == 1, (
+        f"AND gate with input 1111 should output 1, got {dut.O.value}"
+    )
 
     # Test partial input
     dut.I.value = 0b1110  # Index 14
     await Timer(Decimal(100), units="ps")
-    assert dut.O.value == 0, f"AND gate with input 1110 should output 0, got {dut.O.value}"
+    assert dut.O.value == 0, (
+        f"AND gate with input 1110 should output 0, got {dut.O.value}"
+    )
 
 
 @pytest.mark.skip(reason="Cocotb test - run by simulation, not pytest")
@@ -178,16 +190,22 @@ async def test_lut4c_or_gate_functionality(dut: LUT4cProtocol) -> None:
     # Test all 0s input
     dut.I.value = 0b0000
     await Timer(Decimal(100), units="ps")
-    assert dut.O.value == 0, f"OR gate with input 0000 should output 0, got {dut.O.value}"
+    assert dut.O.value == 0, (
+        f"OR gate with input 0000 should output 0, got {dut.O.value}"
+    )
 
     # Test any non-zero input
     dut.I.value = 0b0001
     await Timer(Decimal(100), units="ps")
-    assert dut.O.value == 1, f"OR gate with input 0001 should output 1, got {dut.O.value}"
+    assert dut.O.value == 1, (
+        f"OR gate with input 0001 should output 1, got {dut.O.value}"
+    )
 
     dut.I.value = 0b1010
     await Timer(Decimal(100), units="ps")
-    assert dut.O.value == 1, f"OR gate with input 1010 should output 1, got {dut.O.value}"
+    assert dut.O.value == 1, (
+        f"OR gate with input 1010 should output 1, got {dut.O.value}"
+    )
 
 
 @pytest.mark.skip(reason="Cocotb test - run by simulation, not pytest")
@@ -197,7 +215,9 @@ async def test_lut4c_flip_flop_functionality(dut: LUT4cProtocol) -> None:
     await setup_dut(dut)
 
     # Configure LUT as buffer (output = input[0]) and enable FF
-    dut.ConfigBits.value = 0x1AAAA  # ConfigBits[16] = 1 (enable FF), LUT = alternating pattern
+    dut.ConfigBits.value = (
+        0x1AAAA  # ConfigBits[16] = 1 (enable FF), LUT = alternating pattern
+    )
 
     # Set input to generate LUT output = 1
     dut.I.value = 0b0001  # Should give LUT output based on ConfigBits[1]
@@ -214,13 +234,16 @@ async def test_lut4c_flip_flop_functionality(dut: LUT4cProtocol) -> None:
     dut.I.value = 0b0000
     await Timer(Decimal(100), units="ps")
 
-    # In FF mode, output should not change immediately
-    # (exact behavior depends on whether O or Q is the FF output)
+    # In FF mode, output should not change immediately without clock
+    new_output = dut.O.value
+    assert new_output == old_output, (
+        f"In FF mode, output should not change without clock: expected {old_output}, got {new_output}"
+    )
 
 
 @pytest.mark.skip(reason="Cocotb test - run by simulation, not pytest")
 @cocotb.test
-async def test_lut4c_carry_chain_functionality(dut):
+async def test_lut4c_carry_chain_functionality(dut: LUT4cProtocol) -> None:
     """Test carry chain functionality."""
     await setup_dut(dut)
 
@@ -240,13 +263,16 @@ async def test_lut4c_carry_chain_functionality(dut):
 
     carry_out_1 = dut.Co.value
 
-    # Carry output should be different (exact logic depends on implementation)
-    # This is a basic sanity check
+    # Carry output should be different when carry input changes
+    assert carry_out_0 != carry_out_1, (
+        f"Carry output should change when carry input changes: "
+        f"Ci=0 -> Co={carry_out_0}, Ci=1 -> Co={carry_out_1}"
+    )
 
 
 @pytest.mark.skip(reason="Cocotb test - run by simulation, not pytest")
 @cocotb.test
-async def test_lut4c_set_reset_functionality(dut):
+async def test_lut4c_set_reset_functionality(dut: LUT4cProtocol) -> None:
     """Test set/reset functionality of the flip-flop."""
     await setup_dut(dut)
 
@@ -260,8 +286,8 @@ async def test_lut4c_set_reset_functionality(dut):
     dut.SR.value = 0
     await Timer(Decimal(100), units="ps")
 
-    # After reset, Q should be 0 (or 1 depending on set vs reset configuration)
-    reset_value = dut.Q.value
+    # After reset, O should be at reset value (0 or 1 depending on set vs reset configuration)
+    reset_value = dut.O.value
 
     # Set some data
     dut.I.value = 0b1111  # Configure to give LUT output = 1
@@ -275,12 +301,14 @@ async def test_lut4c_set_reset_functionality(dut):
     await Timer(Decimal(100), units="ps")
 
     # Should return to reset value
-    assert dut.Q.value == reset_value, f"After reset, Q should be {reset_value}, got {dut.Q.value}"
+    assert dut.O.value == reset_value, (
+        f"After reset, O should be {reset_value}, got {dut.O.value}"
+    )
 
 
 @pytest.mark.skip(reason="Cocotb test - run by simulation, not pytest")
 @cocotb.test
-async def test_lut4c_enable_functionality(dut):
+async def test_lut4c_enable_functionality(dut: LUT4cProtocol) -> None:
     """Test enable functionality of the flip-flop."""
     await setup_dut(dut)
 
@@ -293,7 +321,7 @@ async def test_lut4c_enable_functionality(dut):
     await RisingEdge(dut.UserCLK)
     await Timer(Decimal(100), units="ps")
 
-    initial_q = dut.Q.value
+    initial_output = dut.O.value
 
     # Disable and try to change
     dut.EN.value = 0
@@ -301,12 +329,17 @@ async def test_lut4c_enable_functionality(dut):
     await RisingEdge(dut.UserCLK)
     await Timer(Decimal(100), units="ps")
 
-    # Q should not have changed
-    assert dut.Q.value == initial_q, f"With EN=0, Q should hold value {initial_q}, got {dut.Q.value}"
+    # O should not have changed when EN=0
+    assert dut.O.value == initial_output, (
+        f"With EN=0, O should hold value {initial_output}, got {dut.O.value}"
+    )
 
     # Re-enable and change
     dut.EN.value = 1
     await RisingEdge(dut.UserCLK)
     await Timer(Decimal(100), units="ps")
 
-    # Now Q should update (exact value depends on LUT configuration)
+    # Now O should update when EN=1 (exact value depends on LUT configuration)
+    updated_output = dut.O.value
+    # Verify that output changed after re-enabling (unless new input happens to give same LUT output)
+    # For comprehensive testing, we expect the output to reflect the new input after enable

@@ -2,8 +2,8 @@
 
 import os
 import shutil
-from collections.abc import Callable
 from pathlib import Path
+from typing import Protocol
 
 import pytest
 from _pytest.logging import LogCaptureFixture
@@ -29,8 +29,25 @@ VHDL_SOURCE_PATH = (
 )
 
 
+class CocotbRunner(Protocol):
+    """Callable Protocol for our cocotb runner fixture.
+
+    The runner is called with keyword-only arguments. Protocol structural typing
+    allows any compatible callable to satisfy this contract.
+    """
+
+    def __call__(
+        self,
+        *,
+        sources: list[Path],
+        hdl_top_level: str,
+        test_module_path: Path,
+    ) -> None:  # pragma: no cover - typing only
+        ...
+
+
 @pytest.fixture
-def cocotb_runner(tmp_path: Path) -> Callable[[list[Path], str, Path], None]:
+def cocotb_runner(tmp_path: Path) -> CocotbRunner:
     """Factory fixture to create cocotb runners for RTL simulation."""
 
     def _create_runner(
@@ -45,17 +62,17 @@ def cocotb_runner(tmp_path: Path) -> Callable[[list[Path], str, Path], None]:
         if hdl_toplevel_lang not in {".v", ".vhdl"}:
             raise ValueError(f"Unsupported HDL language: {hdl_toplevel_lang}")
 
-        if hdl_toplevel_lang == ".v":
-            sim = "icarus"
-        elif hdl_toplevel_lang == ".vhdl":
-            sim = "ghdl"
+        sim = {".v": "icarus", ".vhdl": "ghdl"}[hdl_toplevel_lang]
         runner = get_runner(sim)
 
         timescales = ("1ps", "1ps")
 
-        sources.insert(
-            0, Path(__file__).parent / "testdata" / f"models{hdl_toplevel_lang}"
-        )
+        # Only add testdata models if models_pack.v is not already included
+        models_pack_included = any("models_pack.v" in str(source) for source in sources)
+        if not models_pack_included:
+            sources.insert(
+                0, Path(__file__).parent / "testdata" / f"models{hdl_toplevel_lang}"
+            )
         # Copy test module and models to temp directory for cocotb
         test_dir = tmp_path / "tests"
         test_dir.mkdir(exist_ok=True)
@@ -74,7 +91,6 @@ def cocotb_runner(tmp_path: Path) -> Callable[[list[Path], str, Path], None]:
                 always=True,
                 build_dir=build_dir,
                 defines={"NOTIMESCALE": 1},
-                timescale=timescales,
             )
         elif hdl_toplevel_lang == ".vhdl":
             # GHDL converts identifiers to lowercase for elaboration and execution
@@ -85,7 +101,6 @@ def cocotb_runner(tmp_path: Path) -> Callable[[list[Path], str, Path], None]:
                 always=True,
                 build_dir=build_dir,
                 defines={"NOTIMESCALE": 1},
-                timescale=timescales,
             )
 
             # Copy all files from build_dir to test_dir
@@ -98,7 +113,6 @@ def cocotb_runner(tmp_path: Path) -> Callable[[list[Path], str, Path], None]:
             test_module=test_module_path.stem,
             build_dir=build_dir,
             test_dir=test_dir,
-            timescale=timescales,
         )
 
     return _create_runner

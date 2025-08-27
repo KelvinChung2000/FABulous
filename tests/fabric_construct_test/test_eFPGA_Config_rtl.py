@@ -1,6 +1,5 @@
 """RTL behavior validation for eFPGA_Config module using cocotb."""
 
-from collections.abc import Callable
 from decimal import Decimal
 from pathlib import Path
 from typing import Any, Protocol
@@ -10,32 +9,32 @@ import pytest
 from cocotb.clock import Clock
 from cocotb.triggers import RisingEdge, Timer
 
-from tests.conftest import VERILOG_SOURCE_PATH, VHDL_SOURCE_PATH
+from tests.conftest import VERILOG_SOURCE_PATH, VHDL_SOURCE_PATH, CocotbRunner
 
 
 class eFPGAConfigProtocol(Protocol):
     """Protocol defining the eFPGA_Config module interface."""
 
     # Inputs
-    CLK: Any
-    resetn: Any
+    CLK: Any  # System clock
+    resetn: Any  # Reset (active low)
     Rx: Any  # UART receive
-    s_clk: Any  # BitBang clock
-    s_data: Any  # BitBang data
-    SelfWriteData: Any  # [31:0] CPU interface
-    SelfWriteStrobe: Any  # CPU interface
+    s_clk: Any  # BitBang serial clock
+    s_data: Any  # BitBang serial data
+    SelfWriteData: Any  # [31:0] CPU configuration data write port
+    SelfWriteStrobe: Any  # CPU write strobe
 
     # Outputs
-    ComActive: Any
-    ReceiveLED: Any
-    ConfigWriteData: Any  # [31:0]
-    ConfigWriteStrobe: Any
+    ComActive: Any  # Communication active flag
+    ReceiveLED: Any  # Receive LED indicator
+    ConfigWriteData: Any  # [31:0] Configuration write data
+    ConfigWriteStrobe: Any  # Configuration write strobe
     FrameAddressRegister: Any  # [FrameBitsPerRow-1:0]
-    LongFrameStrobe: Any
-    RowSelect: Any  # [RowSelectWidth-1:0]
+    LongFrameStrobe: Any  # Long frame strobe
+    RowSelect: Any  # [RowSelectWidth-1:0] Row select
 
 
-def test_eFPGA_Config_verilog_rtl(cocotb_runner: Callable[..., None]) -> None:
+def test_eFPGA_Config_verilog_rtl(cocotb_runner: CocotbRunner) -> None:
     """Test the eFPGA_Config module with Verilog source."""
     cocotb_runner(
         sources=[
@@ -49,7 +48,7 @@ def test_eFPGA_Config_verilog_rtl(cocotb_runner: Callable[..., None]) -> None:
     )
 
 
-def test_eFPGA_Config_vhdl_rtl(cocotb_runner: Callable[..., None]) -> None:
+def test_eFPGA_Config_vhdl_rtl(cocotb_runner: CocotbRunner) -> None:
     """Test the eFPGA_Config module with VHDL source."""
     cocotb_runner(
         sources=[
@@ -282,10 +281,14 @@ async def test_efpga_config_frame_strobe_generation(dut: eFPGAConfigProtocol) ->
                     break
                 await RisingEdge(dut.CLK)
 
-            assert strobe_seen, "LongFrameStrobe should be asserted after complete frame"
+            assert strobe_seen, (
+                "LongFrameStrobe should be asserted after complete frame"
+            )
 
 
-async def _send_bitbang_control_word(dut: eFPGAConfigProtocol, control_word: int) -> None:
+async def _send_bitbang_control_word(
+    dut: eFPGAConfigProtocol, control_word: int
+) -> None:
     """Send a 16-bit control word via bitbang interface."""
     for bit_pos in range(15, -1, -1):
         bit_value = (control_word >> bit_pos) & 1

@@ -2,30 +2,56 @@
 
 from decimal import Decimal
 from pathlib import Path
-from typing import Any
+from typing import Any, Protocol
 
 import cocotb
 import pytest
 from cocotb.clock import Clock
 from cocotb.triggers import RisingEdge, Timer
 
-from tests.conftest import VERILOG_SOURCE_PATH, VHDL_SOURCE_PATH
+from tests.conftest import VERILOG_SOURCE_PATH, VHDL_SOURCE_PATH, CocotbRunner
 
 
-def test_IO_verilog_rtl(cocotb_runner: Any) -> None:
+class IOProtocol(Protocol):
+    """Protocol defining the IO_1_bidirectional_frame_config_pass module interface."""
+
+    # Inputs
+    I: Any  # from fabric to external pin  # noqa: E741
+    T: Any  # tristate control
+    O_top: Any  # from external pin to fabric
+    UserCLK: Any  # Clock
+
+    # Outputs
+    O: Any  # from external pin to fabric  # noqa: E741
+    Q: Any  # from external pin to fabric (registered)
+    I_top: Any  # to external pin
+    T_top: Any  # tristate control to external pin
+
+
+def test_IO_verilog_rtl(cocotb_runner: CocotbRunner) -> None:
     """Test the IO_1_bidirectional_frame_config_pass module with Verilog source."""
     cocotb_runner(
-        sources=[VERILOG_SOURCE_PATH / "Tile" / "W_IO" / "IO_1_bidirectional_frame_config_pass.v"],
+        sources=[
+            VERILOG_SOURCE_PATH
+            / "Tile"
+            / "W_IO"
+            / "IO_1_bidirectional_frame_config_pass.v"
+        ],
         hdl_top_level="IO_1_bidirectional_frame_config_pass",
         test_module_path=Path(__file__),
     )
 
 
 @pytest.mark.skip(reason="Need update VHDL source")
-def test_IO_vhdl_rtl(cocotb_runner: Any) -> None:
+def test_IO_vhdl_rtl(cocotb_runner: CocotbRunner) -> None:
     """Test the IO_1_bidirectional_frame_config_pass module with VHDL source."""
     cocotb_runner(
-        sources=[VHDL_SOURCE_PATH / "Tile" / "W_IO" / "IO_1_bidirectional_frame_config_pass.vhdl"],
+        sources=[
+            VHDL_SOURCE_PATH
+            / "Tile"
+            / "W_IO"
+            / "IO_1_bidirectional_frame_config_pass.vhdl"
+        ],
         hdl_top_level="io_1_bidirectional_frame_config_pass",  # GHDL converts to lowercase
         test_module_path=Path(__file__),
     )
@@ -38,7 +64,9 @@ class IOModel:
         """Initialize the IO model."""
         self.q_reg = 0
 
-    def compute_io(self, input_i: int, input_t: int, o_top: int, config_bits: int) -> tuple[int, int, int, int]:
+    def compute_io(
+        self, input_i: int, input_t: int, o_top: int, _config_bits: int
+    ) -> tuple[int, int, int, int]:
         """
         Compute IO functionality.
 
@@ -79,7 +107,7 @@ class IOModel:
         self.q_reg = 0
 
 
-async def setup_dut(dut: Any) -> None:
+async def setup_dut(dut: IOProtocol) -> None:
     """Common setup for all tests."""
     # Start clock
     clock = Clock(dut.UserCLK, 10, "ns")
@@ -97,7 +125,7 @@ async def setup_dut(dut: Any) -> None:
 
 @pytest.mark.skip(reason="Cocotb test - run by simulation, not pytest")
 @cocotb.test
-async def test_io_output_mode(dut: Any) -> None:
+async def test_io_output_mode(dut: IOProtocol) -> None:
     """Test IO in output mode (T=0)."""
     await setup_dut(dut)
 
@@ -131,7 +159,7 @@ async def test_io_output_mode(dut: Any) -> None:
 
 @pytest.mark.skip(reason="Cocotb test - run by simulation, not pytest")
 @cocotb.test
-async def test_io_input_mode(dut: Any) -> None:
+async def test_io_input_mode(dut: IOProtocol) -> None:
     """Test IO in input mode (T=1)."""
     await setup_dut(dut)
 
@@ -146,7 +174,9 @@ async def test_io_input_mode(dut: Any) -> None:
     assert dut.T_top.value.integer == expected_t_top, (
         f"Input mode O_top=0: Expected T_top={expected_t_top}, got {dut.T_top.value.integer}"
     )
-    assert dut.O.value.integer == expected_o, f"Input mode O_top=0: Expected O={expected_o}, got {dut.O.value.integer}"
+    assert dut.O.value.integer == expected_o, (
+        f"Input mode O_top=0: Expected O={expected_o}, got {dut.O.value.integer}"
+    )
 
     # Test Case 2: Input mode with external signal high
     dut.O_top.value = 1  # External drives high
@@ -156,12 +186,14 @@ async def test_io_input_mode(dut: Any) -> None:
     assert dut.T_top.value.integer == expected_t_top, (
         f"Input mode O_top=1: Expected T_top={expected_t_top}, got {dut.T_top.value.integer}"
     )
-    assert dut.O.value.integer == expected_o, f"Input mode O_top=1: Expected O={expected_o}, got {dut.O.value.integer}"
+    assert dut.O.value.integer == expected_o, (
+        f"Input mode O_top=1: Expected O={expected_o}, got {dut.O.value.integer}"
+    )
 
 
 @pytest.mark.skip(reason="Cocotb test - run by simulation, not pytest")
 @cocotb.test
-async def test_io_registered_input(dut: Any) -> None:
+async def test_io_registered_input(dut: IOProtocol) -> None:
     """Test registered input functionality (Q output)."""
     await setup_dut(dut)
 
@@ -173,7 +205,7 @@ async def test_io_registered_input(dut: Any) -> None:
     await Timer(Decimal(100), units="ps")
 
     # Initial Q should be 0 (or previous state)
-    initial_q = dut.Q.value.integer
+    _initial_q = dut.Q.value.integer
 
     # Change external input to 1
     dut.O_top.value = 1
@@ -182,30 +214,36 @@ async def test_io_registered_input(dut: Any) -> None:
     await Timer(Decimal(100), units="ps")
 
     # Q should now reflect the registered input
-    assert dut.Q.value.integer == 1, f"After clock, Q should be 1, got {dut.Q.value.integer}"
+    assert dut.Q.value.integer == 1, (
+        f"After clock, Q should be 1, got {dut.Q.value.integer}"
+    )
 
     # Change input back to 0 but Q should hold until next clock
     dut.O_top.value = 0
     await Timer(Decimal(100), units="ps")
 
     # Q should still be 1 (previous clocked value)
-    assert dut.Q.value.integer == 1, f"Q should hold previous value, got {dut.Q.value.integer}"
+    assert dut.Q.value.integer == 1, (
+        f"Q should hold previous value, got {dut.Q.value.integer}"
+    )
 
     # Clock again to register new value
     model.clock_cycle(0)
     await RisingEdge(dut.UserCLK)
     await Timer(Decimal(100), units="ps")
 
-    assert dut.Q.value.integer == 0, f"After second clock, Q should be 0, got {dut.Q.value.integer}"
+    assert dut.Q.value.integer == 0, (
+        f"After second clock, Q should be 0, got {dut.Q.value.integer}"
+    )
 
 
 @pytest.mark.skip(reason="Cocotb test - run by simulation, not pytest")
 @cocotb.test
-async def test_io_bidirectional_switching(dut: Any) -> None:
+async def test_io_bidirectional_switching(dut: IOProtocol) -> None:
     """Test switching between input and output modes."""
     await setup_dut(dut)
 
-    model = IOModel()
+    # No software model needed in this scenario
 
     # Start in output mode
     dut.T.value = 0
@@ -237,7 +275,7 @@ async def test_io_bidirectional_switching(dut: Any) -> None:
 
 @pytest.mark.skip(reason="Cocotb test - run by simulation, not pytest")
 @cocotb.test
-async def test_io_simultaneous_signals(dut: Any) -> None:
+async def test_io_simultaneous_signals(dut: IOProtocol) -> None:
     """Test behavior with various signal combinations."""
     await setup_dut(dut)
 
@@ -261,7 +299,9 @@ async def test_io_simultaneous_signals(dut: Any) -> None:
         dut.O_top.value = case["O_top"]
         await Timer(Decimal(100), units="ps")
 
-        expected_i_top, expected_t_top, expected_o, _ = model.compute_io(case["I"], case["T"], case["O_top"], 0)
+        expected_i_top, expected_t_top, expected_o, _ = model.compute_io(
+            case["I"], case["T"], case["O_top"], 0
+        )
 
         # Check T_top (direction control)
         assert dut.T_top.value.integer == expected_t_top, (
@@ -269,7 +309,9 @@ async def test_io_simultaneous_signals(dut: Any) -> None:
         )
 
         # Check O (internal input)
-        assert dut.O.value.integer == expected_o, f"{case['desc']}: Expected O={expected_o}, got {dut.O.value.integer}"
+        assert dut.O.value.integer == expected_o, (
+            f"{case['desc']}: Expected O={expected_o}, got {dut.O.value.integer}"
+        )
 
         # In output mode, check I_top
         if case["T"] == 0:
@@ -280,7 +322,7 @@ async def test_io_simultaneous_signals(dut: Any) -> None:
 
 @pytest.mark.skip(reason="Cocotb test - run by simulation, not pytest")
 @cocotb.test
-async def test_io_clock_independence_combinational(dut: Any) -> None:
+async def test_io_clock_independence_combinational(dut: IOProtocol) -> None:
     """Test that combinational paths (I_top, T_top, O) are clock-independent."""
     await setup_dut(dut)
 
@@ -298,8 +340,12 @@ async def test_io_clock_independence_combinational(dut: Any) -> None:
     await Timer(Decimal(50), units="ps")  # Wait less than clock period
 
     # I_top should change immediately (combinational)
-    assert dut.I_top.value.integer != initial_i_top, "I_top should change immediately (combinational path)"
-    assert dut.I_top.value.integer == 1, f"Expected I_top=1, got {dut.I_top.value.integer}"
+    assert dut.I_top.value.integer != initial_i_top, (
+        "I_top should change immediately (combinational path)"
+    )
+    assert dut.I_top.value.integer == 1, (
+        f"Expected I_top=1, got {dut.I_top.value.integer}"
+    )
 
     # Test T control
     dut.T.value = 1  # Switch to input mode

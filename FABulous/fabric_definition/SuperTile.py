@@ -100,7 +100,7 @@ class SuperTile:
                     internalConnections.append((tile.getWestSidePorts(), x, y))
         return internalConnections
 
-    def getExternalTileIONames(self):
+    def getExternalTileIONames(self) -> tuple[dict, list[bool]]:
         ports = {}
         userCLK = []
 

@@ -94,6 +94,9 @@ def test_fabulous_script_nonexistent_file(
     assert exc_info.value.code != 0
 
 
+@pytest.mark.skip(
+    "Skipping test for no project directory as it is passing due to state leaking"
+)
 def test_fabulous_script_with_no_project_dir(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:

@@ -1,6 +1,5 @@
 """Pytest configuration for CLI tests."""
 
-from collections.abc import Generator
 from pathlib import Path
 
 import pytest
@@ -11,7 +10,7 @@ TILE = "LUT4AB"
 
 
 @pytest.fixture
-def project(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Generator[Path]:
+def project(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     """Create a temporary FABulous project directory."""
     project_dir = tmp_path / "test_project"
     monkeypatch.setenv("FAB_PROJ_DIR", str(project_dir))

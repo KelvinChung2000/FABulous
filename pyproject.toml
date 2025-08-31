@@ -61,8 +61,25 @@ dev = [
   "cocotb-test>=0.2.6",
   "pre-commit>=4.2.0",
   "pytest>=8.4.1",
+  "pytest-cov>=6.2.1",
   "pytest-mock>=3.14.1",
   "pytest-split>=0.10.0",
   "ruff>=0.12.7",
   "pyyaml>=6.0.0",
 ]
+
+[tool.coverage.run]
+branch = true
+parallel = true
+source = ["FABulous"]
+
+[tool.coverage.report]
+omit = ["*/__init__.py", "*/__pycache__/*", "tests/*", "demo/*", "docs/*"]
+show_missing = true
+skip_covered = true
+
+[tool.coverage.xml]
+output = "coverage.xml"
+
+[tool.coverage.html]
+directory = "coverage_html"

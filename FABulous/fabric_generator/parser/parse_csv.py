@@ -142,10 +142,12 @@ def parseTilesCSV(fileName: Path) -> tuple[list[Tile], list[tuple[str, str]]]:
             elif temp[0] == "BEL":
                 belFilePath = filePathParent.joinpath(temp[1])
                 bel_prefix = temp[2] if len(temp) > 2 else ""
-                if temp[1].endswith(".vhdl"):
-                    bels.append(parseBelFile(belFilePath, bel_prefix, "vhdl"))
-                elif temp[1].endswith(".v") or temp[1].endswith(".sv"):
-                    bels.append(parseBelFile(belFilePath, bel_prefix, "verilog"))
+                if (
+                    temp[1].endswith(".vhdl")
+                    or temp[1].endswith(".v")
+                    or temp[1].endswith(".sv")
+                ):
+                    bels.append(parseBelFile(belFilePath, bel_prefix))
                 else:
                     raise InvalidFileType(
                         f"File {belFilePath} is not a .vhdl or .v file. Please check the BEL file."
@@ -387,16 +389,7 @@ def parseSupertilesCSV(fileName: Path, tileDic: dict[str, Tile]) -> list[SuperTi
 
             if line[0] == "BEL":
                 belFilePath = filePath.joinpath(line[1])
-                if line[1].endswith(".vhdl"):
-                    bels.append(parseBelFile(belFilePath, line[2], "vhdl"))
-                elif line[1].endswith(".v") or line[1].endswith(".sv"):
-                    bels.append(parseBelFile(belFilePath, line[2], "verilog"))
-                else:
-                    raise InvalidFileType(
-                        f"File {belFilePath} is not a .vhdl or .v file. Please check the BEL file."
-                    )
-                continue
-
+                bels.append(parseBelFile(belFilePath, line[2]))
             for j in line:
                 if j in tileDic:
                     # mark the tile as part of super tile

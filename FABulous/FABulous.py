@@ -399,7 +399,7 @@ def main() -> None:
             app()
 
         for i in sys.argv[1:]:
-            if i in [i.name for i in app.registered_commands] or i == "--help":
+            if i in [i.name for i in app.registered_commands]:
                 app()
                 break
         else:

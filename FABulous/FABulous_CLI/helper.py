@@ -21,7 +21,7 @@ from loguru import logger
 from packaging.version import Version
 
 from FABulous.custom_exception import PipelineCommandError
-from FABulous.FABulous_settings import get_context, init_context
+from FABulous.FABulous_settings import FAB_USER_CONFIG_DIR
 
 if TYPE_CHECKING:
     from loguru import Record
@@ -305,7 +305,6 @@ def install_oss_cad_suite(destination_folder: Path, update: bool = False) -> Non
     system = platform.system().lower()
     machine = platform.machine().lower()
     url = None
-    init_context(None)
 
     # check if oss-cad-suite folder already exists
     ocs_folder = destination_folder / "oss-cad-suite"
@@ -388,7 +387,7 @@ def install_oss_cad_suite(destination_folder: Path, update: bool = False) -> Non
     ocs_archive.unlink()
 
     # Use user config directory for global .env file
-    user_config_dir = get_context().user_config_dir
+    user_config_dir = FAB_USER_CONFIG_DIR
     user_config_dir.mkdir(parents=True, exist_ok=True)
     env_file = user_config_dir / ".env"
     if not env_file.exists():

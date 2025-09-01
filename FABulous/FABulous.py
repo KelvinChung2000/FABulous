@@ -20,10 +20,7 @@ from FABulous.FABulous_CLI.helper import (
     setup_logger,
     update_project_version,
 )
-from FABulous.FABulous_settings import (
-    get_context,
-    init_context,
-)
+from FABulous.FABulous_settings import FAB_USER_CONFIG_DIR, get_context, init_context
 
 APP_NAME = "FABulous"
 
@@ -173,8 +170,8 @@ def create_project_cmd(
 @app.command("install-oss-cad-suite")
 def install_oss_cad_suite_cmd(
     directory: Annotated[
-        Path, typer.Argument(help="Directory to install oss-cad-suite in")
-    ],
+        Path | None, typer.Argument(help="Directory to install oss-cad-suite in")
+    ] = None,
 ) -> None:
     """Install the oss-cad-suite in the specified directory.
 
@@ -182,8 +179,10 @@ def install_oss_cad_suite_cmd(
     If the directory already exists, it will be replaced. This also automatically adds
     the FAB_OSS_CAD_SUITE env var in the global FABulous .env file.
     """
-
-    install_oss_cad_suite(directory)
+    if directory is None:
+        install_oss_cad_suite(FAB_USER_CONFIG_DIR)
+    else:
+        install_oss_cad_suite(directory)
     logger.info(f"oss-cad-suite installed successfully at {directory}")
 
 
@@ -400,7 +399,7 @@ def main() -> None:
             app()
 
         for i in sys.argv[1:]:
-            if i in [i.name for i in app.registered_commands]:
+            if i in [i.name for i in app.registered_commands] or i == "--help":
                 app()
                 break
         else:

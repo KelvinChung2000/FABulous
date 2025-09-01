@@ -1,3 +1,5 @@
+"""Helper functions for FABulous."""
+
 import functools
 import os
 import platform
@@ -5,8 +7,11 @@ import re
 import shutil
 import sys
 import tarfile
+import tempfile
 from collections.abc import Callable, Sequence
+from importlib import resources
 from importlib.metadata import version
+from importlib.resources.abc import Traversable
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Literal
 
@@ -16,6 +21,7 @@ from loguru import logger
 from packaging.version import Version
 
 from FABulous.custom_exception import PipelineCommandError
+from FABulous.FABulous_settings import get_context, init_context
 
 if TYPE_CHECKING:
     from loguru import Record
@@ -26,6 +32,7 @@ MAX_BITBYTES = 16384
 
 
 def setup_logger(verbosity: int, debug: bool, log_file: Path = Path()) -> None:
+    """Setup logger for FABulous."""
     # Remove the default logger to avoid duplicate logs
     logger.remove()
 
@@ -48,7 +55,6 @@ def setup_logger(verbosity: int, debug: bool, log_file: Path = Path()) -> None:
 
         if os.getenv("FABULOUS_TESTING", None):
             final_log = f"{record['level'].name}: {record['message']}\n"
-
         return final_log
 
     # Determine the log level for the sink
@@ -90,6 +96,34 @@ def create_project(
         The language of project to create ("verilog" or "vhdl"), by default "verilog".
     """
     logger.info(project_dir)
+
+    if lang not in ["verilog", "vhdl"]:
+        raise ValueError(f"Unsupported language: {lang}")
+
+    # Copy the project template using importlib.resources
+    try:
+        common_template_ref = (
+            resources.files("FABulous.fabric_files")
+            / "FABulous_project_template_common"
+        )
+        lang_template_ref = (
+            resources.files("FABulous.fabric_files")
+            / f"FABulous_project_template_{lang}"
+        )
+
+        # Check if templates exist
+        if not common_template_ref.is_dir():
+            raise FileNotFoundError("Common template not found in package resources")
+        if not lang_template_ref.is_dir():
+            raise FileNotFoundError(
+                f"Language template ({lang}) not found in package resources"
+            )
+
+    except (ImportError, AttributeError) as e:
+        raise FileNotFoundError(
+            f"Unable to access fabric templates from package: {e}"
+        ) from e
+
     if project_dir.exists():
         logger.error("Project directory already exists!")
         sys.exit(1)
@@ -97,28 +131,28 @@ def create_project(
         project_dir.mkdir(parents=True, exist_ok=True)
         (project_dir / ".FABulous").mkdir(parents=True, exist_ok=True)
 
-    if lang not in ["verilog", "vhdl"]:
-        lang = "verilog"
+    # Copy templates from package resources using shutil.copytree
+    # Use a robust approach that works in all environments
+    def _copy_template_safely(template_ref: Traversable, target_dir: Path) -> None:
+        """Copy template files safely, handling different installation environments."""
+        try:
+            # Try direct copy first (works in development/editable installs)
+            with resources.as_file(template_ref) as template_src:
+                shutil.copytree(template_src, target_dir, dirs_exist_ok=True)
+        except (OSError, PermissionError, shutil.Error) as e:
+            # Fallback: extract to temp directory first (works with wheels, frozen apps)
+            logger.debug(f"Direct copy failed ({e}), using temp directory fallback")
+            with tempfile.TemporaryDirectory() as temp_dir:
+                temp_template = Path(temp_dir) / "template"
+                with resources.as_file(template_ref) as template_src:
+                    shutil.copytree(template_src, temp_template)
+                shutil.copytree(temp_template, target_dir, dirs_exist_ok=True)
 
-    fab_root_env = os.getenv("FAB_ROOT")
-    if fab_root_env is None:
-        logger.error("FAB_ROOT environment variable is not set. Cannot create project.")
-        sys.exit(1)
-    fabulousRoot = Path(fab_root_env)
+    # Copy common template first
+    _copy_template_safely(common_template_ref, project_dir)
 
-    # Copy the project template
-    common_template = fabulousRoot / "fabric_files/FABulous_project_template_common"
-    lang_template = fabulousRoot / f"fabric_files/FABulous_project_template_{lang}"
-    for source in [common_template, lang_template]:
-        for item in source.rglob("*"):
-            dest_item = project_dir / item.relative_to(source)
-            if item.is_dir():
-                dest_item.mkdir(parents=True, exist_ok=True)
-            else:
-                if dest_item.exists():
-                    logger.warning(f"File {dest_item} already exists. Overwriting...")
-                dest_item.parent.mkdir(parents=True, exist_ok=True)
-                shutil.copy2(item, dest_item)
+    # Copy language-specific template (may overwrite some common files)
+    _copy_template_safely(lang_template_ref, project_dir)
 
     # Replace {HDL_SUFFIX} placeholder in all tile csv files
     new_suffix = "v" if lang == "verilog" else "vhdl"
@@ -199,35 +233,6 @@ def make_hex(binfile: Path, outfile: Path) -> None:
                 print("0", file=f)
 
 
-def check_if_application_exists(application: str) -> Path:
-    """Checks if an application is installed on the system.
-
-    Parameters
-    ----------
-    application : str
-        Name of the application to check.
-    throw_exception : bool, optional
-        If True, throws an exception if the application is not installed, by default True
-
-    Returns
-    -------
-    Path
-        Path to  the application, if installed.
-
-    Raises
-    ------
-    Exception
-        If the application is not installed and throw_exception is True.
-    """
-    path = shutil.which(application)
-    if path is not None:
-        return Path(path)
-    error_msg = f"{application} is not installed. Please install it or set FAB_<APPLICATION>_PATH in the .env file."
-    # To satisfy the `-> Path` return type, an exception must be raised if no path is found.
-    # The throw_exception parameter's original intent might need review if non-exception paths were desired.
-    raise FileNotFoundError(error_msg)
-
-
 def wrap_with_except_handling(fun_to_wrap: Callable) -> Callable:
     """Decorator function that wraps 'fun_to_wrap' with exception handling.
 
@@ -300,6 +305,7 @@ def install_oss_cad_suite(destination_folder: Path, update: bool = False) -> Non
     system = platform.system().lower()
     machine = platform.machine().lower()
     url = None
+    init_context(None)
 
     # check if oss-cad-suite folder already exists
     ocs_folder = destination_folder / "oss-cad-suite"
@@ -381,29 +387,13 @@ def install_oss_cad_suite(destination_folder: Path, update: bool = False) -> Non
     logger.info(f"Remove archive {ocs_archive}")
     ocs_archive.unlink()
 
-    fab_root_env = os.getenv("FAB_ROOT")
-    if fab_root_env is None:
-        logger.error(
-            "FAB_ROOT environment variable is not set. Cannot update .env file for OSS CAD Suite."
-        )
-        raise OSError(
-            "FAB_ROOT is not set, cannot determine .env file path for OSS CAD Suite."
-        )
-    env_file = Path(fab_root_env) / ".env"
-    env_cont = ""
-    if env_file.is_file():
-        logger.info(f"Updating FAB_OSS_CAD_SUITE in .env file {env_file}")
-        env_cont = env_file.read_text()
-        env_cont = env_cont.split("\n")
-        for line in env_cont:
-            if "FAB_OSS_CAD_SUITE" in line:
-                env_cont.remove(line)
-        env_cont.append(f"FAB_OSS_CAD_SUITE={ocs_folder.absolute()}")
-    else:
-        logger.info(f"Creating .env file {env_file}")
-        env_cont = [f"FAB_OSS_CAD_SUITE={ocs_folder.absolute()}"]
-
-    env_file.write_text("\n".join(env_cont))
+    # Use user config directory for global .env file
+    user_config_dir = get_context().user_config_dir
+    user_config_dir.mkdir(parents=True, exist_ok=True)
+    env_file = user_config_dir / ".env"
+    if not env_file.exists():
+        env_file.touch()
+    set_key(env_file, "FAB_OSS_CAD_SUITE", str(ocs_folder.absolute()))
 
     # export oss-cad-suite to PATH
     os.environ["PATH"] += os.pathsep + str(ocs_folder / "bin")
@@ -435,9 +425,11 @@ def update_project_version(project_dir: Path) -> bool:
 class CommandPipeline:
     """Helper class to manage command execution with error handling."""
 
-    def __init__(self, cli_instance: "FABulous_CLI") -> None:
+    def __init__(self, cli_instance: "FABulous_CLI", force: bool = False) -> None:
         self.cli = cli_instance
         self.steps = []
+        self.force = force
+        self.final_exit_code = 0
 
     def add_step(
         self, command: str, error_message: str = "Command failed"
@@ -447,10 +439,28 @@ class CommandPipeline:
         return self
 
     def execute(self) -> bool:
-        """Execute all steps in the pipeline."""
+        """Execute all steps in the pipeline.
+
+        Returns:
+            bool: True if all commands succeeded, False if any failed.
+
+        Raises:
+            PipelineCommandError: If any command fails and force=False.
+        """
 
         for command, error_message in self.steps:
             self.cli.onecmd_plus_hooks(command)
             if self.cli.exit_code != 0:
-                raise PipelineCommandError(error_message)
-        return True
+                self.final_exit_code = self.cli.exit_code
+                logger.error(
+                    f"Command '{command}' execution failed with exit code {self.cli.exit_code}"
+                )
+
+                if not self.force:
+                    raise PipelineCommandError(error_message)
+
+        return self.final_exit_code == 0
+
+    def get_exit_code(self) -> int:
+        """Get the final exit code from pipeline execution."""
+        return self.final_exit_code

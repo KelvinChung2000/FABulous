@@ -120,7 +120,9 @@ def test_run_FABulous_bitstream(
 
 
 def test_run_simulation(
-    cli: FABulous_CLI, caplog: pytest.LogCaptureFixture, mocker: MockerFixture
+    cli: FABulous_CLI,
+    caplog: pytest.LogCaptureFixture,
+    mocker: MockerFixture,
 ) -> None:
     """Test running simulation"""
 

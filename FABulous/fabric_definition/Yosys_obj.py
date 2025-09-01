@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import Literal
 
 from FABulous.custom_exception import InvalidFileType
-from FABulous.FABulous_settings import FABulousSettings
+from FABulous.FABulous_settings import get_context
 
 """
 Type alias for Yosys bit vectors containing integers or logic values.
@@ -254,8 +254,8 @@ class YosysJson:
             )
 
         self.srcPath = path
-        yosys = FABulousSettings().yosys_path
-        ghdl = FABulousSettings().ghdl_path
+        yosys = get_context().yosys_path
+        ghdl = get_context().ghdl_path
         json_file = self.srcPath.with_suffix(".json")
 
         # FIXME: a fake file to ensure things working with 1.3
@@ -263,7 +263,6 @@ class YosysJson:
         temp = temp / "my_package.vhd"
         temp.touch()
         temp.write_text("package my_package is\nend package;\n")
-
         if self.srcPath.suffix in {".vhd", ".vhdl"}:
             runCmd = [
                 f"{ghdl!s}",
@@ -271,7 +270,7 @@ class YosysJson:
                 "--std=08",
                 "--out=verilog",
                 str(temp),
-                f"{FABulousSettings().model_pack!s}",
+                f"{get_context().model_pack!s}",
                 f"{self.srcPath}",
                 "-e",
                 f"{self.srcPath.stem}",

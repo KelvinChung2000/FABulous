@@ -1,5 +1,6 @@
 """Global pytest configuration and fixtures for all FABulous tests."""
 
+import os
 from collections.abc import Generator
 from pathlib import Path
 
@@ -9,6 +10,7 @@ from loguru import logger
 
 from FABulous.FABulous_CLI.FABulous_CLI import FABulous_CLI
 from FABulous.FABulous_CLI.helper import create_project, setup_logger
+from FABulous.FABulous_settings import reset_context
 
 
 def normalize(block: str) -> list[str]:
@@ -39,6 +41,9 @@ def fabulous_test_environment(monkeypatch: pytest.MonkeyPatch) -> None:
     """Setup global test environment for FABulous tests."""
     fabulous_root = str(Path(__file__).resolve().parent.parent / "FABulous")
 
+    for i in os.environ:
+        monkeypatch.delenv(i[0], raising=False)
+
     # Set test environment using monkeypatch for automatic cleanup
     monkeypatch.setenv("FAB_ROOT", fabulous_root)
     monkeypatch.setenv("FABULOUS_TESTING", "TRUE")
@@ -53,7 +58,13 @@ def cli(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> FABulous_CLI:
     project_dir = tmp_path / "test_project"
     monkeypatch.setenv("FAB_PROJ_DIR", str(project_dir))
     create_project(project_dir)
-    cli = FABulous_CLI(writerType="verilog", projectDir=project_dir, enteringDir=tmp_path)
+    cli = FABulous_CLI(
+        "verilog",
+        force=False,
+        interactive=False,
+        verbose=False,
+        debug=True,
+    )
     cli.debug = True
     run_cmd(cli, "load_fabric")
     return cli
@@ -81,3 +92,13 @@ def caplog(caplog: LogCaptureFixture) -> LogCaptureFixture:
     )
     return caplog
     # No need to remove specific handler - cleanup_logger removes all handlers
+
+
+@pytest.fixture
+def project(tmp_path: Path) -> Generator[Path]:
+    project_dir = tmp_path / "test_project"
+    create_project(project_dir)
+    yield project_dir
+
+    # Cleanup
+    reset_context()  # Reset context after each test to avoid state leakage

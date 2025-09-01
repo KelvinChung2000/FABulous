@@ -16,7 +16,6 @@
 
 import argparse
 import csv
-import os
 import pickle
 import pprint
 import subprocess as sp
@@ -53,14 +52,13 @@ from FABulous.FABulous_CLI import cmd_synthesis
 from FABulous.FABulous_CLI.helper import (
     CommandPipeline,
     allow_blank,
-    check_if_application_exists,
     copy_verilog_files,
     install_oss_cad_suite,
     make_hex,
     remove_dir,
     wrap_with_except_handling,
 )
-from FABulous.FABulous_settings import FABulousSettings
+from FABulous.FABulous_settings import get_context, init_context
 
 META_DATA_DIR = ".FABulous"
 
@@ -112,7 +110,6 @@ class FABulous_CLI(Cmd):
     prompt: str = "FABulous> "
     fabulousAPI: FABulous_API
     projectDir: Path
-    enteringDir: Path
     top: str
     allTile: list[str]
     csvFile: Path
@@ -124,15 +121,14 @@ class FABulous_CLI(Cmd):
     def __init__(
         self,
         writerType: str | None,
-        projectDir: Path,
-        enteringDir: Path,
         force: bool = False,
         interactive: bool = False,
+        verbose: bool = False,
+        debug: bool = False,
     ) -> None:
         """Initialises the FABulous shell instance.
 
-        Determines file extension based on the type of writer used in 'fab'
-        and sets fabricLoaded to true if 'fab' has 'fabric' attribute.
+        This sets up the necessary context and initialises the FABulous API.
 
         Parameters
         ----------
@@ -143,11 +139,15 @@ class FABulous_CLI(Cmd):
         script : str, optional
             Path to optional Tcl script to be executed, by default ""
         """
+        try:
+            get_context()
+        except RuntimeError:
+            init_context()
+
         super().__init__(
-            persistent_history_file=f"{FABulousSettings().proj_dir}/{META_DATA_DIR}/.fabulous_history",
+            persistent_history_file=f"{get_context().proj_dir}/{META_DATA_DIR}/.fabulous_history",
             allow_cli_args=False,
         )
-        self.enteringDir = enteringDir
 
         if writerType == "verilog":
             self.fabulousAPI = FABulous_API(VerilogCodeGenerator())
@@ -159,27 +159,28 @@ class FABulous_CLI(Cmd):
             )
             sys.exit(1)
 
-        self.projectDir = projectDir.absolute()
+        self.projectDir = get_context().proj_dir
         self.add_settable(
             Settable("projectDir", Path, "The directory of the project", self)
         )
 
         self.tiles = []
         self.superTiles = []
-        self.csvFile = Path(projectDir / "fabric.csv")
+        self.csvFile = Path(self.projectDir / "fabric.csv").resolve()
         self.add_settable(
             Settable(
                 "csvFile", Path, "The fabric file ", self, completer=Cmd.path_complete
             )
         )
 
-        self.verbose = False
+        self.verbose = verbose
         self.add_settable(Settable("verbose", bool, "verbose output", self))
 
         self.force = force
         self.add_settable(Settable("force", bool, "force execution", self))
 
         self.interactive = interactive
+        self.debug = debug
 
         if isinstance(self.fabulousAPI.writer, VHDLCodeGenerator):
             self.extension = "vhdl"
@@ -238,7 +239,6 @@ class FABulous_CLI(Cmd):
     def do_exit(self, *_ignored: str) -> bool:
         """Exits the FABulous shell and logs info message."""
         logger.info("Exiting FABulous shell")
-        os.chdir(self.enteringDir)
         return True
 
     do_quit = do_exit
@@ -319,7 +319,7 @@ class FABulous_CLI(Cmd):
         Sets the the FAB_OSS_CAD_SUITE environment variable in the .env file.
         """
         if args.destination_folder == "":
-            dest_dir = FABulousSettings().root
+            dest_dir = get_context().root
         else:
             dest_dir = args.destination_folder
 
@@ -348,7 +348,7 @@ class FABulous_CLI(Cmd):
                 self.fabulousAPI.loadFabric(self.csvFile)
             else:
                 raise FileNotFoundError(
-                    "No argument is given and the csv file is set but the file does not exist"
+                    f"No argument is given and the csv file is set at {self.csvFile} but the file does not exist"
                 )
         else:
             self.fabulousAPI.loadFabric(args.file)
@@ -567,7 +567,7 @@ class FABulous_CLI(Cmd):
         If no installation can be found, a warning is produced.
         """
         logger.info("Checking for FABulator installation")
-        fabulatorRoot = FABulousSettings().fabulator_root
+        fabulatorRoot = get_context().fabulator_root
 
         if fabulatorRoot is None:
             logger.warning("FABULATOR_ROOT environment variable not set.")
@@ -727,7 +727,7 @@ class FABulous_CLI(Cmd):
 
         if Path(f"{self.projectDir}/{parent}").exists():
             # TODO rewriting the fab_arch script so no need to copy file for work around
-            npnr = FABulousSettings().nextpnr_path
+            npnr = get_context().nextpnr_path
             if f"{json_file}" in [
                 str(i.name) for i in Path(f"{self.projectDir}/{parent}").iterdir()
             ]:
@@ -881,9 +881,7 @@ class FABulous_CLI(Cmd):
         copy_verilog_files(self.projectDir / "Fabric", fabricFilesDir)
         file_list = [str(i) for i in fabricFilesDir.glob("*.v")]
 
-        iverilog = check_if_application_exists(
-            os.getenv("FAB_IVERILOG_PATH", "iverilog")
-        )
+        iverilog = get_context().iverilog_path
         runCmd = [
             f"{iverilog}",
             "-D",
@@ -911,7 +909,7 @@ class FABulous_CLI(Cmd):
         if self.verbose or self.debug:
             logger.info(f"Make hex file {bitstreamHexPath}")
         make_hex(bitstreamPath, bitstreamHexPath)
-        vvp = FABulousSettings().vvp_path
+        vvp = get_context().vvp_path
 
         # $plusargs is used to pass the bitstream hex and waveform path to the testbench
         vvpArgs = [
@@ -1014,6 +1012,8 @@ class FABulous_CLI(Cmd):
 
         with Path(args.file).open() as f:
             for i in f:
+                if i.startswith("#"):
+                    continue
                 self.onecmd_plus_hooks(i.strip())
                 if self.exit_code != 0:
                     if not self.force:

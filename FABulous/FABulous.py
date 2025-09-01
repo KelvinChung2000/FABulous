@@ -1,51 +1,424 @@
-import argparse
 import os
+import sys
+from dataclasses import dataclass
 from importlib.metadata import version
 from pathlib import Path
+from typing import Annotated, Literal, cast
 
+import click
+import typer
 from loguru import logger
 from packaging.version import Version
 
+from FABulous.custom_exception import PipelineCommandError
+from FABulous.fabric_definition.define import HDLType
+from FABulous.FABulous_CLI import FABulous_CLI
 from FABulous.FABulous_CLI.helper import (
+    CommandPipeline,
     create_project,
     install_oss_cad_suite,
     setup_logger,
     update_project_version,
 )
-from FABulous.FABulous_settings import setup_global_env_vars, setup_project_env_vars
+from FABulous.FABulous_settings import (
+    get_context,
+    init_context,
+)
+
+APP_NAME = "FABulous"
+
+app = typer.Typer(
+    rich_markup_mode="rich",
+    help="[bold blue]FABulous FPGA Fabric Generator[/bold blue]\n\nA command line interface for FABulous FPGA fabric generation and management.",
+    no_args_is_help=True,
+)
+
+
+@dataclass
+class SharedContext:
+    """Context object to hold shared CLI options."""
+
+    verbose: int = 0
+    debug: bool = False
+    log_file: Path | None = None
+    global_dot_env: Path | None = None
+    project_dot_env: Path | None = None
+    force: bool = False
+    writer: str = "verilog"
+
+
+shared_state = SharedContext()
+
+
+def version_callback(value: bool) -> None:
+    """Print version information and exit."""
+    if value:
+        package_version = Version(version("FABulous-FPGA"))
+        typer.echo(f"FABulous CLI {package_version.base_version}")
+        raise typer.Exit
+
+
+def validate_project_directory(value: str) -> Path | None:
+    """Validate the project directory."""
+    if not (Path(value) / ".FABulous").exists():
+        raise ValueError(f"{value} is not a valid FABulous project")
+    return Path(value)
+
+
+ProjectDirType = Annotated[
+    Path | None,
+    typer.Argument(
+        help="Directory path to project folder",
+        parser=validate_project_directory,
+        resolve_path=True,
+        exists=True,
+    ),
+]
+
+
+@app.callback()
+def common_options(
+    _version: Annotated[
+        bool | None,
+        typer.Option(
+            "--version",
+            help="Show version information",
+            callback=version_callback,
+            is_eager=True,
+        ),
+    ] = None,
+    verbose: Annotated[
+        int,
+        typer.Option(
+            "--verbose", "-v", count=True, help="Show detailed log information"
+        ),
+    ] = 0,
+    debug: Annotated[bool, typer.Option("--debug", help="Enable debug mode")] = False,
+    log_file: Annotated[
+        Path | None, typer.Option("--log", help="Log all output to file")
+    ] = None,
+    global_dot_env: Annotated[
+        Path | None,
+        typer.Option("--global-dot-env", "-gde", help="Set global .env file path"),
+    ] = None,
+    project_dot_env: Annotated[
+        Path | None,
+        typer.Option("--project-dot-env", "-pde", help="Set project .env file path"),
+    ] = None,
+    force: Annotated[
+        bool,
+        typer.Option("--force", "-f", help="Force command execution and ignore errors"),
+    ] = False,
+    writer: Annotated[
+        HDLType,
+        typer.Option(
+            "--writer",
+            "-w",
+            help="Set type of HDL code generated. System Verilog is not supported yet.",
+            case_sensitive=False,
+        ),
+    ] = HDLType.VERILOG,
+) -> None:
+    """Common options for all FABulous commands."""
+
+    shared_state.verbose = verbose
+    shared_state.debug = debug
+    shared_state.log_file = log_file
+    shared_state.global_dot_env = global_dot_env
+    shared_state.project_dot_env = project_dot_env
+    shared_state.force = force
+    shared_state.writer = writer
+    setup_logger(
+        shared_state.verbose,
+        shared_state.debug,
+        log_file=shared_state.log_file or Path(),
+    )
+
+
+def check_version_compatibility(_: Path) -> None:
+    """Check version compatibility between package and project."""
+    settings = get_context()
+    project_version = settings.proj_version
+    package_version = Version(version("FABulous-FPGA"))
+
+    if package_version.release < project_version.release:
+        logger.error(
+            f"Version incompatible! FABulous-FPGA version: {package_version}, Project version: {project_version}\n"
+            r'Please run "FABulous <project_dir> --update-project-version" to update the project version.'
+        )
+        raise typer.Exit(1) from None
+
+    if project_version.major != package_version.major:
+        logger.error(
+            f"Major version mismatch! FABulous-FPGA major version: {package_version.major}, Project major version: {project_version.major}\n"
+            "This may lead to compatibility issues. Please ensure the project is compatible with the current FABulous-FPGA version."
+        )
+
+
+@app.command("create-project")
+@app.command("c", hidden=True)
+def create_project_cmd(
+    project_dir: Annotated[
+        Path, typer.Argument(help="Directory to create a project")
+    ] = Path(),
+) -> None:
+    """Create a new FABulous project.
+
+    Alias: c
+    """
+    create_project(project_dir, cast("Literal['verilog', 'vhdl']", shared_state.writer))
+    logger.info(f"FABulous project created successfully at {project_dir}")
+
+
+@app.command("install-oss-cad-suite")
+def install_oss_cad_suite_cmd(
+    directory: Annotated[
+        Path, typer.Argument(help="Directory to install oss-cad-suite in")
+    ],
+) -> None:
+    """Install the oss-cad-suite in the specified directory.
+
+    This will create a new directory called oss-cad-suite and install the suite there.
+    If the directory already exists, it will be replaced. This also automatically adds
+    the FAB_OSS_CAD_SUITE env var in the global FABulous .env file.
+    """
+
+    install_oss_cad_suite(directory)
+    logger.info(f"oss-cad-suite installed successfully at {directory}")
+
+
+@app.command("update-project-version")
+def update_project_version_cmd(
+    project_dir: ProjectDirType = Path(),
+) -> None:
+    """Update project version to match package version."""
+
+    logger.info(f"Using {project_dir} directory as project directory")
+    if not update_project_version(project_dir):
+        logger.error(
+            "Failed to update project version. Please check the logs for more details."
+        )
+        raise typer.Exit(1)
+    logger.info("Project version updated successfully")
+
+
+@app.command("script")
+def script_cmd(
+    project_dir: ProjectDirType = None,
+    script_file: Annotated[
+        Path, typer.Argument(help="Script file to execute", resolve_path=True)
+    ] = Path(),
+    script_type: Annotated[
+        str,
+        typer.Option(
+            "--type",
+            "-t",
+            help="Override script type detection",
+            click_type=click.Choice(["fabulous", "tcl"]),
+        ),
+    ] = "tcl",
+) -> None:
+    """Execute a script file with auto-detection of script type.
+
+    Automatically detects whether the script is a FABulous (.fab, .fs) or TCL (.tcl)
+    script based on file extension and content. You can override the detection with
+    --type.
+
+    If no project directory is specified, uses the current directory.
+    """
+
+    # Initialize context
+    entering_dir = Path.cwd()
+    settings = init_context(
+        project_dir=project_dir,
+        global_dot_env=shared_state.global_dot_env,
+        project_dot_env=shared_state.project_dot_env,
+    )
+    script_file = script_file.absolute()
+    if project_dir is not None:
+        os.chdir(project_dir)
+    fab_CLI = FABulous_CLI(
+        settings.proj_lang,
+        force=shared_state.force,
+    )
+    fab_CLI.debug = shared_state.debug
+    # Change to project directory
+
+    # Try to load fabric, but don't fail if it's not a valid FABulous project
+    fab_CLI.onecmd_plus_hooks("load_fabric")
+
+    # Check if script file exists before trying to execute
+    if not script_file.exists():
+        logger.error(f"Script file {script_file} does not exist")
+        os.chdir(entering_dir)
+        raise typer.Exit(1)
+
+    # Execute the script based on type
+    if (
+        script_file.suffix.lower() in [".fab", ".fs"] and script_type is None
+    ) or script_type == "fabulous":
+        fab_CLI.onecmd_plus_hooks(f"run_script {script_file.absolute()}")
+        if fab_CLI.exit_code:
+            logger.error(
+                f"FABulous script {script_file} execution failed with exit code {fab_CLI.exit_code}"
+            )
+            os.chdir(entering_dir)
+            raise typer.Exit(fab_CLI.exit_code)
+        logger.info(f"FABulous script {script_file} executed successfully")
+    elif (
+        script_file.suffix.lower() == ".tcl" and script_type is None
+    ) or script_type == "tcl":
+        fab_CLI.onecmd_plus_hooks(f"run_tcl {script_file.absolute()}")
+        if fab_CLI.exit_code:
+            logger.error(
+                f"TCL script {script_file} execution failed with exit code {fab_CLI.exit_code}"
+            )
+            os.chdir(entering_dir)
+            raise typer.Exit(fab_CLI.exit_code)
+        logger.info(f"TCL script {script_file} executed successfully")
+    else:
+        os.chdir(entering_dir)
+        logger.error(f"Unknown script type: {script_type}")
+        raise typer.Exit(1)
+
+
+@app.command("start")
+@app.command("s", hidden=True)
+def start_cmd(project_dir: ProjectDirType = None) -> None:
+    """Start FABulous in interactive mode. Alias: s.
+
+    This is the main command for running FABulous in interactive mode or with scripts.
+    If no project directory is specified, uses the current directory.
+    """
+    # Initialize the global context with settings
+    settings = init_context(
+        project_dir=project_dir,
+        global_dot_env=shared_state.global_dot_env,
+        project_dot_env=shared_state.project_dot_env,
+    )
+    entering_dir = Path.cwd()
+    fab_CLI = FABulous_CLI(
+        settings.proj_lang,
+        force=shared_state.force,
+        interactive=True,
+        verbose=shared_state.verbose >= 2,
+        debug=shared_state.debug,
+    )
+    fab_CLI.debug = shared_state.debug
+
+    # Change to project directory
+    if settings.proj_dir is not None:
+        os.chdir(settings.proj_dir)
+    fab_CLI.onecmd_plus_hooks("load_fabric")
+    fab_CLI.cmdloop()
+    os.chdir(entering_dir)
+
+
+@app.command("run")
+@app.command("r", hidden=True)
+def run_cmd(
+    project_dir: ProjectDirType = None,
+    commands: Annotated[
+        list[str] | None,
+        typer.Argument(
+            help="Commands to execute (separated by semicolon + whitespace: 'cmd1; cmd2')",
+            parser=lambda cmds: [
+                cmd.strip() for cmd in cmds.split("; ") if cmd.strip()
+            ],
+        ),
+    ] = None,
+) -> None:
+    """Run commands directly in a FABulous project.
+
+    Alias: r
+    """
+
+    settings = init_context(
+        project_dir=project_dir,
+        global_dot_env=shared_state.global_dot_env,
+        project_dot_env=shared_state.project_dot_env,
+    )
+
+    entering_dir = Path.cwd()
+
+    fab_CLI = FABulous_CLI(
+        settings.proj_lang,
+        force=shared_state.force,
+        interactive=True,
+        verbose=shared_state.verbose >= 2,
+        debug=shared_state.debug,
+    )
+    fab_CLI.debug = shared_state.debug
+
+    # Change to project directory
+    logger.info(f"Setting current working directory to: {settings.proj_dir}")
+    if settings.proj_dir is not None:
+        os.chdir(settings.proj_dir)
+    fab_CLI.onecmd_plus_hooks("load_fabric")
+
+    # Ensure commands is a list
+    if isinstance(commands, str):
+        commands = [commands]
+    if commands is None:
+        return
+
+    # Create and execute command pipeline
+    pipeline = CommandPipeline(fab_CLI, force=shared_state.force)
+
+    # Add all commands to pipeline
+    for cmd in commands:
+        pipeline.add_step(cmd, f"Command '{cmd}' execution failed")
+
+    try:
+        # Execute pipeline
+        success = pipeline.execute()
+
+        if success:
+            logger.info(f'Commands "{"; ".join(commands)}" executed successfully')
+        else:
+            logger.error(
+                f"Commands completed with errors (exit code {pipeline.get_exit_code()})"
+            )
+
+    except PipelineCommandError:
+        # Handle any pipeline errors that weren't caught by force flag
+        # Don't log additional error message as CommandPipeline already logged it
+        os.chdir(entering_dir)
+        raise typer.Exit(1) from None
+
+    os.chdir(entering_dir)
+
+    # Always report the final exit code, even with --force
+    final_exit_code = pipeline.get_exit_code()
+    if final_exit_code != 0:
+        raise typer.Exit(final_exit_code)
 
 
 def main() -> None:
-    """Main function to start the command line interface of FABulous, sets up argument
-    parsing, initialises required components and handles start the FABulous CLI.
+    try:
+        if len(sys.argv) == 1:
+            app()
 
-    Also logs terminal output and if .FABulous folder is missing.
+        for i in sys.argv[1:]:
+            if i in [i.name for i in app.registered_commands]:
+                app()
+                break
+        else:
+            convert_legacy_args_with_deprecation_warning()
+    except typer.Exit as e:
+        sys.exit(e.exit_code)
+    except Exception as e:  # noqa: BLE001 General overall capture
+        logger.error(f"Unexpected error: {e}")
+        sys.exit(1)
 
-    Command line arguments
-    ----------------------
-    project_dir : str
-        Directory path to project folder.
-    -c, --createProject :  bool
-        Flag to create new project.
-    -fs, --FABulousScript: str, optional
-        Run FABulous with a FABulous script.
-    -ts, --TCLscript: str, optional
-        Run FABulous with a TCL script.
-    -log : str, optional
-        Log all the output from the terminal.
-    -w, --writer : <'verilog', 'vhdl'>, optional
-        Set type of HDL code generated. Currently supports .V and .VHDL (Default .V)
-    -md, --metaDataDir : str, optional
-        Set output directory for metadata files, e.g. pip.txt, bel.txt
-    -v, --verbose : bool, optional
-        Show detailed log information including function and line number.
-    -gde, --globalDotEnv : str, optional
-        Set global .env file path. Default is $FAB_ROOT/.env
-    -pde, --projectDotEnv : str, optional
-        Set project .env file path. Default is $FAB_PROJ_DIR/.env
-    -iocd, --install_oss_cad_suite : str, optional
-        Install the oss-cad-suite in the project directory.
-    """
+
+def convert_legacy_args_with_deprecation_warning() -> None:
+    """Convert legacy argparse arguments to new Typer commands with deprecation
+    warning."""
+    import argparse
+    import sys
+    from pathlib import Path
+
     parser = argparse.ArgumentParser(
         description="The command line interface for FABulous"
     )
@@ -87,7 +460,6 @@ def main() -> None:
         default=None,
         help="Run FABulous with a FABulous script. A FABulous script is a text file containing only FABulous commands"
         "This will automatically exit the CLI once the command finish execution, and the exit will always happen gracefully.",
-        nargs=1,
         type=Path,
     )
 
@@ -97,14 +469,13 @@ def main() -> None:
         default=None,
         help="Run FABulous with a TCL script. A TCL script is a text file containing a mix of TCL commands and FABulous commands."
         "This will automatically exit the CLI once the command finish execution, and the exit will always happen gracefully.",
-        nargs=1,
         type=Path,
     )
 
     script_group.add_argument(
         "-p",
         "--commands",
-        nargs=1,
+        type=str,
         help="execute <commands> (to chain commands, separate them with semicolon + whitespace: 'cmd1; cmd2')",
     )
 
@@ -120,8 +491,9 @@ def main() -> None:
     parser.add_argument(
         "-w",
         "--writer",
-        choices=["verilog", "vhdl"],
+        choices=list(HDLType),
         help="Set the type of HDL code generated by the tool. Currently support Verilog and VHDL (Default using Verilog)",
+        default=HDLType.VERILOG,
     )
 
     parser.add_argument(
@@ -144,15 +516,15 @@ def main() -> None:
     parser.add_argument(
         "-gde",
         "--globalDotEnv",
-        nargs=1,
-        help="Set the global .env file path. Default is $FAB_ROOT/.env",
+        help="Set the global .env file path. Default is ~/.config/FABulous/.env",
+        type=Path,
     )
 
     parser.add_argument(
         "-pde",
         "--projectDotEnv",
-        nargs=1,
         help="Set the project .env file path. Default is $FAB_PROJ_DIR/.env",
+        type=Path,
     )
 
     parser.add_argument(
@@ -177,124 +549,104 @@ def main() -> None:
 
     args = parser.parse_args()
 
+    common_options(
+        verbose=args.verbose,
+        debug=args.debug,
+        log_file=args.log,
+        global_dot_env=args.globalDotEnv,
+        project_dot_env=args.projectDotEnv,
+        force=args.force,
+        writer=args.writer if args.writer is not None else HDLType.VERILOG,
+    )
+
     setup_logger(args.verbose, args.debug, log_file=args.log)
 
-    # Start with default value
-    projectDir = Path().cwd()
+    # Show deprecation warning
+    logger.warning(
+        "You are using deprecated argparse-style arguments. "
+        "Please migrate to the new typer-based commands:\n"
+        r"  FABulous --createProject \<dir> → FABulous create-project \<dir>"
+        "\n"
+        r"  FABulous --install_oss_cad_suite → FABulous install-oss-cad-suite \<dir>"
+        "\n"
+        r"  FABulous \<project_dir> --commands \<cmd> → FABulous run \<project_dir> \<cmd>"
+        "\n"
+        r"  FABulous \<project_dir>  → FABulous start \<project_dir>"
+        "\n"
+        r"  FABulous \<project_dir> --debug  → FABulous --debug start \<project_dir>"
+        "\n"
+        "  See 'FABulous --help' for more information."
+    )
 
-    # Setup global and project env vars to load .env files
-    setup_global_env_vars(args)
-    setup_project_env_vars(args)
-
-    projectDir = Path(os.getenv("FAB_PROJ_DIR"))
-
-    # Finally, user provided argument takes highest priority
-    if args.project_dir:
-        projectDir = Path(args.project_dir).absolute().resolve()
+    project_dir = Path(args.project_dir).resolve().absolute()
 
     if args.createProject:
-        create_project(projectDir, args.writer)
-        exit(0)
+        # Convert to: FABulous create-project <project_dir>
+        if not args.project_dir:
+            logger.error("Project directory is required when creating a project")
+            raise typer.Exit(2) from None
+        create_project_cmd(project_dir)
 
-    if args.install_oss_cad_suite:
-        install_oss_cad_suite(projectDir, True)
-        exit(0)
-
-    if not (projectDir / ".FABulous").exists():
-        logger.error(
-            "The directory provided is not a FABulous project as it does not have a .FABulous folder"
-        )
-        exit(1)
-
-    if not projectDir.exists():
-        logger.error(f"The directory provided does not exist: {projectDir}")
-        exit(1)
-
-    if args.update_project_version and not update_project_version(projectDir):
-        logger.error(
-            "Failed to update project version. Please check the logs for more details."
-        )
-        exit(1)
-
-    # init the settings right before we start the CLI
-    from FABulous.FABulous_settings import FABulousSettings
-
-    project_version = FABulousSettings().proj_version
-    package_version = Version(version("FABulous-FPGA"))
-    if package_version.release < project_version.release:
-        logger.error(
-            f"Version incompatible! FABulous-FPGA version: {package_version}, Project version: {project_version}\n"
-            r'Please run "FABulous \<project_dir\> --update-project-version" to update the project version.'
-        )
-        exit(1)
-    if project_version.major != package_version.major:
-        logger.error(
-            f"Major version mismatch! FABulous-FPGA major version: {package_version.major}, Project major version: {project_version.major}\n"
-            "This may lead to compatibility issues. Please ensure the project is compatible with the current FABulous-FPGA version."
-        )
-
-    from FABulous.FABulous_CLI.FABulous_CLI import FABulous_CLI
-
-    fab_CLI = FABulous_CLI(
-        FABulousSettings().proj_lang,
-        projectDir,
-        Path().cwd(),
-        force=args.force,
-    )
-    fab_CLI.debug = args.debug
-    fabScript: None | Path = None
-    tclScript: None | Path = None
-    if args.FABulousScript:
-        fabScript = args.FABulousScript[0].absolute()
-    if args.TCLScript:
-        tclScript = args.TCLScript[0].absolute()
-
-    logger.info(f"Setting current working directory to: {projectDir}")
-    os.chdir(projectDir)
-    fab_CLI.onecmd_plus_hooks("load_fabric")
-
-    if commands := args.commands:
-        commands = [i for i in commands[0].split("; ") if i.strip()]
-        for c in commands:
-            fab_CLI.onecmd_plus_hooks(c)
-            if fab_CLI.exit_code and not args.force:
-                logger.error(
-                    f"Command '{c}' execution failed with exit code {fab_CLI.exit_code}"
-                )
-                exit(fab_CLI.exit_code)
-        else:
-            logger.info(
-                f'Commands "{"; ".join(i.strip() for i in commands)}" executed successfully'
+    elif args.install_oss_cad_suite:
+        # Convert to: FABulous install-oss-cad-suite <directory> [options]
+        install_oss_cad_suite_cmd(project_dir)
+    elif args.update_project_version:
+        update_project_version_cmd(project_dir)
+    elif args.FABulousScript:
+        # Convert legacy --FABulousScript to new typer script command
+        # Use the new Typer script command internally
+        # Pass None when no project directory provided to trigger dotenv resolution
+        try:
+            script_cmd(
+                project_dir=Path(args.project_dir) if args.project_dir else None,
+                script_file=args.FABulousScript,
+                script_type="fabulous",
             )
-            exit(fab_CLI.exit_code)
-
-    elif fabScript is not None:
-        fab_CLI.onecmd_plus_hooks(f"run_script {fabScript}")
-        if fab_CLI.exit_code:
-            logger.error(
-                f"FABulous script {args.FABulousScript} execution failed with exit code {fab_CLI.exit_code}"
+        except typer.Exit as e:
+            sys.exit(e.exit_code)
+    elif args.TCLScript:
+        # Convert legacy --TCLScript to new typer script command
+        # Use the new Typer script command internally
+        # Pass None when no project directory provided to trigger dotenv resolution
+        try:
+            script_cmd(
+                project_dir=Path(args.project_dir) if args.project_dir else None,
+                script_file=args.TCLScript,
+                script_type="tcl",
             )
-        else:
-            logger.info(f"FABulous script {args.FABulousScript} executed successfully")
-        exit(fab_CLI.exit_code)
+        except typer.Exit as e:
+            sys.exit(e.exit_code)
+    elif args.commands is not None:
+        # Convert legacy --commands to new typer run command
+        # Parse commands first to handle empty case
+        parsed_commands = [
+            cmd.strip() for cmd in args.commands.split("; ") if cmd.strip()
+        ]
 
-    elif tclScript is not None:
-        fab_CLI.onecmd_plus_hooks(f"run_tcl {tclScript}")
-        if fab_CLI.exit_code:
-            logger.error(
-                f"TCL script {args.TCLScript} execution failed with exit code {fab_CLI.exit_code}"
+        # Handle empty commands case - exit gracefully
+        if not parsed_commands:
+            logger.info("No commands provided, exiting gracefully")
+            sys.exit(0)
+
+        # Use the new Typer run command internally
+        # Pass None when no project directory provided to trigger dotenv resolution
+        try:
+            run_cmd(
+                project_dir=Path(args.project_dir) if args.project_dir else None,
+                commands=parsed_commands,
             )
-        else:
-            logger.info(f"TCL script {args.TCLScript} executed successfully")
-        exit(fab_CLI.exit_code)
-
+        except typer.Exit as e:
+            sys.exit(e.exit_code)
     else:
-        fab_CLI.interactive = True
-        if args.verbose == 2:
-            fab_CLI.verbose = True
+        # Convert legacy start to new typer start command
+        # Use the new Typer start command internally
+        # Pass None when no project directory provided to trigger dotenv resolution
+        try:
+            start_cmd(project_dir=Path(args.project_dir) if args.project_dir else None)
+        except typer.Exit as e:
+            sys.exit(e.exit_code)
 
-        fab_CLI.cmdloop()
-        exit(0)
+    sys.exit(0)
 
 
 if __name__ == "__main__":

@@ -1,7 +1,9 @@
 """RTL behavior validation for Frame_Data_Reg module using cocotb."""
 
+from collections.abc import Callable
 from decimal import Decimal
 from pathlib import Path
+from typing import Any, Protocol
 
 import cocotb
 import pytest
@@ -11,7 +13,19 @@ from cocotb.triggers import RisingEdge, Timer
 from tests.conftest import VERILOG_SOURCE_PATH, VHDL_SOURCE_PATH
 
 
-def test_Frame_Data_Reg_verilog_rtl(cocotb_runner):
+class FrameDataRegProtocol(Protocol):
+    """Protocol defining the Frame_Data_Reg module interface."""
+
+    # Inputs
+    CLK: Any
+    FrameData_I: Any  # [FrameBitsPerRow-1:0]
+    RowSelect: Any  # [RowSelectWidth-1:0]
+
+    # Outputs
+    FrameData_O: Any  # [FrameBitsPerRow-1:0]
+
+
+def test_Frame_Data_Reg_verilog_rtl(cocotb_runner: Callable[..., None]) -> None:
     """Test the Frame_Data_Reg module with Verilog source."""
     cocotb_runner(
         sources=[VERILOG_SOURCE_PATH / "Fabric" / "Frame_Data_Reg.v"],
@@ -20,7 +34,7 @@ def test_Frame_Data_Reg_verilog_rtl(cocotb_runner):
     )
 
 
-def test_Frame_Data_Reg_vhdl_rtl(cocotb_runner):
+def test_Frame_Data_Reg_vhdl_rtl(cocotb_runner: Callable[..., None]) -> None:
     cocotb_runner(
         sources=[VHDL_SOURCE_PATH / "Fabric" / "Frame_Data_Reg.vhdl"],
         hdl_top_level="Frame_Data_Reg",
@@ -30,7 +44,7 @@ def test_Frame_Data_Reg_vhdl_rtl(cocotb_runner):
 
 @pytest.mark.skip(reason="Cocotb test - run by simulation, not pytest")
 @cocotb.test
-async def test_frame_data_reg_basic(dut):
+async def test_frame_data_reg_basic(dut: FrameDataRegProtocol) -> None:
     """Test basic functionality of Frame_Data_Reg."""
     # Start clock
     clock = Clock(dut.CLK, 10, units="ns")
@@ -81,11 +95,7 @@ async def test_frame_data_reg_basic(dut):
         await RisingEdge(dut.CLK)
         await Timer(Decimal(10), units="ps")
 
-        if row_val == 1:  # Matches the default Row parameter
-            expected = pattern
-        else:  # Does not match
-            expected = dut.FrameData_O.value  # Should remain unchanged
-
+        expected = pattern if row_val == 1 else dut.FrameData_O.value
         actual = dut.FrameData_O.value
         assert actual == expected, (
             f"Row {row_val}: Expected FrameData_O = 0x{expected:08x}, got 0x{actual:08x}"

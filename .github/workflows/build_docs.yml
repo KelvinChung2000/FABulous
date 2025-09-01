@@ -11,11 +11,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-      - uses: ./.github/actions/prepare_FABulous_container
-        with:
-          install_ghdl_mcode: "false"
       - uses: ammaraskar/sphinx-action@8.2.3
+        env:
+          SETUPTOOLS_SCM_PRETEND_VERSION: "0.0"
         with:
-          pre-build-command: "pip install -r requirements.txt"
-          build-command: 'make html SPHINXOPTS+="-W --keep-going -n"'
+          pre-build-command: "pip install uv && uv sync --directory ."
+          build-command: 'make html SPHINXOPTS+="-W --keep-going"'
           docs-folder: "docs/"

@@ -6,9 +6,10 @@
   - [Introduction](#introduction)
   - [How to cite](#how-to-cite)
   - [Prerequisites](#prerequisites)
+    - [Optional: uv for faster dependency management](#optional-uv-for-faster-dependency-management)
   - [Getting started](#getting-started)
-  - [Contribution Guidelines](#contribution-guidelines) - [Development Workflow](#development-workflow) - [Code Formatting](#code-formatting) - [Commit style](#commit-style) - [pre-commit](#pre-commit) - [Code Review](#code-review) - [License](#license)
-  <!--toc:end-->
+    - [Using uv (optional)](#using-uv-optional)
+  - [Contribution Guidelines](#contribution-guidelines)
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Python](https://img.shields.io/badge/Python-3.12-3776AB.svg?style=flat&logo=python&logoColor=white)](https://www.python.org)
@@ -81,6 +82,43 @@ The following packages need to be installed for the CAD toolchain
 - [Yosys](https://github.com/YosysHQ/yosys)
 - [nextpnr-generic](https://github.com/YosysHQ/nextpnr#nextpnr-generic)
 
+### Optional: uv for faster dependency management
+
+[uv](https://github.com/astral-sh/uv) is a high-performance Python package manager that provides faster dependency resolution and installation. While not required for end users, it offers significant speed improvements and reproducible environments.
+
+**Benefits of using uv:**
+
+- 10-100x faster than pip for dependency resolution
+- Automatic virtual environment management
+- Deterministic dependency locking
+- Cross-platform compatibility
+
+**Installation:**
+
+Linux/macOS:
+
+```bash
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
+macOS with Homebrew:
+
+```bash
+brew install uv
+```
+
+Windows:
+
+```powershell
+powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
+```
+
+Or from PyPI:
+
+```bash
+pip install uv
+```
+
 ## Getting started
 
 We recommend using Python virtual environments for the usage of FABulous.
@@ -137,58 +175,62 @@ To run a simulation of a test bitstream on the design with Icarus Verilog:
 The tool also supports using TCL script to drive the build process. Assuming you have created a demo project using
 `(venv)$ FABulous -c demo`, you can call `(venv)$ FABulous demo -s ./demo/FABulous.tcl` to run the demo flow with the TCL interface.
 
+### Using uv (optional)
+
+If you have [uv](https://github.com/astral-sh/uv) installed (see Prerequisites section), you can use it for faster dependency management and automatic virtual environment handling:
+
+```bash
+git clone https://github.com/FPGA-Research-Manchester/FABulous
+cd FABulous
+uv sync                    # Install dependencies and create virtual environment
+uv pip install -e .       # Install FABulous in editable mode
+```
+
+Running FABulous with uv:
+
+```bash
+uv run FABulous -c demo    # Create a demo project
+uv run FABulous demo       # Run FABulous interactive shell
+
+# Or activate the environment and run directly:
+source .venv/bin/activate
+(venv)$ FABulous -c demo
+(venv)$ FABulous demo
+```
+
+Benefits of using uv:
+
+- No need to manually create/manage virtual environments
+- Faster dependency installation
+- Automatic dependency resolution and locking
+- Consistent environments across different machines
+
 More details on bitstream generation can be found [here](https://fabulous.readthedocs.io/en/latest/FPGA-to-bitstream/Bitstream%20generation.html).
 
 Detailed documentation for the project can be found [here](https://fabulous.readthedocs.io/en/latest/index.html)
 
+
 ## Contribution Guidelines
 
-Thank you for considering contributing to FABulous! By contributing, you're helping us improve and grow the project for everyone. Before you start, please take a moment to review our guidelines to ensure a smooth contribution process.
+For comprehensive development information including environment setup, coding standards, and contribution workflows, please see our [Development Guide](https://fabulous.readthedocs.io/en/latest/development.html).
 
-### Development Workflow
+**Quick Reference for Contributors:**
 
-Please first check the [issues](Ghttps://github.com/FPGA-Research-Manchester/FABulous/issues) to and the [FABulous development branch](https://github.com/FPGA-Research/FABulous/tree/FABulous2.0-development) to see if your feature or bug fix has already been reported or implemented/fixed.
+- Use [uv](https://github.com/astral-sh/uv) for development environment setup
+- Follow [Ruff](https://docs.astral.sh/ruff/) formatting and linting standards
+- Use [conventional commits](https://www.conventionalcommits.org/) for commit messages
+- Target the `FABulous2.0-development` branch for pull requests
+- Ensure all tests pass and CI checks succeed
 
-We follow a standard Git workflow for contributions:
-
-- Fork the repository on GitHub.
-- Clone your forked repository to your local machine.
-- If you are not already on the `FABulous2.0-development` branch, switch to it, to use it as base for your work.
-- Create a new branch for your feature or bug fix.
-- Make your changes, following the coding standards and guidelines outlined below.
-- Commit your changes with clear, descriptive commit messages using the [conventional commits style](https://github.com/FPGA-Research/FABulous/tree/FABulous2.0-development).
-- Push your changes to your forked repository.
-- Submit a pull request to the main repository.
-- Ensure your pull request targets the `FABulous2.0-development` branch of the original repository if you add feature.
-- Check that your pull request passes the CI checks. If it does not, please fix the issues first.
-- We will review your pull request and may request changes or provide feedback. Please be responsive to these requests.
-
-### Code Formatting
-
-We use [Ruff](https://docs.astral.sh/ruff/) for code formatting and linting and provide a configuration file in the repository.
-Please make sure your code adheres to our coding standards before submitting a pull request.
-
-### Commit style
-
-We use the 'conventional commits' style for commit messages and pull requests.
-This helps us to automatically generate changelogs and understand the history of changes better.
-See the [conventional commits page](https://www.conventionalcommits.org/en/v1.0.0/) for more information.
-
-### pre-commit
-
-To aid development we suggest to use [pre-commit hooks](https://pre-commit.com/).
-
-To install the pre-commit hooks:
+**Quick Setup:**
 
 ```bash
-(venv)$ pip install pre-commit
-(venv)$ pre-commit install
+curl -LsSf https://astral.sh/uv/install.sh | sh  # Install uv
+git clone https://github.com/FPGA-Research-Manchester/FABulous
+cd FABulous
+uv sync --dev
+uv pip install -e .
+uv run pre-commit install
 ```
-
-### Code Review
-
-Once you've submitted a pull request, one of our maintainers will review your code. Please be patient during this process. We may suggest changes or improvements to ensure the quality and compatibility of your contribution.
-
-### License
 
 By contributing to this project, you agree that your contributions will be licensed under the project's [License](https://opensource.org/licenses/Apache-2.0).

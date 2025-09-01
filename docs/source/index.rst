@@ -30,17 +30,17 @@ Contents
 --------
 
 .. toctree::
-   :maxdepth: 2
+    :maxdepth: 2
 
-   Usage
-   Building fabric
-   fabric_definition
-   fabric_automation
-   FPGA_CAD-tools/index
-   FPGA-to-bitstream/index
-   simulation/index
-   gallery/index
-   references/index
-   definitions
-   contact
-   publications
+    Usage
+    development
+    Building fabric
+    fabric_definition
+    fabric_automation
+    FPGA_CAD-tools/index
+    FPGA-to-bitstream/index
+    simulation/index
+    gallery/index
+    definitions
+    contact
+    publications

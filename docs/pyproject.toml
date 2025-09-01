@@ -1,0 +1,33 @@
+[project]
+name = "fabulous-docs"
+version = "0.1.0"
+description = "Documentation build environment for FABulous FPGA"
+requires-python = ">=3.12"
+dependencies = [
+    # Sphinx core
+    "Sphinx>=8.0.0",
+    "docutils>=0.21.0",
+    # Sphinx extensions
+    "sphinx-copybutton>=0.5.0",
+    "sphinx-prompt==1.9.0",
+    "sphinxcontrib-bibtex>=2.6.0",
+    "sphinx-autodoc-typehints>=2.0.0", # Automatic type hint cross-references
+    "sphinx-autoapi>=3.0.0", # Modern alternative to autosummary
+    "myst-parser>=3.0.0", # Markdown support (industry standard)
+    "sphinx-design>=0.5.0", # Modern UI components
+    "sphinxext-opengraph>=0.9.0", # Social media preview cards
+    # Theme
+    "pydata-sphinx-theme>=0.15.0",
+    "sphinx-remove-toctrees>=1.0.0.post1",
+]
+
+# Editable installation of FABulous package
+[tool.uv.sources]
+fabulous-fpga = { path = "..", editable = true }
+
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[dependency-groups]
+dev = ["sphinx-autobuild"]

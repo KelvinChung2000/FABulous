@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=64", "setuptools_scm>=8"]
+requires = ["setuptools>=64", "setuptools_scm>=8", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -28,6 +28,9 @@ dependencies = [
   'bitarray>=3.3.0',
   "pydantic-settings>=2.10.1",
   "packaging>=25.0",
+  # OS-aware readline dependencies
+  'pyreadline3>=3.4.0; sys_platform == "win32"',
+  'gnureadline>=8.2.0; sys_platform != "win32"',
 ]
 
 [project.urls]
@@ -65,6 +68,7 @@ dev = [
   "pytest-mock>=3.14.1",
   "pytest-split>=0.10.0",
   "ruff>=0.12.7",
+  "taskipy>=1.14.0",
   "pyyaml>=6.0.0",
 ]
 
@@ -83,3 +87,35 @@ output = "coverage.xml"
 
 [tool.coverage.html]
 directory = "coverage_html"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.taskipy.tasks]
+# Development and quality tasks
+format = "ruff format ."
+lint = "ruff check . --fix && pre-commit run --all-files"
+check = "ruff check ."
+qa = "task format && task check"
+
+# Documentation tasks  
+docs-setup = "cd docs && uv sync"
+docs-build = "cd docs && make clean && make html"
+docs-server = "cd docs && make clean && uv run --directory . make livehtml"
+docs-clean = "cd docs && make clean"
+
+fab-proj = "FABulous -c demo"
+
+# FABulous fabric generation tasks
+fab-build = "task fab-proj && FABulous demo -p 'run_FABulous_fabric'"
+fab-build-clean = "rm -r demo && task fab-proj && FABulous demo -p 'run_FABulous_fabric'"
+
+# Test and simulation tasks (using Make targets)
+fab-sim = "task fab-proj && cd ./demo/Test && make FAB_sim"
+fab-sim-clean = "rm -r demo && task fab-proj && cd ./demo/Test && make FAB_sim"
+
+# CI/Development helper tasks
+pre-commit = "task format && task check"
+ci-check = "task check && task test && task docs-build"
+install-dev = "uv sync --group dev"
+clean-all = "find . -type d -name '__pycache__' -exec rm -rf {} + 2>/dev/null || true && find . -name '*.pyc' -delete && rm -rf build/ dist/ *.egg-info/ .pytest_cache/ .ruff_cache/"

@@ -1,5 +1,0 @@
-FABulous
-========
-
-.. automodule:: FABulous
-   :members:

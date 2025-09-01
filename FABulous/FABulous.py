@@ -16,14 +16,12 @@ from FABulous.FABulous_CLI import FABulous_CLI
 from FABulous.FABulous_CLI.helper import (
     CommandPipeline,
     create_project,
+    install_librelane,
     install_oss_cad_suite,
     setup_logger,
     update_project_version,
 )
-from FABulous.FABulous_settings import (
-    get_context,
-    init_context,
-)
+from FABulous.FABulous_settings import FAB_USER_CONFIG_DIR, get_context, init_context
 
 APP_NAME = "FABulous"
 
@@ -174,7 +172,7 @@ def create_project_cmd(
 def install_oss_cad_suite_cmd(
     directory: Annotated[
         Path, typer.Argument(help="Directory to install oss-cad-suite in")
-    ],
+    ] = FAB_USER_CONFIG_DIR,
 ) -> None:
     """Install the oss-cad-suite in the specified directory.
 
@@ -185,6 +183,23 @@ def install_oss_cad_suite_cmd(
 
     install_oss_cad_suite(directory)
     logger.info(f"oss-cad-suite installed successfully at {directory}")
+
+
+@app.command("install-librelane")
+def install_librelane_cmd(
+    directory: Annotated[
+        Path, typer.Argument(help="Directory to install LibreLane in")
+    ] = FAB_USER_CONFIG_DIR,
+) -> None:
+    """Install LibreLane via Nix with FOSSI binary cache.
+
+    This will install Nix (if needed) with FOSSI Foundation cache and clone LibreLane to
+    the specified directory. Requires sudo access for Nix installation. On Windows,
+    please use WSL2.
+    """
+
+    install_librelane(directory)
+    logger.info(f"LibreLane installed successfully at {directory}")
 
 
 @app.command("update-project-version")

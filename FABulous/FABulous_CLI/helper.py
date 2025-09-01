@@ -3,6 +3,7 @@ import os
 import platform
 import re
 import shutil
+import subprocess
 import sys
 import tarfile
 import tempfile
@@ -19,7 +20,7 @@ from loguru import logger
 from packaging.version import Version
 
 from FABulous.custom_exception import PipelineCommandError
-from FABulous.FABulous_settings import get_context, init_context
+from FABulous.FABulous_settings import FAB_USER_CONFIG_DIR, get_context
 
 if TYPE_CHECKING:
     from loguru import Record
@@ -327,7 +328,6 @@ def install_oss_cad_suite(destination_folder: Path, update: bool = False) -> Non
     system = platform.system().lower()
     machine = platform.machine().lower()
     url = None
-    init_context(None)
 
     # check if oss-cad-suite folder already exists
     ocs_folder = destination_folder / "oss-cad-suite"
@@ -410,7 +410,7 @@ def install_oss_cad_suite(destination_folder: Path, update: bool = False) -> Non
     ocs_archive.unlink()
 
     # Use user config directory for global .env file
-    user_config_dir = get_context().user_config_dir
+    user_config_dir = FAB_USER_CONFIG_DIR
     user_config_dir.mkdir(parents=True, exist_ok=True)
     env_file = user_config_dir / ".env"
     if not env_file.exists():
@@ -486,3 +486,167 @@ class CommandPipeline:
     def get_exit_code(self) -> int:
         """Get the final exit code from pipeline execution."""
         return self.final_exit_code
+
+
+def install_librelane(destination_folder: Path) -> None:
+    """Install LibreLane via Nix with FOSSI Foundation cache optimization.
+
+    Detects existing Nix installation and handles both scenarios:
+    - If Nix exists: Updates configuration with FOSSI cache
+    - If Nix missing: Installs Nix with integrated FOSSI cache
+
+    Parameters
+    ----------
+    destination_folder : Path
+        The folder where LibreLane will be cloned.
+
+    Raises
+    ------
+    ValueError
+        If the operating system is Windows (requires WSL2) or unsupported.
+    ConnectionError
+        If network operations fail (git clone, curl, etc.).
+    FileNotFoundError
+        If required dependencies are missing.
+    Exception
+        If Nix installation or configuration fails.
+    """
+
+    # Platform validation
+    system = platform.system().lower()
+    if system == "windows":
+        raise ValueError(
+            "LibreLane installation on Windows requires WSL2. "
+            "Please install Windows Subsystem for Linux 2 and run this command from within WSL."
+        )
+
+    if system not in ["linux", "darwin"]:
+        raise ValueError(
+            f"Unsupported operating system {system}. LibreLane only supports Linux and macOS."
+        )
+
+    # Check if Nix is already installed
+    nix_path = shutil.which("nix")
+
+    if nix_path:
+        logger.info("Nix detected. Configuring FOSSI Foundation cache...")
+        _configure_existing_nix()
+    else:
+        logger.info("Nix not found. Installing Nix with FOSSI cache...")
+        _install_nix_with_cache()
+
+    # Restart Nix daemon to apply configuration changes
+    logger.info("Restarting Nix daemon...")
+    subprocess.run(
+        ["sudo", "pkill", "nix-daemon"], check=True
+    )  # Don't fail if no daemon running
+
+    # Clone LibreLane
+    librelane_dir = destination_folder / "librelane"
+    if librelane_dir.exists():
+        logger.warning(
+            f"LibreLane directory {librelane_dir} already exists. Removing..."
+        )
+        shutil.rmtree(librelane_dir)
+
+    logger.info(f"Cloning LibreLane to {librelane_dir}...")
+    if not destination_folder.exists():
+        destination_folder.mkdir(parents=True, exist_ok=True)
+
+    try:
+        subprocess.run(
+            [
+                "git",
+                "clone",
+                "https://github.com/librelane/librelane",
+                str(librelane_dir),
+            ],
+            check=True,
+        )
+    except subprocess.CalledProcessError as e:
+        raise ConnectionError(f"Failed to clone LibreLane repository: {e}") from e
+
+    # Set up environment variables
+    user_config_dir = get_context().user_config_dir
+    user_config_dir.mkdir(parents=True, exist_ok=True)
+    env_file = user_config_dir / ".env"
+    if not env_file.exists():
+        env_file.touch()
+    set_key(env_file, "FAB_LIBRELANE_PATH", str(librelane_dir.absolute()))
+
+    logger.info("LibreLane installation completed successfully!")
+
+
+def _configure_existing_nix() -> None:
+    """Configure existing Nix installation with FOSSI Foundation cache."""
+
+    # Configuration lines needed for FOSSI cache
+    required_config = [
+        "extra-experimental-features = nix-command flakes",
+        "extra-substituters = https://nix-cache.fossi-foundation.org",
+        "extra-trusted-public-keys = nix-cache.fossi-foundation.org:3+K59iFwXqKsL7BNu6Guy0v+uTlwsxYQxjspXzqLYQs=",
+    ]
+
+    import subprocess as sp
+
+    nix_conf_path = Path("/etc/nix/nix.conf")
+
+    # Read existing configuration
+    existing_content = ""
+    if nix_conf_path.exists():
+        try:
+            existing_content = nix_conf_path.read_text()
+        except PermissionError:
+            logger.debug("Cannot read nix.conf directly, will append configuration")
+
+    # Find missing configuration lines
+    lines_to_add = []
+    for line in required_config:
+        if line not in existing_content:
+            lines_to_add.append(line)
+
+    if not lines_to_add:
+        logger.info("Nix configuration already includes FOSSI cache settings")
+        return
+
+    logger.info("Adding FOSSI cache configuration to Nix...")
+
+    # Use sudo tee to append configuration
+    config_text = "\n" + "\n".join(lines_to_add) + "\n"
+
+    try:
+        sp.run(
+            ["sudo", "tee", "-a", str(nix_conf_path)],
+            input=config_text,
+            text=True,
+            check=True,
+            stdout=sp.DEVNULL,
+        )
+    except sp.CalledProcessError as e:
+        raise ValueError(f"Failed to update Nix configuration: {e}") from e
+
+    logger.info("Successfully updated Nix configuration with FOSSI cache")
+
+
+def _install_nix_with_cache() -> None:
+    """Install Nix with integrated FOSSI Foundation cache configuration."""
+    import subprocess as sp
+
+    logger.info("Installing Nix with FOSSI Foundation cache...")
+
+    # Nix installation command with pre-configured FOSSI cache
+    install_cmd = '''curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install --no-confirm --extra-conf "
+extra-experimental-features = nix-command flakes
+extra-substituters = https://nix-cache.fossi-foundation.org
+extra-trusted-public-keys = nix-cache.fossi-foundation.org:3+K59iFwXqKsL7BNu6Guy0v+uTlwsxYQxjspXzqLYQs=
+"'''
+
+    try:
+        sp.run(install_cmd, shell=True, check=True)
+    except sp.CalledProcessError as e:
+        raise ValueError(f"Failed to install Nix: {e}") from e
+
+    logger.info("Nix installation with FOSSI cache completed successfully!")
+    logger.info(
+        "Please restart your terminal or source your shell configuration to use Nix."
+    )

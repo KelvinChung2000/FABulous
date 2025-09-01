@@ -15,7 +15,7 @@ module ALU #(
   // Define operation codes
   localparam ADD = 3'b000;
   localparam SUB = 3'b001;
-  localparam REDUCE_AND = 3'b010;
+  localparam SSHR = 3'b010;
   localparam REDUCE_OR = 3'b011;
   localparam XOR = 3'b100;
   localparam MUL = 3'b101;
@@ -32,7 +32,7 @@ module ALU #(
       SUB: data_out = data_in1 - data_in2;
       XOR: data_out = data_in1 ^ data_in2;
       MUL: data_out = data_in1 * data_in2;
-      // REDUCE_OR: data_out[0] = |data_in1;
+      SSHR: data_out = data_in1 >>> data_in2;
       // REDUCE_AND: data_out[0] = &data_in1;
       // NOT: data_out = ~data_in1;
       SEL: data_out = data_in3 ? data_in1 : data_in2;

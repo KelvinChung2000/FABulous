@@ -50,28 +50,52 @@ class MuxList(PE_ports):
             self.B_pred_reg_out,
         ]
 
-        self.SEN //= [
-            self.pred_in0,
-            self.pred_in1,
-            self.pred_in2,
-            self.pred_in3,
-            self.RES_pred_reg_out,
-            self.l_Y,
-            self.c_Y,
-            self.VCC,
-            self.GND,
-        ]
-        self.SR //= [
-            self.pred_in0,
-            self.pred_in1,
-            self.pred_in2,
-            self.pred_in3,
-            self.RES_pred_reg_out,
-            self.l_Y,
-            self.c_Y,
-            self.VCC,
-            self.GND,
-        ]
+        for i in ["A_", "B_", "RES_", "A_pred_", "B_pred_", "RES_pred_"]:
+            self[f"{i}rst"] //= [
+                self.pred_in0,
+                self.pred_in1,
+                self.pred_in2,
+                self.pred_in3,
+                self.RES_pred_reg_out,
+                self.l_Y,
+                self.c_Y,
+                self.VCC,
+                self.GND,
+            ]
+            self[f"{i}en"] //= [
+                self.pred_in0,
+                self.pred_in1,
+                self.pred_in2,
+                self.pred_in3,
+                self.RES_pred_reg_out,
+                self.l_Y,
+                self.c_Y,
+                self.VCC,
+                self.GND,
+            ]
+
+        # self.SEN //= [
+        #     self.pred_in0,
+        #     self.pred_in1,
+        #     self.pred_in2,
+        #     self.pred_in3,
+        #     self.RES_pred_reg_out,
+        #     self.l_Y,
+        #     self.c_Y,
+        #     self.VCC,
+        #     self.GND,
+        # ]
+        # self.SR //= [
+        #     self.pred_in0,
+        #     self.pred_in1,
+        #     self.pred_in2,
+        #     self.pred_in3,
+        #     self.RES_pred_reg_out,
+        #     self.l_Y,
+        #     self.c_Y,
+        #     self.VCC,
+        #     self.GND,
+        # ]
 
         self.A_pred_reg_in //= [self.pred_in0, self.pred_in1, self.pred_in2, self.pred_in3, self.RES_pred_reg_out]
         self.B_pred_reg_in //= [self.pred_in0, self.pred_in1, self.pred_in2, self.pred_in3, self.RES_pred_reg_out]

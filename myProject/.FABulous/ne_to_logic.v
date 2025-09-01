@@ -33,7 +33,7 @@ module \$ne (A, B, Y);
                     .A_SIGNED(A_SIGNED),
                     .B_SIGNED(B_SIGNED),
                     .A_WIDTH(1),
-                    .B_WIDTH(1), 
+                    .B_WIDTH(1),
                     .Y_WIDTH(1)
                 ) xor_gate (
                     .A(A),   // Previous result in the chain

@@ -34,11 +34,13 @@ yosys opt_clean
 yosys share
 yosys opt_expr
 yosys opt_clean
-yosys fsm
+# yosys fsm
 yosys techmap -map $project_root/.FABulous/reduce_or_to_or.v
 yosys techmap -map $project_root/.FABulous/reduce_and_to_and.v
 yosys techmap -map $project_root/.FABulous/eq_to_logic.v
 yosys techmap -map $project_root/.FABulous/ne_to_logic.v
+yosys techmap -map $project_root/.FABulous/compare_convert.v
+yosys techmap -map $project_root/.FABulous/neg_to_logic.v
 yosys opt -full
 yosys clean -purge
 
@@ -60,6 +62,10 @@ yosys design -pop
 yosys extract -constports -ignore_parameters -map %xmap
 yosys design -delete xmap
 }
+
+
+
+
 
 # wrapping base design
 yosys techmap -map myProject/Tile/PE/metadata/reg_unit_WIDTH_1/wrap_map_reg_unit_WIDTH_1.v
@@ -107,6 +113,7 @@ yosys clean -purge
 
 # wrapping base design
 yosys techmap -map myProject/Tile/PE/metadata/ALU/wrap_map_ALU.v
+yosys connwrappers -unsigned \$__sshr_wrapper Y Y_WIDTH
 yosys connwrappers -unsigned \$__xor_wrapper Y Y_WIDTH
 yosys connwrappers -unsigned \$__mul_wrapper Y Y_WIDTH
 yosys connwrappers -unsigned \$__add_wrapper Y Y_WIDTH
@@ -114,6 +121,8 @@ yosys connwrappers -unsigned \$__sub_wrapper Y Y_WIDTH
 yosys connwrappers -unsigned \$__mux_wrapper Y WIDTH
 
 # extract cells
+extract "myProject/Tile/PE/metadata/ALU/cell_ALU_ALU_func_2.json" \
+"myProject/Tile/PE/metadata/ALU/wrap_map_ALU.v"
 extract "myProject/Tile/PE/metadata/ALU/cell_ALU_ALU_func_4.json" \
 "myProject/Tile/PE/metadata/ALU/wrap_map_ALU.v"
 extract "myProject/Tile/PE/metadata/ALU/cell_ALU_ALU_func_5.json" \

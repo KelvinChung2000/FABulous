@@ -1,5 +1,4 @@
 import pathlib
-from csv import writer as csvWriter
 from typing import List
 
 from loguru import logger
@@ -452,7 +451,7 @@ class SmGeometry:
                 )
                 self.portGeoms.append(portGeom)
 
-    def saveToCSV(self, writer: csvWriter) -> None:
+    def saveToCSV(self, writer) -> None:
         writer.writerows(
             [
                 ["SWITCH_MATRIX"],

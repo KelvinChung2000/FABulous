@@ -3,8 +3,8 @@ module reg_unit #(
     parameter NoConfigBits = 2,
     parameter WIDTH = 32
 ) (
-    (* FABulous, SHARED="SR" *)input wire rst,
-    (* FABulous, SHARED="SEN" *) input wire en,
+    (* FABulous *)input wire rst,
+    (* FABulous *) input wire en,
     (* FABulous, USER_CLK *) input wire clk,
     (* FABulous *) input  wire [WIDTH-1:0] reg_in,
     (* FABulous *) output reg [WIDTH-1:0] reg_out,

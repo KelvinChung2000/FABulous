@@ -26,10 +26,10 @@ Mem #(
     .read_mode(1'd1),
     .read_mode(1'd0)
 ) _TECHMAP_REPLACE_ (
+    .write_data(PORT_RW0_WR_DATA),
     .addr0(PORT_RW0_ADDR),
     .write_en(PORT_RW0_WR_EN),
-    .read_data(PORT_RW0_RD_DATA),
-    .write_data(PORT_RW0_WR_DATA)
+    .read_data(PORT_RW0_RD_DATA)
 );
 
 endmodule
@@ -74,6 +74,31 @@ module map_ALU_ALU_func_1 #(
 generate
     ALU #(
         .ALU_func(1'd1)
+    ) _TECHMAP_REPLACE_ (
+        .data_in1(data_in1),
+        .data_in2(data_in2),
+        .data_in3(data_in3),
+        .data_out(data_out)
+    );
+
+endgenerate
+
+endmodule
+
+(* techmap_celltype = "ALU_ALU_func_2" *)
+module map_ALU_ALU_func_2 #(
+)
+(
+    input wire[2:0] ALU_func,
+    input wire[31:0] data_in1,
+    input wire[31:0] data_in2,
+    input wire data_in3,
+    output reg[31:0] data_out
+);
+
+generate
+    ALU #(
+        .ALU_func(2'd2)
     ) _TECHMAP_REPLACE_ (
         .data_in1(data_in1),
         .data_in2(data_in2),

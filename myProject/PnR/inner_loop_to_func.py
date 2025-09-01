@@ -6,6 +6,7 @@ Uses xDSL to parse and manipulate MLIR code.
 
 import argparse
 from pathlib import Path
+from random import randint
 import subprocess
 import sys
 from typing import List
@@ -49,7 +50,7 @@ def replace_types_i64_f64_to_i32(module: Operation) -> None:
                             shape_list.append(int(dim))
                     new_inputs.append(builtin.MemRefType(builtin.i32, shape_list))
                 elif isinstance(input_type, builtin.MemRefType) and (
-                    isinstance(input_type.element_type, builtin.IntegerType) or str(input_type.element_type) == 'i64'
+                    isinstance(input_type.element_type, builtin.IntegerType) and str(input_type.element_type) == 'i64'
                 ):
                     # Create new memref type with f32 element
                     shape_list = []
@@ -93,7 +94,7 @@ def replace_types_i64_f64_to_i32(module: Operation) -> None:
             if isinstance(result_type, builtin.Float64Type) or str(result_type) == 'f64':
                 op.results[0]._type = builtin.i32
                 types_replaced += 1
-            elif isinstance(result_type, builtin.IntegerType) and hasattr(result_type, 'width') and result_type.width.data == 64:
+            elif isinstance(result_type, builtin.IntegerType) and str(result_type) == 'i64':
                 op.results[0]._type = builtin.i32
                 types_replaced += 1
         
@@ -103,7 +104,7 @@ def replace_types_i64_f64_to_i32(module: Operation) -> None:
                 if isinstance(result.type, builtin.Float64Type) or str(result.type) == 'f64':
                     result._type = builtin.i32
                     types_replaced += 1
-                elif isinstance(result.type, builtin.IntegerType) and hasattr(result.type, 'width') and result.type.width.data == 64:
+                elif isinstance(result.type, builtin.IntegerType) and str(result.type) == 'i64':
                     result._type = builtin.i32
                     types_replaced += 1
     
@@ -139,12 +140,28 @@ def replace_floatOp_to_intOp(module: Operation) -> None:
             replace_op(op, new_op)
             c += 1
 
-        elif isinstance(op, arith.ConstantOp):
+        elif isinstance(op, arith.DivfOp):
             # Replace with integer operation
-            new_op = arith.ConstantOp(value=int(op.operands[0]), value_type=builtin.i32)
+            new_op = arith.DivUIOp(op.lhs, op.rhs, op.result.type)
             replace_op(op, new_op)
             c += 1
-        
+
+        elif isinstance(op, arith.ConstantOp) and not isinstance(op.value.type, builtin.IntegerType):
+            # Replace with integer operation
+            new_op = arith.ConstantOp(value=builtin.IntegerAttr(randint(0, 100), builtin.i32) ,value_type=builtin.i32)
+            replace_op(op, new_op)
+            c += 1
+        elif isinstance(op, arith.ConstantOp) and str(op.value.type) == 'i64':
+            # Replace with integer operation
+            new_op = arith.ConstantOp(value=builtin.IntegerAttr(op.value.value, builtin.i32) ,value_type=builtin.i32)
+            replace_op(op, new_op)
+            c += 1
+
+        elif isinstance(op, arith.SIToFPOp):
+            # new_op = arith.ExtUIOp(op.input, builtin.i32)
+            op.result.replace_by(op.input)
+            op.detach()
+            c += 1
 
     print(f"Replaced {c} float operations with integer operations in the module")
 

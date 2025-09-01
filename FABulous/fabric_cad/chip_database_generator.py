@@ -1,7 +1,6 @@
 from collections import defaultdict
 from itertools import islice
 from pathlib import Path
-from pprint import pprint
 from subprocess import run
 from typing import cast
 
@@ -13,12 +12,12 @@ from FABulous.fabric_cad.chip_database.database_tile import TileType
 from FABulous.fabric_cad.chip_database.database_timing import TimingValue
 from FABulous.fabric_cad.chip_database.define import NodeWire, PinType
 from FABulous.fabric_cad.graph_draw import genRoutingResourceGraph
-from FABulous.fabric_definition.Wire import WireType
 from FABulous.fabric_definition.define import IO, Loc
 from FABulous.fabric_definition.Fabric import Fabric
 from FABulous.fabric_definition.Port import BelPort, TilePort
 from FABulous.fabric_definition.SwitchMatrix import SwitchMatrix
 from FABulous.fabric_definition.Tile import Tile
+from FABulous.fabric_definition.Wire import WireType
 
 CONTROL_GND_OFFSET = 0x2000
 CONTROL_VCC_OFFSET = 0x4000
@@ -32,6 +31,7 @@ PSEUDO_PIP_MID = 2
 PSEUDO_PIP_END = 3
 
 BEL_PIN_FULLY_INTERNAL = 1
+BEL_PIN_SHARED = 2
 
 
 def genSwitchMatrix(tile: Tile, subTile: str, tileType: TileType, context=1):
@@ -92,6 +92,7 @@ def genSwitchMatrix(tile: Tile, subTile: str, tileType: TileType, context=1):
                     tileType.create_pip(
                         f"c{c}.{i}",
                         outTarget,
+                        timing_class=f"CONTEXT_{c}",
                         flags=(
                             NORMAL if "internal" not in outTarget else PSEUDO_PIP_START
                         ),
@@ -101,7 +102,7 @@ def genSwitchMatrix(tile: Tile, subTile: str, tileType: TileType, context=1):
             for wc in range(p.width):
                 tileType.create_wire(
                     f"{p.name}_{c}_to_{c + 1}_NextCycle[{wc}]",
-                    "NextCycle",
+                    "NEXT_CYCLE",
                     z=zOut,
                     flags=c + 1,
                 )
@@ -116,6 +117,7 @@ def genSwitchMatrix(tile: Tile, subTile: str, tileType: TileType, context=1):
                 tileType.create_pip(
                     output,
                     f"{mux.output.name}_{c}_to_{c + 1}_NextCycle[{wc}]",
+                    timing_class="NEXT_CYCLE",
                     flags=(
                         PSEUDO_PIP_MID if "internal" not in output else PSEUDO_PIP_START
                     ),
@@ -123,6 +125,7 @@ def genSwitchMatrix(tile: Tile, subTile: str, tileType: TileType, context=1):
                 tileType.create_pip(
                     f"{mux.output.name}_{c}_to_{c + 1}_NextCycle[{wc}]",
                     f"c{c + 1}.{pName}",
+                    timing_class="NEXT_CYCLE",
                     flags=PSEUDO_PIP_END,
                 )
 
@@ -231,6 +234,7 @@ def genBel(t: Tile, tile: TileType, wireOnly: bool, context=1):
                         f"{pName}".removeprefix(bel.prefix),
                         f"c{c}.{sName}",
                         PinType.INPUT,
+                        flags=BEL_PIN_SHARED,
                     )
 
             if bel.userCLK:
@@ -314,10 +318,10 @@ def genFabric(fabric: Fabric, chip: Chip, context=1):
                         )
                 for node in nodes:
                     chip.add_node(node, "DEFAULT")
-    setTiming(chip)
+    setTiming(fabric, chip)
 
 
-def setTiming(chip: Chip):
+def setTiming(fabric: Fabric, chip: Chip):
     speed = "DEFAULT"
     tmg = chip.set_speed_grades([speed])
     # --- Routing Delays ---
@@ -360,6 +364,15 @@ def setTiming(chip: Chip):
         cap=TimingValue(5000),  # 5pF
         res=TimingValue(1000),  # 1ohm
     )
+
+    for i in range(fabric.contextCount):
+        tmg.set_bel_pin_class(
+            grade=speed,
+            name=f"CONTEXT_{i}",
+            delay=TimingValue(900 * (i + 1)),  # 100ps intrinstic delay
+            in_cap=TimingValue(5000 * (i + 1)),  # 5pF
+            out_res=TimingValue(1000 * (i + 1)),  # 1ohm
+        )
 
 
 def setPackage(chip: Chip, fabric: Fabric):

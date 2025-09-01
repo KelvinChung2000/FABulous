@@ -1,4 +1,5 @@
 from pathlib import Path
+
 from hdlgen.code_gen import CodeGenerator
 from hdlgen.define import WriterType as codeGenWriterType
 from hdlgen.HDL_Construct.Value import Value
@@ -64,7 +65,8 @@ def genWrapMap(cell: YosysCellDetails, filename, belName, wrapping=True):
                     else:
                         g.Assign(ports[i], sigMapping[i])
 
-                with g.IfElse(params.get("WIDTH", 0) <= width) as tf:
+                maxWidth = max([len(cell.connections[i]) for i in cell.port_directions])
+                with g.IfElse(params.get("WIDTH", 0) <= maxWidth) as tf:
                     with tf.TrueRegion() as t:
                         t.InitModule(
                             targetCell,

@@ -39,6 +39,8 @@ dependencies = [
     "networkx>=3.5",
     "ipywidgets>=8.1.7",
     "xdsl>=0.42.0",
+    "scipy>=1.16.1",
+    "scikit-learn>=1.7.1",
 ]
 
 [project.urls]

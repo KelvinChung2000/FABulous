@@ -39,6 +39,8 @@ yosys techmap -map $project_root/.FABulous/reduce_or_to_or.v
 yosys techmap -map $project_root/.FABulous/reduce_and_to_and.v
 yosys techmap -map $project_root/.FABulous/eq_to_logic.v
 yosys techmap -map $project_root/.FABulous/ne_to_logic.v
+yosys techmap -map $project_root/.FABulous/compare_convert.v
+yosys techmap -map $project_root/.FABulous/neg_to_logic.v
 yosys opt -full
 yosys clean -purge
 
@@ -60,6 +62,10 @@ yosys design -pop
 yosys extract -constports -ignore_parameters -map %xmap
 yosys design -delete xmap
 }
+
+
+
+
 {% for wrapperPath, unWrapperPath, wrapperNames, cells in wrappers %}
 # wrapping base design
 yosys techmap -map {{ wrapperPath }}

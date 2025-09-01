@@ -1,10 +1,8 @@
-from csv import writer as csvWriter
 from typing import List
-
-from loguru import logger
 
 from FABulous.fabric_definition.define import Direction
 from FABulous.geometry_generator.geometry_obj import Location
+from loguru import logger
 
 
 class WireGeometry:
@@ -28,7 +26,7 @@ class WireGeometry:
     def addPathLoc(self, pathLoc: Location) -> None:
         self.path.append(pathLoc)
 
-    def saveToCSV(self, writer: csvWriter) -> None:
+    def saveToCSV(self, writer: object) -> None:
         writer.writerows([["WIRE"], ["Name"] + [self.name]])
         for pathPoint in self.path:
             writer.writerows(
@@ -215,6 +213,6 @@ class StairWires:
             self.refX += 1
             self.refY -= 1
 
-    def saveToCSV(self, writer: csvWriter) -> None:
+    def saveToCSV(self, writer: object) -> None:
         for wireGeom in self.wireGeoms:
             wireGeom.saveToCSV(writer)

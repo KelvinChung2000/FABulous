@@ -97,10 +97,10 @@ module reg_unit #(
     parameter tide_rst = 0
 )
 (
-    input wire[31:0] reg_in,
-    output reg[31:0] reg_out,
     input wire en,
-    input wire rst
+    input wire[31:0] reg_in,
+    input wire rst,
+    output reg[31:0] reg_out
 );
 
 endmodule
@@ -112,10 +112,10 @@ module reg_unit_WIDTH_1 #(
     parameter tide_rst = 0
 )
 (
-    input wire reg_in,
-    output reg reg_out,
     input wire en,
-    input wire rst
+    input wire reg_in,
+    input wire rst,
+    output reg reg_out
 );
 
 endmodule

@@ -23,7 +23,7 @@ set source_futil /home/kelvin/FABulous_fork/myProject/PnR/mac-pipelined/mac-pipe
 set source_hdl /home/kelvin/FABulous_fork/benchmarks/userbench/loop_array_inner/loop_array_inner.sv
 # set source_hdl /home/kelvin/FABulous_fork/myProject/PnR/test.v
 # set source_hdl /home/kelvin/FABulous_fork/myProject/user_design/synth_test_mod.v
-set source_hdl /home/kelvin/FABulous_fork/myProject/PnR/compilation_result/04_verilog/spmv_crs_inner_loop_0.sv
+set source_hdl /home/kelvin/FABulous_fork/myProject/PnR/compilation_result/04_verilog/gemm_ncubed_inner_loop_0.sv
 set -x OUT_JSON_PATH /home/kelvin/FABulous_fork/myProject/user_design/synth_test.json
 set ir /home/kelvin/FABulous_fork/myProject/PnR/mac-pipelined/ir.log
 set my_FAB_ROOT /home/kelvin/FABulous_fork
@@ -41,6 +41,7 @@ cd ../..
 uv run FABulous --debug myProject -p \
         "\
         load_fabric; \
+        serialize_fabric $my_FAB_ROOT/myProject/.FABulous/fabric_serial.json; \
         gen_bitStream_spec; \
         gen_cells_and_techmaps; \
         gen_chipdb -routing_graph $my_FAB_ROOT/myProject/.FABulous/routing_graph.dot -filter 3,5 3,4; \
@@ -62,8 +63,8 @@ nextpnr-himbaechel --chipdb "$my_FAB_ROOT/myProject/.FABulous/hycube.bit" --devi
                    --placer-heap-beta 0.9 \
                    --placer-heap-arch-connectivity-factor 0.0 \
                    --placer-heap-congestion-aware-factor 0.0 \
-                   --no-route \
-                   -o placeTrial=10 --router1-timeout 20000 -f --debug-placer
+                   --router router1 \
+                   -o placeTrial=10 --router1-timeout 20000 --debug-placer
                 #    --placer-heap-export-init-placement "$my_FAB_ROOT/myProject/user_design/test_init_placement.csv" \
 # successful seed:5743725230106451036 
 # python $my_FAB_ROOT/myProject/Test/test_fabric.py

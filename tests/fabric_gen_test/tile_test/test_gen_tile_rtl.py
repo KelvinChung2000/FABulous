@@ -15,21 +15,21 @@ from FABulous.fabric_generator.gen_fabric.gen_tile import generateTile
 
 class TileDUT(Protocol):
     """Protocol defining the Tile module interface."""
-    
+
     # Clock and Reset
     UserCLK: Any  # System clock input
     UserCLKo: Any  # System clock output (chained)
-    
+
     # Frame-based Configuration Interface
     FrameData: Any  # [FrameBitsPerRow-1:0] Frame configuration data input
     FrameStrobe: Any  # [MaxFramesPerCol-1:0] Frame strobe signals input
     FrameData_O: Any  # [FrameBitsPerRow-1:0] Frame data output (chain)
     FrameStrobe_O: Any  # [MaxFramesPerCol-1:0] Frame strobe output (chain)
-    
+
     # FlipFlop Chain Configuration Interface (alternative)
     conf_data: Any  # Configuration data input
     conf_clk: Any  # Configuration clock
-    
+
     # Routing Interface (tile-to-tile connections)
     # Note: Actual routing signals depend on tile configuration
     # Examples of common routing signals:
@@ -59,7 +59,9 @@ def _create_tile_validation_commands(
     commands = []
 
     # Basic RTL checks
-    commands.append("check -noinit")  # Check for multiple drivers and uninitialized signals
+    commands.append(
+        "check -noinit"
+    )  # Check for multiple drivers and uninitialized signals
     commands.append("check -assert")  # Verify all outputs are driven
 
     # Check that expected ports exist
@@ -111,16 +113,22 @@ def _create_tile_validation_commands(
         # Frame signals should connect to config memory (if present)
         if global_config_bits > 0:
             commands.append("select -assert-min 1 w:FrameData %co c:*ConfigMem* %ci %i")
-            commands.append("select -assert-min 1 w:FrameStrobe %co c:*ConfigMem* %ci %i")
+            commands.append(
+                "select -assert-min 1 w:FrameStrobe %co c:*ConfigMem* %ci %i"
+            )
 
         # Frame signals should also connect to switch matrix for configuration
         commands.append("select -assert-min 1 w:FrameData %co c:*switch_matrix* %ci %i")
-        commands.append("select -assert-min 1 w:FrameStrobe %co c:*switch_matrix* %ci %i")
+        commands.append(
+            "select -assert-min 1 w:FrameStrobe %co c:*switch_matrix* %ci %i"
+        )
 
     # Verify configuration bits flow from config memory to switch matrix
     if global_config_bits > 0:
         # Config memory output should connect to switch matrix ConfigBits input
-        commands.append("select -assert-min 1 c:*ConfigMem* %co c:*switch_matrix* %ci %i")
+        commands.append(
+            "select -assert-min 1 c:*ConfigMem* %co c:*switch_matrix* %ci %i"
+        )
 
     # Check that routing signals flow through switch matrix
     # Switch matrix should have both input and output routing signals
@@ -138,7 +146,14 @@ def _create_tile_validation_commands(
             config_bit_mode=ConfigBitMode.FRAME_BASED,
             global_config_bits=32,
             test_name="frame_based_tile",
-            expected_ports=["UserCLK", "UserCLKo", "FrameData", "FrameStrobe", "FrameData_O", "FrameStrobe_O"],
+            expected_ports=[
+                "UserCLK",
+                "UserCLKo",
+                "FrameData",
+                "FrameStrobe",
+                "FrameData_O",
+                "FrameStrobe_O",
+            ],
         ),
         TileTestCase(
             config_bit_mode=ConfigBitMode.FLIPFLOP_CHAIN,
@@ -150,7 +165,14 @@ def _create_tile_validation_commands(
             config_bit_mode=ConfigBitMode.FRAME_BASED,
             global_config_bits=0,
             test_name="no_config_tile",
-            expected_ports=["UserCLK", "UserCLKo", "FrameData", "FrameStrobe", "FrameData_O", "FrameStrobe_O"],
+            expected_ports=[
+                "UserCLK",
+                "UserCLKo",
+                "FrameData",
+                "FrameStrobe",
+                "FrameData_O",
+                "FrameStrobe_O",
+            ],
         ),
     ],
     ids=lambda case: case.test_name,
@@ -193,7 +215,9 @@ def test_tile_rtl_validation(
 
     # Create yosys commands to validate tile structure
     yosys_commands = _create_tile_validation_commands(
-        tile_test_case.config_bit_mode, tile_test_case.global_config_bits, tile_test_case.expected_ports
+        tile_test_case.config_bit_mode,
+        tile_test_case.global_config_bits,
+        tile_test_case.expected_ports,
     )
 
     # Run RTL validation
@@ -223,15 +247,26 @@ def test_tile_with_external_ports_rtl_validation(
 
     # Check if HDL file was created
     if not writer.outFileName.exists():
-        pytest.skip(f"Tile with external ports HDL file {writer.outFileName} was not generated")
+        pytest.skip(
+            f"Tile with external ports HDL file {writer.outFileName} was not generated"
+        )
 
     # Validate structure using Yosys
     validator = yosys_validator(writer.outFileName)
 
     # Expected ports for tile with external I/O
-    expected_ports = ["UserCLK", "UserCLKo", "FrameData", "FrameStrobe", "FrameData_O", "FrameStrobe_O"]
+    expected_ports = [
+        "UserCLK",
+        "UserCLKo",
+        "FrameData",
+        "FrameStrobe",
+        "FrameData_O",
+        "FrameStrobe_O",
+    ]
 
-    yosys_commands = _create_tile_validation_commands(ConfigBitMode.FRAME_BASED, 5, expected_ports)
+    yosys_commands = _create_tile_validation_commands(
+        ConfigBitMode.FRAME_BASED, 5, expected_ports
+    )
     validator.validate(yosys_commands)
 
 
@@ -264,9 +299,18 @@ def test_minimal_tile_rtl_validation(
     validator = yosys_validator(writer.outFileName)
 
     # Basic expected ports for minimal tile
-    expected_ports = ["UserCLK", "UserCLKo", "FrameData", "FrameStrobe", "FrameData_O", "FrameStrobe_O"]
+    expected_ports = [
+        "UserCLK",
+        "UserCLKo",
+        "FrameData",
+        "FrameStrobe",
+        "FrameData_O",
+        "FrameStrobe_O",
+    ]
 
-    yosys_commands = _create_tile_validation_commands(ConfigBitMode.FRAME_BASED, 0, expected_ports)
+    yosys_commands = _create_tile_validation_commands(
+        ConfigBitMode.FRAME_BASED, 0, expected_ports
+    )
     validator.validate(yosys_commands)
 
 

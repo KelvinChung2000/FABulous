@@ -112,8 +112,12 @@ class TestGenHelper:
         writer = code_generator_factory(".v")
 
         # Setup mocks using pytest-mock
-        mock_bootstrap = mocker.patch("FABulous.fabric_generator.gen_fabric.gen_switchmatrix.bootstrapSwitchMatrix")
-        mock_list2csv = mocker.patch("FABulous.fabric_generator.gen_fabric.gen_switchmatrix.list2CSV")
+        mock_bootstrap = mocker.patch(
+            "FABulous.fabric_generator.gen_fabric.gen_switchmatrix.bootstrapSwitchMatrix"
+        )
+        mock_list2csv = mocker.patch(
+            "FABulous.fabric_generator.gen_fabric.gen_switchmatrix.list2CSV"
+        )
         mocker.patch(
             "FABulous.fabric_generator.gen_fabric.gen_switchmatrix.parseMatrix",
             return_value=expected_connections,
@@ -129,7 +133,9 @@ class TestGenHelper:
         # Verify tile.matrixDir was updated
         assert default_tile.matrixDir == csv_file
 
-    def test_bootstrap_switch_matrix(self, default_fabric, default_tile, code_generator_factory, tmp_path, mocker):
+    def test_bootstrap_switch_matrix(
+        self, default_fabric, default_tile, code_generator_factory, tmp_path, mocker
+    ):
         """Test the bootstrap switch matrix functionality for list files."""
         # Setup list file that will trigger bootstrap
         list_file = tmp_path / "test_matrix.list"
@@ -142,8 +148,12 @@ class TestGenHelper:
         writer = code_generator_factory(".v")
 
         # Setup mocks to test bootstrap behavior
-        mock_bootstrap = mocker.patch("FABulous.fabric_generator.gen_fabric.gen_switchmatrix.bootstrapSwitchMatrix")
-        mock_list2csv = mocker.patch("FABulous.fabric_generator.gen_fabric.gen_switchmatrix.list2CSV")
+        mock_bootstrap = mocker.patch(
+            "FABulous.fabric_generator.gen_fabric.gen_switchmatrix.bootstrapSwitchMatrix"
+        )
+        mock_list2csv = mocker.patch(
+            "FABulous.fabric_generator.gen_fabric.gen_switchmatrix.list2CSV"
+        )
         mocker.patch(
             "FABulous.fabric_generator.gen_fabric.gen_switchmatrix.parseMatrix",
             return_value={
@@ -159,7 +169,9 @@ class TestGenHelper:
         mock_bootstrap.assert_called_once_with(default_tile, expected_csv_file)
         mock_list2csv.assert_called_once_with(list_file, expected_csv_file)
 
-    def test_file_format_detection(self, default_fabric, default_tile, code_generator_factory, tmp_path, mocker):
+    def test_file_format_detection(
+        self, default_fabric, default_tile, code_generator_factory, tmp_path, mocker
+    ):
         """Test that the system correctly detects different file formats."""
         writer = code_generator_factory(".v")
 
@@ -168,8 +180,12 @@ class TestGenHelper:
         default_tile.matrixDir = list_file
         list_file.write_text("E1END[0|1],[N1BEG0|N1BEG1]\n")
 
-        mock_list2csv = mocker.patch("FABulous.fabric_generator.gen_fabric.gen_switchmatrix.list2CSV")
-        mock_bootstrap = mocker.patch("FABulous.fabric_generator.gen_fabric.gen_switchmatrix.bootstrapSwitchMatrix")
+        mock_list2csv = mocker.patch(
+            "FABulous.fabric_generator.gen_fabric.gen_switchmatrix.list2CSV"
+        )
+        mock_bootstrap = mocker.patch(
+            "FABulous.fabric_generator.gen_fabric.gen_switchmatrix.bootstrapSwitchMatrix"
+        )
         mocker.patch(
             "FABulous.fabric_generator.gen_fabric.gen_switchmatrix.parseMatrix",
             return_value={"E1END0": ["N1BEG0"]},
@@ -181,7 +197,9 @@ class TestGenHelper:
         mock_list2csv.assert_called_once()
         mock_bootstrap.assert_called_once()
 
-    def test_csv_file_processing(self, default_fabric, default_tile, code_generator_factory, tmp_path, mocker):
+    def test_csv_file_processing(
+        self, default_fabric, default_tile, code_generator_factory, tmp_path, mocker
+    ):
         """Test that CSV files are processed directly without conversion."""
         # Setup CSV file
         csv_file = tmp_path / "test_matrix.csv"
@@ -194,7 +212,9 @@ class TestGenHelper:
         writer = code_generator_factory(".v")
 
         # Setup mocks
-        mock_list2csv = mocker.patch("FABulous.fabric_generator.gen_fabric.gen_switchmatrix.list2CSV")
+        mock_list2csv = mocker.patch(
+            "FABulous.fabric_generator.gen_fabric.gen_switchmatrix.list2CSV"
+        )
         mocker.patch(
             "FABulous.fabric_generator.gen_fabric.gen_switchmatrix.parseMatrix",
             return_value={"E1END0": ["N1BEG0"]},
@@ -222,7 +242,9 @@ class TestGenHelper:
         writer = code_generator_factory(".v")
 
         # Setup mocks
-        mocker.patch("FABulous.fabric_generator.gen_fabric.gen_switchmatrix.bootstrapSwitchMatrix")
+        mocker.patch(
+            "FABulous.fabric_generator.gen_fabric.gen_switchmatrix.bootstrapSwitchMatrix"
+        )
         mocker.patch("FABulous.fabric_generator.gen_fabric.gen_switchmatrix.list2CSV")
         mocker.patch(
             "FABulous.fabric_generator.gen_fabric.gen_switchmatrix.parseMatrix",
@@ -239,7 +261,9 @@ class TestGenHelper:
         assert default_tile.matrixDir == expected_csv_file
         assert default_tile.matrixDir.suffix == ".csv"
 
-    def test_helper_function_integration(self, default_fabric, default_tile, code_generator_factory, tmp_path, mocker):
+    def test_helper_function_integration(
+        self, default_fabric, default_tile, code_generator_factory, tmp_path, mocker
+    ):
         """Test integration of helper functions with list file processing."""
         # Setup file with list format
         list_file = tmp_path / "test_matrix.list"
@@ -252,8 +276,12 @@ class TestGenHelper:
         writer = code_generator_factory(".v")
 
         # Setup mocks - but don't mock the entire flow, just verify calls
-        mock_bootstrap = mocker.patch("FABulous.fabric_generator.gen_fabric.gen_switchmatrix.bootstrapSwitchMatrix")
-        mock_list2csv = mocker.patch("FABulous.fabric_generator.gen_fabric.gen_switchmatrix.list2CSV")
+        mock_bootstrap = mocker.patch(
+            "FABulous.fabric_generator.gen_fabric.gen_switchmatrix.bootstrapSwitchMatrix"
+        )
+        mock_list2csv = mocker.patch(
+            "FABulous.fabric_generator.gen_fabric.gen_switchmatrix.list2CSV"
+        )
         mocker.patch(
             "FABulous.fabric_generator.gen_fabric.gen_switchmatrix.parseMatrix",
             return_value={"E1END0": ["N1BEG0"], "LUT_A": ["N1BEG0"]},

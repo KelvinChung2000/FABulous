@@ -14,20 +14,20 @@ from FABulous.fabric_generator.gen_fabric.gen_fabric import generateFabric
 
 class FabricDUT(Protocol):
     """Protocol defining the eFPGA Fabric module interface."""
-    
+
     # Clock and Reset
     UserCLK: Any  # System clock
-    
+
     # Frame-based Configuration Interface
     FrameData: Any  # [FrameBitsPerRow-1:0] Frame configuration data
     FrameStrobe: Any  # [MaxFramesPerCol-1:0] Frame strobe signals
     FrameData_O: Any  # [FrameBitsPerRow-1:0] Frame data output (chain)
     FrameStrobe_O: Any  # [MaxFramesPerCol-1:0] Frame strobe output (chain)
-    
+
     # FlipFlop Chain Configuration Interface (alternative)
     conf_data: Any  # Configuration data input
     conf_clk: Any  # Configuration clock
-    
+
     # External I/O (when present)
     Tile_X0Y0_A_I: Any  # Example tile I/O - actual ports depend on fabric configuration
     Tile_X0Y0_A_O: Any
@@ -49,7 +49,9 @@ def _create_fabric_validation_commands(
     commands = []
 
     # Basic RTL checks
-    commands.append("check -noinit")  # Check for multiple drivers and uninitialized signals
+    commands.append(
+        "check -noinit"
+    )  # Check for multiple drivers and uninitialized signals
     commands.append("check -assert")  # Verify all outputs are driven
 
     # Check that expected ports exist
@@ -79,7 +81,9 @@ def _create_fabric_validation_commands(
         for col in range(cols):
             tile_instance = f"*tile_{row}_{col}*"
             # UserCLK should connect to each tile's UserCLK input
-            commands.append(f"select -assert-min 1 w:UserCLK %co c:{tile_instance} %ci %i")
+            commands.append(
+                f"select -assert-min 1 w:UserCLK %co c:{tile_instance} %ci %i"
+            )
 
     # Frame-based configuration chain validation
     if config_bit_mode == ConfigBitMode.FRAME_BASED:
@@ -99,13 +103,23 @@ def _create_fabric_validation_commands(
                 if row == rows - 1 and col == cols - 1:
                     # Last tile - its output should connect to fabric output
                     last_tile = f"*tile_{row}_{col}*"
-                    commands.append(f"select -assert-min 1 c:{last_tile} %co w:FrameData_O %i")
-                    commands.append(f"select -assert-min 1 c:{last_tile} %co w:FrameStrobe_O %i")
+                    commands.append(
+                        f"select -assert-min 1 c:{last_tile} %co w:FrameData_O %i"
+                    )
+                    commands.append(
+                        f"select -assert-min 1 c:{last_tile} %co w:FrameStrobe_O %i"
+                    )
                 else:
                     # Intermediate tiles - output connects to next tile's input
                     current_tile = f"*tile_{row}_{col}*"
-                    next_tile = f"*tile_{row}_{col + 1}*" if col < cols - 1 else f"*tile_{row + 1}_0*"
-                    commands.append(f"select -assert-min 1 c:{current_tile} %co c:{next_tile} %ci %i")
+                    next_tile = (
+                        f"*tile_{row}_{col + 1}*"
+                        if col < cols - 1
+                        else f"*tile_{row + 1}_0*"
+                    )
+                    commands.append(
+                        f"select -assert-min 1 c:{current_tile} %co c:{next_tile} %ci %i"
+                    )
 
     # Verify tile-to-tile routing connections
     # Adjacent tiles should have routing wire connections
@@ -116,11 +130,15 @@ def _create_fabric_validation_commands(
             # Check connections to adjacent tiles
             if col < cols - 1:  # Right neighbor
                 right_tile = f"*tile_{row}_{col + 1}*"
-                commands.append(f"select -assert-min 1 c:{current_tile} %co c:{right_tile} %ci %i")
+                commands.append(
+                    f"select -assert-min 1 c:{current_tile} %co c:{right_tile} %ci %i"
+                )
 
             if row < rows - 1:  # Bottom neighbor
                 bottom_tile = f"*tile_{row + 1}_{col}*"
-                commands.append(f"select -assert-min 1 c:{current_tile} %co c:{bottom_tile} %ci %i")
+                commands.append(
+                    f"select -assert-min 1 c:{current_tile} %co c:{bottom_tile} %ci %i"
+                )
 
     return commands
 
@@ -132,7 +150,13 @@ def _create_fabric_validation_commands(
         FabricTestCase(
             config_bit_mode=ConfigBitMode.FRAME_BASED,
             test_name="frame_based_fabric",
-            expected_ports=["UserCLK", "FrameData", "FrameStrobe", "FrameData_O", "FrameStrobe_O"],
+            expected_ports=[
+                "UserCLK",
+                "FrameData",
+                "FrameStrobe",
+                "FrameData_O",
+                "FrameStrobe_O",
+            ],
         ),
         FabricTestCase(
             config_bit_mode=ConfigBitMode.FLIPFLOP_CHAIN,
@@ -218,14 +242,22 @@ def test_fabric_with_io_rtl_validation(
     validator = yosys_validator(writer.outFileName)
 
     # Expected ports for fabric with I/O
-    expected_ports = ["UserCLK", "FrameData", "FrameStrobe", "FrameData_O", "FrameStrobe_O"]
+    expected_ports = [
+        "UserCLK",
+        "FrameData",
+        "FrameStrobe",
+        "FrameData_O",
+        "FrameStrobe_O",
+    ]
 
     fabric_config = {
         "rows": fabric_with_io_tiles.numberOfRows,
         "cols": fabric_with_io_tiles.numberOfColumns,
     }
 
-    yosys_commands = _create_fabric_validation_commands(ConfigBitMode.FRAME_BASED, fabric_config, expected_ports)
+    yosys_commands = _create_fabric_validation_commands(
+        ConfigBitMode.FRAME_BASED, fabric_config, expected_ports
+    )
     validator.validate(yosys_commands)
 
 
@@ -257,14 +289,22 @@ def test_minimal_fabric_rtl_validation(
     validator = yosys_validator(writer.outFileName)
 
     # Basic expected ports for minimal fabric
-    expected_ports = ["UserCLK", "FrameData", "FrameStrobe", "FrameData_O", "FrameStrobe_O"]
+    expected_ports = [
+        "UserCLK",
+        "FrameData",
+        "FrameStrobe",
+        "FrameData_O",
+        "FrameStrobe_O",
+    ]
 
     fabric_config = {
         "rows": empty_fabric.numberOfRows,
         "cols": empty_fabric.numberOfColumns,
     }
 
-    yosys_commands = _create_fabric_validation_commands(ConfigBitMode.FRAME_BASED, fabric_config, expected_ports)
+    yosys_commands = _create_fabric_validation_commands(
+        ConfigBitMode.FRAME_BASED, fabric_config, expected_ports
+    )
     validator.validate(yosys_commands)
 
 

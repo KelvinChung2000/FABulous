@@ -33,7 +33,7 @@ def test_LUT4c_verilog_rtl(cocotb_runner: CocotbRunner) -> None:
     cocotb_runner(
         sources=[
             VERILOG_SOURCE_PATH / "Fabric" / "models_pack.v",  # Include custom modules
-            VERILOG_SOURCE_PATH / "Tile" / "LUT4AB" / "LUT4c_frame_config_dffesr.v"
+            VERILOG_SOURCE_PATH / "Tile" / "LUT4AB" / "LUT4c_frame_config_dffesr.v",
         ],
         hdl_top_level="LUT4c_frame_config_dffesr",
         test_module_path=Path(__file__),

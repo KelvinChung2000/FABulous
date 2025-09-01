@@ -12,39 +12,61 @@ import tempfile
 from dataclasses import dataclass
 from typing import List
 
-@dataclass 
+
+@dataclass
 class ValidationResult:
     """Result of Yosys validation."""
+
     passed: bool
     failures: List[str]
     warnings: List[str] = None
-    
+
     def __post_init__(self):
         if self.warnings is None:
             self.warnings = []
+
 
 def run_yosys_validation(hdl_file: Path, yosys_commands: List[str]) -> ValidationResult:
     """Run Yosys validation with provided commands."""
     # Load script based on HDL type
     load_script = []
     if hdl_file.suffix.lower() == ".v":
-        load_script.extend([f"read_verilog {hdl_file}", "hierarchy -auto-top", "proc", "clean"])
+        load_script.extend(
+            [f"read_verilog {hdl_file}", "hierarchy -auto-top", "proc", "clean"]
+        )
     elif hdl_file.suffix.lower() in [".vhd", ".vhdl"]:
-        load_script.extend(["plugin -i ghdl", f"ghdl --std=08 {hdl_file}", "hierarchy -auto-top", "proc", "clean"])
-    
+        load_script.extend(
+            [
+                "plugin -i ghdl",
+                f"ghdl --std=08 {hdl_file}",
+                "hierarchy -auto-top",
+                "proc",
+                "clean",
+            ]
+        )
+
     with tempfile.TemporaryDirectory() as temp_dir:
         script_file = Path(temp_dir) / "validate.ys"
         script_content = "\n".join(load_script + yosys_commands)
         script_file.write_text(script_content)
 
         try:
-            result = subprocess.run(["yosys", "-s", str(script_file)], capture_output=True, text=True, timeout=60)
+            result = subprocess.run(
+                ["yosys", "-s", str(script_file)],
+                capture_output=True,
+                text=True,
+                timeout=60,
+            )
             if result.returncode == 0:
                 return ValidationResult(passed=True, failures=[])
-            failures = [line.strip() for line in result.stderr.split("\n") if line.strip()]
+            failures = [
+                line.strip() for line in result.stderr.split("\n") if line.strip()
+            ]
             return ValidationResult(passed=False, failures=failures)
         except subprocess.TimeoutExpired:
-            return ValidationResult(passed=False, failures=["Yosys validation timed out"])
+            return ValidationResult(
+                passed=False, failures=["Yosys validation timed out"]
+            )
         except FileNotFoundError:
             return ValidationResult(passed=False, failures=["Yosys not found in PATH"])
 
@@ -60,10 +82,25 @@ class TopWrapperTestCase(NamedTuple):
 class TestGenTopWrapper:
     """Test class for generateTopWrapper function using Yosys assertions."""
 
-    @pytest.mark.parametrize("expected_content", [
-        ["include_eFPGA", "NumberOfRows", "NumberOfCols", "FrameBitsPerRow", "MaxFramesPerCol"],
-        ["Config related ports", "CLK", "resetn", "SelfWriteStrobe", "SelfWriteData"],
-    ])
+    @pytest.mark.parametrize(
+        "expected_content",
+        [
+            [
+                "include_eFPGA",
+                "NumberOfRows",
+                "NumberOfCols",
+                "FrameBitsPerRow",
+                "MaxFramesPerCol",
+            ],
+            [
+                "Config related ports",
+                "CLK",
+                "resetn",
+                "SelfWriteStrobe",
+                "SelfWriteData",
+            ],
+        ],
+    )
     def test_basic_top_wrapper_generation(
         self,
         expected_content: List[str],
@@ -74,26 +111,41 @@ class TestGenTopWrapper:
         """Test basic top wrapper generation with parametrized content checks."""
         writer = code_generator_factory(".v", f"{default_fabric.name}_top")
         writer.outFileName = tmp_path / f"{default_fabric.name}_top.v"
-        
+
         generateTopWrapper(writer, default_fabric)
-        
+
         # Verify output file was created
         assert writer.outFileName.exists()
         content = writer.outFileName.read_text()
-        
+
         # Basic structure checks
         assert f"module {default_fabric.name}_top" in content
         assert "endmodule" in content
-        
+
         # Check expected content
         for expected_item in expected_content:
-            assert expected_item in content, f"Expected '{expected_item}' not found in content"
+            assert expected_item in content, (
+                f"Expected '{expected_item}' not found in content"
+            )
 
-    @pytest.mark.parametrize("validation_commands", [
-        ["hierarchy -check", "stat"],  # Basic hierarchy
-        ["hierarchy -check", "stat", "select c:*eFPGA*", "select -clear"],  # eFPGA instances
-        ["hierarchy -check", "stat", "select w:CLK", "select -clear"],  # Clock signals
-    ])
+    @pytest.mark.parametrize(
+        "validation_commands",
+        [
+            ["hierarchy -check", "stat"],  # Basic hierarchy
+            [
+                "hierarchy -check",
+                "stat",
+                "select c:*eFPGA*",
+                "select -clear",
+            ],  # eFPGA instances
+            [
+                "hierarchy -check",
+                "stat",
+                "select w:CLK",
+                "select -clear",
+            ],  # Clock signals
+        ],
+    )
     def test_top_wrapper_yosys_validation(
         self,
         validation_commands: List[str],
@@ -104,13 +156,13 @@ class TestGenTopWrapper:
         """Parametric Yosys validation for top wrapper."""
         writer = code_generator_factory(".v", f"{default_fabric.name}_top_yosys")
         writer.outFileName = tmp_path / f"{default_fabric.name}_top_yosys.v"
-        
+
         generateTopWrapper(writer, default_fabric)
         assert writer.outFileName.exists()
-        
+
         # Run inline Yosys validation
         result = run_yosys_validation(writer.outFileName, validation_commands)
-        
+
         if not result.passed and len(result.failures) > 1:
             pytest.skip(f"Top wrapper validation found issues: {result.failures[:2]}")
 
@@ -123,6 +175,7 @@ class TestGenTopWrapper:
         """Test top wrapper parameter configuration using default fixture."""
         # Setup basic fabric structure for parameter testing
         from tests.fabric_gen_test.conftest import MockBel
+
         fabric = default_fabric
         fabric.numberOfRows = 4
         fabric.numberOfColumns = 3
@@ -145,20 +198,20 @@ class TestGenTopWrapper:
                 fabric.tileDic[tile.name] = tile
                 row.append(tile)
             fabric.tile.append(row)
-        
+
         writer = code_generator_factory(".v", "default_wrapper_params")
         writer.outFileName = tmp_path / "default_wrapper_params.v"
-        
+
         generateTopWrapper(writer, fabric)
-        
+
         assert writer.outFileName.exists()
         content = writer.outFileName.read_text()
-        
+
         # Basic parameter checks that should work with any valid configuration
         assert "NumberOfRows" in content
         assert "NumberOfCols" in content
         assert "FrameBitsPerRow" in content or "MaxFramesPerCol" in content
-        
+
         # Basic structure checks
         assert "module" in content
         assert "endmodule" in content
@@ -172,6 +225,7 @@ class TestGenTopWrapper:
         """Simple Yosys validation using default fabric fixture."""
         # Setup fabric with basic tile configuration
         from tests.fabric_gen_test.conftest import MockBel
+
         fabric = default_fabric
         fabric.numberOfRows = 2
         fabric.numberOfColumns = 2
@@ -194,36 +248,39 @@ class TestGenTopWrapper:
                 fabric.tileDic[tile.name] = tile
                 row.append(tile)
             fabric.tile.append(row)
-        
+
         writer = code_generator_factory(".v", "default_wrapper_yosys")
         writer.outFileName = tmp_path / "default_wrapper_yosys.v"
-        
+
         generateTopWrapper(writer, fabric)
-        
+
         assert writer.outFileName.exists()
-        
+
         # Run basic Yosys validation with default configuration
         validation_commands = [
             "hierarchy -check",
-            "stat", 
+            "stat",
             f"select c:*{fabric.name}*",
-            "select -clear"
+            "select -clear",
         ]
         result = run_yosys_validation(writer.outFileName, validation_commands)
-        
+
         # Allow some tolerance for basic validation
         if len(result.failures) > 1:
-            pytest.skip(f"Default configuration validation found issues: {result.failures[:2]}")
+            pytest.skip(
+                f"Default configuration validation found issues: {result.failures[:2]}"
+            )
 
     def test_top_wrapper_connection_validation(
         self,
         default_fabric: Fabric,
-        code_generator_factory: Callable[..., CodeGenerator], 
+        code_generator_factory: Callable[..., CodeGenerator],
         tmp_path: Path,
     ) -> None:
         """Test specific connection validation for top wrapper."""
         # Configure for interesting connections
         from tests.fabric_gen_test.conftest import MockBel
+
         default_fabric.numberOfBRAMs = 2
         default_fabric.numberOfRows = 6
         default_fabric.numberOfColumns = 4
@@ -245,14 +302,14 @@ class TestGenTopWrapper:
                 default_fabric.tileDic[tile.name] = tile
                 row.append(tile)
             default_fabric.tile.append(row)
-        
+
         writer = code_generator_factory(".v", f"{default_fabric.name}_top_connections")
         writer.outFileName = tmp_path / f"{default_fabric.name}_top_connections.v"
-        
+
         generateTopWrapper(writer, default_fabric)
-        
+
         assert writer.outFileName.exists()
-        
+
         # Define expected critical connections
         expected_connections = {
             "CLK": "input",  # CLK should be an input port
@@ -260,20 +317,24 @@ class TestGenTopWrapper:
             "LocalWriteData": "wire",  # Internal signals should be wires
             "LocalWriteStrobe": "wire",
         }
-        
+
         # Test specific connection validation inline
         validation_commands = [
             "hierarchy -check",
             "stat",
-            "select w:CLK", "select -clear",  # Check CLK input exists
-            "select w:resetn", "select -clear",  # Check resetn input exists
+            "select w:CLK",
+            "select -clear",  # Check CLK input exists
+            "select w:resetn",
+            "select -clear",  # Check resetn input exists
         ]
         result = run_yosys_validation(writer.outFileName, validation_commands)
-        
+
         if not result.passed:
             # Allow some tolerance for connection validation
             if len(result.failures) > 2:
-                pytest.skip(f"Connection validation found issues: {result.failures[:3]}")
+                pytest.skip(
+                    f"Connection validation found issues: {result.failures[:3]}"
+                )
 
     def test_top_wrapper_vhdl_error_handling(
         self,
@@ -284,6 +345,7 @@ class TestGenTopWrapper:
         """Test error handling when VHDL dependency files are missing."""
         # Setup minimal fabric structure first
         from tests.fabric_gen_test.conftest import MockBel
+
         default_fabric.numberOfBRAMs = 0
         default_fabric.frameBitsPerRow = 32
         default_fabric.maxFramesPerCol = 20
@@ -305,10 +367,10 @@ class TestGenTopWrapper:
                 default_fabric.tileDic[tile.name] = tile
                 row.append(tile)
             default_fabric.tile.append(row)
-            
+
         writer = code_generator_factory(".vhdl", f"{default_fabric.name}_top_missing")
         writer.outFileName = tmp_path / f"{default_fabric.name}_top_missing.vhdl"
-        
+
         # Don't create the required files to trigger error
         with pytest.raises(FileExistsError):
             generateTopWrapper(writer, default_fabric)
@@ -322,6 +384,7 @@ class TestGenTopWrapper:
         """Simple test for top wrapper with BRAMs using default fixture."""
         # Setup basic fabric structure
         from tests.fabric_gen_test.conftest import MockBel
+
         fabric = default_fabric
         fabric.numberOfBRAMs = 2
         fabric.numberOfRows = 2
@@ -344,20 +407,20 @@ class TestGenTopWrapper:
                 fabric.tileDic[tile.name] = tile
                 row.append(tile)
             fabric.tile.append(row)
-        
+
         writer = code_generator_factory(".v", "default_wrapper_brams")
         writer.outFileName = tmp_path / "default_wrapper_brams.v"
-        
+
         generateTopWrapper(writer, fabric)
-        
+
         assert writer.outFileName.exists()
         content = writer.outFileName.read_text()
-        
+
         # Basic checks that should pass with default configuration
         assert "module" in content
         assert "endmodule" in content
         assert "CLK" in content
-        
+
         # Basic structural checks that should always pass
         # Note: BRAM generation depends on additional fabric configuration
         # that may not be set up in this simplified test
@@ -371,6 +434,7 @@ class TestGenTopWrapper:
         """Test that fabric parameters are correctly preserved in top wrapper."""
         # Set specific parameter values
         from tests.fabric_gen_test.conftest import MockBel
+
         default_fabric.numberOfBRAMs = 0
         default_fabric.frameBitsPerRow = 64
         default_fabric.maxFramesPerCol = 25
@@ -392,15 +456,15 @@ class TestGenTopWrapper:
                 default_fabric.tileDic[tile.name] = tile
                 row.append(tile)
             default_fabric.tile.append(row)
-        
+
         writer = code_generator_factory(".v", f"{default_fabric.name}_top_preserve")
         writer.outFileName = tmp_path / f"{default_fabric.name}_top_preserve.v"
-        
+
         generateTopWrapper(writer, default_fabric)
-        
+
         assert writer.outFileName.exists()
         content = writer.outFileName.read_text()
-        
+
         # Check parameter values are preserved (note: NumberOfRows = numberOfRows - 2)
         assert "FrameBitsPerRow" in content
         assert "64" in content
@@ -430,14 +494,14 @@ class TestGenTopWrapper:
         if hdl_extension == ".vhdl":
             dependency_files = [
                 "Frame_Data_Reg.vhdl",
-                "Frame_Select.vhdl", 
+                "Frame_Select.vhdl",
                 "eFPGA_Config.vhdl",
                 "eFPGA.vhdl",
                 "BlockRAM_1KB.vhdl",
             ]
             for dep_file in dependency_files:
                 dep_path = tmp_path / dep_file
-                entity_name = dep_file.replace('.vhdl', '')
+                entity_name = dep_file.replace(".vhdl", "")
                 dep_path.write_text(f"""
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
@@ -454,38 +518,50 @@ begin
     -- Minimal behavioral implementation for synthesis
 end architecture;
 """)
-        
-        writer = code_generator_factory(hdl_extension, f"test_ghdl_{hdl_extension.replace('.', '')}")
-        writer.outFileName = tmp_path / f"test_ghdl_{hdl_extension.replace('.', '')}{hdl_extension}"
-        
+
+        writer = code_generator_factory(
+            hdl_extension, f"test_ghdl_{hdl_extension.replace('.', '')}"
+        )
+        writer.outFileName = (
+            tmp_path / f"test_ghdl_{hdl_extension.replace('.', '')}{hdl_extension}"
+        )
+
         generateTopWrapper(writer, default_fabric)
-        
+
         assert writer.outFileName.exists()
-        
+
         # Run Yosys validation with GHDL support
         config = {
-            'fabric_name': default_fabric.name,
-            'number_of_brams': getattr(default_fabric, 'numberOfBRAMs', 0),
+            "fabric_name": default_fabric.name,
+            "number_of_brams": getattr(default_fabric, "numberOfBRAMs", 0),
         }
-        
+
         # Run inline Yosys validation with GHDL support
         validation_commands = [
             "hierarchy -check",
             "stat",
             f"select c:*{config['fabric_name']}*",
-            "select -clear"
+            "select -clear",
         ]
         result = run_yosys_validation(writer.outFileName, validation_commands)
-        
+
         if not result.passed:
             # For VHDL, be more lenient due to synthesis complexity
             if hdl_extension == ".vhdl":
                 # Check if it's a GHDL-related issue
-                ghdl_issues = [f for f in result.failures if "GHDL" in f or "synthesis" in f.lower()]
+                ghdl_issues = [
+                    f
+                    for f in result.failures
+                    if "GHDL" in f or "synthesis" in f.lower()
+                ]
                 if ghdl_issues:
-                    pytest.skip(f"VHDL validation skipped due to GHDL issues: {ghdl_issues[0]}")
+                    pytest.skip(
+                        f"VHDL validation skipped due to GHDL issues: {ghdl_issues[0]}"
+                    )
                 # Allow some structural issues for VHDL
                 elif len(result.failures) <= 2:
                     pytest.skip(f"VHDL validation has minor issues: {result.failures}")
-            
-            pytest.skip(f"Top wrapper {hdl_extension} validation found issues: {result.failures[:2]}")
+
+            pytest.skip(
+                f"Top wrapper {hdl_extension} validation found issues: {result.failures[:2]}"
+            )

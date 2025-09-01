@@ -19,12 +19,16 @@ class TopWrapperTestCase(NamedTuple):
     expected_ports: list[str]
 
 
-def _create_top_wrapper_validation_commands(number_of_brams: int, expected_ports: list[str]) -> list[str]:
+def _create_top_wrapper_validation_commands(
+    number_of_brams: int, expected_ports: list[str]
+) -> list[str]:
     """Create yosys validation commands for top wrapper structure."""
     commands = []
 
     # Basic RTL checks
-    commands.append("check -noinit")  # Check for multiple drivers and uninitialized signals
+    commands.append(
+        "check -noinit"
+    )  # Check for multiple drivers and uninitialized signals
     commands.append("check -assert")  # Verify all outputs are driven
 
     # Check that expected ports exist
@@ -38,9 +42,15 @@ def _create_top_wrapper_validation_commands(number_of_brams: int, expected_ports
 
     # Port-to-port connectivity validation
     # Clock distribution - CLK should connect to specific ports of each module
-    commands.append("select -assert-min 1 w:CLK %co c:*eFPGA_Config* %ci %i")  # CLK to config
-    commands.append("select -assert-min 1 w:CLK %co c:*Frame_Data_Reg* %ci %i")  # CLK to frame reg
-    commands.append("select -assert-min 1 w:CLK %co c:*Frame_Select* %ci %i")  # CLK to frame select
+    commands.append(
+        "select -assert-min 1 w:CLK %co c:*eFPGA_Config* %ci %i"
+    )  # CLK to config
+    commands.append(
+        "select -assert-min 1 w:CLK %co c:*Frame_Data_Reg* %ci %i"
+    )  # CLK to frame reg
+    commands.append(
+        "select -assert-min 1 w:CLK %co c:*Frame_Select* %ci %i"
+    )  # CLK to frame select
     commands.append("select -assert-min 1 w:CLK %co c:*eFPGA* %ci %i")  # CLK to fabric
 
     # Reset distribution - resetn should connect to reset ports of each module
@@ -53,20 +63,26 @@ def _create_top_wrapper_validation_commands(number_of_brams: int, expected_ports
     commands.append("select -assert-min 1 w:Rx %co c:*eFPGA_Config* %ci %i")
 
     # Configuration signals should flow: eFPGA_Config -> Frame_Data_Reg -> eFPGA
-    commands.append("select -assert-min 1 c:*eFPGA_Config* %co c:*Frame_Data_Reg* %ci %i")
+    commands.append(
+        "select -assert-min 1 c:*eFPGA_Config* %co c:*Frame_Data_Reg* %ci %i"
+    )
     commands.append("select -assert-min 1 c:*Frame_Data_Reg* %co c:*eFPGA* %ci %i")
 
     # Frame selection signals should connect: Frame_Select -> eFPGA
     commands.append("select -assert-min 1 c:*Frame_Select* %co c:*eFPGA* %ci %i")
 
     # Self-write interface validation
-    commands.append("select -assert-min 1 w:SelfWriteStrobe %co c:*eFPGA_Config* %ci %i")
+    commands.append(
+        "select -assert-min 1 w:SelfWriteStrobe %co c:*eFPGA_Config* %ci %i"
+    )
     commands.append("select -assert-min 1 w:SelfWriteData %co c:*eFPGA_Config* %ci %i")
 
     # BRAM specific connectivity validation
     if number_of_brams > 0:
         expected_bram_instances = number_of_brams - 1
-        commands.append(f"select -assert-count {expected_bram_instances} c:*BlockRAM_1KB*")
+        commands.append(
+            f"select -assert-count {expected_bram_instances} c:*BlockRAM_1KB*"
+        )
 
         # BRAM data interface connectivity
         # eFPGA should connect to BRAM data buses
@@ -75,7 +91,9 @@ def _create_top_wrapper_validation_commands(number_of_brams: int, expected_ports
 
         # BRAM instances should connect to the data buses
         commands.append("select -assert-min 1 c:*BlockRAM_1KB* %co w:RAM2FAB_D_I %i")
-        commands.append("select -assert-min 1 w:FAB2RAM_D_O %co c:*BlockRAM_1KB* %ci %i")
+        commands.append(
+            "select -assert-min 1 w:FAB2RAM_D_O %co c:*BlockRAM_1KB* %ci %i"
+        )
 
         # Clock should connect to BRAM instances
         commands.append("select -assert-min 1 w:CLK %co c:*BlockRAM_1KB* %ci %i")
@@ -209,7 +227,9 @@ def test_top_wrapper_with_io_rtl_validation(
 
     # Check if HDL file was created
     if not writer.outFileName.exists():
-        pytest.skip(f"Top wrapper with I/O HDL file {writer.outFileName} was not generated")
+        pytest.skip(
+            f"Top wrapper with I/O HDL file {writer.outFileName} was not generated"
+        )
 
     # Validate structure using Yosys
     validator = yosys_validator(writer.outFileName)
@@ -260,7 +280,9 @@ def test_minimal_top_wrapper_rtl_validation(
 
     # Check if HDL file was created
     if not writer.outFileName.exists():
-        pytest.skip(f"Minimal top wrapper HDL file {writer.outFileName} was not generated")
+        pytest.skip(
+            f"Minimal top wrapper HDL file {writer.outFileName} was not generated"
+        )
 
     # Validate structure using Yosys
     validator = yosys_validator(writer.outFileName)

@@ -31,9 +31,19 @@ def run_yosys_validation(hdl_file: Path, yosys_commands: List[str]) -> Validatio
     # Load script based on HDL type
     load_script = []
     if hdl_file.suffix.lower() == ".v":
-        load_script.extend([f"read_verilog {hdl_file}", "hierarchy -auto-top", "proc", "clean"])
+        load_script.extend(
+            [f"read_verilog {hdl_file}", "hierarchy -auto-top", "proc", "clean"]
+        )
     elif hdl_file.suffix.lower() in [".vhd", ".vhdl"]:
-        load_script.extend(["plugin -i ghdl", f"ghdl --std=08 {hdl_file}", "hierarchy -auto-top", "proc", "clean"])
+        load_script.extend(
+            [
+                "plugin -i ghdl",
+                f"ghdl --std=08 {hdl_file}",
+                "hierarchy -auto-top",
+                "proc",
+                "clean",
+            ]
+        )
 
     with tempfile.TemporaryDirectory() as temp_dir:
         script_file = Path(temp_dir) / "validate.ys"
@@ -41,13 +51,22 @@ def run_yosys_validation(hdl_file: Path, yosys_commands: List[str]) -> Validatio
         script_file.write_text(script_content)
 
         try:
-            result = subprocess.run(["yosys", "-s", str(script_file)], capture_output=True, text=True, timeout=60)
+            result = subprocess.run(
+                ["yosys", "-s", str(script_file)],
+                capture_output=True,
+                text=True,
+                timeout=60,
+            )
             if result.returncode == 0:
                 return ValidationResult(passed=True, failures=[])
-            failures = [line.strip() for line in result.stderr.split("\n") if line.strip()]
+            failures = [
+                line.strip() for line in result.stderr.split("\n") if line.strip()
+            ]
             return ValidationResult(passed=False, failures=failures)
         except subprocess.TimeoutExpired:
-            return ValidationResult(passed=False, failures=["Yosys validation timed out"])
+            return ValidationResult(
+                passed=False, failures=["Yosys validation timed out"]
+            )
         except FileNotFoundError:
             return ValidationResult(passed=False, failures=["Yosys not found in PATH"])
 
@@ -97,7 +116,11 @@ class TestGenFabric:
     @pytest.mark.parametrize(
         "config_mode,expected_signals,absent_signals",
         [
-            (ConfigBitMode.FRAME_BASED, ["FrameData", "FrameStrobe", "CONFIG_PORT"], ["conf_data"]),
+            (
+                ConfigBitMode.FRAME_BASED,
+                ["FrameData", "FrameStrobe", "CONFIG_PORT"],
+                ["conf_data"],
+            ),
             ("FlipFlopChain", ["conf_data"], ["FrameData", "FrameStrobe"]),
         ],
     )
@@ -118,8 +141,12 @@ class TestGenFabric:
             default_fabric.frameBitsPerRow = 32
         setup_fabric_with_tiles(default_fabric)
 
-        writer = code_generator_factory(".v", f"test_fabric_{str(config_mode).replace('.', '_')}")
-        writer.outFileName = tmp_path / f"test_fabric_{str(config_mode).replace('.', '_')}.v"
+        writer = code_generator_factory(
+            ".v", f"test_fabric_{str(config_mode).replace('.', '_')}"
+        )
+        writer.outFileName = (
+            tmp_path / f"test_fabric_{str(config_mode).replace('.', '_')}.v"
+        )
 
         # Generate fabric
         generateFabric(writer, default_fabric)
@@ -171,8 +198,14 @@ class TestGenFabric:
         "validation_type,commands",
         [
             ("hierarchy", ["hierarchy -check", "stat"]),
-            ("basic_structure", ["hierarchy -check", "stat", "select c:*", "select -clear"]),
-            ("signal_check", ["hierarchy -check", "stat", "select w:*", "select -clear"]),
+            (
+                "basic_structure",
+                ["hierarchy -check", "stat", "select c:*", "select -clear"],
+            ),
+            (
+                "signal_check",
+                ["hierarchy -check", "stat", "select w:*", "select -clear"],
+            ),
         ],
     )
     def test_yosys_structural_validation(
@@ -198,7 +231,9 @@ class TestGenFabric:
         # Allow some failures for complex validation types - mock tiles are expected to have issues
         max_failures = {"hierarchy": 2, "basic_structure": 3, "signal_check": 4}
         if len(result.failures) > max_failures.get(validation_type, 0):
-            pytest.skip(f"{validation_type} validation found issues (expected with mock tiles): {result.failures[:2]}")
+            pytest.skip(
+                f"{validation_type} validation found issues (expected with mock tiles): {result.failures[:2]}"
+            )
 
     def test_fabric_port_to_port_connections(
         self,
@@ -268,7 +303,9 @@ endmodule
 
         # Allow some tolerance for basic validation
         if len(result.failures) > 1:
-            pytest.skip(f"Basic structural validation found issues: {result.failures[:2]}")
+            pytest.skip(
+                f"Basic structural validation found issues: {result.failures[:2]}"
+            )
 
     def test_fabric_validation_with_default_size(
         self,
@@ -291,7 +328,9 @@ endmodule
 
         # Allow some tolerance for default configuration
         if len(result.failures) > 1:
-            pytest.skip(f"Default size fabric validation found issues: {result.failures[:2]}")
+            pytest.skip(
+                f"Default size fabric validation found issues: {result.failures[:2]}"
+            )
 
     def test_fabric_with_default_fixture(
         self,

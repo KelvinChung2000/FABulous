@@ -14,54 +14,54 @@ from FABulous.fabric_generator.gen_fabric.gen_switchmatrix import genTileSwitchM
 
 class SwitchMatrixDUT(Protocol):
     """Protocol defining the Switch Matrix module interface."""
-    
+
     # Configuration Interface
     ConfigBits: Any  # [NoConfigBits-1:0] Configuration bits for multiplexer control
-    
+
     # Routing Signal Inputs (examples - actual signals depend on tile configuration)
     # North Direction
     N1END0: Any  # North 1-wire end signal 0
     N1END1: Any  # North 1-wire end signal 1
     N2END0: Any  # North 2-wire end signal 0
     N2END1: Any  # North 2-wire end signal 1
-    
-    # East Direction  
+
+    # East Direction
     E1END0: Any  # East 1-wire end signal 0
     E1END1: Any  # East 1-wire end signal 1
     E2END0: Any  # East 2-wire end signal 0
     E2END1: Any  # East 2-wire end signal 1
-    
+
     # South Direction
     S1END0: Any  # South 1-wire end signal 0
     S1END1: Any  # South 1-wire end signal 1
     S2END0: Any  # South 2-wire end signal 0
     S2END1: Any  # South 2-wire end signal 1
-    
+
     # West Direction
     W1END0: Any  # West 1-wire end signal 0
     W1END1: Any  # West 1-wire end signal 1
     W2END0: Any  # West 2-wire end signal 0
     W2END1: Any  # West 2-wire end signal 1
-    
+
     # Routing Signal Outputs (examples - actual signals depend on tile configuration)
     # North Direction
     N1BEG0: Any  # North 1-wire begin signal 0
     N1BEG1: Any  # North 1-wire begin signal 1
     N2BEG0: Any  # North 2-wire begin signal 0
     N2BEG1: Any  # North 2-wire begin signal 1
-    
+
     # East Direction
     E1BEG0: Any  # East 1-wire begin signal 0
     E1BEG1: Any  # East 1-wire begin signal 1
     E2BEG0: Any  # East 2-wire begin signal 0
     E2BEG1: Any  # East 2-wire begin signal 1
-    
+
     # South Direction
     S1BEG0: Any  # South 1-wire begin signal 0
     S1BEG1: Any  # South 1-wire begin signal 1
     S2BEG0: Any  # South 2-wire begin signal 0
     S2BEG1: Any  # South 2-wire begin signal 1
-    
+
     # West Direction
     W1BEG0: Any  # West 1-wire begin signal 0
     W1BEG1: Any  # West 1-wire begin signal 1
@@ -76,12 +76,16 @@ class SwitchMatrixTestCase(NamedTuple):
     test_name: str
 
 
-def _create_switchmatrix_validation_commands(connections: dict[str, list[str]]) -> list[str]:
+def _create_switchmatrix_validation_commands(
+    connections: dict[str, list[str]],
+) -> list[str]:
     """Create yosys validation commands for switch matrix connections."""
     commands = []
 
     # Basic RTL checks
-    commands.append("check -noinit")  # Check for multiple drivers and uninitialized signals
+    commands.append(
+        "check -noinit"
+    )  # Check for multiple drivers and uninitialized signals
     commands.append("check -assert")  # Verify all outputs are driven
 
     # Check that all expected input/output ports exist
@@ -114,10 +118,14 @@ def _create_switchmatrix_validation_commands(connections: dict[str, list[str]]) 
             # Multiplexer - verify each input can potentially drive the output
             for input_port in inputs:
                 # Check that there's a path from input through mux logic to output
-                commands.append(f"select -assert-min 1 w:{input_port} %co c:* %ci w:{output} %co %i %i")
+                commands.append(
+                    f"select -assert-min 1 w:{input_port} %co c:* %ci w:{output} %co %i %i"
+                )
 
             # Verify ConfigBits controls the multiplexer for this output
-            commands.append(f"select -assert-min 1 w:ConfigBits %co c:* %ci w:{output} %co %i %i")
+            commands.append(
+                f"select -assert-min 1 w:ConfigBits %co c:* %ci w:{output} %co %i %i"
+            )
 
     # Verify no unexpected connections exist
     # Each output should only be driven by its specified inputs (directly or through mux)
@@ -127,7 +135,9 @@ def _create_switchmatrix_validation_commands(connections: dict[str, list[str]]) 
             if input_port not in expected_inputs:
                 # This input should NOT directly connect to this output
                 # Use a negative assertion to ensure no direct connection
-                commands.append(f"select -assert-max 0 w:{input_port} %co w:{output} %i")
+                commands.append(
+                    f"select -assert-max 0 w:{input_port} %co w:{output} %i"
+                )
 
     # ConfigBits connectivity validation
     # ConfigBits should connect to multiplexer control inputs
@@ -137,10 +147,14 @@ def _create_switchmatrix_validation_commands(connections: dict[str, list[str]]) 
 
         # Check that ConfigBits has the right bit width for the multiplexers
         total_config_bits_needed = sum(
-            (len(inputs) - 1).bit_length() for inputs in connections.values() if len(inputs) > 1
+            (len(inputs) - 1).bit_length()
+            for inputs in connections.values()
+            if len(inputs) > 1
         )
         if total_config_bits_needed > 0:
-            commands.append(f"select -assert-min {total_config_bits_needed} w:ConfigBits")
+            commands.append(
+                f"select -assert-min {total_config_bits_needed} w:ConfigBits"
+            )
 
     # Verify signal isolation - inputs should not directly connect to each other
     input_list = list(all_inputs)
@@ -151,11 +165,15 @@ def _create_switchmatrix_validation_commands(connections: dict[str, list[str]]) 
 
     # Check that each input actually has a purpose (connects to at least one output)
     for input_port in all_inputs:
-        connected_outputs = [output for output, inputs in connections.items() if input_port in inputs]
+        connected_outputs = [
+            output for output, inputs in connections.items() if input_port in inputs
+        ]
         if connected_outputs:
             # Build a command to verify this input drives at least one of its connected outputs
             output_selection = " ".join(f"w:{output}" for output in connected_outputs)
-            commands.append(f"select -assert-min 1 w:{input_port} %co {output_selection} %u %i")
+            commands.append(
+                f"select -assert-min 1 w:{input_port} %co {output_selection} %u %i"
+            )
 
     return commands
 
@@ -203,7 +221,9 @@ def test_switchmatrix_rtl_validation(
     """Generate Switch Matrix HDL and verify its structure using Yosys RTL validation."""
 
     # Create code generator using the factory fixture
-    test_name: str = f"{default_tile.name}_{connection_test_case.test_name}_switch_matrix"
+    test_name: str = (
+        f"{default_tile.name}_{connection_test_case.test_name}_switch_matrix"
+    )
     writer: CodeGenerator = code_generator_factory(hdl_lang, test_name)
     writer.outFileName = tmp_path / f"{test_name}{hdl_lang}"
 
@@ -231,7 +251,9 @@ def test_switchmatrix_rtl_validation(
     validator = yosys_validator(writer.outFileName)
 
     # Create yosys commands to validate switch matrix structure
-    yosys_commands = _create_switchmatrix_validation_commands(connection_test_case.connections)
+    yosys_commands = _create_switchmatrix_validation_commands(
+        connection_test_case.connections
+    )
 
     # Run RTL validation
     validator.validate(yosys_commands)

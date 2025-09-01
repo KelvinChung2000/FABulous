@@ -40,7 +40,7 @@ def test_MUX8LUT_verilog_rtl(cocotb_runner: CocotbRunner) -> None:
     cocotb_runner(
         sources=[
             VERILOG_SOURCE_PATH / "Fabric" / "models_pack.v",  # Include custom modules
-            VERILOG_SOURCE_PATH / "Tile" / "LUT4AB" / "MUX8LUT_frame_config_mux.v"
+            VERILOG_SOURCE_PATH / "Tile" / "LUT4AB" / "MUX8LUT_frame_config_mux.v",
         ],
         hdl_top_level="MUX8LUT_frame_config_mux",
         test_module_path=Path(__file__),
@@ -86,26 +86,26 @@ class MUX8LUTModel:
         A, B, C, D, E, F, G, H = inputs
         c0 = config_bits & 1
         c1 = (config_bits >> 1) & 1
-        
+
         # Based on the actual module logic - hierarchical MUXes
         AB = A if (select & 1) == 0 else B
-        CD = C if (select & 1) == 0 else D  
+        CD = C if (select & 1) == 0 else D
         EF = E if (select & 1) == 0 else F
         GH = G if (select & 1) == 0 else H
-        
+
         # Second level
         AD = AB if ((select >> 1) & 1) == 0 else CD
         EH = EF if ((select >> 1) & 1) == 0 else GH
-        
-        # Third level  
+
+        # Third level
         AH = AD if ((select >> 2) & 1) == 0 else EH
         EH_GH = EH if ((select >> 3) & 1) == 0 else GH
-        
+
         return {
-            'M_AB': AB & 1,
-            'M_AD': (CD if c0 == 0 else AD) & 1,
-            'M_AH': (EH_GH if c1 == 0 else AH) & 1,
-            'M_EF': EF & 1
+            "M_AB": AB & 1,
+            "M_AD": (CD if c0 == 0 else AD) & 1,
+            "M_AH": (EH_GH if c1 == 0 else AH) & 1,
+            "M_EF": EF & 1,
         }
 
     def reset(self) -> None:
@@ -172,20 +172,22 @@ async def test_mux8lut_basic_selection(dut: MUX8LUTProtocol) -> None:
     # Set configuration bits for testing
     config_bits = 0  # c1=0, c0=0
     dut.ConfigBits.value = config_bits
-    
+
     # Test each select value
     for select_val in range(16):  # 4-bit select supports 0-15
         set_select_signals(dut, select_val)
         await Timer(Decimal(100), units="ps")
 
-        expected_outputs = model.compute_mux_output(test_inputs, select_val, config_bits)
+        expected_outputs = model.compute_mux_output(
+            test_inputs, select_val, config_bits
+        )
 
         # Check all MUX outputs
         assert dut.M_AB.value.integer == expected_outputs["M_AB"], (
             f"Select {select_val}: M_AB expected {expected_outputs['M_AB']}, got {dut.M_AB.value.integer}"
         )
         assert dut.M_AD.value.integer == expected_outputs["M_AD"], (
-            f"Select {select_val}: M_AD expected {expected_outputs['M_AD']}, got {dut.M_AD.value.integer}"  
+            f"Select {select_val}: M_AD expected {expected_outputs['M_AD']}, got {dut.M_AD.value.integer}"
         )
         assert dut.M_AH.value.integer == expected_outputs["M_AH"], (
             f"Select {select_val}: M_AH expected {expected_outputs['M_AH']}, got {dut.M_AH.value.integer}"

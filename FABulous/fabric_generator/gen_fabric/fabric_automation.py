@@ -377,7 +377,6 @@ def addBelsToPrim(
     support_vectors: bool = False,
 ) -> None:
     """Add a list of Bels as blackbox primitives to yosys prims file.
-    """Add a list of Bels as blackbox primitives to yosys prims file.
 
     Parameters
     ----------
@@ -448,8 +447,8 @@ def addBelsToPrim(
 
             if support_vectors:
                 # Find all ports with their directions
-                # need to parse the json file again,
-                # since port width is not known in BEL object
+                # need to parse the json file again, since port width
+                # is not known in BEL object
                 with bel.src.with_suffix(".json").open() as f:
                     bel_dict = json.load(f)
                 module_ports = bel_dict["modules"][bel.module_name]["ports"]

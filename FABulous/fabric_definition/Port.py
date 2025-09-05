@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 """Port definition module for FPGA fabric.
 
 This module contains the `Port` class, which represents a connection point on a tile
@@ -6,6 +7,9 @@ entering or leaving a tile, including their direction, source and destination na
 offsets, and wire counts. These definitions are typically parsed from a CSV file
 that describes the fabric architecture.
 """
+=======
+"""Store all the port information defined in the CSV file."""
+>>>>>>> 9bd182a0 (fix: rebase fix)
 
 from dataclasses import dataclass
 
@@ -15,13 +19,14 @@ from FABulous.fabric_definition.define import IO, Direction, Side
 @dataclass(frozen=True, eq=True)
 class Port:
     """Store all the port information defined in the CSV file.
-    """Store all the port information defined in the CSV file.
 
     The `name`, `inOut` and `sideOfTile` are added attributes to aid the generation
     of the fabric.
+
     The `name` and `inOut` are related. If the `inOut` is `INPUT`,
     then the name is the source name of the port on the tile.
     Otherwise, the name is the destination name of the port on the tile.
+
     The `sideOfTile` defines where the port is physically located on the tile,
     since for a north direction wire, the input will be physically located on
     the south side of the tile.
@@ -60,7 +65,6 @@ class Port:
     sideOfTile: Side
 
     def __repr__(self) -> str:
-        """Return a string representation of the `Port` object.
         """Return a string representation of the `Port` object.
 
         Returns
@@ -119,8 +123,6 @@ class Port:
         indexed : bool, optional
             If True, wire names use bracket notation (e.g., `port[0]`).
             If False, wire names use simple concatenation (e.g., `port0`).
-            If True, wire names use bracket notation (e.g., `port[0]`).
-            If False, wire names use simple concatenation (e.g., `port0`).
             Defaults to False.
 
         Returns
@@ -152,18 +154,17 @@ class Port:
 
         If 'Indexed' is in the mode, then brackets are added to the signal name.
 
-        Args:
-        ----
+        Parameters
+        ----------
         mode : str, optional
             Mode for expansion. Defaults to "SwitchMatrix".
             Possible modes are 'all', 'allIndexed', 'Top', 'TopIndexed', 'AutoTop',
             'AutoTopIndexed', 'SwitchMatrix', 'SwitchMatrixIndexed', 'AutoSwitchMatrix',
             'AutoSwitchMatrixIndexed'
 
-
         Returns
         -------
-        Tuple : [list[str], list[str]]
+        tuple[list[str], list[str]]
             A tuple of two lists. The first list contains the source names of the ports
             and the second list contains the destination names of the ports.
         """

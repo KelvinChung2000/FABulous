@@ -68,10 +68,6 @@ def generateTile(writer: CodeGenerator, fabric: Fabric, tile: Tile) -> None:
         The code generator instance for RTL output
     fabric : Fabric
         The fabric object containing global configuration
-    writer : CodeGenerator
-        The code generator instance for RTL output
-    fabric : Fabric
-        The fabric object containing global configuration
     tile : Tile
         The tile object containing BELs and port information
 
@@ -565,10 +561,6 @@ def generateSuperTile(
 
     Parameters
     ----------
-    writer : CodeGenerator
-        The code generator instance for RTL output
-    fabric : Fabric
-        The fabric object containing global configuration
     writer : CodeGenerator
         The code generator instance for RTL output
     fabric : Fabric

@@ -26,9 +26,14 @@ def generateBitstreamSpec(fabric: Fabric) -> dict[str, dict]:
     bitstream
     The result file will be further parsed by `bit_gen.py`.
 
+    Parameters
+    ----------
+    fabric : Fabric
+        The fabric object for generating the bitstream specification
+
     Returns
     -------
-    dict [str, dict]
+    dict[str, dict]
         The bits stream specification of the fabric.
     """
     specData = {

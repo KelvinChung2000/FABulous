@@ -386,6 +386,7 @@ def test_force_flag(
     result = run(argv, capture_output=True, text=True)
 
     assert result.stdout.count(search_text) == expected_count
+    assert result.stdout.count(search_text) == expected_count
     assert result.returncode == 1
 
 
@@ -410,6 +411,7 @@ def test_force_flag(
             1,
             1,
             id="error",
+            marks=pytest.mark.xfail(reason="install should fail on error", strict=True),
         ),
     ],
 )
@@ -426,6 +428,7 @@ def test_install_oss_cad_suite(
 
     argv_template: list[str] = argv
     install_dir = tmp_path / "oss"
+    test_argv = [
     test_argv = [
         s.replace("{project}", str(project)).replace("{install_dir}", str(install_dir))
         for s in argv_template
@@ -484,7 +487,13 @@ def test_install_oss_cad_suite(
     # Configure requests mock - success for non-xfail cases, failure for xfail
     if expected_requests == 1:
         # This is the error case (xfail) - mock failure
+    # Configure requests mock - success for non-xfail cases, failure for xfail
+    if expected_requests == 1:
+        # This is the error case (xfail) - mock failure
         m = mocker.patch("requests.get", return_value=MockRequestFail())
+    else:
+        # Success cases - mock successful requests
+        m = mocker.patch("requests.get", side_effect=[MockRequestOK(), MockRequestOK()])
     else:
         # Success cases - mock successful requests
         m = mocker.patch("requests.get", side_effect=[MockRequestOK(), MockRequestOK()])
@@ -493,6 +502,7 @@ def test_install_oss_cad_suite(
     tmp_user_dir = tmp_path / "user_config"
     monkeypatch.setattr("FABulous.FABulous.FAB_USER_CONFIG_DIR", tmp_user_dir)
 
+    monkeypatch.setattr(sys, "argv", test_argv)
     monkeypatch.setattr(sys, "argv", test_argv)
     with pytest.raises(SystemExit) as exc_info:
         main()

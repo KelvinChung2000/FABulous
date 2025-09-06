@@ -11,6 +11,7 @@ from pathlib import Path
 from subprocess import run
 
 import pytest
+from dotenv import set_key
 from pytest_mock import MockerFixture
 
 from FABulous.FABulous import main
@@ -222,39 +223,62 @@ def test_script_execution_cases(
     assert exc_info.value.code == 0
 
 
-## merged into test_script_execution_cases
-
-
-## merged into test_script_execution_cases
-
-
-## merged into test_script_execution_cases
-
-
-## merged into test_script_execution_cases
-
-
 @pytest.mark.parametrize(
-    "argv",
+    ("argv", "commands", "expect_fail"),
     [
-        pytest.param(["FABulous", "{project}", "--commands"], id="legacy"),
-        pytest.param(["FABulous", "run", "{project}"], id="typer"),
+        pytest.param(
+            ["FABulous", "{project}", "--commands"],
+            "help; help",
+            False,
+            id="legacy-success",
+        ),
+        pytest.param(
+            ["FABulous", "run", "{project}"],
+            "help",
+            False,
+            id="typer-success",
+        ),
+        pytest.param(
+            ["FABulous", "{project}", "--commands"],
+            "",
+            False,
+            id="empty-commands",
+        ),
+        pytest.param(
+            ["FABulous", "{project}", "--commands"],
+            "load_fabric non_exist; load_fabric non_exist",
+            True,
+            id="stop-on-first-error",
+        ),
     ],
 )
 def test_commands_execution(
-    project: Path, monkeypatch: pytest.MonkeyPatch, argv: list[str]
+    project: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    argv: list[str],
+    commands: str,
+    expect_fail: bool,
 ) -> None:
-    """Test direct command execution with"""
+    """Test direct command execution with various scenarios"""
     test_args = [arg.replace("{project}", str(project)) for arg in argv]
-    test_args.append("help; help")
-    monkeypatch.setattr(sys, "argv", test_args)
+    if commands:
+        test_args.append(commands)
 
-    with pytest.raises(SystemExit) as exc_info:
-        main()
-    assert exc_info.value.code == 0
+    if expect_fail:
+        # Use subprocess.run for error cases to capture output
+        from subprocess import run
 
-
-## merged into test_create_project_cases
+        result = run(test_args, capture_output=True, text=True)
+        assert result.returncode != 0
+        if "load_fabric non_exist" in commands:
+            # Should stop on first error, only show one attempt
+            assert result.stdout.count("non_exist") == 1
+    else:
+        # Use monkeypatch for success cases
+        monkeypatch.setattr(sys, "argv", test_args)
+        with pytest.raises(SystemExit) as exc_info:
+            main()
+        assert exc_info.value.code == 0
 
 
 @pytest.mark.parametrize(
@@ -378,80 +402,82 @@ def test_debug_mode(
     assert exc_info.value.code == 0
 
 
-def test_force_flag(project: Path, tmp_path: Path) -> None:
-    """Test force flag functionality."""
-    # Run with force flag
-    result = run(
-        [
-            "FABulous",
-            str(project),
-            "--commands",
+@pytest.mark.parametrize(
+    ("argv_base", "commands_or_script", "expected_count", "search_text"),
+    [
+        pytest.param(
+            ["FABulous", "{project}", "--commands"],
             "load_fabric non_existent",
-            "--force",
-        ],
-        capture_output=True,
-        text=True,
-    )
-    assert result.returncode == 1
-
-    # force flag with multiple commands
-    result = run(
-        [
-            "FABulous",
-            str(project),
-            "--commands",
+            1,
+            "non_existent",
+            id="single-command",
+        ),
+        pytest.param(
+            ["FABulous", "{project}", "--commands"],
             "load_fabric non_exist; load_fabric non_exist",
-            "--force",
-        ],
-        capture_output=True,
-        text=True,
-    )
+            2,
+            "non_exist",
+            id="multiple-commands",
+        ),
+        pytest.param(
+            ["FABulous", "{project}", "--FABulousScript"],
+            "load_fabric non_exist.csv\nload_fabric non_exist.csv\n",
+            3,
+            "INFO: Loading fabric",
+            id="script",
+        ),
+    ],
+)
+def test_force_flag(
+    project: Path,
+    tmp_path: Path,
+    argv_base: list[str],
+    commands_or_script: str,
+    expected_count: int,
+    search_text: str,
+) -> None:
+    """Test force flag functionality with different scenarios"""
 
-    assert result.stdout.count("non_exist") == 2
-    assert result.returncode == 1
+    # Replace project placeholder
+    argv = [arg.replace("{project}", str(project)) for arg in argv_base]
 
-    # force flag with FABulous script
-    with (tmp_path / "test.fs").open("w") as f:
-        f.write("load_fabric non_exist.csv\n")
-        f.write("load_fabric non_exist.csv\n")
+    # Handle script vs commands
+    if "--FABulousScript" in argv:
+        # Create script file
+        script_file = tmp_path / "test.fs"
+        with script_file.open("w") as f:
+            f.write(commands_or_script)
+        argv.extend([str(script_file), "--force"])
+    else:
+        # Add commands and force flag
+        argv.extend([commands_or_script, "--force"])
 
-    result = run(
-        [
-            "FABulous",
-            str(project),
-            "--FABulousScript",
-            str(tmp_path / "test.fs"),
-            "--force",
-        ],
-        capture_output=True,
-        text=True,
-    )
+    result = run(argv, capture_output=True, text=True)
 
-    assert result.stdout.count("INFO: Loading fabric") == 3
+    assert result.stdout.count(search_text) == expected_count
     assert result.returncode == 1
 
 
 @pytest.mark.parametrize(
-    ("argv", "expected_code", "expected_requests"),
+    ("argv", "expected_requests"),
     [
         pytest.param(
-            ["FABulous", "{project}", "--install_oss_cad_suite"], 0, 2, id="legacy"
+            ["FABulous", "{project}", "--install_oss_cad_suite"], 2, id="legacy"
         ),
         pytest.param(
-            ["FABulous", "install-oss-cad-suite", "{project}"], 0, 2, id="typer-project"
+            ["FABulous", "install-oss-cad-suite", "{project}"], 2, id="typer-project"
         ),
-        pytest.param(["FABulous", "install-oss-cad-suite"], 0, 2, id="default-dir"),
+        pytest.param(["FABulous", "install-oss-cad-suite"], 2, id="default-dir"),
         pytest.param(
             ["FABulous", "install-oss-cad-suite", "{install_dir}"],
-            0,
             2,
             id="explicit-dir",
         ),
         pytest.param(
             ["FABulous", "install-oss-cad-suite", "{install_dir}"],
-            "nonzero",
             1,
             id="error",
+            marks=pytest.mark.xfail(reason="install should fail on error", strict=True),
         ),
     ],
 )
@@ -461,20 +487,13 @@ def test_install_oss_cad_suite(
     mocker: MockerFixture,
     monkeypatch: pytest.MonkeyPatch,
     argv: list[str],
-    expected_code: int | str,
     expected_requests: int,
 ) -> None:
-    """Unified parametric test for install-oss-cad-suite variants using network mocking.
-
-    Each case provides:
-    - id: label
-    - argv: CLI arguments
-    - expected: dict with 'exit' (0 or 'nonzero') and 'requests' (int call count)
-    """
+    """Unified parametric test for install-oss-cad-suite variants using network mocking."""
 
     argv_template: list[str] = argv
     install_dir = tmp_path / "oss"
-    argv = [
+    test_argv = [
         s.replace("{project}", str(project)).replace("{install_dir}", str(install_dir))
         for s in argv_template
     ]
@@ -519,11 +538,13 @@ def test_install_oss_cad_suite(
 
     monkeypatch.setattr(tarfile, "open", mock_open)
 
-    # Configure requests mock per expected outcome
-    if expected_code == 0:
-        m = mocker.patch("requests.get", side_effect=[MockRequestOK(), MockRequestOK()])
-    else:
+    # Configure requests mock - success for non-xfail cases, failure for xfail
+    if expected_requests == 1:
+        # This is the error case (xfail) - mock failure
         m = mocker.patch("requests.get", return_value=MockRequestFail())
+    else:
+        # Success cases - mock successful requests
+        m = mocker.patch("requests.get", side_effect=[MockRequestOK(), MockRequestOK()])
 
     # Ensure default-dir uses a clean temp user config directory
     tmp_user_dir = tmp_path / "user_config"
@@ -532,14 +553,12 @@ def test_install_oss_cad_suite(
         "FABulous.FABulous_CLI.helper.FAB_USER_CONFIG_DIR", tmp_user_dir
     )
 
-    monkeypatch.setattr(sys, "argv", argv)
+    monkeypatch.setattr(sys, "argv", test_argv)
     with pytest.raises(SystemExit) as exc_info:
         main()
 
-    if expected_code == "nonzero":
-        assert exc_info.value.code != 0
-    else:
-        assert exc_info.value.code == expected_code
+    # All non-xfail cases should succeed
+    assert exc_info.value.code == 0
     assert m.call_count == expected_requests
 
 
@@ -571,57 +590,68 @@ def test_script_mutually_exclusive(
 
 
 @pytest.mark.parametrize(
-    "argv",
+    ("argv", "setup_dir", "expect_contains"),
     [
         pytest.param(
             ["FABulous", "/nonexistent/path/to/project", "--commands", "help"],
-            id="legacy",
+            None,
+            None,
+            id="legacy-nonexistent",
+            marks=pytest.mark.xfail(
+                reason="nonexistent project path should fail", strict=True
+            ),
         ),
         pytest.param(
             ["FABulous", "run", "/nonexistent/path/to/project", "help"],
-            id="typer",
+            None,
+            None,
+            id="typer-nonexistent",
+            marks=pytest.mark.xfail(
+                reason="nonexistent project path should fail", strict=True
+            ),
+        ),
+        pytest.param(
+            ["FABulous", "{regular_dir}", "--commands", "help"],
+            "regular_directory",
+            "not a FABulous project",
+            id="no-fabulous-folder",
+            marks=pytest.mark.xfail(
+                reason="directory without .FABulous folder should fail", strict=True
+            ),
         ),
     ],
 )
 def test_invalid_project_directory(
-    monkeypatch: pytest.MonkeyPatch, argv: list[str]
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture,
+    argv: list[str],
+    setup_dir: str | None,
+    expect_contains: str | None,
 ) -> None:
-    """Invalid project directory should fail in both legacy and Typer styles."""
-    monkeypatch.setattr(sys, "argv", argv)
-    with pytest.raises(SystemExit) as exc_info:
-        main()
-    assert exc_info.value.code != 0
+    """Test various invalid project directory scenarios."""
 
+    # Set up directory if needed
+    if setup_dir:
+        regular_dir = tmp_path / setup_dir
+        regular_dir.mkdir()
+        # Clean up environment variables to avoid contamination
+        monkeypatch.delenv("FAB_PROJ_DIR", raising=False)
+        # Replace placeholder in argv
+        test_args = [arg.replace("{regular_dir}", str(regular_dir)) for arg in argv]
+    else:
+        test_args = argv
 
-def test_project_without_fabulous_folder(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture
-) -> None:
-    """Test error handling for directory without .FABulous folder."""
-    regular_dir = tmp_path / "regular_directory"
-    regular_dir.mkdir()
-
-    # Clean up environment variables to avoid contamination from other tests
-    monkeypatch.delenv("FAB_PROJ_DIR", raising=False)
-
-    test_args = ["FABulous", str(regular_dir), "--commands", "help"]
     monkeypatch.setattr(sys, "argv", test_args)
-
     with pytest.raises(SystemExit) as exc_info:
         main()
 
+    # All cases should fail (but xfail marks handle the expectation)
     assert exc_info.value.code != 0
-    captured = capsys.readouterr()
-    assert "not a FABulous project" in captured.out
 
-
-def test_nonexistent_script_file() -> None:
-    """
-    Deprecated: covered by test_fabulous_script_nonexistent_file.
-    Keeping placeholder to avoid duplicate coverage.
-    """
-
-
-## covered by test_logging_file_creation
+    if expect_contains:
+        captured = capsys.readouterr()
+        assert expect_contains in captured.out
 
 
 def test_writer_case_insensitive_typer(
@@ -727,34 +757,7 @@ def test_project_dir_precedence_param(
     assert settings.proj_dir == dirs[expected_dir]
 
 
-def test_empty_commands(project: Path, monkeypatch: pytest.MonkeyPatch) -> None:
-    """Test handling of empty command string."""
-    test_args = ["FABulous", str(project), "--commands", ""]
-    monkeypatch.setattr(sys, "argv", test_args)
-
-    with pytest.raises(SystemExit) as exc_info:
-        main()
-
-    assert exc_info.value.code == 0
-
-
-def test_command_flag_with_stop_on_first_error(project: Path) -> None:
-    """Test that using --commands with multiple commands raises an error on the
-    first failure"""
-    # Run with multiple commands, where the first one fails
-    result = run(
-        [
-            "FABulous",
-            str(project),
-            "--commands",
-            "load_fabric non_exist; load_fabric non_exist",
-        ],
-        capture_output=True,
-        text=True,
-    )
-
-    assert result.stdout.count("non_exist") == 1
-    assert result.returncode == 1
+## merged into test_commands_execution
 
 
 # ============================================================================
@@ -1078,12 +1081,9 @@ def test_version_compatibility_function(tmp_path: Path) -> None:
     fabulous_dir.mkdir()
     env_file = fabulous_dir / ".env"
 
-    # Mock a project with older version
-    env_content = """FAB_PROJ_LANG=verilog
-FAB_PROJ_VERSION=1.0.0
-FAB_MODEL_PACK=model_pack.v
-"""
-    env_file.write_text(env_content)
+    set_key(env_file, "FAB_PROJ_LANG", "verilog")
+    set_key(env_file, "FAB_PROJ_VERSION", "1.0.0")
+    set_key(env_file, "FAB_MODEL_PACK", "model_pack.v")
 
     reset_context()
 

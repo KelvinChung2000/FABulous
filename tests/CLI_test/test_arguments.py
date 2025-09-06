@@ -7,6 +7,7 @@ covering project creation, script execution, command-line flags, and error handl
 import sys
 import tarfile
 from collections.abc import Callable
+from collections.abc import Callable
 from pathlib import Path
 from subprocess import run
 
@@ -455,13 +456,23 @@ def test_install_oss_cad_suite(
             return {}
 
     # Mock tarfile
+    class MockRequestFail:
+        status_code = 500
+
+        def json(self) -> dict:  # noqa: D401
+            # Not used in fail path
+            return {}
+
+    # Mock tarfile
     class MockTarFile:
         def __enter__(self) -> "MockTarFile":
             return self
 
         def __exit__(self, *_args: object) -> None:
+        def __exit__(self, *_args: object) -> None:
             pass
 
+        def extractall(self, path: str) -> None:  # noqa: ARG002
         def extractall(self, path: str) -> None:  # noqa: ARG002
             pass
 

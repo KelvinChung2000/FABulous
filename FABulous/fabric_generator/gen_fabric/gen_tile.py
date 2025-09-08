@@ -1,8 +1,8 @@
 """Tile generation module for FABulous FPGA architecture.
 
 This module generates RTL code for individual tiles and super tiles within an FPGA
-fabric. It handles the integration of Basic Elements (BELs), switch matrices, and
-configuration infrastructure into complete tile implementations.
+fabric. It handles the integration of Basic Elements of Logic (BELs), switch matrices,
+and configuration infrastructure into complete tile implementations.
 
 Key features:
 - Individual tile RTL generation with BEL instantiation

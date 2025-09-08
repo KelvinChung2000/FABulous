@@ -1146,8 +1146,8 @@ class FABulous_CLI(Cmd):
     def do_generate_custom_tile_config(self, args: argparse.Namespace) -> None:
         """Generate a custom tile configuration for a given tile folder.
 
-        Or path to bel folder. A tile .csv file and a switch matrix .list file will be
-        generated.
+        Or path to bel folder. A tile `.csv` file and a switch matrix `.list` file will
+        be generated.
 
         The provided path may contain bel files, which will be included in the generated
         tile .csv file as well as the generated switch matrix .list file.
@@ -1166,7 +1166,7 @@ class FABulous_CLI(Cmd):
     def do_gen_io_tiles(self, args: argparse.Namespace) -> None:
         """Generate I/O BELs for specified tiles.
 
-        This command generates Input/Output Basic Elements (BELs) for the
+        This command generates Input/Output Basic Elements of Logic (BELs) for the
         specified tiles, enabling external connectivity for the FPGA fabric.
 
         Parameters
@@ -1184,7 +1184,7 @@ class FABulous_CLI(Cmd):
     def do_gen_io_fabric(self, _args: str) -> None:
         """Generate I/O BELs for the entire fabric.
 
-        This command generates Input/Output Basic Elements (BELs) for all
+        This command generates Input/Output Basic Elements of Logic (BELs) for all
         applicable tiles in the fabric, providing external connectivity
         across the entire FPGA design.
 

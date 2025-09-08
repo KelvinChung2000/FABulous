@@ -1,6 +1,6 @@
 """FABulous command-line interface entry point.
 
-This module provides the main entry point for the FABulous FPGA toolkit command-line
+This module provides the main entry point for the FABulous FPGA framework command-line
 interface. It handles argument parsing, project setup, and CLI initialization.
 """
 

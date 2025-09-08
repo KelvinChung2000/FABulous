@@ -13,6 +13,7 @@ from subprocess import run
 
 import pytest
 import typer
+import typer
 from dotenv import set_key
 from pytest_mock import MockerFixture
 
@@ -80,12 +81,20 @@ def test_create_project(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
     writer_lang: str,
+    writer_lang: str,
     argv: list[str],
     expected_code: int,
 ) -> None:
     project_dir = tmp_path / "test_prj"
 
     test_argv = [i.replace("{project}", str(project_dir)) for i in argv]
+
+    # Replace {lang} placeholder with actual writer_lang if present
+    test_argv = [arg.replace("{lang}", writer_lang) for arg in argv]
+    test_argv = [arg for arg in test_argv if arg]  # Remove empty args
+
+    # Append project directory to the command
+    test_argv.append(str(project_dir))
 
     monkeypatch.setattr(sys, "argv", test_argv)
     with pytest.raises(SystemExit) as exc_info:
@@ -100,9 +109,14 @@ def test_create_project(
             assert writer_lang in env_text
         else:
             assert "verilog" in env_text
+        if writer_lang == "vhdl":
+            assert writer_lang in env_text
+        else:
+            assert "verilog" in env_text
 
 
 @pytest.mark.parametrize(
+    ("argv", "start_dir", "expected_code"),
     ("argv", "start_dir", "expected_code"),
     [
         # FAB script with explicit project
@@ -110,11 +124,13 @@ def test_create_project(
             ["FABulous", "{project}", "--FABulousScript", "{file}"],
             None,
             0,
+            0,
             id="fab-legacy",
         ),
         pytest.param(
             ["FABulous", "-p", "{project}", "script", "{file}"],
             None,
+            0,
             0,
             id="fab-typer",
         ),
@@ -122,6 +138,7 @@ def test_create_project(
         pytest.param(
             ["FABulous", "--FABulousScript", "{file}"],
             "project",
+            0,
             0,
             id="fab-cwd-project",
         ),
@@ -137,11 +154,13 @@ def test_create_project(
             ["FABulous", "{project}", "--TCLScript", "{tcl}"],
             None,
             0,
+            0,
             id="tcl-legacy",
         ),
         pytest.param(
             ["FABulous", "-p", "{project}", "script", "{tcl}"],
             None,
+            0,
             0,
             id="tcl-typer",
         ),
@@ -149,6 +168,7 @@ def test_create_project(
         pytest.param(
             ["FABulous", "--FABulousScript", "{file}"],
             "nonproject",
+            1,
             1,
             id="fab-cwd-nonproject",
         ),
@@ -166,6 +186,7 @@ def test_script_execution(
     monkeypatch: pytest.MonkeyPatch,
     argv: list[str],
     start_dir: str | None,
+    expected_code: int,
     expected_code: int,
 ) -> None:
     fab_script = tmp_path / "test_script.fab"
@@ -201,6 +222,7 @@ def test_script_execution(
         main()
 
     assert exc_info.value.code == expected_code
+    assert exc_info.value.code == expected_code
 
 
 @pytest.mark.parametrize(
@@ -216,6 +238,7 @@ def test_script_execution(
                 str(log),
             ],
             0,
+            0,
             id="legacy",
         ),
         pytest.param(
@@ -229,6 +252,7 @@ def test_script_execution(
                 "help",
             ],
             0,
+            0,
             id="typer",
         ),
     ],
@@ -239,6 +263,7 @@ def test_logging_file_creation(
     monkeypatch: pytest.MonkeyPatch,
     argv_builder: Callable[[Path, Path], list[str]],
     expected_code: int,
+    expected_code: int,
 ) -> None:
     """Logging creates file for both legacy and Typer styles."""
     log_file = tmp_path / "cli_test.log"
@@ -248,6 +273,7 @@ def test_logging_file_creation(
     with pytest.raises(SystemExit) as exc_info:
         main()
 
+    assert exc_info.value.code == expected_code
     assert exc_info.value.code == expected_code
     assert log_file.exists()
     assert log_file.stat().st_size > 0
@@ -296,13 +322,16 @@ def test_verbose_mode(
     with pytest.raises(SystemExit) as exc_info:
         main()
     assert exc_info.value.code == expected_code
+    assert exc_info.value.code == expected_code
 
 
 @pytest.mark.parametrize(
     ("argv", "expected_code"),
+    ("argv", "expected_code"),
     [
         pytest.param(
             ["FABulous", "{project}", "--commands", "help", "--debug"],
+            0,
             0,
             id="legacy",
         ),
@@ -315,6 +344,7 @@ def test_verbose_mode(
 )
 def test_debug_mode(
     project: Path, monkeypatch: pytest.MonkeyPatch, argv: list[str], expected_code: int
+    project: Path, monkeypatch: pytest.MonkeyPatch, argv: list[str], expected_code: int
 ) -> None:
     """Debug mode works in both legacy and Typer forms."""
     test_args = [arg.replace("{project}", str(project)) for arg in argv]
@@ -323,6 +353,7 @@ def test_debug_mode(
     with pytest.raises(SystemExit) as exc_info:
         main()
 
+    assert exc_info.value.code == expected_code
     assert exc_info.value.code == expected_code
 
 
@@ -411,7 +442,6 @@ def test_force_flag(
             1,
             1,
             id="error",
-            marks=pytest.mark.xfail(reason="install should fail on error", strict=True),
         ),
     ],
 )
@@ -424,6 +454,7 @@ def test_install_oss_cad_suite(
     expected_requests: int,
     expected_code: int,
 ) -> None:
+    """Parametric test for install-oss-cad-suite variants with mocked network."""
     """Parametric test for install-oss-cad-suite variants with mocked network."""
 
     argv_template: list[str] = argv
@@ -507,6 +538,7 @@ def test_install_oss_cad_suite(
     with pytest.raises(SystemExit) as exc_info:
         main()
 
+    assert exc_info.value.code == expected_code
     assert exc_info.value.code == expected_code
     assert m.call_count == expected_requests
 
@@ -624,6 +656,7 @@ def test_project_dir_precedence(
             ["FABulous", "-p", "{project}", "update-project-version"],
             False,
             0,
+            0,
             id="explicit-success",
         ),
         pytest.param(
@@ -641,6 +674,7 @@ def test_update_project_version_cases(
     argv: list[str],
     chdir_flag: bool,
     expected_code: int,
+    expected_code: int,
 ) -> None:
     test_argv = [s.replace("{project}", str(project)) for s in argv]
     monkeypatch.setattr(
@@ -651,6 +685,7 @@ def test_update_project_version_cases(
         monkeypatch.chdir(project)
     with pytest.raises(SystemExit) as exc_info:
         main()
+    assert exc_info.value.code == expected_code
     assert exc_info.value.code == expected_code
 
 
@@ -664,7 +699,10 @@ def test_update_project_version_cases(
 )
 @pytest.mark.parametrize(
     ("explicit_type", "content", "expected_code"),
+    ("explicit_type", "content", "expected_code"),
     [
+        pytest.param("fabulous", "help\n", 0, id="type-fabulous"),
+        pytest.param("tcl", 'puts "hi"\n', 0, id="type-tcl"),
         pytest.param("fabulous", "help\n", 0, id="type-fabulous"),
         pytest.param("tcl", 'puts "hi"\n', 0, id="type-tcl"),
         pytest.param(
@@ -683,7 +721,9 @@ def test_script_command_type_override(
     explicit_type: str,
     content: str,
     expected_code: int,
+    expected_code: int,
 ) -> None:
+    """Explicit type flag should dictate execution mode regardless of extension."""
     """Explicit type flag should dictate execution mode regardless of extension."""
     script_file = tmp_path / f"test_script{file_ext}"
     script_file.write_text(content)

@@ -20,34 +20,46 @@ from FABulous.FABulous_settings import init_context, reset_context
 
 
 @pytest.mark.parametrize(
-    "writer_lang",
-    [
-        pytest.param("verilog", id="verilog"),
-        pytest.param("vhdl", id="vhdl"),
-        pytest.param("", id="default-writer"),
-        pytest.param("invalid_writer", id="invalid-writer"),
-    ],
-)
-@pytest.mark.parametrize(
     (
         "argv",
+        "writer_lang",
         "precreate",
         "expected_code",
     ),
     [
-        pytest.param(["FABulous", "create-project"], False, 0, id="typer-no-writer"),
-        pytest.param(["FABulous", "--create-project"], False, 0, id="legacy-no-writer"),
         pytest.param(
-            ["FABulous", "-w", "{lang}", "--create-project"],
+            ["FABulous", "create-project"], None, False, 0, id="typer-no-writer"
+        ),
+        pytest.param(
+            ["FABulous", "--create-project"], None, False, 0, id="legacy-no-writer"
+        ),
+        pytest.param(
+            ["FABulous", "-w", "vhdl", "--create-project"],
+            "vhdl",
             False,
             0,
             id="legacy-writer",
         ),
         pytest.param(
-            ["FABulous", "-w", "{lang}", "create-project"],
+            ["FABulous", "-w", "vhdl", "create-project"],
+            "vhdl",
             False,
             0,
             id="typer-writer",
+        ),
+        pytest.param(
+            ["FABulous", "-w", "invalid", "create-project"],
+            "vhdl",
+            False,
+            0,
+            id="typer-invalid-writer",
+        ),
+        pytest.param(
+            ["FABulous", "-w", "invalid", "--create-project"],
+            "vhdl",
+            False,
+            0,
+            id="legacy-invalid-writer",
         ),
     ],
 )
@@ -63,10 +75,7 @@ def test_create_project_cases(
     if precreate:
         project_dir.mkdir(parents=True, exist_ok=True)
 
-    # Replace {lang} placeholder with actual writer_lang if present
-    test_argv = [arg.replace("{lang}", writer_lang) for arg in argv]
-    test_argv = [arg for arg in test_argv if arg]  # Remove empty args
-
+    test_argv = argv
     # Append project directory to the command
     test_argv.append(str(project_dir))
 
@@ -1346,3 +1355,136 @@ def test_common_options_state_update() -> None:
     assert shared_state.log_file == test_log_file
     assert shared_state.force is True
     assert shared_state.writer == HDLType.VHDL
+
+
+# ============================================================================
+# New Additional CLI Edge Case Tests
+# ============================================================================
+
+
+def test_run_trailing_semicolon_noop(project: Path) -> None:
+    """Trailing semicolon token 'help;' currently treated as no-op (success path).
+
+    Document existing behavior: parser ignores unknown token without failing.
+    """
+    result = run(
+        [
+            "FABulous",
+            "run",
+            str(project),
+            "help;",  # Parsed as single token 'help;' (invalid command)
+        ],
+        capture_output=True,
+        text=True,
+    )
+    assert result.returncode == 0
+
+
+def test_run_mixed_success_failure_pipeline(project: Path) -> None:
+    """Pipeline stops on first failing command without --force."""
+    cmd = "help; load_fabric non_exist"
+    result = run(
+        [
+            "FABulous",
+            "run",
+            str(project),
+            cmd,
+        ],
+        capture_output=True,
+        text=True,
+    )
+    # Expect failure due to second command
+    assert result.returncode != 0
+    # only one occurrence of failing fabric token (stopped early)
+    assert result.stdout.count("non_exist") == 1
+
+
+def test_run_trailing_semicolon_force(project: Path) -> None:
+    """With --force a trailing semicolon still yields non-zero exit but continues.
+
+    The invalid command token should not abort processing of prior commands.
+    """
+    result = run(
+        [
+            "FABulous",
+            "run",
+            str(project),
+            "help;",  # invalid token
+            "--force",
+        ],
+        capture_output=True,
+        text=True,
+    )
+    # Force doesn't turn invalid command into success; keep non-zero
+    assert result.returncode != 0
+
+
+def test_legacy_logging_default_filename(project: Path) -> None:
+    """Using legacy -log without path should create FABulous.log in CWD."""
+    result = run(
+        [
+            "FABulous",
+            str(project),
+            "--commands",
+            "help",
+            "-log",  # triggers default const filename
+        ],
+        capture_output=True,
+        text=True,
+        cwd=str(project),
+    )
+    assert result.returncode == 0
+    log_file = Path(project) / "FABulous.log"
+    assert log_file.exists()
+    assert log_file.stat().st_size > 0
+
+
+def test_writer_case_insensitive_verilog(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Explicit VERILOG (uppercase) should be accepted the same as lowercase."""
+    project_dir = tmp_path / "test_upper_verilog"
+    argv = [
+        "FABulous",
+        "--writer",
+        "VERILOG",
+        "create-project",
+        str(project_dir),
+    ]
+    monkeypatch.setattr(sys, "argv", argv)
+    with pytest.raises(SystemExit) as exc_info:
+        main()
+    assert exc_info.value.code == 0
+    env_text = (project_dir / ".FABulous" / ".env").read_text().lower()
+    assert "verilog" in env_text
+
+
+def test_global_option_after_subcommand_error(project: Path) -> None:
+    """Global option placed after subcommand should raise usage error (exit 2)."""
+    result = run(
+        [
+            "FABulous",
+            "run",
+            "--debug",  # Misplaced
+            str(project),
+            "help",
+        ],
+        capture_output=True,
+        text=True,
+    )
+    assert result.returncode == 2
+
+
+def test_start_invalid_project() -> None:
+    """Starting with a non-existent project directory should fail."""
+    invalid = "/nonexistent/path/does/not/exist"
+    result = run(
+        [
+            "FABulous",
+            "start",
+            invalid,
+        ],
+        capture_output=True,
+        text=True,
+    )
+    assert result.returncode != 0

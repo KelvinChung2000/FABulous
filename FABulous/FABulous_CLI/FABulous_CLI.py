@@ -486,8 +486,8 @@ class FABulous_CLI(Cmd):
     def do_gen_tile(self, args: argparse.Namespace) -> None:
         """Generate given tile with switch matrix and configuration memory.
 
-        Parsing input arguments, call functions such as 'genSwitchMatrix' and
-        'genConfigmem'. Handle both regular tiles and super tiles with sub-tiles.
+        Parsing input arguments, call functions such as `genSwitchMatrix` and
+        `genConfigMem`. Handle both regular tiles and super tiles with sub-tiles.
 
         Also logs generation process for each specified tile and sub-tile.
         """
@@ -699,8 +699,6 @@ class FABulous_CLI(Cmd):
 
         Create bitstream specification of the fabric, top wrapper of the fabric, Nextpnr
         model of the fabric and geometry information of the fabric.
-
-        Does this by calling the respective functions 'do_gen_[function]'.
         """
         logger.info("Running FABulous")
 

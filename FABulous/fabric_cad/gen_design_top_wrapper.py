@@ -19,6 +19,11 @@ def generateUserDesignTopWrapper(
 ) -> None:
     """Generate a top wrapper for the user design.
 
+    This function creates a Verilog top-level wrapper that instantiates the
+    user's design and connects its ports to the fabric's external I/O BELs.
+    It automatically discovers external ports from the fabric definition and
+    generates the necessary wiring and BEL instantiations.
+
     Params
     ------
     fabric: Fabric

@@ -1,4 +1,10 @@
-"""Store the information about a supertile."""
+"""Supertile definition for FPGA fabric.
+
+This module contains the `SuperTile` class, which represents a composite tile made
+up of multiple smaller, individual tiles. Supertiles allow for the creation of more
+larger, complex and hierarchical structures within the FPGA fabric, combining different
+functionalities into a single, reusable block.
+"""
 
 from dataclasses import dataclass, field
 

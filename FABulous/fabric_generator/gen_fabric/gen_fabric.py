@@ -26,13 +26,10 @@ from FABulous.fabric_generator.code_generator.code_generator_VHDL import (
 def generateFabric(writer: CodeGenerator, fabric: Fabric) -> None:
     """Generate the fabric.
 
-    The fabric description will be a flat description.
-
-    There are of course many possibilities for generating the fabric. We decided to
-    generate a flat description as it may allow for a little easier debugging. For
-    larger fabrics, this may be an issue, but not for now. We only have wires between
-    two adjacent tiles in North, East, South, West direction. So we use the output ports
-    to generate wires.
+    This function creates a flat description of the FPGA fabric by instantiating all
+    tiles and connecting them based on the provided fabric definition. It handles the
+    generation of top-level I/O ports, wiring between adjacent tiles, and the
+    configuration infrastructure (either Frame-based or FlipFlop chain).
     """
     # we first scan all tiles if those have IOs that have to go to top
     # the order of this scan is later maintained when instantiating the actual tiles

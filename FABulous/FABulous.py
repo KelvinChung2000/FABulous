@@ -9,7 +9,7 @@ import sys
 from dataclasses import dataclass
 from importlib.metadata import version
 from pathlib import Path
-from typing import Annotated, Literal, cast
+from typing import Annotated
 
 import click
 import typer
@@ -27,7 +27,11 @@ from FABulous.FABulous_CLI.helper import (
     setup_logger,
     update_project_version,
 )
-from FABulous.FABulous_settings import FAB_USER_CONFIG_DIR, get_context, init_context
+from FABulous.FABulous_settings import (
+    FAB_USER_CONFIG_DIR,
+    get_context,
+    init_context,
+)
 
 APP_NAME = "FABulous"
 
@@ -45,13 +49,14 @@ app = typer.Typer(
 class SharedContext:
     """Context object to hold shared CLI options."""
 
+    # project_dir should be an optional Path value, not assigned to the Path class
+    project_dir: Path = Path()
     verbose: int = 0
     debug: bool = False
     log_file: Path | None = None
     global_dot_env: Path | None = None
     project_dot_env: Path | None = None
     force: bool = False
-    writer: str = "verilog"
 
 
 shared_state = SharedContext()
@@ -82,9 +87,22 @@ ProjectDirType = Annotated[
     ),
 ]
 
+WriterType = Annotated[
+    HDLType,
+    typer.Option(
+        "--writer",
+        "-w",
+        help="Set type of HDL code generated. System Verilog is not supported yet.",
+        case_sensitive=False,
+    ),
+]
+
+ForceType = Annotated[bool, typer.Option("--force", help="Enable force mode")]
+
 
 @app.callback()
 def common_options(
+    project_dir: ProjectDirType = None,
     _version: Annotated[
         bool | None,
         typer.Option(
@@ -97,7 +115,11 @@ def common_options(
     verbose: Annotated[
         int,
         typer.Option(
-            "--verbose", "-v", count=True, help="Show detailed log information"
+            "--verbose",
+            "-v",
+            count=True,
+            help="Show detailed log information",
+            is_eager=True,
         ),
     ] = 0,
     debug: Annotated[
@@ -115,19 +137,6 @@ def common_options(
         Path | None,
         typer.Option("--project-dot-env", "-pde", help="Set project .env file path"),
     ] = None,
-    force: Annotated[
-        bool,
-        typer.Option("--force", "-f", help="Force command execution and ignore errors"),
-    ] = False,
-    writer: Annotated[
-        HDLType,
-        typer.Option(
-            "--writer",
-            "-w",
-            help="Set type of HDL code generated. System Verilog is not supported yet.",
-            case_sensitive=False,
-        ),
-    ] = HDLType.VERILOG,
 ) -> None:
     """Provide common options for all FABulous commands."""
     shared_state.verbose = verbose
@@ -135,12 +144,17 @@ def common_options(
     shared_state.log_file = log_file
     shared_state.global_dot_env = global_dot_env
     shared_state.project_dot_env = project_dot_env
-    shared_state.force = force
-    shared_state.writer = writer
+    shared_state.project_dir = project_dir or Path.cwd()
+
     setup_logger(
         shared_state.verbose,
         shared_state.debug,
         log_file=shared_state.log_file or Path(),
+    )
+    init_context(
+        project_dir=shared_state.project_dir,
+        global_dot_env=shared_state.global_dot_env,
+        project_dot_env=shared_state.project_dot_env,
     )
 
 
@@ -154,7 +168,7 @@ def check_version_compatibility(_: Path) -> None:
         logger.error(
             f"Version incompatible! FABulous-FPGA version: {package_version}, "
             f"Project version: {project_version}\n"
-            r'Please run "FABulous <project_dir> --update-project-version" '
+            r'Please run "FABulous \<project_dir> --update-project-version" '
             r"to update the project version."
         )
         raise typer.Exit(1) from None
@@ -174,12 +188,13 @@ def create_project_cmd(
     project_dir: Annotated[
         Path, typer.Argument(help="Directory to create a project")
     ] = Path(),
+    writer: WriterType = HDLType.VERILOG,
 ) -> None:
     """Create a new FABulous project.
 
     Alias: c
     """
-    create_project(project_dir, cast("Literal['verilog', 'vhdl']", shared_state.writer))
+    create_project(project_dir, writer)
     logger.info(f"FABulous project created successfully at {project_dir}")
 
 
@@ -223,12 +238,10 @@ def install_fabulator_cmd(
 
 
 @app.command("update-project-version")
-def update_project_version_cmd(
-    project_dir: ProjectDirType = Path(),
-) -> None:
+def update_project_version_cmd() -> None:
     """Update project version to match package version."""
-    logger.info(f"Using {project_dir} directory as project directory")
-    if not update_project_version(project_dir):
+    logger.info(f"Using {shared_state.project_dir} directory as project directory")
+    if not update_project_version(shared_state.project_dir):
         logger.error(
             "Failed to update project version. Please check the logs for more details."
         )
@@ -238,7 +251,6 @@ def update_project_version_cmd(
 
 @app.command("script")
 def script_cmd(
-    project_dir: ProjectDirType = None,
     script_file: Annotated[
         Path, typer.Argument(help="Script file to execute", resolve_path=True)
     ] = Path(),
@@ -251,6 +263,7 @@ def script_cmd(
             click_type=click.Choice(["fabulous", "tcl"]),
         ),
     ] = "tcl",
+    force: ForceType = False,
 ) -> None:
     """Execute a script file with auto-detection of script type.
 
@@ -262,14 +275,8 @@ def script_cmd(
     """
     # Initialize context
     entering_dir = Path.cwd()
-    settings = init_context(
-        project_dir=project_dir,
-        global_dot_env=shared_state.global_dot_env,
-        project_dot_env=shared_state.project_dot_env,
-    )
     script_file = script_file.absolute()
-    if project_dir is not None:
-        os.chdir(project_dir)
+    os.chdir(shared_state.project_dir)
     fab_CLI = FABulous_CLI(
         settings.proj_lang,
         force=shared_state.force,
@@ -320,21 +327,15 @@ def script_cmd(
 
 @app.command("start")
 @app.command("s", hidden=True)
-def start_cmd(project_dir: ProjectDirType = None) -> None:
+def start_cmd() -> None:
     """Start FABulous in interactive mode. Alias: s.
 
     This is the main command for running FABulous in interactive mode or with scripts.
     If no project directory is specified, uses the current directory.
     """
-    # Initialize the global context with settings
-    settings = init_context(
-        project_dir=project_dir,
-        global_dot_env=shared_state.global_dot_env,
-        project_dot_env=shared_state.project_dot_env,
-    )
     entering_dir = Path.cwd()
     fab_CLI = FABulous_CLI(
-        settings.proj_lang,
+        get_context().proj_lang,
         force=shared_state.force,
         interactive=True,
         verbose=shared_state.verbose >= 2,
@@ -343,8 +344,7 @@ def start_cmd(project_dir: ProjectDirType = None) -> None:
     fab_CLI.debug = shared_state.debug
 
     # Change to project directory
-    if settings.proj_dir is not None:
-        os.chdir(settings.proj_dir)
+    os.chdir(get_context().proj_dir)
     fab_CLI.onecmd_plus_hooks("load_fabric")
     fab_CLI.cmdloop()
     os.chdir(entering_dir)
@@ -353,7 +353,6 @@ def start_cmd(project_dir: ProjectDirType = None) -> None:
 @app.command("run")
 @app.command("r", hidden=True)
 def run_cmd(
-    project_dir: ProjectDirType = None,
     commands: Annotated[
         list[str] | None,
         typer.Argument(
@@ -367,22 +366,17 @@ def run_cmd(
             callback=lambda cmds: cmds[0] if cmds else None,
         ),
     ] = None,
+    force: Annotated[bool, typer.Option("--force", help="Enable force mode")] = False,
 ) -> None:
     """Run commands directly in a FABulous project.
 
     Alias: r
     """
-    settings = init_context(
-        project_dir=project_dir,
-        global_dot_env=shared_state.global_dot_env,
-        project_dot_env=shared_state.project_dot_env,
-    )
-
     entering_dir = Path.cwd()
 
     fab_CLI = FABulous_CLI(
-        settings.proj_lang,
-        force=shared_state.force,
+        get_context().proj_lang,
+        force=force,
         interactive=True,
         verbose=shared_state.verbose >= 2,
         debug=shared_state.debug,
@@ -390,9 +384,8 @@ def run_cmd(
     fab_CLI.debug = shared_state.debug
 
     # Change to project directory
-    logger.info(f"Setting current working directory to: {settings.proj_dir}")
-    if settings.proj_dir is not None:
-        os.chdir(settings.proj_dir)
+    logger.info(f"Setting current working directory to: {get_context().proj_dir}")
+    os.chdir(get_context().proj_dir)
     fab_CLI.onecmd_plus_hooks("load_fabric")
     # Ensure commands is a list
     if isinstance(commands, str):

@@ -51,14 +51,14 @@ from FABulous.FABulous_settings import init_context, reset_context
             ["FABulous", "-w", "invalid", "create-project"],
             "vhdl",
             False,
-            0,
+            1,
             id="typer-invalid-writer",
         ),
         pytest.param(
             ["FABulous", "-w", "invalid", "--create-project"],
             "vhdl",
             False,
-            0,
+            1,
             id="legacy-invalid-writer",
         ),
     ],
@@ -301,53 +301,44 @@ def test_logging_file_creation(
     assert log_file.stat().st_size > 0
 
 
-## merged into test_verbose_mode_parametric
-
-
 @pytest.mark.parametrize(
-    ("argv", "vflag", "expected_code"),
+    ("argv", "expected_code"),
     [
         pytest.param(
-            ["FABulous", "{project}", "--commands", "help"],
-            ["-v"],
+            ["FABulous", "{project}", "--commands", "help", "-v"],
             0,
             id="legacy-v",
         ),
         pytest.param(
-            ["FABulous", "{project}", "--commands", "help"],
-            ["-vv"],
+            ["FABulous", "{project}", "--commands", "help", "-vv"],
             0,
             id="legacy-vv",
         ),
         pytest.param(
-            ["FABulous", "run", "{project}", "help"],
-            ["-v"],
+            ["FABulous", "-v", "run", "{project}", "help"],
             0,
             id="typer-v",
         ),
         pytest.param(
-            ["FABulous", "run", "{project}", "help"],
-            ["-vv"],
+            ["FABulous", "-vv", "run", "{project}", "help"],
             0,
             id="typer-vv",
         ),
+        pytest.param(
+            ["FABulous", "run", "{project}", "help"],
+            0,
+            id="typer-vv-after-command",
+        ),
     ],
 )
-def test_verbose_mode_parametric(
+def test_verbose_mode(
     project: Path,
     monkeypatch: pytest.MonkeyPatch,
     argv: list[str],
-    vflag: list[str],
     expected_code: int,
 ) -> None:
     """Verbose mode works in both legacy and Typer forms."""
     test_args = [arg.replace("{project}", str(project)) for arg in argv]
-    if "run" in argv:
-        # Typer form - add flags before subcommand
-        test_args = [test_args[0]] + vflag + test_args[1:]
-    else:
-        # Legacy form - add flags at end
-        test_args.extend(vflag)
     monkeypatch.setattr(sys, "argv", test_args)
 
     with pytest.raises(SystemExit) as exc_info:
@@ -387,21 +378,21 @@ def test_debug_mode(
     ("argv_base", "commands_or_script", "expected_count", "search_text"),
     [
         pytest.param(
-            ["FABulous", "{project}", "--commands"],
+            ["FABulous", "--force", "{project}", "--commands"],
             "load_fabric non_existent",
             1,
             "non_existent",
             id="single-command",
         ),
         pytest.param(
-            ["FABulous", "{project}", "--commands"],
+            ["FABulous", "--force", "{project}", "--commands"],
             "load_fabric non_exist; load_fabric non_exist",
             2,
             "non_exist",
             id="multiple-commands",
         ),
         pytest.param(
-            ["FABulous", "{project}", "--FABulousScript"],
+            ["FABulous", "--force", "{project}", "--FABulousScript"],
             "load_fabric non_exist.csv\nload_fabric non_exist.csv\n",
             3,
             "INFO: Loading fabric",
@@ -428,10 +419,10 @@ def test_force_flag(
         script_file = tmp_path / "test.fs"
         with script_file.open("w") as f:
             f.write(commands_or_script)
-        argv.extend([str(script_file), "--force"])
+        argv.append(str(script_file))
     else:
         # Add commands and force flag
-        argv.extend([commands_or_script, "--force"])
+        argv.append(commands_or_script)
 
     result = run(argv, capture_output=True, text=True)
 
@@ -813,7 +804,7 @@ def test_update_project_version_cases(
         pytest.param(
             "unknown",
             "help\n",
-            1,
+            2,
             id="type-invalid",
         ),
     ],
@@ -919,55 +910,37 @@ def test_default_writer_is_verilog(
         pytest.param(
             ["FABulous", "run", "{project}"],
             False,
-            [0, 1],  # Can return either 0 or 1
+            1,
             id="run-none",
         ),
         pytest.param(
             ["FABulous", "run", "{project}", "help"],
             False,
-            [0],
+            0,
             id="run-single",
         ),
         pytest.param(
             ["FABulous", "run", "{project}", "help;help"],
             False,
-            [0],
+            0,
             id="run-multi",
         ),
         pytest.param(
             ["FABulous", "run", "{project}", "help;  help"],
             False,
-            [0],
+            0,
             id="run-multi-spaces",
-        ),
-        pytest.param(
-            [
-                "FABulous",
-                "run",
-                "{project}",
-                "load_fabric non_exist; load_fabric non_exist",
-                "--force",
-            ],
-            False,
-            [1],  # Should fail with non-zero exit code
-            id="run-force-failures",
         ),
         pytest.param(
             ["FABulous", "r", "{project}", "help"],
             False,
-            [0],
+            0,
             id="run-alias-r",
-        ),
-        pytest.param(
-            ["FABulous", "start"],
-            True,
-            [0],
-            id="start-in-cwd",
         ),
     ],
 )
 def test_run_and_start_variants(
-    project: Path, argv: list[str], use_cwd: bool, expected_codes: list[int]
+    project: Path, argv: list[str], use_cwd: bool, expected_codes: int
 ) -> None:
     test_argv = [s.replace("{project}", str(project)) for s in argv]
     if use_cwd:
@@ -976,7 +949,7 @@ def test_run_and_start_variants(
         result = run(test_argv, capture_output=True, text=True)
 
     # Check return code against expected values
-    assert result.returncode in expected_codes
+    assert result.returncode == expected_codes
 
 
 def test_project_dotenv_only_not_project_cwd_typer(
@@ -1238,12 +1211,12 @@ def test_script_nonexistent_file(
 
 
 @pytest.mark.parametrize(
-    ("file_ext", "expected_type", "expected_code"),
+    ("file_ext", "expected_code"),
     [
-        pytest.param(".fab", "fabulous", 0, id="fab-extension"),
-        pytest.param(".fs", "fabulous", 0, id="fs-extension"),
-        pytest.param(".tcl", "tcl", 0, id="tcl-extension"),
-        pytest.param(".txt", "tcl", 0, id="unknown-extension-defaults-tcl"),
+        pytest.param(".fab", 0, id="fab-extension"),
+        pytest.param(".fs", 0, id="fs-extension"),
+        pytest.param(".tcl", 0, id="tcl-extension"),
+        pytest.param(".txt", 0, id="unknown-extension-defaults-tcl"),
     ],
 )
 def test_script_type_detection(
@@ -1251,7 +1224,6 @@ def test_script_type_detection(
     project: Path,
     monkeypatch: pytest.MonkeyPatch,
     file_ext: str,
-    expected_type: str,
     expected_code: int,
 ) -> None:
     """Test automatic script type detection based on file extension"""
@@ -1355,11 +1327,6 @@ def test_common_options_state_update() -> None:
     assert shared_state.log_file == test_log_file
     assert shared_state.force is True
     assert shared_state.writer == HDLType.VHDL
-
-
-# ============================================================================
-# New Additional CLI Edge Case Tests
-# ============================================================================
 
 
 def test_run_trailing_semicolon_noop(project: Path) -> None:

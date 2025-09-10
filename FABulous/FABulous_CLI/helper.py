@@ -20,7 +20,7 @@ from importlib import resources
 from importlib.metadata import version
 from importlib.resources.abc import Traversable
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Literal
+from typing import TYPE_CHECKING, Any
 
 import requests
 from dotenv import get_key, set_key
@@ -28,7 +28,7 @@ from loguru import logger
 from packaging.version import Version
 
 from FABulous.custom_exception import PipelineCommandError
-from FABulous.FABulous_settings import add_var_to_global_env
+from FABulous.fabric_definition.define import HDLType
 
 if TYPE_CHECKING:
     from loguru import Record
@@ -116,9 +116,7 @@ def setup_logger(verbosity: int, debug: bool, log_file: Path = Path()) -> None:
         )
 
 
-def create_project(
-    project_dir: Path, lang: Literal["verilog", "vhdl"] = "verilog"
-) -> None:
+def create_project(project_dir: Path, lang: HDLType = HDLType.VERILOG) -> None:
     """Create a FABulous project containing all required files.
 
     Copies the common files and the appropriate project template.
@@ -148,7 +146,7 @@ def create_project(
     logger.info(project_dir)
 
     if lang not in ["verilog", "vhdl"]:
-        raise ValueError(f"Unsupported language: {lang}")
+        raise ValueError(f"Unsupported language: {lang!s}")
 
     # Copy the project template using importlib.resources
     try:
@@ -158,7 +156,7 @@ def create_project(
         )
         lang_template_ref = (
             resources.files("FABulous.fabric_files")
-            / f"FABulous_project_template_{lang}"
+            / f"FABulous_project_template_{lang!s}"
         )
 
         # Check if templates exist
@@ -166,7 +164,7 @@ def create_project(
             raise FileNotFoundError("Common template not found in package resources")
         if not lang_template_ref.is_dir():
             raise FileNotFoundError(
-                f"Language template ({lang}) not found in package resources"
+                f"Language template ({lang!s}) not found in package resources"
             )
 
     except (ImportError, AttributeError) as e:
@@ -205,14 +203,14 @@ def create_project(
     _copy_template_safely(lang_template_ref, project_dir)
 
     # Replace {HDL_SUFFIX} placeholder in all tile csv files
-    new_suffix = "v" if lang == "verilog" else "vhdl"
+    new_suffix = "v" if lang == HDLType.VERILOG else HDLType.VHDL
     for file_path in project_dir.rglob("*.csv"):
         content = file_path.read_text()
         new_content = re.sub(r"\{HDL_SUFFIX\}", new_suffix, content)
         file_path.write_text(new_content)
 
     env_file = project_dir / ".FABulous" / ".env"
-    set_key(env_file, "FAB_PROJ_LANG", lang)
+    set_key(env_file, "FAB_PROJ_LANG", str(lang))
     set_key(env_file, "FAB_PROJ_VERSION", version("FABulous-FPGA"))
     set_key(env_file, "FAB_PROJ_VERSION_CREATED", version("FABulous-FPGA"))
     set_key(
@@ -221,7 +219,9 @@ def create_project(
         str(project_dir.absolute() / "Fabric" / f"models_pack.{new_suffix}"),
     )
 
-    logger.info(f"New FABulous project created in {project_dir} with {lang} language.")
+    logger.info(
+        f"New FABulous project created in {project_dir} with {lang!s} language."
+    )
 
 
 def copy_verilog_files(src: Path, dst: Path) -> None:
@@ -312,6 +312,9 @@ def wrap_with_except_handling(fun_to_wrap: Callable) -> Callable:
             Reraises any exception caught during the execution of 'fun_to_wrap'.
         """
         try:
+            # Print the name of the function being wrapped (fallback to class name)
+            if not args:
+                args = ("",)
             fun_to_wrap(*args, **varargs)
         except Exception:  # noqa: BLE001 - Catching all exceptions is ok here
             import traceback

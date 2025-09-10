@@ -44,7 +44,7 @@ class FABulousSettings(BaseSettings):
     oss_cad_suite: Path | None = None
 
     proj_dir: Path = Field(default_factory=Path.cwd)
-    proj_lang: str = "verilog"
+    proj_lang: HDLType = HDLType.VERILOG
     models_pack: Path | None = None
     switch_matrix_debug_signal: bool = False
     proj_version_created: Version = Version("0.0.1")

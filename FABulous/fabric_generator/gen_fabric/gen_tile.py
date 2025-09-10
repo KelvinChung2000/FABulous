@@ -567,7 +567,6 @@ def generateSuperTile(
         The fabric object containing global configuration
     superTile : SuperTile
         Super tile object containing tile map and configuration
-        Super tile object containing tile map and configuration
     """
     writer.addHeader(f"{superTile.name}")
     writer.addParameterStart(indentLevel=1)

@@ -100,7 +100,10 @@ def common_options(
             "--verbose", "-v", count=True, help="Show detailed log information"
         ),
     ] = 0,
-    debug: Annotated[bool, typer.Option("--debug", help="Enable debug mode")] = False,
+    debug: Annotated[
+        bool | None,
+        typer.Option("--debug/--no-debug", help="Enable/disable debug mode"),
+    ] = None,
     log_file: Annotated[
         Path | None, typer.Option("--log", help="Log all output to file")
     ] = None,
@@ -128,7 +131,7 @@ def common_options(
 ) -> None:
     """Provide common options for all FABulous commands."""
     shared_state.verbose = verbose
-    shared_state.debug = debug
+    shared_state.debug = os.getenv("FAB_DEBUG") is not None if debug is None else debug
     shared_state.log_file = log_file
     shared_state.global_dot_env = global_dot_env
     shared_state.project_dot_env = project_dot_env
@@ -270,6 +273,7 @@ def script_cmd(
     fab_CLI = FABulous_CLI(
         settings.proj_lang,
         force=shared_state.force,
+        debug=shared_state.debug,
     )
     fab_CLI.debug = shared_state.debug
     # Change to project directory

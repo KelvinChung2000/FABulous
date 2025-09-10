@@ -661,6 +661,22 @@ class TestContextMethods:
         assert settings.proj_version_created == Version("1.0.0")
         assert str(settings.yosys_path) == "/opt/oss-cad-suite/bin/yosys"
 
+    def test_debug_env_variable(
+        self, project: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Test that the DEBUG environment variable is respected."""
+        monkeypatch.setenv("FAB_DEBUG", "1")
+
+        settings = init_context(project_dir=project)
+
+        assert settings.debug is True
+
+        monkeypatch.setenv("FAB_DEBUG", "True")
+
+        settings = init_context(project_dir=project)
+
+        assert settings.debug is True
+
 
 class TestIntegration:
     """Integration tests for FABulous settings functionality with new context system."""

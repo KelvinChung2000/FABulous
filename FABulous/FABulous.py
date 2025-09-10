@@ -44,6 +44,23 @@ app = typer.Typer(
 )
 
 
+@dataclass
+class SharedContext:
+    """Context object to hold shared CLI options."""
+
+    # project_dir should be an optional Path value, not assigned to the Path class
+    project_dir: Path = Path()
+    verbose: int = 0
+    debug: bool = False
+    log_file: Path | None = None
+    global_dot_env: Path | None = None
+    project_dot_env: Path | None = None
+    force: bool = False
+
+
+shared_state = SharedContext()
+
+
 def version_callback(value: bool) -> None:
     """Print version information and exit."""
     if value:
@@ -84,85 +101,8 @@ WriterType = Annotated[
 ForceType = Annotated[bool, typer.Option("--force", help="Enable force mode")]
 
 
-GLOBAL_FLAGS = {
-    "--verbose",
-    "-v",
-    "--debug",
-    "--log",
-    "--global-dot-env",
-    "-gde",
-    "--project-dot-env",
-    "-pde",
-}
-
-
-def reorder_options(argv: list[str]) -> list[str]:
-    """Reorder global flags to be before subcommands.
-
-    Rules:
-    - Only flags whose (base) token (before any '=') is in GLOBAL_FLAGS are moved.
-    - Supports both --opt=value and --opt value forms (second handled heuristically:
-      if the next token does not start with '-' it is treated as that flag's value).
-    - Flags already before the subcommand are left untouched.
-    - Order among moved flags is preserved relative to their appearance after
-      the subcommand.
-    - If no registered subcommand is present, argv is returned unchanged.
-    """
-    if (
-        len(argv) == 2
-        and Path(argv[1]).exists()
-        and (Path(argv[1]) / ".FABulous").exists()
-    ):
-        return ["FABulous", "--project-dir", argv[1], "start"]
-
-    if len(argv) < 3:
-        return argv
-
-    command_names = {c.name for c in app.registered_commands}
-
-    # Find first subcommand occurrence
-    cmd_index = None
-    for i, tok in enumerate(argv[1:], start=1):
-        if tok in command_names:
-            cmd_index = i
-            break
-    if cmd_index is None:
-        return argv  # No subcommand -> nothing to reorder
-
-    before = argv[:cmd_index]  # program + any already-leading global flags
-    command = argv[cmd_index]
-    after = argv[cmd_index + 1 :]
-
-    moved: list[str] = []
-    remaining: list[str] = []
-    i = 0
-
-    while i < len(after):
-        tok = after[i]
-        base = tok.split("=", 1)[0] if tok.startswith("--") else tok
-        if base in GLOBAL_FLAGS:
-            # Move the flag
-            moved.append(tok)
-            # If value is separated (no '=' and next token not an option),
-            # treat as value
-            if "=" not in tok and (i + 1) < len(after):
-                nxt = after[i + 1]
-                if not nxt.startswith("-"):
-                    moved.append(nxt)
-                    i += 1
-        else:
-            remaining.append(tok)
-        i += 1
-
-    if not moved:
-        return argv
-
-    return before + moved + [command] + remaining
-
-
 @app.callback()
 def common_options(
-    ctx: typer.Context,
     project_dir: ProjectDirType = None,
     _version: Annotated[
         bool | None,
@@ -180,6 +120,7 @@ def common_options(
             "-v",
             count=True,
             help="Show detailed log information",
+            is_eager=True,
         ),
     ] = 0,
     debug: Annotated[
@@ -201,24 +142,22 @@ def common_options(
     ] = None,
 ) -> None:
     """Provide common options for all FABulous commands."""
+    shared_state.verbose = verbose
+    shared_state.debug = os.getenv("FAB_DEBUG") is not None if debug is None else debug
+    shared_state.log_file = log_file
+    shared_state.global_dot_env = global_dot_env
+    shared_state.project_dot_env = project_dot_env
+    shared_state.project_dir = project_dir or Path.cwd()
+
     setup_logger(
-        verbose,
-        debug or False,
-        log_file=log_file or Path(),
+        shared_state.verbose,
+        shared_state.debug,
+        log_file=shared_state.log_file or Path(),
     )
-
-    if (s := ctx.invoked_subcommand) and (
-        s.startswith("install") or s == "create-project" or s == "c"
-    ):
-        return
-
-    if "--help" in sys.argv:
-        return
-
     init_context(
-        project_dir=project_dir or Path().cwd(),
-        global_dot_env=global_dot_env,
-        project_dot_env=project_dot_env,
+        project_dir=shared_state.project_dir,
+        global_dot_env=shared_state.global_dot_env,
+        project_dot_env=shared_state.project_dot_env,
     )
 
 
@@ -249,21 +188,15 @@ def check_version_compatibility(_: Path) -> None:
 @app.command("create-project")
 @app.command("c", hidden=True)
 def create_project_cmd(
-    project_dir: Annotated[Path, typer.Argument(help="Directory to create a project")],
+    project_dir: Annotated[
+        Path, typer.Argument(help="Directory to create a project")
+    ] = Path(),
     writer: WriterType = HDLType.VERILOG,
-    overwrite: bool = False,
 ) -> None:
     """Create a new FABulous project.
 
     Alias: c
     """
-    if project_dir.exists() and not overwrite:
-        delete_existing = typer.confirm(
-            f"Project directory {project_dir} already exists. Overwrite?"
-        )
-        if not delete_existing:
-            logger.info("Project creation cancelled.")
-            raise typer.Exit(0)
     create_project(project_dir, writer)
     logger.info(f"FABulous project created successfully at {project_dir}")
 
@@ -310,8 +243,8 @@ def install_fabulator_cmd(
 @app.command("update-project-version")
 def update_project_version_cmd() -> None:
     """Update project version to match package version."""
-    logger.info(f"Using {get_context().proj_dir} directory as project directory")
-    if not update_project_version(get_context().proj_dir):
+    logger.info(f"Using {shared_state.project_dir} directory as project directory")
+    if not update_project_version(shared_state.project_dir):
         logger.error(
             "Failed to update project version. Please check the logs for more details."
         )
@@ -352,7 +285,7 @@ def script_cmd(
     # Initialize context
     entering_dir = Path.cwd()
     script_file = script_file.absolute()
-    os.chdir(get_context().proj_dir)
+    os.chdir(shared_state.project_dir)
     fab_CLI = FABulous_CLI(
         writerType=get_context().proj_lang,
         force=force,
@@ -402,7 +335,7 @@ def script_cmd(
 
 @app.command("start")
 @app.command("s", hidden=True)
-def start_cmd(force: ForceType = False) -> None:
+def start_cmd() -> None:
     """Start FABulous in interactive mode. Alias: s.
 
     This is the main command for running FABulous in interactive mode or with scripts.
@@ -411,11 +344,14 @@ def start_cmd(force: ForceType = False) -> None:
     entering_dir = Path.cwd()
     fab_CLI = FABulous_CLI(
         get_context().proj_lang,
-        force=force,
+        force=shared_state.force,
         interactive=True,
         verbose=get_context().verbose >= 2,
         debug=get_context().debug,
     )
+    fab_CLI.debug = shared_state.debug
+
+    # Change to project directory
     os.chdir(get_context().proj_dir)
     fab_CLI.onecmd_plus_hooks("load_fabric")
     fab_CLI.cmdloop()
@@ -438,7 +374,7 @@ def run_cmd(
             callback=lambda cmds: cmds[0] if cmds else None,
         ),
     ] = None,
-    force: ForceType = False,
+    force: Annotated[bool, typer.Option("--force", help="Enable force mode")] = False,
 ) -> None:
     """Run commands directly in a FABulous project.
 
@@ -448,9 +384,9 @@ def run_cmd(
     fab_CLI = FABulous_CLI(
         get_context().proj_lang,
         force=force,
-        interactive=False,
-        verbose=get_context().verbose >= 2,
-        debug=get_context().debug,
+        interactive=True,
+        verbose=shared_state.verbose >= 2,
+        debug=shared_state.debug,
     )
 
     # Change to project directory

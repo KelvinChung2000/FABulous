@@ -281,13 +281,16 @@ def test_logging_file_creation(
 
 @pytest.mark.parametrize(
     ("argv", "expected_code"),
+    ("argv", "expected_code"),
     [
         pytest.param(
+            ["FABulous", "{project}", "--commands", "help", "-v"],
             ["FABulous", "{project}", "--commands", "help", "-v"],
             0,
             id="legacy-v",
         ),
         pytest.param(
+            ["FABulous", "{project}", "--commands", "help", "-vv"],
             ["FABulous", "{project}", "--commands", "help", "-vv"],
             0,
             id="legacy-vv",
@@ -309,6 +312,7 @@ def test_logging_file_creation(
         ),
     ],
 )
+def test_verbose_mode(
 def test_verbose_mode(
     project: Path,
     monkeypatch: pytest.MonkeyPatch,
@@ -362,6 +366,7 @@ def test_debug_mode(
     [
         pytest.param(
             ["FABulous", "--force", "{project}", "--commands"],
+            ["FABulous", "--force", "{project}", "--commands"],
             "load_fabric non_existent",
             1,
             "non_existent",
@@ -369,12 +374,14 @@ def test_debug_mode(
         ),
         pytest.param(
             ["FABulous", "--force", "{project}", "--commands"],
+            ["FABulous", "--force", "{project}", "--commands"],
             "load_fabric non_exist; load_fabric non_exist",
             2,
             "non_exist",
             id="multiple-commands",
         ),
         pytest.param(
+            ["FABulous", "--force", "{project}", "--FABulousScript"],
             ["FABulous", "--force", "{project}", "--FABulousScript"],
             "load_fabric non_exist.csv\nload_fabric non_exist.csv\n",
             3,
@@ -410,8 +417,10 @@ def test_force_flag(
         with script_file.open("w") as f:
             f.write(commands_or_script)
         argv.append(str(script_file))
+        argv.append(str(script_file))
     else:
         # Add commands and force flag
+        argv.append(commands_or_script)
         argv.append(commands_or_script)
 
     result = run(argv, capture_output=True, text=True)
@@ -709,6 +718,7 @@ def test_update_project_version_cases(
             "unknown",
             "help\n",
             2,
+            2,
             id="type-invalid",
         ),
     ],
@@ -833,6 +843,7 @@ def test_default_writer_is_verilog(
             ],
             False,
             1,
+            1,
             id="run-none",
         ),
         pytest.param(
@@ -851,11 +862,13 @@ def test_default_writer_is_verilog(
             ["FABulous", "-p", "{project}", "run", "help;help"],
             False,
             0,
+            0,
             id="run-multi",
         ),
         pytest.param(
             ["FABulous", "-p", "{project}", "run", "help;  help"],
             False,
+            0,
             0,
             id="run-multi-spaces",
         ),
@@ -1096,7 +1109,12 @@ def test_script_execution_with_content(
 
 @pytest.mark.parametrize(
     ("file_ext", "expected_code"),
+    ("file_ext", "expected_code"),
     [
+        pytest.param(".fab", 0, id="fab-extension"),
+        pytest.param(".fs", 0, id="fs-extension"),
+        pytest.param(".tcl", 0, id="tcl-extension"),
+        pytest.param(".txt", 0, id="unknown-extension-defaults-tcl"),
         pytest.param(".fab", 0, id="fab-extension"),
         pytest.param(".fs", 0, id="fs-extension"),
         pytest.param(".tcl", 0, id="tcl-extension"),

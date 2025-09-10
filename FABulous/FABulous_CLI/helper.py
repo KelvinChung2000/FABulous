@@ -29,7 +29,6 @@ from packaging.version import Version
 
 from FABulous.custom_exception import PipelineCommandError
 from FABulous.fabric_definition.define import HDLType
-from FABulous.FABulous_settings import add_var_to_global_env
 
 if TYPE_CHECKING:
     from loguru import Record

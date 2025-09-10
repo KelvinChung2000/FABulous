@@ -49,6 +49,8 @@ class FABulousSettings(BaseSettings):
         description="Deprecated, use proj_version instead",
     )
 
+    debug: bool = False
+
     @field_validator("proj_version", "proj_version_created", "version", mode="before")
     @classmethod
     def parse_version_str(cls, value: str | Version) -> Version:

@@ -267,6 +267,7 @@ def script_cmd(
     fab_CLI = FABulous_CLI(
         settings.proj_lang,
         force=shared_state.force,
+        debug=(settings.debug if not shared_state.debug else True),
     )
     fab_CLI.debug = shared_state.debug
     # Change to project directory
@@ -331,7 +332,7 @@ def start_cmd(project_dir: ProjectDirType = None) -> None:
         force=shared_state.force,
         interactive=True,
         verbose=shared_state.verbose >= 2,
-        debug=shared_state.debug,
+        debug=(settings.debug if not shared_state.debug else True),
     )
     fab_CLI.debug = shared_state.debug
 
@@ -379,7 +380,7 @@ def run_cmd(
         force=shared_state.force,
         interactive=True,
         verbose=shared_state.verbose >= 2,
-        debug=shared_state.debug,
+        debug=(settings.debug if not shared_state.debug else True),
     )
     fab_CLI.debug = shared_state.debug
 

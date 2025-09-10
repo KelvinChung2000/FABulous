@@ -48,8 +48,6 @@ class Bel:
         The feature map of the BEL.
     userCLK : bool
         Whether the BEL has userCLK port.
-    individually_declared : bool
-        Whether ports are individually declared.
     ports_vectors : dict[str, dict[str, tuple[IO, int]]]
         Dictionary structure to save vectorized port information.
     carry : dict[str, dict[IO, str]]

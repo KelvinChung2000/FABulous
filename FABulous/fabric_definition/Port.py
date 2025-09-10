@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 """Port definition module for FPGA fabric.
 
 This module contains the `Port` class, which represents a connection point on a tile
@@ -7,9 +6,6 @@ entering or leaving a tile, including their direction, source and destination na
 offsets, and wire counts. These definitions are typically parsed from a CSV file
 that describes the fabric architecture.
 """
-=======
-"""Store all the port information defined in the CSV file."""
->>>>>>> 9bd182a0 (fix: rebase fix)
 
 from dataclasses import dataclass
 

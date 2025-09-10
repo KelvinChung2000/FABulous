@@ -6,7 +6,6 @@ interface. It handles argument parsing, project setup, and CLI initialization.
 
 import os
 import sys
-from dataclasses import dataclass
 from importlib.metadata import version
 from pathlib import Path
 from typing import Annotated
@@ -45,15 +44,18 @@ app = typer.Typer(
 )
 
 
-@dataclass
-class SharedContext:
-    """Context object to hold shared CLI options."""
+# @dataclass
+# class SharedContext:
+#     """Context object to hold shared CLI options."""
 
-    verbose: int = 0
-    debug: bool = False
+#     verbose: int = 0
+#     debug: bool = False
+#     global_dot_env: Path | None = None
+#     project_dot_env: Path | None = None
+#     project_dir: Path | None = None
 
 
-shared_state = SharedContext()
+# shared_state = SharedContext()
 
 
 def version_callback(value: bool) -> None:
@@ -73,7 +75,9 @@ def validate_project_directory(value: str) -> Path | None:
 
 ProjectDirType = Annotated[
     Path | None,
-    typer.Argument(
+    typer.Option(
+        "--project-dir",
+        "-p",
         help="Directory path to project folder",
         parser=validate_project_directory,
         resolve_path=True,
@@ -139,6 +143,7 @@ def reorder_options(argv: list[str]) -> list[str]:
     moved: list[str] = []
     remaining: list[str] = []
     i = 0
+
     while i < len(after):
         tok = after[i]
         base = tok.split("=", 1)[0] if tok.startswith("--") else tok
@@ -164,6 +169,7 @@ def reorder_options(argv: list[str]) -> list[str]:
 
 @app.callback()
 def common_options(
+    ctx: typer.Context | None,
     project_dir: ProjectDirType = None,
     _version: Annotated[
         bool | None,
@@ -201,22 +207,28 @@ def common_options(
     ] = None,
 ) -> None:
     """Provide common options for all FABulous commands."""
-    shared_state.verbose = verbose
-    shared_state.debug = os.getenv("FAB_DEBUG") is not None if debug is None else debug
-    shared_state.log_file = log_file
-    shared_state.global_dot_env = global_dot_env
-    shared_state.project_dot_env = project_dot_env
-    shared_state.project_dir = project_dir or Path.cwd()
-
+    # shared_state.verbose = verbose
+    # shared_state.debug = debug
+    # shared_state.global_dot_env = global_dot_env
+    # shared_state.project_dot_env = project_dot_env
+    # shared_state.project_dir = project_dir
     setup_logger(
         verbose,
         debug,
         log_file=log_file or Path(),
     )
+
+    if (
+        ctx is not None
+        and (s := ctx.invoked_subcommand)
+        and (s.startswith("install") or s == "create-project")
+    ):
+        return
+
     init_context(
-        project_dir=project_dir or Path.cwd(),
+        project_dir=project_dir,
         global_dot_env=global_dot_env,
-        project_dot_env=project_dot_env,
+        project_dot_env=project_dot_env or Path().cwd(),
     )
 
 
@@ -348,7 +360,7 @@ def script_cmd(
     fab_CLI = FABulous_CLI(
         writerType=get_context().proj_lang,
         force=force,
-        debug=shared_state.debug,
+        debug=get_context().debug,
     )
     # Change to project directory
 
@@ -439,7 +451,6 @@ def run_cmd(
     Alias: r
     """
     entering_dir = Path.cwd()
-
     fab_CLI = FABulous_CLI(
         get_context().proj_lang,
         force=force,
@@ -670,6 +681,7 @@ def convert_legacy_args_with_deprecation_warning() -> None:
     args = parser.parse_args()
 
     common_options(
+        ctx=None,
         project_dir=Path(args.project_dir) if args.project_dir else None,
         verbose=args.verbose,
         debug=args.debug,
@@ -705,7 +717,7 @@ def convert_legacy_args_with_deprecation_warning() -> None:
         if not args.project_dir:
             logger.error("Project directory is required when creating a project")
             raise typer.Exit(2) from None
-        create_project_cmd(project_dir, HDLType[args.writer])
+        create_project_cmd(project_dir, HDLType[args.writer.upper()])
 
     elif args.install_oss_cad_suite:
         # Convert to: FABulous install-oss-cad-suite <directory> [options]

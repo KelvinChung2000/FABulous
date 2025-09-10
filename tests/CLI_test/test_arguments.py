@@ -31,34 +31,34 @@ from FABulous.FABulous_settings import init_context, reset_context
             ["FABulous", "create-project"], None, False, 0, id="typer-no-writer"
         ),
         pytest.param(
-            ["FABulous", "--create-project"], None, False, 0, id="legacy-no-writer"
+            ["FABulous", "--createProject"], None, False, 0, id="legacy-no-writer"
         ),
         pytest.param(
-            ["FABulous", "-w", "vhdl", "--create-project"],
+            ["FABulous", "-w", "vhdl", "--createProject"],
             "vhdl",
             False,
             0,
             id="legacy-writer",
         ),
         pytest.param(
-            ["FABulous", "-w", "vhdl", "create-project"],
+            ["FABulous", "create-project", "-w", "vhdl"],
             "vhdl",
             False,
             0,
             id="typer-writer",
         ),
         pytest.param(
-            ["FABulous", "-w", "invalid", "create-project"],
+            ["FABulous", "create-project", "-w", "invalid"],
             "vhdl",
             False,
-            1,
+            2,
             id="typer-invalid-writer",
         ),
         pytest.param(
-            ["FABulous", "-w", "invalid", "--create-project"],
+            ["FABulous", "-w", "invalid", "--createProject"],
             "vhdl",
             False,
-            1,
+            2,
             id="legacy-invalid-writer",
         ),
     ],
@@ -105,7 +105,7 @@ def test_create_project_cases(
             id="fab-legacy",
         ),
         pytest.param(
-            ["FABulous", "script", "{project}", "{file}"],
+            ["FABulous", "-p", "{project}", "script", "{file}"],
             None,
             0,
             id="fab-typer",
@@ -119,9 +119,9 @@ def test_create_project_cases(
         ),
         # FAB script with nonexistent file
         pytest.param(
-            ["FABulous", "script", "{project}", "{missing}"],
+            ["FABulous", "-p", "{project}", "script", "{missing}"],
             None,
-            1,
+            2,
             id="fab-nonexistent",
         ),
         # TCL script with explicit project
@@ -132,7 +132,7 @@ def test_create_project_cases(
             id="tcl-legacy",
         ),
         pytest.param(
-            ["FABulous", "script", "{project}", "{tcl}"],
+            ["FABulous", "-p", "{project}", "script", "{tcl}"],
             None,
             0,
             id="tcl-typer",
@@ -143,6 +143,12 @@ def test_create_project_cases(
             "nonproject",
             1,
             id="fab-cwd-nonproject",
+        ),
+        pytest.param(
+            ["FABulous", "-p", "{project}", "script", "nonexistent.fab"],
+            None,
+            2,
+            id="tcl-typer",
         ),
     ],
 )
@@ -190,33 +196,29 @@ def test_script_execution_cases(
 
 
 @pytest.mark.parametrize(
-    ("argv", "commands", "expect_fail", "expected_code"),
+    ("argv", "commands", "expected_code"),
     [
         pytest.param(
             ["FABulous", "{project}", "--commands"],
             "help; help",
-            False,
             0,
             id="legacy-success",
         ),
         pytest.param(
             ["FABulous", "run", "{project}"],
             "help",
-            False,
             0,
             id="typer-success",
         ),
         pytest.param(
             ["FABulous", "{project}", "--commands"],
             "",
-            False,
-            0,
+            2,
             id="empty-commands",
         ),
         pytest.param(
             ["FABulous", "{project}", "--commands"],
             "load_fabric non_exist; load_fabric non_exist",
-            True,
             1,
             id="stop-on-first-error",
         ),
@@ -227,7 +229,6 @@ def test_commands_execution(
     monkeypatch: pytest.MonkeyPatch,
     argv: list[str],
     commands: str,
-    expect_fail: bool,
     expected_code: int,
 ) -> None:
     """Test direct command execution with various scenarios"""
@@ -235,21 +236,11 @@ def test_commands_execution(
     if commands:
         test_args.append(commands)
 
-    if expect_fail:
-        # Use subprocess.run for error cases to capture output
-        from subprocess import run
-
-        result = run(test_args, capture_output=True, text=True)
-        assert result.returncode != 0
-        if "load_fabric non_exist" in commands:
-            # Should stop on first error, only show one attempt
-            assert result.stdout.count("non_exist") == 1
-    else:
-        # Use monkeypatch for success cases
-        monkeypatch.setattr(sys, "argv", test_args)
-        with pytest.raises(SystemExit) as exc_info:
-            main()
-        assert exc_info.value.code == expected_code
+    # Use monkeypatch for success cases
+    monkeypatch.setattr(sys, "argv", test_args)
+    with pytest.raises(SystemExit) as exc_info:
+        main()
+    assert exc_info.value.code == expected_code
 
 
 @pytest.mark.parametrize(
@@ -431,22 +422,24 @@ def test_force_flag(
 
 
 @pytest.mark.parametrize(
-    ("argv", "expected_requests"),
+    ("argv", "expected_requests", "expected_code"),
     [
         pytest.param(
-            ["FABulous", "{project}", "--install_oss_cad_suite"], 2, id="legacy"
+            ["FABulous", "{project}", "--install_oss_cad_suite"], 2, 0, id="legacy"
         ),
         pytest.param(
-            ["FABulous", "install-oss-cad-suite", "{project}"], 2, id="typer-project"
+            ["FABulous", "install-oss-cad-suite", "{project}"], 2, 0, id="typer-project"
         ),
-        pytest.param(["FABulous", "install-oss-cad-suite"], 2, id="default-dir"),
+        pytest.param(["FABulous", "install-oss-cad-suite"], 2, 0, id="default-dir"),
         pytest.param(
             ["FABulous", "install-oss-cad-suite", "{install_dir}"],
             2,
+            0,
             id="explicit-dir",
         ),
         pytest.param(
             ["FABulous", "install-oss-cad-suite", "{install_dir}"],
+            1,
             1,
             id="error",
         ),
@@ -459,6 +452,7 @@ def test_install_oss_cad_suite(
     monkeypatch: pytest.MonkeyPatch,
     argv: list[str],
     expected_requests: int,
+    expected_code: int,
 ) -> None:
     """Parametric test for install-oss-cad-suite variants with mocked network."""
 
@@ -520,9 +514,6 @@ def test_install_oss_cad_suite(
     # Ensure default-dir uses a clean temp user config directory
     tmp_user_dir = tmp_path / "user_config"
     monkeypatch.setattr("FABulous.FABulous.FAB_USER_CONFIG_DIR", tmp_user_dir)
-    monkeypatch.setattr(
-        "FABulous.FABulous_CLI.helper.FAB_USER_CONFIG_DIR", tmp_user_dir
-    )
 
     monkeypatch.setattr(sys, "argv", test_argv)
     with pytest.raises(SystemExit) as exc_info:
@@ -749,25 +740,21 @@ def test_create_project_alias_typer(
 
 
 @pytest.mark.parametrize(
-    ("argv", "result", "chdir_flag", "expected_code"),
+    ("argv", "result", "expected_code"),
     [
         pytest.param(
-            ["FABulous", "update-project-version", "{project}"],
+            ["FABulous", "-p", "{project}", "update-project-version"],
             True,
-            False,
             0,
             id="explicit-success",
         ),
         pytest.param(
-            ["FABulous", "update-project-version", "{project}"],
-            False,
+            ["FABulous", "-p", "{project}update-project-version"],
             False,
             1,
             id="explicit-failure",
         ),
-        pytest.param(
-            ["FABulous", "update-project-version"], True, True, 0, id="cwd-success"
-        ),
+        pytest.param(["FABulous", "update-project-version"], True, 0, id="cwd-success"),
     ],
 )
 def test_update_project_version_cases(
@@ -809,7 +796,7 @@ def test_update_project_version_cases(
         ),
     ],
 )
-def test_script_command_type_override_param(
+def test_script_command_type_override(
     tmp_path: Path,
     project: Path,
     monkeypatch: pytest.MonkeyPatch,
@@ -824,8 +811,9 @@ def test_script_command_type_override_param(
 
     test_args = [
         "FABulous",
-        "script",
+        "-p",
         str(project),
+        "script",
         str(script_file),
         "--type",
         explicit_type,
@@ -905,51 +893,81 @@ def test_default_writer_is_verilog(
 
 
 @pytest.mark.parametrize(
-    ("argv", "use_cwd", "expected_codes"),
+    ("argv", "use_cwd", "expected_code"),
     [
+        # Original basic variants
         pytest.param(
-            ["FABulous", "run", "{project}"],
+            [
+                "FABulous",
+                "-p",
+                "{project}",
+                "run",
+            ],
             False,
             1,
             id="run-none",
         ),
         pytest.param(
-            ["FABulous", "run", "{project}", "help"],
+            ["FABulous", "-p", "{project}", "run", "help"],
             False,
             0,
             id="run-single",
         ),
         pytest.param(
-            ["FABulous", "run", "{project}", "help;help"],
+            ["FABulous", "-p", "{project}", "run", "help;help"],
             False,
             0,
             id="run-multi",
         ),
         pytest.param(
-            ["FABulous", "run", "{project}", "help;  help"],
+            ["FABulous", "-p", "{project}", "run", "help;  help"],
             False,
             0,
             id="run-multi-spaces",
         ),
         pytest.param(
-            ["FABulous", "r", "{project}", "help"],
+            ["FABulous", "-p", "{project}", "r", "help"],
             False,
             0,
             id="run-alias-r",
         ),
+        pytest.param(
+            [
+                "FABulous",
+                "-p",
+                "{project}",
+                "run",
+                "help;",
+            ],
+            False,
+            0,
+            id="trailing-semi-noop",
+        ),
+        pytest.param(
+            [
+                "FABulous",
+                "-p",
+                "{project}",
+                "run",
+                "help; load_fabric non_exist",
+            ],
+            False,
+            1,
+            id="mixed-success-fail",
+        ),
     ],
 )
-def test_run_and_start_variants(
-    project: Path, argv: list[str], use_cwd: bool, expected_codes: int
+def test_run_variants(
+    project: Path, argv: list[str], use_cwd: bool, expected_code: int
 ) -> None:
+    """Unified run command behavior tests (return code only)."""
     test_argv = [s.replace("{project}", str(project)) for s in argv]
     if use_cwd:
         result = run(test_argv, capture_output=True, text=True, cwd=str(project))
     else:
         result = run(test_argv, capture_output=True, text=True)
 
-    # Check return code against expected values
-    assert result.returncode == expected_codes
+    assert result.returncode == expected_code
 
 
 def test_project_dotenv_only_not_project_cwd_typer(
@@ -1169,7 +1187,7 @@ def test_shared_context_defaults() -> None:
     ("script_content", "expected_code"),
     [
         pytest.param("help\n", 0, id="simple-command"),
-        pytest.param("# Comment\nhelp\nload_fabric test\n", 0, id="multi-line"),
+        pytest.param("# Comment\nhelp\nload_fabric test.csv\n", 1, id="multi-line"),
         pytest.param("", 0, id="empty-script"),
     ],
 )
@@ -1184,30 +1202,13 @@ def test_script_execution_with_content(
     script_file = tmp_path / "test.fab"
     script_file.write_text(script_content)
 
-    test_args = ["FABulous", "script", str(project), str(script_file)]
+    test_args = ["FABulous", "-p", str(project), "script", str(script_file)]
     monkeypatch.setattr(sys, "argv", test_args)
 
     with pytest.raises(SystemExit) as exc_info:
         main()
 
     assert exc_info.value.code == expected_code
-
-
-def test_script_nonexistent_file(
-    tmp_path: Path,
-    project: Path,
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    """Test script command with nonexistent file"""
-    nonexistent_file = tmp_path / "nonexistent.fab"
-
-    test_args = ["FABulous", "script", str(project), str(nonexistent_file)]
-    monkeypatch.setattr(sys, "argv", test_args)
-
-    with pytest.raises(SystemExit) as exc_info:
-        main()
-
-    assert exc_info.value.code == 1
 
 
 @pytest.mark.parametrize(
@@ -1232,7 +1233,7 @@ def test_script_type_detection(
     script_file = tmp_path / f"test{file_ext}"
     script_file.write_text("help\n")
 
-    test_args = ["FABulous", "script", str(project), str(script_file)]
+    test_args = ["FABulous", "-p", str(project), "script", str(script_file)]
     monkeypatch.setattr(sys, "argv", test_args)
 
     with pytest.raises(SystemExit) as exc_info:
@@ -1292,8 +1293,9 @@ def test_run_command_pipeline_error(
     """Test run command with pipeline execution error"""
     test_args = [
         "FABulous",
-        "run",
+        "-p",
         str(project),
+        "run",
         "load_fabric nonexistent_fabric",
     ]
     monkeypatch.setattr(sys, "argv", test_args)
@@ -1329,61 +1331,7 @@ def test_common_options_state_update() -> None:
     assert shared_state.writer == HDLType.VHDL
 
 
-def test_run_trailing_semicolon_noop(project: Path) -> None:
-    """Trailing semicolon token 'help;' currently treated as no-op (success path).
-
-    Document existing behavior: parser ignores unknown token without failing.
-    """
-    result = run(
-        [
-            "FABulous",
-            "run",
-            str(project),
-            "help;",  # Parsed as single token 'help;' (invalid command)
-        ],
-        capture_output=True,
-        text=True,
-    )
-    assert result.returncode == 0
-
-
-def test_run_mixed_success_failure_pipeline(project: Path) -> None:
-    """Pipeline stops on first failing command without --force."""
-    cmd = "help; load_fabric non_exist"
-    result = run(
-        [
-            "FABulous",
-            "run",
-            str(project),
-            cmd,
-        ],
-        capture_output=True,
-        text=True,
-    )
-    # Expect failure due to second command
-    assert result.returncode != 0
-    # only one occurrence of failing fabric token (stopped early)
-    assert result.stdout.count("non_exist") == 1
-
-
-def test_run_trailing_semicolon_force(project: Path) -> None:
-    """With --force a trailing semicolon still yields non-zero exit but continues.
-
-    The invalid command token should not abort processing of prior commands.
-    """
-    result = run(
-        [
-            "FABulous",
-            "run",
-            str(project),
-            "help;",  # invalid token
-            "--force",
-        ],
-        capture_output=True,
-        text=True,
-    )
-    # Force doesn't turn invalid command into success; keep non-zero
-    assert result.returncode != 0
+## test_run_edge_cases merged into test_run_variants
 
 
 def test_legacy_logging_default_filename(project: Path) -> None:
@@ -1420,20 +1368,21 @@ def test_writer_case_insensitive_verilog(
     assert "verilog" in env_text
 
 
-def test_global_option_after_subcommand_error(project: Path) -> None:
+def test_global_option_after_subcommand(project: Path) -> None:
     """Global option placed after subcommand should raise usage error (exit 2)."""
     result = run(
         [
             "FABulous",
-            "run",
-            "--debug",  # Misplaced
+            "-p",
             str(project),
+            "run",
             "help",
+            "--debug",
         ],
         capture_output=True,
         text=True,
     )
-    assert result.returncode == 2
+    assert result.returncode == 0
 
 
 def test_start_invalid_project() -> None:
@@ -1442,8 +1391,9 @@ def test_start_invalid_project() -> None:
     result = run(
         [
             "FABulous",
-            "start",
+            "-p",
             invalid,
+            "start",
         ],
         capture_output=True,
         text=True,

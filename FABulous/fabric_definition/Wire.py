@@ -51,7 +51,7 @@ class Wire:
         """
         return f"{self.source}-X{self.xOffset}Y{self.yOffset}>{self.destination}"
 
-    def __eq__(self, __o: object) -> bool:
+    def __eq__(self, __o: object, /) -> bool:
         """Check if two `Wire` objects are equal.
 
         Two wires are considered equal if they have the same

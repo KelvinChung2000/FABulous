@@ -90,8 +90,6 @@ class Port:
         indexed : bool, optional
             If True, wire names use bracket notation (e.g., `port[0]`).
             If False, wire names use simple concatenation (e.g., `port0`).
-            If True, wire names use bracket notation (e.g., `port[0]`).
-            If False, wire names use simple concatenation (e.g., `port0`).
             Defaults to False.
 
         Returns

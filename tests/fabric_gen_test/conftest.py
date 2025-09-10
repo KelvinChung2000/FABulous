@@ -34,7 +34,6 @@ class TileConfig(NamedTuple):
 @pytest.fixture
 def default_fabric(mocker: MockerFixture) -> Fabric:
     """Create a Fabric instance with given parameters."""
-    """Create a Fabric instance with given parameters."""
     fabric = mocker.create_autospec(Fabric, spec_set=False)
     fabric.frameBitsPerRow = 32
     fabric.maxFramesPerCol = 20
@@ -44,7 +43,6 @@ def default_fabric(mocker: MockerFixture) -> Fabric:
 
 @pytest.fixture
 def default_tile(mocker: MockerFixture) -> Tile:
-    """Create a Tile instance with given parameters."""
     """Create a Tile instance with given parameters."""
     tile = mocker.create_autospec(Tile, spec_set=False)
     tile.name = "DefaultTile"

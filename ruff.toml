@@ -116,7 +116,7 @@ select = [
 # Ignoed rules:
 # - PYI063: https://docs.astral.sh/ruff/rules/pep484-style-positional-only-parameter/
 # - TRY003: https://docs.astral.sh/ruff/rules/raise-vanilla-args/
-ignore = ["PYI063", "TRY003"]
+ignore = ["TRY003"]
 
 # Allow fix for all enabled rules (when `--fix`) is provided.
 fixable = ["ALL"]

@@ -87,7 +87,7 @@ class Tile:
         self.wireList = []
         self.tileDir = tileDir
 
-    def __eq__(self, __o: object) -> bool:
+    def __eq__(self, __o: object, /) -> bool:
         """Check equality between tiles based on their name.
 
         Parameters

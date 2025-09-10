@@ -1411,13 +1411,7 @@ def test_writer_case_insensitive_verilog(
 ) -> None:
     """Explicit VERILOG (uppercase) should be accepted the same as lowercase."""
     project_dir = tmp_path / "test_upper_verilog"
-    argv = [
-        "FABulous",
-        "--writer",
-        "VERILOG",
-        "create-project",
-        str(project_dir),
-    ]
+    argv = ["FABulous", "create-project", str(project_dir), "--writer", "VERILOG"]
     monkeypatch.setattr(sys, "argv", argv)
     with pytest.raises(SystemExit) as exc_info:
         main()

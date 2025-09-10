@@ -1,3 +1,10 @@
+"""User design top wrapper generation module.
+
+This module provides functionality to generate top-level wrappers for user designs that
+interface with the FPGA fabric. The wrapper handles signal mapping between user logic
+and fabric I/O ports.
+"""
+
 from pathlib import Path
 
 from loguru import logger
@@ -11,6 +18,11 @@ def generateUserDesignTopWrapper(
     fabric: Fabric, user_design_path: Path, output: Path
 ) -> None:
     """Generate a top wrapper for the user design.
+
+    This function creates a Verilog top-level wrapper that instantiates the
+    user's design and connects its ports to the fabric's external I/O BELs.
+    It automatically discovers external ports from the fabric definition and
+    generates the necessary wiring and BEL instantiations.
 
     Params
     ------
@@ -56,8 +68,8 @@ def generateUserDesignTopWrapper(
 
     # generate component instantioations
     for x in range(fabric.numberOfColumns):
-        # we walk backwards through the Y list,
-        # since there is something mixed up with the coordinate system
+        # we walk backwards through the Y list, since there is something mixed up with
+        # the coordinate system
         for y in range(fabric.numberOfRows - 1, -1, -1):
             bels = fabric.getBelsByTileXY(x, y)
             if not bels:

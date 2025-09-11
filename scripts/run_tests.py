@@ -247,10 +247,10 @@ def main():
             logger.error(f"Failure in Group {failure['index']}")
             if failure["stdout"]:
                 logger.warning("--- STDOUT ---")
-                logger.info(f"{failure['stdout']}")
+                logger.info(f"\n{failure['stdout']}")
             if failure["stderr"]:
                 logger.error("--- STDERR ---")
-                logger.error(f"{failure['stderr']}")
+                logger.error(f"\n{failure['stderr']}")
             logger.info("-" * 20)
         final_exit_code = 1
 

@@ -2,12 +2,47 @@
 
 from dataclasses import dataclass, field
 from pathlib import Path
+from typing import Self
+
+import yaml
 
 from FABulous.fabric_definition.Bel import Bel
-from FABulous.fabric_definition.define import IO, Direction, Side
+from FABulous.fabric_definition.define import IO, Direction, PinSortMode, Side
 from FABulous.fabric_definition.Gen_IO import Gen_IO
 from FABulous.fabric_definition.Port import Port
 from FABulous.fabric_definition.Wire import Wire
+
+
+@dataclass
+class PinOrderConfig:
+    min_distance: int | None
+    max_distance: int | None
+    pins: list[str]
+    sort_mode: PinSortMode
+
+    def __init__(
+        self,
+        min_distance: int | None = None,
+        max_distance: int | None = None,
+        sort_mode: PinSortMode = PinSortMode.BUS_MAJOR,
+    ) -> None:
+        self.min_distance = min_distance
+        self.max_distance = max_distance
+        self.sort_mode = sort_mode
+
+    def __call__(self, pins: list[str]) -> Self:
+        self.pins = pins
+        return self
+
+    def to_dict(self) -> dict:
+        if self.pins is None:
+            self.pins = []
+        return {
+            "min_distance": self.min_distance,
+            "max_distance": self.max_distance,
+            "pins": self.pins,
+            "sort_mode": self.sort_mode,
+        }
 
 
 @dataclass
@@ -78,6 +113,7 @@ class Tile:
         gen_ios: list[Gen_IO],
         userCLK: bool,
         configBit: int = 0,
+        pinOrderConfig: dict[Side, PinOrderConfig] | None = None,
     ) -> None:
         self.name = name
         self.portsInfo = ports
@@ -88,6 +124,10 @@ class Tile:
         self.matrixConfigBits = configBit
         self.wireList = []
         self.tileDir = tileDir
+
+        if pinOrderConfig is None:
+            pinOrderConfig = {}
+        self.pinOrderConfig = pinOrderConfig
 
     def __eq__(self, __o: object, /) -> bool:
         """Check equality between tiles based on their name.
@@ -298,3 +338,67 @@ class Tile:
 
     def portInfo(self) -> list[Bel]:
         return self.bels
+
+    def generateIOPinOrderConfig(self, outfile: Path, prefix: str = "") -> None:
+        """Generates the I/O pin order configuration for a given tile.
+
+        Parameters
+        ----------
+        tile : Tile
+            The tile for which to generate the I/O pin order configuration.
+        outfile : Path
+            The output file path where the configuration will be saved.
+        """
+        port_dict = {"N": [], "E": [], "S": [], "W": []}
+
+        for p in self.getNorthPorts(IO.OUTPUT) + self.getNorthPorts(IO.INPUT):
+            port_dict["N"].append(
+                self.pinOrderConfig[Direction.NORTH](
+                    p.expandPortInfoByName(prefix=prefix)
+                ).to_dict()
+            )
+        port_dict["N"].append(PinOrderConfig()([f"{prefix}UserCLKo"]).to_dict())
+        port_dict["N"].append(
+            PinOrderConfig()([f"{prefix}FrameStrobe_O\\[.*\\]"]).to_dict()
+        )
+
+        for p in self.getEastPorts(IO.INPUT) + self.getEastPorts(IO.OUTPUT):
+            port_dict["E"].append(
+                self.pinOrderConfig[Direction.EAST](
+                    p.expandPortInfoByName(prefix=prefix)
+                ).to_dict()
+            )
+        port_dict["E"].append(
+            PinOrderConfig()([f"{prefix}FrameData_O\\[.*\\]"]).to_dict()
+        )
+
+        for p in self.getSouthPorts(IO.INPUT) + self.getSouthPorts(IO.OUTPUT):
+            port_dict["S"].append(
+                self.pinOrderConfig[Direction.SOUTH](
+                    p.expandPortInfoByName(prefix=prefix)
+                ).to_dict()
+            )
+        port_dict["S"].append(PinOrderConfig()([f"{prefix}UserCLK"]).to_dict())
+        port_dict["S"].append(
+            PinOrderConfig()([f"{prefix}FrameStrobe\\[.*\\]"]).to_dict()
+        )
+
+        for p in self.getWestPorts(IO.OUTPUT) + self.getWestPorts(IO.INPUT):
+            port_dict["W"].append(
+                self.pinOrderConfig[Direction.WEST](
+                    p.expandPortInfoByName(prefix=prefix)
+                ).to_dict()
+            )
+        port_dict["W"].append(
+            PinOrderConfig()([f"{prefix}FrameData\\[.*\\]"]).to_dict()
+        )
+
+        for b in self.bels:
+            port_dict["S"].append(
+                self.pinOrderConfig[Direction.SOUTH](
+                    [f"{prefix}{i}" for i in b.externalInput + b.externalOutput]
+                ).to_dict()
+            )
+
+        with outfile.open("w") as f:
+            yaml.dump(port_dict, f)

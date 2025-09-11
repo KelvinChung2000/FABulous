@@ -76,7 +76,9 @@ class Port:
             f"Side={self.sideOfTile.value})"
         )
 
-    def expandPortInfoByName(self, indexed: bool = False) -> list[str]:
+    def expandPortInfoByName(
+        self, indexed: bool = False, prefix: str = ""
+    ) -> list[str]:
         """Expand port information to individual wire names.
 
         Generates a list of individual wire names for this port, accounting for
@@ -100,10 +102,18 @@ class Port:
         else:
             wireCount = self.wireCount
         if not indexed:
-            return [f"{self.name}{i}" for i in range(wireCount) if self.name != "NULL"]
-        return [f"{self.name}[{i}]" for i in range(wireCount) if self.name != "NULL"]
+            return [
+                f"{prefix}{self.name}{i}"
+                for i in range(wireCount)
+                if self.name != "NULL"
+            ]
+        return [
+            f"{prefix}{self.name}[{i}]" for i in range(wireCount) if self.name != "NULL"
+        ]
 
-    def expandPortInfoByNameTop(self, indexed: bool = False) -> list[str]:
+    def expandPortInfoByNameTop(
+        self, indexed: bool = False, prefix: str = ""
+    ) -> list[str]:
         """Expand port information for top-level connections.
 
         Similar to expandPortInfoByName but specifically for top-level tile
@@ -131,12 +141,12 @@ class Port:
 
         if not indexed:
             return [
-                f"{self.name}{i}"
+                f"{prefix}{self.name}{i}"
                 for i in range(startIndex, wireCount)
                 if self.name != "NULL"
             ]
         return [
-            f"{self.name}[{i}]"
+            f"{prefix}{self.name}[{i}]"
             for i in range(startIndex, wireCount)
             if self.name != "NULL"
         ]

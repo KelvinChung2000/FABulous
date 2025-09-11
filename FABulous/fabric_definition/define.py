@@ -115,3 +115,8 @@ class FABulousAttribute(StrEnum):
     GLOBAL = "GLOBAL"
     USER_CLK = "USER_CLK"
     CONFIG_BIT = "CONFIG_BIT"
+
+
+class PinSortMode(StrEnum):
+    BUS_MAJOR = "bus_major"
+    BIT_MINOR = "bit_minor"

@@ -24,6 +24,9 @@ from FABulous.fabric_generator.code_generator import CodeGenerator
 from FABulous.fabric_generator.code_generator.code_generator_VHDL import (
     VHDLCodeGenerator,
 )
+from FABulous.fabric_generator.gds_generator.flows.tile_marco_flow import (
+    FABulousTileVerilog,
+)
 from FABulous.fabric_generator.gen_fabric.fabric_automation import genIOBel
 from FABulous.fabric_generator.gen_fabric.gen_configmem import generateConfigMem
 from FABulous.fabric_generator.gen_fabric.gen_fabric import generateFabric
@@ -403,3 +406,15 @@ class FABulous_API:
             if tile.gen_ios:
                 logger.info(f"Generating IO BELs for tile {tile.name}")
                 self.genIOBelForTile(tile.name)
+
+    def gen_io_pin_order_config(self, tile: Tile, outfile: Path) -> None:
+        tile.generateIOPinOrderConfig(outfile)
+
+    def runMarcoFlow(self, tile_dir: Path, io_pin_config: Path) -> None:
+        """Runs the marco flow to generate the marco verilog files."""
+        flow = FABulousTileVerilog(
+            {"IO_PIN_ORDER_CONFIG": io_pin_config}, design_dir=str(tile_dir)
+        )
+        (final_state, steps) = flow.start()
+
+        logger.info("Marco flow completed.")

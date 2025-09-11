@@ -44,20 +44,6 @@ app = typer.Typer(
 )
 
 
-# @dataclass
-# class SharedContext:
-#     """Context object to hold shared CLI options."""
-
-#     verbose: int = 0
-#     debug: bool = False
-#     global_dot_env: Path | None = None
-#     project_dot_env: Path | None = None
-#     project_dir: Path | None = None
-
-
-# shared_state = SharedContext()
-
-
 def version_callback(value: bool) -> None:
     """Print version information and exit."""
     if value:
@@ -172,7 +158,7 @@ def reorder_options(argv: list[str]) -> list[str]:
 
 @app.callback()
 def common_options(
-    ctx: typer.Context | None,
+    ctx: typer.Context,
     project_dir: ProjectDirType = None,
     _version: Annotated[
         bool | None,
@@ -190,7 +176,6 @@ def common_options(
             "-v",
             count=True,
             help="Show detailed log information",
-            is_eager=True,
         ),
     ] = 0,
     debug: Annotated[
@@ -212,28 +197,24 @@ def common_options(
     ] = None,
 ) -> None:
     """Provide common options for all FABulous commands."""
-    # shared_state.verbose = verbose
-    # shared_state.debug = debug
-    # shared_state.global_dot_env = global_dot_env
-    # shared_state.project_dot_env = project_dot_env
-    # shared_state.project_dir = project_dir
     setup_logger(
         verbose,
-        debug,
+        debug or False,
         log_file=log_file or Path(),
     )
 
-    if (
-        ctx is not None
-        and (s := ctx.invoked_subcommand)
-        and (s.startswith("install") or s == "create-project")
+    if (s := ctx.invoked_subcommand) and (
+        s.startswith("install") or s == "create-project" or s == "c"
     ):
         return
 
+    if "--help" in sys.argv:
+        return
+
     init_context(
-        project_dir=project_dir,
+        project_dir=project_dir or Path().cwd(),
         global_dot_env=global_dot_env,
-        project_dot_env=project_dot_env or Path().cwd(),
+        project_dot_env=project_dot_env,
     )
 
 
@@ -264,9 +245,7 @@ def check_version_compatibility(_: Path) -> None:
 @app.command("create-project")
 @app.command("c", hidden=True)
 def create_project_cmd(
-    project_dir: Annotated[
-        Path, typer.Argument(help="Directory to create a project")
-    ] = Path(),
+    project_dir: Annotated[Path, typer.Argument(help="Directory to create a project")],
     writer: WriterType = HDLType.VERILOG,
 ) -> None:
     """Create a new FABulous project.
@@ -426,8 +405,6 @@ def start_cmd(force: ForceType = False) -> None:
         verbose=get_context().verbose >= 2,
         debug=get_context().debug,
     )
-
-    # Change to project directory
     os.chdir(get_context().proj_dir)
     fab_CLI.onecmd_plus_hooks("load_fabric")
     fab_CLI.cmdloop()
@@ -461,8 +438,8 @@ def run_cmd(
         get_context().proj_lang,
         force=force,
         interactive=True,
-        verbose=shared_state.verbose >= 2,
-        debug=shared_state.debug,
+        verbose=get_context().verbose >= 2,
+        debug=get_context().debug,
     )
 
     # Change to project directory

@@ -906,38 +906,6 @@ def test_short_dotenv_flags(
     assert isinstance(result.returncode, int)
 
 
-def test_version_compatibility_function(tmp_path: Path) -> None:
-    """Test version compatibility checking function directly"""
-    from unittest.mock import patch
-
-    from FABulous.FABulous import check_version_compatibility
-    from FABulous.FABulous_settings import init_context, reset_context
-
-    # Create a test project with version info
-    project_dir = tmp_path / "version_test_project"
-    project_dir.mkdir()
-    fabulous_dir = project_dir / ".FABulous"
-    fabulous_dir.mkdir()
-    env_file = fabulous_dir / ".env"
-
-    set_key(env_file, "FAB_PROJ_LANG", "verilog")
-    set_key(env_file, "FAB_PROJ_VERSION", "1.0.0")
-    set_key(env_file, "FAB_MODEL_PACK", "model_pack.v")
-
-    reset_context()
-
-    # Test version compatibility with mocked package version
-    with patch("FABulous.FABulous.version") as mock_version:
-        mock_version.return_value = "2.0.0"  # Newer package version
-
-        # Initialize context with the test project
-        init_context(project_dir=project_dir)
-
-    # This should log an error about major version mismatch (no exit)
-    # Should not raise. Logging checks are environment-dependent.
-    check_version_compatibility(project_dir)
-
-
 @pytest.mark.parametrize(
     ("subcmd", "expected_code"),
     [
@@ -1020,7 +988,6 @@ def test_check_version_compatibility_cases(
 
     # Set up project version in .env file
     env_file = project / ".FABulous" / ".env"
-    from dotenv import set_key
 
     set_key(env_file, "FAB_PROJ_VERSION", project_ver)
 

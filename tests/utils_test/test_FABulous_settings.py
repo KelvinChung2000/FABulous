@@ -6,6 +6,7 @@ from pathlib import Path
 import pytest
 from dotenv import set_key
 from packaging.version import Version
+from pydantic import ValidationError
 from pytest_mock import MockerFixture
 
 from FABulous.FABulous_settings import (
@@ -592,7 +593,7 @@ class TestContextMethods:
         env_file.touch()
         set_key(env_file, "FAB_PROJ_LANG", "invalid_language")
 
-        with pytest.raises(ValueError, match="Invalid project language"):
+        with pytest.raises(ValidationError, match="validation error"):
             init_context(project_dir=project, global_dot_env=env_file)
 
     def test_context_preserves_working_directory(self, project: Path) -> None:

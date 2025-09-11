@@ -155,8 +155,9 @@ To exit the shell simply type `exit` and this will terminate the shell.
 A demo of the whole flow:
 
 ```bash
-(venv)$ FABulous -c demo # Create a demo project
-(venv)$ FABulous demo # Run Fabulous interactive shell for demo project
+(venv)$ FABulous create-project demo # Create a demo project
+(venv)$ cd demo 
+(venv)$ FABulous start # Run Fabulous interactive shell for demo project
 
 # In the FABulous shell
 FABulous> load_fabric

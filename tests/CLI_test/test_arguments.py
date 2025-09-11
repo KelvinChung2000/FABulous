@@ -996,12 +996,12 @@ def test_validate_project_directory_invalid(tmp_path: Path) -> None:
 
 
 @pytest.mark.parametrize(
-    ("package_ver", "project_ver", "should_exit", "should_log_error"),
+    ("package_ver", "project_ver", "should_exit"),
     [
-        pytest.param("2.0.0", "1.0.0", False, False, id="package-newer-minor"),
-        pytest.param("1.0.0", "2.0.0", True, True, id="package-older"),
-        pytest.param("2.0.0", "1.0.0", False, True, id="major-version-mismatch"),
-        pytest.param("1.1.0", "1.0.0", False, False, id="same-major-newer-minor"),
+        pytest.param("2.0.0", "1.0.0", False, id="package-newer-minor"),
+        pytest.param("1.0.0", "2.0.0", True, id="package-older"),
+        pytest.param("2.0.0", "1.0.0", False, id="major-version-mismatch"),
+        pytest.param("1.1.0", "1.0.0", False, id="same-major-newer-minor"),
     ],
 )
 def test_check_version_compatibility_cases(
@@ -1009,10 +1009,9 @@ def test_check_version_compatibility_cases(
     package_ver: str,
     project_ver: str,
     should_exit: bool,
-    should_log_error: bool,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """Test version compatibility checking with different version scenarios"""
-    from unittest.mock import patch
 
     from FABulous.FABulous import check_version_compatibility
     from FABulous.FABulous_settings import init_context, reset_context
@@ -1028,16 +1027,15 @@ def test_check_version_compatibility_cases(
     # Initialize context
     init_context(project_dir=project)
 
+    monkeypatch.setattr("FABulous.FABulous.version", lambda _: package_ver)
+    monkeypatch.setattr("importlib.metadata.version", lambda _: package_ver)
     # Mock the package version
-    with patch("FABulous.FABulous.version") as mock_version:
-        mock_version.return_value = package_ver
-
-        if should_exit:
-            with pytest.raises(typer.Exit):
-                check_version_compatibility(project)
-        else:
-            # Should not raise an exception
+    if should_exit:
+        with pytest.raises(typer.Exit):
             check_version_compatibility(project)
+    else:
+        # Should not raise an exception
+        check_version_compatibility(project)
 
 
 @pytest.mark.parametrize(

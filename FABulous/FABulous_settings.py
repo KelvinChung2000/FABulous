@@ -181,6 +181,16 @@ class FABulousSettings(BaseSettings):
             raise ValueError(f"{value} is not a FABulous project")
         return value.resolve()
 
+    @field_validator("proj_lang", mode="before")
+    @classmethod
+    def parse_proj_lang(cls, value: str | HDLType) -> str | HDLType:
+        """Parse project language from string or HDLType enum."""
+        if isinstance(value, HDLType):
+            return value
+        if isinstance(value, str):
+            return value.strip().lower()
+        raise ValueError("Project language must be a string or HDLType enum")
+
     @field_validator("proj_lang", mode="after")
     @classmethod
     def validate_proj_lang(cls, value: str | HDLType) -> HDLType:

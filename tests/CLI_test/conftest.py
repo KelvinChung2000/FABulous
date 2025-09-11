@@ -13,6 +13,7 @@ TILE = "LUT4AB"
 @pytest.fixture
 def project(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     """Create a temporary FABulous project directory."""
+    monkeypatch.chdir(tmp_path)
     project_dir = tmp_path / "test_project"
     monkeypatch.setenv("FAB_PROJ_DIR", str(project_dir))
     create_project(project_dir)
@@ -49,6 +50,7 @@ def project_directories(tmp_path: Path) -> dict[str, Path]:
         set_key(env_file, "FAB_PROJ_LANG", "verilog")
         set_key(env_file, "FAB_PROJ_VERSION", "1.0.0")
         set_key(env_file, "FAB_MODELS_PACK", str(models_pack_file))
+        set_key(env_file, "FAB_PROJ_DIR", str(project_dir))
 
     # Create project-specific .env file for testing
     project_dotenv_file = tmp_path / "project_specific.env"
@@ -60,6 +62,7 @@ def project_directories(tmp_path: Path) -> dict[str, Path]:
     project_dotenv_fallback_file = tmp_path / "project_fallback.env"
     project_dotenv_fallback_file.touch()
     set_key(project_dotenv_fallback_file, "FAB_PROJ_LANG", "verilog")
+    set_key(project_dotenv_fallback_file, "FAB_PROJ_DIR", str(default_dir))
 
     # Create global .env file for testing
     global_dotenv_file = tmp_path / "global.env"

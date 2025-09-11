@@ -193,6 +193,7 @@ class FABulous_CLI(Cmd):
             persistent_history_file=f"{get_context().proj_dir}/{META_DATA_DIR}/.fabulous_history",
             allow_cli_args=False,
         )
+        logger.info(f"Running at: {get_context().proj_dir}")
 
         if writerType == "verilog":
             self.fabulousAPI = FABulous_API(VerilogCodeGenerator())

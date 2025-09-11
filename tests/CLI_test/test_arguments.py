@@ -23,68 +23,75 @@ from FABulous.FABulous_settings import init_context, reset_context
     (
         "argv",
         "writer_lang",
-        "precreate",
         "expected_code",
     ),
     [
         pytest.param(
-            ["FABulous", "create-project"], None, False, 0, id="typer-no-writer"
+            ["FABulous", "create-project", "{project}"], None, 0, id="typer-no-writer"
         ),
         pytest.param(
-            ["FABulous", "--createProject"], None, False, 0, id="legacy-no-writer"
+            ["FABulous", "c", "{project}"], None, 0, id="typer-no-writer-alias"
         ),
+        pytest.param(["FABulous", "create-project"], None, 2, id="typer-no-project"),
         pytest.param(
-            ["FABulous", "-w", "vhdl", "--createProject"],
+            ["FABulous", "--createProject", "{project}"], None, 0, id="legacy-no-writer"
+        ),
+        pytest.param(["FABulous", "--createProject"], None, 2, id="legacy-no-project"),
+        pytest.param(
+            ["FABulous", "-w", "vhdl", "--createProject", "{project}"],
             "vhdl",
-            False,
             0,
             id="legacy-writer",
         ),
         pytest.param(
-            ["FABulous", "create-project", "-w", "vhdl"],
+            ["FABulous", "create-project", "-w", "vhdl", "{project}"],
             "vhdl",
-            False,
             0,
             id="typer-writer",
         ),
         pytest.param(
-            ["FABulous", "create-project", "-w", "invalid"],
+            ["FABulous", "create-project", "-w", "invalid", "{project}"],
             "vhdl",
-            False,
             2,
             id="typer-invalid-writer",
         ),
         pytest.param(
-            ["FABulous", "-w", "invalid", "--createProject"],
+            ["FABulous", "-w", "invalid", "--createProject", "{project}"],
             "vhdl",
-            False,
             2,
             id="legacy-invalid-writer",
         ),
+        pytest.param(
+            ["FABulous", "-w", "VERILOG", "--createProject", "{project}"],
+            "verilog",
+            0,
+            id="case-insensitive-legacy",
+        ),
+        pytest.param(
+            ["FABulous", "create-project", "{project}", "-w", "VERILOG"],
+            "verilog",
+            0,
+            id="case-insensitive-typer",
+        ),
     ],
 )
-def test_create_project_cases(
+def test_create_project(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
     writer_lang: str,
     argv: list[str],
-    precreate: bool,
     expected_code: int,
 ) -> None:
     project_dir = tmp_path / "test_prj"
-    if precreate:
-        project_dir.mkdir(parents=True, exist_ok=True)
 
-    test_argv = argv
-    # Append project directory to the command
-    test_argv.append(str(project_dir))
+    test_argv = [i.replace("{project}", str(project_dir)) for i in argv]
 
     monkeypatch.setattr(sys, "argv", test_argv)
     with pytest.raises(SystemExit) as exc_info:
         main()
     assert exc_info.value.code == expected_code
 
-    if expected_code == 0 and not precreate:
+    if expected_code == 0:
         # Success path: verify project + writer recorded
         assert project_dir.exists()
         env_text = (project_dir / ".FABulous" / ".env").read_text().lower()
@@ -152,7 +159,7 @@ def test_create_project_cases(
         ),
     ],
 )
-def test_script_execution_cases(
+def test_script_execution(
     tmp_path: Path,
     project: Path,
     monkeypatch: pytest.MonkeyPatch,
@@ -196,54 +203,6 @@ def test_script_execution_cases(
 
 
 @pytest.mark.parametrize(
-    ("argv", "commands", "expected_code"),
-    [
-        pytest.param(
-            ["FABulous", "{project}", "--commands"],
-            "help; help",
-            0,
-            id="legacy-success",
-        ),
-        pytest.param(
-            ["FABulous", "run", "{project}"],
-            "help",
-            0,
-            id="typer-success",
-        ),
-        pytest.param(
-            ["FABulous", "{project}", "--commands"],
-            "",
-            2,
-            id="empty-commands",
-        ),
-        pytest.param(
-            ["FABulous", "{project}", "--commands"],
-            "load_fabric non_exist; load_fabric non_exist",
-            1,
-            id="stop-on-first-error",
-        ),
-    ],
-)
-def test_commands_execution(
-    project: Path,
-    monkeypatch: pytest.MonkeyPatch,
-    argv: list[str],
-    commands: str,
-    expected_code: int,
-) -> None:
-    """Test direct command execution with various scenarios"""
-    test_args = [arg.replace("{project}", str(project)) for arg in argv]
-    if commands:
-        test_args.append(commands)
-
-    # Use monkeypatch for success cases
-    monkeypatch.setattr(sys, "argv", test_args)
-    with pytest.raises(SystemExit) as exc_info:
-        main()
-    assert exc_info.value.code == expected_code
-
-
-@pytest.mark.parametrize(
     ("argv_builder", "expected_code"),
     [
         pytest.param(
@@ -261,10 +220,11 @@ def test_commands_execution(
         pytest.param(
             lambda prj, log: [
                 "FABulous",
+                "-p",
+                str(prj),
                 "--log",
                 str(log),
                 "run",
-                str(prj),
                 "help",
             ],
             0,
@@ -306,17 +266,17 @@ def test_logging_file_creation(
             id="legacy-vv",
         ),
         pytest.param(
-            ["FABulous", "-v", "run", "{project}", "help"],
+            ["FABulous", "-p", "{project}", "-v", "run", "help"],
             0,
             id="typer-v",
         ),
         pytest.param(
-            ["FABulous", "-vv", "run", "{project}", "help"],
+            ["FABulous", "-p", "{project}", "-vv", "run", "help"],
             0,
             id="typer-vv",
         ),
         pytest.param(
-            ["FABulous", "run", "{project}", "help"],
+            ["FABulous", "-p", "{project}", "run", "help", "-v"],
             0,
             id="typer-vv-after-command",
         ),
@@ -346,7 +306,7 @@ def test_verbose_mode(
             id="legacy",
         ),
         pytest.param(
-            ["FABulous", "--debug", "run", "{project}", "help"],
+            ["FABulous", "-p", "{project}", "--debug", "run", "help"],
             0,
             id="typer",
         ),
@@ -388,6 +348,13 @@ def test_debug_mode(
             3,
             "INFO: Loading fabric",
             id="script",
+        ),
+        pytest.param(
+            ["FABulous", "-p", "{project}", "run", "--force"],
+            "load_fabric non_existent",
+            1,
+            "non_existent",
+            id="single-command",
         ),
     ],
 )
@@ -551,91 +518,6 @@ def test_script_mutually_exclusive(
 
 
 @pytest.mark.parametrize(
-    ("argv", "setup_dir", "expect_contains"),
-    [
-        pytest.param(
-            ["FABulous", "/nonexistent/path/to/project", "--commands", "help"],
-            None,
-            None,
-            id="legacy-nonexistent",
-        ),
-        pytest.param(
-            ["FABulous", "script", "/nonexistent/path/to/project", "help"],
-            None,
-            None,
-            id="typer-nonexistent",
-        ),
-        pytest.param(
-            ["FABulous", "{regular_dir}", "--commands", "help"],
-            "regular_directory",
-            "not a FABulous project",
-            id="no-fabulous-folder",
-        ),
-    ],
-)
-def test_invalid_project_directory(
-    tmp_path: Path,
-    monkeypatch: pytest.MonkeyPatch,
-    capsys: pytest.CaptureFixture,
-    argv: list[str],
-    setup_dir: str | None,
-    expect_contains: str | None,
-) -> None:
-    """Test various invalid project directory scenarios."""
-
-    # Set up directory if needed
-    if setup_dir:
-        regular_dir = tmp_path / setup_dir
-        regular_dir.mkdir()
-        # Clean up environment variables to avoid contamination
-        monkeypatch.delenv("FAB_PROJ_DIR", raising=False)
-        # Replace placeholder in argv
-        test_args = [arg.replace("{regular_dir}", str(regular_dir)) for arg in argv]
-    else:
-        test_args = argv
-
-    monkeypatch.setattr(sys, "argv", test_args)
-    with pytest.raises(SystemExit) as exc_info:
-        main()
-
-    # All cases should fail (but xfail marks handle the expectation)
-    assert exc_info.value.code != 0
-
-    if expect_contains:
-        captured = capsys.readouterr()
-        assert expect_contains in captured.out
-
-
-def test_writer_case_insensitive_typer(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
-    """Test case-insensitivity of writer option in Typer."""
-    project_dir = tmp_path / "test_case_insensitive_writer"
-    test_args = [
-        "FABulous",
-        "--writer",
-        "VHDL",
-        "create-project",
-        str(project_dir),
-    ]
-    monkeypatch.setattr(sys, "argv", test_args)
-
-    with pytest.raises(SystemExit) as exc_info:
-        main()
-
-    assert exc_info.value.code == 0
-    assert project_dir.exists()
-    assert (project_dir / ".FABulous").exists()
-    assert "vhdl" in (project_dir / ".FABulous" / ".env").read_text().lower()
-
-
-## covered by test_invalid_project_directory
-
-
-## merged into test_install_oss_cad_suite_parametric
-
-
-@pytest.mark.parametrize(
     ("global_dotenv", "project_dotenv", "env_var", "user_dir", "expected_dir"),
     [
         pytest.param(
@@ -680,7 +562,7 @@ def test_writer_case_insensitive_typer(
         ),
     ],
 )
-def test_project_dir_precedence_param(
+def test_project_dir_precedence(
     project_directories: dict[str, Path],
     global_dotenv: str | None,
     project_dotenv: str | None,
@@ -714,42 +596,17 @@ def test_project_dir_precedence_param(
         assert settings.proj_dir.resolve() == dirs[expected_dir].resolve()
 
 
-## merged into test_commands_execution
-
-
-# ============================================================================
-# Typer-Specific Tests (features not available in legacy format)
-# ============================================================================
-
-
-def test_create_project_alias_typer(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
-    """Test create-project alias 'c'"""
-    project_dir = tmp_path / "test_alias_project"
-
-    test_args = ["FABulous", "c", str(project_dir)]
-    monkeypatch.setattr(sys, "argv", test_args)
-
-    with pytest.raises(SystemExit) as exc_info:
-        main()
-
-    assert exc_info.value.code == 0
-    assert project_dir.exists()
-    assert (project_dir / ".FABulous").exists()
-
-
 @pytest.mark.parametrize(
-    ("argv", "result", "expected_code"),
+    ("argv", "chdir_flag", "expected_code"),
     [
         pytest.param(
             ["FABulous", "-p", "{project}", "update-project-version"],
-            True,
+            False,
             0,
             id="explicit-success",
         ),
         pytest.param(
-            ["FABulous", "-p", "{project}update-project-version"],
+            ["FABulous", "-p", "{project}", "update-project-version"],
             False,
             1,
             id="explicit-failure",
@@ -761,15 +618,16 @@ def test_update_project_version_cases(
     project: Path,
     monkeypatch: pytest.MonkeyPatch,
     argv: list[str],
-    result: bool,
     chdir_flag: bool,
     expected_code: int,
 ) -> None:
     test_argv = [s.replace("{project}", str(project)) for s in argv]
+    monkeypatch.setattr(
+        "FABulous.FABulous.update_project_version", lambda _p: not bool(expected_code)
+    )
+    monkeypatch.setattr(sys, "argv", test_argv)
     if chdir_flag:
         monkeypatch.chdir(project)
-    monkeypatch.setattr("FABulous.FABulous.update_project_version", lambda _p: result)
-    monkeypatch.setattr(sys, "argv", test_argv)
     with pytest.raises(SystemExit) as exc_info:
         main()
     assert exc_info.value.code == expected_code
@@ -826,18 +684,24 @@ def test_script_command_type_override(
     assert exc_info.value.code == expected_code
 
 
-def test_run_alias_typer(project: Path, monkeypatch: pytest.MonkeyPatch) -> None:
-    """Test run command alias 'r' (typer-only feature)"""
-    test_args = ["FABulous", "r", str(project), "help"]
-    monkeypatch.setattr(sys, "argv", test_args)
-
-    with pytest.raises(SystemExit) as exc_info:
-        main()
-
-    assert exc_info.value.code == 0
-
-
-def test_start_alias_typer(project: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+@pytest.mark.parametrize(
+    ("argv", "expected_code", "chdir_flag"),
+    [
+        pytest.param(
+            ["FABulous", "-p", "{project}", "s"], 0, False, id="alias-explicit"
+        ),
+        pytest.param(["FABulous", "s"], 0, True, id="alias-only"),
+        pytest.param(["FABulous", "start"], 0, True, id="full-command"),
+        pytest.param(["FABulous", "start"], 1, False, id="full-command-no-cwd"),
+    ],
+)
+def test_start(
+    project: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    argv: list[str],
+    expected_code: int,
+    chdir_flag: bool,
+) -> None:
     """Test start command alias 's' (typer-only feature)"""
 
     # Mock cmdloop to avoid hanging
@@ -846,13 +710,16 @@ def test_start_alias_typer(project: Path, monkeypatch: pytest.MonkeyPatch) -> No
 
     monkeypatch.setattr("FABulous.FABulous_CLI.FABulous_CLI.cmdloop", mock_cmdloop)
 
-    test_args = ["FABulous", "s", str(project)]
+    test_args = [s.replace("{project}", str(project)) for s in argv]
     monkeypatch.setattr(sys, "argv", test_args)
+
+    if chdir_flag:
+        monkeypatch.chdir(project)
 
     with pytest.raises(SystemExit) as exc_info:
         main()
 
-    assert exc_info.value.code == 0
+    assert exc_info.value.code == expected_code
 
 
 @pytest.mark.parametrize(
@@ -911,7 +778,13 @@ def test_default_writer_is_verilog(
             ["FABulous", "-p", "{project}", "run", "help"],
             False,
             0,
-            id="run-single",
+            id="run-single-explicit",
+        ),
+        pytest.param(
+            ["FABulous", "run", "help"],
+            True,
+            0,
+            id="run-single-cwd",
         ),
         pytest.param(
             ["FABulous", "-p", "{project}", "run", "help;help"],
@@ -955,6 +828,24 @@ def test_default_writer_is_verilog(
             1,
             id="mixed-success-fail",
         ),
+        pytest.param(
+            [
+                "FABulous",
+                "-p",
+                "{project}",
+                "--commands",
+                "load_fabric non_exist; load_fabric non_exist",
+            ],
+            False,
+            1,
+            id="stop-on-first-error",
+        ),
+        pytest.param(
+            ["FABulous", "{project}", "--commands", ""],
+            False,
+            0,
+            id="empty-commands",
+        ),
     ],
 )
 def test_run_variants(
@@ -968,26 +859,6 @@ def test_run_variants(
         result = run(test_argv, capture_output=True, text=True)
 
     assert result.returncode == expected_code
-
-
-def test_project_dotenv_only_not_project_cwd_typer(
-    project_directories: dict[str, Path],
-) -> None:
-    dirs = project_directories
-    result = run(
-        [
-            "FABulous",
-            "--project-dot-env",
-            str(dirs["project_dotenv_fallback_file"]),
-            "run",
-            "help",
-        ],
-        capture_output=True,
-        text=True,
-        cwd=str(dirs["default_dir"]),
-    )
-    # Expect command executed successfully
-    assert result.returncode == 0
 
 
 @pytest.mark.parametrize(
@@ -1169,20 +1040,6 @@ def test_check_version_compatibility_cases(
             check_version_compatibility(project)
 
 
-def test_shared_context_defaults() -> None:
-    """Test SharedContext class default values"""
-    from FABulous.FABulous import SharedContext
-
-    context = SharedContext()
-    assert context.verbose == 0
-    assert context.debug is False
-    assert context.log_file is None
-    assert context.global_dot_env is None
-    assert context.project_dot_env is None
-    assert context.force is False
-    assert context.writer == "verilog"
-
-
 @pytest.mark.parametrize(
     ("script_content", "expected_code"),
     [
@@ -1257,35 +1114,6 @@ def test_main_function_exception_handling(monkeypatch: pytest.MonkeyPatch) -> No
     assert exc_info.value.code == 1
 
 
-@pytest.mark.parametrize(
-    ("legacy_args", "expected_exit_code"),
-    [
-        pytest.param(
-            ["FABulous", "--createProject"],
-            2,  # Missing project directory
-            id="create-project-missing-dir",
-        ),
-        pytest.param(
-            ["FABulous", "/nonexistent/path", "--commands", ""],
-            0,  # Empty commands should exit gracefully
-            id="empty-commands",
-        ),
-    ],
-)
-def test_legacy_argument_edge_cases(
-    monkeypatch: pytest.MonkeyPatch,
-    legacy_args: list[str],
-    expected_exit_code: int,
-) -> None:
-    """Test edge cases in legacy argument conversion"""
-    monkeypatch.setattr(sys, "argv", legacy_args)
-
-    with pytest.raises(SystemExit) as exc_info:
-        main()
-
-    assert exc_info.value.code == expected_exit_code
-
-
 def test_run_command_pipeline_error(
     project: Path,
     monkeypatch: pytest.MonkeyPatch,
@@ -1307,33 +1135,6 @@ def test_run_command_pipeline_error(
     assert exc_info.value.code != 0
 
 
-def test_common_options_state_update() -> None:
-    """Test that common_options updates shared_state correctly"""
-    from FABulous.fabric_definition.define import HDLType
-    from FABulous.FABulous import common_options, shared_state
-
-    # Reset shared state
-    shared_state.verbose = 0
-    shared_state.debug = False
-    shared_state.force = False
-
-    # Call common_options with test values
-    test_log_file = Path("/tmp/test.log")
-    common_options(
-        verbose=2, debug=True, log_file=test_log_file, force=True, writer=HDLType.VHDL
-    )
-
-    # Verify state was updated
-    assert shared_state.verbose == 2
-    assert shared_state.debug is True
-    assert shared_state.log_file == test_log_file
-    assert shared_state.force is True
-    assert shared_state.writer == HDLType.VHDL
-
-
-## test_run_edge_cases merged into test_run_variants
-
-
 def test_legacy_logging_default_filename(project: Path) -> None:
     """Using legacy -log without path should create FABulous.log in CWD."""
     result = run(
@@ -1352,20 +1153,6 @@ def test_legacy_logging_default_filename(project: Path) -> None:
     log_file = Path(project) / "FABulous.log"
     assert log_file.exists()
     assert log_file.stat().st_size > 0
-
-
-def test_writer_case_insensitive_verilog(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
-    """Explicit VERILOG (uppercase) should be accepted the same as lowercase."""
-    project_dir = tmp_path / "test_upper_verilog"
-    argv = ["FABulous", "create-project", str(project_dir), "--writer", "VERILOG"]
-    monkeypatch.setattr(sys, "argv", argv)
-    with pytest.raises(SystemExit) as exc_info:
-        main()
-    assert exc_info.value.code == 0
-    env_text = (project_dir / ".FABulous" / ".env").read_text().lower()
-    assert "verilog" in env_text
 
 
 def test_global_option_after_subcommand(project: Path) -> None:

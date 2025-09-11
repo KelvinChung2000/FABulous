@@ -215,6 +215,7 @@ FAB_PROJ_DIR              The root directory of the FABulous project          Th
 FAB_MODELS_PACK           The model pack for the project                      Pointing to <project_dir>/Fabric/models_pack.<project_lang>
 FAB_OSS_CAD_SUITE         Path to the oss-cad-suite installation              <None>
 FAB_DEBUG                 Enable debug mode                                   False
+FAB_VERBOSE               Enable verbose mode                                 0
 ========================= =================================================== ===========================================================================
 
 Project Specific Environment Variables

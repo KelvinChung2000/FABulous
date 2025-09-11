@@ -56,6 +56,7 @@ class FABulousSettings(BaseSettings):
     )
 
     debug: bool = False
+    verbose: int = 0
 
     @field_validator("proj_version", "proj_version_created", "version", mode="before")
     @classmethod

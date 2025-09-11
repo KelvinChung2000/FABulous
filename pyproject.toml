@@ -136,3 +136,13 @@ pre-commit = "task format && task check"
 ci-check = "task check && task test && task docs-build"
 install-dev = "uv sync --group dev"
 clean-all = "find . -type d -name '__pycache__' -exec rm -rf {} + 2>/dev/null || true && find . -name '*.pyc' -delete && rm -rf build/ dist/ *.egg-info/ .pytest_cache/ .ruff_cache/"
+
+# Unified test runner task (pytest-split + durations maintenance)
+# Usage examples:
+#   task test -- --dry-run
+#   task test -- --refresh-durations
+#   task test -- --splits 8 --group 3 -k foo -vv
+#   task test -- --splits 8 --group 3 --maxfail=1
+# Provide flags after first '--'.
+
+test = "uv run scripts/run_tests.py"

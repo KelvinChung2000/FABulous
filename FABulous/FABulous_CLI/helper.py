@@ -601,11 +601,11 @@ def clone_git_repo(repo_url: str, target_dir: Path, branch: str = "main") -> boo
 
     Parameters
     ----------
-    repo_url: str
+    repo_url : str
         GitHub repository URL (e.g., "https://github.com/user/repo.git")
-    target_dir: Path
+    target_dir : Path
         Local directory to clone/download to
-    branch: str
+    branch : str
         Git branch to checkout (default: "main")
 
     Returns
@@ -695,7 +695,7 @@ def install_fabulator(install_dir: Path) -> None:
 
     Parameters
     ----------
-    install_dir: Path
+    install_dir : Path
         The directory where FABulator will be installed.
 
     Raises

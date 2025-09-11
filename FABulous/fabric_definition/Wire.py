@@ -49,13 +49,6 @@ class Wire:
         str
             A compact string showing source, offsets, and destination.
         """
-        """Return string representation of the wire.
-
-        Returns
-        -------
-        str
-            A compact string showing source, offsets, and destination.
-        """
         return f"{self.source}-X{self.xOffset}Y{self.yOffset}>{self.destination}"
 
     def __eq__(self, __o: object) -> bool:

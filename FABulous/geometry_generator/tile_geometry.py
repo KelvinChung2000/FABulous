@@ -71,7 +71,7 @@ class TileGeometry:
     belGeomList: list[BelGeometry] = field(default_factory=list)
     wireGeomList: list[WireGeometry] = field(default_factory=list)
     stairWiresList: list[StairWires] = field(default_factory=list)
-    currPortGroupId: int = -1
+    currPortGroupId: int = 0
     queuedAdjustmentBottom: int = 0
     queuedAdjustmentLeft: int = 0
     reserveStairSpaceBottom: bool = False
@@ -208,7 +208,6 @@ class TileGeometry:
 
     def generateBelWires(self) -> None:
         """Generate the wires between the switch matrix and its bels."""
-        """Generate the wires between the switch matrix and its bels."""
         for belGeom in self.belGeomList:
             belToSmDistanceX = belGeom.relX - (
                 self.smGeometry.relX + self.smGeometry.width
@@ -228,10 +227,7 @@ class TileGeometry:
                 wireGeom.addPathLoc(end)
                 self.wireGeomList.append(wireGeom)
 
-    # Instance attributes are initialized in __init__
-
     def generateDirectWires(self, padding: int) -> None:
-        """Generate wires to neigbouring tiles."""
         """Generate wires to neigbouring tiles."""
         self.northMiddleX = self.smGeometry.relX - padding
         self.southMiddleX = self.smGeometry.relX - padding

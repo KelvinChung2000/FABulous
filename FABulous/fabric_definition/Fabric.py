@@ -69,11 +69,11 @@ class Fabric:
         A dictionary of tiles that are not used in the fabric,
         but defined in the fabric.csv.
         The key is the name of the tile and the value is the tile.
-    unusedSuperTileDic: dict[str, SuperTile]
+    unusedSuperTileDic : dict[str, SuperTile]
         A dictionary of super tiles that are not used in the fabric,
         but defined in the fabric.csv.
         The key is the name of the tile and the value is the tile.
-    commonWirePair: list[tuple[str, str]]
+    commonWirePair : list[tuple[str, str]]
         A list of common wire pairs in the fabric.
     """
 
@@ -332,13 +332,6 @@ class Fabric:
         return ret
 
     def getAllUniqueBels(self) -> list[Bel]:
-        """Get all unique BELs from all tiles in the fabric.
-
-        Returns
-        -------
-        list[Bel]
-            A list of all unique BELs across all tiles.
-        """
         """Get all unique BELs from all tiles in the fabric.
 
         Returns

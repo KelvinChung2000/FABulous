@@ -133,7 +133,7 @@ class StairWires:
         self.refX = 0
         self.refY = 0
         self.offset = 0
-        self.direction = Direction.NORTH  # Default value
+        self.direction = Direction.NORTH
         self.groupWires = 0
         self.tileWidth = 0
         self.tileHeight = 0

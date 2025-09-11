@@ -215,8 +215,6 @@ FAB_PROJ_DIR              The root directory of the FABulous project          Th
 FAB_MODEL_PACK            The model pack for the project                      Pointing to <project_dir>/Fabric/model_pack.<project_lang>
 FAB_OSS_CAD_SUITE         Path to the oss-cad-suite installation              <None>
 FAB_DEBUG                 Enable debug mode                                   False
-FAB_PROJ_VERSION_CREATED  The version of FABulous used to create the project  Same as the version of FABulous-FPGA package installed
-FAB_PROJ_VERSION          The current project version                         Same as the version of FABulous-FPGA package installed
 ========================= =================================================== ===========================================================================
 
 Project Specific Environment Variables
@@ -234,4 +232,6 @@ Variable Name                   Description                                     
 =============================== ======================================================================= ===========================================================================
 FAB_PROJ_LANG                   RTL language used in FABulous project [verilog/vhdl]                    verilog (default) or language specified by ``-w`` command line argument
 FAB_SWITCH_MATRIX_DEBUG_SIGNAL  Generate debug signals in switch matrix RTL implementation [True/False] True
+FAB_PROJ_VERSION_CREATED        The version of FABulous used to create the project                      Same as the version of FABulous-FPGA package installed
+FAB_PROJ_VERSION                The current project version                                             Same as the version of FABulous-FPGA package installed
 =============================== ======================================================================= ===========================================================================

@@ -50,7 +50,6 @@ from FABulous.fabric_generator.code_generator.code_generator_Verilog import (
 from FABulous.fabric_generator.code_generator.code_generator_VHDL import (
     VHDLCodeGenerator,
 )
-from FABulous.fabric_generator.gds_generator.gds_generator import gdsGenerator
 from FABulous.fabric_generator.gen_fabric.fabric_automation import (
     generateCustomTileConfig,
 )
@@ -1233,9 +1232,58 @@ class FABulous_CLI(Cmd):
         """
         self.fabulousAPI.genFabricIOBels()
 
+    # @with_category(CMD_FABRIC_FLOW)
+    # def do_gen_gds(self, args: str) -> None:
+    #     gdsFAB = gdsGenerator(
+    #         self, args, self.fabulousAPI, self.allTile, self.csvFile, self.projectDir
+    #     )
+    #     gdsFAB.run()
+
+    gds_parser = Cmd2ArgumentParser()
+    gds_parser.add_argument(
+        "tile",
+        type=str,
+        help="A tile",
+        completer=lambda self: self.fab.getTiles(),
+    )
+    gds_parser.add_argument(
+        "pdk_root",
+        type=Path,
+        help="Path to the PDK root directory",
+        completer=Cmd.path_complete,
+    )
+    gds_parser.add_argument(
+        "pdk",
+        type=str,
+        help="Name of the PDK",
+        choices=["sky130A", "sky130B", "ihp-sg13g2"],
+    )
+
     @with_category(CMD_FABRIC_FLOW)
-    def do_gen_gds(self, args: str) -> None:
-        gdsFAB = gdsGenerator(
-            self, args, self.fabulousAPI, self.allTile, self.csvFile, self.projectDir
+    @with_argparser(tile_single_parser)
+    def do_gen_tile_gds(self, args: argparse.Namespace) -> None:
+        """Generate GDSII files for a specific tile.
+
+        This command generates GDSII files for the specified tile, allowing for
+        the physical representation of the tile to be created.
+
+        Parameters
+        ----------
+        args : argparse.Namespace
+            Command arguments containing:
+            - tile: Name of the tile to generate GDSII files for
+        """
+        if not args.tile:
+            logger.error("Tile name must be specified")
+            return
+
+        pin_order_file = (
+            self.projectDir / "Tile" / args.tile / f"{args.tile}_io_pin_order.yaml"
         )
-        gdsFAB.run()
+        if t := self.fabulousAPI.getTile(args.tile):
+            self.fabulousAPI.gen_io_pin_order_config(t, pin_order_file)
+
+        self.fabulousAPI.genTileMarco(
+            self.projectDir / "Tile" / args.tile,
+            pin_order_file,
+        )

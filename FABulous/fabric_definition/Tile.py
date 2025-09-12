@@ -41,7 +41,7 @@ class PinOrderConfig:
             "min_distance": self.min_distance,
             "max_distance": self.max_distance,
             "pins": self.pins,
-            "sort_mode": self.sort_mode,
+            "sort_mode": str(self.sort_mode),
         }
 
 
@@ -126,8 +126,14 @@ class Tile:
         self.tileDir = tileDir
 
         if pinOrderConfig is None:
-            pinOrderConfig = {}
-        self.pinOrderConfig = pinOrderConfig
+            self.pinOrderConfig = {
+                Side.NORTH: PinOrderConfig(sort_mode=PinSortMode.BUS_MAJOR),
+                Side.EAST: PinOrderConfig(sort_mode=PinSortMode.BUS_MAJOR),
+                Side.SOUTH: PinOrderConfig(sort_mode=PinSortMode.BUS_MAJOR),
+                Side.WEST: PinOrderConfig(sort_mode=PinSortMode.BUS_MAJOR),
+            }
+        else:
+            self.pinOrderConfig = pinOrderConfig
 
     def __eq__(self, __o: object, /) -> bool:
         """Check equality between tiles based on their name.
@@ -353,7 +359,7 @@ class Tile:
 
         for p in self.getNorthPorts(IO.OUTPUT) + self.getNorthPorts(IO.INPUT):
             port_dict["N"].append(
-                self.pinOrderConfig[Direction.NORTH](
+                self.pinOrderConfig[Side.NORTH](
                     p.expandPortInfoByName(prefix=prefix)
                 ).to_dict()
             )
@@ -364,7 +370,7 @@ class Tile:
 
         for p in self.getEastPorts(IO.INPUT) + self.getEastPorts(IO.OUTPUT):
             port_dict["E"].append(
-                self.pinOrderConfig[Direction.EAST](
+                self.pinOrderConfig[Side.EAST](
                     p.expandPortInfoByName(prefix=prefix)
                 ).to_dict()
             )
@@ -374,7 +380,7 @@ class Tile:
 
         for p in self.getSouthPorts(IO.INPUT) + self.getSouthPorts(IO.OUTPUT):
             port_dict["S"].append(
-                self.pinOrderConfig[Direction.SOUTH](
+                self.pinOrderConfig[Side.SOUTH](
                     p.expandPortInfoByName(prefix=prefix)
                 ).to_dict()
             )
@@ -385,7 +391,7 @@ class Tile:
 
         for p in self.getWestPorts(IO.OUTPUT) + self.getWestPorts(IO.INPUT):
             port_dict["W"].append(
-                self.pinOrderConfig[Direction.WEST](
+                self.pinOrderConfig[Side.WEST](
                     p.expandPortInfoByName(prefix=prefix)
                 ).to_dict()
             )
@@ -395,7 +401,7 @@ class Tile:
 
         for b in self.bels:
             port_dict["S"].append(
-                self.pinOrderConfig[Direction.SOUTH](
+                self.pinOrderConfig[Side.SOUTH](
                     [f"{prefix}{i}" for i in b.externalInput + b.externalOutput]
                 ).to_dict()
             )

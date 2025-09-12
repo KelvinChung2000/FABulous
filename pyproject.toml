@@ -34,7 +34,7 @@ dependencies = [
   # OS-aware readline dependencies
   'pyreadline3>=3.4.0; sys_platform == "win32"',
   'gnureadline>=8.2.0; sys_platform != "win32"',
-  "librelane>=2.4.0",
+  "librelane>=2.4.2",
 ]
 
 [project.urls]
@@ -81,6 +81,7 @@ dev = [
   "cocotb>=2.0.0",
   "pre-commit>=4.2.0",
   "pytest>=8.4.1",
+  "pytest-cov>=6.2.1",
   "pytest-mock>=3.14.1",
   "pytest-split>=0.10.0",
   "ruff>=0.12.7",

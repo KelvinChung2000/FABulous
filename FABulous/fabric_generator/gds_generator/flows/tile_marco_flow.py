@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Optional
+from typing import Any, Optional
 
 from librelane.config.variable import Variable
 from librelane.flows.classic import Classic, VHDLClassic
@@ -12,17 +12,14 @@ from FABulous.fabric_generator.gds_generator.steps.IO_placement import (
     FABulousIOPlacement,
 )
 
-subs = [
+subs = {
     # Replace with FABulous IO Placement
-    ("Odb.CustomIOPlacement", FABulousIOPlacement),
+    "Odb.CustomIOPlacement": FABulousIOPlacement,
     # Disable STA
-    ("OpenROAD.STAPrePNR", None),
-    ("OpenROAD.STAMidPNR", None),
-    ("OpenROAD.STAMidPNR", None),
-    ("OpenROAD.STAMidPNR", None),
-    ("OpenROAD.STAMidPNR", None),
-    ("OpenROAD.STAPostPNR", None),
-]
+    "OpenROAD.STAPrePNR": None,
+    "OpenROAD.STAMidPNR": None,
+    "OpenROAD.STAPostPNR": None,
+}
 
 configs = Classic.config_vars + [
     Variable(
@@ -81,7 +78,7 @@ class FABulousTile(VHDLClassic):
     Substitutions = subs
     config_vars = configs
 
-    def run(self, initial_state: State, **kwargs) -> tuple[State, list[Step]]:
+    def run(self, initial_state: State, **kwargs: Any) -> tuple[State, list[Step]]:  # noqa: ANN401
         warn("Linting and equivalence checking for VHDL files is disabled")
 
         vhdl_files = Path(self.config["FABULOUS_TILE_DIR"]).rglob("*.vhdl")

@@ -7,12 +7,13 @@ tool paths, project settings, and environment variable management.
 from importlib.metadata import version as meta_version
 from pathlib import Path
 from shutil import which
+from typing import Self
 
 import typer
 from dotenv import set_key
 from loguru import logger
 from packaging.version import Version
-from pydantic import Field, ValidationInfo, field_validator
+from pydantic import Field, ValidationInfo, field_validator, model_validator
 from pydantic_settings import (
     BaseSettings,
     SettingsConfigDict,
@@ -59,6 +60,8 @@ class FABulousSettings(BaseSettings):
     debug: bool = False
     verbose: int = 0
     editor: str | None = None
+    pdk_root: Path = Path("~/.ciel")
+    pdk: str | None = None
 
     @field_validator("proj_version", "proj_version_created", "version", mode="before")
     @classmethod
@@ -275,6 +278,20 @@ class FABulousSettings(BaseSettings):
             f"Some features may be unavailable."
         )
         return None
+
+    @model_validator(mode="after")
+    def check_pdk(self) -> Self:
+        """Check if PDK_root and PDK are set correctly."""
+        if self.pdk_root is None or self.pdk is None:
+            logger.warning(
+                "PDK_root or PDK is not set. Back-end GDS features may be unavailable."
+            )
+            return self
+        pdk_path = self.pdk_root.resolve() / self.pdk
+        if not pdk_path.exists():
+            raise ValueError(f"PDK path {pdk_path} does not exist.")
+        logger.info(f"Using PDK at {pdk_path}")
+        return self
 
 
 # Module-level singleton pattern for settings management

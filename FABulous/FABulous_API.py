@@ -433,10 +433,34 @@ class FABulous_API:
     def gen_io_pin_order_config(self, tile: Tile, outfile: Path) -> None:
         tile.generateIOPinOrderConfig(outfile)
 
-    def runMarcoFlow(self, tile_dir: Path, io_pin_config: Path) -> None:
+    def genTileMarco(
+        self,
+        tile_dir: Path,
+        io_pin_config: Path,
+        *,
+        pdk_root: Path | None = None,
+        pdk: str | None = None,
+    ) -> None:
         """Runs the marco flow to generate the marco verilog files."""
+        if pdk_root is None:
+            pdk_root = get_context().pdk_root
+            if pdk_root is None:
+                raise ValueError(
+                    "PDK root must be specified either here or in settings."
+                )
+        if pdk is None:
+            pdk = get_context().pdk
+            if pdk is None:
+                raise ValueError("PDK must be specified either here or in settings.")
+
         flow = FABulousTileVerilog(
-            {"IO_PIN_ORDER_CONFIG": io_pin_config}, design_dir=str(tile_dir)
+            {
+                "IO_PIN_ORDER_CONFIG": io_pin_config,
+                "FABULOUS_TILE_DIR": str(tile_dir),
+            },
+            pdk_root=str(pdk_root),
+            pdk=pdk,
+            design_dir=str(tile_dir),
         )
         (final_state, steps) = flow.start()
 

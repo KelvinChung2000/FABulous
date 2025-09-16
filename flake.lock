@@ -24,26 +24,6 @@
     "devshell": {
       "inputs": {
         "nixpkgs": [
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "lastModified": 1741473158,
-        "narHash": "sha256-kWNaq6wQUbUMlPgw8Y+9/9wP0F8SHkjy24/mN3UAppg=",
-        "owner": "numtide",
-        "repo": "devshell",
-        "rev": "7c9e793ebe66bcba8292989a68c0419b737a22a0",
-        "type": "github"
-      },
-      "original": {
-        "owner": "numtide",
-        "repo": "devshell",
-        "type": "github"
-      }
-    },
-    "devshell_2": {
-      "inputs": {
-        "nixpkgs": [
           "librelane",
           "nix-eda",
           "nixpkgs"
@@ -80,7 +60,7 @@
     "librelane": {
       "inputs": {
         "ciel": "ciel",
-        "devshell": "devshell_2",
+        "devshell": "devshell",
         "flake-compat": "flake-compat",
         "nix-eda": "nix-eda"
       },
@@ -213,7 +193,6 @@
     },
     "root": {
       "inputs": {
-        "devshell": "devshell",
         "librelane": "librelane",
         "nixpkgs": "nixpkgs_2",
         "nixpkgs-unstable": "nixpkgs-unstable",

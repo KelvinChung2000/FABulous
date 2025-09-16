@@ -26,10 +26,10 @@
     let
       system = "x86_64-linux";
       lib = nixpkgs.lib;
-    pkgsBase = nixpkgs-unstable.legacyPackages.${system};
+      pkgsBase = nixpkgs-unstable.legacyPackages.${system};
 
-    # Base Python for uv2nix builders (plain interpreter)
-    python = pkgsBase.python312;
+      # Base Python for uv2nix builders (plain interpreter)
+      python = pkgsBase.python312;
 
       # Load uv workspace and create overlays (uv2nix hello-world)
       workspace = uv2nix.lib.workspace.loadWorkspace { workspaceRoot = ./.; };

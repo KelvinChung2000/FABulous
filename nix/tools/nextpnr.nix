@@ -1,7 +1,6 @@
 # NextPNR - Place and route tool
 { lib
 , stdenv
-, fetchFromGitHub
 , cmake
 , pkg-config
 , python3
@@ -13,7 +12,6 @@
 , owner
 , repo
 , rev
-, hash
 , fetchSubmodules ? true
 }:
 
@@ -23,8 +21,9 @@ stdenv.mkDerivation rec {
            else if (lib.hasPrefix "v" rev) then lib.removePrefix "v" rev
            else "dev-${lib.substring 0 7 rev}";
 
-  src = fetchFromGitHub {
-    inherit owner repo rev hash fetchSubmodules;
+  src = builtins.fetchGit {
+    url = "https://github.com/${owner}/${repo}.git";
+    rev = rev;
   };
 
   nativeBuildInputs = [

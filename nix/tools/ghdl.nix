@@ -1,25 +1,26 @@
 # Custom GHDL derivation with mcode backend from master branch
 { lib
 , stdenv
-, fetchFromGitHub
 , gnat
 , zlib
 , which
 , pkg-config
-# Version control parameters (provided by default.nix)
-, owner ? "ghdl"
-, repo ? "ghdl"
-, rev ? "master"
-, hash ? "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="
-, fetchSubmodules ? false
+ # Version control parameters (provided by default.nix)
+ , owner ? "ghdl"
+ , repo ? "ghdl"
+ , rev ? "master"
+ , fetchSubmodules ? false
 }:
 
 stdenv.mkDerivation rec {
   pname = "ghdl-master";
   version = if rev == "master" then "5.0-dev" else rev;
 
-  src = fetchFromGitHub {
-    inherit owner repo rev hash fetchSubmodules;
+  src = builtins.fetchGit {
+    url = "https://github.com/${owner}/${repo}.git";
+    rev = rev;
+    # Note: builtins.fetchGit does not accept fetchSubmodules; if you need
+    # submodules use a different fetcher or update this logic.
   };
 
   nativeBuildInputs = [

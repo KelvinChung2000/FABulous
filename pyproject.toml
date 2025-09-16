@@ -134,3 +134,7 @@ pre-commit = "task format && task check"
 ci-check = "task check && task test && task docs-build"
 install-dev = "uv sync --group dev"
 clean-all = "find . -type d -name '__pycache__' -exec rm -rf {} + 2>/dev/null || true && find . -name '*.pyc' -delete && rm -rf build/ dist/ *.egg-info/ .pytest_cache/ .ruff_cache/"
+
+# Extra build dependencies for uv/uv2nix when building sdists lacking explicit build-system requires
+[tool.uv.extra-build-dependencies]
+"fasm-0.0.2.post88" = ["setuptools"]

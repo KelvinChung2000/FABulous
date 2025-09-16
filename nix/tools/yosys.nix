@@ -1,7 +1,6 @@
 # Yosys - Synthesis tool
 { lib
 , stdenv
-, fetchFromGitHub
 , pkg-config
 , bison
 , flex
@@ -14,7 +13,6 @@
 , owner
 , repo
 , rev
-, hash
 , fetchSubmodules ? true
 }:
 
@@ -22,8 +20,9 @@ stdenv.mkDerivation rec {
   pname = "yosys";
   version = if (lib.hasPrefix "v" rev) then lib.removePrefix "v" rev else "dev-${lib.substring 0 7 rev}";
 
-  src = fetchFromGitHub {
-    inherit owner repo rev hash fetchSubmodules;
+  src = builtins.fetchGit {
+    url = "https://github.com/${owner}/${repo}.git";
+    rev = rev;
   };
 
   nativeBuildInputs = [

@@ -12,7 +12,7 @@ let
       config = versions.${toolName};
     in
     pkgs.callPackage (./tools + "/${toolName}.nix") {
-      inherit (config) owner repo rev hash;
+      inherit (config) owner repo rev;
       fetchSubmodules = config.fetchSubmodules or false;
     };
 
@@ -20,15 +20,13 @@ let
   buildToolWithFallback = toolName: nixpkgsPackage:
     let
       config = versions.${toolName};
-      # Check if hash is placeholder (needs updating)
-      needsHash = config.hash == "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+      # Use custom build if rev is set, otherwise fallback
+      hasRev = config ? rev;
     in
-    if needsHash then
-      # Fall back to nixpkgs version if hash not updated yet
-      nixpkgsPackage
+    if hasRev then
+      buildTool toolName
     else
-      # Use custom build with proper hash
-      buildTool toolName;
+      nixpkgsPackage;
 
 in
 {

@@ -307,6 +307,39 @@ def install_fabulator_cmd(
     logger.info(f"FABulator installed successfully at {directory}")
 
 
+@app.command("install-and-config-nix")
+def install_and_config_nix_cmd() -> None:
+    """Install and configure Nix package manager."""
+    import shutil
+    import subprocess
+
+    if which := shutil.which("nix"):
+        logger.info(f"Nix is already installed at {which}, skipping installation")
+        return
+    subprocess.run("curl -L https://nixos.org/nix/install | sh", shell=True, check=True)
+    logger.info("Nix installed successfully")
+    config_path = Path("~/.config/nix/nix.conf")
+    config_path.parent.mkdir(parents=True, exist_ok=True)
+    if config_path.exists():
+        logger.warning(
+            f"Nix config file {config_path} already exists, will not proceed and make "
+            "changes. Please manually add the following line to the config file "
+            "for a faster setup:\n"
+            "extra-experimental-features = nix-command flakes\n"
+            "extra-substituters = https://nix-cache.fossi-foundation.org\n"
+            "extra-trusted-public-keys = "
+            "nix-cache.fossi-foundation.org:3+K59iFwXqKsL7BNu6Guy0v+uTlwsxYQxjspXzqLYQs=\n"
+        )
+        shutil.copy(config_path, config_path.with_suffix(".bak"))
+    with Path("~/.config/nix/nix.conf").open("w") as f:
+        f.write("experimental-features = nix-command flakes\n")
+        f.write("substituters = https://nix-cache.fossi-foundation.org\n")
+        f.write(
+            "trusted-public-keys = "
+            "nix-cache.fossi-foundation.org:3+K59iFwXqKsL7BNu6Guy0v+uTlwsxYQxjspXzqLYQs=\n"
+        )
+
+
 @app.command("update-project-version")
 def update_project_version_cmd() -> None:
     """Update project version to match package version."""

@@ -10,10 +10,8 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: Install Determinate Nix
-      uses: DeterminateSystems/nix-installer-action@main
-      with:
-        extra-conf: ${{ inputs.extra-conf }}
+    - name: Install Nix
+      uses: nixbuild/nix-quick-install-action@v33
     - name: Verify Nix installation
       shell: bash
       run: |
@@ -21,5 +19,5 @@ runs:
         nix --version || true
         echo '/etc/nix/nix.conf content (if present):'
         if [ -f /etc/nix/nix.conf ]; then sudo cat /etc/nix/nix.conf || true; else echo '(no /etc/nix/nix.conf)'; fi
-    - name: Setup Magic Nix Cache
-      uses: DeterminateSystems/magic-nix-cache-action@main
+    # - name: Setup Magic Nix Cache
+    #   uses: DeterminateSystems/magic-nix-cache-action@v13

@@ -74,12 +74,9 @@ jobs:
           else
             echo ".test_durations_fallback does not exist! Run with default even splits."
           fi
-
-      - name: Install Nix
-        uses: DeterminateSystems/nix-installer-action@main
-
-      - name: Setup Magic Nix Cache
-        uses: DeterminateSystems/magic-nix-cache-action@main
+      
+      - name: Setup Nix
+        uses: ./.github/actions/setup-nix
 
       # When running pytest, we write the new test durations using options
       # `--store-durations --clean-durations`.

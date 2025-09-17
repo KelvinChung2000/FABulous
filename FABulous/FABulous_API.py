@@ -110,7 +110,7 @@ class FABulous_API:
             If 'fabric_dir' does not end with '.csv'
         """
         if fabric_dir.suffix == ".csv":
-            self.fabric = fileParser.parseFabricCSV(fabric_dir)
+            self.fabric = fileParser.parseFabricCSV(str(fabric_dir))
             self.geometryGenerator = GeometryGenerator(self.fabric)
         else:
             logger.error("Only .csv files are supported for fabric loading")
@@ -254,7 +254,7 @@ class FABulous_API:
             Padding value for geometry generation, by default 8.
         """
         self.geometryGenerator.generateGeometry(geomPadding)
-        self.geometryGenerator.saveToCSV(self.writer.outFileName)
+        self.geometryGenerator.saveToCSV(str(self.writer.outFileName))
 
     def genTopWrapper(self) -> None:
         """Generate the top wrapper for the fabric.
@@ -431,17 +431,31 @@ class FABulous_API:
                 self.genIOBelForTile(tile.name)
 
     def gen_io_pin_order_config(self, tile: Tile, outfile: Path) -> None:
+        """Generate IO pin order configuration YAML for a tile.
+
+        Parameters
+        ----------
+        tile : Tile
+            The tile for which to generate the configuration.
+        outfile : Path
+            Output YAML path.
+        """
         tile.generateIOPinOrderConfig(outfile)
 
     def genTileMarco(
         self,
         tile_dir: Path,
         io_pin_config: Path,
+        out_folder: Path,
         *,
         pdk_root: Path | None = None,
         pdk: str | None = None,
     ) -> None:
-        """Runs the marco flow to generate the marco verilog files."""
+        """Run the marco flow to generate the marco Verilog files."""
+        # Ensure that any Python executed by embedded Yosys (pyosys) can import
+        # packages from the currently active virtual environment. Without this,
+        # imports like `click` inside librelane's pyosys scripts may fail.
+
         if pdk_root is None:
             pdk_root = get_context().pdk_root
             if pdk_root is None:
@@ -453,15 +467,39 @@ class FABulous_API:
             if pdk is None:
                 raise ValueError("PDK must be specified either here or in settings.")
 
+        file_list = [str(tile_dir / f) for f in tile_dir.glob("*.v")]
+        if f := get_context().model_pack:
+            file_list.append(str(f.resolve()))
+        (tile_dir / "macro").mkdir(exist_ok=True)
+        logger.info(f"PDK root: {pdk_root}")
+        logger.info(f"PDK: {pdk}")
+        logger.info(f"Output folder: {out_folder.resolve()}")
         flow = FABulousTileVerilog(
             {
-                "IO_PIN_ORDER_CONFIG": io_pin_config,
+                "DESIGN_NAME": tile_dir.name,
+                "FABULOUS_TILE_PIN_CONFIG": io_pin_config,
                 "FABULOUS_TILE_DIR": str(tile_dir),
+                "VERILOG_FILES": file_list,
+                "DIE_AREA": get_context().die_area,
+                "CORE_AREA": get_context().core_area,
+                "FP_SIZING": get_context().fp_sizing,
+                "FP_IO_VEXTEND": get_context().fp_io_vextend,
+                "FP_IO_HEXTEND": get_context().fp_io_hextend,
+                "FP_IO_VLENGTH": get_context().fp_io_vlength,
+                "FP_IO_HLENGTH": get_context().fp_io_hlength,
+                "FP_IO_HTHICKNESS_MULT": get_context().fp_io_hthickness_mult,
+                "FP_IO_VTHICKNESS_MULT": get_context().fp_io_vthickness_mult,
+                "FP_IO_HLAYER": get_context().fp_io_hlayer,
+                "FP_IO_VLAYER": get_context().fp_io_vlayer,
             },
-            pdk_root=str(pdk_root),
+            name=tile_dir.name,
+            design_dir=str(out_folder.resolve()),
             pdk=pdk,
-            design_dir=str(tile_dir),
+            pdk_root=str((pdk_root).resolve().parent),
         )
         (final_state, steps) = flow.start()
 
         logger.info("Marco flow completed.")
+
+    def genFabricGDS(self, fabric_dir: Path) -> None:
+        pass

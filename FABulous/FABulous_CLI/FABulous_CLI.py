@@ -537,7 +537,9 @@ class FABulous_CLI(Cmd):
         logger.info(f"Generating tile {' '.join(args.tiles)}")
         for t in args.tiles:
             if subTiles := [
-                f.stem for f in (self.projectDir / f"Tile/{t}").iterdir() if f.is_dir()
+                f.stem
+                for f in (self.projectDir / f"Tile/{t}").iterdir()
+                if f.is_dir() and f.name != "macro"
             ]:
                 logger.info(
                     f"{t} is a super tile, generating {t} with sub tiles "
@@ -1295,4 +1297,5 @@ class FABulous_CLI(Cmd):
         self.fabulousAPI.genTileMarco(
             self.projectDir / "Tile" / args.tile,
             pin_order_file,
+            self.projectDir / "Tile" / args.tile / "macro",
         )

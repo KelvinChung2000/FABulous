@@ -25,23 +25,17 @@ configs = Classic.config_vars + [
     Variable(
         "FABULOUS_TILE_PIN_CONFIG",
         Path,
-        """
-            The side of the macro at which the external pins are placed.
-            """,
+        "The side of the macro at which the external pins are placed.",
     ),
     Variable(
         "FABULOUS_TILE_DIR",
         Path,
-        """
-            Path to the tile directory where the CSV file is located.
-            """,
+        "Path to the tile directory where the CSV file is located.",
     ),
     Variable(
         "FABULOUS_SUPERTILE",
         Optional[bool],
-        """
-            Is the tile a supertile?
-            """,
+        "Is the tile a supertile?",
         default=False,
     ),
 ]
@@ -53,13 +47,6 @@ class FABulousTileVerilog(Classic):
     config_vars = configs
 
     def run(self, initial_state: State, **kwargs) -> tuple[State, list[Step]]:
-        verilog_files = Path(self.config["FABULOUS_TILE_DIR"]).rglob("*.v")
-
-        info(verilog_files)
-
-        # Overwrite VERILOG_FILES config variable with our Verilog files
-        self.config = self.config.copy(VERILOG_FILES=verilog_files)
-
         (final_state, steps) = super().run(initial_state, **kwargs)
 
         final_views_path = (
@@ -74,19 +61,12 @@ class FABulousTileVerilog(Classic):
 
 
 @Flow.factory.register()
-class FABulousTile(VHDLClassic):
+class FABulousTileVHDL(VHDLClassic):
     Substitutions = subs
     config_vars = configs
 
     def run(self, initial_state: State, **kwargs: Any) -> tuple[State, list[Step]]:  # noqa: ANN401
         warn("Linting and equivalence checking for VHDL files is disabled")
-
-        vhdl_files = Path(self.config["FABULOUS_TILE_DIR"]).rglob("*.vhdl")
-
-        info(vhdl_files)
-
-        # Overwrite VHDL_FILES config variable with our VHDL files
-        self.config = self.config.copy(VHDL_FILES=vhdl_files)
 
         (final_state, steps) = super().run(initial_state, **kwargs)
 

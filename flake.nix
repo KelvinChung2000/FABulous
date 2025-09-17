@@ -84,7 +84,8 @@
         inputsFrom = [ baseShell ];
         buildInputs = with pkgs; [ 
           which
-          customPkgs.ghdl  
+          customPkgs.ghdl
+          nextpnr  
         ];
         env = {
           UV_PYTHON = python.interpreter;
@@ -95,7 +96,6 @@
         shellHook = ''
           REPO_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
           export REPO_ROOT
-          echo "Entering FABulous editable shell (Tk ready)."
         '';
       };
 

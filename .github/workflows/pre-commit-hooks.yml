@@ -7,10 +7,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v5
-    - name: Install Nix
-      uses: DeterminateSystems/nix-installer-action@main
-    - name: Setup Magic Nix Cache
-      uses: DeterminateSystems/magic-nix-cache-action@main
+    - name: Setup Nix
+      uses: ./.github/actions/setup-nix
     - name: Run pre-commit hooks
       run: |
+        # Ensure flakes and nix command experimental features are enabled in this session
+        export NIXPKGS_ALLOW_BROKEN=1
+        nix --version
         nix develop --command pre-commit run --all-files

@@ -1,0 +1,25 @@
+name: setup-nix
+description: "Install Nix with flakes and nix-command enabled for CI runs (wrapper around DeterminateSystems/nix-installer-action)."
+inputs:
+  extra-conf:
+    description: |-
+      Additional nix.conf content to append. By default this action enables
+      experimental-features = nix-command flakes. You can override or append.
+    required: false
+    default: "experimental-features = nix-command flakes"
+runs:
+  using: "composite"
+  steps:
+    - name: Install Determinate Nix
+      uses: DeterminateSystems/nix-installer-action@main
+      with:
+        extra-conf: ${{ inputs.extra-conf }}
+    - name: Verify Nix installation
+      shell: bash
+      run: |
+        echo 'Nix version:'
+        nix --version || true
+        echo '/etc/nix/nix.conf content (if present):'
+        if [ -f /etc/nix/nix.conf ]; then sudo cat /etc/nix/nix.conf || true; else echo '(no /etc/nix/nix.conf)'; fi
+    - name: Setup Magic Nix Cache
+      uses: DeterminateSystems/magic-nix-cache-action@main

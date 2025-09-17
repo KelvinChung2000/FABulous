@@ -21,4 +21,5 @@ runs:
       uses: DeterminateSystems/magic-nix-cache-action@v13
     - name: build
       shell: bash
-      run: nix build .
+      run: |
+        nix build .#devShells.x86_64-linux.default

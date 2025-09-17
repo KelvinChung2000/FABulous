@@ -56,9 +56,23 @@ class FABulousSettings(BaseSettings):
         description="Deprecated, use proj_version instead",
     )
 
+    # CLI variable
     debug: bool = False
-    pdk_root: Path = Path("~/.ciel")
+
+    # GDS variables
+    pdk_root: Path = Path().home() / ".ciel"
     pdk: str | None = None
+    die_area: tuple[int, int, int, int] | None = (0, 0, 250, 250)
+    core_area: tuple[int, int, int, int] | None = (5, 5, 245, 245)
+    fp_sizing: str = "absolute"
+    fp_io_vextend: float = 1.5
+    fp_io_hextend: float = 1.5
+    fp_io_vlength: float = 0.8
+    fp_io_hlength: float = 0.8
+    fp_io_hthickness_mult: float = 2.0
+    fp_io_vthickness_mult: float = 2.0
+    fp_io_hlayer: str = "met3"
+    fp_io_vlayer: str = "met2"
 
     @field_validator("proj_version", "proj_version_created", "version", mode="before")
     @classmethod
@@ -241,7 +255,7 @@ class FABulousSettings(BaseSettings):
                 "PDK_root or PDK is not set. Back-end GDS features may be unavailable."
             )
             return self
-        pdk_path = self.pdk_root.resolve() / self.pdk
+        pdk_path = self.pdk_root.resolve()
         if not pdk_path.exists():
             raise ValueError(f"PDK path {pdk_path} does not exist.")
         logger.info(f"Using PDK at {pdk_path}")

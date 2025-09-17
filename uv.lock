@@ -318,6 +318,7 @@ name = "fabulous-fpga"
 source = { editable = "." }
 dependencies = [
     { name = "bitarray" },
+    { name = "click" },
     { name = "cmd2" },
     { name = "fasm" },
     { name = "gnureadline", marker = "sys_platform != 'win32'" },
@@ -348,6 +349,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "bitarray", specifier = ">=3.3.0" },
+    { name = "click", specifier = ">=8.1.8" },
     { name = "cmd2", specifier = ">=2" },
     { name = "fasm", specifier = ">=0.0.2" },
     { name = "gnureadline", marker = "sys_platform != 'win32'", specifier = ">=8.2.0" },

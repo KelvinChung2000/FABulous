@@ -3,6 +3,10 @@
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+    nixpkgs-stable = {
+      url = "github:nixos/nixpkgs/nixos-25.05";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
     pyproject-nix = {
       url = "github:pyproject-nix/pyproject.nix";
@@ -22,12 +26,26 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     librelane.url = "github:librelane/librelane";
+
+    # Tag-pinned sources for custom tools (locked in flake.lock)
+    ghdl-src = {
+      url = "github:ghdl/ghdl/nightly";
+      flake = false;
+    };
+    nextpnr-src = {
+      url = "github:YosysHQ/nextpnr/nextpnr-0.9";
+      flake = false;
+    };
+
   };
 
   outputs =
     {
       nixpkgs,
+      nixpkgs-stable,
       librelane,
+      ghdl-src,
+      nextpnr-src,
       pyproject-nix,
       uv2nix,
       pyproject-build-systems,
@@ -64,7 +82,10 @@
         system:
         let
           pkgs = nixpkgs.legacyPackages.${system};
-          python = pkgs.python3;
+          # This is the canonical way to build a Python interpreter with Tkinter support.
+          # The `ps.tkinter` package is a reference to the Tkinter module that gets
+          # compiled into the Python interpreter itself.
+          python = nixpkgs-stable.legacyPackages.${system}.python312Full;
         in
         (pkgs.callPackage pyproject-nix.build.packages {
           inherit python;
@@ -88,7 +109,14 @@
           virtualenv = pythonSet.mkVirtualEnv "FABulous-env" workspace.deps.all;
           baseShell = librelane.devShells.${system}.dev;
           # pass the current pkgs to the nix overlay so it returns a package set
-          customPkgs = import ./nix { inherit pkgs; };
+          # also pass flake-locked sources so tags resolve to a fixed commit
+          customPkgs = import ./nix {
+            inherit pkgs;
+            srcs = {
+              ghdl = ghdl-src;
+              nextpnr = nextpnr-src;
+            };
+          };
         in
         {
           default = pkgs.mkShell {
@@ -97,8 +125,8 @@
               virtualenv
               pkgs.uv
               pkgs.which
-              customPkgs.nextpnr
               customPkgs.ghdl
+              customPkgs.nextpnr
             ];
             env = {
               UV_NO_SYNC = "1";

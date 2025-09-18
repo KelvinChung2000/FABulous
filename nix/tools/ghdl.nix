@@ -10,18 +10,17 @@
  , repo ? "ghdl"
  , rev
  , fetchSubmodules ? false
+ , prefetchedSrc ? null
 }:
 
 stdenv.mkDerivation rec {
   pname = "ghdl-master";
   version = if rev == "master" then "5.0-dev" else rev;
 
-  src = builtins.fetchGit {
+  src = if prefetchedSrc != null then prefetchedSrc else (builtins.fetchGit {
     url = "https://github.com/${owner}/${repo}.git";
-    rev = rev;
-    # Note: builtins.fetchGit does not accept fetchSubmodules; if you need
-    # submodules use a different fetcher or update this logic.
-  };
+    inherit rev;
+  });
 
   nativeBuildInputs = [
     pkg-config

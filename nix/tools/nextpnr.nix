@@ -11,16 +11,17 @@
 , repo ? "nextpnr"
 , rev
 , fetchSubmodules ? true
+ , prefetchedSrc ? null
 }:
 
 stdenv.mkDerivation rec {
   pname = "nextpnr";
   version = "nextpnr-0.8";
 
-  src = builtins.fetchGit {
+  src = if prefetchedSrc != null then prefetchedSrc else (builtins.fetchGit {
     url = "https://github.com/${owner}/${repo}.git";
-    rev = rev;
-  };
+    inherit rev;
+  });
 
   nativeBuildInputs = [
     cmake

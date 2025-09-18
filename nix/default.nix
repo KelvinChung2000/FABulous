@@ -1,57 +1,49 @@
 # Systematic EDA tool dependency management
 # Version-controlled builds with easy hash management
-{ pkgs }:
+{ pkgs, srcs ? { } }:
 
 let
   # Import version configurations
   versions = import ./versions.nix;
 
   # Helper function to build a tool from configuration.
-  # - versions.nix MUST provide a `rev` (either a commit or a tag).
-  # - If `rev` is a 40-char commit sha it's used directly.
-  # - If `rev` looks like a tag, we attempt to resolve it via the
-  #   GitHub API to a commit sha and use that. If resolution fails we
-  #   raise a clear error.
+  # NOTE: For pure, reproducible builds, prefer pinning `rev` to a commit SHA
+  # in versions.nix. Tags may work via builtins.fetchGit in the tool derivation,
+  # but are less reproducible.
+  # Resolve rev from versions.nix to a commit SHA before calling the tool derivation.
+  # In impure dev shells, resolve non-SHA revs by trying a tag ref first, then a branch ref.
   buildTool = toolName:
     let
       config = versions.${toolName};
       hasRev = config ? rev;
       revVal = if hasRev then config.rev else "";
-  isCommit = hasRev && builtins.match "^[0-9a-f]{40}$" revVal != null;
-
-      resolveTagToCommit =
-        let
-          owner = config.owner;
-          repo = config.repo;
-          tag = revVal;
-          refsUrl = "https://api.github.com/repos/${owner}/${repo}/git/refs/tags/${tag}";
-          refsJson = builtins.fromJSON (builtins.readFile (builtins.fetchurl { url = refsUrl; }));
-          obj = refsJson.object;
-          sha = obj.sha;
-          typ = obj.type;
-          # Annotated tags point to a tag object; dereference if needed
-          commitSha = if typ == "commit" then sha else
-            let
-              tagUrl = "https://api.github.com/repos/${owner}/${repo}/git/tags/${sha}";
-              tagJson = builtins.fromJSON (builtins.readFile (builtins.fetchurl { url = tagUrl; }));
-            in tagJson.object.sha;
-        in commitSha;
-    in
-    if !hasRev then
-      builtins.error ("versions.nix must provide a 'rev' (commit or tag) for tool: " + toString toolName)
-    else
-      let
-        tv = builtins.tryEval resolveTagToCommit;
-        commit = if isCommit then revVal else (if tv.success then tv.value else null);
-      in
-  if commit == null || builtins.match "^[0-9a-f]{40}$" commit == null then
-        builtins.error ("Could not resolve rev '" + toString revVal + "' for " + toString toolName + ".\nTried resolving tag via GitHub API and failed. Please provide a commit hash in versions.nix.")
+      isCommit = hasRev && builtins.match "^[0-9a-f]{40}$" revVal != null;
+      pinnedSrc = srcs.${toolName} or null;
+      commit = if !hasRev then
+        builtins.error ("versions.nix must provide a 'rev' (commit or tag) for tool: " + toString toolName)
+      else if isCommit then
+        revVal
       else
-        pkgs.callPackage (./tools + "/${toolName}.nix") {
+        # For a tag/branch: prefer flake-locked srcs when provided; otherwise try to resolve tag/branch (impure)
+        if pinnedSrc != null then pinnedSrc.rev else (
+          let
+            url = "https://github.com/${config.owner}/${config.repo}.git";
+            tryRef = ref: builtins.tryEval ((builtins.fetchGit { inherit url ref; }).rev);
+            tagAttempt = tryRef ("refs/tags/" + revVal);
+            branchAttempt = tryRef ("refs/heads/" + revVal);
+          in if tagAttempt.success then tagAttempt.value
+             else if branchAttempt.success then branchAttempt.value
+             else builtins.error ("Could not resolve rev '" + revVal + "' for " + toString toolName + " as tag or branch")
+        );
+    in
+      if builtins.match "^[0-9a-f]{40}$" commit == null then
+        builtins.error ("Resolved rev for " + toString toolName + " is not a commit SHA: " + toString commit)
+      else
+        pkgs.callPackage (./tools + "/${toolName}.nix") ({
           inherit (config) owner repo;
           rev = commit;
           fetchSubmodules = config.fetchSubmodules or false;
-        };
+        } // (if (!isCommit) && (pinnedSrc != null) then { prefetchedSrc = pinnedSrc; } else { }));
 
 in
 {

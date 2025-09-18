@@ -57,8 +57,6 @@ def belMapProcessing(module_info: YosysModule) -> dict:
 
         belMapDic[new_key] = {0: {0: "1"}}
 
-    print(module_info.attributes)
-    print(belMapDic)
     # yosys reverses belmap, reverse back to keep original belmap.
     return dict(reversed(list(belMapDic.items())))
 

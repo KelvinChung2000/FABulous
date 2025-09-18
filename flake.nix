@@ -1,41 +1,48 @@
 {
-  description = "FABulous editable dev shell (uv2nix hello-world style)";
+  description = "hello world application using uv2nix";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.05";
-    nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+
     pyproject-nix = {
       url = "github:pyproject-nix/pyproject.nix";
-      inputs.nixpkgs.follows = "nixpkgs-unstable";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
+
     uv2nix = {
       url = "github:pyproject-nix/uv2nix";
       inputs.pyproject-nix.follows = "pyproject-nix";
-      inputs.nixpkgs.follows = "nixpkgs-unstable";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
+
     pyproject-build-systems = {
       url = "github:pyproject-nix/build-system-pkgs";
       inputs.pyproject-nix.follows = "pyproject-nix";
       inputs.uv2nix.follows = "uv2nix";
-      inputs.nixpkgs.follows = "nixpkgs-unstable";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
     librelane.url = "github:librelane/librelane";
   };
 
-  outputs = { self, librelane, nixpkgs, nixpkgs-unstable, uv2nix, pyproject-nix, pyproject-build-systems, ... }:
+  outputs =
+    {
+      nixpkgs,
+      librelane,
+      pyproject-nix,
+      uv2nix,
+      pyproject-build-systems,
+      ...
+    }:
     let
-      system = "x86_64-linux";
-      lib = nixpkgs.lib;
-      pkgsBase = nixpkgs-unstable.legacyPackages.${system};
+      inherit (nixpkgs) lib;
+      forAllSystems = lib.genAttrs lib.systems.flakeExposed;
 
-      # Base Python for uv2nix builders (plain interpreter)
-      python = pkgsBase.python312;
-
-      # Load uv workspace and create overlays (uv2nix hello-world)
       workspace = uv2nix.lib.workspace.loadWorkspace { workspaceRoot = ./.; };
-      overlay = workspace.mkPyprojectOverlay { sourcePreference = "wheel"; };
 
-      # Fix sdists that miss build deps
+      overlay = workspace.mkPyprojectOverlay {
+        sourcePreference = "wheel";
+      };
+
       pyprojectOverrides = final: prev: {
         fasm = prev.fasm.overrideAttrs (old: {
           nativeBuildInputs = (old.nativeBuildInputs or []) ++ final.resolveBuildSystem {
@@ -47,59 +54,68 @@
             setuptools = [ ]; wheel = [ ];
           };
         });
-        "cocotb-test" = prev."cocotb-test".overrideAttrs (old: {
-          nativeBuildInputs = (old.nativeBuildInputs or []) ++ final.resolveBuildSystem {
-            setuptools = [ ]; wheel = [ ];
-          };
-        });
       };
 
-      pythonSet = (pkgsBase.callPackage pyproject-nix.build.packages { inherit python; })
-        .overrideScope (lib.composeManyExtensions [
-          pyproject-build-systems.overlays.default
-          overlay
-          pyprojectOverrides
-        ]);
-
-      # Enable editable installs for local package(s)
       editableOverlay = workspace.mkEditablePyprojectOverlay {
-        # Use an environment variable to avoid embedding a Nix store path
         root = "$REPO_ROOT";
-        members = [ "fabulous-fpga" ];
       };
-      editablePythonSet = pythonSet.overrideScope (lib.composeManyExtensions [ editableOverlay ]);
 
-      # Venv with dev deps and editable install
-      editableVenv = editablePythonSet.mkVirtualEnv "fabulous-dev-env" workspace.deps.all;
-      localOverlay = final: prev: {
-            customPkgs = import ./nix { pkgs = final; };
+      pythonSets = forAllSystems (
+        system:
+        let
+          pkgs = nixpkgs.legacyPackages.${system};
+          python = pkgs.python3;
+        in
+        (pkgs.callPackage pyproject-nix.build.packages {
+          inherit python;
+        }).overrideScope
+          (
+            lib.composeManyExtensions [
+              pyproject-build-systems.overlays.wheel
+              overlay
+              pyprojectOverrides
+            ]
+          )
+      );
+
+    in
+    {
+      devShells = forAllSystems (
+        system:
+        let
+          pkgs = nixpkgs.legacyPackages.${system};
+          pythonSet = pythonSets.${system}.overrideScope editableOverlay;
+          virtualenv = pythonSet.mkVirtualEnv "FABulous-env" workspace.deps.all;
+          baseShell = librelane.devShells.${system}.dev;
+          # pass the current pkgs to the nix overlay so it returns a package set
+          customPkgs = import ./nix { inherit pkgs; };
+        in
+        {
+          default = pkgs.mkShell {
+            inputsFrom = [ baseShell ];
+            packages = [
+              virtualenv
+              pkgs.uv
+              pkgs.which
+              customPkgs.nextpnr
+              customPkgs.ghdl
+            ];
+            env = {
+              UV_NO_SYNC = "1";
+              UV_PYTHON = pythonSet.python.interpreter;
+              UV_PYTHON_DOWNLOADS = "never";
+            };
+            shellHook = ''
+              unset PYTHONPATH
+              export REPO_ROOT=$(git rev-parse --show-toplevel)
+              . ${virtualenv}/bin/activate
+            '';
           };
-      pkgs = import nixpkgs { system = "x86_64-linux"; overlays = [ librelane.overlays.default localOverlay ]; };
-      baseShell = librelane.devShells."x86_64-linux".dev;
-    in {
-      # Single editable shell; nix-shell . will start this
-      devShells.${system}.default = pkgsBase.mkShell {
-        name = "fabulous";
-        packages = [ editableVenv pkgsBase.uv pkgsBase.python312Packages.tkinter ];
-        inputsFrom = [ baseShell ];
-        buildInputs = with pkgs; [ 
-          which
-          customPkgs.ghdl
-          nextpnr  
-        ];
-        env = {
-          UV_PYTHON = python.interpreter;
-          UV_PYTHON_DOWNLOADS = "never";
-          # Expose tkinter module and its extension module to the venv's Python
-          PYTHONPATH = "${pkgsBase.python312Packages.tkinter}/lib/python3.12:${pkgsBase.python312Packages.tkinter}/lib/python3.12/lib-dynload";
-        };
-        shellHook = ''
-          REPO_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
-          export REPO_ROOT
-        '';
-      };
+        }
+      );
 
-      # Make legacy `nix-shell .` pick the default editable shell
-      devShell.${system} = self.devShells.${system}.default;
+      packages = forAllSystems (system: {
+        default = pythonSets.${system}.mkVirtualEnv "FABulous-env" workspace.deps.default;
+      });
     };
 }

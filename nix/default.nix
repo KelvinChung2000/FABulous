@@ -6,37 +6,62 @@ let
   # Import version configurations
   versions = import ./versions.nix;
 
-  # Helper function to build a tool from configuration
+  # Helper function to build a tool from configuration.
+  # - versions.nix MUST provide a `rev` (either a commit or a tag).
+  # - If `rev` is a 40-char commit sha it's used directly.
+  # - If `rev` looks like a tag, we attempt to resolve it via the
+  #   GitHub API to a commit sha and use that. If resolution fails we
+  #   raise a clear error.
   buildTool = toolName:
     let
       config = versions.${toolName};
-    in
-    pkgs.callPackage (./tools + "/${toolName}.nix") {
-      inherit (config) owner repo rev;
-      fetchSubmodules = config.fetchSubmodules or false;
-    };
-
-  # Helper function to choose between custom build and nixpkgs fallback
-  buildToolWithFallback = toolName: nixpkgsPackage:
-    let
-      config = versions.${toolName};
-      # Use custom build if rev is set, otherwise fallback
       hasRev = config ? rev;
+      revVal = if hasRev then config.rev else "";
+  isCommit = hasRev && builtins.match "^[0-9a-f]{40}$" revVal != null;
+
+      resolveTagToCommit =
+        let
+          owner = config.owner;
+          repo = config.repo;
+          tag = revVal;
+          refsUrl = "https://api.github.com/repos/${owner}/${repo}/git/refs/tags/${tag}";
+          refsJson = builtins.fromJSON (builtins.readFile (builtins.fetchurl { url = refsUrl; }));
+          obj = refsJson.object;
+          sha = obj.sha;
+          typ = obj.type;
+          # Annotated tags point to a tag object; dereference if needed
+          commitSha = if typ == "commit" then sha else
+            let
+              tagUrl = "https://api.github.com/repos/${owner}/${repo}/git/tags/${sha}";
+              tagJson = builtins.fromJSON (builtins.readFile (builtins.fetchurl { url = tagUrl; }));
+            in tagJson.object.sha;
+        in commitSha;
     in
-    if hasRev then
-      buildTool toolName
+    if !hasRev then
+      builtins.error ("versions.nix must provide a 'rev' (commit or tag) for tool: " + toString toolName)
     else
-      nixpkgsPackage;
+      let
+        tv = builtins.tryEval resolveTagToCommit;
+        commit = if isCommit then revVal else (if tv.success then tv.value else null);
+      in
+  if commit == null || builtins.match "^[0-9a-f]{40}$" commit == null then
+        builtins.error ("Could not resolve rev '" + toString revVal + "' for " + toString toolName + ".\nTried resolving tag via GitHub API and failed. Please provide a commit hash in versions.nix.")
+      else
+        pkgs.callPackage (./tools + "/${toolName}.nix") {
+          inherit (config) owner repo;
+          rev = commit;
+          fetchSubmodules = config.fetchSubmodules or false;
+        };
 
 in
 {
   # Custom builds only for these tools
-  nextpnr = buildToolWithFallback "nextpnr" pkgs.nextpnr;
-  ghdl = buildToolWithFallback "ghdl" pkgs.ghdl;
+  nextpnr = buildTool "nextpnr";
+  ghdl = buildTool "ghdl";
 
   # Convenience aliases for common usage patterns
-  # yosys-latest = buildToolWithFallback "yosys" pkgs.yosys;
-  ghdl-master = buildToolWithFallback "ghdl" pkgs.ghdl;
+  # yosys-latest = buildTool "yosys";
+  ghdl-master = buildTool "ghdl";
 
   # Export the versions for inspection
   edaVersions = versions;

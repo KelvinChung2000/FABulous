@@ -76,7 +76,6 @@ exclude = ["setup.py", "docs", "build", ".venv", "demo/*", "tests"]
 [dependency-groups]
 dev = [
   "cocotb>=1.9.2",
-  "cocotb-test>=0.2.6",
   "pre-commit>=4.2.0",
   "pytest>=8.4.1",
   "pytest-cov>=6.2.1",
@@ -137,7 +136,3 @@ install-dev = "uv sync --group dev"
 clean-all = "find . -type d -name '__pycache__' -exec rm -rf {} + 2>/dev/null || true && find . -name '*.pyc' -delete && rm -rf build/ dist/ *.egg-info/ .pytest_cache/ .ruff_cache/"
 
 update-lock = "uv update && nix flake update"
-
-# Extra build dependencies for uv/uv2nix when building sdists lacking explicit build-system requires
-[tool.uv.extra-build-dependencies]
-"fasm-0.0.2.post88" = ["setuptools"]

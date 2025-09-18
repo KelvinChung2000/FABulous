@@ -6,20 +6,16 @@
 , python3
 , boost
 , eigen
-, icestorm
-, trellis
 , python3Packages
-, owner
-, repo
+, owner ? "YosysHQ"
+, repo ? "nextpnr"
 , rev
 , fetchSubmodules ? true
 }:
 
 stdenv.mkDerivation rec {
   pname = "nextpnr";
-  version = if (lib.hasPrefix "nextpnr-" rev) then lib.removePrefix "nextpnr-" rev
-           else if (lib.hasPrefix "v" rev) then lib.removePrefix "v" rev
-           else "dev-${lib.substring 0 7 rev}";
+  version = "nextpnr-0.8";
 
   src = builtins.fetchGit {
     url = "https://github.com/${owner}/${repo}.git";
@@ -38,33 +34,16 @@ stdenv.mkDerivation rec {
   ];
 
   cmakeFlags = [
-    "-DARCH=generic;himbaechel"
+    "-DARCH=generic"
   ];
 
   enableParallelBuilding = true;
-
-  # Set up runtime paths
-  # postInstall = ''
-  #   wrapProgram $out/bin/nextpnr-ice40 \
-  #     --prefix PATH : ${lib.makeBinPath [ icestorm ]}
-
-  #   wrapProgram $out/bin/nextpnr-ecp5 \
-  #     --prefix PATH : ${lib.makeBinPath [ trellis ]}
-
-  #   if [ -f $out/bin/nextpnr-gowin ]; then
-  #     wrapProgram $out/bin/nextpnr-gowin \
-  #       --prefix PATH : ${lib.makeBinPath [ python3Packages.apycula ]}
-  #   fi
-  # '';
 
   meta = with lib; {
     description = "Portable FPGA place and route tool";
     longDescription = ''
       nextpnr is a vendor neutral, timing driven, FOSS FPGA place and route
       tool. Currently nextpnr supports:
-      * Lattice iCE40 devices (through Project IceStorm)
-      * Lattice ECP5 devices (through Project Trellis)
-      * Gowin devices (through Apicula)
       * Generic FPGA architecture for research and education
     '';
     homepage = "https://github.com/YosysHQ/nextpnr";

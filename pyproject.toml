@@ -78,7 +78,6 @@ exclude = ["setup.py", "docs", "build", ".venv", "demo/*", "tests"]
 [dependency-groups]
 dev = [
   "cocotb>=1.9.2",
-  "cocotb-test>=0.2.6",
   "pre-commit>=4.2.0",
   "pytest>=8.4.1",
   "pytest-cov>=6.2.1",

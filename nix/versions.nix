@@ -4,13 +4,13 @@
   nextpnr = {
     owner = "YosysHQ";
     repo = "nextpnr";
-    rev = "nextpnr-0.8"; # Latest stable release
+    rev = "nextpnr-0.9";
   };
 
   ghdl = {
     owner = "ghdl";
     repo = "ghdl";
-    rev = "1ed6445836f4101504c3da0bb95ce051351fb546"; # Latest master commit
+    rev = "nightly";
   };
 
 }

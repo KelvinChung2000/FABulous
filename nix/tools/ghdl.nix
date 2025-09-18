@@ -8,7 +8,7 @@
  # Version control parameters (provided by default.nix)
  , owner ? "ghdl"
  , repo ? "ghdl"
- , rev ? "master"
+ , rev
  , fetchSubmodules ? false
 }:
 

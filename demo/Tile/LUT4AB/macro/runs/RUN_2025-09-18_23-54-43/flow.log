@@ -1,0 +1,1797 @@
+Starting…
+Running 'Verilator.Lint' at 'Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/01-verilator-lint'…
+Logging subprocess to [repr.filename]'Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/01-verilator-lint/verilator-lint.log'[/repr.filename]…
+Running 'Checker.LintTimingConstructs' at 'Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/02-checker-linttimingconstructs'…
+Check for Lint Timing Errors clear.
+Running 'Checker.LintErrors' at 'Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/03-checker-linterrors'…
+Check for Lint errors clear.
+Running 'Checker.LintWarnings' at 'Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/04-checker-lintwarnings'…
+26 Lint warnings found.
+Running 'Yosys.JsonHeader' at 'Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/05-yosys-jsonheader'…
+Logging subprocess to [repr.filename]'Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/05-yosys-jsonheader/yosys-jsonheader.log'[/repr.filename]…
+Running 'Yosys.Synthesis' at 'Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/06-yosys-synthesis'…
+Logging subprocess to [repr.filename]'Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/06-yosys-synthesis/yosys-synthesis.log'[/repr.filename]…
+Parsing synthesis checks…
+Running 'Checker.YosysUnmappedCells' at 'Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/07-checker-yosysunmappedcells'…
+Check for Unmapped Yosys instances clear.
+Running 'Checker.YosysSynthChecks' at 'Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/08-checker-yosyssynthchecks'…
+Check for Yosys check errors clear.
+Running 'Checker.NetlistAssignStatements' at 'Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/09-checker-netlistassignstatements'…
+Running 'OpenROAD.CheckSDCFiles' at 'Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/10-openroad-checksdcfiles'…
+'PNR_SDC_FILE' is not defined. Using generic fallback SDC for OpenROAD PnR steps.
+'SIGNOFF_SDC_FILE' is not defined. Using generic fallback SDC for OpenROAD PnR steps.
+Running 'OpenROAD.CheckMacroInstances' at 'Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/11-openroad-checkmacroinstances'…
+No macros found, skipping instance check…
+Running 'OpenROAD.Floorplan' at 'Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/12-openroad-floorplan'…
+Logging subprocess to [repr.filename]'Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/12-openroad-floorplan/openroad-floorplan.log'[/repr.filename]…
+[STA-0366] port '__VIRTUAL_CLK__' not found.
+[STA-0366] port '__VIRTUAL_CLK__' not found.
+[STA-0419] transition time can not be specified for virtual clocks.
+[STA-0450] virtual clock __VIRTUAL_CLK__ can not be propagated.
+[IFP-0028] Core area lower left (5.000, 5.000) snapped to (5.060, 5.440).
+Running 'Odb.CheckMacroAntennaProperties' at 'Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/13-odb-checkmacroantennaproperties'…
+No cells provided, skipping…
+Running 'Odb.SetPowerConnections' at 'Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/14-odb-setpowerconnections'…
+Logging subprocess to [repr.filename]'Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/14-odb-setpowerconnections/odb-setpowerconnections.log'[/repr.filename]…
+Running 'Odb.ManualMacroPlacement' at 'Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/15-odb-manualmacroplacement'…
+No instances found, skipping 'Odb.ManualMacroPlacement'…
+Running 'OpenROAD.CutRows' at 'Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/16-openroad-cutrows'…
+Logging subprocess to [repr.filename]'Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/16-openroad-cutrows/openroad-cutrows.log'[/repr.filename]…
+[STA-0366] port '__VIRTUAL_CLK__' not found.
+[STA-0366] port '__VIRTUAL_CLK__' not found.
+[STA-0419] transition time can not be specified for virtual clocks.
+[STA-0450] virtual clock __VIRTUAL_CLK__ can not be propagated.
+Running 'OpenROAD.TapEndcapInsertion' at 'Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/17-openroad-tapendcapinsertion'…
+Logging subprocess to [repr.filename]'Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/17-openroad-tapendcapinsertion/openroad-tapendcapinsertion.log'[/repr.filename]…
+[STA-0366] port '__VIRTUAL_CLK__' not found.
+[STA-0366] port '__VIRTUAL_CLK__' not found.
+[STA-0419] transition time can not be specified for virtual clocks.
+[STA-0450] virtual clock __VIRTUAL_CLK__ can not be propagated.
+Running 'Odb.AddPDNObstructions' at 'Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/18-odb-addpdnobstructions'…
+'PDN_OBSTRUCTIONS' is not defined. Skipping 'Odb.AddPDNObstructions'…
+Running 'OpenROAD.GeneratePDN' at 'Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/19-openroad-generatepdn'…
+'FP_PDN_CFG' not explicitly set, setting it to /nix/store/381vlqh72qv21j2s2ssfql1j0vg3f44v-FABulous-env/lib/python3.12/site-packages/librelane/scripts/openroad/common/pdn_cfg.tcl…
+Logging subprocess to [repr.filename]'Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/19-openroad-generatepdn/openroad-generatepdn.log'[/repr.filename]…
+[STA-0366] port '__VIRTUAL_CLK__' not found.
+[STA-0366] port '__VIRTUAL_CLK__' not found.
+[STA-0419] transition time can not be specified for virtual clocks.
+[STA-0450] virtual clock __VIRTUAL_CLK__ can not be propagated.
+Running 'Odb.RemovePDNObstructions' at 'Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/20-odb-removepdnobstructions'…
+'PDN_OBSTRUCTIONS' is not defined. Skipping 'Odb.RemovePDNObstructions'…
+Running 'Odb.AddRoutingObstructions' at 'Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/21-odb-addroutingobstructions'…
+'ROUTING_OBSTRUCTIONS' is not defined. Skipping 'Odb.AddRoutingObstructions'…
+Running 'OpenROAD.GlobalPlacementSkipIO' at 'Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/22-openroad-globalplacementskipio'…
+'PL_TARGET_DENSITY_PCT' not explicitly set, using dynamically calculated target density: 20.83800…
+Logging subprocess to [repr.filename]'Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/22-openroad-globalplacementskipio/openroad-globalplacementskipio.log'[/repr.filename]…
+[STA-0366] port '__VIRTUAL_CLK__' not found.
+[STA-0366] port '__VIRTUAL_CLK__' not found.
+[STA-0419] transition time can not be specified for virtual clocks.
+[STA-0450] virtual clock __VIRTUAL_CLK__ can not be propagated.
+Running 'OpenROAD.IOPlacement' at 'Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/23-openroad-ioplacement'…
+Logging subprocess to [repr.filename]'Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/23-openroad-ioplacement/openroad-ioplacement.log'[/repr.filename]…
+[STA-0366] port '__VIRTUAL_CLK__' not found.
+[STA-0366] port '__VIRTUAL_CLK__' not found.
+[STA-0419] transition time can not be specified for virtual clocks.
+[STA-0450] virtual clock __VIRTUAL_CLK__ can not be propagated.
+Loading the incremental configuration has generated the following warnings:
+The configuration variable 'FP_PIN_ORDER_CFG' is deprecated. Please check the docs for the usage on the replacement variable 'IO_PIN_ORDER_CFG'.
+Running 'Odb.FABulousIOPlacement' at 'Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/24-odb-fabulousioplacement'…
+No custom floorplan file configured, skipping…
+Running 'Odb.ApplyDEFTemplate' at 'Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/25-odb-applydeftemplate'…
+No DEF template provided, skipping…
+Running 'OpenROAD.GlobalPlacement' at 'Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/26-openroad-globalplacement'…
+'PL_TARGET_DENSITY_PCT' not explicitly set, using dynamically calculated target density: 20.83800…
+Logging subprocess to [repr.filename]'Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/26-openroad-globalplacement/openroad-globalplacement.log'[/repr.filename]…
+[STA-0366] port '__VIRTUAL_CLK__' not found.
+[STA-0366] port '__VIRTUAL_CLK__' not found.
+[STA-0419] transition time can not be specified for virtual clocks.
+[STA-0450] virtual clock __VIRTUAL_CLK__ can not be propagated.
+Running 'Odb.WriteVerilogHeader' at 'Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/27-odb-writeverilogheader'…
+Logging subprocess to [repr.filename]'Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/27-odb-writeverilogheader/odb-writeverilogheader.log'[/repr.filename]…
+Running 'Checker.PowerGridViolations' at 'Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/28-checker-powergridviolations'…
+Check for power grid violations (as reported by OpenROAD PSM- you may ignore these if LVS passes) clear.
+Running 'OpenROAD.RepairDesignPostGPL' at 'Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/29-openroad-repairdesignpostgpl'…
+Logging subprocess to [repr.filename]'Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/29-openroad-repairdesignpostgpl/openroad-repairdesignpostgpl.log'[/repr.filename]…
+[STA-0366] port '__VIRTUAL_CLK__' not found.
+[STA-0366] port '__VIRTUAL_CLK__' not found.
+[STA-0419] transition time can not be specified for virtual clocks.
+[STA-0450] virtual clock __VIRTUAL_CLK__ can not be propagated.
+Running 'Odb.ManualGlobalPlacement' at 'Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/30-odb-manualglobalplacement'…
+'MANUAL_GLOBAL_PLACEMENTS' not set, skipping…
+Running 'OpenROAD.DetailedPlacement' at 'Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/31-openroad-detailedplacement'…
+Logging subprocess to [repr.filename]'Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/31-openroad-detailedplacement/openroad-detailedplacement.log'[/repr.filename]…
+[STA-0366] port '__VIRTUAL_CLK__' not found.
+[STA-0366] port '__VIRTUAL_CLK__' not found.
+[STA-0419] transition time can not be specified for virtual clocks.
+[STA-0450] virtual clock __VIRTUAL_CLK__ can not be propagated.
+Running 'OpenROAD.CTS' at 'Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/32-openroad-cts'…
+No CLOCK_NET (or CLOCK_PORT) specified. CTS cannot be performed. Returning state unaltered…
+Running 'OpenROAD.STAMidPNR-1' at 'Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/33-openroad-stamidpnr-1'…
+Logging subprocess to [repr.filename]'Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/33-openroad-stamidpnr-1/openroad-stamidpnr-1.log'[/repr.filename]…
+[STA-0366] port '__VIRTUAL_CLK__' not found.
+[STA-0366] port '__VIRTUAL_CLK__' not found.
+[STA-0419] transition time can not be specified for virtual clocks.
+[STA-0450] virtual clock __VIRTUAL_CLK__ can not be propagated.
+[GRT-0097] No global routing found for nets.
+Running 'OpenROAD.ResizerTimingPostCTS' at 'Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/34-openroad-resizertimingpostcts'…
+Logging subprocess to [repr.filename]'Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/34-openroad-resizertimingpostcts/openroad-resizertimingpostcts.log'[/repr.filename]…
+[STA-0366] port '__VIRTUAL_CLK__' not found.
+[STA-0366] port '__VIRTUAL_CLK__' not found.
+[STA-0419] transition time can not be specified for virtual clocks.
+[STA-0450] virtual clock __VIRTUAL_CLK__ can not be propagated.
+[STA-0450] virtual clock __VIRTUAL_CLK__ can not be propagated.
+[RSZ-0062] Unable to repair all setup violations.
+Running 'OpenROAD.STAMidPNR-2' at 'Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/35-openroad-stamidpnr-2'…
+Logging subprocess to [repr.filename]'Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/35-openroad-stamidpnr-2/openroad-stamidpnr-2.log'[/repr.filename]…
+[STA-0366] port '__VIRTUAL_CLK__' not found.
+[STA-0366] port '__VIRTUAL_CLK__' not found.
+[STA-0419] transition time can not be specified for virtual clocks.
+[STA-0450] virtual clock __VIRTUAL_CLK__ can not be propagated.
+[GRT-0097] No global routing found for nets.
+Running 'OpenROAD.GlobalRouting' at 'Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/36-openroad-globalrouting'…
+Logging subprocess to [repr.filename]'Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/36-openroad-globalrouting/openroad-globalrouting.log'[/repr.filename]…
+[STA-0366] port '__VIRTUAL_CLK__' not found.
+[STA-0366] port '__VIRTUAL_CLK__' not found.
+[STA-0419] transition time can not be specified for virtual clocks.
+[STA-0450] virtual clock __VIRTUAL_CLK__ can not be propagated.
+[STA-0450] virtual clock __VIRTUAL_CLK__ can not be propagated.
+[GRT-0036] Pin Ci is outside die area.
+[GRT-0036] Pin Co is outside die area.
+[GRT-0036] Pin E1BEG[0] is outside die area.
+[GRT-0036] Pin E1BEG[1] is outside die area.
+[GRT-0036] Pin E1BEG[2] is outside die area.
+[GRT-0036] Pin E1BEG[3] is outside die area.
+[GRT-0036] Pin E1END[0] is outside die area.
+[GRT-0036] Pin E1END[1] is outside die area.
+[GRT-0036] Pin E1END[2] is outside die area.
+[GRT-0036] Pin E1END[3] is outside die area.
+[GRT-0036] Pin E2BEG[0] is outside die area.
+[GRT-0036] Pin E2BEG[1] is outside die area.
+[GRT-0036] Pin E2BEG[2] is outside die area.
+[GRT-0036] Pin E2BEG[3] is outside die area.
+[GRT-0036] Pin E2BEG[4] is outside die area.
+[GRT-0036] Pin E2BEG[5] is outside die area.
+[GRT-0036] Pin E2BEG[6] is outside die area.
+[GRT-0036] Pin E2BEG[7] is outside die area.
+[GRT-0036] Pin E2BEGb[0] is outside die area.
+[GRT-0036] Pin E2BEGb[1] is outside die area.
+[GRT-0036] Pin E2BEGb[2] is outside die area.
+[GRT-0036] Pin E2BEGb[3] is outside die area.
+[GRT-0036] Pin E2BEGb[4] is outside die area.
+[GRT-0036] Pin E2BEGb[5] is outside die area.
+[GRT-0036] Pin E2BEGb[6] is outside die area.
+[GRT-0036] Pin E2BEGb[7] is outside die area.
+[GRT-0036] Pin E2END[0] is outside die area.
+[GRT-0036] Pin E2END[1] is outside die area.
+[GRT-0036] Pin E2END[2] is outside die area.
+[GRT-0036] Pin E2END[3] is outside die area.
+[GRT-0036] Pin E2END[4] is outside die area.
+[GRT-0036] Pin E2END[5] is outside die area.
+[GRT-0036] Pin E2END[6] is outside die area.
+[GRT-0036] Pin E2END[7] is outside die area.
+[GRT-0036] Pin E2MID[0] is outside die area.
+[GRT-0036] Pin E2MID[1] is outside die area.
+[GRT-0036] Pin E2MID[2] is outside die area.
+[GRT-0036] Pin E2MID[3] is outside die area.
+[GRT-0036] Pin E2MID[4] is outside die area.
+[GRT-0036] Pin E2MID[5] is outside die area.
+[GRT-0036] Pin E2MID[6] is outside die area.
+[GRT-0036] Pin E2MID[7] is outside die area.
+[GRT-0036] Pin E6BEG[0] is outside die area.
+[GRT-0036] Pin E6BEG[10] is outside die area.
+[GRT-0036] Pin E6BEG[11] is outside die area.
+[GRT-0036] Pin E6BEG[1] is outside die area.
+[GRT-0036] Pin E6BEG[2] is outside die area.
+[GRT-0036] Pin E6BEG[3] is outside die area.
+[GRT-0036] Pin E6BEG[4] is outside die area.
+[GRT-0036] Pin E6BEG[5] is outside die area.
+[GRT-0036] Pin E6BEG[6] is outside die area.
+[GRT-0036] Pin E6BEG[7] is outside die area.
+[GRT-0036] Pin E6BEG[8] is outside die area.
+[GRT-0036] Pin E6BEG[9] is outside die area.
+[GRT-0036] Pin E6END[0] is outside die area.
+[GRT-0036] Pin E6END[10] is outside die area.
+[GRT-0036] Pin E6END[11] is outside die area.
+[GRT-0036] Pin E6END[1] is outside die area.
+[GRT-0036] Pin E6END[2] is outside die area.
+[GRT-0036] Pin E6END[3] is outside die area.
+[GRT-0036] Pin E6END[4] is outside die area.
+[GRT-0036] Pin E6END[5] is outside die area.
+[GRT-0036] Pin E6END[6] is outside die area.
+[GRT-0036] Pin E6END[7] is outside die area.
+[GRT-0036] Pin E6END[8] is outside die area.
+[GRT-0036] Pin E6END[9] is outside die area.
+[GRT-0036] Pin EE4BEG[0] is outside die area.
+[GRT-0036] Pin EE4BEG[10] is outside die area.
+[GRT-0036] Pin EE4BEG[11] is outside die area.
+[GRT-0036] Pin EE4BEG[12] is outside die area.
+[GRT-0036] Pin EE4BEG[13] is outside die area.
+[GRT-0036] Pin EE4BEG[14] is outside die area.
+[GRT-0036] Pin EE4BEG[15] is outside die area.
+[GRT-0036] Pin EE4BEG[1] is outside die area.
+[GRT-0036] Pin EE4BEG[2] is outside die area.
+[GRT-0036] Pin EE4BEG[3] is outside die area.
+[GRT-0036] Pin EE4BEG[4] is outside die area.
+[GRT-0036] Pin EE4BEG[5] is outside die area.
+[GRT-0036] Pin EE4BEG[6] is outside die area.
+[GRT-0036] Pin EE4BEG[7] is outside die area.
+[GRT-0036] Pin EE4BEG[8] is outside die area.
+[GRT-0036] Pin EE4BEG[9] is outside die area.
+[GRT-0036] Pin EE4END[0] is outside die area.
+[GRT-0036] Pin EE4END[10] is outside die area.
+[GRT-0036] Pin EE4END[11] is outside die area.
+[GRT-0036] Pin EE4END[12] is outside die area.
+[GRT-0036] Pin EE4END[13] is outside die area.
+[GRT-0036] Pin EE4END[14] is outside die area.
+[GRT-0036] Pin EE4END[15] is outside die area.
+[GRT-0036] Pin EE4END[1] is outside die area.
+[GRT-0036] Pin EE4END[2] is outside die area.
+[GRT-0036] Pin EE4END[3] is outside die area.
+[GRT-0036] Pin EE4END[4] is outside die area.
+[GRT-0036] Pin EE4END[5] is outside die area.
+[GRT-0036] Pin EE4END[6] is outside die area.
+[GRT-0036] Pin EE4END[7] is outside die area.
+[GRT-0036] Pin EE4END[8] is outside die area.
+[GRT-0036] Pin EE4END[9] is outside die area.
+[GRT-0036] Pin FrameData[0] is outside die area.
+[GRT-0036] Pin FrameData[10] is outside die area.
+[GRT-0036] Pin FrameData[11] is outside die area.
+[GRT-0036] Pin FrameData[12] is outside die area.
+[GRT-0036] Pin FrameData[13] is outside die area.
+[GRT-0036] Pin FrameData[14] is outside die area.
+[GRT-0036] Pin FrameData[15] is outside die area.
+[GRT-0036] Pin FrameData[16] is outside die area.
+[GRT-0036] Pin FrameData[17] is outside die area.
+[GRT-0036] Pin FrameData[18] is outside die area.
+[GRT-0036] Pin FrameData[19] is outside die area.
+[GRT-0036] Pin FrameData[1] is outside die area.
+[GRT-0036] Pin FrameData[20] is outside die area.
+[GRT-0036] Pin FrameData[21] is outside die area.
+[GRT-0036] Pin FrameData[22] is outside die area.
+[GRT-0036] Pin FrameData[23] is outside die area.
+[GRT-0036] Pin FrameData[24] is outside die area.
+[GRT-0036] Pin FrameData[25] is outside die area.
+[GRT-0036] Pin FrameData[26] is outside die area.
+[GRT-0036] Pin FrameData[27] is outside die area.
+[GRT-0036] Pin FrameData[28] is outside die area.
+[GRT-0036] Pin FrameData[29] is outside die area.
+[GRT-0036] Pin FrameData[2] is outside die area.
+[GRT-0036] Pin FrameData[30] is outside die area.
+[GRT-0036] Pin FrameData[31] is outside die area.
+[GRT-0036] Pin FrameData[3] is outside die area.
+[GRT-0036] Pin FrameData[4] is outside die area.
+[GRT-0036] Pin FrameData[5] is outside die area.
+[GRT-0036] Pin FrameData[6] is outside die area.
+[GRT-0036] Pin FrameData[7] is outside die area.
+[GRT-0036] Pin FrameData[8] is outside die area.
+[GRT-0036] Pin FrameData[9] is outside die area.
+[GRT-0036] Pin FrameData_O[0] is outside die area.
+[GRT-0036] Pin FrameData_O[10] is outside die area.
+[GRT-0036] Pin FrameData_O[11] is outside die area.
+[GRT-0036] Pin FrameData_O[12] is outside die area.
+[GRT-0036] Pin FrameData_O[13] is outside die area.
+[GRT-0036] Pin FrameData_O[14] is outside die area.
+[GRT-0036] Pin FrameData_O[15] is outside die area.
+[GRT-0036] Pin FrameData_O[16] is outside die area.
+[GRT-0036] Pin FrameData_O[17] is outside die area.
+[GRT-0036] Pin FrameData_O[18] is outside die area.
+[GRT-0036] Pin FrameData_O[19] is outside die area.
+[GRT-0036] Pin FrameData_O[1] is outside die area.
+[GRT-0036] Pin FrameData_O[20] is outside die area.
+[GRT-0036] Pin FrameData_O[21] is outside die area.
+[GRT-0036] Pin FrameData_O[22] is outside die area.
+[GRT-0036] Pin FrameData_O[23] is outside die area.
+[GRT-0036] Pin FrameData_O[24] is outside die area.
+[GRT-0036] Pin FrameData_O[25] is outside die area.
+[GRT-0036] Pin FrameData_O[26] is outside die area.
+[GRT-0036] Pin FrameData_O[27] is outside die area.
+[GRT-0036] Pin FrameData_O[28] is outside die area.
+[GRT-0036] Pin FrameData_O[29] is outside die area.
+[GRT-0036] Pin FrameData_O[2] is outside die area.
+[GRT-0036] Pin FrameData_O[30] is outside die area.
+[GRT-0036] Pin FrameData_O[31] is outside die area.
+[GRT-0036] Pin FrameData_O[3] is outside die area.
+[GRT-0036] Pin FrameData_O[4] is outside die area.
+[GRT-0036] Pin FrameData_O[5] is outside die area.
+[GRT-0036] Pin FrameData_O[6] is outside die area.
+[GRT-0036] Pin FrameData_O[7] is outside die area.
+[GRT-0036] Pin FrameData_O[8] is outside die area.
+[GRT-0036] Pin FrameData_O[9] is outside die area.
+[GRT-0036] Pin FrameStrobe[0] is outside die area.
+[GRT-0036] Pin FrameStrobe[10] is outside die area.
+[GRT-0036] Pin FrameStrobe[11] is outside die area.
+[GRT-0036] Pin FrameStrobe[12] is outside die area.
+[GRT-0036] Pin FrameStrobe[13] is outside die area.
+[GRT-0036] Pin FrameStrobe[14] is outside die area.
+[GRT-0036] Pin FrameStrobe[15] is outside die area.
+[GRT-0036] Pin FrameStrobe[16] is outside die area.
+[GRT-0036] Pin FrameStrobe[17] is outside die area.
+[GRT-0036] Pin FrameStrobe[18] is outside die area.
+[GRT-0036] Pin FrameStrobe[19] is outside die area.
+[GRT-0036] Pin FrameStrobe[1] is outside die area.
+[GRT-0036] Pin FrameStrobe[2] is outside die area.
+[GRT-0036] Pin FrameStrobe[3] is outside die area.
+[GRT-0036] Pin FrameStrobe[4] is outside die area.
+[GRT-0036] Pin FrameStrobe[5] is outside die area.
+[GRT-0036] Pin FrameStrobe[6] is outside die area.
+[GRT-0036] Pin FrameStrobe[7] is outside die area.
+[GRT-0036] Pin FrameStrobe[8] is outside die area.
+[GRT-0036] Pin FrameStrobe[9] is outside die area.
+[GRT-0036] Pin FrameStrobe_O[0] is outside die area.
+[GRT-0036] Pin FrameStrobe_O[10] is outside die area.
+[GRT-0036] Pin FrameStrobe_O[11] is outside die area.
+[GRT-0036] Pin FrameStrobe_O[12] is outside die area.
+[GRT-0036] Pin FrameStrobe_O[13] is outside die area.
+[GRT-0036] Pin FrameStrobe_O[14] is outside die area.
+[GRT-0036] Pin FrameStrobe_O[15] is outside die area.
+[GRT-0036] Pin FrameStrobe_O[16] is outside die area.
+[GRT-0036] Pin FrameStrobe_O[17] is outside die area.
+[GRT-0036] Pin FrameStrobe_O[18] is outside die area.
+[GRT-0036] Pin FrameStrobe_O[19] is outside die area.
+[GRT-0036] Pin FrameStrobe_O[1] is outside die area.
+[GRT-0036] Pin FrameStrobe_O[2] is outside die area.
+[GRT-0036] Pin FrameStrobe_O[3] is outside die area.
+[GRT-0036] Pin FrameStrobe_O[4] is outside die area.
+[GRT-0036] Pin FrameStrobe_O[5] is outside die area.
+[GRT-0036] Pin FrameStrobe_O[6] is outside die area.
+[GRT-0036] Pin FrameStrobe_O[7] is outside die area.
+[GRT-0036] Pin FrameStrobe_O[8] is outside die area.
+[GRT-0036] Pin FrameStrobe_O[9] is outside die area.
+[GRT-0036] Pin N1BEG[0] is outside die area.
+[GRT-0036] Pin N1BEG[1] is outside die area.
+[GRT-0036] Pin N1BEG[2] is outside die area.
+[GRT-0036] Pin N1BEG[3] is outside die area.
+[GRT-0036] Pin N1END[0] is outside die area.
+[GRT-0036] Pin N1END[1] is outside die area.
+[GRT-0036] Pin N1END[2] is outside die area.
+[GRT-0036] Pin N1END[3] is outside die area.
+[GRT-0036] Pin N2BEG[0] is outside die area.
+[GRT-0036] Pin N2BEG[1] is outside die area.
+[GRT-0036] Pin N2BEG[2] is outside die area.
+[GRT-0036] Pin N2BEG[3] is outside die area.
+[GRT-0036] Pin N2BEG[4] is outside die area.
+[GRT-0036] Pin N2BEG[5] is outside die area.
+[GRT-0036] Pin N2BEG[6] is outside die area.
+[GRT-0036] Pin N2BEG[7] is outside die area.
+[GRT-0036] Pin N2BEGb[0] is outside die area.
+[GRT-0036] Pin N2BEGb[1] is outside die area.
+[GRT-0036] Pin N2BEGb[2] is outside die area.
+[GRT-0036] Pin N2BEGb[3] is outside die area.
+[GRT-0036] Pin N2BEGb[4] is outside die area.
+[GRT-0036] Pin N2BEGb[5] is outside die area.
+[GRT-0036] Pin N2BEGb[6] is outside die area.
+[GRT-0036] Pin N2BEGb[7] is outside die area.
+[GRT-0036] Pin N2END[0] is outside die area.
+[GRT-0036] Pin N2END[1] is outside die area.
+[GRT-0036] Pin N2END[2] is outside die area.
+[GRT-0036] Pin N2END[3] is outside die area.
+[GRT-0036] Pin N2END[4] is outside die area.
+[GRT-0036] Pin N2END[5] is outside die area.
+[GRT-0036] Pin N2END[6] is outside die area.
+[GRT-0036] Pin N2END[7] is outside die area.
+[GRT-0036] Pin N2MID[0] is outside die area.
+[GRT-0036] Pin N2MID[1] is outside die area.
+[GRT-0036] Pin N2MID[2] is outside die area.
+[GRT-0036] Pin N2MID[3] is outside die area.
+[GRT-0036] Pin N2MID[4] is outside die area.
+[GRT-0036] Pin N2MID[5] is outside die area.
+[GRT-0036] Pin N2MID[6] is outside die area.
+[GRT-0036] Pin N2MID[7] is outside die area.
+[GRT-0036] Pin N4BEG[0] is outside die area.
+[GRT-0036] Pin N4BEG[10] is outside die area.
+[GRT-0036] Pin N4BEG[11] is outside die area.
+[GRT-0036] Pin N4BEG[12] is outside die area.
+[GRT-0036] Pin N4BEG[13] is outside die area.
+[GRT-0036] Pin N4BEG[14] is outside die area.
+[GRT-0036] Pin N4BEG[15] is outside die area.
+[GRT-0036] Pin N4BEG[1] is outside die area.
+[GRT-0036] Pin N4BEG[2] is outside die area.
+[GRT-0036] Pin N4BEG[3] is outside die area.
+[GRT-0036] Pin N4BEG[4] is outside die area.
+[GRT-0036] Pin N4BEG[5] is outside die area.
+[GRT-0036] Pin N4BEG[6] is outside die area.
+[GRT-0036] Pin N4BEG[7] is outside die area.
+[GRT-0036] Pin N4BEG[8] is outside die area.
+[GRT-0036] Pin N4BEG[9] is outside die area.
+[GRT-0036] Pin N4END[0] is outside die area.
+[GRT-0036] Pin N4END[10] is outside die area.
+[GRT-0036] Pin N4END[11] is outside die area.
+[GRT-0036] Pin N4END[12] is outside die area.
+[GRT-0036] Pin N4END[13] is outside die area.
+[GRT-0036] Pin N4END[14] is outside die area.
+[GRT-0036] Pin N4END[15] is outside die area.
+[GRT-0036] Pin N4END[1] is outside die area.
+[GRT-0036] Pin N4END[2] is outside die area.
+[GRT-0036] Pin N4END[3] is outside die area.
+[GRT-0036] Pin N4END[4] is outside die area.
+[GRT-0036] Pin N4END[5] is outside die area.
+[GRT-0036] Pin N4END[6] is outside die area.
+[GRT-0036] Pin N4END[7] is outside die area.
+[GRT-0036] Pin N4END[8] is outside die area.
+[GRT-0036] Pin N4END[9] is outside die area.
+[GRT-0036] Pin NN4BEG[0] is outside die area.
+[GRT-0036] Pin NN4BEG[10] is outside die area.
+[GRT-0036] Pin NN4BEG[11] is outside die area.
+[GRT-0036] Pin NN4BEG[12] is outside die area.
+[GRT-0036] Pin NN4BEG[13] is outside die area.
+[GRT-0036] Pin NN4BEG[14] is outside die area.
+[GRT-0036] Pin NN4BEG[15] is outside die area.
+[GRT-0036] Pin NN4BEG[1] is outside die area.
+[GRT-0036] Pin NN4BEG[2] is outside die area.
+[GRT-0036] Pin NN4BEG[3] is outside die area.
+[GRT-0036] Pin NN4BEG[4] is outside die area.
+[GRT-0036] Pin NN4BEG[5] is outside die area.
+[GRT-0036] Pin NN4BEG[6] is outside die area.
+[GRT-0036] Pin NN4BEG[7] is outside die area.
+[GRT-0036] Pin NN4BEG[8] is outside die area.
+[GRT-0036] Pin NN4BEG[9] is outside die area.
+[GRT-0036] Pin NN4END[0] is outside die area.
+[GRT-0036] Pin NN4END[10] is outside die area.
+[GRT-0036] Pin NN4END[11] is outside die area.
+[GRT-0036] Pin NN4END[12] is outside die area.
+[GRT-0036] Pin NN4END[13] is outside die area.
+[GRT-0036] Pin NN4END[14] is outside die area.
+[GRT-0036] Pin NN4END[15] is outside die area.
+[GRT-0036] Pin NN4END[1] is outside die area.
+[GRT-0036] Pin NN4END[2] is outside die area.
+[GRT-0036] Pin NN4END[3] is outside die area.
+[GRT-0036] Pin NN4END[4] is outside die area.
+[GRT-0036] Pin NN4END[5] is outside die area.
+[GRT-0036] Pin NN4END[6] is outside die area.
+[GRT-0036] Pin NN4END[7] is outside die area.
+[GRT-0036] Pin NN4END[8] is outside die area.
+[GRT-0036] Pin NN4END[9] is outside die area.
+[GRT-0036] Pin S1BEG[0] is outside die area.
+[GRT-0036] Pin S1BEG[1] is outside die area.
+[GRT-0036] Pin S1BEG[2] is outside die area.
+[GRT-0036] Pin S1BEG[3] is outside die area.
+[GRT-0036] Pin S1END[0] is outside die area.
+[GRT-0036] Pin S1END[1] is outside die area.
+[GRT-0036] Pin S1END[2] is outside die area.
+[GRT-0036] Pin S1END[3] is outside die area.
+[GRT-0036] Pin S2BEG[0] is outside die area.
+[GRT-0036] Pin S2BEG[1] is outside die area.
+[GRT-0036] Pin S2BEG[2] is outside die area.
+[GRT-0036] Pin S2BEG[3] is outside die area.
+[GRT-0036] Pin S2BEG[4] is outside die area.
+[GRT-0036] Pin S2BEG[5] is outside die area.
+[GRT-0036] Pin S2BEG[6] is outside die area.
+[GRT-0036] Pin S2BEG[7] is outside die area.
+[GRT-0036] Pin S2BEGb[0] is outside die area.
+[GRT-0036] Pin S2BEGb[1] is outside die area.
+[GRT-0036] Pin S2BEGb[2] is outside die area.
+[GRT-0036] Pin S2BEGb[3] is outside die area.
+[GRT-0036] Pin S2BEGb[4] is outside die area.
+[GRT-0036] Pin S2BEGb[5] is outside die area.
+[GRT-0036] Pin S2BEGb[6] is outside die area.
+[GRT-0036] Pin S2BEGb[7] is outside die area.
+[GRT-0036] Pin S2END[0] is outside die area.
+[GRT-0036] Pin S2END[1] is outside die area.
+[GRT-0036] Pin S2END[2] is outside die area.
+[GRT-0036] Pin S2END[3] is outside die area.
+[GRT-0036] Pin S2END[4] is outside die area.
+[GRT-0036] Pin S2END[5] is outside die area.
+[GRT-0036] Pin S2END[6] is outside die area.
+[GRT-0036] Pin S2END[7] is outside die area.
+[GRT-0036] Pin S2MID[0] is outside die area.
+[GRT-0036] Pin S2MID[1] is outside die area.
+[GRT-0036] Pin S2MID[2] is outside die area.
+[GRT-0036] Pin S2MID[3] is outside die area.
+[GRT-0036] Pin S2MID[4] is outside die area.
+[GRT-0036] Pin S2MID[5] is outside die area.
+[GRT-0036] Pin S2MID[6] is outside die area.
+[GRT-0036] Pin S2MID[7] is outside die area.
+[GRT-0036] Pin S4BEG[0] is outside die area.
+[GRT-0036] Pin S4BEG[10] is outside die area.
+[GRT-0036] Pin S4BEG[11] is outside die area.
+[GRT-0036] Pin S4BEG[12] is outside die area.
+[GRT-0036] Pin S4BEG[13] is outside die area.
+[GRT-0036] Pin S4BEG[14] is outside die area.
+[GRT-0036] Pin S4BEG[15] is outside die area.
+[GRT-0036] Pin S4BEG[1] is outside die area.
+[GRT-0036] Pin S4BEG[2] is outside die area.
+[GRT-0036] Pin S4BEG[3] is outside die area.
+[GRT-0036] Pin S4BEG[4] is outside die area.
+[GRT-0036] Pin S4BEG[5] is outside die area.
+[GRT-0036] Pin S4BEG[6] is outside die area.
+[GRT-0036] Pin S4BEG[7] is outside die area.
+[GRT-0036] Pin S4BEG[8] is outside die area.
+[GRT-0036] Pin S4BEG[9] is outside die area.
+[GRT-0036] Pin S4END[0] is outside die area.
+[GRT-0036] Pin S4END[10] is outside die area.
+[GRT-0036] Pin S4END[11] is outside die area.
+[GRT-0036] Pin S4END[12] is outside die area.
+[GRT-0036] Pin S4END[13] is outside die area.
+[GRT-0036] Pin S4END[14] is outside die area.
+[GRT-0036] Pin S4END[15] is outside die area.
+[GRT-0036] Pin S4END[1] is outside die area.
+[GRT-0036] Pin S4END[2] is outside die area.
+[GRT-0036] Pin S4END[3] is outside die area.
+[GRT-0036] Pin S4END[4] is outside die area.
+[GRT-0036] Pin S4END[5] is outside die area.
+[GRT-0036] Pin S4END[6] is outside die area.
+[GRT-0036] Pin S4END[7] is outside die area.
+[GRT-0036] Pin S4END[8] is outside die area.
+[GRT-0036] Pin S4END[9] is outside die area.
+[GRT-0036] Pin SS4BEG[0] is outside die area.
+[GRT-0036] Pin SS4BEG[10] is outside die area.
+[GRT-0036] Pin SS4BEG[11] is outside die area.
+[GRT-0036] Pin SS4BEG[12] is outside die area.
+[GRT-0036] Pin SS4BEG[13] is outside die area.
+[GRT-0036] Pin SS4BEG[14] is outside die area.
+[GRT-0036] Pin SS4BEG[15] is outside die area.
+[GRT-0036] Pin SS4BEG[1] is outside die area.
+[GRT-0036] Pin SS4BEG[2] is outside die area.
+[GRT-0036] Pin SS4BEG[3] is outside die area.
+[GRT-0036] Pin SS4BEG[4] is outside die area.
+[GRT-0036] Pin SS4BEG[5] is outside die area.
+[GRT-0036] Pin SS4BEG[6] is outside die area.
+[GRT-0036] Pin SS4BEG[7] is outside die area.
+[GRT-0036] Pin SS4BEG[8] is outside die area.
+[GRT-0036] Pin SS4BEG[9] is outside die area.
+[GRT-0036] Pin SS4END[0] is outside die area.
+[GRT-0036] Pin SS4END[10] is outside die area.
+[GRT-0036] Pin SS4END[11] is outside die area.
+[GRT-0036] Pin SS4END[12] is outside die area.
+[GRT-0036] Pin SS4END[13] is outside die area.
+[GRT-0036] Pin SS4END[14] is outside die area.
+[GRT-0036] Pin SS4END[15] is outside die area.
+[GRT-0036] Pin SS4END[1] is outside die area.
+[GRT-0036] Pin SS4END[2] is outside die area.
+[GRT-0036] Pin SS4END[3] is outside die area.
+[GRT-0036] Pin SS4END[4] is outside die area.
+[GRT-0036] Pin SS4END[5] is outside die area.
+[GRT-0036] Pin SS4END[6] is outside die area.
+[GRT-0036] Pin SS4END[7] is outside die area.
+[GRT-0036] Pin SS4END[8] is outside die area.
+[GRT-0036] Pin SS4END[9] is outside die area.
+[GRT-0036] Pin UserCLK is outside die area.
+[GRT-0036] Pin UserCLKo is outside die area.
+[GRT-0036] Pin W1BEG[0] is outside die area.
+[GRT-0036] Pin W1BEG[1] is outside die area.
+[GRT-0036] Pin W1BEG[2] is outside die area.
+[GRT-0036] Pin W1BEG[3] is outside die area.
+[GRT-0036] Pin W1END[0] is outside die area.
+[GRT-0036] Pin W1END[1] is outside die area.
+[GRT-0036] Pin W1END[2] is outside die area.
+[GRT-0036] Pin W1END[3] is outside die area.
+[GRT-0036] Pin W2BEG[0] is outside die area.
+[GRT-0036] Pin W2BEG[1] is outside die area.
+[GRT-0036] Pin W2BEG[2] is outside die area.
+[GRT-0036] Pin W2BEG[3] is outside die area.
+[GRT-0036] Pin W2BEG[4] is outside die area.
+[GRT-0036] Pin W2BEG[5] is outside die area.
+[GRT-0036] Pin W2BEG[6] is outside die area.
+[GRT-0036] Pin W2BEG[7] is outside die area.
+[GRT-0036] Pin W2BEGb[0] is outside die area.
+[GRT-0036] Pin W2BEGb[1] is outside die area.
+[GRT-0036] Pin W2BEGb[2] is outside die area.
+[GRT-0036] Pin W2BEGb[3] is outside die area.
+[GRT-0036] Pin W2BEGb[4] is outside die area.
+[GRT-0036] Pin W2BEGb[5] is outside die area.
+[GRT-0036] Pin W2BEGb[6] is outside die area.
+[GRT-0036] Pin W2BEGb[7] is outside die area.
+[GRT-0036] Pin W2END[0] is outside die area.
+[GRT-0036] Pin W2END[1] is outside die area.
+[GRT-0036] Pin W2END[2] is outside die area.
+[GRT-0036] Pin W2END[3] is outside die area.
+[GRT-0036] Pin W2END[4] is outside die area.
+[GRT-0036] Pin W2END[5] is outside die area.
+[GRT-0036] Pin W2END[6] is outside die area.
+[GRT-0036] Pin W2END[7] is outside die area.
+[GRT-0036] Pin W2MID[0] is outside die area.
+[GRT-0036] Pin W2MID[1] is outside die area.
+[GRT-0036] Pin W2MID[2] is outside die area.
+[GRT-0036] Pin W2MID[3] is outside die area.
+[GRT-0036] Pin W2MID[4] is outside die area.
+[GRT-0036] Pin W2MID[5] is outside die area.
+[GRT-0036] Pin W2MID[6] is outside die area.
+[GRT-0036] Pin W2MID[7] is outside die area.
+[GRT-0036] Pin W6BEG[0] is outside die area.
+[GRT-0036] Pin W6BEG[10] is outside die area.
+[GRT-0036] Pin W6BEG[11] is outside die area.
+[GRT-0036] Pin W6BEG[1] is outside die area.
+[GRT-0036] Pin W6BEG[2] is outside die area.
+[GRT-0036] Pin W6BEG[3] is outside die area.
+[GRT-0036] Pin W6BEG[4] is outside die area.
+[GRT-0036] Pin W6BEG[5] is outside die area.
+[GRT-0036] Pin W6BEG[6] is outside die area.
+[GRT-0036] Pin W6BEG[7] is outside die area.
+[GRT-0036] Pin W6BEG[8] is outside die area.
+[GRT-0036] Pin W6BEG[9] is outside die area.
+[GRT-0036] Pin W6END[0] is outside die area.
+[GRT-0036] Pin W6END[10] is outside die area.
+[GRT-0036] Pin W6END[11] is outside die area.
+[GRT-0036] Pin W6END[1] is outside die area.
+[GRT-0036] Pin W6END[2] is outside die area.
+[GRT-0036] Pin W6END[3] is outside die area.
+[GRT-0036] Pin W6END[4] is outside die area.
+[GRT-0036] Pin W6END[5] is outside die area.
+[GRT-0036] Pin W6END[6] is outside die area.
+[GRT-0036] Pin W6END[7] is outside die area.
+[GRT-0036] Pin W6END[8] is outside die area.
+[GRT-0036] Pin W6END[9] is outside die area.
+[GRT-0036] Pin WW4BEG[0] is outside die area.
+[GRT-0036] Pin WW4BEG[10] is outside die area.
+[GRT-0036] Pin WW4BEG[11] is outside die area.
+[GRT-0036] Pin WW4BEG[12] is outside die area.
+[GRT-0036] Pin WW4BEG[13] is outside die area.
+[GRT-0036] Pin WW4BEG[14] is outside die area.
+[GRT-0036] Pin WW4BEG[15] is outside die area.
+[GRT-0036] Pin WW4BEG[1] is outside die area.
+[GRT-0036] Pin WW4BEG[2] is outside die area.
+[GRT-0036] Pin WW4BEG[3] is outside die area.
+[GRT-0036] Pin WW4BEG[4] is outside die area.
+[GRT-0036] Pin WW4BEG[5] is outside die area.
+[GRT-0036] Pin WW4BEG[6] is outside die area.
+[GRT-0036] Pin WW4BEG[7] is outside die area.
+[GRT-0036] Pin WW4BEG[8] is outside die area.
+[GRT-0036] Pin WW4BEG[9] is outside die area.
+[GRT-0036] Pin WW4END[0] is outside die area.
+[GRT-0036] Pin WW4END[10] is outside die area.
+[GRT-0036] Pin WW4END[11] is outside die area.
+[GRT-0036] Pin WW4END[12] is outside die area.
+[GRT-0036] Pin WW4END[13] is outside die area.
+[GRT-0036] Pin WW4END[14] is outside die area.
+[GRT-0036] Pin WW4END[15] is outside die area.
+[GRT-0036] Pin WW4END[1] is outside die area.
+[GRT-0036] Pin WW4END[2] is outside die area.
+[GRT-0036] Pin WW4END[3] is outside die area.
+[GRT-0036] Pin WW4END[4] is outside die area.
+[GRT-0036] Pin WW4END[5] is outside die area.
+[GRT-0036] Pin WW4END[6] is outside die area.
+[GRT-0036] Pin WW4END[7] is outside die area.
+[GRT-0036] Pin WW4END[8] is outside die area.
+[GRT-0036] Pin WW4END[9] is outside die area.
+Running 'OpenROAD.CheckAntennas' at 'Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/37-openroad-checkantennas'…
+Logging subprocess to [repr.filename]'Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/37-openroad-checkantennas/openroad-checkantennas.log'[/repr.filename]…
+[STA-0366] port '__VIRTUAL_CLK__' not found.
+[STA-0366] port '__VIRTUAL_CLK__' not found.
+[STA-0419] transition time can not be specified for virtual clocks.
+[STA-0450] virtual clock __VIRTUAL_CLK__ can not be propagated.
+Gating variable for step 'OpenROAD.RepairDesignPostGRT' set to 'False'- the step will be skipped.
+Skipping step 'Repair Design (Post-Global Routing)'…
+Running 'Odb.DiodesOnPorts' at 'Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/38-odb-diodesonports'…
+'DIODE_ON_PORTS' is set to 'none': skipping…
+Gating variable for step 'Odb.HeuristicDiodeInsertion' set to 'False'- the step will be skipped.
+Skipping step 'Heuristic Diode Insertion'…
+Running 'OpenROAD.RepairAntennas' at 'Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/39-openroad-repairantennas'…
+Running 'DiodeInsertion' at 'Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/39-openroad-repairantennas/1-diodeinsertion'…
+Logging subprocess to [repr.filename]'Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/39-openroad-repairantennas/1-diodeinsertion/diodeinsertion.log'[/repr.filename]…
+[STA-0366] port '__VIRTUAL_CLK__' not found.
+[STA-0366] port '__VIRTUAL_CLK__' not found.
+[STA-0419] transition time can not be specified for virtual clocks.
+[STA-0450] virtual clock __VIRTUAL_CLK__ can not be propagated.
+[STA-0450] virtual clock __VIRTUAL_CLK__ can not be propagated.
+[GRT-0036] Pin Ci is outside die area.
+[GRT-0036] Pin Co is outside die area.
+[GRT-0036] Pin E1BEG[0] is outside die area.
+[GRT-0036] Pin E1BEG[1] is outside die area.
+[GRT-0036] Pin E1BEG[2] is outside die area.
+[GRT-0036] Pin E1BEG[3] is outside die area.
+[GRT-0036] Pin E1END[0] is outside die area.
+[GRT-0036] Pin E1END[1] is outside die area.
+[GRT-0036] Pin E1END[2] is outside die area.
+[GRT-0036] Pin E1END[3] is outside die area.
+[GRT-0036] Pin E2BEG[0] is outside die area.
+[GRT-0036] Pin E2BEG[1] is outside die area.
+[GRT-0036] Pin E2BEG[2] is outside die area.
+[GRT-0036] Pin E2BEG[3] is outside die area.
+[GRT-0036] Pin E2BEG[4] is outside die area.
+[GRT-0036] Pin E2BEG[5] is outside die area.
+[GRT-0036] Pin E2BEG[6] is outside die area.
+[GRT-0036] Pin E2BEG[7] is outside die area.
+[GRT-0036] Pin E2BEGb[0] is outside die area.
+[GRT-0036] Pin E2BEGb[1] is outside die area.
+[GRT-0036] Pin E2BEGb[2] is outside die area.
+[GRT-0036] Pin E2BEGb[3] is outside die area.
+[GRT-0036] Pin E2BEGb[4] is outside die area.
+[GRT-0036] Pin E2BEGb[5] is outside die area.
+[GRT-0036] Pin E2BEGb[6] is outside die area.
+[GRT-0036] Pin E2BEGb[7] is outside die area.
+[GRT-0036] Pin E2END[0] is outside die area.
+[GRT-0036] Pin E2END[1] is outside die area.
+[GRT-0036] Pin E2END[2] is outside die area.
+[GRT-0036] Pin E2END[3] is outside die area.
+[GRT-0036] Pin E2END[4] is outside die area.
+[GRT-0036] Pin E2END[5] is outside die area.
+[GRT-0036] Pin E2END[6] is outside die area.
+[GRT-0036] Pin E2END[7] is outside die area.
+[GRT-0036] Pin E2MID[0] is outside die area.
+[GRT-0036] Pin E2MID[1] is outside die area.
+[GRT-0036] Pin E2MID[2] is outside die area.
+[GRT-0036] Pin E2MID[3] is outside die area.
+[GRT-0036] Pin E2MID[4] is outside die area.
+[GRT-0036] Pin E2MID[5] is outside die area.
+[GRT-0036] Pin E2MID[6] is outside die area.
+[GRT-0036] Pin E2MID[7] is outside die area.
+[GRT-0036] Pin E6BEG[0] is outside die area.
+[GRT-0036] Pin E6BEG[10] is outside die area.
+[GRT-0036] Pin E6BEG[11] is outside die area.
+[GRT-0036] Pin E6BEG[1] is outside die area.
+[GRT-0036] Pin E6BEG[2] is outside die area.
+[GRT-0036] Pin E6BEG[3] is outside die area.
+[GRT-0036] Pin E6BEG[4] is outside die area.
+[GRT-0036] Pin E6BEG[5] is outside die area.
+[GRT-0036] Pin E6BEG[6] is outside die area.
+[GRT-0036] Pin E6BEG[7] is outside die area.
+[GRT-0036] Pin E6BEG[8] is outside die area.
+[GRT-0036] Pin E6BEG[9] is outside die area.
+[GRT-0036] Pin E6END[0] is outside die area.
+[GRT-0036] Pin E6END[10] is outside die area.
+[GRT-0036] Pin E6END[11] is outside die area.
+[GRT-0036] Pin E6END[1] is outside die area.
+[GRT-0036] Pin E6END[2] is outside die area.
+[GRT-0036] Pin E6END[3] is outside die area.
+[GRT-0036] Pin E6END[4] is outside die area.
+[GRT-0036] Pin E6END[5] is outside die area.
+[GRT-0036] Pin E6END[6] is outside die area.
+[GRT-0036] Pin E6END[7] is outside die area.
+[GRT-0036] Pin E6END[8] is outside die area.
+[GRT-0036] Pin E6END[9] is outside die area.
+[GRT-0036] Pin EE4BEG[0] is outside die area.
+[GRT-0036] Pin EE4BEG[10] is outside die area.
+[GRT-0036] Pin EE4BEG[11] is outside die area.
+[GRT-0036] Pin EE4BEG[12] is outside die area.
+[GRT-0036] Pin EE4BEG[13] is outside die area.
+[GRT-0036] Pin EE4BEG[14] is outside die area.
+[GRT-0036] Pin EE4BEG[15] is outside die area.
+[GRT-0036] Pin EE4BEG[1] is outside die area.
+[GRT-0036] Pin EE4BEG[2] is outside die area.
+[GRT-0036] Pin EE4BEG[3] is outside die area.
+[GRT-0036] Pin EE4BEG[4] is outside die area.
+[GRT-0036] Pin EE4BEG[5] is outside die area.
+[GRT-0036] Pin EE4BEG[6] is outside die area.
+[GRT-0036] Pin EE4BEG[7] is outside die area.
+[GRT-0036] Pin EE4BEG[8] is outside die area.
+[GRT-0036] Pin EE4BEG[9] is outside die area.
+[GRT-0036] Pin EE4END[0] is outside die area.
+[GRT-0036] Pin EE4END[10] is outside die area.
+[GRT-0036] Pin EE4END[11] is outside die area.
+[GRT-0036] Pin EE4END[12] is outside die area.
+[GRT-0036] Pin EE4END[13] is outside die area.
+[GRT-0036] Pin EE4END[14] is outside die area.
+[GRT-0036] Pin EE4END[15] is outside die area.
+[GRT-0036] Pin EE4END[1] is outside die area.
+[GRT-0036] Pin EE4END[2] is outside die area.
+[GRT-0036] Pin EE4END[3] is outside die area.
+[GRT-0036] Pin EE4END[4] is outside die area.
+[GRT-0036] Pin EE4END[5] is outside die area.
+[GRT-0036] Pin EE4END[6] is outside die area.
+[GRT-0036] Pin EE4END[7] is outside die area.
+[GRT-0036] Pin EE4END[8] is outside die area.
+[GRT-0036] Pin EE4END[9] is outside die area.
+[GRT-0036] Pin FrameData[0] is outside die area.
+[GRT-0036] Pin FrameData[10] is outside die area.
+[GRT-0036] Pin FrameData[11] is outside die area.
+[GRT-0036] Pin FrameData[12] is outside die area.
+[GRT-0036] Pin FrameData[13] is outside die area.
+[GRT-0036] Pin FrameData[14] is outside die area.
+[GRT-0036] Pin FrameData[15] is outside die area.
+[GRT-0036] Pin FrameData[16] is outside die area.
+[GRT-0036] Pin FrameData[17] is outside die area.
+[GRT-0036] Pin FrameData[18] is outside die area.
+[GRT-0036] Pin FrameData[19] is outside die area.
+[GRT-0036] Pin FrameData[1] is outside die area.
+[GRT-0036] Pin FrameData[20] is outside die area.
+[GRT-0036] Pin FrameData[21] is outside die area.
+[GRT-0036] Pin FrameData[22] is outside die area.
+[GRT-0036] Pin FrameData[23] is outside die area.
+[GRT-0036] Pin FrameData[24] is outside die area.
+[GRT-0036] Pin FrameData[25] is outside die area.
+[GRT-0036] Pin FrameData[26] is outside die area.
+[GRT-0036] Pin FrameData[27] is outside die area.
+[GRT-0036] Pin FrameData[28] is outside die area.
+[GRT-0036] Pin FrameData[29] is outside die area.
+[GRT-0036] Pin FrameData[2] is outside die area.
+[GRT-0036] Pin FrameData[30] is outside die area.
+[GRT-0036] Pin FrameData[31] is outside die area.
+[GRT-0036] Pin FrameData[3] is outside die area.
+[GRT-0036] Pin FrameData[4] is outside die area.
+[GRT-0036] Pin FrameData[5] is outside die area.
+[GRT-0036] Pin FrameData[6] is outside die area.
+[GRT-0036] Pin FrameData[7] is outside die area.
+[GRT-0036] Pin FrameData[8] is outside die area.
+[GRT-0036] Pin FrameData[9] is outside die area.
+[GRT-0036] Pin FrameData_O[0] is outside die area.
+[GRT-0036] Pin FrameData_O[10] is outside die area.
+[GRT-0036] Pin FrameData_O[11] is outside die area.
+[GRT-0036] Pin FrameData_O[12] is outside die area.
+[GRT-0036] Pin FrameData_O[13] is outside die area.
+[GRT-0036] Pin FrameData_O[14] is outside die area.
+[GRT-0036] Pin FrameData_O[15] is outside die area.
+[GRT-0036] Pin FrameData_O[16] is outside die area.
+[GRT-0036] Pin FrameData_O[17] is outside die area.
+[GRT-0036] Pin FrameData_O[18] is outside die area.
+[GRT-0036] Pin FrameData_O[19] is outside die area.
+[GRT-0036] Pin FrameData_O[1] is outside die area.
+[GRT-0036] Pin FrameData_O[20] is outside die area.
+[GRT-0036] Pin FrameData_O[21] is outside die area.
+[GRT-0036] Pin FrameData_O[22] is outside die area.
+[GRT-0036] Pin FrameData_O[23] is outside die area.
+[GRT-0036] Pin FrameData_O[24] is outside die area.
+[GRT-0036] Pin FrameData_O[25] is outside die area.
+[GRT-0036] Pin FrameData_O[26] is outside die area.
+[GRT-0036] Pin FrameData_O[27] is outside die area.
+[GRT-0036] Pin FrameData_O[28] is outside die area.
+[GRT-0036] Pin FrameData_O[29] is outside die area.
+[GRT-0036] Pin FrameData_O[2] is outside die area.
+[GRT-0036] Pin FrameData_O[30] is outside die area.
+[GRT-0036] Pin FrameData_O[31] is outside die area.
+[GRT-0036] Pin FrameData_O[3] is outside die area.
+[GRT-0036] Pin FrameData_O[4] is outside die area.
+[GRT-0036] Pin FrameData_O[5] is outside die area.
+[GRT-0036] Pin FrameData_O[6] is outside die area.
+[GRT-0036] Pin FrameData_O[7] is outside die area.
+[GRT-0036] Pin FrameData_O[8] is outside die area.
+[GRT-0036] Pin FrameData_O[9] is outside die area.
+[GRT-0036] Pin FrameStrobe[0] is outside die area.
+[GRT-0036] Pin FrameStrobe[10] is outside die area.
+[GRT-0036] Pin FrameStrobe[11] is outside die area.
+[GRT-0036] Pin FrameStrobe[12] is outside die area.
+[GRT-0036] Pin FrameStrobe[13] is outside die area.
+[GRT-0036] Pin FrameStrobe[14] is outside die area.
+[GRT-0036] Pin FrameStrobe[15] is outside die area.
+[GRT-0036] Pin FrameStrobe[16] is outside die area.
+[GRT-0036] Pin FrameStrobe[17] is outside die area.
+[GRT-0036] Pin FrameStrobe[18] is outside die area.
+[GRT-0036] Pin FrameStrobe[19] is outside die area.
+[GRT-0036] Pin FrameStrobe[1] is outside die area.
+[GRT-0036] Pin FrameStrobe[2] is outside die area.
+[GRT-0036] Pin FrameStrobe[3] is outside die area.
+[GRT-0036] Pin FrameStrobe[4] is outside die area.
+[GRT-0036] Pin FrameStrobe[5] is outside die area.
+[GRT-0036] Pin FrameStrobe[6] is outside die area.
+[GRT-0036] Pin FrameStrobe[7] is outside die area.
+[GRT-0036] Pin FrameStrobe[8] is outside die area.
+[GRT-0036] Pin FrameStrobe[9] is outside die area.
+[GRT-0036] Pin FrameStrobe_O[0] is outside die area.
+[GRT-0036] Pin FrameStrobe_O[10] is outside die area.
+[GRT-0036] Pin FrameStrobe_O[11] is outside die area.
+[GRT-0036] Pin FrameStrobe_O[12] is outside die area.
+[GRT-0036] Pin FrameStrobe_O[13] is outside die area.
+[GRT-0036] Pin FrameStrobe_O[14] is outside die area.
+[GRT-0036] Pin FrameStrobe_O[15] is outside die area.
+[GRT-0036] Pin FrameStrobe_O[16] is outside die area.
+[GRT-0036] Pin FrameStrobe_O[17] is outside die area.
+[GRT-0036] Pin FrameStrobe_O[18] is outside die area.
+[GRT-0036] Pin FrameStrobe_O[19] is outside die area.
+[GRT-0036] Pin FrameStrobe_O[1] is outside die area.
+[GRT-0036] Pin FrameStrobe_O[2] is outside die area.
+[GRT-0036] Pin FrameStrobe_O[3] is outside die area.
+[GRT-0036] Pin FrameStrobe_O[4] is outside die area.
+[GRT-0036] Pin FrameStrobe_O[5] is outside die area.
+[GRT-0036] Pin FrameStrobe_O[6] is outside die area.
+[GRT-0036] Pin FrameStrobe_O[7] is outside die area.
+[GRT-0036] Pin FrameStrobe_O[8] is outside die area.
+[GRT-0036] Pin FrameStrobe_O[9] is outside die area.
+[GRT-0036] Pin N1BEG[0] is outside die area.
+[GRT-0036] Pin N1BEG[1] is outside die area.
+[GRT-0036] Pin N1BEG[2] is outside die area.
+[GRT-0036] Pin N1BEG[3] is outside die area.
+[GRT-0036] Pin N1END[0] is outside die area.
+[GRT-0036] Pin N1END[1] is outside die area.
+[GRT-0036] Pin N1END[2] is outside die area.
+[GRT-0036] Pin N1END[3] is outside die area.
+[GRT-0036] Pin N2BEG[0] is outside die area.
+[GRT-0036] Pin N2BEG[1] is outside die area.
+[GRT-0036] Pin N2BEG[2] is outside die area.
+[GRT-0036] Pin N2BEG[3] is outside die area.
+[GRT-0036] Pin N2BEG[4] is outside die area.
+[GRT-0036] Pin N2BEG[5] is outside die area.
+[GRT-0036] Pin N2BEG[6] is outside die area.
+[GRT-0036] Pin N2BEG[7] is outside die area.
+[GRT-0036] Pin N2BEGb[0] is outside die area.
+[GRT-0036] Pin N2BEGb[1] is outside die area.
+[GRT-0036] Pin N2BEGb[2] is outside die area.
+[GRT-0036] Pin N2BEGb[3] is outside die area.
+[GRT-0036] Pin N2BEGb[4] is outside die area.
+[GRT-0036] Pin N2BEGb[5] is outside die area.
+[GRT-0036] Pin N2BEGb[6] is outside die area.
+[GRT-0036] Pin N2BEGb[7] is outside die area.
+[GRT-0036] Pin N2END[0] is outside die area.
+[GRT-0036] Pin N2END[1] is outside die area.
+[GRT-0036] Pin N2END[2] is outside die area.
+[GRT-0036] Pin N2END[3] is outside die area.
+[GRT-0036] Pin N2END[4] is outside die area.
+[GRT-0036] Pin N2END[5] is outside die area.
+[GRT-0036] Pin N2END[6] is outside die area.
+[GRT-0036] Pin N2END[7] is outside die area.
+[GRT-0036] Pin N2MID[0] is outside die area.
+[GRT-0036] Pin N2MID[1] is outside die area.
+[GRT-0036] Pin N2MID[2] is outside die area.
+[GRT-0036] Pin N2MID[3] is outside die area.
+[GRT-0036] Pin N2MID[4] is outside die area.
+[GRT-0036] Pin N2MID[5] is outside die area.
+[GRT-0036] Pin N2MID[6] is outside die area.
+[GRT-0036] Pin N2MID[7] is outside die area.
+[GRT-0036] Pin N4BEG[0] is outside die area.
+[GRT-0036] Pin N4BEG[10] is outside die area.
+[GRT-0036] Pin N4BEG[11] is outside die area.
+[GRT-0036] Pin N4BEG[12] is outside die area.
+[GRT-0036] Pin N4BEG[13] is outside die area.
+[GRT-0036] Pin N4BEG[14] is outside die area.
+[GRT-0036] Pin N4BEG[15] is outside die area.
+[GRT-0036] Pin N4BEG[1] is outside die area.
+[GRT-0036] Pin N4BEG[2] is outside die area.
+[GRT-0036] Pin N4BEG[3] is outside die area.
+[GRT-0036] Pin N4BEG[4] is outside die area.
+[GRT-0036] Pin N4BEG[5] is outside die area.
+[GRT-0036] Pin N4BEG[6] is outside die area.
+[GRT-0036] Pin N4BEG[7] is outside die area.
+[GRT-0036] Pin N4BEG[8] is outside die area.
+[GRT-0036] Pin N4BEG[9] is outside die area.
+[GRT-0036] Pin N4END[0] is outside die area.
+[GRT-0036] Pin N4END[10] is outside die area.
+[GRT-0036] Pin N4END[11] is outside die area.
+[GRT-0036] Pin N4END[12] is outside die area.
+[GRT-0036] Pin N4END[13] is outside die area.
+[GRT-0036] Pin N4END[14] is outside die area.
+[GRT-0036] Pin N4END[15] is outside die area.
+[GRT-0036] Pin N4END[1] is outside die area.
+[GRT-0036] Pin N4END[2] is outside die area.
+[GRT-0036] Pin N4END[3] is outside die area.
+[GRT-0036] Pin N4END[4] is outside die area.
+[GRT-0036] Pin N4END[5] is outside die area.
+[GRT-0036] Pin N4END[6] is outside die area.
+[GRT-0036] Pin N4END[7] is outside die area.
+[GRT-0036] Pin N4END[8] is outside die area.
+[GRT-0036] Pin N4END[9] is outside die area.
+[GRT-0036] Pin NN4BEG[0] is outside die area.
+[GRT-0036] Pin NN4BEG[10] is outside die area.
+[GRT-0036] Pin NN4BEG[11] is outside die area.
+[GRT-0036] Pin NN4BEG[12] is outside die area.
+[GRT-0036] Pin NN4BEG[13] is outside die area.
+[GRT-0036] Pin NN4BEG[14] is outside die area.
+[GRT-0036] Pin NN4BEG[15] is outside die area.
+[GRT-0036] Pin NN4BEG[1] is outside die area.
+[GRT-0036] Pin NN4BEG[2] is outside die area.
+[GRT-0036] Pin NN4BEG[3] is outside die area.
+[GRT-0036] Pin NN4BEG[4] is outside die area.
+[GRT-0036] Pin NN4BEG[5] is outside die area.
+[GRT-0036] Pin NN4BEG[6] is outside die area.
+[GRT-0036] Pin NN4BEG[7] is outside die area.
+[GRT-0036] Pin NN4BEG[8] is outside die area.
+[GRT-0036] Pin NN4BEG[9] is outside die area.
+[GRT-0036] Pin NN4END[0] is outside die area.
+[GRT-0036] Pin NN4END[10] is outside die area.
+[GRT-0036] Pin NN4END[11] is outside die area.
+[GRT-0036] Pin NN4END[12] is outside die area.
+[GRT-0036] Pin NN4END[13] is outside die area.
+[GRT-0036] Pin NN4END[14] is outside die area.
+[GRT-0036] Pin NN4END[15] is outside die area.
+[GRT-0036] Pin NN4END[1] is outside die area.
+[GRT-0036] Pin NN4END[2] is outside die area.
+[GRT-0036] Pin NN4END[3] is outside die area.
+[GRT-0036] Pin NN4END[4] is outside die area.
+[GRT-0036] Pin NN4END[5] is outside die area.
+[GRT-0036] Pin NN4END[6] is outside die area.
+[GRT-0036] Pin NN4END[7] is outside die area.
+[GRT-0036] Pin NN4END[8] is outside die area.
+[GRT-0036] Pin NN4END[9] is outside die area.
+[GRT-0036] Pin S1BEG[0] is outside die area.
+[GRT-0036] Pin S1BEG[1] is outside die area.
+[GRT-0036] Pin S1BEG[2] is outside die area.
+[GRT-0036] Pin S1BEG[3] is outside die area.
+[GRT-0036] Pin S1END[0] is outside die area.
+[GRT-0036] Pin S1END[1] is outside die area.
+[GRT-0036] Pin S1END[2] is outside die area.
+[GRT-0036] Pin S1END[3] is outside die area.
+[GRT-0036] Pin S2BEG[0] is outside die area.
+[GRT-0036] Pin S2BEG[1] is outside die area.
+[GRT-0036] Pin S2BEG[2] is outside die area.
+[GRT-0036] Pin S2BEG[3] is outside die area.
+[GRT-0036] Pin S2BEG[4] is outside die area.
+[GRT-0036] Pin S2BEG[5] is outside die area.
+[GRT-0036] Pin S2BEG[6] is outside die area.
+[GRT-0036] Pin S2BEG[7] is outside die area.
+[GRT-0036] Pin S2BEGb[0] is outside die area.
+[GRT-0036] Pin S2BEGb[1] is outside die area.
+[GRT-0036] Pin S2BEGb[2] is outside die area.
+[GRT-0036] Pin S2BEGb[3] is outside die area.
+[GRT-0036] Pin S2BEGb[4] is outside die area.
+[GRT-0036] Pin S2BEGb[5] is outside die area.
+[GRT-0036] Pin S2BEGb[6] is outside die area.
+[GRT-0036] Pin S2BEGb[7] is outside die area.
+[GRT-0036] Pin S2END[0] is outside die area.
+[GRT-0036] Pin S2END[1] is outside die area.
+[GRT-0036] Pin S2END[2] is outside die area.
+[GRT-0036] Pin S2END[3] is outside die area.
+[GRT-0036] Pin S2END[4] is outside die area.
+[GRT-0036] Pin S2END[5] is outside die area.
+[GRT-0036] Pin S2END[6] is outside die area.
+[GRT-0036] Pin S2END[7] is outside die area.
+[GRT-0036] Pin S2MID[0] is outside die area.
+[GRT-0036] Pin S2MID[1] is outside die area.
+[GRT-0036] Pin S2MID[2] is outside die area.
+[GRT-0036] Pin S2MID[3] is outside die area.
+[GRT-0036] Pin S2MID[4] is outside die area.
+[GRT-0036] Pin S2MID[5] is outside die area.
+[GRT-0036] Pin S2MID[6] is outside die area.
+[GRT-0036] Pin S2MID[7] is outside die area.
+[GRT-0036] Pin S4BEG[0] is outside die area.
+[GRT-0036] Pin S4BEG[10] is outside die area.
+[GRT-0036] Pin S4BEG[11] is outside die area.
+[GRT-0036] Pin S4BEG[12] is outside die area.
+[GRT-0036] Pin S4BEG[13] is outside die area.
+[GRT-0036] Pin S4BEG[14] is outside die area.
+[GRT-0036] Pin S4BEG[15] is outside die area.
+[GRT-0036] Pin S4BEG[1] is outside die area.
+[GRT-0036] Pin S4BEG[2] is outside die area.
+[GRT-0036] Pin S4BEG[3] is outside die area.
+[GRT-0036] Pin S4BEG[4] is outside die area.
+[GRT-0036] Pin S4BEG[5] is outside die area.
+[GRT-0036] Pin S4BEG[6] is outside die area.
+[GRT-0036] Pin S4BEG[7] is outside die area.
+[GRT-0036] Pin S4BEG[8] is outside die area.
+[GRT-0036] Pin S4BEG[9] is outside die area.
+[GRT-0036] Pin S4END[0] is outside die area.
+[GRT-0036] Pin S4END[10] is outside die area.
+[GRT-0036] Pin S4END[11] is outside die area.
+[GRT-0036] Pin S4END[12] is outside die area.
+[GRT-0036] Pin S4END[13] is outside die area.
+[GRT-0036] Pin S4END[14] is outside die area.
+[GRT-0036] Pin S4END[15] is outside die area.
+[GRT-0036] Pin S4END[1] is outside die area.
+[GRT-0036] Pin S4END[2] is outside die area.
+[GRT-0036] Pin S4END[3] is outside die area.
+[GRT-0036] Pin S4END[4] is outside die area.
+[GRT-0036] Pin S4END[5] is outside die area.
+[GRT-0036] Pin S4END[6] is outside die area.
+[GRT-0036] Pin S4END[7] is outside die area.
+[GRT-0036] Pin S4END[8] is outside die area.
+[GRT-0036] Pin S4END[9] is outside die area.
+[GRT-0036] Pin SS4BEG[0] is outside die area.
+[GRT-0036] Pin SS4BEG[10] is outside die area.
+[GRT-0036] Pin SS4BEG[11] is outside die area.
+[GRT-0036] Pin SS4BEG[12] is outside die area.
+[GRT-0036] Pin SS4BEG[13] is outside die area.
+[GRT-0036] Pin SS4BEG[14] is outside die area.
+[GRT-0036] Pin SS4BEG[15] is outside die area.
+[GRT-0036] Pin SS4BEG[1] is outside die area.
+[GRT-0036] Pin SS4BEG[2] is outside die area.
+[GRT-0036] Pin SS4BEG[3] is outside die area.
+[GRT-0036] Pin SS4BEG[4] is outside die area.
+[GRT-0036] Pin SS4BEG[5] is outside die area.
+[GRT-0036] Pin SS4BEG[6] is outside die area.
+[GRT-0036] Pin SS4BEG[7] is outside die area.
+[GRT-0036] Pin SS4BEG[8] is outside die area.
+[GRT-0036] Pin SS4BEG[9] is outside die area.
+[GRT-0036] Pin SS4END[0] is outside die area.
+[GRT-0036] Pin SS4END[10] is outside die area.
+[GRT-0036] Pin SS4END[11] is outside die area.
+[GRT-0036] Pin SS4END[12] is outside die area.
+[GRT-0036] Pin SS4END[13] is outside die area.
+[GRT-0036] Pin SS4END[14] is outside die area.
+[GRT-0036] Pin SS4END[15] is outside die area.
+[GRT-0036] Pin SS4END[1] is outside die area.
+[GRT-0036] Pin SS4END[2] is outside die area.
+[GRT-0036] Pin SS4END[3] is outside die area.
+[GRT-0036] Pin SS4END[4] is outside die area.
+[GRT-0036] Pin SS4END[5] is outside die area.
+[GRT-0036] Pin SS4END[6] is outside die area.
+[GRT-0036] Pin SS4END[7] is outside die area.
+[GRT-0036] Pin SS4END[8] is outside die area.
+[GRT-0036] Pin SS4END[9] is outside die area.
+[GRT-0036] Pin UserCLK is outside die area.
+[GRT-0036] Pin UserCLKo is outside die area.
+[GRT-0036] Pin W1BEG[0] is outside die area.
+[GRT-0036] Pin W1BEG[1] is outside die area.
+[GRT-0036] Pin W1BEG[2] is outside die area.
+[GRT-0036] Pin W1BEG[3] is outside die area.
+[GRT-0036] Pin W1END[0] is outside die area.
+[GRT-0036] Pin W1END[1] is outside die area.
+[GRT-0036] Pin W1END[2] is outside die area.
+[GRT-0036] Pin W1END[3] is outside die area.
+[GRT-0036] Pin W2BEG[0] is outside die area.
+[GRT-0036] Pin W2BEG[1] is outside die area.
+[GRT-0036] Pin W2BEG[2] is outside die area.
+[GRT-0036] Pin W2BEG[3] is outside die area.
+[GRT-0036] Pin W2BEG[4] is outside die area.
+[GRT-0036] Pin W2BEG[5] is outside die area.
+[GRT-0036] Pin W2BEG[6] is outside die area.
+[GRT-0036] Pin W2BEG[7] is outside die area.
+[GRT-0036] Pin W2BEGb[0] is outside die area.
+[GRT-0036] Pin W2BEGb[1] is outside die area.
+[GRT-0036] Pin W2BEGb[2] is outside die area.
+[GRT-0036] Pin W2BEGb[3] is outside die area.
+[GRT-0036] Pin W2BEGb[4] is outside die area.
+[GRT-0036] Pin W2BEGb[5] is outside die area.
+[GRT-0036] Pin W2BEGb[6] is outside die area.
+[GRT-0036] Pin W2BEGb[7] is outside die area.
+[GRT-0036] Pin W2END[0] is outside die area.
+[GRT-0036] Pin W2END[1] is outside die area.
+[GRT-0036] Pin W2END[2] is outside die area.
+[GRT-0036] Pin W2END[3] is outside die area.
+[GRT-0036] Pin W2END[4] is outside die area.
+[GRT-0036] Pin W2END[5] is outside die area.
+[GRT-0036] Pin W2END[6] is outside die area.
+[GRT-0036] Pin W2END[7] is outside die area.
+[GRT-0036] Pin W2MID[0] is outside die area.
+[GRT-0036] Pin W2MID[1] is outside die area.
+[GRT-0036] Pin W2MID[2] is outside die area.
+[GRT-0036] Pin W2MID[3] is outside die area.
+[GRT-0036] Pin W2MID[4] is outside die area.
+[GRT-0036] Pin W2MID[5] is outside die area.
+[GRT-0036] Pin W2MID[6] is outside die area.
+[GRT-0036] Pin W2MID[7] is outside die area.
+[GRT-0036] Pin W6BEG[0] is outside die area.
+[GRT-0036] Pin W6BEG[10] is outside die area.
+[GRT-0036] Pin W6BEG[11] is outside die area.
+[GRT-0036] Pin W6BEG[1] is outside die area.
+[GRT-0036] Pin W6BEG[2] is outside die area.
+[GRT-0036] Pin W6BEG[3] is outside die area.
+[GRT-0036] Pin W6BEG[4] is outside die area.
+[GRT-0036] Pin W6BEG[5] is outside die area.
+[GRT-0036] Pin W6BEG[6] is outside die area.
+[GRT-0036] Pin W6BEG[7] is outside die area.
+[GRT-0036] Pin W6BEG[8] is outside die area.
+[GRT-0036] Pin W6BEG[9] is outside die area.
+[GRT-0036] Pin W6END[0] is outside die area.
+[GRT-0036] Pin W6END[10] is outside die area.
+[GRT-0036] Pin W6END[11] is outside die area.
+[GRT-0036] Pin W6END[1] is outside die area.
+[GRT-0036] Pin W6END[2] is outside die area.
+[GRT-0036] Pin W6END[3] is outside die area.
+[GRT-0036] Pin W6END[4] is outside die area.
+[GRT-0036] Pin W6END[5] is outside die area.
+[GRT-0036] Pin W6END[6] is outside die area.
+[GRT-0036] Pin W6END[7] is outside die area.
+[GRT-0036] Pin W6END[8] is outside die area.
+[GRT-0036] Pin W6END[9] is outside die area.
+[GRT-0036] Pin WW4BEG[0] is outside die area.
+[GRT-0036] Pin WW4BEG[10] is outside die area.
+[GRT-0036] Pin WW4BEG[11] is outside die area.
+[GRT-0036] Pin WW4BEG[12] is outside die area.
+[GRT-0036] Pin WW4BEG[13] is outside die area.
+[GRT-0036] Pin WW4BEG[14] is outside die area.
+[GRT-0036] Pin WW4BEG[15] is outside die area.
+[GRT-0036] Pin WW4BEG[1] is outside die area.
+[GRT-0036] Pin WW4BEG[2] is outside die area.
+[GRT-0036] Pin WW4BEG[3] is outside die area.
+[GRT-0036] Pin WW4BEG[4] is outside die area.
+[GRT-0036] Pin WW4BEG[5] is outside die area.
+[GRT-0036] Pin WW4BEG[6] is outside die area.
+[GRT-0036] Pin WW4BEG[7] is outside die area.
+[GRT-0036] Pin WW4BEG[8] is outside die area.
+[GRT-0036] Pin WW4BEG[9] is outside die area.
+[GRT-0036] Pin WW4END[0] is outside die area.
+[GRT-0036] Pin WW4END[10] is outside die area.
+[GRT-0036] Pin WW4END[11] is outside die area.
+[GRT-0036] Pin WW4END[12] is outside die area.
+[GRT-0036] Pin WW4END[13] is outside die area.
+[GRT-0036] Pin WW4END[14] is outside die area.
+[GRT-0036] Pin WW4END[15] is outside die area.
+[GRT-0036] Pin WW4END[1] is outside die area.
+[GRT-0036] Pin WW4END[2] is outside die area.
+[GRT-0036] Pin WW4END[3] is outside die area.
+[GRT-0036] Pin WW4END[4] is outside die area.
+[GRT-0036] Pin WW4END[5] is outside die area.
+[GRT-0036] Pin WW4END[6] is outside die area.
+[GRT-0036] Pin WW4END[7] is outside die area.
+[GRT-0036] Pin WW4END[8] is outside die area.
+[GRT-0036] Pin WW4END[9] is outside die area.
+[GRT-0036] Pin E1BEG[2] is outside die area.
+[GRT-0036] Pin E2BEG[0] is outside die area.
+[GRT-0036] Pin E2BEG[1] is outside die area.
+[GRT-0036] Pin E2BEG[2] is outside die area.
+[GRT-0036] Pin E2BEG[5] is outside die area.
+[GRT-0036] Pin E2BEG[7] is outside die area.
+[GRT-0036] Pin E2BEGb[1] is outside die area.
+[GRT-0036] Pin E2BEGb[7] is outside die area.
+[GRT-0036] Pin E2END[1] is outside die area.
+[GRT-0036] Pin E2MID[1] is outside die area.
+[GRT-0036] Pin E2MID[2] is outside die area.
+[GRT-0036] Pin E2MID[3] is outside die area.
+[GRT-0036] Pin E2MID[4] is outside die area.
+[GRT-0036] Pin E2MID[5] is outside die area.
+[GRT-0036] Pin E2MID[7] is outside die area.
+[GRT-0036] Pin E6BEG[2] is outside die area.
+[GRT-0036] Pin E6BEG[7] is outside die area.
+[GRT-0036] Pin E6BEG[9] is outside die area.
+[GRT-0036] Pin E6END[10] is outside die area.
+[GRT-0036] Pin E6END[3] is outside die area.
+[GRT-0036] Pin E6END[7] is outside die area.
+[GRT-0036] Pin E6END[8] is outside die area.
+[GRT-0036] Pin EE4BEG[11] is outside die area.
+[GRT-0036] Pin EE4BEG[14] is outside die area.
+[GRT-0036] Pin EE4BEG[3] is outside die area.
+[GRT-0036] Pin EE4BEG[9] is outside die area.
+[GRT-0036] Pin EE4END[10] is outside die area.
+[GRT-0036] Pin EE4END[11] is outside die area.
+[GRT-0036] Pin EE4END[12] is outside die area.
+[GRT-0036] Pin EE4END[4] is outside die area.
+[GRT-0036] Pin EE4END[5] is outside die area.
+[GRT-0036] Pin EE4END[6] is outside die area.
+[GRT-0036] Pin EE4END[8] is outside die area.
+[GRT-0036] Pin EE4END[9] is outside die area.
+[GRT-0036] Pin FrameData[0] is outside die area.
+[GRT-0036] Pin FrameData[17] is outside die area.
+[GRT-0036] Pin FrameData[1] is outside die area.
+[GRT-0036] Pin FrameData[21] is outside die area.
+[GRT-0036] Pin FrameData[25] is outside die area.
+[GRT-0036] Pin FrameData[26] is outside die area.
+[GRT-0036] Pin FrameData[27] is outside die area.
+[GRT-0036] Pin FrameData[28] is outside die area.
+[GRT-0036] Pin FrameData[29] is outside die area.
+[GRT-0036] Pin FrameData[30] is outside die area.
+[GRT-0036] Pin FrameData[31] is outside die area.
+[GRT-0036] Pin FrameData[4] is outside die area.
+[GRT-0036] Pin FrameData[6] is outside die area.
+[GRT-0036] Pin FrameData_O[13] is outside die area.
+[GRT-0036] Pin FrameData_O[16] is outside die area.
+[GRT-0036] Pin FrameData_O[17] is outside die area.
+[GRT-0036] Pin FrameData_O[30] is outside die area.
+[GRT-0036] Pin FrameData_O[6] is outside die area.
+[GRT-0036] Pin FrameStrobe[0] is outside die area.
+[GRT-0036] Pin FrameStrobe[10] is outside die area.
+[GRT-0036] Pin FrameStrobe[11] is outside die area.
+[GRT-0036] Pin FrameStrobe[12] is outside die area.
+[GRT-0036] Pin FrameStrobe[14] is outside die area.
+[GRT-0036] Pin FrameStrobe[15] is outside die area.
+[GRT-0036] Pin FrameStrobe[18] is outside die area.
+[GRT-0036] Pin FrameStrobe[19] is outside die area.
+[GRT-0036] Pin FrameStrobe[2] is outside die area.
+[GRT-0036] Pin FrameStrobe[3] is outside die area.
+[GRT-0036] Pin FrameStrobe[7] is outside die area.
+[GRT-0036] Pin FrameStrobe_O[0] is outside die area.
+[GRT-0036] Pin FrameStrobe_O[10] is outside die area.
+[GRT-0036] Pin FrameStrobe_O[17] is outside die area.
+[GRT-0036] Pin FrameStrobe_O[19] is outside die area.
+[GRT-0036] Pin FrameStrobe_O[1] is outside die area.
+[GRT-0036] Pin FrameStrobe_O[2] is outside die area.
+[GRT-0036] Pin FrameStrobe_O[3] is outside die area.
+[GRT-0036] Pin FrameStrobe_O[4] is outside die area.
+[GRT-0036] Pin FrameStrobe_O[5] is outside die area.
+[GRT-0036] Pin FrameStrobe_O[6] is outside die area.
+[GRT-0036] Pin FrameStrobe_O[7] is outside die area.
+[GRT-0036] Pin N1BEG[2] is outside die area.
+[GRT-0036] Pin N2BEG[1] is outside die area.
+[GRT-0036] Pin N2BEG[2] is outside die area.
+[GRT-0036] Pin N2BEG[3] is outside die area.
+[GRT-0036] Pin N2BEG[4] is outside die area.
+[GRT-0036] Pin N2BEG[7] is outside die area.
+[GRT-0036] Pin N2BEGb[6] is outside die area.
+[GRT-0036] Pin N2END[5] is outside die area.
+[GRT-0036] Pin N2MID[2] is outside die area.
+[GRT-0036] Pin N2MID[3] is outside die area.
+[GRT-0036] Pin N2MID[5] is outside die area.
+[GRT-0036] Pin N2MID[6] is outside die area.
+[GRT-0036] Pin N4BEG[12] is outside die area.
+[GRT-0036] Pin N4BEG[13] is outside die area.
+[GRT-0036] Pin N4BEG[14] is outside die area.
+[GRT-0036] Pin N4BEG[15] is outside die area.
+[GRT-0036] Pin N4BEG[7] is outside die area.
+[GRT-0036] Pin N4BEG[8] is outside die area.
+[GRT-0036] Pin N4END[10] is outside die area.
+[GRT-0036] Pin N4END[13] is outside die area.
+[GRT-0036] Pin N4END[15] is outside die area.
+[GRT-0036] Pin N4END[4] is outside die area.
+[GRT-0036] Pin N4END[5] is outside die area.
+[GRT-0036] Pin N4END[6] is outside die area.
+[GRT-0036] Pin N4END[7] is outside die area.
+[GRT-0036] Pin N4END[8] is outside die area.
+[GRT-0036] Pin N4END[9] is outside die area.
+[GRT-0036] Pin NN4BEG[3] is outside die area.
+[GRT-0036] Pin NN4BEG[8] is outside die area.
+[GRT-0036] Pin NN4END[10] is outside die area.
+[GRT-0036] Pin NN4END[11] is outside die area.
+[GRT-0036] Pin NN4END[13] is outside die area.
+[GRT-0036] Pin NN4END[14] is outside die area.
+[GRT-0036] Pin NN4END[15] is outside die area.
+[GRT-0036] Pin NN4END[5] is outside die area.
+[GRT-0036] Pin NN4END[6] is outside die area.
+[GRT-0036] Pin NN4END[9] is outside die area.
+[GRT-0036] Pin S1BEG[3] is outside die area.
+[GRT-0036] Pin S2BEG[7] is outside die area.
+[GRT-0036] Pin S2BEGb[7] is outside die area.
+[GRT-0036] Pin S2END[5] is outside die area.
+[GRT-0036] Pin S2MID[0] is outside die area.
+[GRT-0036] Pin S2MID[2] is outside die area.
+[GRT-0036] Pin S2MID[3] is outside die area.
+[GRT-0036] Pin S2MID[5] is outside die area.
+[GRT-0036] Pin S4BEG[10] is outside die area.
+[GRT-0036] Pin S4BEG[12] is outside die area.
+[GRT-0036] Pin S4BEG[13] is outside die area.
+[GRT-0036] Pin S4BEG[14] is outside die area.
+[GRT-0036] Pin S4BEG[15] is outside die area.
+[GRT-0036] Pin S4BEG[2] is outside die area.
+[GRT-0036] Pin S4BEG[6] is outside die area.
+[GRT-0036] Pin S4END[11] is outside die area.
+[GRT-0036] Pin S4END[12] is outside die area.
+[GRT-0036] Pin S4END[13] is outside die area.
+[GRT-0036] Pin S4END[15] is outside die area.
+[GRT-0036] Pin S4END[4] is outside die area.
+[GRT-0036] Pin S4END[5] is outside die area.
+[GRT-0036] Pin S4END[7] is outside die area.
+[GRT-0036] Pin S4END[8] is outside die area.
+[GRT-0036] Pin SS4BEG[12] is outside die area.
+[GRT-0036] Pin SS4BEG[14] is outside die area.
+[GRT-0036] Pin SS4BEG[2] is outside die area.
+[GRT-0036] Pin SS4BEG[4] is outside die area.
+[GRT-0036] Pin SS4END[10] is outside die area.
+[GRT-0036] Pin SS4END[11] is outside die area.
+[GRT-0036] Pin SS4END[12] is outside die area.
+[GRT-0036] Pin SS4END[13] is outside die area.
+[GRT-0036] Pin SS4END[14] is outside die area.
+[GRT-0036] Pin SS4END[4] is outside die area.
+[GRT-0036] Pin SS4END[5] is outside die area.
+[GRT-0036] Pin SS4END[7] is outside die area.
+[GRT-0036] Pin SS4END[9] is outside die area.
+[GRT-0036] Pin W1BEG[2] is outside die area.
+[GRT-0036] Pin W1BEG[3] is outside die area.
+[GRT-0036] Pin W2BEG[1] is outside die area.
+[GRT-0036] Pin W2BEG[2] is outside die area.
+[GRT-0036] Pin W2BEG[3] is outside die area.
+[GRT-0036] Pin W2BEG[7] is outside die area.
+[GRT-0036] Pin W2BEGb[0] is outside die area.
+[GRT-0036] Pin W2MID[0] is outside die area.
+[GRT-0036] Pin W2MID[2] is outside die area.
+[GRT-0036] Pin W2MID[3] is outside die area.
+[GRT-0036] Pin W2MID[4] is outside die area.
+[GRT-0036] Pin W2MID[5] is outside die area.
+[GRT-0036] Pin W2MID[6] is outside die area.
+[GRT-0036] Pin W6BEG[0] is outside die area.
+[GRT-0036] Pin W6BEG[2] is outside die area.
+[GRT-0036] Pin W6BEG[9] is outside die area.
+[GRT-0036] Pin W6END[10] is outside die area.
+[GRT-0036] Pin W6END[3] is outside die area.
+[GRT-0036] Pin W6END[5] is outside die area.
+[GRT-0036] Pin W6END[6] is outside die area.
+[GRT-0036] Pin W6END[9] is outside die area.
+[GRT-0036] Pin WW4BEG[0] is outside die area.
+[GRT-0036] Pin WW4BEG[8] is outside die area.
+[GRT-0036] Pin WW4END[10] is outside die area.
+[GRT-0036] Pin WW4END[11] is outside die area.
+[GRT-0036] Pin WW4END[12] is outside die area.
+[GRT-0036] Pin WW4END[13] is outside die area.
+[GRT-0036] Pin WW4END[14] is outside die area.
+[GRT-0036] Pin WW4END[15] is outside die area.
+[GRT-0036] Pin WW4END[5] is outside die area.
+[GRT-0036] Pin WW4END[6] is outside die area.
+[GRT-0036] Pin WW4END[7] is outside die area.
+[GRT-0036] Pin WW4END[8] is outside die area.
+[GRT-0036] Pin WW4END[9] is outside die area.
+[GRT-0036] Pin E6END[10] is outside die area.
+[GRT-0036] Pin Ci is outside die area.
+[GRT-0036] Pin Co is outside die area.
+[GRT-0036] Pin E1BEG[0] is outside die area.
+[GRT-0036] Pin E1BEG[1] is outside die area.
+[GRT-0036] Pin E1BEG[2] is outside die area.
+[GRT-0036] Pin E1BEG[3] is outside die area.
+[GRT-0036] Pin E1END[0] is outside die area.
+[GRT-0036] Pin E1END[1] is outside die area.
+[GRT-0036] Pin E1END[2] is outside die area.
+[GRT-0036] Pin E1END[3] is outside die area.
+[GRT-0036] Pin E2BEG[0] is outside die area.
+[GRT-0036] Pin E2BEG[1] is outside die area.
+[GRT-0036] Pin E2BEG[2] is outside die area.
+[GRT-0036] Pin E2BEG[3] is outside die area.
+[GRT-0036] Pin E2BEG[4] is outside die area.
+[GRT-0036] Pin E2BEG[5] is outside die area.
+[GRT-0036] Pin E2BEG[6] is outside die area.
+[GRT-0036] Pin E2BEG[7] is outside die area.
+[GRT-0036] Pin E2BEGb[0] is outside die area.
+[GRT-0036] Pin E2BEGb[1] is outside die area.
+[GRT-0036] Pin E2BEGb[2] is outside die area.
+[GRT-0036] Pin E2BEGb[3] is outside die area.
+[GRT-0036] Pin E2BEGb[4] is outside die area.
+[GRT-0036] Pin E2BEGb[5] is outside die area.
+[GRT-0036] Pin E2BEGb[6] is outside die area.
+[GRT-0036] Pin E2BEGb[7] is outside die area.
+[GRT-0036] Pin E2END[0] is outside die area.
+[GRT-0036] Pin E2END[1] is outside die area.
+[GRT-0036] Pin E2END[2] is outside die area.
+[GRT-0036] Pin E2END[3] is outside die area.
+[GRT-0036] Pin E2END[4] is outside die area.
+[GRT-0036] Pin E2END[5] is outside die area.
+[GRT-0036] Pin E2END[6] is outside die area.
+[GRT-0036] Pin E2END[7] is outside die area.
+[GRT-0036] Pin E2MID[0] is outside die area.
+[GRT-0036] Pin E2MID[1] is outside die area.
+[GRT-0036] Pin E2MID[2] is outside die area.
+[GRT-0036] Pin E2MID[3] is outside die area.
+[GRT-0036] Pin E2MID[4] is outside die area.
+[GRT-0036] Pin E2MID[5] is outside die area.
+[GRT-0036] Pin E2MID[6] is outside die area.
+[GRT-0036] Pin E2MID[7] is outside die area.
+[GRT-0036] Pin E6BEG[0] is outside die area.
+[GRT-0036] Pin E6BEG[10] is outside die area.
+[GRT-0036] Pin E6BEG[11] is outside die area.
+[GRT-0036] Pin E6BEG[1] is outside die area.
+[GRT-0036] Pin E6BEG[2] is outside die area.
+[GRT-0036] Pin E6BEG[3] is outside die area.
+[GRT-0036] Pin E6BEG[4] is outside die area.
+[GRT-0036] Pin E6BEG[5] is outside die area.
+[GRT-0036] Pin E6BEG[6] is outside die area.
+[GRT-0036] Pin E6BEG[7] is outside die area.
+[GRT-0036] Pin E6BEG[8] is outside die area.
+[GRT-0036] Pin E6BEG[9] is outside die area.
+[GRT-0036] Pin E6END[0] is outside die area.
+[GRT-0036] Pin E6END[10] is outside die area.
+[GRT-0036] Pin E6END[11] is outside die area.
+[GRT-0036] Pin E6END[1] is outside die area.
+[GRT-0036] Pin E6END[2] is outside die area.
+[GRT-0036] Pin E6END[3] is outside die area.
+[GRT-0036] Pin E6END[4] is outside die area.
+[GRT-0036] Pin E6END[5] is outside die area.
+[GRT-0036] Pin E6END[6] is outside die area.
+[GRT-0036] Pin E6END[7] is outside die area.
+[GRT-0036] Pin E6END[8] is outside die area.
+[GRT-0036] Pin E6END[9] is outside die area.
+[GRT-0036] Pin EE4BEG[0] is outside die area.
+[GRT-0036] Pin EE4BEG[10] is outside die area.
+[GRT-0036] Pin EE4BEG[11] is outside die area.
+[GRT-0036] Pin EE4BEG[12] is outside die area.
+[GRT-0036] Pin EE4BEG[13] is outside die area.
+[GRT-0036] Pin EE4BEG[14] is outside die area.
+[GRT-0036] Pin EE4BEG[15] is outside die area.
+[GRT-0036] Pin EE4BEG[1] is outside die area.
+[GRT-0036] Pin EE4BEG[2] is outside die area.
+[GRT-0036] Pin EE4BEG[3] is outside die area.
+[GRT-0036] Pin EE4BEG[4] is outside die area.
+[GRT-0036] Pin EE4BEG[5] is outside die area.
+[GRT-0036] Pin EE4BEG[6] is outside die area.
+[GRT-0036] Pin EE4BEG[7] is outside die area.
+[GRT-0036] Pin EE4BEG[8] is outside die area.
+[GRT-0036] Pin EE4BEG[9] is outside die area.
+[GRT-0036] Pin EE4END[0] is outside die area.
+[GRT-0036] Pin EE4END[10] is outside die area.
+[GRT-0036] Pin EE4END[11] is outside die area.
+[GRT-0036] Pin EE4END[12] is outside die area.
+[GRT-0036] Pin EE4END[13] is outside die area.
+[GRT-0036] Pin EE4END[14] is outside die area.
+[GRT-0036] Pin EE4END[15] is outside die area.
+[GRT-0036] Pin EE4END[1] is outside die area.
+[GRT-0036] Pin EE4END[2] is outside die area.
+[GRT-0036] Pin EE4END[3] is outside die area.
+[GRT-0036] Pin EE4END[4] is outside die area.
+[GRT-0036] Pin EE4END[5] is outside die area.
+[GRT-0036] Pin EE4END[6] is outside die area.
+[GRT-0036] Pin EE4END[7] is outside die area.
+[GRT-0036] Pin EE4END[8] is outside die area.
+[GRT-0036] Pin EE4END[9] is outside die area.
+[GRT-0036] Pin FrameData[0] is outside die area.
+[GRT-0036] Pin FrameData[10] is outside die area.
+[GRT-0036] Pin FrameData[11] is outside die area.
+[GRT-0036] Pin FrameData[12] is outside die area.
+[GRT-0036] Pin FrameData[13] is outside die area.
+[GRT-0036] Pin FrameData[14] is outside die area.
+[GRT-0036] Pin FrameData[15] is outside die area.
+[GRT-0036] Pin FrameData[16] is outside die area.
+[GRT-0036] Pin FrameData[17] is outside die area.
+[GRT-0036] Pin FrameData[18] is outside die area.
+[GRT-0036] Pin FrameData[19] is outside die area.
+[GRT-0036] Pin FrameData[1] is outside die area.
+[GRT-0036] Pin FrameData[20] is outside die area.
+[GRT-0036] Pin FrameData[21] is outside die area.
+[GRT-0036] Pin FrameData[22] is outside die area.
+[GRT-0036] Pin FrameData[23] is outside die area.
+[GRT-0036] Pin FrameData[24] is outside die area.
+[GRT-0036] Pin FrameData[25] is outside die area.
+[GRT-0036] Pin FrameData[26] is outside die area.
+[GRT-0036] Pin FrameData[27] is outside die area.
+[GRT-0036] Pin FrameData[28] is outside die area.
+[GRT-0036] Pin FrameData[29] is outside die area.
+[GRT-0036] Pin FrameData[2] is outside die area.
+[GRT-0036] Pin FrameData[30] is outside die area.
+[GRT-0036] Pin FrameData[31] is outside die area.
+[GRT-0036] Pin FrameData[3] is outside die area.
+[GRT-0036] Pin FrameData[4] is outside die area.
+[GRT-0036] Pin FrameData[5] is outside die area.
+[GRT-0036] Pin FrameData[6] is outside die area.
+[GRT-0036] Pin FrameData[7] is outside die area.
+[GRT-0036] Pin FrameData[8] is outside die area.
+[GRT-0036] Pin FrameData[9] is outside die area.
+[GRT-0036] Pin FrameData_O[0] is outside die area.
+[GRT-0036] Pin FrameData_O[10] is outside die area.
+[GRT-0036] Pin FrameData_O[11] is outside die area.
+[GRT-0036] Pin FrameData_O[12] is outside die area.
+[GRT-0036] Pin FrameData_O[13] is outside die area.
+[GRT-0036] Pin FrameData_O[14] is outside die area.
+[GRT-0036] Pin FrameData_O[15] is outside die area.
+[GRT-0036] Pin FrameData_O[16] is outside die area.
+[GRT-0036] Pin FrameData_O[17] is outside die area.
+[GRT-0036] Pin FrameData_O[18] is outside die area.
+[GRT-0036] Pin FrameData_O[19] is outside die area.
+[GRT-0036] Pin FrameData_O[1] is outside die area.
+[GRT-0036] Pin FrameData_O[20] is outside die area.
+[GRT-0036] Pin FrameData_O[21] is outside die area.
+[GRT-0036] Pin FrameData_O[22] is outside die area.
+[GRT-0036] Pin FrameData_O[23] is outside die area.
+[GRT-0036] Pin FrameData_O[24] is outside die area.
+[GRT-0036] Pin FrameData_O[25] is outside die area.
+[GRT-0036] Pin FrameData_O[26] is outside die area.
+[GRT-0036] Pin FrameData_O[27] is outside die area.
+[GRT-0036] Pin FrameData_O[28] is outside die area.
+[GRT-0036] Pin FrameData_O[29] is outside die area.
+[GRT-0036] Pin FrameData_O[2] is outside die area.
+[GRT-0036] Pin FrameData_O[30] is outside die area.
+[GRT-0036] Pin FrameData_O[31] is outside die area.
+[GRT-0036] Pin FrameData_O[3] is outside die area.
+[GRT-0036] Pin FrameData_O[4] is outside die area.
+[GRT-0036] Pin FrameData_O[5] is outside die area.
+[GRT-0036] Pin FrameData_O[6] is outside die area.
+[GRT-0036] Pin FrameData_O[7] is outside die area.
+[GRT-0036] Pin FrameData_O[8] is outside die area.
+[GRT-0036] Pin FrameData_O[9] is outside die area.
+[GRT-0036] Pin FrameStrobe[0] is outside die area.
+[GRT-0036] Pin FrameStrobe[10] is outside die area.
+[GRT-0036] Pin FrameStrobe[11] is outside die area.
+[GRT-0036] Pin FrameStrobe[12] is outside die area.
+[GRT-0036] Pin FrameStrobe[13] is outside die area.
+[GRT-0036] Pin FrameStrobe[14] is outside die area.
+[GRT-0036] Pin FrameStrobe[15] is outside die area.
+[GRT-0036] Pin FrameStrobe[16] is outside die area.
+[GRT-0036] Pin FrameStrobe[17] is outside die area.
+[GRT-0036] Pin FrameStrobe[18] is outside die area.
+[GRT-0036] Pin FrameStrobe[19] is outside die area.
+[GRT-0036] Pin FrameStrobe[1] is outside die area.
+[GRT-0036] Pin FrameStrobe[2] is outside die area.
+[GRT-0036] Pin FrameStrobe[3] is outside die area.
+[GRT-0036] Pin FrameStrobe[4] is outside die area.
+[GRT-0036] Pin FrameStrobe[5] is outside die area.
+[GRT-0036] Pin FrameStrobe[6] is outside die area.
+[GRT-0036] Pin FrameStrobe[7] is outside die area.
+[GRT-0036] Pin FrameStrobe[8] is outside die area.
+[GRT-0036] Pin FrameStrobe[9] is outside die area.
+[GRT-0036] Pin FrameStrobe_O[0] is outside die area.
+[GRT-0036] Pin FrameStrobe_O[10] is outside die area.
+[GRT-0036] Pin FrameStrobe_O[11] is outside die area.
+[GRT-0036] Pin FrameStrobe_O[12] is outside die area.
+[GRT-0036] Pin FrameStrobe_O[13] is outside die area.
+[GRT-0036] Pin FrameStrobe_O[14] is outside die area.
+[GRT-0036] Pin FrameStrobe_O[15] is outside die area.
+[GRT-0036] Pin FrameStrobe_O[16] is outside die area.
+[GRT-0036] Pin FrameStrobe_O[17] is outside die area.
+[GRT-0036] Pin FrameStrobe_O[18] is outside die area.
+[GRT-0036] Pin FrameStrobe_O[19] is outside die area.
+[GRT-0036] Pin FrameStrobe_O[1] is outside die area.
+[GRT-0036] Pin FrameStrobe_O[2] is outside die area.
+[GRT-0036] Pin FrameStrobe_O[3] is outside die area.
+[GRT-0036] Pin FrameStrobe_O[4] is outside die area.
+[GRT-0036] Pin FrameStrobe_O[5] is outside die area.
+[GRT-0036] Pin FrameStrobe_O[6] is outside die area.
+[GRT-0036] Pin FrameStrobe_O[7] is outside die area.
+[GRT-0036] Pin FrameStrobe_O[8] is outside die area.
+[GRT-0036] Pin FrameStrobe_O[9] is outside die area.
+[GRT-0036] Pin N1BEG[0] is outside die area.
+[GRT-0036] Pin N1BEG[1] is outside die area.
+[GRT-0036] Pin N1BEG[2] is outside die area.
+[GRT-0036] Pin N1BEG[3] is outside die area.
+[GRT-0036] Pin N1END[0] is outside die area.
+[GRT-0036] Pin N1END[1] is outside die area.
+[GRT-0036] Pin N1END[2] is outside die area.
+[GRT-0036] Pin N1END[3] is outside die area.
+[GRT-0036] Pin N2BEG[0] is outside die area.
+[GRT-0036] Pin N2BEG[1] is outside die area.
+[GRT-0036] Pin N2BEG[2] is outside die area.
+[GRT-0036] Pin N2BEG[3] is outside die area.
+[GRT-0036] Pin N2BEG[4] is outside die area.
+[GRT-0036] Pin N2BEG[5] is outside die area.
+[GRT-0036] Pin N2BEG[6] is outside die area.
+[GRT-0036] Pin N2BEG[7] is outside die area.
+[GRT-0036] Pin N2BEGb[0] is outside die area.
+[GRT-0036] Pin N2BEGb[1] is outside die area.
+[GRT-0036] Pin N2BEGb[2] is outside die area.
+[GRT-0036] Pin N2BEGb[3] is outside die area.
+[GRT-0036] Pin N2BEGb[4] is outside die area.
+[GRT-0036] Pin N2BEGb[5] is outside die area.
+[GRT-0036] Pin N2BEGb[6] is outside die area.
+[GRT-0036] Pin N2BEGb[7] is outside die area.
+[GRT-0036] Pin N2END[0] is outside die area.
+[GRT-0036] Pin N2END[1] is outside die area.
+[GRT-0036] Pin N2END[2] is outside die area.
+[GRT-0036] Pin N2END[3] is outside die area.
+[GRT-0036] Pin N2END[4] is outside die area.
+[GRT-0036] Pin N2END[5] is outside die area.
+[GRT-0036] Pin N2END[6] is outside die area.
+[GRT-0036] Pin N2END[7] is outside die area.
+[GRT-0036] Pin N2MID[0] is outside die area.
+[GRT-0036] Pin N2MID[1] is outside die area.
+[GRT-0036] Pin N2MID[2] is outside die area.
+[GRT-0036] Pin N2MID[3] is outside die area.
+[GRT-0036] Pin N2MID[4] is outside die area.
+[GRT-0036] Pin N2MID[5] is outside die area.
+[GRT-0036] Pin N2MID[6] is outside die area.
+[GRT-0036] Pin N2MID[7] is outside die area.
+[GRT-0036] Pin N4BEG[0] is outside die area.
+[GRT-0036] Pin N4BEG[10] is outside die area.
+[GRT-0036] Pin N4BEG[11] is outside die area.
+[GRT-0036] Pin N4BEG[12] is outside die area.
+[GRT-0036] Pin N4BEG[13] is outside die area.
+[GRT-0036] Pin N4BEG[14] is outside die area.
+[GRT-0036] Pin N4BEG[15] is outside die area.
+[GRT-0036] Pin N4BEG[1] is outside die area.
+[GRT-0036] Pin N4BEG[2] is outside die area.
+[GRT-0036] Pin N4BEG[3] is outside die area.
+[GRT-0036] Pin N4BEG[4] is outside die area.
+[GRT-0036] Pin N4BEG[5] is outside die area.
+[GRT-0036] Pin N4BEG[6] is outside die area.
+[GRT-0036] Pin N4BEG[7] is outside die area.
+[GRT-0036] Pin N4BEG[8] is outside die area.
+[GRT-0036] Pin N4BEG[9] is outside die area.
+[GRT-0036] Pin N4END[0] is outside die area.
+[GRT-0036] Pin N4END[10] is outside die area.
+[GRT-0036] Pin N4END[11] is outside die area.
+[GRT-0036] Pin N4END[12] is outside die area.
+[GRT-0036] Pin N4END[13] is outside die area.
+[GRT-0036] Pin N4END[14] is outside die area.
+[GRT-0036] Pin N4END[15] is outside die area.
+[GRT-0036] Pin N4END[1] is outside die area.
+[GRT-0036] Pin N4END[2] is outside die area.
+[GRT-0036] Pin N4END[3] is outside die area.
+[GRT-0036] Pin N4END[4] is outside die area.
+[GRT-0036] Pin N4END[5] is outside die area.
+[GRT-0036] Pin N4END[6] is outside die area.
+[GRT-0036] Pin N4END[7] is outside die area.
+[GRT-0036] Pin N4END[8] is outside die area.
+[GRT-0036] Pin N4END[9] is outside die area.
+[GRT-0036] Pin NN4BEG[0] is outside die area.
+[GRT-0036] Pin NN4BEG[10] is outside die area.
+[GRT-0036] Pin NN4BEG[11] is outside die area.
+[GRT-0036] Pin NN4BEG[12] is outside die area.
+[GRT-0036] Pin NN4BEG[13] is outside die area.
+[GRT-0036] Pin NN4BEG[14] is outside die area.
+[GRT-0036] Pin NN4BEG[15] is outside die area.
+[GRT-0036] Pin NN4BEG[1] is outside die area.
+[GRT-0036] Pin NN4BEG[2] is outside die area.
+[GRT-0036] Pin NN4BEG[3] is outside die area.
+[GRT-0036] Pin NN4BEG[4] is outside die area.
+[GRT-0036] Pin NN4BEG[5] is outside die area.
+[GRT-0036] Pin NN4BEG[6] is outside die area.
+[GRT-0036] Pin NN4BEG[7] is outside die area.
+[GRT-0036] Pin NN4BEG[8] is outside die area.
+[GRT-0036] Pin NN4BEG[9] is outside die area.
+[GRT-0036] Pin NN4END[0] is outside die area.
+[GRT-0036] Pin NN4END[10] is outside die area.
+[GRT-0036] Pin NN4END[11] is outside die area.
+[GRT-0036] Pin NN4END[12] is outside die area.
+[GRT-0036] Pin NN4END[13] is outside die area.
+[GRT-0036] Pin NN4END[14] is outside die area.
+[GRT-0036] Pin NN4END[15] is outside die area.
+[GRT-0036] Pin NN4END[1] is outside die area.
+[GRT-0036] Pin NN4END[2] is outside die area.
+[GRT-0036] Pin NN4END[3] is outside die area.
+[GRT-0036] Pin NN4END[4] is outside die area.
+[GRT-0036] Pin NN4END[5] is outside die area.
+[GRT-0036] Pin NN4END[6] is outside die area.
+[GRT-0036] Pin NN4END[7] is outside die area.
+[GRT-0036] Pin NN4END[8] is outside die area.
+[GRT-0036] Pin NN4END[9] is outside die area.
+[GRT-0036] Pin S1BEG[0] is outside die area.
+[GRT-0036] Pin S1BEG[1] is outside die area.
+[GRT-0036] Pin S1BEG[2] is outside die area.
+[GRT-0036] Pin S1BEG[3] is outside die area.
+[GRT-0036] message limit reached, this message will no longer print
+Running 'OpenROAD.CheckAntennas' at 'Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/39-openroad-repairantennas/2-openroad-checkantennas'…
+Logging subprocess to [repr.filename]'Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/39-openroad-repairantennas/2-openroad-checkantennas/openroad-checkantennas.log'[/repr.filename]…
+[STA-0366] port '__VIRTUAL_CLK__' not found.
+[STA-0366] port '__VIRTUAL_CLK__' not found.
+[STA-0419] transition time can not be specified for virtual clocks.
+[STA-0450] virtual clock __VIRTUAL_CLK__ can not be propagated.
+Gating variable for step 'OpenROAD.ResizerTimingPostGRT' set to 'False'- the step will be skipped.
+Skipping step 'Resizer Timing Optimizations (Post-Global Routing)'…
+Running 'OpenROAD.STAMidPNR-3' at 'Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/40-openroad-stamidpnr-3'…
+Logging subprocess to [repr.filename]'Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/40-openroad-stamidpnr-3/openroad-stamidpnr-3.log'[/repr.filename]…
+[STA-0366] port '__VIRTUAL_CLK__' not found.
+[STA-0366] port '__VIRTUAL_CLK__' not found.
+[STA-0419] transition time can not be specified for virtual clocks.
+[STA-0450] virtual clock __VIRTUAL_CLK__ can not be propagated.
+Running 'OpenROAD.DetailedRouting' at 'Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/41-openroad-detailedrouting'…
+Running TritonRoute with 32 threads…
+Logging subprocess to [repr.filename]'Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/41-openroad-detailedrouting/openroad-detailedrouting.log'[/repr.filename]…
+[STA-0366] port '__VIRTUAL_CLK__' not found.
+[STA-0366] port '__VIRTUAL_CLK__' not found.
+[STA-0419] transition time can not be specified for virtual clocks.
+[STA-0450] virtual clock __VIRTUAL_CLK__ can not be propagated.
+[DRT-0349] LEF58_ENCLOSURE with no CUTCLASS is not supported. Skipping for layer mcon
+[DRT-0349] LEF58_ENCLOSURE with no CUTCLASS is not supported. Skipping for layer mcon
+[DRT-0349] LEF58_ENCLOSURE with no CUTCLASS is not supported. Skipping for layer via
+[DRT-0349] LEF58_ENCLOSURE with no CUTCLASS is not supported. Skipping for layer via
+[DRT-0349] LEF58_ENCLOSURE with no CUTCLASS is not supported. Skipping for layer via2
+[DRT-0349] LEF58_ENCLOSURE with no CUTCLASS is not supported. Skipping for layer via2
+[DRT-0349] LEF58_ENCLOSURE with no CUTCLASS is not supported. Skipping for layer via3
+[DRT-0349] LEF58_ENCLOSURE with no CUTCLASS is not supported. Skipping for layer via3
+[DRT-0349] LEF58_ENCLOSURE with no CUTCLASS is not supported. Skipping for layer via4
+[DRT-0349] LEF58_ENCLOSURE with no CUTCLASS is not supported. Skipping for layer via4
+Running 'Odb.RemoveRoutingObstructions' at 'Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/42-odb-removeroutingobstructions'…
+'ROUTING_OBSTRUCTIONS' is not defined. Skipping 'Odb.RemoveRoutingObstructions'…
+Running 'OpenROAD.CheckAntennas-1' at 'Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/43-openroad-checkantennas-1'…
+Logging subprocess to [repr.filename]'Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/43-openroad-checkantennas-1/openroad-checkantennas-1.log'[/repr.filename]…
+[STA-0366] port '__VIRTUAL_CLK__' not found.
+[STA-0366] port '__VIRTUAL_CLK__' not found.
+[STA-0419] transition time can not be specified for virtual clocks.
+[STA-0450] virtual clock __VIRTUAL_CLK__ can not be propagated.
+Running 'Checker.TrDRC' at 'Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/44-checker-trdrc'…
+Check for Routing DRC errors clear.
+Running 'Odb.ReportDisconnectedPins' at 'Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/45-odb-reportdisconnectedpins'…
+Logging subprocess to [repr.filename]'Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/45-odb-reportdisconnectedpins/odb-reportdisconnectedpins.log'[/repr.filename]…
+Running 'Checker.DisconnectedPins' at 'Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/46-checker-disconnectedpins'…
+Check for critical disconnected pins clear.
+Running 'Odb.ReportWireLength' at 'Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/47-odb-reportwirelength'…
+Logging subprocess to [repr.filename]'Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/47-odb-reportwirelength/odb-reportwirelength.log'[/repr.filename]…
+Running 'Checker.WireLength' at 'Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/48-checker-wirelength'…
+Threshold for Threshold-surpassing long wires is not set. The checker will be skipped.
+Running 'OpenROAD.FillInsertion' at 'Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/49-openroad-fillinsertion'…
+Logging subprocess to [repr.filename]'Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/49-openroad-fillinsertion/openroad-fillinsertion.log'[/repr.filename]…
+[STA-0366] port '__VIRTUAL_CLK__' not found.
+[STA-0366] port '__VIRTUAL_CLK__' not found.
+[STA-0419] transition time can not be specified for virtual clocks.
+[STA-0450] virtual clock __VIRTUAL_CLK__ can not be propagated.
+Running 'Odb.CellFrequencyTables' at 'Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/50-odb-cellfrequencytables'…
+Logging subprocess to [repr.filename]'Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/50-odb-cellfrequencytables/buffer_list.txt'[/repr.filename]…
+Logging subprocess to [repr.filename]'Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/50-odb-cellfrequencytables/odb-cellfrequencytables.log'[/repr.filename]…
+Running 'OpenROAD.RCX' at 'Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/51-openroad-rcx'…
+Running RCX for corners matching nom_* (/home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/51-openroad-rcx/nom/rcx.log)…
+Running RCX for corners matching min_* (/home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/51-openroad-rcx/min/rcx.log)…
+Running RCX for corners matching max_* (/home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/51-openroad-rcx/max/rcx.log)…
+Logging subprocess to [repr.filename]'Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/51-openroad-rcx/nom/rcx.log'[/repr.filename]…
+Logging subprocess to [repr.filename]'Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/51-openroad-rcx/min/rcx.log'[/repr.filename]…
+Logging subprocess to [repr.filename]'Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/51-openroad-rcx/max/rcx.log'[/repr.filename]…
+Finished RCX for corners matching min_*.
+Finished RCX for corners matching nom_*.
+Finished RCX for corners matching max_*.
+Running 'OpenROAD.IRDropReport' at 'Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/52-openroad-irdropreport'…
+'VSRC_LOC_FILES' was not given a value, which may make the results of IR drop analysis inaccurate. If you are not integrating a top-level chip for manufacture, you may ignore this warning, otherwise, see the documentation for 'VSRC_LOC_FILES'.
+Logging subprocess to [repr.filename]'Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/52-openroad-irdropreport/openroad-irdropreport.log'[/repr.filename]…
+[STA-0366] port '__VIRTUAL_CLK__' not found.
+[STA-0366] port '__VIRTUAL_CLK__' not found.
+[STA-0419] transition time can not be specified for virtual clocks.
+[STA-0450] virtual clock __VIRTUAL_CLK__ can not be propagated.
+[INFO PSM-0040] All shapes on net VPWR are connected.
+########## IR report #################
+Net              : VPWR
+Corner           : nom_tt_025C_1v80
+Supply voltage   : 1.80e+00 V
+Worstcase voltage: 1.80e+00 V
+Average voltage  : 1.80e+00 V
+Average IR drop  : 3.06e-05 V
+Worstcase IR drop: 4.73e-04 V
+Percentage drop  : 0.03 %
+######################################
+[INFO PSM-0040] All shapes on net VGND are connected.
+########## IR report #################
+Net              : VGND
+Corner           : nom_tt_025C_1v80
+Supply voltage   : 0.00e+00 V
+Worstcase voltage: 4.09e-04 V
+Average voltage  : 3.06e-05 V
+Average IR drop  : 3.06e-05 V
+Worstcase IR drop: 4.09e-04 V
+Percentage drop  : 0.02 %
+######################################
+
+Running 'Magic.StreamOut' at 'Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/53-magic-streamout'…
+Logging subprocess to [repr.filename]'Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/53-magic-streamout/magic-streamout.log'[/repr.filename]…
+Running 'KLayout.StreamOut' at 'Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/54-klayout-streamout'…
+Logging subprocess to [repr.filename]'Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/54-klayout-streamout/klayout-streamout.log'[/repr.filename]…
+Running 'Magic.WriteLEF' at 'Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/55-magic-writelef'…
+Logging subprocess to [repr.filename]'Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/55-magic-writelef/magic-writelef.log'[/repr.filename]…
+Running 'Odb.CheckDesignAntennaProperties' at 'Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/56-odb-checkdesignantennaproperties'…
+Logging subprocess to [repr.filename]'Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/56-odb-checkdesignantennaproperties/odb-checkdesignantennaproperties.log'[/repr.filename]…
+Running 'KLayout.XOR' at 'Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/57-klayout-xor'…
+Running XOR with 32 threads…
+Logging subprocess to [repr.filename]'Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/57-klayout-xor/klayout-xor.log'[/repr.filename]…
+Running 'Checker.XOR' at 'Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/58-checker-xor'…
+Check for XOR differences clear.
+Running 'Magic.DRC' at 'Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/59-magic-drc'…
+Logging subprocess to [repr.filename]'Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/59-magic-drc/magic-drc.log'[/repr.filename]…
+Running 'KLayout.DRC' at 'Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/60-klayout-drc'…
+Running KLayout DRC with 32 threads…
+Logging subprocess to [repr.filename]'Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/60-klayout-drc/klayout-drc.log'[/repr.filename]…
+Logging subprocess to [repr.filename]'Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/60-klayout-drc/xml_drc_report_to_json.log'[/repr.filename]…
+Subprocess had a non-zero exit.
+Last 10 line(s):
+  File "/nix/store/rq8s59nddba5lgij126ylf75qrxlgmkf-python3-3.12.11/lib/python3.12/json/__init__.py", line 106, in <module>
+    from .decoder import JSONDecoder, JSONDecodeError
+  File "/nix/store/rq8s59nddba5lgij126ylf75qrxlgmkf-python3-3.12.11/lib/python3.12/json/decoder.py", line 3, in <module>
+    import re
+  File "/nix/store/rq8s59nddba5lgij126ylf75qrxlgmkf-python3-3.12.11/lib/python3.12/re/__init__.py", line 125, in <module>
+    from . import _compiler, _parser
+  File "/nix/store/rq8s59nddba5lgij126ylf75qrxlgmkf-python3-3.12.11/lib/python3.12/re/_compiler.py", line 18, in <module>
+    assert _sre.MAGIC == MAGIC, "SRE module mismatch"
+           ^^^^^^^^^^^^^^^^^^^
+AssertionError: SRE module mismatch
+
+Full log file: 'Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/60-klayout-drc/xml_drc_report_to_json.log'

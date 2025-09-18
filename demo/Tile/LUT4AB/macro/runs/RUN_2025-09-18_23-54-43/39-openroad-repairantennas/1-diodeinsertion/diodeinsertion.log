@@ -1,0 +1,1170 @@
+Reading OpenROAD database at '/home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/36-openroad-globalrouting/LUT4AB.odb'…
+Reading library file at '/home/kelvin/.ciel/ciel/sky130/versions/0fe599b2afb6708d281543108caf8310912f54af/sky130A/libs.ref/sky130_fd_sc_hd/lib/sky130_fd_sc_hd__tt_025C_1v80.lib'…
+Reading design constraints file at '/nix/store/381vlqh72qv21j2s2ssfql1j0vg3f44v-FABulous-env/lib/python3.12/site-packages/librelane/scripts/base.sdc'…
+[WARNING STA-0366] port '__VIRTUAL_CLK__' not found.
+[INFO] Using clock __VIRTUAL_CLK__…
+[INFO] Setting output delay to: 2
+[INFO] Setting input delay to: 2
+[WARNING STA-0366] port '__VIRTUAL_CLK__' not found.
+[INFO] Setting load to: 0.033442
+[INFO] Setting clock uncertainty to: 0.25
+[INFO] Setting clock transition to: 0.1499999999999999944488848768742172978818416595458984375
+[WARNING STA-0419] transition time can not be specified for virtual clocks.
+[INFO] Setting timing derate to: 5%
+[WARNING STA-0450] virtual clock __VIRTUAL_CLK__ can not be propagated.
+[WARNING STA-0450] virtual clock __VIRTUAL_CLK__ can not be propagated.
+[INFO] Setting signal min routing layer to: met1 and clock min routing layer to met1. 
+[INFO] Setting signal max routing layer to: met5 and clock max routing layer to met5. 
+-congestion_iterations 50 -verbose
+[INFO GRT-0020] Min routing layer: met1
+[INFO GRT-0021] Max routing layer: met5
+[INFO GRT-0022] Global adjustment: 30%
+[INFO GRT-0023] Grid origin: (0, 0)
+[INFO GRT-0043] No OR_DEFAULT vias defined.
+[INFO GRT-0088] Layer li1     Track-Pitch = 0.4600  line-2-Via Pitch: 0.3400
+[INFO GRT-0088] Layer met1    Track-Pitch = 0.3400  line-2-Via Pitch: 0.3400
+[INFO GRT-0088] Layer met2    Track-Pitch = 0.4600  line-2-Via Pitch: 0.3500
+[INFO GRT-0088] Layer met3    Track-Pitch = 0.6800  line-2-Via Pitch: 0.6150
+[INFO GRT-0088] Layer met4    Track-Pitch = 0.9200  line-2-Via Pitch: 1.0400
+[INFO GRT-0088] Layer met5    Track-Pitch = 3.4000  line-2-Via Pitch: 3.1100
+[INFO GRT-0019] Found 0 clock nets.
+[WARNING GRT-0036] Pin Ci is outside die area.
+[WARNING GRT-0036] Pin Co is outside die area.
+[WARNING GRT-0036] Pin E1BEG[0] is outside die area.
+[WARNING GRT-0036] Pin E1BEG[1] is outside die area.
+[WARNING GRT-0036] Pin E1BEG[2] is outside die area.
+[WARNING GRT-0036] Pin E1BEG[3] is outside die area.
+[WARNING GRT-0036] Pin E1END[0] is outside die area.
+[WARNING GRT-0036] Pin E1END[1] is outside die area.
+[WARNING GRT-0036] Pin E1END[2] is outside die area.
+[WARNING GRT-0036] Pin E1END[3] is outside die area.
+[WARNING GRT-0036] Pin E2BEG[0] is outside die area.
+[WARNING GRT-0036] Pin E2BEG[1] is outside die area.
+[WARNING GRT-0036] Pin E2BEG[2] is outside die area.
+[WARNING GRT-0036] Pin E2BEG[3] is outside die area.
+[WARNING GRT-0036] Pin E2BEG[4] is outside die area.
+[WARNING GRT-0036] Pin E2BEG[5] is outside die area.
+[WARNING GRT-0036] Pin E2BEG[6] is outside die area.
+[WARNING GRT-0036] Pin E2BEG[7] is outside die area.
+[WARNING GRT-0036] Pin E2BEGb[0] is outside die area.
+[WARNING GRT-0036] Pin E2BEGb[1] is outside die area.
+[WARNING GRT-0036] Pin E2BEGb[2] is outside die area.
+[WARNING GRT-0036] Pin E2BEGb[3] is outside die area.
+[WARNING GRT-0036] Pin E2BEGb[4] is outside die area.
+[WARNING GRT-0036] Pin E2BEGb[5] is outside die area.
+[WARNING GRT-0036] Pin E2BEGb[6] is outside die area.
+[WARNING GRT-0036] Pin E2BEGb[7] is outside die area.
+[WARNING GRT-0036] Pin E2END[0] is outside die area.
+[WARNING GRT-0036] Pin E2END[1] is outside die area.
+[WARNING GRT-0036] Pin E2END[2] is outside die area.
+[WARNING GRT-0036] Pin E2END[3] is outside die area.
+[WARNING GRT-0036] Pin E2END[4] is outside die area.
+[WARNING GRT-0036] Pin E2END[5] is outside die area.
+[WARNING GRT-0036] Pin E2END[6] is outside die area.
+[WARNING GRT-0036] Pin E2END[7] is outside die area.
+[WARNING GRT-0036] Pin E2MID[0] is outside die area.
+[WARNING GRT-0036] Pin E2MID[1] is outside die area.
+[WARNING GRT-0036] Pin E2MID[2] is outside die area.
+[WARNING GRT-0036] Pin E2MID[3] is outside die area.
+[WARNING GRT-0036] Pin E2MID[4] is outside die area.
+[WARNING GRT-0036] Pin E2MID[5] is outside die area.
+[WARNING GRT-0036] Pin E2MID[6] is outside die area.
+[WARNING GRT-0036] Pin E2MID[7] is outside die area.
+[WARNING GRT-0036] Pin E6BEG[0] is outside die area.
+[WARNING GRT-0036] Pin E6BEG[10] is outside die area.
+[WARNING GRT-0036] Pin E6BEG[11] is outside die area.
+[WARNING GRT-0036] Pin E6BEG[1] is outside die area.
+[WARNING GRT-0036] Pin E6BEG[2] is outside die area.
+[WARNING GRT-0036] Pin E6BEG[3] is outside die area.
+[WARNING GRT-0036] Pin E6BEG[4] is outside die area.
+[WARNING GRT-0036] Pin E6BEG[5] is outside die area.
+[WARNING GRT-0036] Pin E6BEG[6] is outside die area.
+[WARNING GRT-0036] Pin E6BEG[7] is outside die area.
+[WARNING GRT-0036] Pin E6BEG[8] is outside die area.
+[WARNING GRT-0036] Pin E6BEG[9] is outside die area.
+[WARNING GRT-0036] Pin E6END[0] is outside die area.
+[WARNING GRT-0036] Pin E6END[10] is outside die area.
+[WARNING GRT-0036] Pin E6END[11] is outside die area.
+[WARNING GRT-0036] Pin E6END[1] is outside die area.
+[WARNING GRT-0036] Pin E6END[2] is outside die area.
+[WARNING GRT-0036] Pin E6END[3] is outside die area.
+[WARNING GRT-0036] Pin E6END[4] is outside die area.
+[WARNING GRT-0036] Pin E6END[5] is outside die area.
+[WARNING GRT-0036] Pin E6END[6] is outside die area.
+[WARNING GRT-0036] Pin E6END[7] is outside die area.
+[WARNING GRT-0036] Pin E6END[8] is outside die area.
+[WARNING GRT-0036] Pin E6END[9] is outside die area.
+[WARNING GRT-0036] Pin EE4BEG[0] is outside die area.
+[WARNING GRT-0036] Pin EE4BEG[10] is outside die area.
+[WARNING GRT-0036] Pin EE4BEG[11] is outside die area.
+[WARNING GRT-0036] Pin EE4BEG[12] is outside die area.
+[WARNING GRT-0036] Pin EE4BEG[13] is outside die area.
+[WARNING GRT-0036] Pin EE4BEG[14] is outside die area.
+[WARNING GRT-0036] Pin EE4BEG[15] is outside die area.
+[WARNING GRT-0036] Pin EE4BEG[1] is outside die area.
+[WARNING GRT-0036] Pin EE4BEG[2] is outside die area.
+[WARNING GRT-0036] Pin EE4BEG[3] is outside die area.
+[WARNING GRT-0036] Pin EE4BEG[4] is outside die area.
+[WARNING GRT-0036] Pin EE4BEG[5] is outside die area.
+[WARNING GRT-0036] Pin EE4BEG[6] is outside die area.
+[WARNING GRT-0036] Pin EE4BEG[7] is outside die area.
+[WARNING GRT-0036] Pin EE4BEG[8] is outside die area.
+[WARNING GRT-0036] Pin EE4BEG[9] is outside die area.
+[WARNING GRT-0036] Pin EE4END[0] is outside die area.
+[WARNING GRT-0036] Pin EE4END[10] is outside die area.
+[WARNING GRT-0036] Pin EE4END[11] is outside die area.
+[WARNING GRT-0036] Pin EE4END[12] is outside die area.
+[WARNING GRT-0036] Pin EE4END[13] is outside die area.
+[WARNING GRT-0036] Pin EE4END[14] is outside die area.
+[WARNING GRT-0036] Pin EE4END[15] is outside die area.
+[WARNING GRT-0036] Pin EE4END[1] is outside die area.
+[WARNING GRT-0036] Pin EE4END[2] is outside die area.
+[WARNING GRT-0036] Pin EE4END[3] is outside die area.
+[WARNING GRT-0036] Pin EE4END[4] is outside die area.
+[WARNING GRT-0036] Pin EE4END[5] is outside die area.
+[WARNING GRT-0036] Pin EE4END[6] is outside die area.
+[WARNING GRT-0036] Pin EE4END[7] is outside die area.
+[WARNING GRT-0036] Pin EE4END[8] is outside die area.
+[WARNING GRT-0036] Pin EE4END[9] is outside die area.
+[WARNING GRT-0036] Pin FrameData[0] is outside die area.
+[WARNING GRT-0036] Pin FrameData[10] is outside die area.
+[WARNING GRT-0036] Pin FrameData[11] is outside die area.
+[WARNING GRT-0036] Pin FrameData[12] is outside die area.
+[WARNING GRT-0036] Pin FrameData[13] is outside die area.
+[WARNING GRT-0036] Pin FrameData[14] is outside die area.
+[WARNING GRT-0036] Pin FrameData[15] is outside die area.
+[WARNING GRT-0036] Pin FrameData[16] is outside die area.
+[WARNING GRT-0036] Pin FrameData[17] is outside die area.
+[WARNING GRT-0036] Pin FrameData[18] is outside die area.
+[WARNING GRT-0036] Pin FrameData[19] is outside die area.
+[WARNING GRT-0036] Pin FrameData[1] is outside die area.
+[WARNING GRT-0036] Pin FrameData[20] is outside die area.
+[WARNING GRT-0036] Pin FrameData[21] is outside die area.
+[WARNING GRT-0036] Pin FrameData[22] is outside die area.
+[WARNING GRT-0036] Pin FrameData[23] is outside die area.
+[WARNING GRT-0036] Pin FrameData[24] is outside die area.
+[WARNING GRT-0036] Pin FrameData[25] is outside die area.
+[WARNING GRT-0036] Pin FrameData[26] is outside die area.
+[WARNING GRT-0036] Pin FrameData[27] is outside die area.
+[WARNING GRT-0036] Pin FrameData[28] is outside die area.
+[WARNING GRT-0036] Pin FrameData[29] is outside die area.
+[WARNING GRT-0036] Pin FrameData[2] is outside die area.
+[WARNING GRT-0036] Pin FrameData[30] is outside die area.
+[WARNING GRT-0036] Pin FrameData[31] is outside die area.
+[WARNING GRT-0036] Pin FrameData[3] is outside die area.
+[WARNING GRT-0036] Pin FrameData[4] is outside die area.
+[WARNING GRT-0036] Pin FrameData[5] is outside die area.
+[WARNING GRT-0036] Pin FrameData[6] is outside die area.
+[WARNING GRT-0036] Pin FrameData[7] is outside die area.
+[WARNING GRT-0036] Pin FrameData[8] is outside die area.
+[WARNING GRT-0036] Pin FrameData[9] is outside die area.
+[WARNING GRT-0036] Pin FrameData_O[0] is outside die area.
+[WARNING GRT-0036] Pin FrameData_O[10] is outside die area.
+[WARNING GRT-0036] Pin FrameData_O[11] is outside die area.
+[WARNING GRT-0036] Pin FrameData_O[12] is outside die area.
+[WARNING GRT-0036] Pin FrameData_O[13] is outside die area.
+[WARNING GRT-0036] Pin FrameData_O[14] is outside die area.
+[WARNING GRT-0036] Pin FrameData_O[15] is outside die area.
+[WARNING GRT-0036] Pin FrameData_O[16] is outside die area.
+[WARNING GRT-0036] Pin FrameData_O[17] is outside die area.
+[WARNING GRT-0036] Pin FrameData_O[18] is outside die area.
+[WARNING GRT-0036] Pin FrameData_O[19] is outside die area.
+[WARNING GRT-0036] Pin FrameData_O[1] is outside die area.
+[WARNING GRT-0036] Pin FrameData_O[20] is outside die area.
+[WARNING GRT-0036] Pin FrameData_O[21] is outside die area.
+[WARNING GRT-0036] Pin FrameData_O[22] is outside die area.
+[WARNING GRT-0036] Pin FrameData_O[23] is outside die area.
+[WARNING GRT-0036] Pin FrameData_O[24] is outside die area.
+[WARNING GRT-0036] Pin FrameData_O[25] is outside die area.
+[WARNING GRT-0036] Pin FrameData_O[26] is outside die area.
+[WARNING GRT-0036] Pin FrameData_O[27] is outside die area.
+[WARNING GRT-0036] Pin FrameData_O[28] is outside die area.
+[WARNING GRT-0036] Pin FrameData_O[29] is outside die area.
+[WARNING GRT-0036] Pin FrameData_O[2] is outside die area.
+[WARNING GRT-0036] Pin FrameData_O[30] is outside die area.
+[WARNING GRT-0036] Pin FrameData_O[31] is outside die area.
+[WARNING GRT-0036] Pin FrameData_O[3] is outside die area.
+[WARNING GRT-0036] Pin FrameData_O[4] is outside die area.
+[WARNING GRT-0036] Pin FrameData_O[5] is outside die area.
+[WARNING GRT-0036] Pin FrameData_O[6] is outside die area.
+[WARNING GRT-0036] Pin FrameData_O[7] is outside die area.
+[WARNING GRT-0036] Pin FrameData_O[8] is outside die area.
+[WARNING GRT-0036] Pin FrameData_O[9] is outside die area.
+[WARNING GRT-0036] Pin FrameStrobe[0] is outside die area.
+[WARNING GRT-0036] Pin FrameStrobe[10] is outside die area.
+[WARNING GRT-0036] Pin FrameStrobe[11] is outside die area.
+[WARNING GRT-0036] Pin FrameStrobe[12] is outside die area.
+[WARNING GRT-0036] Pin FrameStrobe[13] is outside die area.
+[WARNING GRT-0036] Pin FrameStrobe[14] is outside die area.
+[WARNING GRT-0036] Pin FrameStrobe[15] is outside die area.
+[WARNING GRT-0036] Pin FrameStrobe[16] is outside die area.
+[WARNING GRT-0036] Pin FrameStrobe[17] is outside die area.
+[WARNING GRT-0036] Pin FrameStrobe[18] is outside die area.
+[WARNING GRT-0036] Pin FrameStrobe[19] is outside die area.
+[WARNING GRT-0036] Pin FrameStrobe[1] is outside die area.
+[WARNING GRT-0036] Pin FrameStrobe[2] is outside die area.
+[WARNING GRT-0036] Pin FrameStrobe[3] is outside die area.
+[WARNING GRT-0036] Pin FrameStrobe[4] is outside die area.
+[WARNING GRT-0036] Pin FrameStrobe[5] is outside die area.
+[WARNING GRT-0036] Pin FrameStrobe[6] is outside die area.
+[WARNING GRT-0036] Pin FrameStrobe[7] is outside die area.
+[WARNING GRT-0036] Pin FrameStrobe[8] is outside die area.
+[WARNING GRT-0036] Pin FrameStrobe[9] is outside die area.
+[WARNING GRT-0036] Pin FrameStrobe_O[0] is outside die area.
+[WARNING GRT-0036] Pin FrameStrobe_O[10] is outside die area.
+[WARNING GRT-0036] Pin FrameStrobe_O[11] is outside die area.
+[WARNING GRT-0036] Pin FrameStrobe_O[12] is outside die area.
+[WARNING GRT-0036] Pin FrameStrobe_O[13] is outside die area.
+[WARNING GRT-0036] Pin FrameStrobe_O[14] is outside die area.
+[WARNING GRT-0036] Pin FrameStrobe_O[15] is outside die area.
+[WARNING GRT-0036] Pin FrameStrobe_O[16] is outside die area.
+[WARNING GRT-0036] Pin FrameStrobe_O[17] is outside die area.
+[WARNING GRT-0036] Pin FrameStrobe_O[18] is outside die area.
+[WARNING GRT-0036] Pin FrameStrobe_O[19] is outside die area.
+[WARNING GRT-0036] Pin FrameStrobe_O[1] is outside die area.
+[WARNING GRT-0036] Pin FrameStrobe_O[2] is outside die area.
+[WARNING GRT-0036] Pin FrameStrobe_O[3] is outside die area.
+[WARNING GRT-0036] Pin FrameStrobe_O[4] is outside die area.
+[WARNING GRT-0036] Pin FrameStrobe_O[5] is outside die area.
+[WARNING GRT-0036] Pin FrameStrobe_O[6] is outside die area.
+[WARNING GRT-0036] Pin FrameStrobe_O[7] is outside die area.
+[WARNING GRT-0036] Pin FrameStrobe_O[8] is outside die area.
+[WARNING GRT-0036] Pin FrameStrobe_O[9] is outside die area.
+[WARNING GRT-0036] Pin N1BEG[0] is outside die area.
+[WARNING GRT-0036] Pin N1BEG[1] is outside die area.
+[WARNING GRT-0036] Pin N1BEG[2] is outside die area.
+[WARNING GRT-0036] Pin N1BEG[3] is outside die area.
+[WARNING GRT-0036] Pin N1END[0] is outside die area.
+[WARNING GRT-0036] Pin N1END[1] is outside die area.
+[WARNING GRT-0036] Pin N1END[2] is outside die area.
+[WARNING GRT-0036] Pin N1END[3] is outside die area.
+[WARNING GRT-0036] Pin N2BEG[0] is outside die area.
+[WARNING GRT-0036] Pin N2BEG[1] is outside die area.
+[WARNING GRT-0036] Pin N2BEG[2] is outside die area.
+[WARNING GRT-0036] Pin N2BEG[3] is outside die area.
+[WARNING GRT-0036] Pin N2BEG[4] is outside die area.
+[WARNING GRT-0036] Pin N2BEG[5] is outside die area.
+[WARNING GRT-0036] Pin N2BEG[6] is outside die area.
+[WARNING GRT-0036] Pin N2BEG[7] is outside die area.
+[WARNING GRT-0036] Pin N2BEGb[0] is outside die area.
+[WARNING GRT-0036] Pin N2BEGb[1] is outside die area.
+[WARNING GRT-0036] Pin N2BEGb[2] is outside die area.
+[WARNING GRT-0036] Pin N2BEGb[3] is outside die area.
+[WARNING GRT-0036] Pin N2BEGb[4] is outside die area.
+[WARNING GRT-0036] Pin N2BEGb[5] is outside die area.
+[WARNING GRT-0036] Pin N2BEGb[6] is outside die area.
+[WARNING GRT-0036] Pin N2BEGb[7] is outside die area.
+[WARNING GRT-0036] Pin N2END[0] is outside die area.
+[WARNING GRT-0036] Pin N2END[1] is outside die area.
+[WARNING GRT-0036] Pin N2END[2] is outside die area.
+[WARNING GRT-0036] Pin N2END[3] is outside die area.
+[WARNING GRT-0036] Pin N2END[4] is outside die area.
+[WARNING GRT-0036] Pin N2END[5] is outside die area.
+[WARNING GRT-0036] Pin N2END[6] is outside die area.
+[WARNING GRT-0036] Pin N2END[7] is outside die area.
+[WARNING GRT-0036] Pin N2MID[0] is outside die area.
+[WARNING GRT-0036] Pin N2MID[1] is outside die area.
+[WARNING GRT-0036] Pin N2MID[2] is outside die area.
+[WARNING GRT-0036] Pin N2MID[3] is outside die area.
+[WARNING GRT-0036] Pin N2MID[4] is outside die area.
+[WARNING GRT-0036] Pin N2MID[5] is outside die area.
+[WARNING GRT-0036] Pin N2MID[6] is outside die area.
+[WARNING GRT-0036] Pin N2MID[7] is outside die area.
+[WARNING GRT-0036] Pin N4BEG[0] is outside die area.
+[WARNING GRT-0036] Pin N4BEG[10] is outside die area.
+[WARNING GRT-0036] Pin N4BEG[11] is outside die area.
+[WARNING GRT-0036] Pin N4BEG[12] is outside die area.
+[WARNING GRT-0036] Pin N4BEG[13] is outside die area.
+[WARNING GRT-0036] Pin N4BEG[14] is outside die area.
+[WARNING GRT-0036] Pin N4BEG[15] is outside die area.
+[WARNING GRT-0036] Pin N4BEG[1] is outside die area.
+[WARNING GRT-0036] Pin N4BEG[2] is outside die area.
+[WARNING GRT-0036] Pin N4BEG[3] is outside die area.
+[WARNING GRT-0036] Pin N4BEG[4] is outside die area.
+[WARNING GRT-0036] Pin N4BEG[5] is outside die area.
+[WARNING GRT-0036] Pin N4BEG[6] is outside die area.
+[WARNING GRT-0036] Pin N4BEG[7] is outside die area.
+[WARNING GRT-0036] Pin N4BEG[8] is outside die area.
+[WARNING GRT-0036] Pin N4BEG[9] is outside die area.
+[WARNING GRT-0036] Pin N4END[0] is outside die area.
+[WARNING GRT-0036] Pin N4END[10] is outside die area.
+[WARNING GRT-0036] Pin N4END[11] is outside die area.
+[WARNING GRT-0036] Pin N4END[12] is outside die area.
+[WARNING GRT-0036] Pin N4END[13] is outside die area.
+[WARNING GRT-0036] Pin N4END[14] is outside die area.
+[WARNING GRT-0036] Pin N4END[15] is outside die area.
+[WARNING GRT-0036] Pin N4END[1] is outside die area.
+[WARNING GRT-0036] Pin N4END[2] is outside die area.
+[WARNING GRT-0036] Pin N4END[3] is outside die area.
+[WARNING GRT-0036] Pin N4END[4] is outside die area.
+[WARNING GRT-0036] Pin N4END[5] is outside die area.
+[WARNING GRT-0036] Pin N4END[6] is outside die area.
+[WARNING GRT-0036] Pin N4END[7] is outside die area.
+[WARNING GRT-0036] Pin N4END[8] is outside die area.
+[WARNING GRT-0036] Pin N4END[9] is outside die area.
+[WARNING GRT-0036] Pin NN4BEG[0] is outside die area.
+[WARNING GRT-0036] Pin NN4BEG[10] is outside die area.
+[WARNING GRT-0036] Pin NN4BEG[11] is outside die area.
+[WARNING GRT-0036] Pin NN4BEG[12] is outside die area.
+[WARNING GRT-0036] Pin NN4BEG[13] is outside die area.
+[WARNING GRT-0036] Pin NN4BEG[14] is outside die area.
+[WARNING GRT-0036] Pin NN4BEG[15] is outside die area.
+[WARNING GRT-0036] Pin NN4BEG[1] is outside die area.
+[WARNING GRT-0036] Pin NN4BEG[2] is outside die area.
+[WARNING GRT-0036] Pin NN4BEG[3] is outside die area.
+[WARNING GRT-0036] Pin NN4BEG[4] is outside die area.
+[WARNING GRT-0036] Pin NN4BEG[5] is outside die area.
+[WARNING GRT-0036] Pin NN4BEG[6] is outside die area.
+[WARNING GRT-0036] Pin NN4BEG[7] is outside die area.
+[WARNING GRT-0036] Pin NN4BEG[8] is outside die area.
+[WARNING GRT-0036] Pin NN4BEG[9] is outside die area.
+[WARNING GRT-0036] Pin NN4END[0] is outside die area.
+[WARNING GRT-0036] Pin NN4END[10] is outside die area.
+[WARNING GRT-0036] Pin NN4END[11] is outside die area.
+[WARNING GRT-0036] Pin NN4END[12] is outside die area.
+[WARNING GRT-0036] Pin NN4END[13] is outside die area.
+[WARNING GRT-0036] Pin NN4END[14] is outside die area.
+[WARNING GRT-0036] Pin NN4END[15] is outside die area.
+[WARNING GRT-0036] Pin NN4END[1] is outside die area.
+[WARNING GRT-0036] Pin NN4END[2] is outside die area.
+[WARNING GRT-0036] Pin NN4END[3] is outside die area.
+[WARNING GRT-0036] Pin NN4END[4] is outside die area.
+[WARNING GRT-0036] Pin NN4END[5] is outside die area.
+[WARNING GRT-0036] Pin NN4END[6] is outside die area.
+[WARNING GRT-0036] Pin NN4END[7] is outside die area.
+[WARNING GRT-0036] Pin NN4END[8] is outside die area.
+[WARNING GRT-0036] Pin NN4END[9] is outside die area.
+[WARNING GRT-0036] Pin S1BEG[0] is outside die area.
+[WARNING GRT-0036] Pin S1BEG[1] is outside die area.
+[WARNING GRT-0036] Pin S1BEG[2] is outside die area.
+[WARNING GRT-0036] Pin S1BEG[3] is outside die area.
+[WARNING GRT-0036] Pin S1END[0] is outside die area.
+[WARNING GRT-0036] Pin S1END[1] is outside die area.
+[WARNING GRT-0036] Pin S1END[2] is outside die area.
+[WARNING GRT-0036] Pin S1END[3] is outside die area.
+[WARNING GRT-0036] Pin S2BEG[0] is outside die area.
+[WARNING GRT-0036] Pin S2BEG[1] is outside die area.
+[WARNING GRT-0036] Pin S2BEG[2] is outside die area.
+[WARNING GRT-0036] Pin S2BEG[3] is outside die area.
+[WARNING GRT-0036] Pin S2BEG[4] is outside die area.
+[WARNING GRT-0036] Pin S2BEG[5] is outside die area.
+[WARNING GRT-0036] Pin S2BEG[6] is outside die area.
+[WARNING GRT-0036] Pin S2BEG[7] is outside die area.
+[WARNING GRT-0036] Pin S2BEGb[0] is outside die area.
+[WARNING GRT-0036] Pin S2BEGb[1] is outside die area.
+[WARNING GRT-0036] Pin S2BEGb[2] is outside die area.
+[WARNING GRT-0036] Pin S2BEGb[3] is outside die area.
+[WARNING GRT-0036] Pin S2BEGb[4] is outside die area.
+[WARNING GRT-0036] Pin S2BEGb[5] is outside die area.
+[WARNING GRT-0036] Pin S2BEGb[6] is outside die area.
+[WARNING GRT-0036] Pin S2BEGb[7] is outside die area.
+[WARNING GRT-0036] Pin S2END[0] is outside die area.
+[WARNING GRT-0036] Pin S2END[1] is outside die area.
+[WARNING GRT-0036] Pin S2END[2] is outside die area.
+[WARNING GRT-0036] Pin S2END[3] is outside die area.
+[WARNING GRT-0036] Pin S2END[4] is outside die area.
+[WARNING GRT-0036] Pin S2END[5] is outside die area.
+[WARNING GRT-0036] Pin S2END[6] is outside die area.
+[WARNING GRT-0036] Pin S2END[7] is outside die area.
+[WARNING GRT-0036] Pin S2MID[0] is outside die area.
+[WARNING GRT-0036] Pin S2MID[1] is outside die area.
+[WARNING GRT-0036] Pin S2MID[2] is outside die area.
+[WARNING GRT-0036] Pin S2MID[3] is outside die area.
+[WARNING GRT-0036] Pin S2MID[4] is outside die area.
+[WARNING GRT-0036] Pin S2MID[5] is outside die area.
+[WARNING GRT-0036] Pin S2MID[6] is outside die area.
+[WARNING GRT-0036] Pin S2MID[7] is outside die area.
+[WARNING GRT-0036] Pin S4BEG[0] is outside die area.
+[WARNING GRT-0036] Pin S4BEG[10] is outside die area.
+[WARNING GRT-0036] Pin S4BEG[11] is outside die area.
+[WARNING GRT-0036] Pin S4BEG[12] is outside die area.
+[WARNING GRT-0036] Pin S4BEG[13] is outside die area.
+[WARNING GRT-0036] Pin S4BEG[14] is outside die area.
+[WARNING GRT-0036] Pin S4BEG[15] is outside die area.
+[WARNING GRT-0036] Pin S4BEG[1] is outside die area.
+[WARNING GRT-0036] Pin S4BEG[2] is outside die area.
+[WARNING GRT-0036] Pin S4BEG[3] is outside die area.
+[WARNING GRT-0036] Pin S4BEG[4] is outside die area.
+[WARNING GRT-0036] Pin S4BEG[5] is outside die area.
+[WARNING GRT-0036] Pin S4BEG[6] is outside die area.
+[WARNING GRT-0036] Pin S4BEG[7] is outside die area.
+[WARNING GRT-0036] Pin S4BEG[8] is outside die area.
+[WARNING GRT-0036] Pin S4BEG[9] is outside die area.
+[WARNING GRT-0036] Pin S4END[0] is outside die area.
+[WARNING GRT-0036] Pin S4END[10] is outside die area.
+[WARNING GRT-0036] Pin S4END[11] is outside die area.
+[WARNING GRT-0036] Pin S4END[12] is outside die area.
+[WARNING GRT-0036] Pin S4END[13] is outside die area.
+[WARNING GRT-0036] Pin S4END[14] is outside die area.
+[WARNING GRT-0036] Pin S4END[15] is outside die area.
+[WARNING GRT-0036] Pin S4END[1] is outside die area.
+[WARNING GRT-0036] Pin S4END[2] is outside die area.
+[WARNING GRT-0036] Pin S4END[3] is outside die area.
+[WARNING GRT-0036] Pin S4END[4] is outside die area.
+[WARNING GRT-0036] Pin S4END[5] is outside die area.
+[WARNING GRT-0036] Pin S4END[6] is outside die area.
+[WARNING GRT-0036] Pin S4END[7] is outside die area.
+[WARNING GRT-0036] Pin S4END[8] is outside die area.
+[WARNING GRT-0036] Pin S4END[9] is outside die area.
+[WARNING GRT-0036] Pin SS4BEG[0] is outside die area.
+[WARNING GRT-0036] Pin SS4BEG[10] is outside die area.
+[WARNING GRT-0036] Pin SS4BEG[11] is outside die area.
+[WARNING GRT-0036] Pin SS4BEG[12] is outside die area.
+[WARNING GRT-0036] Pin SS4BEG[13] is outside die area.
+[WARNING GRT-0036] Pin SS4BEG[14] is outside die area.
+[WARNING GRT-0036] Pin SS4BEG[15] is outside die area.
+[WARNING GRT-0036] Pin SS4BEG[1] is outside die area.
+[WARNING GRT-0036] Pin SS4BEG[2] is outside die area.
+[WARNING GRT-0036] Pin SS4BEG[3] is outside die area.
+[WARNING GRT-0036] Pin SS4BEG[4] is outside die area.
+[WARNING GRT-0036] Pin SS4BEG[5] is outside die area.
+[WARNING GRT-0036] Pin SS4BEG[6] is outside die area.
+[WARNING GRT-0036] Pin SS4BEG[7] is outside die area.
+[WARNING GRT-0036] Pin SS4BEG[8] is outside die area.
+[WARNING GRT-0036] Pin SS4BEG[9] is outside die area.
+[WARNING GRT-0036] Pin SS4END[0] is outside die area.
+[WARNING GRT-0036] Pin SS4END[10] is outside die area.
+[WARNING GRT-0036] Pin SS4END[11] is outside die area.
+[WARNING GRT-0036] Pin SS4END[12] is outside die area.
+[WARNING GRT-0036] Pin SS4END[13] is outside die area.
+[WARNING GRT-0036] Pin SS4END[14] is outside die area.
+[WARNING GRT-0036] Pin SS4END[15] is outside die area.
+[WARNING GRT-0036] Pin SS4END[1] is outside die area.
+[WARNING GRT-0036] Pin SS4END[2] is outside die area.
+[WARNING GRT-0036] Pin SS4END[3] is outside die area.
+[WARNING GRT-0036] Pin SS4END[4] is outside die area.
+[WARNING GRT-0036] Pin SS4END[5] is outside die area.
+[WARNING GRT-0036] Pin SS4END[6] is outside die area.
+[WARNING GRT-0036] Pin SS4END[7] is outside die area.
+[WARNING GRT-0036] Pin SS4END[8] is outside die area.
+[WARNING GRT-0036] Pin SS4END[9] is outside die area.
+[WARNING GRT-0036] Pin UserCLK is outside die area.
+[WARNING GRT-0036] Pin UserCLKo is outside die area.
+[WARNING GRT-0036] Pin W1BEG[0] is outside die area.
+[WARNING GRT-0036] Pin W1BEG[1] is outside die area.
+[WARNING GRT-0036] Pin W1BEG[2] is outside die area.
+[WARNING GRT-0036] Pin W1BEG[3] is outside die area.
+[WARNING GRT-0036] Pin W1END[0] is outside die area.
+[WARNING GRT-0036] Pin W1END[1] is outside die area.
+[WARNING GRT-0036] Pin W1END[2] is outside die area.
+[WARNING GRT-0036] Pin W1END[3] is outside die area.
+[WARNING GRT-0036] Pin W2BEG[0] is outside die area.
+[WARNING GRT-0036] Pin W2BEG[1] is outside die area.
+[WARNING GRT-0036] Pin W2BEG[2] is outside die area.
+[WARNING GRT-0036] Pin W2BEG[3] is outside die area.
+[WARNING GRT-0036] Pin W2BEG[4] is outside die area.
+[WARNING GRT-0036] Pin W2BEG[5] is outside die area.
+[WARNING GRT-0036] Pin W2BEG[6] is outside die area.
+[WARNING GRT-0036] Pin W2BEG[7] is outside die area.
+[WARNING GRT-0036] Pin W2BEGb[0] is outside die area.
+[WARNING GRT-0036] Pin W2BEGb[1] is outside die area.
+[WARNING GRT-0036] Pin W2BEGb[2] is outside die area.
+[WARNING GRT-0036] Pin W2BEGb[3] is outside die area.
+[WARNING GRT-0036] Pin W2BEGb[4] is outside die area.
+[WARNING GRT-0036] Pin W2BEGb[5] is outside die area.
+[WARNING GRT-0036] Pin W2BEGb[6] is outside die area.
+[WARNING GRT-0036] Pin W2BEGb[7] is outside die area.
+[WARNING GRT-0036] Pin W2END[0] is outside die area.
+[WARNING GRT-0036] Pin W2END[1] is outside die area.
+[WARNING GRT-0036] Pin W2END[2] is outside die area.
+[WARNING GRT-0036] Pin W2END[3] is outside die area.
+[WARNING GRT-0036] Pin W2END[4] is outside die area.
+[WARNING GRT-0036] Pin W2END[5] is outside die area.
+[WARNING GRT-0036] Pin W2END[6] is outside die area.
+[WARNING GRT-0036] Pin W2END[7] is outside die area.
+[WARNING GRT-0036] Pin W2MID[0] is outside die area.
+[WARNING GRT-0036] Pin W2MID[1] is outside die area.
+[WARNING GRT-0036] Pin W2MID[2] is outside die area.
+[WARNING GRT-0036] Pin W2MID[3] is outside die area.
+[WARNING GRT-0036] Pin W2MID[4] is outside die area.
+[WARNING GRT-0036] Pin W2MID[5] is outside die area.
+[WARNING GRT-0036] Pin W2MID[6] is outside die area.
+[WARNING GRT-0036] Pin W2MID[7] is outside die area.
+[WARNING GRT-0036] Pin W6BEG[0] is outside die area.
+[WARNING GRT-0036] Pin W6BEG[10] is outside die area.
+[WARNING GRT-0036] Pin W6BEG[11] is outside die area.
+[WARNING GRT-0036] Pin W6BEG[1] is outside die area.
+[WARNING GRT-0036] Pin W6BEG[2] is outside die area.
+[WARNING GRT-0036] Pin W6BEG[3] is outside die area.
+[WARNING GRT-0036] Pin W6BEG[4] is outside die area.
+[WARNING GRT-0036] Pin W6BEG[5] is outside die area.
+[WARNING GRT-0036] Pin W6BEG[6] is outside die area.
+[WARNING GRT-0036] Pin W6BEG[7] is outside die area.
+[WARNING GRT-0036] Pin W6BEG[8] is outside die area.
+[WARNING GRT-0036] Pin W6BEG[9] is outside die area.
+[WARNING GRT-0036] Pin W6END[0] is outside die area.
+[WARNING GRT-0036] Pin W6END[10] is outside die area.
+[WARNING GRT-0036] Pin W6END[11] is outside die area.
+[WARNING GRT-0036] Pin W6END[1] is outside die area.
+[WARNING GRT-0036] Pin W6END[2] is outside die area.
+[WARNING GRT-0036] Pin W6END[3] is outside die area.
+[WARNING GRT-0036] Pin W6END[4] is outside die area.
+[WARNING GRT-0036] Pin W6END[5] is outside die area.
+[WARNING GRT-0036] Pin W6END[6] is outside die area.
+[WARNING GRT-0036] Pin W6END[7] is outside die area.
+[WARNING GRT-0036] Pin W6END[8] is outside die area.
+[WARNING GRT-0036] Pin W6END[9] is outside die area.
+[WARNING GRT-0036] Pin WW4BEG[0] is outside die area.
+[WARNING GRT-0036] Pin WW4BEG[10] is outside die area.
+[WARNING GRT-0036] Pin WW4BEG[11] is outside die area.
+[WARNING GRT-0036] Pin WW4BEG[12] is outside die area.
+[WARNING GRT-0036] Pin WW4BEG[13] is outside die area.
+[WARNING GRT-0036] Pin WW4BEG[14] is outside die area.
+[WARNING GRT-0036] Pin WW4BEG[15] is outside die area.
+[WARNING GRT-0036] Pin WW4BEG[1] is outside die area.
+[WARNING GRT-0036] Pin WW4BEG[2] is outside die area.
+[WARNING GRT-0036] Pin WW4BEG[3] is outside die area.
+[WARNING GRT-0036] Pin WW4BEG[4] is outside die area.
+[WARNING GRT-0036] Pin WW4BEG[5] is outside die area.
+[WARNING GRT-0036] Pin WW4BEG[6] is outside die area.
+[WARNING GRT-0036] Pin WW4BEG[7] is outside die area.
+[WARNING GRT-0036] Pin WW4BEG[8] is outside die area.
+[WARNING GRT-0036] Pin WW4BEG[9] is outside die area.
+[WARNING GRT-0036] Pin WW4END[0] is outside die area.
+[WARNING GRT-0036] Pin WW4END[10] is outside die area.
+[WARNING GRT-0036] Pin WW4END[11] is outside die area.
+[WARNING GRT-0036] Pin WW4END[12] is outside die area.
+[WARNING GRT-0036] Pin WW4END[13] is outside die area.
+[WARNING GRT-0036] Pin WW4END[14] is outside die area.
+[WARNING GRT-0036] Pin WW4END[15] is outside die area.
+[WARNING GRT-0036] Pin WW4END[1] is outside die area.
+[WARNING GRT-0036] Pin WW4END[2] is outside die area.
+[WARNING GRT-0036] Pin WW4END[3] is outside die area.
+[WARNING GRT-0036] Pin WW4END[4] is outside die area.
+[WARNING GRT-0036] Pin WW4END[5] is outside die area.
+[WARNING GRT-0036] Pin WW4END[6] is outside die area.
+[WARNING GRT-0036] Pin WW4END[7] is outside die area.
+[WARNING GRT-0036] Pin WW4END[8] is outside die area.
+[WARNING GRT-0036] Pin WW4END[9] is outside die area.
+[INFO GRT-0001] Minimum degree: 2
+[INFO GRT-0002] Maximum degree: 11
+[INFO GRT-0003] Macros: 0
+[INFO GRT-0043] No OR_DEFAULT vias defined.
+[INFO GRT-0004] Blockages: 11639
+
+[INFO GRT-0053] Routing resources analysis:
+          Routing      Original      Derated      Resource
+Layer     Direction    Resources     Resources    Reduction (%)
+---------------------------------------------------------------
+li1        Vertical            0             0          0.00%
+met1       Horizontal     104328         50350          51.74%
+met2       Vertical        78192         51274          34.43%
+met3       Horizontal      52128         35738          31.44%
+met4       Vertical        31392         19596          37.58%
+met5       Horizontal      10368          4899          52.75%
+---------------------------------------------------------------
+
+[INFO GRT-0197] Via related to pin nodes: 13788
+[INFO GRT-0198] Via related Steiner nodes: 672
+[INFO GRT-0199] Via filling finished.
+[INFO GRT-0111] Final number of vias: 18763
+[INFO GRT-0112] Final usage 3D: 82561
+
+[INFO GRT-0096] Final congestion report:
+Layer         Resource        Demand        Usage (%)    Max H / Max V / Total Overflow
+---------------------------------------------------------------------------------------
+li1                  0             0            0.00%             0 /  0 /  0
+met1             50350         11338           22.52%             0 /  0 /  0
+met2             51274         12808           24.98%             0 /  0 /  0
+met3             35738          1556            4.35%             0 /  0 /  0
+met4             19596           570            2.91%             0 /  0 /  0
+met5              4899             0            0.00%             0 /  0 /  0
+---------------------------------------------------------------------------------------
+Total           161857         26272           16.23%             0 /  0 /  0
+
+[INFO GRT-0018] Total wirelength: 230798 um
+[INFO GRT-0014] Routed nets: 2550
+[INFO GRT-0006] Repairing antennas, iteration 1.
+[INFO GRT-0043] No OR_DEFAULT vias defined.
+[INFO GRT-0012] Found 92 antenna violations.
+[INFO GRT-0015] Inserted 110 diodes.
+[WARNING GRT-0036] Pin E1BEG[2] is outside die area.
+[WARNING GRT-0036] Pin E2BEG[0] is outside die area.
+[WARNING GRT-0036] Pin E2BEG[1] is outside die area.
+[WARNING GRT-0036] Pin E2BEG[2] is outside die area.
+[WARNING GRT-0036] Pin E2BEG[5] is outside die area.
+[WARNING GRT-0036] Pin E2BEG[7] is outside die area.
+[WARNING GRT-0036] Pin E2BEGb[1] is outside die area.
+[WARNING GRT-0036] Pin E2BEGb[7] is outside die area.
+[WARNING GRT-0036] Pin E2END[1] is outside die area.
+[WARNING GRT-0036] Pin E2MID[1] is outside die area.
+[WARNING GRT-0036] Pin E2MID[2] is outside die area.
+[WARNING GRT-0036] Pin E2MID[3] is outside die area.
+[WARNING GRT-0036] Pin E2MID[4] is outside die area.
+[WARNING GRT-0036] Pin E2MID[5] is outside die area.
+[WARNING GRT-0036] Pin E2MID[7] is outside die area.
+[WARNING GRT-0036] Pin E6BEG[2] is outside die area.
+[WARNING GRT-0036] Pin E6BEG[7] is outside die area.
+[WARNING GRT-0036] Pin E6BEG[9] is outside die area.
+[WARNING GRT-0036] Pin E6END[10] is outside die area.
+[WARNING GRT-0036] Pin E6END[3] is outside die area.
+[WARNING GRT-0036] Pin E6END[7] is outside die area.
+[WARNING GRT-0036] Pin E6END[8] is outside die area.
+[WARNING GRT-0036] Pin EE4BEG[11] is outside die area.
+[WARNING GRT-0036] Pin EE4BEG[14] is outside die area.
+[WARNING GRT-0036] Pin EE4BEG[3] is outside die area.
+[WARNING GRT-0036] Pin EE4BEG[9] is outside die area.
+[WARNING GRT-0036] Pin EE4END[10] is outside die area.
+[WARNING GRT-0036] Pin EE4END[11] is outside die area.
+[WARNING GRT-0036] Pin EE4END[12] is outside die area.
+[WARNING GRT-0036] Pin EE4END[4] is outside die area.
+[WARNING GRT-0036] Pin EE4END[5] is outside die area.
+[WARNING GRT-0036] Pin EE4END[6] is outside die area.
+[WARNING GRT-0036] Pin EE4END[8] is outside die area.
+[WARNING GRT-0036] Pin EE4END[9] is outside die area.
+[WARNING GRT-0036] Pin FrameData[0] is outside die area.
+[WARNING GRT-0036] Pin FrameData[17] is outside die area.
+[WARNING GRT-0036] Pin FrameData[1] is outside die area.
+[WARNING GRT-0036] Pin FrameData[21] is outside die area.
+[WARNING GRT-0036] Pin FrameData[25] is outside die area.
+[WARNING GRT-0036] Pin FrameData[26] is outside die area.
+[WARNING GRT-0036] Pin FrameData[27] is outside die area.
+[WARNING GRT-0036] Pin FrameData[28] is outside die area.
+[WARNING GRT-0036] Pin FrameData[29] is outside die area.
+[WARNING GRT-0036] Pin FrameData[30] is outside die area.
+[WARNING GRT-0036] Pin FrameData[31] is outside die area.
+[WARNING GRT-0036] Pin FrameData[4] is outside die area.
+[WARNING GRT-0036] Pin FrameData[6] is outside die area.
+[WARNING GRT-0036] Pin FrameData_O[13] is outside die area.
+[WARNING GRT-0036] Pin FrameData_O[16] is outside die area.
+[WARNING GRT-0036] Pin FrameData_O[17] is outside die area.
+[WARNING GRT-0036] Pin FrameData_O[30] is outside die area.
+[WARNING GRT-0036] Pin FrameData_O[6] is outside die area.
+[WARNING GRT-0036] Pin FrameStrobe[0] is outside die area.
+[WARNING GRT-0036] Pin FrameStrobe[10] is outside die area.
+[WARNING GRT-0036] Pin FrameStrobe[11] is outside die area.
+[WARNING GRT-0036] Pin FrameStrobe[12] is outside die area.
+[WARNING GRT-0036] Pin FrameStrobe[14] is outside die area.
+[WARNING GRT-0036] Pin FrameStrobe[15] is outside die area.
+[WARNING GRT-0036] Pin FrameStrobe[18] is outside die area.
+[WARNING GRT-0036] Pin FrameStrobe[19] is outside die area.
+[WARNING GRT-0036] Pin FrameStrobe[2] is outside die area.
+[WARNING GRT-0036] Pin FrameStrobe[3] is outside die area.
+[WARNING GRT-0036] Pin FrameStrobe[7] is outside die area.
+[WARNING GRT-0036] Pin FrameStrobe_O[0] is outside die area.
+[WARNING GRT-0036] Pin FrameStrobe_O[10] is outside die area.
+[WARNING GRT-0036] Pin FrameStrobe_O[17] is outside die area.
+[WARNING GRT-0036] Pin FrameStrobe_O[19] is outside die area.
+[WARNING GRT-0036] Pin FrameStrobe_O[1] is outside die area.
+[WARNING GRT-0036] Pin FrameStrobe_O[2] is outside die area.
+[WARNING GRT-0036] Pin FrameStrobe_O[3] is outside die area.
+[WARNING GRT-0036] Pin FrameStrobe_O[4] is outside die area.
+[WARNING GRT-0036] Pin FrameStrobe_O[5] is outside die area.
+[WARNING GRT-0036] Pin FrameStrobe_O[6] is outside die area.
+[WARNING GRT-0036] Pin FrameStrobe_O[7] is outside die area.
+[WARNING GRT-0036] Pin N1BEG[2] is outside die area.
+[WARNING GRT-0036] Pin N2BEG[1] is outside die area.
+[WARNING GRT-0036] Pin N2BEG[2] is outside die area.
+[WARNING GRT-0036] Pin N2BEG[3] is outside die area.
+[WARNING GRT-0036] Pin N2BEG[4] is outside die area.
+[WARNING GRT-0036] Pin N2BEG[7] is outside die area.
+[WARNING GRT-0036] Pin N2BEGb[6] is outside die area.
+[WARNING GRT-0036] Pin N2END[5] is outside die area.
+[WARNING GRT-0036] Pin N2MID[2] is outside die area.
+[WARNING GRT-0036] Pin N2MID[3] is outside die area.
+[WARNING GRT-0036] Pin N2MID[5] is outside die area.
+[WARNING GRT-0036] Pin N2MID[6] is outside die area.
+[WARNING GRT-0036] Pin N4BEG[12] is outside die area.
+[WARNING GRT-0036] Pin N4BEG[13] is outside die area.
+[WARNING GRT-0036] Pin N4BEG[14] is outside die area.
+[WARNING GRT-0036] Pin N4BEG[15] is outside die area.
+[WARNING GRT-0036] Pin N4BEG[7] is outside die area.
+[WARNING GRT-0036] Pin N4BEG[8] is outside die area.
+[WARNING GRT-0036] Pin N4END[10] is outside die area.
+[WARNING GRT-0036] Pin N4END[13] is outside die area.
+[WARNING GRT-0036] Pin N4END[15] is outside die area.
+[WARNING GRT-0036] Pin N4END[4] is outside die area.
+[WARNING GRT-0036] Pin N4END[5] is outside die area.
+[WARNING GRT-0036] Pin N4END[6] is outside die area.
+[WARNING GRT-0036] Pin N4END[7] is outside die area.
+[WARNING GRT-0036] Pin N4END[8] is outside die area.
+[WARNING GRT-0036] Pin N4END[9] is outside die area.
+[WARNING GRT-0036] Pin NN4BEG[3] is outside die area.
+[WARNING GRT-0036] Pin NN4BEG[8] is outside die area.
+[WARNING GRT-0036] Pin NN4END[10] is outside die area.
+[WARNING GRT-0036] Pin NN4END[11] is outside die area.
+[WARNING GRT-0036] Pin NN4END[13] is outside die area.
+[WARNING GRT-0036] Pin NN4END[14] is outside die area.
+[WARNING GRT-0036] Pin NN4END[15] is outside die area.
+[WARNING GRT-0036] Pin NN4END[5] is outside die area.
+[WARNING GRT-0036] Pin NN4END[6] is outside die area.
+[WARNING GRT-0036] Pin NN4END[9] is outside die area.
+[WARNING GRT-0036] Pin S1BEG[3] is outside die area.
+[WARNING GRT-0036] Pin S2BEG[7] is outside die area.
+[WARNING GRT-0036] Pin S2BEGb[7] is outside die area.
+[WARNING GRT-0036] Pin S2END[5] is outside die area.
+[WARNING GRT-0036] Pin S2MID[0] is outside die area.
+[WARNING GRT-0036] Pin S2MID[2] is outside die area.
+[WARNING GRT-0036] Pin S2MID[3] is outside die area.
+[WARNING GRT-0036] Pin S2MID[5] is outside die area.
+[WARNING GRT-0036] Pin S4BEG[10] is outside die area.
+[WARNING GRT-0036] Pin S4BEG[12] is outside die area.
+[WARNING GRT-0036] Pin S4BEG[13] is outside die area.
+[WARNING GRT-0036] Pin S4BEG[14] is outside die area.
+[WARNING GRT-0036] Pin S4BEG[15] is outside die area.
+[WARNING GRT-0036] Pin S4BEG[2] is outside die area.
+[WARNING GRT-0036] Pin S4BEG[6] is outside die area.
+[WARNING GRT-0036] Pin S4END[11] is outside die area.
+[WARNING GRT-0036] Pin S4END[12] is outside die area.
+[WARNING GRT-0036] Pin S4END[13] is outside die area.
+[WARNING GRT-0036] Pin S4END[15] is outside die area.
+[WARNING GRT-0036] Pin S4END[4] is outside die area.
+[WARNING GRT-0036] Pin S4END[5] is outside die area.
+[WARNING GRT-0036] Pin S4END[7] is outside die area.
+[WARNING GRT-0036] Pin S4END[8] is outside die area.
+[WARNING GRT-0036] Pin SS4BEG[12] is outside die area.
+[WARNING GRT-0036] Pin SS4BEG[14] is outside die area.
+[WARNING GRT-0036] Pin SS4BEG[2] is outside die area.
+[WARNING GRT-0036] Pin SS4BEG[4] is outside die area.
+[WARNING GRT-0036] Pin SS4END[10] is outside die area.
+[WARNING GRT-0036] Pin SS4END[11] is outside die area.
+[WARNING GRT-0036] Pin SS4END[12] is outside die area.
+[WARNING GRT-0036] Pin SS4END[13] is outside die area.
+[WARNING GRT-0036] Pin SS4END[14] is outside die area.
+[WARNING GRT-0036] Pin SS4END[4] is outside die area.
+[WARNING GRT-0036] Pin SS4END[5] is outside die area.
+[WARNING GRT-0036] Pin SS4END[7] is outside die area.
+[WARNING GRT-0036] Pin SS4END[9] is outside die area.
+[WARNING GRT-0036] Pin W1BEG[2] is outside die area.
+[WARNING GRT-0036] Pin W1BEG[3] is outside die area.
+[WARNING GRT-0036] Pin W2BEG[1] is outside die area.
+[WARNING GRT-0036] Pin W2BEG[2] is outside die area.
+[WARNING GRT-0036] Pin W2BEG[3] is outside die area.
+[WARNING GRT-0036] Pin W2BEG[7] is outside die area.
+[WARNING GRT-0036] Pin W2BEGb[0] is outside die area.
+[WARNING GRT-0036] Pin W2MID[0] is outside die area.
+[WARNING GRT-0036] Pin W2MID[2] is outside die area.
+[WARNING GRT-0036] Pin W2MID[3] is outside die area.
+[WARNING GRT-0036] Pin W2MID[4] is outside die area.
+[WARNING GRT-0036] Pin W2MID[5] is outside die area.
+[WARNING GRT-0036] Pin W2MID[6] is outside die area.
+[WARNING GRT-0036] Pin W6BEG[0] is outside die area.
+[WARNING GRT-0036] Pin W6BEG[2] is outside die area.
+[WARNING GRT-0036] Pin W6BEG[9] is outside die area.
+[WARNING GRT-0036] Pin W6END[10] is outside die area.
+[WARNING GRT-0036] Pin W6END[3] is outside die area.
+[WARNING GRT-0036] Pin W6END[5] is outside die area.
+[WARNING GRT-0036] Pin W6END[6] is outside die area.
+[WARNING GRT-0036] Pin W6END[9] is outside die area.
+[WARNING GRT-0036] Pin WW4BEG[0] is outside die area.
+[WARNING GRT-0036] Pin WW4BEG[8] is outside die area.
+[WARNING GRT-0036] Pin WW4END[10] is outside die area.
+[WARNING GRT-0036] Pin WW4END[11] is outside die area.
+[WARNING GRT-0036] Pin WW4END[12] is outside die area.
+[WARNING GRT-0036] Pin WW4END[13] is outside die area.
+[WARNING GRT-0036] Pin WW4END[14] is outside die area.
+[WARNING GRT-0036] Pin WW4END[15] is outside die area.
+[WARNING GRT-0036] Pin WW4END[5] is outside die area.
+[WARNING GRT-0036] Pin WW4END[6] is outside die area.
+[WARNING GRT-0036] Pin WW4END[7] is outside die area.
+[WARNING GRT-0036] Pin WW4END[8] is outside die area.
+[WARNING GRT-0036] Pin WW4END[9] is outside die area.
+[INFO GRT-0009] rerouting 674 nets.
+[INFO GRT-0001] Minimum degree: 2
+[INFO GRT-0002] Maximum degree: 14
+[INFO GRT-0006] Repairing antennas, iteration 2.
+[INFO GRT-0043] No OR_DEFAULT vias defined.
+[INFO GRT-0012] Found 25 antenna violations.
+[INFO GRT-0015] Inserted 30 diodes.
+[WARNING GRT-0036] Pin E6END[10] is outside die area.
+[INFO GRT-0009] rerouting 83 nets.
+[INFO GRT-0001] Minimum degree: 2
+[INFO GRT-0002] Maximum degree: 15
+[INFO GRT-0006] Repairing antennas, iteration 3.
+[INFO GRT-0043] No OR_DEFAULT vias defined.
+[INFO GRT-0012] Found 7 antenna violations.
+[INFO GRT-0015] Inserted 7 diodes.
+[INFO GRT-0009] rerouting 9 nets.
+[INFO GRT-0001] Minimum degree: 3
+[INFO GRT-0002] Maximum degree: 13
+Placement Analysis
+---------------------------------
+total displacement          0.0 u
+average displacement        0.0 u
+max displacement            0.0 u
+original HPWL          161180.8 u
+legalized HPWL         161180.8 u
+delta HPWL                    0 %
+
+[INFO DPL-0020] Mirrored 818 instances
+[INFO DPL-0021] HPWL before          161180.8 u
+[INFO DPL-0022] HPWL after           159087.8 u
+[INFO DPL-0023] HPWL delta               -1.3 %
+-congestion_iterations 50 -verbose
+[INFO GRT-0020] Min routing layer: met1
+[INFO GRT-0021] Max routing layer: met5
+[INFO GRT-0022] Global adjustment: 30%
+[INFO GRT-0023] Grid origin: (0, 0)
+[INFO GRT-0043] No OR_DEFAULT vias defined.
+[INFO GRT-0088] Layer li1     Track-Pitch = 0.4600  line-2-Via Pitch: 0.3400
+[INFO GRT-0088] Layer met1    Track-Pitch = 0.3400  line-2-Via Pitch: 0.3400
+[INFO GRT-0088] Layer met2    Track-Pitch = 0.4600  line-2-Via Pitch: 0.3500
+[INFO GRT-0088] Layer met3    Track-Pitch = 0.6800  line-2-Via Pitch: 0.6150
+[INFO GRT-0088] Layer met4    Track-Pitch = 0.9200  line-2-Via Pitch: 1.0400
+[INFO GRT-0088] Layer met5    Track-Pitch = 3.4000  line-2-Via Pitch: 3.1100
+[INFO GRT-0019] Found 0 clock nets.
+[WARNING GRT-0036] Pin Ci is outside die area.
+[WARNING GRT-0036] Pin Co is outside die area.
+[WARNING GRT-0036] Pin E1BEG[0] is outside die area.
+[WARNING GRT-0036] Pin E1BEG[1] is outside die area.
+[WARNING GRT-0036] Pin E1BEG[2] is outside die area.
+[WARNING GRT-0036] Pin E1BEG[3] is outside die area.
+[WARNING GRT-0036] Pin E1END[0] is outside die area.
+[WARNING GRT-0036] Pin E1END[1] is outside die area.
+[WARNING GRT-0036] Pin E1END[2] is outside die area.
+[WARNING GRT-0036] Pin E1END[3] is outside die area.
+[WARNING GRT-0036] Pin E2BEG[0] is outside die area.
+[WARNING GRT-0036] Pin E2BEG[1] is outside die area.
+[WARNING GRT-0036] Pin E2BEG[2] is outside die area.
+[WARNING GRT-0036] Pin E2BEG[3] is outside die area.
+[WARNING GRT-0036] Pin E2BEG[4] is outside die area.
+[WARNING GRT-0036] Pin E2BEG[5] is outside die area.
+[WARNING GRT-0036] Pin E2BEG[6] is outside die area.
+[WARNING GRT-0036] Pin E2BEG[7] is outside die area.
+[WARNING GRT-0036] Pin E2BEGb[0] is outside die area.
+[WARNING GRT-0036] Pin E2BEGb[1] is outside die area.
+[WARNING GRT-0036] Pin E2BEGb[2] is outside die area.
+[WARNING GRT-0036] Pin E2BEGb[3] is outside die area.
+[WARNING GRT-0036] Pin E2BEGb[4] is outside die area.
+[WARNING GRT-0036] Pin E2BEGb[5] is outside die area.
+[WARNING GRT-0036] Pin E2BEGb[6] is outside die area.
+[WARNING GRT-0036] Pin E2BEGb[7] is outside die area.
+[WARNING GRT-0036] Pin E2END[0] is outside die area.
+[WARNING GRT-0036] Pin E2END[1] is outside die area.
+[WARNING GRT-0036] Pin E2END[2] is outside die area.
+[WARNING GRT-0036] Pin E2END[3] is outside die area.
+[WARNING GRT-0036] Pin E2END[4] is outside die area.
+[WARNING GRT-0036] Pin E2END[5] is outside die area.
+[WARNING GRT-0036] Pin E2END[6] is outside die area.
+[WARNING GRT-0036] Pin E2END[7] is outside die area.
+[WARNING GRT-0036] Pin E2MID[0] is outside die area.
+[WARNING GRT-0036] Pin E2MID[1] is outside die area.
+[WARNING GRT-0036] Pin E2MID[2] is outside die area.
+[WARNING GRT-0036] Pin E2MID[3] is outside die area.
+[WARNING GRT-0036] Pin E2MID[4] is outside die area.
+[WARNING GRT-0036] Pin E2MID[5] is outside die area.
+[WARNING GRT-0036] Pin E2MID[6] is outside die area.
+[WARNING GRT-0036] Pin E2MID[7] is outside die area.
+[WARNING GRT-0036] Pin E6BEG[0] is outside die area.
+[WARNING GRT-0036] Pin E6BEG[10] is outside die area.
+[WARNING GRT-0036] Pin E6BEG[11] is outside die area.
+[WARNING GRT-0036] Pin E6BEG[1] is outside die area.
+[WARNING GRT-0036] Pin E6BEG[2] is outside die area.
+[WARNING GRT-0036] Pin E6BEG[3] is outside die area.
+[WARNING GRT-0036] Pin E6BEG[4] is outside die area.
+[WARNING GRT-0036] Pin E6BEG[5] is outside die area.
+[WARNING GRT-0036] Pin E6BEG[6] is outside die area.
+[WARNING GRT-0036] Pin E6BEG[7] is outside die area.
+[WARNING GRT-0036] Pin E6BEG[8] is outside die area.
+[WARNING GRT-0036] Pin E6BEG[9] is outside die area.
+[WARNING GRT-0036] Pin E6END[0] is outside die area.
+[WARNING GRT-0036] Pin E6END[10] is outside die area.
+[WARNING GRT-0036] Pin E6END[11] is outside die area.
+[WARNING GRT-0036] Pin E6END[1] is outside die area.
+[WARNING GRT-0036] Pin E6END[2] is outside die area.
+[WARNING GRT-0036] Pin E6END[3] is outside die area.
+[WARNING GRT-0036] Pin E6END[4] is outside die area.
+[WARNING GRT-0036] Pin E6END[5] is outside die area.
+[WARNING GRT-0036] Pin E6END[6] is outside die area.
+[WARNING GRT-0036] Pin E6END[7] is outside die area.
+[WARNING GRT-0036] Pin E6END[8] is outside die area.
+[WARNING GRT-0036] Pin E6END[9] is outside die area.
+[WARNING GRT-0036] Pin EE4BEG[0] is outside die area.
+[WARNING GRT-0036] Pin EE4BEG[10] is outside die area.
+[WARNING GRT-0036] Pin EE4BEG[11] is outside die area.
+[WARNING GRT-0036] Pin EE4BEG[12] is outside die area.
+[WARNING GRT-0036] Pin EE4BEG[13] is outside die area.
+[WARNING GRT-0036] Pin EE4BEG[14] is outside die area.
+[WARNING GRT-0036] Pin EE4BEG[15] is outside die area.
+[WARNING GRT-0036] Pin EE4BEG[1] is outside die area.
+[WARNING GRT-0036] Pin EE4BEG[2] is outside die area.
+[WARNING GRT-0036] Pin EE4BEG[3] is outside die area.
+[WARNING GRT-0036] Pin EE4BEG[4] is outside die area.
+[WARNING GRT-0036] Pin EE4BEG[5] is outside die area.
+[WARNING GRT-0036] Pin EE4BEG[6] is outside die area.
+[WARNING GRT-0036] Pin EE4BEG[7] is outside die area.
+[WARNING GRT-0036] Pin EE4BEG[8] is outside die area.
+[WARNING GRT-0036] Pin EE4BEG[9] is outside die area.
+[WARNING GRT-0036] Pin EE4END[0] is outside die area.
+[WARNING GRT-0036] Pin EE4END[10] is outside die area.
+[WARNING GRT-0036] Pin EE4END[11] is outside die area.
+[WARNING GRT-0036] Pin EE4END[12] is outside die area.
+[WARNING GRT-0036] Pin EE4END[13] is outside die area.
+[WARNING GRT-0036] Pin EE4END[14] is outside die area.
+[WARNING GRT-0036] Pin EE4END[15] is outside die area.
+[WARNING GRT-0036] Pin EE4END[1] is outside die area.
+[WARNING GRT-0036] Pin EE4END[2] is outside die area.
+[WARNING GRT-0036] Pin EE4END[3] is outside die area.
+[WARNING GRT-0036] Pin EE4END[4] is outside die area.
+[WARNING GRT-0036] Pin EE4END[5] is outside die area.
+[WARNING GRT-0036] Pin EE4END[6] is outside die area.
+[WARNING GRT-0036] Pin EE4END[7] is outside die area.
+[WARNING GRT-0036] Pin EE4END[8] is outside die area.
+[WARNING GRT-0036] Pin EE4END[9] is outside die area.
+[WARNING GRT-0036] Pin FrameData[0] is outside die area.
+[WARNING GRT-0036] Pin FrameData[10] is outside die area.
+[WARNING GRT-0036] Pin FrameData[11] is outside die area.
+[WARNING GRT-0036] Pin FrameData[12] is outside die area.
+[WARNING GRT-0036] Pin FrameData[13] is outside die area.
+[WARNING GRT-0036] Pin FrameData[14] is outside die area.
+[WARNING GRT-0036] Pin FrameData[15] is outside die area.
+[WARNING GRT-0036] Pin FrameData[16] is outside die area.
+[WARNING GRT-0036] Pin FrameData[17] is outside die area.
+[WARNING GRT-0036] Pin FrameData[18] is outside die area.
+[WARNING GRT-0036] Pin FrameData[19] is outside die area.
+[WARNING GRT-0036] Pin FrameData[1] is outside die area.
+[WARNING GRT-0036] Pin FrameData[20] is outside die area.
+[WARNING GRT-0036] Pin FrameData[21] is outside die area.
+[WARNING GRT-0036] Pin FrameData[22] is outside die area.
+[WARNING GRT-0036] Pin FrameData[23] is outside die area.
+[WARNING GRT-0036] Pin FrameData[24] is outside die area.
+[WARNING GRT-0036] Pin FrameData[25] is outside die area.
+[WARNING GRT-0036] Pin FrameData[26] is outside die area.
+[WARNING GRT-0036] Pin FrameData[27] is outside die area.
+[WARNING GRT-0036] Pin FrameData[28] is outside die area.
+[WARNING GRT-0036] Pin FrameData[29] is outside die area.
+[WARNING GRT-0036] Pin FrameData[2] is outside die area.
+[WARNING GRT-0036] Pin FrameData[30] is outside die area.
+[WARNING GRT-0036] Pin FrameData[31] is outside die area.
+[WARNING GRT-0036] Pin FrameData[3] is outside die area.
+[WARNING GRT-0036] Pin FrameData[4] is outside die area.
+[WARNING GRT-0036] Pin FrameData[5] is outside die area.
+[WARNING GRT-0036] Pin FrameData[6] is outside die area.
+[WARNING GRT-0036] Pin FrameData[7] is outside die area.
+[WARNING GRT-0036] Pin FrameData[8] is outside die area.
+[WARNING GRT-0036] Pin FrameData[9] is outside die area.
+[WARNING GRT-0036] Pin FrameData_O[0] is outside die area.
+[WARNING GRT-0036] Pin FrameData_O[10] is outside die area.
+[WARNING GRT-0036] Pin FrameData_O[11] is outside die area.
+[WARNING GRT-0036] Pin FrameData_O[12] is outside die area.
+[WARNING GRT-0036] Pin FrameData_O[13] is outside die area.
+[WARNING GRT-0036] Pin FrameData_O[14] is outside die area.
+[WARNING GRT-0036] Pin FrameData_O[15] is outside die area.
+[WARNING GRT-0036] Pin FrameData_O[16] is outside die area.
+[WARNING GRT-0036] Pin FrameData_O[17] is outside die area.
+[WARNING GRT-0036] Pin FrameData_O[18] is outside die area.
+[WARNING GRT-0036] Pin FrameData_O[19] is outside die area.
+[WARNING GRT-0036] Pin FrameData_O[1] is outside die area.
+[WARNING GRT-0036] Pin FrameData_O[20] is outside die area.
+[WARNING GRT-0036] Pin FrameData_O[21] is outside die area.
+[WARNING GRT-0036] Pin FrameData_O[22] is outside die area.
+[WARNING GRT-0036] Pin FrameData_O[23] is outside die area.
+[WARNING GRT-0036] Pin FrameData_O[24] is outside die area.
+[WARNING GRT-0036] Pin FrameData_O[25] is outside die area.
+[WARNING GRT-0036] Pin FrameData_O[26] is outside die area.
+[WARNING GRT-0036] Pin FrameData_O[27] is outside die area.
+[WARNING GRT-0036] Pin FrameData_O[28] is outside die area.
+[WARNING GRT-0036] Pin FrameData_O[29] is outside die area.
+[WARNING GRT-0036] Pin FrameData_O[2] is outside die area.
+[WARNING GRT-0036] Pin FrameData_O[30] is outside die area.
+[WARNING GRT-0036] Pin FrameData_O[31] is outside die area.
+[WARNING GRT-0036] Pin FrameData_O[3] is outside die area.
+[WARNING GRT-0036] Pin FrameData_O[4] is outside die area.
+[WARNING GRT-0036] Pin FrameData_O[5] is outside die area.
+[WARNING GRT-0036] Pin FrameData_O[6] is outside die area.
+[WARNING GRT-0036] Pin FrameData_O[7] is outside die area.
+[WARNING GRT-0036] Pin FrameData_O[8] is outside die area.
+[WARNING GRT-0036] Pin FrameData_O[9] is outside die area.
+[WARNING GRT-0036] Pin FrameStrobe[0] is outside die area.
+[WARNING GRT-0036] Pin FrameStrobe[10] is outside die area.
+[WARNING GRT-0036] Pin FrameStrobe[11] is outside die area.
+[WARNING GRT-0036] Pin FrameStrobe[12] is outside die area.
+[WARNING GRT-0036] Pin FrameStrobe[13] is outside die area.
+[WARNING GRT-0036] Pin FrameStrobe[14] is outside die area.
+[WARNING GRT-0036] Pin FrameStrobe[15] is outside die area.
+[WARNING GRT-0036] Pin FrameStrobe[16] is outside die area.
+[WARNING GRT-0036] Pin FrameStrobe[17] is outside die area.
+[WARNING GRT-0036] Pin FrameStrobe[18] is outside die area.
+[WARNING GRT-0036] Pin FrameStrobe[19] is outside die area.
+[WARNING GRT-0036] Pin FrameStrobe[1] is outside die area.
+[WARNING GRT-0036] Pin FrameStrobe[2] is outside die area.
+[WARNING GRT-0036] Pin FrameStrobe[3] is outside die area.
+[WARNING GRT-0036] Pin FrameStrobe[4] is outside die area.
+[WARNING GRT-0036] Pin FrameStrobe[5] is outside die area.
+[WARNING GRT-0036] Pin FrameStrobe[6] is outside die area.
+[WARNING GRT-0036] Pin FrameStrobe[7] is outside die area.
+[WARNING GRT-0036] Pin FrameStrobe[8] is outside die area.
+[WARNING GRT-0036] Pin FrameStrobe[9] is outside die area.
+[WARNING GRT-0036] Pin FrameStrobe_O[0] is outside die area.
+[WARNING GRT-0036] Pin FrameStrobe_O[10] is outside die area.
+[WARNING GRT-0036] Pin FrameStrobe_O[11] is outside die area.
+[WARNING GRT-0036] Pin FrameStrobe_O[12] is outside die area.
+[WARNING GRT-0036] Pin FrameStrobe_O[13] is outside die area.
+[WARNING GRT-0036] Pin FrameStrobe_O[14] is outside die area.
+[WARNING GRT-0036] Pin FrameStrobe_O[15] is outside die area.
+[WARNING GRT-0036] Pin FrameStrobe_O[16] is outside die area.
+[WARNING GRT-0036] Pin FrameStrobe_O[17] is outside die area.
+[WARNING GRT-0036] Pin FrameStrobe_O[18] is outside die area.
+[WARNING GRT-0036] Pin FrameStrobe_O[19] is outside die area.
+[WARNING GRT-0036] Pin FrameStrobe_O[1] is outside die area.
+[WARNING GRT-0036] Pin FrameStrobe_O[2] is outside die area.
+[WARNING GRT-0036] Pin FrameStrobe_O[3] is outside die area.
+[WARNING GRT-0036] Pin FrameStrobe_O[4] is outside die area.
+[WARNING GRT-0036] Pin FrameStrobe_O[5] is outside die area.
+[WARNING GRT-0036] Pin FrameStrobe_O[6] is outside die area.
+[WARNING GRT-0036] Pin FrameStrobe_O[7] is outside die area.
+[WARNING GRT-0036] Pin FrameStrobe_O[8] is outside die area.
+[WARNING GRT-0036] Pin FrameStrobe_O[9] is outside die area.
+[WARNING GRT-0036] Pin N1BEG[0] is outside die area.
+[WARNING GRT-0036] Pin N1BEG[1] is outside die area.
+[WARNING GRT-0036] Pin N1BEG[2] is outside die area.
+[WARNING GRT-0036] Pin N1BEG[3] is outside die area.
+[WARNING GRT-0036] Pin N1END[0] is outside die area.
+[WARNING GRT-0036] Pin N1END[1] is outside die area.
+[WARNING GRT-0036] Pin N1END[2] is outside die area.
+[WARNING GRT-0036] Pin N1END[3] is outside die area.
+[WARNING GRT-0036] Pin N2BEG[0] is outside die area.
+[WARNING GRT-0036] Pin N2BEG[1] is outside die area.
+[WARNING GRT-0036] Pin N2BEG[2] is outside die area.
+[WARNING GRT-0036] Pin N2BEG[3] is outside die area.
+[WARNING GRT-0036] Pin N2BEG[4] is outside die area.
+[WARNING GRT-0036] Pin N2BEG[5] is outside die area.
+[WARNING GRT-0036] Pin N2BEG[6] is outside die area.
+[WARNING GRT-0036] Pin N2BEG[7] is outside die area.
+[WARNING GRT-0036] Pin N2BEGb[0] is outside die area.
+[WARNING GRT-0036] Pin N2BEGb[1] is outside die area.
+[WARNING GRT-0036] Pin N2BEGb[2] is outside die area.
+[WARNING GRT-0036] Pin N2BEGb[3] is outside die area.
+[WARNING GRT-0036] Pin N2BEGb[4] is outside die area.
+[WARNING GRT-0036] Pin N2BEGb[5] is outside die area.
+[WARNING GRT-0036] Pin N2BEGb[6] is outside die area.
+[WARNING GRT-0036] Pin N2BEGb[7] is outside die area.
+[WARNING GRT-0036] Pin N2END[0] is outside die area.
+[WARNING GRT-0036] Pin N2END[1] is outside die area.
+[WARNING GRT-0036] Pin N2END[2] is outside die area.
+[WARNING GRT-0036] Pin N2END[3] is outside die area.
+[WARNING GRT-0036] Pin N2END[4] is outside die area.
+[WARNING GRT-0036] Pin N2END[5] is outside die area.
+[WARNING GRT-0036] Pin N2END[6] is outside die area.
+[WARNING GRT-0036] Pin N2END[7] is outside die area.
+[WARNING GRT-0036] Pin N2MID[0] is outside die area.
+[WARNING GRT-0036] Pin N2MID[1] is outside die area.
+[WARNING GRT-0036] Pin N2MID[2] is outside die area.
+[WARNING GRT-0036] Pin N2MID[3] is outside die area.
+[WARNING GRT-0036] Pin N2MID[4] is outside die area.
+[WARNING GRT-0036] Pin N2MID[5] is outside die area.
+[WARNING GRT-0036] Pin N2MID[6] is outside die area.
+[WARNING GRT-0036] Pin N2MID[7] is outside die area.
+[WARNING GRT-0036] Pin N4BEG[0] is outside die area.
+[WARNING GRT-0036] Pin N4BEG[10] is outside die area.
+[WARNING GRT-0036] Pin N4BEG[11] is outside die area.
+[WARNING GRT-0036] Pin N4BEG[12] is outside die area.
+[WARNING GRT-0036] Pin N4BEG[13] is outside die area.
+[WARNING GRT-0036] Pin N4BEG[14] is outside die area.
+[WARNING GRT-0036] Pin N4BEG[15] is outside die area.
+[WARNING GRT-0036] Pin N4BEG[1] is outside die area.
+[WARNING GRT-0036] Pin N4BEG[2] is outside die area.
+[WARNING GRT-0036] Pin N4BEG[3] is outside die area.
+[WARNING GRT-0036] Pin N4BEG[4] is outside die area.
+[WARNING GRT-0036] Pin N4BEG[5] is outside die area.
+[WARNING GRT-0036] Pin N4BEG[6] is outside die area.
+[WARNING GRT-0036] Pin N4BEG[7] is outside die area.
+[WARNING GRT-0036] Pin N4BEG[8] is outside die area.
+[WARNING GRT-0036] Pin N4BEG[9] is outside die area.
+[WARNING GRT-0036] Pin N4END[0] is outside die area.
+[WARNING GRT-0036] Pin N4END[10] is outside die area.
+[WARNING GRT-0036] Pin N4END[11] is outside die area.
+[WARNING GRT-0036] Pin N4END[12] is outside die area.
+[WARNING GRT-0036] Pin N4END[13] is outside die area.
+[WARNING GRT-0036] Pin N4END[14] is outside die area.
+[WARNING GRT-0036] Pin N4END[15] is outside die area.
+[WARNING GRT-0036] Pin N4END[1] is outside die area.
+[WARNING GRT-0036] Pin N4END[2] is outside die area.
+[WARNING GRT-0036] Pin N4END[3] is outside die area.
+[WARNING GRT-0036] Pin N4END[4] is outside die area.
+[WARNING GRT-0036] Pin N4END[5] is outside die area.
+[WARNING GRT-0036] Pin N4END[6] is outside die area.
+[WARNING GRT-0036] Pin N4END[7] is outside die area.
+[WARNING GRT-0036] Pin N4END[8] is outside die area.
+[WARNING GRT-0036] Pin N4END[9] is outside die area.
+[WARNING GRT-0036] Pin NN4BEG[0] is outside die area.
+[WARNING GRT-0036] Pin NN4BEG[10] is outside die area.
+[WARNING GRT-0036] Pin NN4BEG[11] is outside die area.
+[WARNING GRT-0036] Pin NN4BEG[12] is outside die area.
+[WARNING GRT-0036] Pin NN4BEG[13] is outside die area.
+[WARNING GRT-0036] Pin NN4BEG[14] is outside die area.
+[WARNING GRT-0036] Pin NN4BEG[15] is outside die area.
+[WARNING GRT-0036] Pin NN4BEG[1] is outside die area.
+[WARNING GRT-0036] Pin NN4BEG[2] is outside die area.
+[WARNING GRT-0036] Pin NN4BEG[3] is outside die area.
+[WARNING GRT-0036] Pin NN4BEG[4] is outside die area.
+[WARNING GRT-0036] Pin NN4BEG[5] is outside die area.
+[WARNING GRT-0036] Pin NN4BEG[6] is outside die area.
+[WARNING GRT-0036] Pin NN4BEG[7] is outside die area.
+[WARNING GRT-0036] Pin NN4BEG[8] is outside die area.
+[WARNING GRT-0036] Pin NN4BEG[9] is outside die area.
+[WARNING GRT-0036] Pin NN4END[0] is outside die area.
+[WARNING GRT-0036] Pin NN4END[10] is outside die area.
+[WARNING GRT-0036] Pin NN4END[11] is outside die area.
+[WARNING GRT-0036] Pin NN4END[12] is outside die area.
+[WARNING GRT-0036] Pin NN4END[13] is outside die area.
+[WARNING GRT-0036] Pin NN4END[14] is outside die area.
+[WARNING GRT-0036] Pin NN4END[15] is outside die area.
+[WARNING GRT-0036] Pin NN4END[1] is outside die area.
+[WARNING GRT-0036] Pin NN4END[2] is outside die area.
+[WARNING GRT-0036] Pin NN4END[3] is outside die area.
+[WARNING GRT-0036] Pin NN4END[4] is outside die area.
+[WARNING GRT-0036] Pin NN4END[5] is outside die area.
+[WARNING GRT-0036] Pin NN4END[6] is outside die area.
+[WARNING GRT-0036] Pin NN4END[7] is outside die area.
+[WARNING GRT-0036] Pin NN4END[8] is outside die area.
+[WARNING GRT-0036] Pin NN4END[9] is outside die area.
+[WARNING GRT-0036] Pin S1BEG[0] is outside die area.
+[WARNING GRT-0036] Pin S1BEG[1] is outside die area.
+[WARNING GRT-0036] Pin S1BEG[2] is outside die area.
+[WARNING GRT-0036] Pin S1BEG[3] is outside die area.
+[WARNING GRT-0036] message limit reached, this message will no longer print
+[INFO GRT-0001] Minimum degree: 2
+[INFO GRT-0002] Maximum degree: 15
+[INFO GRT-0003] Macros: 0
+[INFO GRT-0043] No OR_DEFAULT vias defined.
+[INFO GRT-0004] Blockages: 11639
+
+[INFO GRT-0053] Routing resources analysis:
+          Routing      Original      Derated      Resource
+Layer     Direction    Resources     Resources    Reduction (%)
+---------------------------------------------------------------
+li1        Vertical            0             0          0.00%
+met1       Horizontal     104328         50347          51.74%
+met2       Vertical        78192         51274          34.43%
+met3       Horizontal      52128         35738          31.44%
+met4       Vertical        31392         19596          37.58%
+met5       Horizontal      10368          4899          52.75%
+---------------------------------------------------------------
+
+[INFO GRT-0197] Via related to pin nodes: 13840
+[INFO GRT-0198] Via related Steiner nodes: 682
+[INFO GRT-0199] Via filling finished.
+[INFO GRT-0111] Final number of vias: 18871
+[INFO GRT-0112] Final usage 3D: 82915
+
+[INFO GRT-0096] Final congestion report:
+Layer         Resource        Demand        Usage (%)    Max H / Max V / Total Overflow
+---------------------------------------------------------------------------------------
+li1                  0             0            0.00%             0 /  0 /  0
+met1             50347         11831           23.50%             0 /  0 /  0
+met2             51274         12952           25.26%             0 /  0 /  0
+met3             35738          1084            3.03%             0 /  0 /  0
+met4             19596           435            2.22%             0 /  0 /  0
+met5              4899             0            0.00%             0 /  0 /  0
+---------------------------------------------------------------------------------------
+Total           161854         26302           16.25%             0 /  0 /  0
+
+[INFO GRT-0018] Total wirelength: 231998 um
+[INFO GRT-0014] Routed nets: 2550
+[INFO] Setting RC values…
+Setting global connections for newly added cells…
+[INFO] Setting global connections...
+Updating metrics…
+Cell type report:                       Count       Area
+  Fill cell                               358    1343.79
+  Tap cell                               3348    4189.02
+  Antenna cell                            147     367.85
+  Buffer                                  224     994.70
+  Timing Repair Buffer                    660    5157.45
+  Inverter                                 61     228.97
+  Sequential cell                         624    9409.02
+  Multi-Input combinational cell          727   11771.29
+  Total                                  6149   33462.09
+Writing OpenROAD database to '/home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/39-openroad-repairantennas/1-diodeinsertion/LUT4AB.odb'…
+Writing layout to '/home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/39-openroad-repairantennas/1-diodeinsertion/LUT4AB.def'…

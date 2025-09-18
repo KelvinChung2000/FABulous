@@ -1,0 +1,85 @@
+
+===========================================================================
+Violator List
+============================================================================
+[setup in-out] Ci -> Co : -33.307930
+[setup in-out] Ci -> N1BEG[0] : -32.562710
+[setup in-out] Ci -> E1BEG[0] : -32.522625
+[setup in-out] Ci -> S1BEG[0] : -32.449883
+[setup in-out] Ci -> W1BEG[0] : -32.429070
+[setup in-out] Ci -> N1BEG[3] : -32.342300
+[setup in-out] Ci -> W1BEG[3] : -32.340843
+[setup in-out] Ci -> E1BEG[3] : -32.339508
+[setup in-out] Ci -> S1BEG[3] : -32.337227
+[setup in-out] Ci -> W1BEG[2] : -31.828547
+[setup in-out] Ci -> N1BEG[2] : -31.811852
+[setup in-out] Ci -> E1BEG[2] : -31.793985
+[setup in-out] Ci -> S1BEG[2] : -31.786432
+[setup in-out] Ci -> E1BEG[1] : -31.773781
+[setup in-out] Ci -> W1BEG[1] : -31.755985
+[setup in-out] Ci -> N1BEG[1] : -31.627771
+[setup in-out] Ci -> S1BEG[1] : -31.580069
+[setup in-out] Ci -> E2BEG[3] : -31.444714
+[setup in-out] Ci -> W2BEG[1] : -31.395548
+[setup in-out] Ci -> N2BEG[3] : -31.369980
+[setup in-out] Ci -> N2BEG[2] : -31.353926
+[setup in-out] Ci -> S2BEG[1] : -31.352337
+[setup in-out] Ci -> W2BEG[6] : -31.332779
+[setup in-out] Ci -> E2BEG[2] : -31.329060
+[setup in-out] Ci -> E6BEG[10] : -31.314838
+[setup in-out] Ci -> N2BEG[1] : -31.299917
+[setup in-out] Ci -> W6BEG[10] : -31.295832
+[setup in-out] Ci -> E2BEG[1] : -31.291533
+[setup in-out] Ci -> W2BEG[3] : -31.267221
+[setup in-out] Ci -> W6BEG[11] : -31.263245
+[setup in-out] Ci -> E6BEG[11] : -31.261522
+[setup in-out] Ci -> W2BEG[2] : -31.252449
+[setup in-out] Ci -> N2BEG[5] : -31.224514
+[setup in-out] Ci -> N2BEG[0] : -31.194109
+[setup in-out] Ci -> S2BEG[0] : -31.194105
+[setup in-out] Ci -> E2BEG[0] : -31.147192
+[setup in-out] Ci -> N2BEG[6] : -31.142683
+[setup in-out] Ci -> E2BEG[6] : -31.109335
+[setup in-out] Ci -> N2BEG[4] : -31.108284
+[setup in-out] Ci -> W2BEG[0] : -31.053968
+[setup in-out] Ci -> SS4BEG[13] : -30.877417
+[setup in-out] Ci -> NN4BEG[13] : -30.867140
+[setup in-out] Ci -> EE4BEG[13] : -30.862286
+[setup in-out] Ci -> WW4BEG[13] : -30.790337
+[setup in-out] Ci -> N4BEG[15] : -30.563385
+[setup in-out] Ci -> NN4BEG[15] : -28.823704
+[setup in-out] Ci -> WW4BEG[15] : -28.762156
+[setup in-out] Ci -> SS4BEG[15] : -28.757048
+[setup in-out] Ci -> EE4BEG[15] : -28.744331
+[setup in-out] Ci -> E2BEG[7] : -28.150343
+[setup in-out] Ci -> W2BEG[7] : -28.114632
+[setup in-out] Ci -> S2BEG[7] : -27.896530
+[setup in-out] Ci -> NN4BEG[14] : -27.768448
+[setup in-out] Ci -> WW4BEG[14] : -27.764647
+[setup in-out] Ci -> EE4BEG[14] : -27.754803
+[setup in-out] Ci -> S2BEG[6] : -27.720110
+[setup in-out] Ci -> SS4BEG[14] : -27.620001
+[setup in-out] Ci -> S4BEG[14] : -27.511724
+[setup in-out] Ci -> S2BEG[2] : -25.105539
+[setup in-out] Ci -> EE4BEG[12] : -25.020868
+[setup in-out] Ci -> NN4BEG[12] : -24.990747
+[setup in-out] Ci -> SS4BEG[12] : -24.949909
+[setup in-out] Ci -> WW4BEG[12] : -24.840805
+[setup in-out] Ci -> N4BEG[14] : -24.760344
+[setup in-out] Ci -> S2BEG[5] : -20.989477
+[setup in-out] Ci -> S4BEG[13] : -19.998077
+[setup in-out] Ci -> S2BEG[3] : -17.165308
+[setup in-out] Ci -> N4BEG[13] : -16.930508
+[setup in-out] Ci -> W2BEG[5] : -14.337546
+[setup in-out] Ci -> N4BEG[12] : -13.735791
+[setup in-out] Ci -> E2BEG[4] : -10.193436
+[setup in-out] Ci -> W2BEG[4] : -7.708774
+[setup in-out] Ci -> E2BEG[5] : -5.221666
+[setup in-out] Ci -> S4BEG[15] : -4.136172
+[setup in-out] Ci -> S2BEG[4] : -0.957334
+Writing metric timing__hold_vio__count__corner:nom_tt_025C_1v80: 0
+Writing metric timing__hold_r2r__ws__corner:nom_tt_025C_1v80: 1e30
+Writing metric timing__hold_r2r_vio__count__corner:nom_tt_025C_1v80: 0
+Writing metric timing__setup_vio__count__corner:nom_tt_025C_1v80: 75
+Writing metric timing__setup_r2r__ws__corner:nom_tt_025C_1v80: 1e30
+Writing metric timing__setup_r2r_vio__count__corner:nom_tt_025C_1v80: 0

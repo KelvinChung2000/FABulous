@@ -1,0 +1,57 @@
+{
+   "creator": "Yosys 0.46 (git sha1 e97731b9dda91fa5fa53ed87df7c34163ba59a41, clang++ 17.0.6 -fPIC -O3)",
+   "invocation": "stat -json -liberty /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/tmp/c52492d1aae2441dbcc45592594478c9.lib ",
+   "modules": {
+      "\\LUT4AB": {
+         "num_wires":         3962,
+         "num_wire_bits":     4422,
+         "num_pub_wires":     768,
+         "num_pub_wire_bits": 1228,
+         "num_ports":         48,
+         "num_port_bits":     508,
+         "num_memories":      0,
+         "num_memory_bits":   0,
+         "num_processes":     0,
+         "num_cells":         2067,
+         "area":              9419.033600,
+         "num_cells_by_type": {
+            "$_ANDNOT_": 18,
+            "$_AND_": 10,
+            "$_MUX_": 1202,
+            "$_NAND_": 3,
+            "$_NOR_": 15,
+            "$_NOT_": 179,
+            "$_ORNOT_": 8,
+            "$_OR_": 8,
+            "sky130_fd_sc_hd__dfxtp_2": 8,
+            "sky130_fd_sc_hd__dlxtp_1": 616
+         }
+      }
+   },
+      "design": {
+         "num_wires":         3962,
+         "num_wire_bits":     4422,
+         "num_pub_wires":     768,
+         "num_pub_wire_bits": 1228,
+         "num_ports":         48,
+         "num_port_bits":     508,
+         "num_memories":      0,
+         "num_memory_bits":   0,
+         "num_processes":     0,
+         "num_cells":         2067,
+         "area":              9419.033600,
+         "num_cells_by_type": {
+            "$_ANDNOT_": 18,
+            "$_AND_": 10,
+            "$_MUX_": 1202,
+            "$_NAND_": 3,
+            "$_NOR_": 15,
+            "$_NOT_": 179,
+            "$_ORNOT_": 8,
+            "$_OR_": 8,
+            "sky130_fd_sc_hd__dfxtp_2": 8,
+            "sky130_fd_sc_hd__dlxtp_1": 616
+         }
+      }
+}
+

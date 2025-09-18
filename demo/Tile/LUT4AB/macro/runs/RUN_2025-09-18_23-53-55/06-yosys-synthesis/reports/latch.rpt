@@ -1,0 +1,4 @@
+
+20. Executing PROC_DLATCH pass (convert process syncs to latches).
+Latch inferred for signal `\LHQD1.\Q' from process `\LHQD1.$proc$/home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:55$11': $auto$proc_dlatch.cc:433:proc_dlatch$29
+Latch inferred for signal `\LHQD1.\QN' from process `\LHQD1.$proc$/home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:55$11': $auto$proc_dlatch.cc:433:proc_dlatch$40

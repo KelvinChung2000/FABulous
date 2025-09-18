@@ -1,0 +1,1 @@
+openroad -exit -no_splash -metrics /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/35-openroad-stamidpnr-2/or_metrics_out.json /nix/store/381vlqh72qv21j2s2ssfql1j0vg3f44v-FABulous-env/lib/python3.12/site-packages/librelane/scripts/openroad/sta/corner.tcl

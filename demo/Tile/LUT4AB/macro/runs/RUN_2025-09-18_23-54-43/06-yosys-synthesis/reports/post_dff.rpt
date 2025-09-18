@@ -1,0 +1,37 @@
+112. Printing statistics.
+
+=== LUT4AB ===
+
+   Number of wires:               3962
+   Number of wire bits:           4422
+   Number of public wires:         768
+   Number of public wire bits:    1228
+   Number of ports:                 48
+   Number of port bits:            508
+   Number of memories:               0
+   Number of memory bits:            0
+   Number of processes:              0
+   Number of cells:               2067
+     $_ANDNOT_                      18
+     $_AND_                         10
+     $_MUX_                       1202
+     $_NAND_                         3
+     $_NOR_                         15
+     $_NOT_                        179
+     $_ORNOT_                        8
+     $_OR_                           8
+     sky130_fd_sc_hd__dfxtp_2        8
+     sky130_fd_sc_hd__dlxtp_1      616
+
+   Area for cell type $_NOT_ is unknown!
+   Area for cell type $_AND_ is unknown!
+   Area for cell type $_NAND_ is unknown!
+   Area for cell type $_OR_ is unknown!
+   Area for cell type $_NOR_ is unknown!
+   Area for cell type $_ANDNOT_ is unknown!
+   Area for cell type $_ORNOT_ is unknown!
+   Area for cell type $_MUX_ is unknown!
+
+   Chip area for module '\LUT4AB': 9419.033600
+     of which used for sequential elements: 170.163200 (1.81%)
+

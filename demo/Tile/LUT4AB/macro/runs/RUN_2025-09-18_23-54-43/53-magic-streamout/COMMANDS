@@ -1,0 +1,1 @@
+magic -dnull -noconsole -rcfile /home/kelvin/.ciel/ciel/sky130/versions/0fe599b2afb6708d281543108caf8310912f54af/sky130A/libs.tech/magic/sky130A.magicrc /nix/store/381vlqh72qv21j2s2ssfql1j0vg3f44v-FABulous-env/lib/python3.12/site-packages/librelane/scripts/magic/wrapper.tcl

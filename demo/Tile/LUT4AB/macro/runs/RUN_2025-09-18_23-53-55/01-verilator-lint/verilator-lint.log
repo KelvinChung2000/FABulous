@@ -1,0 +1,419 @@
+%Warning-UNUSEDSIGNAL: /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB.v:181:24: Bits of signal are not used: 'ConfigBits_N'[153:0]
+                                                                                                     : ... note: In instance 'LUT4AB'
+  181 | wire[NoConfigBits-1:0] ConfigBits_N;
+      |                        ^~~~~~~~~~~~
+                       ... For warning description see https://verilator.org/warn/UNUSEDSIGNAL?v=5.018
+                       ... Use "/* verilator lint_off UNUSEDSIGNAL */" and lint_on around source to disable this message.
+%Warning-UNUSEDSIGNAL: /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB.v:188:12: Bits of signal are not driven, nor used: 'N4END_i'[3:0]
+                                                                                                     : ... note: In instance 'LUT4AB'
+  188 | wire[15:0] N4END_i;
+      |            ^~~~~~~
+%Warning-UNUSEDSIGNAL: /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB.v:190:12: Bits of signal are not driven, nor used: 'NN4END_i'[3:0]
+                                                                                                     : ... note: In instance 'LUT4AB'
+  190 | wire[15:0] NN4END_i;
+      |            ^~~~~~~~
+%Warning-UNUSEDSIGNAL: /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB.v:192:12: Bits of signal are not driven, nor used: 'EE4END_i'[3:0]
+                                                                                                     : ... note: In instance 'LUT4AB'
+  192 | wire[15:0] EE4END_i;
+      |            ^~~~~~~~
+%Warning-UNUSEDSIGNAL: /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB.v:194:12: Bits of signal are not driven, nor used: 'E6END_i'[1:0]
+                                                                                                     : ... note: In instance 'LUT4AB'
+  194 | wire[11:0] E6END_i;
+      |            ^~~~~~~
+%Warning-UNUSEDSIGNAL: /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB.v:196:12: Bits of signal are not driven, nor used: 'S4END_i'[3:0]
+                                                                                                     : ... note: In instance 'LUT4AB'
+  196 | wire[15:0] S4END_i;
+      |            ^~~~~~~
+%Warning-UNUSEDSIGNAL: /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB.v:198:12: Bits of signal are not driven, nor used: 'SS4END_i'[3:0]
+                                                                                                     : ... note: In instance 'LUT4AB'
+  198 | wire[15:0] SS4END_i;
+      |            ^~~~~~~~
+%Warning-UNUSEDSIGNAL: /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB.v:200:12: Bits of signal are not driven, nor used: 'WW4END_i'[3:0]
+                                                                                                     : ... note: In instance 'LUT4AB'
+  200 | wire[15:0] WW4END_i;
+      |            ^~~~~~~~
+%Warning-UNUSEDSIGNAL: /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB.v:202:12: Bits of signal are not driven, nor used: 'W6END_i'[1:0]
+                                                                                                     : ... note: In instance 'LUT4AB'
+  202 | wire[11:0] W6END_i;
+      |            ^~~~~~~
+%Warning-UNUSEDSIGNAL: /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB_switch_matrix.v:511:35: Bits of signal are not used: 'ConfigBits_N'[191:190,181:180,171:170,161:160,151:150,141:140,131:130,121:120]
+                                                                                                                   : ... note: In instance 'LUT4AB.Inst_LUT4AB_switch_matrix'
+  511 |         input  [NoConfigBits-1:0] ConfigBits_N
+      |                                   ^~~~~~~~~~~~
+%Warning-UNUSEDPARAM: /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB_switch_matrix.v:514:11: Parameter is not used: 'GND'
+                                                                                                                  : ... note: In instance 'LUT4AB.Inst_LUT4AB_switch_matrix'
+  514 | parameter GND = 1'b0;
+      |           ^~~
+%Warning-UNUSEDPARAM: /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB_switch_matrix.v:516:11: Parameter is not used: 'VCC'
+                                                                                                                  : ... note: In instance 'LUT4AB.Inst_LUT4AB_switch_matrix'
+  516 | parameter VCC = 1'b1;
+      |           ^~~
+%Warning-UNUSEDPARAM: /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB_switch_matrix.v:517:11: Parameter is not used: 'VDD0'
+                                                                                                                  : ... note: In instance 'LUT4AB.Inst_LUT4AB_switch_matrix'
+  517 | parameter VDD0 = 1'b1;
+      |           ^~~~
+%Warning-UNUSEDPARAM: /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB_switch_matrix.v:518:11: Parameter is not used: 'VDD'
+                                                                                                                  : ... note: In instance 'LUT4AB.Inst_LUT4AB_switch_matrix'
+  518 | parameter VDD = 1'b1;
+      |           ^~~
+%Warning-UNUSEDSIGNAL: /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:283:11: Signal is not used: 'S2N'
+                                                                                                     : ... note: In instance 'LUT4AB.Inst_LUT4AB_switch_matrix.inst_cus_mux81_buf_J_EN_BEG0'
+  283 |     input S2N;
+      |           ^~~
+%Warning-UNUSEDSIGNAL: /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:188:11: Signal is not used: 'S0N'
+                                                                                                     : ... note: In instance 'LUT4AB.Inst_LUT4AB_switch_matrix.inst_cus_mux81_buf_J_EN_BEG0.cus_mux41_buf_inst1'
+  188 |     input S0N;
+      |           ^~~
+%Warning-UNUSEDSIGNAL: /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:190:11: Signal is not used: 'S1N'
+                                                                                                     : ... note: In instance 'LUT4AB.Inst_LUT4AB_switch_matrix.inst_cus_mux81_buf_J_EN_BEG0.cus_mux41_buf_inst1'
+  190 |     input S1N;
+      |           ^~~
+%Warning-UNOPTFLAT: /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB_switch_matrix.v:216:16: Signal unoptimizable: Circular combinational logic: 'LUT4AB.__Vcellinp__Inst_LUT4AB_switch_matrix__J_l_AB_END0'
+  216 |         input  J_l_AB_END0,
+      |                ^~~~~~~~~~~
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB_switch_matrix.v:216:16:      Example path: LUT4AB.__Vcellinp__Inst_LUT4AB_switch_matrix__J_l_AB_END0
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:214:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4c_frame_config_dffesr.v:54:10:      Example path: LUT4AB.Inst_LA_LUT4c_frame_config_dffesr.I0mux
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:201:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:439:12:      Example path: LUT4AB.Inst_LA_LUT4c_frame_config_dffesr.inst_cus_mux161_buf.X
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:214:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB.v:75:6:      Example path: LUT4AB.LA_O
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:214:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/MUX8LUT_frame_config_mux.v:39:10:      Example path: LUT4AB.Inst_MUX8LUT_frame_config_mux.AB
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:214:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/MUX8LUT_frame_config_mux.v:41:10:      Example path: LUT4AB.Inst_MUX8LUT_frame_config_mux.AD
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:214:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB.v:153:6:      Example path: LUT4AB.M_AD
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:201:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:439:12:      Example path: LUT4AB.Inst_LUT4AB_switch_matrix.inst_cus_mux161_buf_JN2BEG1.X
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB.v:2003:6:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB_switch_matrix.v:216:16:      Example path: LUT4AB.__Vcellinp__Inst_LUT4AB_switch_matrix__J_l_AB_END0
+%Warning-UNOPTFLAT: /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB_switch_matrix.v:221:16: Signal unoptimizable: Circular combinational logic: 'LUT4AB.__Vcellinp__Inst_LUT4AB_switch_matrix__J_l_CD_END1'
+  221 |         input  J_l_CD_END1,
+      |                ^~~~~~~~~~~
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB_switch_matrix.v:221:16:      Example path: LUT4AB.__Vcellinp__Inst_LUT4AB_switch_matrix__J_l_CD_END1
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:201:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB.v:87:6:      Example path: LUT4AB.LC_I1
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4c_frame_config_dffesr.v:136:15:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB.v:94:6:      Example path: LUT4AB.LC_Co
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4c_frame_config_dffesr.v:136:15:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB.v:103:6:      Example path: LUT4AB.LD_Co
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4c_frame_config_dffesr.v:136:15:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB.v:112:6:      Example path: LUT4AB.LE_Co
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4c_frame_config_dffesr.v:136:15:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB.v:121:6:      Example path: LUT4AB.LF_Co
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4c_frame_config_dffesr.v:136:15:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB.v:130:6:      Example path: LUT4AB.LG_Co
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:214:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4c_frame_config_dffesr.v:54:10:      Example path: LUT4AB.Inst_LH_LUT4c_frame_config_dffesr.I0mux
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:201:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:439:12:      Example path: LUT4AB.Inst_LH_LUT4c_frame_config_dffesr.inst_cus_mux161_buf.X
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:214:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB.v:138:6:      Example path: LUT4AB.LH_O
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:214:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/MUX8LUT_frame_config_mux.v:39:22:      Example path: LUT4AB.Inst_MUX8LUT_frame_config_mux.GH
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:214:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB.v:154:6:      Example path: LUT4AB.M_AH
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:201:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:439:12:      Example path: LUT4AB.Inst_LUT4AB_switch_matrix.inst_cus_mux161_buf_JN2BEG2.X
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB.v:2007:6:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB_switch_matrix.v:220:16:      Example path: LUT4AB.__Vcellinp__Inst_LUT4AB_switch_matrix__J_l_CD_END0
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:214:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4c_frame_config_dffesr.v:54:10:      Example path: LUT4AB.Inst_LC_LUT4c_frame_config_dffesr.I0mux
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:201:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:439:12:      Example path: LUT4AB.Inst_LC_LUT4c_frame_config_dffesr.inst_cus_mux161_buf.X
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:214:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB.v:93:6:      Example path: LUT4AB.LC_O
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:214:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/MUX8LUT_frame_config_mux.v:39:14:      Example path: LUT4AB.Inst_MUX8LUT_frame_config_mux.CD
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:214:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB.v:153:6:      Example path: LUT4AB.M_AD
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:201:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:439:12:      Example path: LUT4AB.Inst_LUT4AB_switch_matrix.inst_cus_mux161_buf_JN2BEG1.X
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB.v:2003:6:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB_switch_matrix.v:216:16:      Example path: LUT4AB.__Vcellinp__Inst_LUT4AB_switch_matrix__J_l_AB_END0
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:214:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4c_frame_config_dffesr.v:54:10:      Example path: LUT4AB.Inst_LA_LUT4c_frame_config_dffesr.I0mux
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:201:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:439:12:      Example path: LUT4AB.Inst_LA_LUT4c_frame_config_dffesr.inst_cus_mux161_buf.X
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:214:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB.v:75:6:      Example path: LUT4AB.LA_O
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:214:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/MUX8LUT_frame_config_mux.v:39:10:      Example path: LUT4AB.Inst_MUX8LUT_frame_config_mux.AB
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:214:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/MUX8LUT_frame_config_mux.v:41:10:      Example path: LUT4AB.Inst_MUX8LUT_frame_config_mux.AD
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:214:14:      Example path: ASSIGNW
+%Warning-UNOPTFLAT: /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:439:12: Signal unoptimizable: Circular combinational logic: 'LUT4AB.Inst_LUT4AB_switch_matrix.inst_cus_mux161_buf_JW2BEG3.X'
+                                                                                                  : ... note: In instance 'LUT4AB.Inst_LUT4AB_switch_matrix.inst_cus_mux161_buf_JW2BEG3'
+  439 |     output X;
+      |            ^
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:439:12:      Example path: LUT4AB.Inst_LUT4AB_switch_matrix.inst_cus_mux161_buf_JW2BEG3.X
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB.v:1926:6:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB_switch_matrix.v:139:16:      Example path: LUT4AB.__Vcellinp__Inst_LUT4AB_switch_matrix__J2MID_ABa_END3
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:201:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:439:12:      Example path: LUT4AB.Inst_LA_LUT4c_frame_config_dffesr.inst_cus_mux161_buf.X
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:214:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB.v:75:6:      Example path: LUT4AB.LA_O
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:214:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/MUX8LUT_frame_config_mux.v:39:10:      Example path: LUT4AB.Inst_MUX8LUT_frame_config_mux.AB
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:214:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/MUX8LUT_frame_config_mux.v:41:10:      Example path: LUT4AB.Inst_MUX8LUT_frame_config_mux.AD
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:214:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB.v:153:6:      Example path: LUT4AB.M_AD
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:201:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:439:12:      Example path: LUT4AB.Inst_LUT4AB_switch_matrix.inst_cus_mux161_buf_JN2BEG1.X
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB.v:2003:6:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB_switch_matrix.v:216:16:      Example path: LUT4AB.__Vcellinp__Inst_LUT4AB_switch_matrix__J_l_AB_END0
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:214:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4c_frame_config_dffesr.v:54:10:      Example path: LUT4AB.Inst_LA_LUT4c_frame_config_dffesr.I0mux
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:201:14:      Example path: ASSIGNW
+%Warning-UNOPTFLAT: /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB_switch_matrix.v:218:16: Signal unoptimizable: Circular combinational logic: 'LUT4AB.__Vcellinp__Inst_LUT4AB_switch_matrix__J_l_AB_END2'
+  218 |         input  J_l_AB_END2,
+      |                ^~~~~~~~~~~
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB_switch_matrix.v:218:16:      Example path: LUT4AB.__Vcellinp__Inst_LUT4AB_switch_matrix__J_l_AB_END2
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:201:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB.v:70:6:      Example path: LUT4AB.LA_I2
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4c_frame_config_dffesr.v:136:15:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB.v:76:6:      Example path: LUT4AB.LA_Co
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4c_frame_config_dffesr.v:136:15:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB.v:85:6:      Example path: LUT4AB.LB_Co
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4c_frame_config_dffesr.v:136:15:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB.v:94:6:      Example path: LUT4AB.LC_Co
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4c_frame_config_dffesr.v:136:15:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB.v:103:6:      Example path: LUT4AB.LD_Co
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4c_frame_config_dffesr.v:136:15:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB.v:112:6:      Example path: LUT4AB.LE_Co
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4c_frame_config_dffesr.v:136:15:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB.v:121:6:      Example path: LUT4AB.LF_Co
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4c_frame_config_dffesr.v:136:15:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB.v:130:6:      Example path: LUT4AB.LG_Co
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:214:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4c_frame_config_dffesr.v:54:10:      Example path: LUT4AB.Inst_LH_LUT4c_frame_config_dffesr.I0mux
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:201:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:439:12:      Example path: LUT4AB.Inst_LH_LUT4c_frame_config_dffesr.inst_cus_mux161_buf.X
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:214:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB.v:138:6:      Example path: LUT4AB.LH_O
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:214:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/MUX8LUT_frame_config_mux.v:39:22:      Example path: LUT4AB.Inst_MUX8LUT_frame_config_mux.GH
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:214:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB.v:154:6:      Example path: LUT4AB.M_AH
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:201:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:439:12:      Example path: LUT4AB.Inst_LUT4AB_switch_matrix.inst_cus_mux161_buf_JN2BEG2.X
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB.v:2007:6:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB_switch_matrix.v:220:16:      Example path: LUT4AB.__Vcellinp__Inst_LUT4AB_switch_matrix__J_l_CD_END0
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:214:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4c_frame_config_dffesr.v:54:10:      Example path: LUT4AB.Inst_LC_LUT4c_frame_config_dffesr.I0mux
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:201:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:439:12:      Example path: LUT4AB.Inst_LC_LUT4c_frame_config_dffesr.inst_cus_mux161_buf.X
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:214:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB.v:93:6:      Example path: LUT4AB.LC_O
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:214:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/MUX8LUT_frame_config_mux.v:39:14:      Example path: LUT4AB.Inst_MUX8LUT_frame_config_mux.CD
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:214:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB.v:153:6:      Example path: LUT4AB.M_AD
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:201:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:439:12:      Example path: LUT4AB.Inst_LUT4AB_switch_matrix.inst_cus_mux161_buf_JN2BEG1.X
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB.v:2003:6:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB_switch_matrix.v:216:16:      Example path: LUT4AB.__Vcellinp__Inst_LUT4AB_switch_matrix__J_l_AB_END0
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:214:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4c_frame_config_dffesr.v:54:10:      Example path: LUT4AB.Inst_LA_LUT4c_frame_config_dffesr.I0mux
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:201:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:439:12:      Example path: LUT4AB.Inst_LA_LUT4c_frame_config_dffesr.inst_cus_mux161_buf.X
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:214:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB.v:75:6:      Example path: LUT4AB.LA_O
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:214:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/MUX8LUT_frame_config_mux.v:39:10:      Example path: LUT4AB.Inst_MUX8LUT_frame_config_mux.AB
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:214:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/MUX8LUT_frame_config_mux.v:41:10:      Example path: LUT4AB.Inst_MUX8LUT_frame_config_mux.AD
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:214:14:      Example path: ASSIGNW
+%Warning-UNOPTFLAT: /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB_switch_matrix.v:217:16: Signal unoptimizable: Circular combinational logic: 'LUT4AB.__Vcellinp__Inst_LUT4AB_switch_matrix__J_l_AB_END1'
+  217 |         input  J_l_AB_END1,
+      |                ^~~~~~~~~~~
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB_switch_matrix.v:217:16:      Example path: LUT4AB.__Vcellinp__Inst_LUT4AB_switch_matrix__J_l_AB_END1
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:201:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB.v:69:6:      Example path: LUT4AB.LA_I1
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4c_frame_config_dffesr.v:136:15:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB.v:76:6:      Example path: LUT4AB.LA_Co
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4c_frame_config_dffesr.v:136:15:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB.v:85:6:      Example path: LUT4AB.LB_Co
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4c_frame_config_dffesr.v:136:15:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB.v:94:6:      Example path: LUT4AB.LC_Co
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4c_frame_config_dffesr.v:136:15:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB.v:103:6:      Example path: LUT4AB.LD_Co
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4c_frame_config_dffesr.v:136:15:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB.v:112:6:      Example path: LUT4AB.LE_Co
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4c_frame_config_dffesr.v:136:15:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB.v:121:6:      Example path: LUT4AB.LF_Co
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4c_frame_config_dffesr.v:136:15:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB.v:130:6:      Example path: LUT4AB.LG_Co
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:214:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4c_frame_config_dffesr.v:54:10:      Example path: LUT4AB.Inst_LH_LUT4c_frame_config_dffesr.I0mux
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:201:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:439:12:      Example path: LUT4AB.Inst_LH_LUT4c_frame_config_dffesr.inst_cus_mux161_buf.X
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:214:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB.v:138:6:      Example path: LUT4AB.LH_O
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:214:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/MUX8LUT_frame_config_mux.v:39:22:      Example path: LUT4AB.Inst_MUX8LUT_frame_config_mux.GH
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:214:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB.v:154:6:      Example path: LUT4AB.M_AH
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:201:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:439:12:      Example path: LUT4AB.Inst_LUT4AB_switch_matrix.inst_cus_mux161_buf_JN2BEG2.X
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB.v:2007:6:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB_switch_matrix.v:220:16:      Example path: LUT4AB.__Vcellinp__Inst_LUT4AB_switch_matrix__J_l_CD_END0
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:214:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4c_frame_config_dffesr.v:54:10:      Example path: LUT4AB.Inst_LC_LUT4c_frame_config_dffesr.I0mux
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:201:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:439:12:      Example path: LUT4AB.Inst_LC_LUT4c_frame_config_dffesr.inst_cus_mux161_buf.X
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:214:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB.v:93:6:      Example path: LUT4AB.LC_O
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:214:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/MUX8LUT_frame_config_mux.v:39:14:      Example path: LUT4AB.Inst_MUX8LUT_frame_config_mux.CD
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:214:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB.v:153:6:      Example path: LUT4AB.M_AD
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:201:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:439:12:      Example path: LUT4AB.Inst_LUT4AB_switch_matrix.inst_cus_mux161_buf_JN2BEG1.X
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB.v:2003:6:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB_switch_matrix.v:216:16:      Example path: LUT4AB.__Vcellinp__Inst_LUT4AB_switch_matrix__J_l_AB_END0
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:214:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4c_frame_config_dffesr.v:54:10:      Example path: LUT4AB.Inst_LA_LUT4c_frame_config_dffesr.I0mux
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:201:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:439:12:      Example path: LUT4AB.Inst_LA_LUT4c_frame_config_dffesr.inst_cus_mux161_buf.X
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:214:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB.v:75:6:      Example path: LUT4AB.LA_O
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:214:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/MUX8LUT_frame_config_mux.v:39:10:      Example path: LUT4AB.Inst_MUX8LUT_frame_config_mux.AB
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:214:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/MUX8LUT_frame_config_mux.v:41:10:      Example path: LUT4AB.Inst_MUX8LUT_frame_config_mux.AD
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:214:14:      Example path: ASSIGNW
+%Warning-UNOPTFLAT: /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB_switch_matrix.v:222:16: Signal unoptimizable: Circular combinational logic: 'LUT4AB.__Vcellinp__Inst_LUT4AB_switch_matrix__J_l_CD_END2'
+  222 |         input  J_l_CD_END2,
+      |                ^~~~~~~~~~~
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB_switch_matrix.v:222:16:      Example path: LUT4AB.__Vcellinp__Inst_LUT4AB_switch_matrix__J_l_CD_END2
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:201:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB.v:88:6:      Example path: LUT4AB.LC_I2
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4c_frame_config_dffesr.v:136:15:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB.v:94:6:      Example path: LUT4AB.LC_Co
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4c_frame_config_dffesr.v:136:15:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB.v:103:6:      Example path: LUT4AB.LD_Co
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4c_frame_config_dffesr.v:136:15:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB.v:112:6:      Example path: LUT4AB.LE_Co
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4c_frame_config_dffesr.v:136:15:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB.v:121:6:      Example path: LUT4AB.LF_Co
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4c_frame_config_dffesr.v:136:15:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB.v:130:6:      Example path: LUT4AB.LG_Co
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:214:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4c_frame_config_dffesr.v:54:10:      Example path: LUT4AB.Inst_LH_LUT4c_frame_config_dffesr.I0mux
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:201:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:439:12:      Example path: LUT4AB.Inst_LH_LUT4c_frame_config_dffesr.inst_cus_mux161_buf.X
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:214:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB.v:138:6:      Example path: LUT4AB.LH_O
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:214:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/MUX8LUT_frame_config_mux.v:39:22:      Example path: LUT4AB.Inst_MUX8LUT_frame_config_mux.GH
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:214:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB.v:154:6:      Example path: LUT4AB.M_AH
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:201:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:439:12:      Example path: LUT4AB.Inst_LUT4AB_switch_matrix.inst_cus_mux161_buf_JN2BEG2.X
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB.v:2007:6:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB_switch_matrix.v:220:16:      Example path: LUT4AB.__Vcellinp__Inst_LUT4AB_switch_matrix__J_l_CD_END0
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:214:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4c_frame_config_dffesr.v:54:10:      Example path: LUT4AB.Inst_LC_LUT4c_frame_config_dffesr.I0mux
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:201:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:439:12:      Example path: LUT4AB.Inst_LC_LUT4c_frame_config_dffesr.inst_cus_mux161_buf.X
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:214:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB.v:93:6:      Example path: LUT4AB.LC_O
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:214:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/MUX8LUT_frame_config_mux.v:39:14:      Example path: LUT4AB.Inst_MUX8LUT_frame_config_mux.CD
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:214:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB.v:153:6:      Example path: LUT4AB.M_AD
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:201:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:439:12:      Example path: LUT4AB.Inst_LUT4AB_switch_matrix.inst_cus_mux161_buf_JN2BEG1.X
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB.v:2003:6:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB_switch_matrix.v:216:16:      Example path: LUT4AB.__Vcellinp__Inst_LUT4AB_switch_matrix__J_l_AB_END0
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:214:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4c_frame_config_dffesr.v:54:10:      Example path: LUT4AB.Inst_LA_LUT4c_frame_config_dffesr.I0mux
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:201:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:439:12:      Example path: LUT4AB.Inst_LA_LUT4c_frame_config_dffesr.inst_cus_mux161_buf.X
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:214:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB.v:75:6:      Example path: LUT4AB.LA_O
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:214:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/MUX8LUT_frame_config_mux.v:39:10:      Example path: LUT4AB.Inst_MUX8LUT_frame_config_mux.AB
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:214:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/MUX8LUT_frame_config_mux.v:41:10:      Example path: LUT4AB.Inst_MUX8LUT_frame_config_mux.AD
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:214:14:      Example path: ASSIGNW
+%Warning-UNOPTFLAT: /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB_switch_matrix.v:219:16: Signal unoptimizable: Circular combinational logic: 'LUT4AB.__Vcellinp__Inst_LUT4AB_switch_matrix__J_l_AB_END3'
+  219 |         input  J_l_AB_END3,
+      |                ^~~~~~~~~~~
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB_switch_matrix.v:219:16:      Example path: LUT4AB.__Vcellinp__Inst_LUT4AB_switch_matrix__J_l_AB_END3
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:201:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:439:12:      Example path: LUT4AB.Inst_LA_LUT4c_frame_config_dffesr.inst_cus_mux161_buf.X
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:214:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB.v:75:6:      Example path: LUT4AB.LA_O
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:214:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/MUX8LUT_frame_config_mux.v:39:10:      Example path: LUT4AB.Inst_MUX8LUT_frame_config_mux.AB
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:214:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/MUX8LUT_frame_config_mux.v:41:10:      Example path: LUT4AB.Inst_MUX8LUT_frame_config_mux.AD
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:214:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB.v:153:6:      Example path: LUT4AB.M_AD
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:201:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:439:12:      Example path: LUT4AB.Inst_LUT4AB_switch_matrix.inst_cus_mux161_buf_JN2BEG1.X
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB.v:2003:6:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB_switch_matrix.v:216:16:      Example path: LUT4AB.__Vcellinp__Inst_LUT4AB_switch_matrix__J_l_AB_END0
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:214:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4c_frame_config_dffesr.v:54:10:      Example path: LUT4AB.Inst_LA_LUT4c_frame_config_dffesr.I0mux
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:201:14:      Example path: ASSIGNW
+%Warning-UNOPTFLAT: /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB_switch_matrix.v:220:16: Signal unoptimizable: Circular combinational logic: 'LUT4AB.__Vcellinp__Inst_LUT4AB_switch_matrix__J_l_CD_END0'
+  220 |         input  J_l_CD_END0,
+      |                ^~~~~~~~~~~
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB_switch_matrix.v:220:16:      Example path: LUT4AB.__Vcellinp__Inst_LUT4AB_switch_matrix__J_l_CD_END0
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:214:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4c_frame_config_dffesr.v:54:10:      Example path: LUT4AB.Inst_LC_LUT4c_frame_config_dffesr.I0mux
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:201:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:439:12:      Example path: LUT4AB.Inst_LC_LUT4c_frame_config_dffesr.inst_cus_mux161_buf.X
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:214:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB.v:93:6:      Example path: LUT4AB.LC_O
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:214:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/MUX8LUT_frame_config_mux.v:39:14:      Example path: LUT4AB.Inst_MUX8LUT_frame_config_mux.CD
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:214:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB.v:153:6:      Example path: LUT4AB.M_AD
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:201:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:439:12:      Example path: LUT4AB.Inst_LUT4AB_switch_matrix.inst_cus_mux161_buf_JN2BEG1.X
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB.v:2003:6:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB_switch_matrix.v:216:16:      Example path: LUT4AB.__Vcellinp__Inst_LUT4AB_switch_matrix__J_l_AB_END0
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:214:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4c_frame_config_dffesr.v:54:10:      Example path: LUT4AB.Inst_LA_LUT4c_frame_config_dffesr.I0mux
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:201:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:439:12:      Example path: LUT4AB.Inst_LA_LUT4c_frame_config_dffesr.inst_cus_mux161_buf.X
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:214:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB.v:75:6:      Example path: LUT4AB.LA_O
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:214:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/MUX8LUT_frame_config_mux.v:39:10:      Example path: LUT4AB.Inst_MUX8LUT_frame_config_mux.AB
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:214:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/MUX8LUT_frame_config_mux.v:41:10:      Example path: LUT4AB.Inst_MUX8LUT_frame_config_mux.AD
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:214:14:      Example path: ASSIGNW
+%Warning-UNOPTFLAT: /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB_switch_matrix.v:223:16: Signal unoptimizable: Circular combinational logic: 'LUT4AB.__Vcellinp__Inst_LUT4AB_switch_matrix__J_l_CD_END3'
+  223 |         input  J_l_CD_END3,
+      |                ^~~~~~~~~~~
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB_switch_matrix.v:223:16:      Example path: LUT4AB.__Vcellinp__Inst_LUT4AB_switch_matrix__J_l_CD_END3
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:201:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:439:12:      Example path: LUT4AB.Inst_LC_LUT4c_frame_config_dffesr.inst_cus_mux161_buf.X
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:214:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB.v:93:6:      Example path: LUT4AB.LC_O
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:214:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/MUX8LUT_frame_config_mux.v:39:14:      Example path: LUT4AB.Inst_MUX8LUT_frame_config_mux.CD
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:214:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB.v:153:6:      Example path: LUT4AB.M_AD
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:201:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:439:12:      Example path: LUT4AB.Inst_LUT4AB_switch_matrix.inst_cus_mux161_buf_JN2BEG1.X
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB.v:2003:6:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB_switch_matrix.v:216:16:      Example path: LUT4AB.__Vcellinp__Inst_LUT4AB_switch_matrix__J_l_AB_END0
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:214:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4c_frame_config_dffesr.v:54:10:      Example path: LUT4AB.Inst_LA_LUT4c_frame_config_dffesr.I0mux
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:201:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:439:12:      Example path: LUT4AB.Inst_LA_LUT4c_frame_config_dffesr.inst_cus_mux161_buf.X
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:214:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/LUT4AB.v:75:6:      Example path: LUT4AB.LA_O
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:214:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/MUX8LUT_frame_config_mux.v:39:10:      Example path: LUT4AB.Inst_MUX8LUT_frame_config_mux.AB
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:214:14:      Example path: ASSIGNW
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/MUX8LUT_frame_config_mux.v:41:10:      Example path: LUT4AB.Inst_MUX8LUT_frame_config_mux.AD
+                    /home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Fabric/models_pack.v:214:14:      Example path: ASSIGNW

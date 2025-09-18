@@ -1,0 +1,36 @@
+106. Printing statistics.
+
+=== LUT4AB ===
+
+   Number of wires:               2106
+   Number of wire bits:           2566
+   Number of public wires:         768
+   Number of public wire bits:    1228
+   Number of ports:                 48
+   Number of port bits:            508
+   Number of memories:               0
+   Number of memory bits:            0
+   Number of processes:              0
+   Number of cells:               2059
+     $_ANDNOT_                      18
+     $_AND_                         10
+     $_DFFE_PP_                      8
+     $_DLATCH_P_                   616
+     $_MUX_                       1194
+     $_NAND_                         3
+     $_NOR_                         15
+     $_NOT_                        179
+     $_ORNOT_                        8
+     $_OR_                           8
+
+   Area for cell type $_NOT_ is unknown!
+   Area for cell type $_AND_ is unknown!
+   Area for cell type $_NAND_ is unknown!
+   Area for cell type $_OR_ is unknown!
+   Area for cell type $_NOR_ is unknown!
+   Area for cell type $_ANDNOT_ is unknown!
+   Area for cell type $_ORNOT_ is unknown!
+   Area for cell type $_MUX_ is unknown!
+   Area for cell type $_DFFE_PP_ is unknown!
+   Area for cell type $_DLATCH_P_ is unknown!
+

@@ -1,0 +1,5 @@
+`verilator_config
+lint_off -rule DECLFILENAME
+lint_off -rule EOFNEWLINE
+lint_off -rule UNDRIVEN -file "/home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-52-09/tmp/cf1653596340457e8f55191e516865cb.bb.v"
+lint_off -rule UNUSEDSIGNAL -file "/home/kelvin/FABulous_fork.worktrees/gds-flow/demo/Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-52-09/tmp/cf1653596340457e8f55191e516865cb.bb.v"

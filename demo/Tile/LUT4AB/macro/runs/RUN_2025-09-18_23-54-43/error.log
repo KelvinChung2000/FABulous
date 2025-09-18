@@ -1,0 +1,14 @@
+Subprocess had a non-zero exit.
+Last 10 line(s):
+  File "/nix/store/rq8s59nddba5lgij126ylf75qrxlgmkf-python3-3.12.11/lib/python3.12/json/__init__.py", line 106, in <module>
+    from .decoder import JSONDecoder, JSONDecodeError
+  File "/nix/store/rq8s59nddba5lgij126ylf75qrxlgmkf-python3-3.12.11/lib/python3.12/json/decoder.py", line 3, in <module>
+    import re
+  File "/nix/store/rq8s59nddba5lgij126ylf75qrxlgmkf-python3-3.12.11/lib/python3.12/re/__init__.py", line 125, in <module>
+    from . import _compiler, _parser
+  File "/nix/store/rq8s59nddba5lgij126ylf75qrxlgmkf-python3-3.12.11/lib/python3.12/re/_compiler.py", line 18, in <module>
+    assert _sre.MAGIC == MAGIC, "SRE module mismatch"
+           ^^^^^^^^^^^^^^^^^^^
+AssertionError: SRE module mismatch
+
+Full log file: 'Tile/LUT4AB/macro/runs/RUN_2025-09-18_23-54-43/60-klayout-drc/xml_drc_report_to_json.log'

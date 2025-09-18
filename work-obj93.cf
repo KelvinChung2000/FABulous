@@ -1,5 +1,0 @@
-v 4
-file . "FABulous/fabric_files/FABulous_project_template_vhdl/Tile/LUT4AB/LUT4c_frame_config_dffesr.vhdl" "02b65574bc2722f6af6c989102c828d50e9898c2" "20250917213129.286":
-  package attr_pack_lut4ab_lut4c_frame_config_dffesr at 1( 0) + 0 on 4;
-  entity lut4c_frame_config_dffesr at 27( 902) + 0 on 4;
-  architecture behavioral of lut4c_frame_config_dffesr at 75( 3914) + 0 on 4;

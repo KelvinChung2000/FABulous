@@ -339,7 +339,11 @@ class YosysJson:
                 res = [x.strip() for x in res]
                 res = [x for x in res if x]  # Remove empty strings
                 res = dict(x.split("=", 1) for x in res)
+                res = {k.lower(): v for k, v in res.items()}
                 module.attributes.update(res)
+                module.attributes = {
+                    k.replace("attr_", ""): v for k, v in module.attributes.items()
+                }
                 module.attributes["BelMap"] = True
                 module.attributes["FABulous"] = True
 

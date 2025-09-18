@@ -17,8 +17,8 @@ package attr_pack_LUT4AB_LUT4c_frame_config_dffesr is
   attribute INIT_13     : integer;
   attribute INIT_14     : integer;
   attribute INIT_15     : integer;
-  attribute FF_con      : integer;
   attribute IOmux       : integer;
+  attribute ATTR_FF     : integer; -- renamed from FF to ATTR_FF to avoid conflicts
   attribute SET_NORESET : integer;
   attribute EXTERNAL    : string;
   attribute SHARED_PORT : string;
@@ -64,7 +64,7 @@ entity LUT4c_frame_config_dffesr is
   attribute INIT_13 of LUT4c_frame_config_dffesr     : entity is 13;
   attribute INIT_14 of LUT4c_frame_config_dffesr     : entity is 14;
   attribute INIT_15 of LUT4c_frame_config_dffesr     : entity is 15;
-  attribute FF_con of LUT4c_frame_config_dffesr      : entity is 16;
+  attribute ATTR_FF of LUT4c_frame_config_dffesr     : entity is 16; -- updated to new name
   attribute IOmux of LUT4c_frame_config_dffesr       : entity is 17;
   attribute SET_NORESET of LUT4c_frame_config_dffesr : entity is 18;
   attribute EXTERNAL of UserCLK                      : signal is "TRUE";
@@ -102,13 +102,13 @@ begin
   --   Ci;
 
   inst_cus_mux21_I0mux : entity work.cus_mux21
-  port map
-  (
-    A0 => I(0),
-    A1 => Ci,
-    S  => c_I0mux,
-    X  => I0mux
-  );
+    port map
+    (
+      A0 => I(0),
+      A1 => Ci,
+      S  => c_I0mux,
+      X  => I0mux
+    );
   LUT_index <= I(3) & I(2) & I(1) & I0mux;
 
   -- The LUT is just a multiplexer
@@ -120,42 +120,42 @@ begin
   LUT_index_3N <= not LUT_index(3);
 
   inst_cus_mux161_buf : entity work.cus_mux161_buf
-  port map
-  (
-    A0  => LUT_values(0),
-    A1  => LUT_values(1),
-    A2  => LUT_values(2),
-    A3  => LUT_values(3),
-    A4  => LUT_values(4),
-    A5  => LUT_values(5),
-    A6  => LUT_values(6),
-    A7  => LUT_values(7),
-    A8  => LUT_values(8),
-    A9  => LUT_values(9),
-    A10 => LUT_values(10),
-    A11 => LUT_values(11),
-    A12 => LUT_values(12),
-    A13 => LUT_values(13),
-    A14 => LUT_values(14),
-    A15 => LUT_values(15),
-    S0  => LUT_index(0),
-    S0N => LUT_index_0N,
-    S1  => LUT_index(1),
-    S1N => LUT_index_1N,
-    S2  => LUT_index(2),
-    S2N => LUT_index_2N,
-    S3  => LUT_index(3),
-    S3N => LUT_index_3N,
-    X   => LUT_out);
+    port map
+    (
+      A0  => LUT_values(0),
+      A1  => LUT_values(1),
+      A2  => LUT_values(2),
+      A3  => LUT_values(3),
+      A4  => LUT_values(4),
+      A5  => LUT_values(5),
+      A6  => LUT_values(6),
+      A7  => LUT_values(7),
+      A8  => LUT_values(8),
+      A9  => LUT_values(9),
+      A10 => LUT_values(10),
+      A11 => LUT_values(11),
+      A12 => LUT_values(12),
+      A13 => LUT_values(13),
+      A14 => LUT_values(14),
+      A15 => LUT_values(15),
+      S0  => LUT_index(0),
+      S0N => LUT_index_0N,
+      S1  => LUT_index(1),
+      S1N => LUT_index_1N,
+      S2  => LUT_index(2),
+      S2N => LUT_index_2N,
+      S3  => LUT_index(3),
+      S3N => LUT_index_3N,
+      X   => LUT_out);
 
   cus_mux21_O : entity work.cus_mux21
-  port map
-  (
-    A0 => LUT_out,
-    A1 => LUT_flop,
-    S  => c_out_mux,
-    X  => O
-  );
+    port map
+    (
+      A0 => LUT_out,
+      A1 => LUT_flop,
+      S  => c_out_mux,
+      X  => O
+    );
 
   -- iCE40 like carry chain (as this is supported in Yosys; would normally go for fractured LUT
   Co <= (Ci and I(1)) or (Ci and I(2)) or (I(1) and I(2));

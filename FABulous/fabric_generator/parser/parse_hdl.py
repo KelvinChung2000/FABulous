@@ -37,6 +37,8 @@ def belMapProcessing(module_info: YosysModule) -> dict:
         "cells_not_processed",
         "src",
         "top",
+        "belmap",
+        "fabulous",
     }
     # match case for INIT. (may need modifying for other naming conventions.)
     for key, _value in module_info.attributes.items():
@@ -55,6 +57,8 @@ def belMapProcessing(module_info: YosysModule) -> dict:
 
         belMapDic[new_key] = {0: {0: "1"}}
 
+    print(module_info.attributes)
+    print(belMapDic)
     # yosys reverses belmap, reverse back to keep original belmap.
     return dict(reversed(list(belMapDic.items())))
 

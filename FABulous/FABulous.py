@@ -244,11 +244,19 @@ def check_version_compatibility(_: Path) -> None:
 def create_project_cmd(
     project_dir: Annotated[Path, typer.Argument(help="Directory to create a project")],
     writer: WriterType = HDLType.VERILOG,
+    overwrite: bool = False,
 ) -> None:
     """Create a new FABulous project.
 
     Alias: c
     """
+    if project_dir.exists() and not overwrite:
+        delete_existing = typer.confirm(
+            f"Project directory {project_dir} already exists. Overwrite?"
+        )
+        if not delete_existing:
+            logger.info("Project creation cancelled.")
+            raise typer.Exit(0)
     create_project(project_dir, writer)
     logger.info(f"FABulous project created successfully at {project_dir}")
 

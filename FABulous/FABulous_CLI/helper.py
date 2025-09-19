@@ -120,6 +120,8 @@ def setup_logger(verbosity: int, debug: bool, log_file: Path = Path()) -> None:
 def create_project(project_dir: Path, lang: HDLType = HDLType.VERILOG) -> None:
     """Create a FABulous project containing all required files.
 
+    **This function will overwrite existing files in the target directory.**
+
     Copies the common files and the appropriate project template.
     Replaces the `{HDL_SUFFIX}` placeholder in all tile csv files with the appropriate
     file extension.
@@ -173,12 +175,8 @@ def create_project(project_dir: Path, lang: HDLType = HDLType.VERILOG) -> None:
             f"Unable to access fabric templates from package: {e}"
         ) from e
 
-    if project_dir.exists():
-        logger.error("Project directory already exists!")
-        sys.exit(1)
-    else:
-        project_dir.mkdir(parents=True, exist_ok=True)
-        (project_dir / ".FABulous").mkdir(parents=True, exist_ok=True)
+    project_dir.mkdir(parents=True, exist_ok=True)
+    (project_dir / ".FABulous").mkdir(parents=True, exist_ok=True)
 
     # Copy templates from package resources using shutil.copytree
     # Use a robust approach that works in all environments

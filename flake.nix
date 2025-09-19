@@ -82,9 +82,8 @@
         system:
         let
           pkgs = nixpkgs.legacyPackages.${system};
-          # This is the canonical way to build a Python interpreter with Tkinter support.
-          # The `ps.tkinter` package is a reference to the Tkinter module that gets
-          # compiled into the Python interpreter itself.
+
+          # I can only get Tkinter support by using python3Full from nixpkgs-stable
           python = nixpkgs-stable.legacyPackages.${system}.python312Full;
         in
         (pkgs.callPackage pyproject-nix.build.packages {
@@ -108,6 +107,7 @@
           pythonSet = pythonSets.${system}.overrideScope editableOverlay;
           virtualenv = pythonSet.mkVirtualEnv "FABulous-env" workspace.deps.all;
           baseShell = librelane.devShells.${system}.dev;
+          
           # pass the current pkgs to the nix overlay so it returns a package set
           # also pass flake-locked sources so tags resolve to a fixed commit
           customPkgs = import ./nix {
@@ -136,7 +136,13 @@
             shellHook = ''
               unset PYTHONPATH
               export REPO_ROOT=$(git rev-parse --show-toplevel)
+              ORIGINAL_PS1="$PS1"
               . ${virtualenv}/bin/activate
+              # Restore original PS1 to avoid double prompt decoration
+              export PS1="$ORIGINAL_PS1"
+
+              # Put our Python first in PATH to avoid conflicts with system Python
+              export PATH="${pythonSet.python}/bin:$PATH"
             '';
           };
         }

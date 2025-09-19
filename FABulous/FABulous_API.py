@@ -24,8 +24,9 @@ from FABulous.fabric_generator.code_generator import CodeGenerator
 from FABulous.fabric_generator.code_generator.code_generator_VHDL import (
     VHDLCodeGenerator,
 )
+from FABulous.fabric_generator.gds_generator.flows.fabric_flow import FABulousFabricGDS
 from FABulous.fabric_generator.gds_generator.flows.tile_marco_flow import (
-    FABulousTileVerilog,
+    FABulousTileVerilogMarcoFlow,
 )
 from FABulous.fabric_generator.gen_fabric.fabric_automation import genIOBel
 from FABulous.fabric_generator.gen_fabric.gen_configmem import generateConfigMem
@@ -452,10 +453,6 @@ class FABulous_API:
         pdk: str | None = None,
     ) -> None:
         """Run the marco flow to generate the marco Verilog files."""
-        # Ensure that any Python executed by embedded Yosys (pyosys) can import
-        # packages from the currently active virtual environment. Without this,
-        # imports like `click` inside librelane's pyosys scripts may fail.
-
         if pdk_root is None:
             pdk_root = get_context().pdk_root
             if pdk_root is None:
@@ -474,7 +471,7 @@ class FABulous_API:
         logger.info(f"PDK root: {pdk_root}")
         logger.info(f"PDK: {pdk}")
         logger.info(f"Output folder: {out_folder.resolve()}")
-        flow = FABulousTileVerilog(
+        flow = FABulousTileVerilogMarcoFlow(
             {
                 "DESIGN_NAME": tile_dir.name,
                 "FABULOUS_TILE_PIN_CONFIG": io_pin_config,
@@ -497,9 +494,60 @@ class FABulous_API:
             pdk=pdk,
             pdk_root=str((pdk_root).resolve().parent),
         )
-        (final_state, steps) = flow.start()
-
+        (success, state_list) = flow.start()
+        if not success:
+            raise RuntimeError(f"Marco flow failed at {state_list}")
         logger.info("Marco flow completed.")
 
-    def genFabricGDS(self, fabric_dir: Path) -> None:
-        pass
+    def genFabricGDS(
+        self,
+        tile_dir: Path,
+        fabric_misc: Path,
+        out_folder: Path,
+        *,
+        pdk_root: Path | None = None,
+        pdk: str | None = None,
+    ) -> None:
+        if pdk_root is None:
+            pdk_root = get_context().pdk_root
+            if pdk_root is None:
+                raise ValueError(
+                    "PDK root must be specified either here or in settings."
+                )
+        if pdk is None:
+            pdk = get_context().pdk
+            if pdk is None:
+                raise ValueError("PDK must be specified either here or in settings.")
+
+        file_list = [str(tile_dir / f) for f in tile_dir.glob("*.v")]
+        if f := get_context().model_pack:
+            file_list.append(str(f.resolve()))
+
+        logger.info(f"PDK root: {pdk_root}")
+        logger.info(f"PDK: {pdk}")
+        logger.info(f"Output folder: {out_folder.resolve()}")
+        flow = FABulousFabricGDS(
+            {
+                "DESIGN_NAME": self.fabric.name,
+                "VERILOG_FILES": file_list,
+                "DIE_AREA": get_context().die_area,
+                "CORE_AREA": get_context().core_area,
+                "FP_SIZING": get_context().fp_sizing,
+                "FP_IO_VEXTEND": get_context().fp_io_vextend,
+                "FP_IO_HEXTEND": get_context().fp_io_hextend,
+                "FP_IO_VLENGTH": get_context().fp_io_vlength,
+                "FP_IO_HLENGTH": get_context().fp_io_hlength,
+                "FP_IO_HTHICKNESS_MULT": get_context().fp_io_hthickness_mult,
+                "FP_IO_VTHICKNESS_MULT": get_context().fp_io_vthickness_mult,
+                "FP_IO_HLAYER": get_context().fp_io_hlayer,
+                "FP_IO_VLAYER": get_context().fp_io_vlayer,
+            },
+            name=self.fabric.name,
+            design_dir=str(out_folder.resolve()),
+            pdk=pdk,
+            pdk_root=str((pdk_root).resolve().parent),
+        )
+        (success, state_list) = flow.start()
+        if not success:
+            raise RuntimeError(f"Marco flow failed at {state_list}")
+        logger.info("Marco flow completed.")

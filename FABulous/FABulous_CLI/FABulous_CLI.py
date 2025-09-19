@@ -1299,3 +1299,12 @@ class FABulous_CLI(Cmd):
             pin_order_file,
             self.projectDir / "Tile" / args.tile / "macro",
         )
+
+    @with_category(CMD_FABRIC_FLOW)
+    def do_gen_fabric_gds(self) -> None:
+        """Generate GDSII files for the entire fabric."""
+        self.fabulousAPI.genFabricGDS(
+            self.projectDir / "Tile",
+            self.projectDir / "Fabric",
+            self.projectDir / "gds",
+        )

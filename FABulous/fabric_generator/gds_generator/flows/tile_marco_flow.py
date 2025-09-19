@@ -8,13 +8,13 @@ from librelane.logging.logger import info, warn
 from librelane.state.state import State
 from librelane.steps.step import Step
 
-from FABulous.fabric_generator.gds_generator.steps.IO_placement import (
-    FABulousIOPlacement,
+from FABulous.fabric_generator.gds_generator.steps.tile_IO_placement import (
+    FABulousTileIOPlacement,
 )
 
 subs = {
     # Replace with FABulous IO Placement
-    "Odb.CustomIOPlacement": FABulousIOPlacement,
+    "Odb.CustomIOPlacement": FABulousTileIOPlacement,
     # Disable STA
     "OpenROAD.STAPrePNR": None,
     "OpenROAD.STAMidPNR": None,
@@ -42,7 +42,7 @@ configs = Classic.config_vars + [
 
 
 @Flow.factory.register()
-class FABulousTileVerilog(Classic):
+class FABulousTileVerilogMarcoFlow(Classic):
     Substitutions = subs
     config_vars = configs
 
@@ -52,7 +52,6 @@ class FABulousTileVerilog(Classic):
         final_views_path = (
             Path(self.config["FABULOUS_TILE_DIR"]) / "macro" / self.config["PDK"]
         )
-
         info(f"Saving final views for FABulous to {final_views_path}")
 
         final_state.save_snapshot(final_views_path)
@@ -61,7 +60,7 @@ class FABulousTileVerilog(Classic):
 
 
 @Flow.factory.register()
-class FABulousTileVHDL(VHDLClassic):
+class FABulousTileVHDLMarcoFlow(VHDLClassic):
     Substitutions = subs
     config_vars = configs
 

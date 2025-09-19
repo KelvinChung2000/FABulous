@@ -24,7 +24,7 @@ def _migrate_unmatched_io(x: object) -> str:
 
 
 @Step.factory.register()
-class FABulousIOPlacement(OdbpyStep):
+class FABulousTileIOPlacement(OdbpyStep):
     """Places I/O pins using a custom script, which uses a "pin order configuration"
     file.
 

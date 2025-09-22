@@ -266,6 +266,8 @@ class FABulousSettings(BaseSettings):
         This method logs a warning if a tool is not found in `PATH`, as some
         features may be unavailable without the tool.
         """
+        logger.info(f"Resolved path: {value}")
+
         if value is not None:
             return value
         tool_map = {
@@ -276,6 +278,8 @@ class FABulousSettings(BaseSettings):
             "ghdl_path": "ghdl",
         }
         tool = tool_map.get(info.field_name, None)  # type: ignore[attr-defined]
+        print(f"field_name: {info.field_name}, tool: {tool}")  # Debug print
+        print(info)
         if tool is None:
             logger.warning(
                 f"No tool found for {info.field_name} during settings initialisation. "
@@ -283,6 +287,7 @@ class FABulousSettings(BaseSettings):
             )
             return None
         tool_path = which(tool)
+        logger.info(f"Resolved {tool} path: {tool_path}")
         if tool_path is not None:
             return Path(tool_path).resolve()
 

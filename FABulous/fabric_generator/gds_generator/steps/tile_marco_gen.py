@@ -30,6 +30,9 @@ class TileMarcoGen(Step):
     # Get the Classic flow class from the Flow factory at runtime.
     # Use assignment instead of subclassing with a call expression.
 
+    id = "FABulous.TileMarcoGen"
+    name = "FABulous Tile to Macro Conversion"
+
     inputs = []
     outputs = [
         DesignFormat.GDS,

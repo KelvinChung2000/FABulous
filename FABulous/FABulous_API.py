@@ -488,15 +488,26 @@ class FABulous_API:
                 "FP_IO_VTHICKNESS_MULT": get_context().fp_io_vthickness_mult,
                 "FP_IO_HLAYER": get_context().fp_io_hlayer,
                 "FP_IO_VLAYER": get_context().fp_io_vlayer,
+                "MAX_TRANSITION_CONSTRAINT": 1.0,
+                "MAX_FANOUT_CONSTRAINT": 16,
+                "PL_RESIZER_SETUP_SLACK_MARGIN": 1,
+                "GLB_RESIZER_SETUP_SLACK_MARGIN": 0.2,
+                "PL_RESIZER_HOLD_SLACK_MARGIN": 1,
+                "GLB_RESIZER_HOLD_SLACK_MARGIN": 0.2,
+                "RUN_HEURISTIC_DIODE_INSERTION": True,
+                "HEURISTIC_ANTENNA_THRESHOLD": 110,
+                "GRT_REPAIR_ANTENNAS": True,
+                "PL_TARGET_DENSITY_PCT": 70,
             },
             name=tile_dir.name,
             design_dir=str(out_folder.resolve()),
             pdk=pdk,
             pdk_root=str((pdk_root).resolve().parent),
         )
-        (success, state_list) = flow.start()
-        if not success:
-            raise RuntimeError(f"Marco flow failed at {state_list}")
+        result = flow.start()
+        print(result)
+        # if not success:
+        #     raise RuntimeError(f"Marco flow failed at {state_list}")
         logger.info("Marco flow completed.")
 
     def genFabricGDS(

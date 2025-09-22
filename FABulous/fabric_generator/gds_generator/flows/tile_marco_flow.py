@@ -47,7 +47,7 @@ class FABulousTileVerilogMarcoFlow(Classic):
     config_vars = configs
 
     def run(self, initial_state: State, **kwargs) -> tuple[State, list[Step]]:
-        (final_state, steps) = super().run(initial_state, **kwargs)
+        final_state, steps = super().run(initial_state, **kwargs)
 
         final_views_path = (
             Path(self.config["FABULOUS_TILE_DIR"]) / "macro" / self.config["PDK"]

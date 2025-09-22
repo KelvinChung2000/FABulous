@@ -283,7 +283,7 @@ class FABulous_CLI(Cmd):
             logger.opt(exception=e).error(str(e).replace("<", r"\<"))
             self.exit_code = 1
             if self.interactive:
-                return False
+                return None
             return not self.force
 
     def do_exit(self, *_ignored: str) -> bool:
@@ -1299,6 +1299,17 @@ class FABulous_CLI(Cmd):
             pin_order_file,
             self.projectDir / "Tile" / args.tile / "macro",
         )
+
+    @with_category(CMD_FABRIC_FLOW)
+    def do_gen_all_tile_gds(self, *_args: str) -> None:
+        """Generate GDSII files for all tiles in the fabric."""
+        for i in self.allTile:
+            logger.info(f"Generating GDS for tile {i}")
+            self.fabulousAPI.genTileMarco(
+                self.projectDir / "Tile" / i,
+                self.projectDir / "Tile" / i / f"{i}_io_pin_order.yaml",
+                self.projectDir / "Tile" / i / "macro",
+            )
 
     @with_category(CMD_FABRIC_FLOW)
     def do_gen_fabric_gds(self) -> None:

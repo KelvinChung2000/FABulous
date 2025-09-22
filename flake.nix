@@ -25,7 +25,7 @@
       inputs.uv2nix.follows = "uv2nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    librelane.url = "github:librelane/librelane";
+    librelane.url = "github:librelane/librelane/dev";
 
     # Tag-pinned sources for custom tools (locked in flake.lock)
     ghdl-src = {

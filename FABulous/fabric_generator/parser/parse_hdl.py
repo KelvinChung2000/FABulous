@@ -228,7 +228,6 @@ def parseBelFile(
     ports_vectors["external"] = {}
     ports_vectors["config"] = {}
     ports_vectors["shared"] = {}
-
     yosys_json = YosysJson(filename)
     filtered_ports: dict[str, tuple[IO, list]] = {}
 

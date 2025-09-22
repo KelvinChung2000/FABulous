@@ -441,7 +441,7 @@ def run_cmd(
     fab_CLI = FABulous_CLI(
         get_context().proj_lang,
         force=force,
-        interactive=True,
+        interactive=False,
         verbose=get_context().verbose >= 2,
         debug=get_context().debug,
     )

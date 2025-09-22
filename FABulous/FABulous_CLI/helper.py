@@ -136,7 +136,7 @@ def create_project(project_dir: Path, lang: HDLType = HDLType.VERILOG) -> None:
     ----------
     project_dir : Path
         Directory where the project will be created.
-    lang : Literal["verilog", "vhdl"], optional
+    lang : HDLType, optional
         The language of project to create ("verilog" or "vhdl"), by default "verilog".
 
     Raises

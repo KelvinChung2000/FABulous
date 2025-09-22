@@ -363,7 +363,7 @@ requires-dist = [
     { name = "cmd2", specifier = ">=2" },
     { name = "fasm", specifier = ">=0.0.2" },
     { name = "gnureadline", marker = "sys_platform != 'win32'", specifier = ">=8.2.0" },
-    { name = "librelane", directory = "../../librelane" },
+    { name = "librelane", specifier = ">=2.4.2" },
     { name = "loguru", specifier = ">=0.7.0" },
     { name = "packaging", specifier = ">=25.0" },
     { name = "pydantic-settings", specifier = ">=2.10.1" },
@@ -545,7 +545,7 @@ wheels = [
 [[package]]
 name = "librelane"
 version = "3.0.0.dev39"
-source = { directory = "../../librelane" }
+source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "ciel" },
     { name = "click" },
@@ -562,23 +562,9 @@ dependencies = [
     { name = "semver" },
     { name = "yamlcore" },
 ]
-
-[package.metadata]
-requires-dist = [
-    { name = "ciel", specifier = ">=2.0.3,<3" },
-    { name = "click", specifier = ">=8,<8.2" },
-    { name = "cloup", specifier = ">=3.0.5,<4" },
-    { name = "deprecated", specifier = ">=1.2.10,<2" },
-    { name = "httpx", specifier = ">=0.22.0,<0.29" },
-    { name = "klayout", specifier = ">=0.29.0,<0.31.0" },
-    { name = "lln-libparse", specifier = "==0.56.*" },
-    { name = "lxml", specifier = ">=4.9.0" },
-    { name = "psutil", specifier = ">=5.9.0" },
-    { name = "pyyaml", specifier = ">=5,<7" },
-    { name = "rapidfuzz", specifier = ">=3.9.0,<4" },
-    { name = "rich", specifier = ">=12,<15" },
-    { name = "semver", specifier = ">=3.0.2,<4.0.0" },
-    { name = "yamlcore", specifier = ">=0.0.2,<0.0.3" },
+sdist = { url = "https://files.pythonhosted.org/packages/c8/a1/e855e69edd9f936b2887699500886012849907031ceeb2566990d223d453/librelane-3.0.0.dev39.tar.gz", hash = "sha256:44ec4bc8de5b5859abae7c4dc5e2da6cadf9859676c9b9704d0590d1d5175a7f", size = 295844, upload-time = "2025-09-15T17:13:29.721Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/46/d6/053b528b04d5af9422f9cde4672c41c3cb4dbcb26b3b033e6ce5a1a15bf8/librelane-3.0.0.dev39-py3-none-any.whl", hash = "sha256:16ecf4c97f044fbacd4c855667ae5edbe52a7d177f0dfc8dcedf0ab52eed7428", size = 406009, upload-time = "2025-09-15T17:13:27.762Z" },
 ]
 
 [[package]]

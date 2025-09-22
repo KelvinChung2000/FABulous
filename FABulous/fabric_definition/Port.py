@@ -18,9 +18,11 @@ class Port:
 
     The `name`, `inOut` and `sideOfTile` are added attributes to aid the generation
     of the fabric.
+
     The `name` and `inOut` are related. If the `inOut` is `INPUT`,
     then the name is the source name of the port on the tile.
     Otherwise, the name is the destination name of the port on the tile.
+
     The `sideOfTile` defines where the port is physically located on the tile,
     since for a north direction wire, the input will be physically located on
     the south side of the tile.
@@ -146,8 +148,8 @@ class Port:
 
         If 'Indexed' is in the mode, then brackets are added to the signal name.
 
-        Args
-        ----
+        Parameters
+        ----------
         mode : str, optional
             Mode for expansion. Defaults to "SwitchMatrix".
             Possible modes are 'all', 'allIndexed', 'Top', 'TopIndexed', 'AutoTop',
@@ -156,7 +158,7 @@ class Port:
 
         Returns
         -------
-        Tuple : [list[str], list[str]]
+        tuple[list[str], list[str]]
             A tuple of two lists. The first list contains the source names of the ports
             and the second list contains the destination names of the ports.
         """
@@ -174,12 +176,12 @@ class Port:
             thisRange = self.wireCount
         elif mode == "AutoSwitchMatrix" or mode == "AutoSwitchMatrixIndexed":
             if self.sourceName == "NULL" or self.destinationName == "NULL":
-                # the following line connects all wires to the switch matrix in the
-                #  case one port is NULL (typically termination)
+                # the following line connects all wires to the switch matrix in the case
+                # one port is NULL (typically termination)
                 thisRange = (abs(self.xOffset) + abs(self.yOffset)) * self.wireCount
             else:
-                # the following line connects all bottom wires to the switch matrix
-                # in the case begin and end ports are used
+                # the following line connects all bottom wires to the switch matrix in
+                # the case begin and end ports are used
                 thisRange = self.wireCount
         # range ((wires*distance)-1 downto 0) as connected to the tile top
         elif mode in [
@@ -192,8 +194,8 @@ class Port:
         ]:
             thisRange = (abs(self.xOffset) + abs(self.yOffset)) * self.wireCount
 
-        # the following three lines are needed to get the top line[wires] that are
-        # actually the connection from a switch matrix to the routing fabric
+        # the following three lines are needed to get the top line[wires] that
+        # are actually the connection from a switch matrix to the routing fabric
         startIndex = 0
         if mode in ["Top", "TopIndexed"]:
             startIndex = ((abs(self.xOffset) + abs(self.yOffset)) - 1) * self.wireCount

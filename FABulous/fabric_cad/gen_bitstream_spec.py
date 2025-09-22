@@ -26,9 +26,14 @@ def generateBitstreamSpec(fabric: Fabric) -> dict[str, dict]:
     bitstream
     The result file will be further parsed by `bit_gen.py`.
 
+    Parameters
+    ----------
+    fabric : Fabric
+        The fabric object for generating the bitstream specification
+
     Returns
     -------
-    dict [str, dict]
+    dict[str, dict]
         The bits stream specification of the fabric.
     """
     specData = {
@@ -139,8 +144,8 @@ def generateBitstreamSpec(fabric: Fabric) -> dict[str, dict]:
                             curBitOffset += len(keyDict[entry])
 
             # All the generation will be working on the tile level with the tileDic
-            # This is added to propagate the updated switch matrix to
-            #  each of the tile in the fabric
+            # This is added to propagate the updated switch matrix to each of the tile
+            # in the fabric
             if tile.matrixDir.suffix == ".list":
                 tile.matrixDir = tile.matrixDir.with_suffix(".csv")
 

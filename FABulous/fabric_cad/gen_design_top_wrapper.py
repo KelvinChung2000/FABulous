@@ -35,8 +35,10 @@ def generateUserDesignTopWrapper(
 
     Raises
     ------
-    ValueError
+    InvalidFileType
         Output file is not a Verilog file or user design path is not a file
+    FileNotFoundError
+        User design file is not a file or does not exist
     """
     top_wrapper: list[str] = [""]
 
@@ -108,8 +110,8 @@ def generateUserDesignTopWrapper(
                 # This is done similar in the npnr model gen, to get the bel prefix
                 # So we assume to get the same Bel prefix here.
                 # convert number of bel i to character A,B,C ...
-                # But we need to do this backwards,
-                # starting with the highest letter for a tile
+                # But we need to do this backwards, starting with the highest letter for
+                # a tile
                 prefix = chr(ord("A") + len(bels) - 1 - i)
 
                 if bel.name in [
@@ -120,9 +122,8 @@ def generateUserDesignTopWrapper(
                 ]:
                     # This is a special case for the RAM_IO bels, since
                     # for some unknown reasons, the prefix used in the nexpnr backend
-                    # is not based on the number of bels,
-                    # it is based on the actual bel prefix
-                    # which is defined in the tile csv.
+                    # is not based on the number of bels, it is based on the actual bel
+                    # prefix which is defined in the tile csv.
                     # https://github.com/YosysHQ/nextpnr/blob/master/generic/viaduct/fabulous/fabulous.cc#L355
                     prefix = bel.prefix.removesuffix("_")
 

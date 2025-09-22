@@ -1,6 +1,6 @@
 """Switch matrix geometry definitions."""
 
-import pathlib
+from pathlib import Path
 
 from loguru import logger
 
@@ -15,13 +15,17 @@ from FABulous.geometry_generator.port_geometry import PortGeometry, PortType
 class SmGeometry:
     """A data structure representing the geometry of a Switch Matrix.
 
+    Sets all attributes to default values: None for names and paths,
+    zero for dimensions and coordinates, and empty lists for ports
+    and port geometries.
+
     Attributes
     ----------
     name : str
         Name of the switch matrix
-    src : str
+    src : Path
         File path of the switch matrix HDL source file
-    csv : str
+    csv : Path
         File path of the switch matrix CSV file
     width : int
         Width of the switch matrix
@@ -31,17 +35,17 @@ class SmGeometry:
         X coordinate of the switch matrix, relative within the tile
     relY : int
         Y coordinate of the switch matrix, relative within the tile
-    northPorts : List[Port]
+    northPorts : list[Port]
         List of the ports of the switch matrix in north direction
-    southPorts : List[Port]
+    southPorts : list[Port]
         List of the ports of the switch matrix in south direction
-    eastPorts : List[Port]
+    eastPorts : list[Port]
         List of the ports of the switch matrix in east direction
-    westPorts : List[Port]
+    westPorts : list[Port]
         List of the ports of the switch matrix in west direction
-    jumpPorts : List[Port]
+    jumpPorts : list[Port]
         List of the jump ports of the switch matrix
-    portGeoms : List[PortGeometry]
+    portGeoms : list[PortGeometry]
         List of geometries of the ports of the switch matrix
     northWiresReservedWidth : int
         Reserved width for wires going north
@@ -58,8 +62,8 @@ class SmGeometry:
     """
 
     name: str
-    src: pathlib.Path
-    csv: pathlib.Path
+    src: Path
+    csv: Path
     width: int
     height: int
     relX: int
@@ -78,12 +82,6 @@ class SmGeometry:
     westPortsRightX: int
 
     def __init__(self) -> None:
-        """Initialize a SmGeometry instance.
-
-        Sets all attributes to default values: None for names and paths,
-        zero for dimensions and coordinates, and empty lists for ports
-        and port geometries.
-        """
         self.name = None
         self.src = None
         self.csv = None
@@ -511,7 +509,7 @@ class SmGeometry:
 
         Parameters
         ----------
-        writer :
+        writer : object
             The CSV `writer` object to use for output
         """
         writer.writerows(

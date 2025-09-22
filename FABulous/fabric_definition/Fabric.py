@@ -34,7 +34,7 @@ class Fabric:
         The number of rows of the fabric
     numberOfColumns : int
         The number of columns of the fabric
-    configMitMode : ConfigBitMode
+    configBitMode : ConfigBitMode
         The configuration bit mode of the fabric.
         Currently supports frame based or ff chain
     frameBitsPerRow : int
@@ -69,10 +69,12 @@ class Fabric:
         A dictionary of tiles that are not used in the fabric,
         but defined in the fabric.csv.
         The key is the name of the tile and the value is the tile.
-    unusedSuperTileDic: dict[str, Tile]
+    unusedSuperTileDic : dict[str, SuperTile]
         A dictionary of super tiles that are not used in the fabric,
         but defined in the fabric.csv.
         The key is the name of the tile and the value is the tile.
+    commonWirePair : list[tuple[str, str]]
+        A list of common wire pairs in the fabric.
     """
 
     tile: list[list[Tile]] = field(default_factory=list)
@@ -369,4 +371,5 @@ class Fabric:
             )
         if self.tile[y][x] is None:
             return []
+
         return self.tile[y][x].bels

@@ -6,6 +6,8 @@ It handles both direct connections to neighboring tiles and complex stair-like r
 for longer-distance connections.
 """
 
+from dataclasses import dataclass, field
+
 from FABulous.custom_exception import InvalidPortType
 from FABulous.fabric_definition.define import Direction, Side
 from FABulous.fabric_definition.Tile import Tile
@@ -16,8 +18,12 @@ from FABulous.geometry_generator.sm_geometry import SmGeometry
 from FABulous.geometry_generator.wire_geometry import StairWires, WireGeometry
 
 
+@dataclass
 class TileGeometry:
     """A data structure representing the geometry of a tile.
+
+    Initializes all attributes to default values: empty name, zero dimensions,
+    no border, and empty lists for geometric components.
 
     Attributes
     ----------
@@ -31,37 +37,49 @@ class TileGeometry:
         Border of the fabric the tile is on
     smGeometry : SmGeometry
         Geometry of the tiles switch matrix
-    belGeomList : List[BelGeometry]
+    belGeomList : list[BelGeometry]
         List of the geometries of the tiles bels
-    wireGeomList : List[WireGeometry]
+    wireGeomList : list[WireGeometry]
         List of the geometries of the tiles wires
-    stairWiresList : List[StairWires]
+    stairWiresList : list[StairWires]
         List of the stair-like wires of the tile
+    currPortGroupId : int
+        Current port group ID being processed
+    queuedAdjustmentBottom : int
+        Queued adjustment for bottom positioning
+    queuedAdjustmentLeft : int
+        Queued adjustment for left positioning
+    reserveStairSpaceBottom : bool
+        Whether to reserve space at bottom for stair wires
+    reserveStairSpaceLeft : bool
+        Whether to reserve space at left for stair wires
+    eastMiddleY : int
+        Middle Y coordinate for east side
+    northMiddleX : int
+        Middle X coordinate for north side
+    southMiddleX : int
+        Middle X coordinate for south side
+    westMiddleY : int
+        Middle Y coordinate for west side
     """
 
-    name: str
-    width: int
-    height: int
-    border: Border
-    smGeometry: SmGeometry
-    belGeomList: list[BelGeometry]
-    wireGeomList: list[WireGeometry]
-    stairWiresList: list[StairWires]
-
-    def __init__(self) -> None:
-        """Initialize a `TileGeometry` instance.
-
-        Initializes all attributes to default values: empty name, zero dimensions,
-        no border, and empty lists for geometric components.
-        """
-        self.name = None
-        self.width = 0
-        self.height = 0
-        self.border = Border.NONE
-        self.smGeometry = SmGeometry()
-        self.belGeomList = []
-        self.wireGeomList = []
-        self.stairWiresList = []
+    name: str = ""
+    width: int = 0
+    height: int = 0
+    border: Border = Border.NONE
+    smGeometry: SmGeometry = field(default_factory=SmGeometry)
+    belGeomList: list[BelGeometry] = field(default_factory=list)
+    wireGeomList: list[WireGeometry] = field(default_factory=list)
+    stairWiresList: list[StairWires] = field(default_factory=list)
+    currPortGroupId: int = 0
+    queuedAdjustmentBottom: int = 0
+    queuedAdjustmentLeft: int = 0
+    reserveStairSpaceBottom: bool = False
+    reserveStairSpaceLeft: bool = False
+    eastMiddleY: int = 0
+    northMiddleX: int = 0
+    southMiddleX: int = 0
+    westMiddleY: int = 0
 
     def generateGeometry(self, tile: Tile, padding: int) -> None:
         """Generate the geometry for a tile.
@@ -209,11 +227,6 @@ class TileGeometry:
                 wireGeom.addPathLoc(end)
                 self.wireGeomList.append(wireGeom)
 
-    northMiddleX = None
-    southMiddleX = None
-    eastMiddleY = None
-    westMiddleY = None
-
     def generateDirectWires(self, padding: int) -> None:
         """Generate wires to neigbouring tiles."""
         self.northMiddleX = self.smGeometry.relX - padding
@@ -286,12 +299,6 @@ class TileGeometry:
 
             self.wireGeomList.append(wireGeom)
 
-    currPortGroupId = 0
-    reserveStairSpaceLeft = False
-    reserveStairSpaceBottom = False
-    queuedAdjustmentLeft = 0
-    queuedAdjustmentBottom = 0
-
     def generateIndirectWires(self, padding: int) -> None:
         """Generate wires to non-neighbouring tiles.
 
@@ -303,6 +310,11 @@ class TileGeometry:
         ----------
         padding : int
             The padding space to add around wire routing
+
+        Raises
+        ------
+        InvalidPortType
+            If a port has abs(offset) > 1 but no tile side assigned.
         """
         for portGeom in self.smGeometry.portGeoms:
             if abs(portGeom.offset) < 2:
@@ -548,8 +560,8 @@ class TileGeometry:
 
         Parameters
         ----------
-        writer
-            The CSV `writer` object to use for output
+        writer : object
+            The CSV writer object to use for output
         """
         writer.writerows(
             [

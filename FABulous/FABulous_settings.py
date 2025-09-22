@@ -195,7 +195,7 @@ class FABulousSettings(BaseSettings):
         ----------
         value : Path | None
             The explicitly provided tool path, if any.
-        info : FieldValidationInfo
+        info : ValidationInfo
             Validation context containing field information.
 
         Returns
@@ -245,13 +245,18 @@ def init_context(
     This function gathers .env files and lets the pydantic-settings system handle
     project directory resolution.
 
-    Args:
-        global_dot_env: Global .env file path
-        project_dot_env: Project .env file path
-        explicit_project_dir: Explicitly provided project directory (highest priority)
+    Parameters
+    ----------
+    project_dir : Path | None
+        Project directory path (if None, uses cwd)
+    global_dot_env : Path | None
+        Path to a global .env file (if any)
+    project_dot_env : Path | None
+        Path to a project-specific .env file (if any)
 
     Returns
     -------
+    FABulousSettings
         The initialized FABulousSettings instance
     """
     global _context_instance
@@ -323,11 +328,13 @@ def get_context() -> FABulousSettings:
 
     Returns
     -------
+    FABulousSettings
         The current FABulousSettings instance
 
     Raises
     ------
-        RuntimeError: If context has not been initialized with init_context()
+    RuntimeError
+        If context has not been initialized with init_context()
     """
     global _context_instance
 
@@ -351,15 +358,10 @@ def add_var_to_global_env(key: str, value: str) -> None:
 
     Parameters
     ----------
-        key: str
-            The environment variable key to add or update.
-        value: str
-            The value to set for the environment variable.
-
-    Raises
-    ------
-        RuntimeError
-            If the user config directory is not set.
+    key: str
+        The environment variable key to add or update.
+    value: str
+        The value to set for the environment variable.
     """
     # Use user config directory for global .env file
     user_config_dir = FAB_USER_CONFIG_DIR

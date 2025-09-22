@@ -1,5 +1,4 @@
 """Classes for geometry generation."""
-
 # Copyright 2023 Heidelberg University
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,22 +22,24 @@ from FABulous.geometry_generator.fabric_geometry import FabricGeometry
 class GeometryGenerator:
     """Class to handle the generation of the geometry for a fabric.
 
+    Parameters
+    ----------
+    fabric : Fabric
+        The fabric object passed from the CSV definition files
+
+
     Attributes
     ----------
     fabric : Fabric
         The fabric object passed from the CSV definition files
-    fabricGeometry : FabricGeometry
+    fabricGeometry : FabricGeometry | None, optional
         The generated geometry object
     """
 
-    def __init__(self, fabric: Fabric) -> None:
-        """Initialize a `GeometryGenerator` instance.
+    fabric: Fabric
+    fabricGeometry: FabricGeometry | None
 
-        Parameters
-        ----------
-        fabric : Fabric
-            The fabric object from CSV definition files
-        """
+    def __init__(self, fabric: Fabric) -> None:
         self.fabric = fabric
         self.fabricGeometry = None
 
@@ -66,10 +67,5 @@ class GeometryGenerator:
         ----------
         fileName : str
             The name of the CSV file to create
-
-        Raises
-        ------
-        AttributeError
-            If generateGeometry() has not been called yet
         """
         self.fabricGeometry.saveToCSV(fileName)

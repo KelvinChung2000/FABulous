@@ -49,7 +49,7 @@ def setup_logger(verbosity: int, debug: bool, log_file: Path = Path()) -> None:
         1+: Includes timestamp, module name, function, line number
     debug : bool
         If True, sets log level to `DEBUG`, otherwise sets to `INFO`.
-    log_file : pathlib.Path, optional
+    log_file : Path
         Path to log file. If provided, logs will be written to file instead of stdout.
         Default is `Path()`, which results in logging to stdout.
 
@@ -137,6 +137,13 @@ def create_project(
         Directory where the project will be created.
     lang : Literal["verilog", "vhdl"], optional
         The language of project to create ("verilog" or "vhdl"), by default "verilog".
+
+    Raises
+    ------
+    FileNotFoundError
+        If the template files cannot be found in the package resources.
+    ValueError
+        If an unsupported language is specified.
     """
     logger.info(project_dir)
 
@@ -222,9 +229,9 @@ def copy_verilog_files(src: Path, dst: Path) -> None:
 
     Parameters
     ----------
-    src : str
+    src : Path
         Source directory.
-    dst : str
+    dst : Path
         Destination directory
     """
     for file_path in src.rglob("*.v"):
@@ -239,7 +246,7 @@ def remove_dir(path: Path) -> None:
 
     Parameters
     ----------
-    path : str
+    path : Path
         Path of the directory to remove.
     """
     try:
@@ -255,9 +262,9 @@ def make_hex(binfile: Path, outfile: Path) -> None:
 
     Parameters
     ----------
-    binfile : str
+    binfile : Path
         Path to binary file.
-    outfile : str
+    outfile : Path
         Path to ouput hex file.
     """
     with Path(binfile).open("rb") as f:
@@ -280,8 +287,13 @@ def wrap_with_except_handling(fun_to_wrap: Callable) -> Callable:
 
     Parameters
     ----------
-    fun_to_wrap : callable
+    fun_to_wrap : Callable
         The function to be wrapped with exception handling.
+
+    Returns
+    -------
+    Callable
+        The wrapped function with exception handling.
     """
 
     def inter(*args: Any, **varargs: Any) -> None:  # noqa: ANN401
@@ -289,10 +301,15 @@ def wrap_with_except_handling(fun_to_wrap: Callable) -> Callable:
 
         Parameters
         ----------
-        *args : tuple
+        *args : Any
             Positional arguments to pass to 'fun_to_wrap'.
-        **varags : dict
+        **varargs : Any
             Keyword arguments to pass to 'fun_to_wrap'.
+
+        Raises
+        ------
+        Exception
+            Reraises any exception caught during the execution of 'fun_to_wrap'.
         """
         try:
             fun_to_wrap(*args, **varargs)
@@ -348,21 +365,21 @@ def install_oss_cad_suite(destination_folder: Path, update: bool = False) -> Non
 
     Parameters
     ----------
-        destination_folder: Path
-            The folder where the OSS CAD Suite will be installed.
-        update : bool
-            If True, it will update the existing installation if it exists.
+    destination_folder: Path
+        The folder where the OSS CAD Suite will be installed.
+    update : bool
+        If True, it will update the existing installation if it exists.
 
     Raises
     ------
-        FileExistsError
-            If the folder already exists and update is not set to True.
-        requests.RequestException
-            If the download fails or the request to GitHub fails.
-        ValueError
-            If the operating system or architecture is not supported.
-            If no valid archive is found for the current OS and architecture.
-            If the file format of the downloaded archive is unsupported.
+    ConnectionError
+        If the download fails or the request to GitHub fails.
+    FileExistsError
+        If the folder already exists and update is not set to True.
+    ValueError
+        If the operating system or architecture is not supported.
+        If no valid archive is found for the current OS and architecture.
+        If the file format of the downloaded archive is unsupported.
     """
     github_releases_url = (
         "https://api.github.com/repos/YosysHQ/oss-cad-suite-build/releases/latest"
@@ -507,16 +524,17 @@ def update_project_version(project_dir: Path) -> bool:
 
 
 class CommandPipeline:
-    """Helper class to manage command execution with error handling."""
+    """Helper class to manage command execution with error handling.
+
+    Parameters
+    ----------
+    cli_instance : FABulous_CLI
+        The CLI instance to use for command execution.
+    force : bool
+        If True, continues executing commands even if one fails.
+    """
 
     def __init__(self, cli_instance: "FABulous_CLI", force: bool = False) -> None:
-        """Initialize the command pipeline.
-
-        Parameters
-        ----------
-        cli_instance : FABulous_CLI
-            The CLI instance to use for command execution.
-        """
         self.cli = cli_instance
         self.steps = []
         self.force = force
@@ -583,21 +601,22 @@ def clone_git_repo(repo_url: str, target_dir: Path, branch: str = "main") -> boo
 
     Parameters
     ----------
-        repo_url: str
-            GitHub repository URL (e.g., "https://github.com/user/repo.git")
-        target_dir: Path
-            Local directory to clone/download to
-        branch: str
-            Git branch to checkout (default: "main")
+    repo_url : str
+        GitHub repository URL (e.g., "https://github.com/user/repo.git")
+    target_dir : Path
+        Local directory to clone/download to
+    branch : str
+        Git branch to checkout (default: "main")
 
     Returns
     -------
+    bool
         True if successful, False otherwise
 
     Raises
     ------
-        FileNotFoundError
-            If git application not found in PATH
+    FileNotFoundError
+        If git application not found in PATH
     """
     if shutil.which("git") is None:
         raise FileNotFoundError("Application git not found in PATH")
@@ -676,8 +695,13 @@ def install_fabulator(install_dir: Path) -> None:
 
     Parameters
     ----------
-        install_dir: Path
-            The directory where FABulator will be installed.
+    install_dir : Path
+        The directory where FABulator will be installed.
+
+    Raises
+    ------
+    RuntimeError
+        If the installation fails.
     """
     fabulator_dir = install_dir / "FABulator"
     repo_url = "https://github.com/FPGA-Research/FABulator.git"

@@ -7,5 +7,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v5
-    - uses: actions/setup-python@v5
-    - uses: pre-commit/action@v3.0.1
+    - name: Install uv
+      uses: astral-sh/setup-uv@v6
+    - name: Install the project
+      run: |
+        echo "UV_SYSTEM_PYTHON=1" >> $GITHUB_ENV
+        uv sync --locked --all-extras --dev
+
+    - name: run pre-commit
+      run: |
+        uv run pre-commit install
+        uv run pre-commit run --show-diff-on-failure --color=always --all-files

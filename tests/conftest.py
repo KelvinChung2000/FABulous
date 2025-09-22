@@ -13,6 +13,29 @@ from FABulous.FABulous_CLI.helper import create_project, setup_logger
 from FABulous.FABulous_settings import reset_context
 
 
+def pytest_addoption(parser: pytest.Parser) -> None:  # type: ignore[name-defined]
+    """Add command line option to include slow tests explicitly.
+
+    Usage: pytest --runslow
+    Without this flag, tests marked with @pytest.mark.slow are skipped via addopts filter.
+    """
+    parser.addoption(
+        "--runslow",
+        action="store_true",
+        default=False,
+        help="run tests marked as slow (overrides default '-m not slow')",
+    )
+
+
+def pytest_configure(config: pytest.Config) -> None:  # type: ignore[name-defined]
+    # If --runslow is given, remove the '-m not slow' filter so slow tests run.
+    if (
+        config.getoption("runslow")
+        and getattr(config.option, "markexpr", None) == "not slow"
+    ):
+        config.option.markexpr = ""
+
+
 def normalize(block: str) -> list[str]:
     """Normalize a block of text to perform comparison.
 

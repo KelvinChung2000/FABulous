@@ -1,4 +1,4 @@
-import os
+from importlib import resources
 
 from librelane.config.variable import Variable
 from librelane.steps.common_variables import (
@@ -28,21 +28,24 @@ class AddBuffers(OpenROADStep):
             Variable(
                 "DESIGN_REPAIR_BUFFER_INPUT_PORTS",
                 bool,
-                "Specifies whether or not to insert buffers on input ports when design repairs are run.",
+                "Specifies whether or not to insert buffers on input ports when design "
+                "repairs are run.",
                 default=True,
                 deprecated_names=["PL_RESIZER_BUFFER_INPUT_PORTS"],
             ),
             Variable(
                 "DESIGN_REPAIR_BUFFER_OUTPUT_PORTS",
                 bool,
-                "Specifies whether or not to insert buffers on input ports when design repairs are run.",
+                "Specifies whether or not to insert buffers on input ports when design "
+                "repairs are run.",
                 default=True,
                 deprecated_names=["PL_RESIZER_BUFFER_OUTPUT_PORTS"],
             ),
             Variable(
                 "DESIGN_REPAIR_REMOVE_BUFFERS",
                 bool,
-                "Invokes OpenROAD's remove_buffers command to remove buffers from synthesis, which gives OpenROAD more flexibility when buffering nets.",
+                "Invokes OpenROAD's remove_buffers command to remove buffers from "
+                "synthesis, which gives OpenROAD more flexibility when buffering nets.",
                 default=False,
             ),
         ]
@@ -61,5 +64,8 @@ class AddBuffers(OpenROADStep):
             **kwargs,
         )
 
-    def get_script_path(self):
-        return os.path.join(os.path.dirname(__file__), "scripts", "add_buffers.tcl")
+    def get_script_path(self) -> str:
+        return str(
+            resources.files("FABulous.fabric_generator.gds_generator.script")
+            / "add_buffers.tcl"
+        )

@@ -8,13 +8,18 @@ from librelane.logging.logger import info, warn
 from librelane.state.state import State
 from librelane.steps.step import Step
 
+from FABulous.fabric_generator.gds_generator.steps.add_buffer import AddBuffers
 from FABulous.fabric_generator.gds_generator.steps.tile_IO_placement import (
     FABulousTileIOPlacement,
 )
 
 subs = {
+    # "OpenROAD.IOPlacement": FABulousTileIOPlacement,
     # Replace with FABulous IO Placement
     "Odb.CustomIOPlacement": FABulousTileIOPlacement,
+    "OpenROAD.Resize*": None,
+    "OpenROAD.RepairDesign*": None,
+    "+OpenROAD.GlobalPlacement": AddBuffers,
     # Disable STA
     "OpenROAD.STAPrePNR": None,
     "OpenROAD.STAMidPNR": None,
@@ -22,11 +27,6 @@ subs = {
 }
 
 configs = Classic.config_vars + [
-    Variable(
-        "FABULOUS_TILE_PIN_CONFIG",
-        Path,
-        "The side of the macro at which the external pins are placed.",
-    ),
     Variable(
         "FABULOUS_TILE_DIR",
         Path,

@@ -1,5 +1,5 @@
-import os
 from decimal import Decimal
+from importlib import resources
 from typing import Literal, Optional
 
 from librelane.common.types import Path
@@ -40,9 +40,11 @@ class FABulousTileIOPlacement(OdbpyStep):
             "IO_PIN_V_LENGTH",
             Optional[Decimal],
             """
-            The length of the pins with a north or south orientation. If unspecified by a PDK, the script will use whichever is higher of the following two values:
+            The length of the pins with a north or south orientation. If unspecified by 
+            a PDK, the script will use whichever is higher of the following two values:
                 * The pin width
-                * The minimum value satisfying the minimum area constraint given the pin width
+                * The minimum value satisfying the minimum area constraint given the 
+                  pin width
             """,
             units="µm",
             pdk=True,
@@ -51,9 +53,11 @@ class FABulousTileIOPlacement(OdbpyStep):
             "IO_PIN_H_LENGTH",
             Optional[Decimal],
             """
-            The length of the pins with an east or west orientation. If unspecified by a PDK, the script will use whichever is higher of the following two values:
+            The length of the pins with an east or west orientation. If unspecified by 
+            a PDK, the script will use whichever is higher of the following two values:
                 * The pin width
-                * The minimum value satisfying the minimum area constraint given the pin width
+                * The minimum value satisfying the minimum area constraint given the 
+                  pin width
             """,
             units="µm",
             pdk=True,
@@ -67,7 +71,11 @@ class FABulousTileIOPlacement(OdbpyStep):
         Variable(
             "ERRORS_ON_UNMATCHED_IO",
             Literal["none", "unmatched_design", "unmatched_cfg", "both"],
-            "Controls whether to emit an error in: no situation, when pins exist in the design that do not exist in the config file, when pins exist in the config file that do not exist in the design, and both respectively. `both` is recommended, as the default is only for backwards compatibility with librelane 1.",
+            "Controls whether to emit an error in: no situation, when pins exist in "
+            "the design that do not exist in the config file, when pins exist in the "
+            "config file that do not exist in the design, and both respectively. "
+            "`both` is recommended, as the default is only for backwards compatibility "
+            "with librelane 1.",
             default="unmatched_design",  # Backwards compatible with librelane 1
             deprecated_names=[
                 ("QUIT_ON_UNMATCHED_IO", _migrate_unmatched_io),
@@ -76,7 +84,10 @@ class FABulousTileIOPlacement(OdbpyStep):
     ]
 
     def get_script_path(self) -> str:
-        return os.path.join(os.path.dirname(__file__), "scripts", "io_place.py")
+        return str(
+            resources.files("FABulous.fabric_generator.gds_generator.script")
+            / "io_place.py"
+        )
 
     def get_command(self) -> list[str]:
         length_args = []

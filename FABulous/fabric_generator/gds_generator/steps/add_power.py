@@ -15,7 +15,6 @@ class FABulousPower(OdbpyStep):
     def get_script_path(self) -> str:
         return str(
             resources.files("FABulous.fabric_generator.gds_generator.script")
-            / "scripts"
             / "odb_power.py"
         )
 

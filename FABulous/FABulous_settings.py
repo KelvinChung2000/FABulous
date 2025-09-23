@@ -64,11 +64,11 @@ class FABulousSettings(BaseSettings):
     # GDS variables
     pdk_root: Path = Path().home() / ".ciel"
     pdk: str | None = None
-    die_area: tuple[int, int, int, int] | None = (0, 0, 500, 500)
-    core_area: tuple[int, int, int, int] | None = (5, 5, 495, 495)
+    die_area: tuple[int, int, int, int] | None = (0, 0, 250, 250)
+    core_area: tuple[int, int, int, int] | None = (5, 5, 245, 245)
     fp_sizing: str = "absolute"
-    fp_io_vextend: float = 1.5
-    fp_io_hextend: float = 1.5
+    fp_io_vextend: float = 0.0
+    fp_io_hextend: float = 0.0
     fp_io_vlength: float = 0.8
     fp_io_hlength: float = 0.8
     fp_io_hthickness_mult: float = 2.0

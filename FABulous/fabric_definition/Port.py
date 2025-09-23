@@ -78,8 +78,48 @@ class Port:
             f"Side={self.sideOfTile.value})"
         )
 
+    def expandPortFull(
+        self, indexed: bool = False, prefix: str = "", escape: bool = False
+    ) -> list[str]:
+        """Expand port information to individual wire names.
+
+        Generates a list of individual wire names for this port, accounting for
+        wire count and offset calculations. For termination ports (NULL), the
+        wire count is multiplied by the Manhattan distance.
+
+        Parameters
+        ----------
+        indexed : bool, optional
+            If True, wire names use bracket notation (e.g., `port[0]`).
+            If False, wire names use simple concatenation (e.g., `port0`).
+            Defaults to False.
+
+        Returns
+        -------
+        list[str]
+            List of individual wire names for this port.
+        """
+        wireCount = (abs(self.xOffset) + abs(self.yOffset)) * self.wireCount
+
+        if wireCount == 1 and self.name != "NULL":
+            return [f"{prefix}{self.name}"]
+
+        if escape:
+            return [rf"{prefix}{self.name}\[.*\]"]
+
+        if indexed:
+            return [
+                f"{prefix}{self.name}[{i}]"
+                for i in range(wireCount)
+                if self.name != "NULL"
+            ]
+
+        return [
+            f"{prefix}{self.name}{i}" for i in range(wireCount) if self.name != "NULL"
+        ]
+
     def expandPortInfoByName(
-        self, indexed: bool = False, prefix: str = ""
+        self, indexed: bool = False, prefix: str = "", escape: bool = False
     ) -> list[str]:
         """Expand port information to individual wire names.
 
@@ -103,9 +143,20 @@ class Port:
             wireCount = (abs(self.xOffset) + abs(self.yOffset)) * self.wireCount
         else:
             wireCount = self.wireCount
+
+        if wireCount == 1 and self.name != "NULL":
+            return [f"{prefix}{self.name}"]
+
         if not indexed:
             return [
                 f"{prefix}{self.name}{i}"
+                for i in range(wireCount)
+                if self.name != "NULL"
+            ]
+
+        if escape:
+            return [
+                rf"{prefix}{self.name}\[{i}\]"
                 for i in range(wireCount)
                 if self.name != "NULL"
             ]
@@ -114,7 +165,7 @@ class Port:
         ]
 
     def expandPortInfoByNameTop(
-        self, indexed: bool = False, prefix: str = ""
+        self, indexed: bool = False, prefix: str = "", escape: bool = False
     ) -> list[str]:
         """Expand port information for top-level connections.
 
@@ -141,9 +192,19 @@ class Port:
 
         wireCount = (abs(self.xOffset) + abs(self.yOffset)) * self.wireCount
 
+        if wireCount == 1 and self.name != "NULL":
+            return [f"{prefix}{self.name}"]
+
         if not indexed:
             return [
                 f"{prefix}{self.name}{i}"
+                for i in range(startIndex, wireCount)
+                if self.name != "NULL"
+            ]
+
+        if escape:
+            return [
+                rf"{prefix}{self.name}\[{i}\]"
                 for i in range(startIndex, wireCount)
                 if self.name != "NULL"
             ]

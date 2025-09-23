@@ -19,16 +19,19 @@ class PinOrderConfig:
     max_distance: int | None
     pins: list[str]
     sort_mode: PinSortMode
+    reverse_result: bool
 
     def __init__(
         self,
         min_distance: int | None = None,
         max_distance: int | None = None,
         sort_mode: PinSortMode = PinSortMode.BUS_MAJOR,
+        reverse_result: bool = False,
     ) -> None:
         self.min_distance = min_distance
         self.max_distance = max_distance
         self.sort_mode = sort_mode
+        self.reverse_result = reverse_result
 
     def __call__(self, pins: list[str]) -> Self:
         self.pins = pins
@@ -42,6 +45,7 @@ class PinOrderConfig:
             "max_distance": self.max_distance,
             "pins": self.pins,
             "sort_mode": str(self.sort_mode),
+            "reverse_result": self.reverse_result,
         }
 
 
@@ -357,54 +361,39 @@ class Tile:
         """
         port_dict = {"N": [], "E": [], "S": [], "W": []}
 
-        for p in self.getNorthPorts(IO.OUTPUT) + self.getNorthPorts(IO.INPUT):
-            port_dict["N"].append(
-                self.pinOrderConfig[Side.NORTH](
-                    p.expandPortInfoByName(prefix=prefix)
-                ).to_dict()
-            )
+        for p in self.getNorthSidePorts():
+            if r := p.expandPortFull(indexed=True, prefix=prefix, escape=True):
+                port_dict["N"].append(self.pinOrderConfig[Side.NORTH](r).to_dict())
         port_dict["N"].append(PinOrderConfig()([f"{prefix}UserCLKo"]).to_dict())
         port_dict["N"].append(
             PinOrderConfig()([f"{prefix}FrameStrobe_O\\[.*\\]"]).to_dict()
         )
 
-        for p in self.getEastPorts(IO.INPUT) + self.getEastPorts(IO.OUTPUT):
-            port_dict["E"].append(
-                self.pinOrderConfig[Side.EAST](
-                    p.expandPortInfoByName(prefix=prefix)
-                ).to_dict()
-            )
+        for p in self.getEastSidePorts():
+            if r := p.expandPortFull(indexed=True, prefix=prefix, escape=True):
+                port_dict["E"].append(self.pinOrderConfig[Side.EAST](r).to_dict())
         port_dict["E"].append(
             PinOrderConfig()([f"{prefix}FrameData_O\\[.*\\]"]).to_dict()
         )
 
-        for p in self.getSouthPorts(IO.INPUT) + self.getSouthPorts(IO.OUTPUT):
-            port_dict["S"].append(
-                self.pinOrderConfig[Side.SOUTH](
-                    p.expandPortInfoByName(prefix=prefix)
-                ).to_dict()
-            )
+        for p in self.getSouthSidePorts():
+            if r := p.expandPortFull(indexed=True, prefix=prefix, escape=True):
+                port_dict["S"].append(self.pinOrderConfig[Side.SOUTH](r).to_dict())
         port_dict["S"].append(PinOrderConfig()([f"{prefix}UserCLK"]).to_dict())
         port_dict["S"].append(
             PinOrderConfig()([f"{prefix}FrameStrobe\\[.*\\]"]).to_dict()
         )
 
-        for p in self.getWestPorts(IO.OUTPUT) + self.getWestPorts(IO.INPUT):
-            port_dict["W"].append(
-                self.pinOrderConfig[Side.WEST](
-                    p.expandPortInfoByName(prefix=prefix)
-                ).to_dict()
-            )
+        for p in self.getWestSidePorts():
+            if r := p.expandPortFull(indexed=True, prefix=prefix, escape=True):
+                port_dict["W"].append(self.pinOrderConfig[Side.WEST](r).to_dict())
         port_dict["W"].append(
             PinOrderConfig()([f"{prefix}FrameData\\[.*\\]"]).to_dict()
         )
 
         for b in self.bels:
-            port_dict["S"].append(
-                self.pinOrderConfig[Side.SOUTH](
-                    [f"{prefix}{i}" for i in b.externalInput + b.externalOutput]
-                ).to_dict()
-            )
+            if r := [f"{prefix}{i}" for i in b.externalInput + b.externalOutput]:
+                port_dict["S"].append(self.pinOrderConfig[Side.SOUTH](r).to_dict())
 
         with outfile.open("w") as f:
             yaml.dump(port_dict, f)

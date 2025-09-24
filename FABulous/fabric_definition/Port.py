@@ -78,9 +78,7 @@ class Port:
             f"Side={self.sideOfTile.value})"
         )
 
-    def expandPortFull(
-        self, indexed: bool = False, prefix: str = "", escape: bool = False
-    ) -> list[str]:
+    def getPortRegex(self, indexed: bool = False, prefix: str = "") -> str:
         """Expand port information to individual wire names.
 
         Generates a list of individual wire names for this port, accounting for
@@ -102,21 +100,10 @@ class Port:
         wireCount = (abs(self.xOffset) + abs(self.yOffset)) * self.wireCount
 
         if wireCount == 1 and self.name != "NULL":
-            return [f"{prefix}{self.name}"]
-
-        if escape:
-            return [rf"{prefix}{self.name}\[.*\]"]
-
+            return f"{prefix}{self.name}"
         if indexed:
-            return [
-                f"{prefix}{self.name}[{i}]"
-                for i in range(wireCount)
-                if self.name != "NULL"
-            ]
-
-        return [
-            f"{prefix}{self.name}{i}" for i in range(wireCount) if self.name != "NULL"
-        ]
+            return rf"{prefix}{self.name}\[\d+\]"
+        return rf"{prefix}{self.name}\d+"
 
     def expandPortInfoByName(
         self, indexed: bool = False, prefix: str = "", escape: bool = False

@@ -4,7 +4,7 @@ from typing import Any, Optional
 from librelane.config.variable import Variable
 from librelane.flows.classic import Classic, VHDLClassic
 from librelane.flows.flow import Flow
-from librelane.logging.logger import info, warn
+from librelane.logging.logger import warn
 from librelane.state.state import State
 from librelane.steps.step import Step
 
@@ -21,9 +21,9 @@ subs = {
     "OpenROAD.RepairDesign*": None,
     "+OpenROAD.GlobalPlacement": AddBuffers,
     # Disable STA
-    "OpenROAD.STAPrePNR": None,
-    "OpenROAD.STAMidPNR": None,
-    "OpenROAD.STAPostPNR": None,
+    "OpenROAD.STAPrePNR*": None,
+    "OpenROAD.STAMidPNR*": None,
+    "OpenROAD.STAPostPNR*": None,
 }
 
 configs = Classic.config_vars + [
@@ -46,17 +46,8 @@ class FABulousTileVerilogMarcoFlow(Classic):
     Substitutions = subs
     config_vars = configs
 
-    def run(self, initial_state: State, **kwargs) -> tuple[State, list[Step]]:
-        final_state, steps = super().run(initial_state, **kwargs)
-
-        final_views_path = (
-            Path(self.config["FABULOUS_TILE_DIR"]) / "macro" / self.config["PDK"]
-        )
-        info(f"Saving final views for FABulous to {final_views_path}")
-
-        final_state.save_snapshot(final_views_path)
-
-        return (final_state, steps)
+    def run(self, initial_state: State, **kwargs: Any) -> tuple[State, list[Step]]:  # noqa: ANN401
+        return super().run(initial_state, **kwargs)
 
 
 @Flow.factory.register()
@@ -66,15 +57,4 @@ class FABulousTileVHDLMarcoFlow(VHDLClassic):
 
     def run(self, initial_state: State, **kwargs: Any) -> tuple[State, list[Step]]:  # noqa: ANN401
         warn("Linting and equivalence checking for VHDL files is disabled")
-
-        (final_state, steps) = super().run(initial_state, **kwargs)
-
-        final_views_path = (
-            Path(self.config["FABULOUS_TILE_DIR"]) / "macro" / self.config["PDK"]
-        )
-
-        info(f"Saving final views for FABulous to {final_views_path}")
-
-        final_state.save_snapshot(final_views_path)
-
-        return (final_state, steps)
+        return super().run(initial_state, **kwargs)

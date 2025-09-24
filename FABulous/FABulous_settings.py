@@ -65,16 +65,10 @@ class FABulousSettings(BaseSettings):
     pdk_root: Path = Path().home() / ".ciel"
     pdk: str | None = None
     die_area: tuple[int, int, int, int] | None = (0, 0, 250, 250)
-    core_area: tuple[int, int, int, int] | None = (5, 5, 245, 245)
-    fp_sizing: str = "absolute"
-    fp_io_vextend: float = 0.0
-    fp_io_hextend: float = 0.0
-    fp_io_vlength: float = 0.8
-    fp_io_hlength: float = 0.8
-    fp_io_hthickness_mult: float = 2.0
-    fp_io_vthickness_mult: float = 2.0
     fp_io_hlayer: str = "met3"
     fp_io_vlayer: str = "met2"
+    synth_strategy = "AREA 2"
+    clock_period: float = 20.0  # in ns
 
     @field_validator("proj_version", "proj_version_created", "version", mode="before")
     @classmethod
@@ -278,8 +272,6 @@ class FABulousSettings(BaseSettings):
             "ghdl_path": "ghdl",
         }
         tool = tool_map.get(info.field_name, None)  # type: ignore[attr-defined]
-        print(f"field_name: {info.field_name}, tool: {tool}")  # Debug print
-        print(info)
         if tool is None:
             logger.warning(
                 f"No tool found for {info.field_name} during settings initialisation. "

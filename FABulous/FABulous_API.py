@@ -5,7 +5,9 @@ parsing fabric definitions, generating HDL code, creating geometries, and handli
 various fabric-related operations.
 """
 
+import json
 from collections.abc import Iterable
+from decimal import Decimal
 from pathlib import Path
 
 from loguru import logger
@@ -25,6 +27,9 @@ from FABulous.fabric_generator.code_generator.code_generator_VHDL import (
     VHDLCodeGenerator,
 )
 from FABulous.fabric_generator.gds_generator.flows.fabric_flow import FABulousFabricGDS
+from FABulous.fabric_generator.gds_generator.flows.fabric_stitching_flow import (
+    MacroSettings,
+)
 from FABulous.fabric_generator.gds_generator.flows.tile_marco_flow import (
     FABulousTileVerilogMarcoFlow,
 )
@@ -464,7 +469,7 @@ class FABulous_API:
             if pdk is None:
                 raise ValueError("PDK must be specified either here or in settings.")
 
-        file_list = [str(tile_dir / f) for f in tile_dir.glob("*.v")]
+        file_list = [str(tile_dir / f) for f in tile_dir.glob("**/*.v")]
         if f := get_context().model_pack:
             file_list.append(str(f.resolve()))
         (tile_dir / "macro").mkdir(exist_ok=True)
@@ -479,13 +484,11 @@ class FABulous_API:
                 "VERILOG_FILES": file_list,
                 "DIE_AREA": get_context().die_area,
                 # "CORE_AREA": get_context().core_area,
-                "FP_SIZING": get_context().fp_sizing,
-                "FP_IO_VEXTEND": get_context().fp_io_vextend,
-                "FP_IO_HEXTEND": get_context().fp_io_hextend,
-                # "FP_IO_VLENGTH": get_context().fp_io_vlength,
-                # "FP_IO_HLENGTH": get_context().fp_io_hlength,
-                "FP_IO_HTHICKNESS_MULT": get_context().fp_io_hthickness_mult,
-                "FP_IO_VTHICKNESS_MULT": get_context().fp_io_vthickness_mult,
+                "FP_SIZING": "absolute",
+                "FP_IO_VEXTEND": 0.0,
+                "FP_IO_HEXTEND": 0.0,
+                "FP_IO_HTHICKNESS_MULT": 2.0,
+                "FP_IO_VTHICKNESS_MULT": 2.0,
                 "FP_IO_HLAYER": get_context().fp_io_hlayer,
                 "FP_IO_VLAYER": get_context().fp_io_vlayer,
                 # "MAX_TRANSITION_CONSTRAINT": 1.0,
@@ -495,14 +498,19 @@ class FABulous_API:
                 # "PL_RESIZER_HOLD_SLACK_MARGIN": 1,
                 # "GLB_RESIZER_HOLD_SLACK_MARGIN": 0.2,
                 "RUN_HEURISTIC_DIODE_INSERTION": False,
-                "HEURISTIC_ANTENNA_THRESHOLD": 110,
+                "HEURISTIC_ANTENNA_THRESHOLD": 90,
                 "GRT_REPAIR_ANTENNAS": True,
                 "PL_TARGET_DENSITY_PCT": 58,
-                "SYNTH_STRATEGY": "AREA 2",
+                "SYNTH_STRATEGY": get_context().synth_strategy,
                 "PL_TIME_DRIVEN": False,
                 "DESIGN_REPAIR_BUFFER_INPUT_PORTS": False,
                 "DESIGN_REPAIR_BUFFER_OUTPUT_PORTS": True,
                 "CLOCK_PORT": "UserCLK",
+                "CLOCK_PERIOD": get_context().clock_period,
+                "CTS_SINK_CLUSTERING_SIZE": 25,
+                "CTS_SINK_CLUSTERING_MAX_DIAMETER": 50,
+                "CTS_SINK_CLUSTERING_ENABLE": False,
+                "MAGIC_NO_EXT_UNIQUE": False,
             },
             name=tile_dir.name,
             design_dir=str(out_folder.resolve()),
@@ -510,14 +518,13 @@ class FABulous_API:
             pdk_root=str((pdk_root).resolve().parent),
         )
         result = flow.start()
-        print(result)
-        # if not success:
-        #     raise RuntimeError(f"Marco flow failed at {state_list}")
+        logger.info(f"Saving final views for FABulous to {out_folder / 'final_views'}")
+        result.save_snapshot(out_folder / "final_views")
         logger.info("Marco flow completed.")
 
     def genFabricGDS(
         self,
-        tile_dir: Path,
+        tile_marco_paths: dict[str, Path],
         fabric_misc: Path,
         out_folder: Path,
         *,
@@ -535,9 +542,32 @@ class FABulous_API:
             if pdk is None:
                 raise ValueError("PDK must be specified either here or in settings.")
 
-        file_list = [str(tile_dir / f) for f in tile_dir.glob("*.v")]
+        file_list = [str(fabric_misc / f) for f in fabric_misc.glob("*.v")]
         if f := get_context().model_pack:
             file_list.append(str(f.resolve()))
+
+        macros: dict[str, MacroSettings] = {}
+
+        for name, tile_marco_path in tile_marco_paths.items():
+            die_area = json.loads(
+                (tile_marco_path / "metrics.json").read_text(encoding="utf-8")
+            ).get("design__die__bbox", None)
+
+            if die_area is None:
+                raise ValueError(f"metrics.json for {name} missing die bbox")
+            _, _, width, height = [Decimal(m) for m in die_area.split(",")]
+
+            spef_dict = {}
+            for i in (tile_marco_path / "spef").iterdir():
+                spef_dict[str(i.name)] = list(i.glob("*.spef"))
+
+            macros[name] = MacroSettings(
+                size=(width, height),
+                gds=str(tile_marco_path / f"{name}.gds"),
+                lef=str(tile_marco_path / f"{name}.lef"),
+                nl=str(tile_marco_path / f"{name}.nl"),
+                spef=spef_dict,
+            )
 
         logger.info(f"PDK root: {pdk_root}")
         logger.info(f"PDK: {pdk}")
@@ -547,23 +577,17 @@ class FABulous_API:
                 "DESIGN_NAME": self.fabric.name,
                 "VERILOG_FILES": file_list,
                 "DIE_AREA": get_context().die_area,
-                "CORE_AREA": get_context().core_area,
-                "FP_SIZING": get_context().fp_sizing,
-                "FP_IO_VEXTEND": get_context().fp_io_vextend,
-                "FP_IO_HEXTEND": get_context().fp_io_hextend,
-                "FP_IO_VLENGTH": get_context().fp_io_vlength,
-                "FP_IO_HLENGTH": get_context().fp_io_hlength,
-                "FP_IO_HTHICKNESS_MULT": get_context().fp_io_hthickness_mult,
-                "FP_IO_VTHICKNESS_MULT": get_context().fp_io_vthickness_mult,
                 "FP_IO_HLAYER": get_context().fp_io_hlayer,
                 "FP_IO_VLAYER": get_context().fp_io_vlayer,
+                "FABULOUS_MACROS_SETTINGS": macros,
+                "FABULOUS_TILE_SPACING": 1.0,
             },
             name=self.fabric.name,
             design_dir=str(out_folder.resolve()),
             pdk=pdk,
             pdk_root=str((pdk_root).resolve().parent),
         )
-        (success, state_list) = flow.start()
-        if not success:
-            raise RuntimeError(f"Marco flow failed at {state_list}")
-        logger.info("Marco flow completed.")
+        result = flow.start()
+        logger.info(f"Saving final views for FABulous to {out_folder / 'final_views'}")
+        result.save_snapshot(out_folder / "final_views")
+        logger.info("Stitching flow completed.")

@@ -1305,11 +1305,7 @@ class FABulous_CLI(Cmd):
         """Generate GDSII files for all tiles in the fabric."""
         for i in self.allTile:
             logger.info(f"Generating GDS for tile {i}")
-            self.fabulousAPI.genTileMarco(
-                self.projectDir / "Tile" / i,
-                self.projectDir / "Tile" / i / f"{i}_io_pin_order.yaml",
-                self.projectDir / "Tile" / i / "macro",
-            )
+            self.onecmd_plus_hooks(f"gen_tile_gds {i}")
 
     @with_category(CMD_FABRIC_FLOW)
     def do_gen_fabric_gds(self) -> None:

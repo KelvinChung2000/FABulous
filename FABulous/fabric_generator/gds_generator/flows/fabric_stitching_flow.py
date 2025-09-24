@@ -32,6 +32,7 @@ class MacroInstance:
 class MacroSettings:
     """Represents a macro definition with its files and instances."""
 
+    size: tuple[Decimal, Decimal]
     gds: str
     lef: str
     nl: str

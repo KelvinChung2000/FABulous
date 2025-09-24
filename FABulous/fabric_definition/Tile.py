@@ -362,33 +362,33 @@ class Tile:
         port_dict = {"N": [], "E": [], "S": [], "W": []}
 
         for p in self.getNorthSidePorts():
-            if r := p.expandPortFull(indexed=True, prefix=prefix, escape=True):
-                port_dict["N"].append(self.pinOrderConfig[Side.NORTH](r).to_dict())
+            if r := p.getPortRegex(indexed=True, prefix=prefix):
+                port_dict["N"].append(self.pinOrderConfig[Side.NORTH]([r]).to_dict())
         port_dict["N"].append(PinOrderConfig()([f"{prefix}UserCLKo"]).to_dict())
         port_dict["N"].append(
-            PinOrderConfig()([f"{prefix}FrameStrobe_O\\[.*\\]"]).to_dict()
+            PinOrderConfig()([rf"{prefix}FrameStrobe_O\[\d+\]"]).to_dict()
         )
 
         for p in self.getEastSidePorts():
-            if r := p.expandPortFull(indexed=True, prefix=prefix, escape=True):
-                port_dict["E"].append(self.pinOrderConfig[Side.EAST](r).to_dict())
+            if r := p.getPortRegex(indexed=True, prefix=prefix):
+                port_dict["E"].append(self.pinOrderConfig[Side.EAST]([r]).to_dict())
         port_dict["E"].append(
-            PinOrderConfig()([f"{prefix}FrameData_O\\[.*\\]"]).to_dict()
+            PinOrderConfig()([rf"{prefix}FrameData_O\[\d+\]"]).to_dict()
         )
 
         for p in self.getSouthSidePorts():
-            if r := p.expandPortFull(indexed=True, prefix=prefix, escape=True):
-                port_dict["S"].append(self.pinOrderConfig[Side.SOUTH](r).to_dict())
+            if r := p.getPortRegex(indexed=True, prefix=prefix):
+                port_dict["S"].append(self.pinOrderConfig[Side.SOUTH]([r]).to_dict())
         port_dict["S"].append(PinOrderConfig()([f"{prefix}UserCLK"]).to_dict())
         port_dict["S"].append(
-            PinOrderConfig()([f"{prefix}FrameStrobe\\[.*\\]"]).to_dict()
+            PinOrderConfig()([rf"{prefix}FrameStrobe\[\d+\]"]).to_dict()
         )
 
         for p in self.getWestSidePorts():
-            if r := p.expandPortFull(indexed=True, prefix=prefix, escape=True):
-                port_dict["W"].append(self.pinOrderConfig[Side.WEST](r).to_dict())
+            if r := p.getPortRegex(indexed=True, prefix=prefix):
+                port_dict["W"].append(self.pinOrderConfig[Side.WEST]([r]).to_dict())
         port_dict["W"].append(
-            PinOrderConfig()([f"{prefix}FrameData\\[.*\\]"]).to_dict()
+            PinOrderConfig()([rf"{prefix}FrameData\[\d+\]"]).to_dict()
         )
 
         for b in self.bels:

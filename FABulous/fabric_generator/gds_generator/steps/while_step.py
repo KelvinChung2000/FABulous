@@ -47,8 +47,8 @@ class WhileStep(Step):
                 views_update, metrics_update = step.run(state, **kwargs)
                 state = views_update.state_out
 
-                total_views_update += views_update
-                total_metrics_update += metrics_update
+                total_views_update.update(views_update)
+                total_metrics_update.update(metrics_update)
 
             state, break_loop = self.post_iteration_callback(state)
             if break_loop:

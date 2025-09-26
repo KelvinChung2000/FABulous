@@ -106,7 +106,9 @@
           pkgs = nixpkgs.legacyPackages.${system};
           pythonSet = pythonSets.${system}.overrideScope editableOverlay;
           virtualenv = pythonSet.mkVirtualEnv "FABulous-env" workspace.deps.all;
-          baseShell = librelane.devShells.${system}.dev;
+          baseShell = if librelane.devShells ? ${system} && librelane.devShells.${system} ? dev
+                      then librelane.devShells.${system}.dev
+                      else null;
           
           # pass the current pkgs to the nix overlay so it returns a package set
           # also pass flake-locked sources so tags resolve to a fixed commit
@@ -120,13 +122,18 @@
         in
         {
           default = pkgs.mkShell {
-            inputsFrom = [ baseShell ];
+            inputsFrom = lib.optionals (baseShell != null) [ baseShell ];
             packages = [
               virtualenv
               pkgs.uv
               pkgs.which
-              customPkgs.ghdl
               customPkgs.nextpnr
+            ] ++ lib.optionals pkgs.stdenv.isDarwin [
+              # Additional macOS-specific packages if needed
+              pkgs.darwin.cctools
+            ] ++ lib.optionals (pkgs.stdenv.isLinux || (pkgs.stdenv.isDarwin && pkgs.stdenv.isx86_64)) [
+              # GHDL is only available on Linux and x86_64-darwin due to GNAT limitations
+              customPkgs.ghdl
             ];
             env = {
               UV_NO_SYNC = "1";
@@ -143,6 +150,17 @@
 
               # Put our Python first in PATH to avoid conflicts with system Python
               export PATH="${pythonSet.python}/bin:$PATH"
+
+              # macOS-specific environment setup
+              ${lib.optionalString pkgs.stdenv.isDarwin ''
+                # Set up macOS-specific environment if needed
+                export MACOSX_DEPLOYMENT_TARGET="11.0"
+                ${lib.optionalString pkgs.stdenv.isAarch64 ''
+                  # Note: GHDL is not available on Apple Silicon due to GNAT limitations
+                  # Consider using alternative VHDL simulators or running via Docker
+                  echo "Warning: GHDL is not available on Apple Silicon Macs"
+                ''}
+              ''}
             '';
           };
         }

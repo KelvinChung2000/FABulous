@@ -7,6 +7,7 @@
 , boost
 , eigen
 , python3Packages
+, darwin ? null
 , owner ? "YosysHQ"
 , repo ? "nextpnr"
 , rev
@@ -27,6 +28,8 @@ stdenv.mkDerivation rec {
     cmake
     pkg-config
     python3
+  ] ++ lib.optionals stdenv.isDarwin [
+    darwin.cctools
   ];
 
   buildInputs = [

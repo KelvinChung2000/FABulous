@@ -5,6 +5,7 @@
 , zlib
 , which
 , pkg-config
+, darwin ? null
  # Version control parameters (provided by default.nix)
  , owner ? "ghdl"
  , repo ? "ghdl"
@@ -26,6 +27,8 @@ stdenv.mkDerivation rec {
     pkg-config
     which
     gnat
+  ] ++ lib.optionals stdenv.isDarwin [
+    darwin.cctools
   ];
 
   buildInputs = [

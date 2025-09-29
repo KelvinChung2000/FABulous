@@ -64,11 +64,6 @@ class FABulousSettings(BaseSettings):
     # GDS variables
     pdk_root: Path = Path().home() / ".ciel"
     pdk: str | None = None
-    die_area: tuple[int, int, int, int] | None = (0, 0, 250, 250)
-    fp_io_hlayer: str = "met3"
-    fp_io_vlayer: str = "met2"
-    synth_strategy = "AREA 2"
-    clock_period: float = 20.0  # in ns
 
     @field_validator("proj_version", "proj_version_created", "version", mode="before")
     @classmethod

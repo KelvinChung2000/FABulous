@@ -105,7 +105,9 @@ def equally_spaced_sequence(side: str, side_pin_placement, possible_locations):
         ]  # Remove the virtual pins from the side_pin_placement list
 
     logger.debug(
-        "Placement details %s | virtual=%d actual=%d total=%d tracks=%d tracks_per_pin=%d used=%d unused=%d start_idx=%d",
+        "Placement details %s | "
+        "virtual=%d actual=%d total=%d tracks=%d "
+        "tracks_per_pin=%d used=%d unused=%d start_idx=%d",
         side,
         virtual_pin_count,
         actual_pin_count,
@@ -153,14 +155,14 @@ def sorter(bterm, order: ioplace_parser.Order):
                 priority_keys.append(bus)
             else:
                 keys.append(bus)
-            text = text[:start] + text[end + 1 :]
+            text = text[:start] + text[end:]
         elif match := standalone_numbers.search(text):
             index = int(match[0])
             if order == ioplace_parser.Order.bitMajor:
                 priority_keys.append(index)
             else:
                 keys.append(index)
-            text = text[: match.pos] + text[match.endpos + 1 :]
+            text = text[: match.start()] + text[match.end() :]
         else:
             break
     return [priority_keys, keys]
@@ -182,7 +184,7 @@ class SegmentInfo:
     "-u",
     "--unmatched-error",
     type=click.Choice(["none", "unmatched_design", "unmatched_cfg", "both"]),
-    default=True,
+    default="both",
     help="Treat unmatched pins as error",
 )
 @click.option(
@@ -434,9 +436,33 @@ def io_place(
             if not pin_placement[side_choice]:
                 pin_placement[side_choice].append([])
                 segment_pin_counts[side_choice].append(0)
+                # Create corresponding entry in info_by_side with default values
+                info_by_side[side_choice].append(
+                    SegmentInfo(
+                        min_distance=None,  # Will be adjusted later
+                        max_distance=None,
+                        pins=[],
+                        sort_mode=ioplace_parser.Order.busMajor,
+                        reverse_result=False,
+                    )
+                )
             seg_choice = random.randrange(len(pin_placement[side_choice]))
-            pin_placement[side_choice][seg_choice].append(bterm)
-            segment_pin_counts[side_choice][seg_choice] += 1
+            if isinstance(pin_placement[side_choice][seg_choice], int):
+                # If the chosen segment is a virtual pin count, create a new segment
+                pin_placement[side_choice].append([bterm])
+                segment_pin_counts[side_choice].append(1)
+                info_by_side[side_choice].append(
+                    SegmentInfo(
+                        min_distance=None,  # Will be adjusted later
+                        max_distance=None,
+                        pins=[],
+                        sort_mode=ioplace_parser.Order.busMajor,
+                        reverse_result=False,
+                    )
+                )
+            else:
+                pin_placement[side_choice][seg_choice].append(bterm)
+                segment_pin_counts[side_choice][seg_choice] += 1
 
     # generate slots
     DIE_AREA = reader.block.getDieArea()
@@ -475,16 +501,17 @@ def io_place(
             fractional = [c / total * count_total for c in counts]
             sizes = [max(1, int(round(f))) for f in fractional]
             delta = count_total - sum(sizes)
-            i = 0
-            while delta != 0 and sizes:
-                if delta > 0:
-                    sizes[i % num_segments] += 1
-                    delta -= 1
-                else:  # delta < 0
-                    if sizes[i % num_segments] > 1:
-                        sizes[i % num_segments] -= 1
+            # Distribute remaining tracks using round-robin
+            while delta > 0:
+                for i in range(num_segments):
+                    if delta > 0:
+                        sizes[i] += 1
+                        delta -= 1
+            while delta < 0:
+                for i in range(num_segments):
+                    if delta < 0 and sizes[i] > 1:
+                        sizes[i] -= 1
                         delta += 1
-                i += 1
             start = 0
             slices = []
             for size in sizes:
@@ -505,6 +532,8 @@ def io_place(
         for segment_n, _segment in enumerate(segments):
             min_distance = info_by_side[side][segment_n].min_distance * micron_in_units
             max_distance = info_by_side[side][segment_n].max_distance
+            if max_distance is not None:
+                max_distance = max_distance * micron_in_units
             if side == "N":
                 raw_tracks = v_tracks_N[segment_n]
                 step = v_step

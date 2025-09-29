@@ -10,6 +10,7 @@ from collections.abc import Iterable
 from decimal import Decimal
 from pathlib import Path
 
+import yaml
 from loguru import logger
 
 import FABulous.fabric_cad.gen_npnr_model as model_gen_npnr
@@ -26,7 +27,6 @@ from FABulous.fabric_generator.code_generator import CodeGenerator
 from FABulous.fabric_generator.code_generator.code_generator_VHDL import (
     VHDLCodeGenerator,
 )
-from FABulous.fabric_generator.gds_generator.flows.fabric_flow import FABulousFabricGDS
 from FABulous.fabric_generator.gds_generator.flows.fabric_stitching_flow import (
     MacroSettings,
 )
@@ -454,6 +454,8 @@ class FABulous_API:
         io_pin_config: Path,
         out_folder: Path,
         *,
+        base_config_path: Path | None = None,
+        tile_config_override: dict | None = None,
         pdk_root: Path | None = None,
         pdk: str | None = None,
     ) -> None:
@@ -469,49 +471,34 @@ class FABulous_API:
             if pdk is None:
                 raise ValueError("PDK must be specified either here or in settings.")
 
-        file_list = [str(tile_dir / f) for f in tile_dir.glob("**/*.v")]
+        file_list = [str(f) for f in tile_dir.glob("**/*.v") if "macro" not in f.parts]
         if f := get_context().model_pack:
             file_list.append(str(f.resolve()))
         (tile_dir / "macro").mkdir(exist_ok=True)
         logger.info(f"PDK root: {pdk_root}")
         logger.info(f"PDK: {pdk}")
         logger.info(f"Output folder: {out_folder.resolve()}")
+        final_config_args = {}
+        if base_config_path:
+            final_config_args.update(
+                yaml.safe_load(base_config_path.read_text(encoding="utf-8"))
+            )
+        if (tile_dir / "gds_config.yaml").exists():
+            final_config_args.update(
+                yaml.safe_load(
+                    (tile_dir / "gds_config.yaml").read_text(encoding="utf-8")
+                )
+            )
+
+        if tile_config_override:
+            final_config_args.update(tile_config_override)
+
+        final_config_args["DESIGN_NAME"] = tile_dir.name
+        final_config_args["IO_PIN_ORDER_CFG"] = str(io_pin_config)
+        final_config_args["FABULOUS_TILE_DIR"] = str(tile_dir)
+        final_config_args["VERILOG_FILES"] = file_list
         flow = FABulousTileVerilogMarcoFlow(
-            {
-                "DESIGN_NAME": tile_dir.name,
-                "IO_PIN_ORDER_CFG": io_pin_config,
-                "FABULOUS_TILE_DIR": str(tile_dir),
-                "VERILOG_FILES": file_list,
-                "DIE_AREA": get_context().die_area,
-                # "CORE_AREA": get_context().core_area,
-                "FP_SIZING": "absolute",
-                "FP_IO_VEXTEND": 0.0,
-                "FP_IO_HEXTEND": 0.0,
-                "FP_IO_HTHICKNESS_MULT": 2.0,
-                "FP_IO_VTHICKNESS_MULT": 2.0,
-                "FP_IO_HLAYER": get_context().fp_io_hlayer,
-                "FP_IO_VLAYER": get_context().fp_io_vlayer,
-                # "MAX_TRANSITION_CONSTRAINT": 1.0,
-                # "MAX_FANOUT_CONSTRAINT": 16,
-                # "PL_RESIZER_SETUP_SLACK_MARGIN": 1,
-                # "GLB_RESIZER_SETUP_SLACK_MARGIN": 0.2,
-                # "PL_RESIZER_HOLD_SLACK_MARGIN": 1,
-                # "GLB_RESIZER_HOLD_SLACK_MARGIN": 0.2,
-                "RUN_HEURISTIC_DIODE_INSERTION": False,
-                "HEURISTIC_ANTENNA_THRESHOLD": 90,
-                "GRT_REPAIR_ANTENNAS": True,
-                "PL_TARGET_DENSITY_PCT": 58,
-                "SYNTH_STRATEGY": get_context().synth_strategy,
-                "PL_TIME_DRIVEN": False,
-                "DESIGN_REPAIR_BUFFER_INPUT_PORTS": False,
-                "DESIGN_REPAIR_BUFFER_OUTPUT_PORTS": True,
-                "CLOCK_PORT": "UserCLK",
-                "CLOCK_PERIOD": get_context().clock_period,
-                "CTS_SINK_CLUSTERING_SIZE": 25,
-                "CTS_SINK_CLUSTERING_MAX_DIAMETER": 50,
-                "CTS_SINK_CLUSTERING_ENABLE": False,
-                "MAGIC_NO_EXT_UNIQUE": False,
-            },
+            final_config_args,
             name=tile_dir.name,
             design_dir=str(out_folder.resolve()),
             pdk=pdk,
@@ -569,25 +556,25 @@ class FABulous_API:
                 spef=spef_dict,
             )
 
-        logger.info(f"PDK root: {pdk_root}")
-        logger.info(f"PDK: {pdk}")
-        logger.info(f"Output folder: {out_folder.resolve()}")
-        flow = FABulousFabricGDS(
-            {
-                "DESIGN_NAME": self.fabric.name,
-                "VERILOG_FILES": file_list,
-                "DIE_AREA": get_context().die_area,
-                "FP_IO_HLAYER": get_context().fp_io_hlayer,
-                "FP_IO_VLAYER": get_context().fp_io_vlayer,
-                "FABULOUS_MACROS_SETTINGS": macros,
-                "FABULOUS_TILE_SPACING": 1.0,
-            },
-            name=self.fabric.name,
-            design_dir=str(out_folder.resolve()),
-            pdk=pdk,
-            pdk_root=str((pdk_root).resolve().parent),
-        )
-        result = flow.start()
-        logger.info(f"Saving final views for FABulous to {out_folder / 'final_views'}")
-        result.save_snapshot(out_folder / "final_views")
-        logger.info("Stitching flow completed.")
+        # logger.info(f"PDK root: {pdk_root}")
+        # logger.info(f"PDK: {pdk}")
+        # logger.info(f"Output folder: {out_folder.resolve()}")
+        # flow = FABulousFabricGDS(
+        #     {
+        #         "DESIGN_NAME": self.fabric.name,
+        #         "VERILOG_FILES": file_list,
+        #         "DIE_AREA": get_context().die_area,
+        #         "FP_IO_HLAYER": get_context().fp_io_hlayer,
+        #         "FP_IO_VLAYER": get_context().fp_io_vlayer,
+        #         "FABULOUS_MACROS_SETTINGS": macros,
+        #         "FABULOUS_TILE_SPACING": 1.0,
+        #     },
+        #     name=self.fabric.name,
+        #     design_dir=str(out_folder.resolve()),
+        #     pdk=pdk,
+        #     pdk_root=str((pdk_root).resolve().parent),
+        # )
+        # result = flow.start()
+        # logger.info(f"Saving final views for FABulous to {out_folder / 'final_views'}")
+        # result.save_snapshot(out_folder / "final_views")
+        # logger.info("Stitching flow completed.")

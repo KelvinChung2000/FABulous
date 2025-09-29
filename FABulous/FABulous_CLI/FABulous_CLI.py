@@ -1298,6 +1298,10 @@ class FABulous_CLI(Cmd):
             self.projectDir / "Tile" / args.tile,
             pin_order_file,
             self.projectDir / "Tile" / args.tile / "macro",
+            base_config_path=self.projectDir
+            / "Tile"
+            / "include"
+            / "base_tile_gds_config.yaml",
         )
 
     @with_category(CMD_FABRIC_FLOW)

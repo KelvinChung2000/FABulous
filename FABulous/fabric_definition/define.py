@@ -118,5 +118,8 @@ class FABulousAttribute(StrEnum):
 
 
 class PinSortMode(StrEnum):
+    """Enumeration for pin sorting modes."""
+
     BUS_MAJOR = "bus_major"
     BIT_MINOR = "bit_minor"
+    CUSTOM = "custom"

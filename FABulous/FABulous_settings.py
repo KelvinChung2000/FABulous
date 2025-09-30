@@ -64,6 +64,7 @@ class FABulousSettings(BaseSettings):
     # GDS variables
     pdk_root: Path = Path().home() / ".ciel"
     pdk: str | None = None
+    fabric_die_area: tuple[int, int, int, int] = (0, 0, 1000, 1000)
 
     @field_validator("proj_version", "proj_version_created", "version", mode="before")
     @classmethod

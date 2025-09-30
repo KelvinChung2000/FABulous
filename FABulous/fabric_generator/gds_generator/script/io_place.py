@@ -11,28 +11,41 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+"""Utilities for placing IO pins by expanding configuration segments."""
+
 import logging
 import math
 import os
-import random
 import re
 import sys
+from collections.abc import Iterable
 from dataclasses import dataclass
 from decimal import Decimal
 from functools import partial
 from pathlib import Path
+from typing import Any, Protocol
 
 import click
-import ioplace_parser
-import odb
+import odb  # type: ignore[import]
 import yaml
-from reader import click_odb
+from librelane.logging.logger import debug, err, info, warn
+from librelane.scripts.odbpy.reader import click_odb
 
-logger = logging.getLogger(__name__)
+from FABulous.fabric_definition.define import PinSortMode, Side
 
 
-def grid_to_tracks(origin, count, step):
-    tracks = []
+class OdbReaderLike(Protocol):
+    """Protocol describing the reader object provided by the click wrapper."""
+
+    dbunits: float
+    tech: Any
+    block: Any
+    name: str
+
+
+def grid_to_tracks(origin: float, count: int, step: float) -> list[float]:
+    """Return monotonically increasing track locations starting at origin."""
+    tracks: list[float] = []
     pos = origin
     for _ in range(count):
         tracks.append(pos)
@@ -43,7 +56,10 @@ def grid_to_tracks(origin, count, step):
     return tracks
 
 
-def equally_spaced_sequence(side: str, side_pin_placement, possible_locations):
+def equally_spaced_sequence(
+    side: str, side_pin_placement: list, possible_locations: list
+) -> tuple[list, list]:
+    """Select evenly spaced slots for the given pins on a single side."""
     virtual_pin_count = 0
     actual_pin_count = len(side_pin_placement)
     total_pin_count = actual_pin_count + virtual_pin_count
@@ -52,24 +68,21 @@ def equally_spaced_sequence(side: str, side_pin_placement, possible_locations):
             side_pin_placement[i], int
         ):  # This is an int value indicating virtual pins
             virtual_pin_count = virtual_pin_count + side_pin_placement[i]
-            actual_pin_count = (
-                actual_pin_count - 1
-            )  # Decrement actual pin count, this value was only there to indicate virtual pin count
+            actual_pin_count = actual_pin_count - 1
+            # Decrement actual pin count, this value was only there to
+            # indicate virtual pin count
             total_pin_count = actual_pin_count + virtual_pin_count
     result = []
     tracks = len(possible_locations)
 
     if total_pin_count > tracks:
-        logger.error(
-            "The %s side of the floorplan doesn't have enough slots for all the pins: "
-            "%d pins/%d slots.",
-            side,
-            total_pin_count,
-            tracks,
+        err(
+            f"The {side} side of the floorplan doesn't have enough slots for all "
+            f"the pins: {total_pin_count} pins/{tracks} slots."
         )
-        logger.error(
-            "Try re-assigning pins to other sides, enabling proportional allocation, or "
-            "making the floorplan larger."
+        err(
+            "Try re-assigning pins to other sides, enabling proportional allocation, "
+            "or making the floorplan larger."
         )
         sys.exit(1)
     elif total_pin_count == tracks:
@@ -80,7 +93,7 @@ def equally_spaced_sequence(side: str, side_pin_placement, possible_locations):
     # From this point, pin_count always < tracks.
     tracks_per_pin = math.floor(tracks / total_pin_count)  # >=1
     # O| | | O| | | O| | |
-    # tracks_per_pin = 3
+    # Example scenario where tracks_per_pin equals 3
     # notice the last two tracks are unused
     # thus:
     used_tracks = tracks_per_pin * (total_pin_count - 1) + 1
@@ -104,24 +117,16 @@ def equally_spaced_sequence(side: str, side_pin_placement, possible_locations):
             pin for pin in side_pin_placement if not isinstance(pin, int)
         ]  # Remove the virtual pins from the side_pin_placement list
 
-    logger.debug(
-        "Placement details %s | "
-        "virtual=%d actual=%d total=%d tracks=%d "
-        "tracks_per_pin=%d used=%d unused=%d start_idx=%d",
-        side,
-        virtual_pin_count,
-        actual_pin_count,
-        total_pin_count,
-        len(possible_locations),
-        tracks_per_pin,
-        used_tracks,
-        unused_tracks,
-        starting_track_index,
+    info(
+        f"Placement details {side} | "
+        f"{virtual_pin_count=} {actual_pin_count=} {total_pin_count=} "
+        f"possible_locations={len(possible_locations)} "
+        f"{tracks_per_pin=} {used_tracks=} {unused_tracks=} {starting_track_index=}",
     )
 
     VISUALIZE_PLACEMENT = False
     if VISUALIZE_PLACEMENT:
-        logger.debug("Placement Map:")
+        debug("Placement Map:")
         map_str = ["["]
         used_track_indices = []
         for i, location in enumerate(possible_locations):
@@ -131,8 +136,8 @@ def equally_spaced_sequence(side: str, side_pin_placement, possible_locations):
             else:
                 map_str.append(f"{location}, ")
         map_str.append("]")
-        logger.debug("".join(map_str))
-        logger.debug("Used track indices: %s", used_track_indices)
+        debug("".join(map_str))
+        debug("Used track indices: %s", used_track_indices)
 
     return result, side_pin_placement
 
@@ -142,7 +147,8 @@ standalone_numbers = re.compile(r"\b\d+\b")
 trash = re.compile(r"^[^\w\d]+$")
 
 
-def sorter(bterm, order: ioplace_parser.Order):
+def sorter(bterm: "odb.dbBTerm", order: PinSortMode) -> list[list[str | int]]:
+    """Return sorting keys for a boundary term using the requested strategy."""
     text: str = bterm.getName()
     keys = []
     priority_keys = []
@@ -151,14 +157,14 @@ def sorter(bterm, order: ioplace_parser.Order):
         if match := identifiers.search(text):
             bus = match[0]
             start, end = match.span(0)
-            if order == ioplace_parser.Order.busMajor:
+            if order == PinSortMode.BUS_MAJOR:
                 priority_keys.append(bus)
             else:
                 keys.append(bus)
             text = text[:start] + text[end:]
         elif match := standalone_numbers.search(text):
             index = int(match[0])
-            if order == ioplace_parser.Order.bitMajor:
+            if order == PinSortMode.BIT_MINOR:
                 priority_keys.append(index)
             else:
                 keys.append(index)
@@ -170,13 +176,404 @@ def sorter(bterm, order: ioplace_parser.Order):
 
 @dataclass(slots=True)
 class SegmentInfo:
-    """Data for one YAML-defined segment on a side."""
+    """Fully processed data for one YAML-defined segment on a side."""
 
+    side: Side
+    sort_mode: PinSortMode
     min_distance: float | None
     max_distance: float | None
-    pins: list[str]
-    sort_mode: ioplace_parser.Order
     reverse_result: bool
+    pin_entries: list
+
+    @classmethod
+    def from_config(
+        cls,
+        side: Side,
+        segment: dict,
+        bterms: list,
+        regex_by_bterm: dict,
+        unmatched_regexes: set[str],
+    ) -> "SegmentInfo":
+        """Build a fully populated segment from a raw YAML entry."""
+        sort_mode_str = segment.get("sort_mode", "bus_major")
+        if sort_mode_str == "bus_major":
+            sort_mode = PinSortMode.BUS_MAJOR
+        elif sort_mode_str == "bit_minor":
+            sort_mode = PinSortMode.BIT_MINOR
+        else:
+            raise ValueError(f"Unknown sort mode {sort_mode_str}")
+
+        entries: list = []
+        for pattern in segment.get("pins", []):
+            if isinstance(pattern, int):
+                entries.append(pattern)
+                continue
+
+            anchored = f"^{pattern}$"
+            matched_terms = [b for b in bterms if re.match(anchored, b.getName())]
+
+            if not matched_terms:
+                unmatched_regexes.add(pattern)
+                continue
+
+            for bterm in matched_terms:
+                if bterm in regex_by_bterm:
+                    raise SystemExit(
+                        f"[ERROR] Multiple regexes matched {bterm.getName()}: "
+                        f"{regex_by_bterm[bterm]} and {pattern}"
+                    )
+                regex_by_bterm[bterm] = pattern
+
+            matched_terms.sort(key=partial(sorter, order=sort_mode))
+            entries.extend(matched_terms)
+
+        return cls(
+            side=side,
+            sort_mode=sort_mode,
+            min_distance=segment.get("min_distance"),
+            max_distance=segment.get("max_distance"),
+            reverse_result=segment.get("reverse_result", False),
+            pin_entries=entries,
+        )
+
+    @property
+    def actual_pin_count(self) -> int:
+        """Return the number of concrete pins in this segment."""
+        return sum(1 for entry in self.pin_entries if not isinstance(entry, int))
+
+    @property
+    def has_virtual_placeholders(self) -> bool:
+        """Return True if this segment reserves space using virtual pins."""
+        return any(isinstance(entry, int) for entry in self.pin_entries)
+
+    def ensure_min_distance(self, min_allowed: float) -> None:
+        """Clamp the minimum spacing constraint to the technology limit."""
+        if self.min_distance is None or self.min_distance < min_allowed:
+            debug(
+                "Adjusting min_distance for side %s segment (given=%s -> %s)",
+                self.side.value,
+                self.min_distance,
+                min_allowed,
+            )
+            self.min_distance = min_allowed
+
+    def apply_reverse(self) -> None:
+        """Reverse pin order when requested by the configuration."""
+        if self.reverse_result:
+            self.pin_entries.reverse()
+
+    def replace_pin_entries(self, entries: list) -> None:
+        """Overwrite the stored pin list after track allocation."""
+        self.pin_entries = entries
+
+
+class PinPlacementPlan:
+    """Collects processed segment definitions and related pin bookkeeping."""
+
+    __slots__ = (
+        "segments_by_side",
+        "regex_by_bterm",
+        "unmatched_config_patterns",
+        "unmatched_design_bterms",
+        "unmatched_design_pin_names",
+        "critical_errors_found",
+        "track_coordinates",
+    )
+
+    def __init__(
+        self,
+        config_data: dict,
+        bterms: list,
+        unmatched_error: str,
+    ) -> None:
+        """Initialise the plan by expanding all regex patterns."""
+        self.segments_by_side: dict[Side, list[SegmentInfo]] = {
+            side: [] for side in Side
+        }
+        self.regex_by_bterm: dict = {}
+        self.unmatched_config_patterns: set[str] = set()
+        self.critical_errors_found = False
+        self.track_coordinates: dict[Side, list[list[float]]] = {
+            side: [] for side in Side
+        }
+
+        normalized_config = self._normalize_config(config_data)
+        for side, segments in normalized_config.items():
+            for segment in segments:
+                seg_info = SegmentInfo.from_config(
+                    side,
+                    segment,
+                    bterms,
+                    self.regex_by_bterm,
+                    self.unmatched_config_patterns,
+                )
+                self.segments_by_side[side].append(seg_info)
+
+        self.unmatched_design_bterms: set = {
+            bterm for bterm in bterms if bterm not in self.regex_by_bterm
+        }
+        self.unmatched_design_pin_names: set[str] = {
+            bterm.getName() for bterm in self.unmatched_design_bterms
+        }
+
+        self._handle_unmatched(unmatched_error)
+
+    def _handle_unmatched(self, unmatched_error: str) -> None:
+        """Report unmatched pins and enforce error policy."""
+        for pin_name in self.unmatched_config_patterns:
+            should_error = unmatched_error in {"unmatched_cfg", "both"}
+            if should_error:
+                self.critical_errors_found = True
+                err(f"{pin_name} not found in design but found in config.")
+            else:
+                warn(f"{pin_name} not found in design but found in config.")
+
+        for pin_name in self.unmatched_design_pin_names:
+            should_error = unmatched_error in {"unmatched_design", "both"}
+            if should_error:
+                self.critical_errors_found = True
+                err(f"{pin_name} not found in config but found in design.")
+            else:
+                warn(f"{pin_name} not found in config but found in design.")
+
+        if self.critical_errors_found:
+            err("Critical mismatches found.")
+            raise SystemExit(os.EX_DATAERR)
+
+    @staticmethod
+    def _normalize_config(config_data: dict) -> dict[Side, list[dict]]:
+        """Return a side-indexed segment list regardless of config style."""
+        if not config_data:
+            return {side: [] for side in Side}  # Return empty list for each side
+
+        side_keys = {side.value for side in Side}
+        if all(key in side_keys for key in config_data):
+            normalized: dict[Side, list[dict]] = {side: [] for side in Side}
+            for key, segments in config_data.items():
+                if segments is None:
+                    continue
+                if not isinstance(segments, list):
+                    raise TypeError(
+                        "Config for side "
+                        f"{key} must be a list of segments, got "
+                        f"{type(segments).__name__}"
+                    )  # Raise TypeError if segments are not a list
+                normalized[Side(key)] = segments
+            return normalized
+
+        tile_pattern = re.compile(r"^X(?P<x>\d+)Y(?P<y>\d+)$")
+        if not all(tile_pattern.match(key) for key in config_data):
+            raise ValueError(
+                "Configuration keys must either be sides (N/E/S/W) or tile "
+                "coordinates X#Y#"
+            )  # Raise ValueError if keys are invalid
+
+        tiles: dict[tuple[int, int], dict] = {}
+        for key, entry in config_data.items():
+            match = tile_pattern.match(key)
+            assert match is not None  # validated above
+            tile_config = entry or {}
+            if not isinstance(tile_config, dict):
+                raise TypeError(
+                    "Configuration for tile "
+                    f"{key} must be a mapping of sides to segments"
+                )
+            tiles[(int(match.group("x")), int(match.group("y")))] = tile_config
+
+        neighbor_offsets = {
+            Side.NORTH: (0, -1),
+            Side.SOUTH: (0, 1),
+            Side.EAST: (1, 0),
+            Side.WEST: (-1, 0),
+        }
+
+        side_entries: dict[Side, list[tuple[int, int, list[dict]]]] = {
+            side: [] for side in Side
+        }
+
+        for (x, y), tile_config in tiles.items():
+            for side, (dx, dy) in neighbor_offsets.items():
+                neighbor_exists = (x + dx, y + dy) in tiles
+
+                value = None
+                for alias in (side.value, side.value[0]):
+                    if alias in tile_config:
+                        value = tile_config[alias]
+                        break
+
+                if value is None:
+                    segments = []
+                else:
+                    if not isinstance(value, list):
+                        raise TypeError(
+                            "Segments for tile X"
+                            f"{x}Y{y} side {side.value} must be provided as a list"
+                        )  # Raise TypeError if segments are not a list
+                    segments = value
+
+                if neighbor_exists:
+                    if segments:
+                        raise ValueError(
+                            "Tile X"
+                            f"{x}Y{y} side {side.value} is not on the boundary; "
+                            "remove its configuration."
+                        )  # Raise ValueError if tile is not on boundary
+                    continue
+
+                if segments:
+                    side_entries[side].append((x, y, segments))
+
+        config_by_side: dict[Side, list[dict]] = {side: [] for side in Side}
+
+        for side, entries in side_entries.items():
+            if side in (Side.NORTH, Side.SOUTH):
+                entries.sort(key=lambda item: item[0])  # sort by x coordinate
+            else:
+                entries.sort(key=lambda item: item[1])  # sort by y coordinate
+            for _, _, segments in entries:
+                config_by_side[side].extend(segments)
+
+        return config_by_side
+
+    def allocate_tracks(
+        self,
+        specs: dict[Side, tuple[int, float, float]],
+    ) -> None:
+        """Allocate raw track coordinates for every segment on each side."""
+        for side, segments in self.segments_by_side.items():
+            if side not in specs:
+                raise KeyError(f"Missing track specification for side {side.value}")
+            count_total, step, origin = specs[side]
+            self.track_coordinates[side] = self._build_tracks_for_segments(
+                count_total, step, origin, segments
+            )
+
+    @staticmethod
+    def _build_tracks_for_segments(
+        count_total: int,
+        step: float,
+        origin: float,
+        segments_for_side: list[SegmentInfo],
+    ) -> list[list[float]]:
+        tracks_container: list[list[float]] = []
+        num_segments = len(segments_for_side)
+        if num_segments == 0:
+            return tracks_container
+
+        counts = [segment.actual_pin_count for segment in segments_for_side]
+        total = sum(counts)
+
+        if total == 0:
+            base = count_total // num_segments if num_segments else 0
+            remainder = count_total - base * num_segments
+            slices = []
+            start = 0
+            for idx in range(num_segments):
+                size = base + (1 if idx < remainder else 0)
+                slices.append((start, size))
+                start += size
+        else:
+            fractional = [c / total * count_total for c in counts]
+            sizes = [max(1, int(round(fraction))) for fraction in fractional]
+            delta = count_total - sum(sizes)
+
+            while delta > 0:
+                for idx in range(num_segments):
+                    if delta == 0:
+                        break
+                    sizes[idx] += 1
+                    delta -= 1
+            while delta < 0:
+                for idx in range(num_segments):
+                    if delta == 0:
+                        break
+                    if sizes[idx] > 1:
+                        sizes[idx] -= 1
+                        delta += 1
+
+            start = 0
+            slices = []
+            for size in sizes:
+                slices.append((start, size))
+                start += size
+
+        for start_idx, size in slices:
+            start_coord = origin + start_idx * step
+            tracks_container.append(grid_to_tracks(start_coord, size, step))
+        return tracks_container
+
+    def tracks_for_segment(self, side: Side, index: int) -> list[float]:
+        """Return the raw track coordinates allocated for a segment."""
+        return self.track_coordinates[side][index]
+
+    def segments(self, side: Side) -> list[SegmentInfo]:
+        """Return the ordered list of segments for a given side."""
+        return self.segments_by_side[side]
+
+    def all_segments(self) -> Iterable[SegmentInfo]:
+        """Iterate over all segments across every side."""
+        for side in Side:
+            yield from self.segments_by_side[side]
+
+    def ensure_min_distances(self, min_by_side: dict[Side, float]) -> None:
+        """Ensure each segment meets technology minimum spacing requirements."""
+        for side, segments in self.segments_by_side.items():
+            for segment in segments:
+                segment.ensure_min_distance(min_by_side[side])
+
+    def assign_unmatched_pins(self) -> None:
+        """Place unmatched pins into the lowest-utilization segments."""
+        if not self.unmatched_design_bterms:
+            return
+        warn(
+            "Assigning unmatched pins to lowest-utilization segments (no regex match)…"
+        )
+
+        unmatched_terms = sorted(
+            self.unmatched_design_bterms,
+            key=lambda term: term.getName(),
+        )
+        self.unmatched_design_bterms.clear()
+
+        for bterm in unmatched_terms:
+            segment = self._select_segment_for_unmatched()
+            segment.pin_entries.append(bterm)
+            self.unmatched_design_pin_names.discard(bterm.getName())
+
+    def _select_segment_for_unmatched(self) -> SegmentInfo:
+        """Return the segment that currently has the lowest utilisation."""
+        candidates: list[tuple[int, int, Side, int, SegmentInfo]] = []
+        for side in Side:
+            for index, segment in enumerate(self.segments_by_side[side]):
+                candidates.append(
+                    (
+                        segment.actual_pin_count,
+                        len(segment.pin_entries),
+                        side,
+                        index,
+                        segment,
+                    )
+                )
+
+        if candidates:
+            candidates.sort(key=lambda item: (item[0], item[1], item[2].value, item[3]))
+            return candidates[0][4]
+
+        side_choice = min(Side, key=lambda side: len(self.segments_by_side[side]))
+        return self._create_empty_segment(side_choice)
+
+    def _create_empty_segment(self, side: Side) -> SegmentInfo:
+        """Create a placeholder segment for unmatched pins on the given side."""
+        segment = SegmentInfo(
+            side=side,
+            sort_mode=PinSortMode.BUS_MAJOR,
+            min_distance=None,
+            max_distance=None,
+            reverse_result=False,
+            pin_entries=[],
+        )
+        self.segments_by_side[side].append(segment)
+        return segment
 
 
 @click.command()
@@ -251,102 +648,80 @@ class SegmentInfo:
 )
 @click_odb
 def io_place(
-    reader,
+    reader: OdbReaderLike,
     config: str,
     ver_layer: str,
     hor_layer: str,
     ver_width_mult: float,
     hor_width_mult: float,
-    hor_length: float,
-    ver_length: float,
+    hor_length: float | None,
+    ver_length: float | None,
     hor_extension: float,
     ver_extension: float,
-    unmatched_error: bool,
+    unmatched_error: str,
     verbose: bool,
-):
+) -> None:
     """
     Places the IOs in an input def with an optional config file that supports regexes.
 
     Config format:
     #N|#S|#E|#W
-    pin1_regex (low co-ordinates to high co-ordinates; e.g., bottom to top and left to right)
+    pin1_regex (low co-ordinates to high co-ordinates; e.g., bottom to top and
+    left to right)
     pin2_regex
     ...
 
     #S|#N|#E|#W
     """
-    logging.basicConfig(
-        level=logging.DEBUG if verbose else logging.INFO,
-        format="[%(levelname)s] %(message)s",
-    )
+    if verbose:
+        logging.getLogger().setLevel(logging.DEBUG)
+
     config_file_name = Path(config)
     micron_in_units = reader.dbunits
 
-    H_EXTENSION = int(micron_in_units * hor_extension)
-    V_EXTENSION = int(micron_in_units * ver_extension)
+    h_extension = int(micron_in_units * hor_extension)
+    v_extension = int(micron_in_units * ver_extension)
 
-    if H_EXTENSION < 0:
-        H_EXTENSION = 0
+    if h_extension < 0:
+        h_extension = 0
 
-    if V_EXTENSION < 0:
-        V_EXTENSION = 0
+    if v_extension < 0:
+        v_extension = 0
 
-    H_LAYER = reader.tech.findLayer(hor_layer)
-    V_LAYER = reader.tech.findLayer(ver_layer)
+    h_layer = reader.tech.findLayer(hor_layer)
+    v_layer = reader.tech.findLayer(ver_layer)
 
-    H_WIDTH = int(Decimal(hor_width_mult) * H_LAYER.getWidth())
-    V_WIDTH = int(Decimal(ver_width_mult) * V_LAYER.getWidth())
+    h_width = int(Decimal(hor_width_mult) * h_layer.getWidth())
+    v_width = int(Decimal(ver_width_mult) * v_layer.getWidth())
 
     if hor_length is not None:
-        H_LENGTH = int(micron_in_units * hor_length)
+        h_length = int(micron_in_units * hor_length)
     else:
-        H_LENGTH = max(
+        h_length = max(
             int(
                 math.ceil(
-                    H_LAYER.getArea() * micron_in_units * micron_in_units / H_WIDTH
+                    h_layer.getArea() * micron_in_units * micron_in_units / h_width
                 )
             ),
-            H_WIDTH,
+            h_width,
         )
 
     if ver_length is not None:
-        V_LENGTH = int(micron_in_units * ver_length)
+        v_length = int(micron_in_units * ver_length)
     else:
-        V_LENGTH = max(
+        v_length = max(
             int(
                 math.ceil(
-                    V_LAYER.getArea() * micron_in_units * micron_in_units / V_WIDTH
+                    v_layer.getArea() * micron_in_units * micron_in_units / v_width
                 )
             ),
-            V_WIDTH,
+            v_width,
         )
 
     with config_file_name.open(encoding="utf8") as file:
         config_data = yaml.safe_load(file)
 
-    info_by_side = {side: [] for side in ("N", "E", "S", "W")}
-
-    for side, segments in config_data.items():
-        for segment in segments:
-            sort_mode_str = segment.get("sort_mode", "bus_major")
-            if sort_mode_str == "bus_major":
-                sort_mode = ioplace_parser.Order.busMajor
-            elif sort_mode_str == "bus_minor":
-                sort_mode = ioplace_parser.Order.busMinor
-            else:
-                raise ValueError(f"Unknown sort mode {sort_mode_str}")
-            info_by_side[side].append(
-                SegmentInfo(
-                    min_distance=segment.get("min_distance"),
-                    max_distance=segment.get("max_distance"),
-                    pins=segment.get("pins", []),
-                    sort_mode=sort_mode,
-                    reverse_result=segment.get("reverse_result", False),
-                )
-            )
-
-    logger.debug("info_by_side: %s", info_by_side)
-    logger.info("Top-level design name: %s", reader.name)
+    info(f"Top-level design name: {reader.name}")
 
     bterms = [
         bterm
@@ -354,115 +729,17 @@ def io_place(
         if bterm.getSigType() not in ["POWER", "GROUND"]
     ]
 
-    for side, segments in info_by_side.items():
-        for side_info in segments:
-            min_allowed = (
-                (V_WIDTH + V_LAYER.getSpacing())
-                if side in ["N", "S"]
-                else (H_WIDTH + H_LAYER.getSpacing())
-            ) / reader.dbunits
-            if side_info.min_distance is None or side_info.min_distance < min_allowed:
-                logger.debug(
-                    "Adjusting min_distance for side %s segment (given=%s -> %s)",
-                    side,
-                    side_info.min_distance,
-                    min_allowed,
-                )
-                side_info.min_distance = min_allowed
+    plan = PinPlacementPlan(config_data, bterms, unmatched_error)
+    debug("Segment plan: %s", plan.segments_by_side)
 
-    # build a list of pins
-    pin_placement = {s: [] for s in ("N", "E", "W", "S")}
-
-    regex_by_bterm: dict = {}
-    unmatched_regexes: set[str] = set()
-    segment_pin_counts = {s: [] for s in ("N", "E", "S", "W")}
-    for side, segments in info_by_side.items():
-        for seg_idx, seg in enumerate(segments):
-            collected_terms: list = []
-            count_in_segment = 0
-            for pattern in seg.pins:
-                if isinstance(pattern, int):
-                    pin_placement[side].append(pattern)
-                    continue
-                anchored = f"^{pattern}$"
-                matched_terms = [b for b in bterms if re.match(anchored, b.getName())]
-                if not matched_terms:
-                    unmatched_regexes.add(pattern)
-                    continue
-                for b in matched_terms:
-                    if b in regex_by_bterm:
-                        raise SystemExit(
-                            f"[ERROR] Multiple regexes matched {b.getName()}: {regex_by_bterm[b]} and {pattern}"
-                        )
-                    regex_by_bterm[b] = pattern
-                matched_terms.sort(key=partial(sorter, order=seg.sort_mode))
-                collected_terms.extend(matched_terms)
-                count_in_segment += len(matched_terms)
-            pin_placement[side].append(collected_terms)
-            segment_pin_counts[side].append(count_in_segment)
-
-    logger.debug("pin_placement (pre random fill): %s", pin_placement)
-
-    # check for extra or missing pins
-    not_in_design = unmatched_regexes
-    not_in_config = {b.getName() for b in bterms if b not in regex_by_bterm}
-    mismatches_found = False
-    for is_in, not_in, pins in [
-        ("config", "design", not_in_design),
-        ("design", "config", not_in_config),
-    ]:
-        for name in pins:
-            if (
-                is_in == "config"
-                and (unmatched_error in {"unmatched_cfg", "both"})
-                or is_in == "design"
-                and (unmatched_error in {"unmatched_design", "both"})
-            ):
-                mismatches_found = True
-                logger.error("%s not found in %s but found in %s.", name, not_in, is_in)
-            else:
-                logger.warning(
-                    "%s not found in %s but found in %s.", name, not_in, is_in
-                )
-    if mismatches_found:
-        logger.error("Critical mismatches found.")
-        raise SystemExit(os.EX_DATAERR)
-
-    if not_in_config:
-        logger.info("Assigning random sides to unmatched pins (no regex match)…")
-        for bname in not_in_config:
-            bterm = next(bt for bt in bterms if bt.getName() == bname)
-            side_choice = random.choice(list(pin_placement.keys()))
-            if not pin_placement[side_choice]:
-                pin_placement[side_choice].append([])
-                segment_pin_counts[side_choice].append(0)
-                # Create corresponding entry in info_by_side with default values
-                info_by_side[side_choice].append(
-                    SegmentInfo(
-                        min_distance=None,  # Will be adjusted later
-                        max_distance=None,
-                        pins=[],
-                        sort_mode=ioplace_parser.Order.busMajor,
-                        reverse_result=False,
-                    )
-                )
-            seg_choice = random.randrange(len(pin_placement[side_choice]))
-            if isinstance(pin_placement[side_choice][seg_choice], int):
-                # If the chosen segment is a virtual pin count, create a new segment
-                pin_placement[side_choice].append([bterm])
-                segment_pin_counts[side_choice].append(1)
-                info_by_side[side_choice].append(
-                    SegmentInfo(
-                        min_distance=None,  # Will be adjusted later
-                        max_distance=None,
-                        pins=[],
-                        sort_mode=ioplace_parser.Order.busMajor,
-                        reverse_result=False,
-                    )
-                )
-            else:
-                pin_placement[side_choice][seg_choice].append(bterm)
-                segment_pin_counts[side_choice][seg_choice] += 1
+    min_by_side = {
+        Side.NORTH: (v_width + v_layer.getSpacing()) / reader.dbunits,
+        Side.SOUTH: (v_width + v_layer.getSpacing()) / reader.dbunits,
+        Side.EAST: (h_width + h_layer.getSpacing()) / reader.dbunits,
+        Side.WEST: (h_width + h_layer.getSpacing()) / reader.dbunits,
+    }
+    plan.assign_unmatched_pins()
+    plan.ensure_min_distances(min_by_side)
 
     # generate slots
     DIE_AREA = reader.block.getDieArea()
@@ -471,165 +748,108 @@ def io_place(
     BLOCK_UR_X = DIE_AREA.xMax()
     BLOCK_UR_Y = DIE_AREA.yMax()
 
-    origin_h, count_h, h_step = reader.block.findTrackGrid(H_LAYER).getGridPatternY(0)
-    origin_v, count_v, v_step = reader.block.findTrackGrid(V_LAYER).getGridPatternX(0)
+    origin_h: float
+    count_h: int
+    h_step: float
+    origin_v: float
+    count_v: int
+    v_step: float
 
-    # Build track lists per side with either equal or proportional slices
-    h_tracks_E = []
-    h_tracks_W = []
-    v_tracks_N = []
-    v_tracks_S = []
+    origin_h, count_h, h_step = reader.block.findTrackGrid(h_layer).getGridPatternY(0)
+    origin_v, count_v, v_step = reader.block.findTrackGrid(v_layer).getGridPatternX(0)
 
-    def build_tracks(count_total, step, origin, side_key, segment_counts):
-        """Return list of track coordinate lists per segment.
+    step_by_side = {
+        Side.EAST: h_step,
+        Side.WEST: h_step,
+        Side.NORTH: v_step,
+        Side.SOUTH: v_step,
+    }
 
-        Uses proportional allocation (pin-count weighted). If all counts are zero,
-        falls back to equal slices.
-        """
-        tracks_container = []
-        segments = pin_placement[side_key]
-        num_segments = len(segments)
-        if num_segments == 0:
-            return tracks_container
-        counts = segment_counts[side_key]
-        total = sum(counts) if counts else 0
-        if total == 0:
-            base = count_total // num_segments if num_segments else 0
-            slices = [(i * base, base) for i in range(num_segments)]
-        else:
-            # proportional slices with rounding reconciliation
-            fractional = [c / total * count_total for c in counts]
-            sizes = [max(1, int(round(f))) for f in fractional]
-            delta = count_total - sum(sizes)
-            # Distribute remaining tracks using round-robin
-            while delta > 0:
-                for i in range(num_segments):
-                    if delta > 0:
-                        sizes[i] += 1
-                        delta -= 1
-            while delta < 0:
-                for i in range(num_segments):
-                    if delta < 0 and sizes[i] > 1:
-                        sizes[i] -= 1
-                        delta += 1
-            start = 0
-            slices = []
-            for size in sizes:
-                slices.append((start, size))
-                start += size
-        for start_idx, size in slices:
-            start_coord = origin + start_idx * step
-            tracks_container.append(grid_to_tracks(start_coord, size, step))
-        return tracks_container
+    pin_tracks: dict[Side, list[list[float]]] = {side: [] for side in Side}
 
-    h_tracks_E = build_tracks(count_h, h_step, origin_h, "E", segment_pin_counts)
-    h_tracks_W = build_tracks(count_h, h_step, origin_h, "W", segment_pin_counts)
-    v_tracks_N = build_tracks(count_v, v_step, origin_v, "N", segment_pin_counts)
-    v_tracks_S = build_tracks(count_v, v_step, origin_v, "S", segment_pin_counts)
-
-    pin_tracks = {"N": [], "E": [], "W": [], "S": []}
-    for side, segments in pin_placement.items():
-        for segment_n, _segment in enumerate(segments):
-            min_distance = info_by_side[side][segment_n].min_distance * micron_in_units
-            max_distance = info_by_side[side][segment_n].max_distance
+    for side in Side:
+        for segment_index, segment in enumerate(plan.segments(side)):
+            min_distance_value = segment.min_distance
+            if min_distance_value is None:
+                raise AssertionError("min_distance must be defined before placement")
+            min_distance = min_distance_value * micron_in_units
+            max_distance = segment.max_distance
             if max_distance is not None:
                 max_distance = max_distance * micron_in_units
-            if side == "N":
-                raw_tracks = v_tracks_N[segment_n]
-                step = v_step
-            elif side == "S":
-                raw_tracks = v_tracks_S[segment_n]
-                step = v_step
-            elif side == "E":
-                raw_tracks = h_tracks_E[segment_n]
-                step = h_step
-            else:  # W
-                raw_tracks = h_tracks_W[segment_n]
-                step = h_step
+
+            raw_tracks = plan.tracks_for_segment(side, segment_index)
+            step = step_by_side[side]
+
             stride = max(1, math.ceil(min_distance / step))
             filtered = [raw_tracks[i] for i in range(0, len(raw_tracks), stride)]
-            # Enforce max_distance: ensure distance between consecutive chosen tracks
+
             if max_distance is not None:
                 max_stride = max(1, math.floor(max_distance / step))
-                # If current stride causes larger gaps, insert intermediate tracks
                 enforced = []
                 last_index = None
-                for idx in range(len(raw_tracks)):
+                for idx, track in enumerate(raw_tracks):
                     if idx % stride == 0:
                         if last_index is None:
-                            enforced.append(raw_tracks[idx])
+                            enforced.append(track)
                             last_index = idx
                         else:
                             if idx - last_index > max_stride:
-                                # add intermediate indices to satisfy max_distance
                                 interim = last_index + max_stride
                                 while interim < idx:
                                     enforced.append(raw_tracks[interim])
                                     interim += max_stride
-                            enforced.append(raw_tracks[idx])
+                            enforced.append(track)
                             last_index = idx
                 filtered = enforced
-            needed = sum(
-                1 for p in pin_placement[side][segment_n] if not isinstance(p, int)
-            )
+
+            needed = segment.actual_pin_count
             if needed > len(filtered):
-                logger.error(
-                    (
-                        "Insufficient tracks: min_distance=%.3f µm side=%s seg=%d "
-                        "needed=%d pins got=%d slots stride=%d raw=%d"
-                    ),
-                    info_by_side[side][segment_n].min_distance,
-                    side,
-                    segment_n,
-                    needed,
-                    len(filtered),
-                    stride,
-                    len(raw_tracks),
+                err(
+                    "Insufficient tracks: "
+                    f"min_distance={segment.min_distance:.3f} µm "
+                    f"side={side.value} seg={segment_index} pins={needed} "
+                    f"got {len(filtered)} slots "
+                    f"stride={stride} raw={len(raw_tracks)}"
                 )
-                logger.error(
-                    "Hint: reduce min_distance, enlarge die, or redistribute pins."
-                )
+                err("Hint: reduce min_distance, enlarge die, or redistribute pins.")
                 raise SystemExit(os.EX_DATAERR)
+
             pin_tracks[side].append(filtered)
 
-    # reversals (including randomly-assigned pins, if needed)
-    for side, segments in info_by_side.items():
-        for segment_n, side_info in enumerate(segments):
-            if side_info.reverse_result:
-                pin_placement[side][segment_n].reverse()
+    for segment in plan.all_segments():
+        segment.apply_reverse()
 
-    # create the pins
-    for side, segments in pin_placement.items():
-        for segment_n, _segment in enumerate(segments):
-            logger.debug(
+    for side in Side:
+        for segment_index, segment in enumerate(plan.segments(side)):
+            debug(
                 "Placing side=%s seg=%d pins=%d slots=%d",
-                side,
-                segment_n,
-                len(pin_placement[side][segment_n]),
-                len(pin_tracks[side][segment_n]),
+                side.value,
+                segment_index,
+                segment.actual_pin_count,
+                len(pin_tracks[side][segment_index]) if pin_tracks[side] else 0,
             )
 
-            slots, pin_placement[side][segment_n] = equally_spaced_sequence(
-                side, pin_placement[side][segment_n], pin_tracks[side][segment_n]
+            slots, resolved_pins = equally_spaced_sequence(
+                side.value,
+                segment.pin_entries,
+                pin_tracks[side][segment_index],
             )
+            segment.replace_pin_entries(resolved_pins)
 
-            logger.debug(
+            debug(
                 "Slots assigned = %d (pins=%d)",
                 len(slots),
-                len(pin_placement[side][segment_n]),
+                len(segment.pin_entries),
             )
-            assert len(slots) == len(pin_placement[side][segment_n])
+            assert len(slots) == len(segment.pin_entries)
 
-            for i in range(len(pin_placement[side][segment_n])):
-                bterm = pin_placement[side][segment_n][i]
-                slot = slots[i]
+            for pin_index, bterm in enumerate(segment.pin_entries):
+                slot = slots[pin_index]
                 pin_name = bterm.getName()
-                logger.debug("%s -> %d", pin_name, slot)
+                debug(f"{pin_name} -> {slot}")
                 pins = bterm.getBPins()
                 if len(pins) > 0:
-                    logger.warning(
-                        "%s already has shapes. Modifying existing shape.", pin_name
-                    )
+                    warn(f"{pin_name} already has shapes. Modifying existing shape.")
                     assert len(pins) == 1
                     pin_bpin = pins[0]
                 else:
@@ -637,22 +857,22 @@ def io_place(
 
                 pin_bpin.setPlacementStatus("PLACED")
 
-                if side in ["N", "S"]:
-                    rect = odb.Rect(0, 0, V_WIDTH, V_LENGTH + V_EXTENSION)
-                    if side == "N":
-                        y = BLOCK_UR_Y - V_LENGTH
+                if side in {Side.NORTH, Side.SOUTH}:
+                    rect = odb.Rect(0, 0, v_width, v_length + v_extension)
+                    if side is Side.NORTH:
+                        y = BLOCK_UR_Y - v_length
                     else:
-                        y = BLOCK_LL_Y - V_EXTENSION
-                    rect.moveTo(slot - V_WIDTH // 2, y)
-                    odb.dbBox_create(pin_bpin, V_LAYER, *rect.ll(), *rect.ur())
+                        y = BLOCK_LL_Y - v_extension
+                    rect.moveTo(slot - v_width // 2, y)
+                    odb.dbBox_create(pin_bpin, v_layer, *rect.ll(), *rect.ur())
                 else:
-                    rect = odb.Rect(0, 0, H_LENGTH + H_EXTENSION, H_WIDTH)
-                    if side == "E":
-                        x = BLOCK_UR_X - H_LENGTH
+                    rect = odb.Rect(0, 0, h_length + h_extension, h_width)
+                    if side is Side.EAST:
+                        x = BLOCK_UR_X - h_length
                     else:
-                        x = BLOCK_LL_X - H_EXTENSION
-                    rect.moveTo(x, slot - H_WIDTH // 2)
-                    odb.dbBox_create(pin_bpin, H_LAYER, *rect.ll(), *rect.ur())
+                        x = BLOCK_LL_X - h_extension
+                    rect.moveTo(x, slot - h_width // 2)
+                    odb.dbBox_create(pin_bpin, h_layer, *rect.ll(), *rect.ur())
 
 
 if __name__ == "__main__":

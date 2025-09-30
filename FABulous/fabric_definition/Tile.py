@@ -1,10 +1,7 @@
 """Store information about a tile."""
 
 from dataclasses import dataclass, field
-from pathlib import Path
-from typing import Self
-
-import yaml
+from typing import TYPE_CHECKING
 
 from FABulous.fabric_definition.Bel import Bel
 from FABulous.fabric_definition.define import IO, Direction, PinSortMode, Side
@@ -12,41 +9,8 @@ from FABulous.fabric_definition.Gen_IO import Gen_IO
 from FABulous.fabric_definition.Port import Port
 from FABulous.fabric_definition.Wire import Wire
 
-
-@dataclass
-class PinOrderConfig:
-    min_distance: int | None
-    max_distance: int | None
-    pins: list[str]
-    sort_mode: PinSortMode
-    reverse_result: bool
-
-    def __init__(
-        self,
-        min_distance: int | None = None,
-        max_distance: int | None = None,
-        sort_mode: PinSortMode = PinSortMode.BUS_MAJOR,
-        reverse_result: bool = False,
-    ) -> None:
-        self.min_distance = min_distance
-        self.max_distance = max_distance
-        self.sort_mode = sort_mode
-        self.reverse_result = reverse_result
-
-    def __call__(self, pins: list[str]) -> Self:
-        self.pins = pins
-        return self
-
-    def to_dict(self) -> dict:
-        if self.pins is None:
-            self.pins = []
-        return {
-            "min_distance": self.min_distance,
-            "max_distance": self.max_distance,
-            "pins": self.pins,
-            "sort_mode": str(self.sort_mode),
-            "reverse_result": self.reverse_result,
-        }
+if TYPE_CHECKING:  # pragma: no cover - typing only
+    from FABulous.fabric_cad.gen_io_pin_config_yaml import PinOrderConfig
 
 
 @dataclass
@@ -105,7 +69,8 @@ class Tile:
     withUserCLK: bool = False
     wireList: list[Wire] = field(default_factory=list)
     tileDir: Path = Path()
-    partOfSuperTile: bool = False
+    partOfSuperTile = False
+    pinOrderConfig: dict = field(default_factory=dict)
 
     def __init__(
         self,
@@ -117,7 +82,7 @@ class Tile:
         gen_ios: list[Gen_IO],
         userCLK: bool,
         configBit: int = 0,
-        pinOrderConfig: dict[Side, PinOrderConfig] | None = None,
+        pinOrderConfig: dict[Side, "PinOrderConfig"] | None = None,
     ) -> None:
         self.name = name
         self.portsInfo = ports
@@ -130,6 +95,8 @@ class Tile:
         self.tileDir = tileDir
 
         if pinOrderConfig is None:
+            from FABulous.fabric_cad.gen_io_pin_config_yaml import PinOrderConfig
+
             self.pinOrderConfig = {
                 Side.NORTH: PinOrderConfig(sort_mode=PinSortMode.BUS_MAJOR),
                 Side.EAST: PinOrderConfig(sort_mode=PinSortMode.BUS_MAJOR),
@@ -334,66 +301,21 @@ class Tile:
         return ret
 
     def getUserCLK(self) -> bool:
+        """Return whether the tile exposes a user clock."""
         return self.withUserCLK
 
-    def getPortPairs(self) -> list[str]:
+    def getPortPairs(self) -> list[list[str | int]]:
+        """Return port connectivity information for non-jump wires."""
         return [
             [p.sourceName, p.destinationName, p.wireCount, p.name]
             for p in self.portsInfo
             if p.wireDirection != Direction.JUMP
         ]
 
-    def getExternalTileIONames(self) -> list[str]:
+    def getExternalTileIONames(self) -> list[Bel]:
+        """Return BELs that expose external IO behaviour."""
         return [p for p in self.bels if p.name != "NULL"]
 
     def portInfo(self) -> list[Bel]:
+        """Return BEL metadata for the tile."""
         return self.bels
-
-    def generateIOPinOrderConfig(self, outfile: Path, prefix: str = "") -> None:
-        """Generates the I/O pin order configuration for a given tile.
-
-        Parameters
-        ----------
-        tile : Tile
-            The tile for which to generate the I/O pin order configuration.
-        outfile : Path
-            The output file path where the configuration will be saved.
-        """
-        port_dict = {"N": [], "E": [], "S": [], "W": []}
-
-        for p in self.getNorthSidePorts():
-            if r := p.getPortRegex(indexed=True, prefix=prefix):
-                port_dict["N"].append(self.pinOrderConfig[Side.NORTH]([r]).to_dict())
-        port_dict["N"].append(PinOrderConfig()([f"{prefix}UserCLKo"]).to_dict())
-        port_dict["N"].append(
-            PinOrderConfig()([rf"{prefix}FrameStrobe_O\[\d+\]"]).to_dict()
-        )
-
-        for p in self.getEastSidePorts():
-            if r := p.getPortRegex(indexed=True, prefix=prefix):
-                port_dict["E"].append(self.pinOrderConfig[Side.EAST]([r]).to_dict())
-        port_dict["E"].append(
-            PinOrderConfig()([rf"{prefix}FrameData_O\[\d+\]"]).to_dict()
-        )
-
-        for p in self.getSouthSidePorts():
-            if r := p.getPortRegex(indexed=True, prefix=prefix):
-                port_dict["S"].append(self.pinOrderConfig[Side.SOUTH]([r]).to_dict())
-        port_dict["S"].append(PinOrderConfig()([f"{prefix}UserCLK"]).to_dict())
-        port_dict["S"].append(
-            PinOrderConfig()([rf"{prefix}FrameStrobe\[\d+\]"]).to_dict()
-        )
-
-        for p in self.getWestSidePorts():
-            if r := p.getPortRegex(indexed=True, prefix=prefix):
-                port_dict["W"].append(self.pinOrderConfig[Side.WEST]([r]).to_dict())
-        port_dict["W"].append(
-            PinOrderConfig()([rf"{prefix}FrameData\[\d+\]"]).to_dict()
-        )
-
-        for b in self.bels:
-            if r := [f"{prefix}{i}" for i in b.externalInput + b.externalOutput]:
-                port_dict["S"].append(self.pinOrderConfig[Side.SOUTH](r).to_dict())
-
-        with outfile.open("w") as f:
-            yaml.dump(port_dict, f)

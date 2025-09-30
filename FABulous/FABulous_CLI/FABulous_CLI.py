@@ -1314,7 +1314,7 @@ class FABulous_CLI(Cmd):
     @with_category(CMD_FABRIC_FLOW)
     def do_gen_fabric_gds(self) -> None:
         """Generate GDSII files for the entire fabric."""
-        self.fabulousAPI.genFabricGDS(
+        self.fabulousAPI.fabric_stitching(
             self.projectDir / "Tile",
             self.projectDir / "Fabric",
             self.projectDir / "gds",

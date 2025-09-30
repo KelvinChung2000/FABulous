@@ -141,6 +141,7 @@
               UV_PYTHON_DOWNLOADS = "never";
             };
             shellHook = ''
+              # Clear any pre-existing PYTHONPATH to avoid leaking host paths
               unset PYTHONPATH
               export REPO_ROOT=$(git rev-parse --show-toplevel)
               ORIGINAL_PS1="$PS1"
@@ -150,6 +151,18 @@
 
               # Put our Python first in PATH to avoid conflicts with system Python
               export PATH="${pythonSet.python}/bin:$PATH"
+
+              # Ensure the repository root and the virtualenv site-packages are importable
+              # for external embedded interpreters (e.g. OpenROAD) that may invoke Python
+              # without inheriting the activated environment. We append rather than prepend
+              # to keep venv site-packages resolution order intact when PYTHONPATH is picked up.
+              VENV_SITE=$(python -c 'import site,sys; print(site.getsitepackages()[0])' 2>/dev/null || true)
+              if [ -n "$VENV_SITE" ]; then
+                export PYTHONPATH="$REPO_ROOT:$VENV_SITE"
+              else
+                export PYTHONPATH="$REPO_ROOT"
+              fi
+              echo "[flake shell] PYTHONPATH set to: $PYTHONPATH" >&2
 
               # macOS-specific environment setup
               ${lib.optionalString pkgs.stdenv.isDarwin ''

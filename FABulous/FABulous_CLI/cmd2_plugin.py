@@ -156,7 +156,22 @@ def _register_click_completer(
     setattr(app, completer_name, completer)
 
 
-def _build_cache(app: Cmd) -> dict[str, click.Command]:
+def reregister_completers(app: Cmd) -> None:
+    """Re-register all Typer command completers.
+
+    This is useful after cmd2 disables/enables categories, which replaces
+    completers with disabled stubs. Call this after enabling categories
+    to restore working completers.
+    """
+    cache = getattr(app, "typer_command_cache", None)
+    if not cache:
+        return
+
+    for cmd_name, (click_cmd, completion_spec) in cache.items():
+        _register_click_completer(app, cmd_name, click_cmd, completion_spec)
+
+
+def _build_cache(app: Cmd) -> dict[str, tuple[click.Command, CompletionSpec | None]]:
     cfg = cast("_SupportsTyperConfig", app)
     if not getattr(cfg, "typer_auto_enable", True):
         return {}
@@ -295,4 +310,4 @@ class Cmd2TyperPlugin:
             self._typer_plugin_installed = True
 
 
-__all__ = ["plugin_start", "Cmd2TyperPlugin", "CompletionSpec"]
+__all__ = ["plugin_start", "Cmd2TyperPlugin", "CompletionSpec", "reregister_completers"]

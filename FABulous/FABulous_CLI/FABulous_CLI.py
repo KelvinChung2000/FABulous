@@ -56,8 +56,15 @@ from FABulous.fabric_generator.gen_fabric.fabric_automation import (
 from FABulous.fabric_generator.parser.parse_csv import parseTilesCSV
 from FABulous.FABulous_API import FABulous_API
 from FABulous.FABulous_CLI import cmd_synthesis
-from FABulous.FABulous_CLI.cmd2_plugin import Cmd2TyperPlugin, CompletionSpec
-from FABulous.FABulous_CLI.completion_helpers import complete_tile_names
+from FABulous.FABulous_CLI.cmd2_plugin import (
+    Cmd2TyperPlugin,
+    CompletionSpec,
+    reregister_completers,
+)
+from FABulous.FABulous_CLI.completion_helpers import (
+    complete_bel_names,
+    complete_tile_names,
+)
 from FABulous.FABulous_CLI.helper import (
     CommandPipeline,
     copy_verilog_files,
@@ -398,12 +405,22 @@ class FABulous_CLI(Cmd2TyperPlugin, Cmd):
 
         self.enable_category(CMD_FABRIC_FLOW)
         self.enable_category(CMD_USER_DESIGN_FLOW)
+        self.enable_category(CMD_HELPER)
+
+        # Re-register completers after enabling categories
+        # (cmd2 replaces completers with stubs when categories are disabled/enabled)
+        reregister_completers(self)
+
         logger.info("Complete")
 
     @with_category(CMD_HELPER)
     def do_print_bel(
         self,
-        bel: Annotated[str, typer.Argument(help="Name of the BEL to display")],
+        bel: Annotated[
+            str,
+            CompletionSpec(completer=complete_bel_names),
+            typer.Argument(help="Name of the BEL to display"),
+        ],
     ) -> None:
         """Print a BEL object to the console."""
         if not self.fabricLoaded:
@@ -418,7 +435,11 @@ class FABulous_CLI(Cmd2TyperPlugin, Cmd):
     @with_category(CMD_HELPER)
     def do_print_tile(
         self,
-        tile: Annotated[str, typer.Argument(help="Name of the tile to display")],
+        tile: Annotated[
+            str,
+            CompletionSpec(completer=complete_tile_names),
+            typer.Argument(help="Name of the tile to display"),
+        ],
     ) -> None:
         """Print a tile object to the console."""
         if not self.fabricLoaded:
@@ -435,6 +456,7 @@ class FABulous_CLI(Cmd2TyperPlugin, Cmd):
         self,
         tiles: Annotated[
             list[str],
+            CompletionSpec(completer=complete_tile_names),
             typer.Argument(
                 ...,
                 metavar="TILE...",
@@ -464,6 +486,7 @@ class FABulous_CLI(Cmd2TyperPlugin, Cmd):
         self,
         tiles: Annotated[
             list[str],
+            CompletionSpec(completer=complete_tile_names),
             typer.Argument(
                 ...,
                 metavar="TILE...",
@@ -1237,6 +1260,7 @@ class FABulous_CLI(Cmd2TyperPlugin, Cmd):
         self,
         tiles: Annotated[
             list[str],
+            CompletionSpec(completer=complete_tile_names),
             typer.Argument(..., metavar="TILE...", help="Tiles to add I/O BELs"),
         ],
     ) -> None:

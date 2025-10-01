@@ -56,7 +56,8 @@ from FABulous.fabric_generator.gen_fabric.fabric_automation import (
 from FABulous.fabric_generator.parser.parse_csv import parseTilesCSV
 from FABulous.FABulous_API import FABulous_API
 from FABulous.FABulous_CLI import cmd_synthesis
-from FABulous.FABulous_CLI.cmd2_plugin import Cmd2TyperPlugin
+from FABulous.FABulous_CLI.cmd2_plugin import Cmd2TyperPlugin, CompletionSpec
+from FABulous.FABulous_CLI.completion_helpers import complete_tile_names
 from FABulous.FABulous_CLI.helper import (
     CommandPipeline,
     copy_verilog_files,
@@ -490,6 +491,7 @@ class FABulous_CLI(Cmd2TyperPlugin, Cmd):
         self,
         tiles: Annotated[
             list[str],
+            CompletionSpec(completer=complete_tile_names),
             typer.Argument(..., metavar="TILE...", help="Tiles to generate"),
         ],
     ) -> None:

@@ -17,6 +17,23 @@ from loguru import logger
 from FABulous.custom_exception import CommandError
 
 
+class CompletionSpec:
+    """Specification for tab completion behavior.
+
+    Used to declare completion functions that the plugin will wire up to both
+    Click's autocompletion and cmd2's tab completion.
+    """
+
+    def __init__(self, completer: Callable[[Cmd, str, str, int], list[str]]):
+        """Initialize completion specification.
+
+        Args:
+            completer: Function that takes (app, text, line, begidx) and returns
+                      list of completion strings. Compatible with cmd2 completer signature.
+        """
+        self.completer = completer
+
+
 class _SupportsTyperConfig(Protocol):  # pragma: no cover
     typer_auto_enable: bool
     typer_skip_commands: set[str]
@@ -84,24 +101,54 @@ def _default_builder(
     raise RuntimeError(f"Failed to build Typer command for {name}")
 
 
+def _extract_completion_spec(func: Callable[..., Any]) -> CompletionSpec | None:
+    """Extract CompletionSpec from function annotations if present."""
+    sig = inspect.signature(func)
+
+    for param in sig.parameters.values():
+        if param.name == "self":
+            continue
+
+        # Check if annotation contains CompletionSpec
+        ann = param.annotation
+        if ann is inspect.Signature.empty:
+            continue
+
+        # Handle Annotated types
+        origin = getattr(ann, "__origin__", None)
+        if origin is not None:
+            # For Annotated[type, metadata...], check metadata
+            metadata = getattr(ann, "__metadata__", ())
+            for item in metadata:
+                if isinstance(item, CompletionSpec):
+                    return item
+
+    return None
+
+
 def _register_click_completer(
-    app: Cmd, cmd_name: str, click_cmd: click.Command
+    app: Cmd,
+    cmd_name: str,
+    click_cmd: click.Command,
+    completion_spec: CompletionSpec | None,
 ) -> None:
-    """Register a cmd2 completer that delegates to Click shell completion."""
+    """Register a cmd2 completer using the provided CompletionSpec.
 
-    def completer(text: str, _line: str, _begidx: int, _endidx: int) -> list[str]:
-        # Parse the command line to get arguments so far
+    Args:
+        app: The cmd2 application instance
+        cmd_name: Name of the command (without 'do_' prefix)
+        click_cmd: The Click command object
+        completion_spec: Optional completion specification with custom completer
+    """
+    if completion_spec is None:
+        # No custom completion, skip registration
+        return
+
+    def completer(text: str, line: str, begidx: int, endidx: int) -> list[str]:
         try:
-            # Create Click context for completion
-            ctx = click.Context(click_cmd, obj=app)
-
-            # Get completions from Click
-            completions = click_cmd.shell_complete(ctx, text)
-
-            # Extract completion values
-            return [comp.value for comp in completions]
+            # Call the user-provided completion function
+            return completion_spec.completer(app, text, line, begidx)
         except (AttributeError, TypeError, ValueError):
-            # Fall back to empty completion on any error
             return []
 
     # Register the completer with cmd2
@@ -154,9 +201,10 @@ def _build_cache(app: Cmd) -> dict[str, click.Command]:
         cmd_name = attr[3:]
         bound_cb = cast("Callable[..., Any]", func.__get__(app))
         try:
-            cache[cmd_name] = builder(
-                bound_cb, cmd_name, dict(overrides.get(cmd_name, {}))
-            )
+            click_cmd = builder(bound_cb, cmd_name, dict(overrides.get(cmd_name, {})))
+            # Extract completion specification if present
+            completion_spec = _extract_completion_spec(func)
+            cache[cmd_name] = (click_cmd, completion_spec)
         except (TypeError, ValueError) as e:  # pragma: no cover
             logger.error("Failed to build Typer command '{}': {}", cmd_name, e)
     return cache
@@ -177,8 +225,8 @@ def plugin_start(app: Cmd) -> None:
         return
 
     # Register shell completion handlers for each Typer command
-    for cmd_name, click_cmd in cache.items():
-        _register_click_completer(app, cmd_name, click_cmd)
+    for cmd_name, (click_cmd, completion_spec) in cache.items():
+        _register_click_completer(app, cmd_name, click_cmd, completion_spec)
 
     def _postparsing(data: PostparsingData) -> PostparsingData:  # pragma: no cover
         """Postparsing hook compatible with cmd2 2.7.0.
@@ -192,9 +240,10 @@ def plugin_start(app: Cmd) -> None:
         cmd = statement.command
         if not cmd:
             return data
-        click_cmd = cache.get(cmd)
-        if not click_cmd:
+        entry = cache.get(cmd)
+        if not entry:
             return data
+        click_cmd, _ = entry  # Unpack (click_cmd, completion_spec)
         arg_tokens = getattr(statement, "arg_list", None)
         arg_list = list(arg_tokens) if arg_tokens else []
         try:
@@ -246,4 +295,4 @@ class Cmd2TyperPlugin:
             self._typer_plugin_installed = True
 
 
-__all__ = ["plugin_start", "Cmd2TyperPlugin"]
+__all__ = ["plugin_start", "Cmd2TyperPlugin", "CompletionSpec"]

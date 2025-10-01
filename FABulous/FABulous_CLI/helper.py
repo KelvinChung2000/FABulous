@@ -587,9 +587,9 @@ class CommandPipeline:
                     f"Command '{command}' execution failed with exit code "
                     f"{self.cli.exit_code}"
                 )
-
                 if not self.force:
                     raise PipelineCommandError(error_message)
+                continue
 
         return self.final_exit_code == 0
 

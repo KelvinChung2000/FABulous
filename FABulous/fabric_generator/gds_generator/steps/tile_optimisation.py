@@ -31,7 +31,7 @@ class OptMode(StrEnum):
 
 var = [
     Variable(
-        "FABULOUS_OPTIMISATION_STEP_SIZE",
+        "FABULOUS_OPTIMISATION_STEP_COUNT",
         int,
         "The size of which the tile size reduces by in each iteration.",
         default=5,
@@ -161,7 +161,7 @@ class TileOptimisation(WhileStep):
                 die_area = (
                     0,
                     0,
-                    width - self.config["FABULOUS_OPTIMISATION_STEP_SIZE"],
+                    width - self.config["FABULOUS_OPTIMISATION_STEP_COUNT"],
                     height,
                 )
             case OptMode.FIX_WIDTH:
@@ -169,7 +169,7 @@ class TileOptimisation(WhileStep):
                     0,
                     0,
                     width,
-                    height - self.config["FABULOUS_OPTIMISATION_STEP_SIZE"],
+                    height - self.config["FABULOUS_OPTIMISATION_STEP_COUNT"],
                 )
             case OptMode.BALANCED:
                 if (
@@ -178,7 +178,7 @@ class TileOptimisation(WhileStep):
                     die_area = (
                         0,
                         0,
-                        width - self.config["FABULOUS_OPTIMISATION_STEP_SIZE"],
+                        width - self.config["FABULOUS_OPTIMISATION_STEP_COUNT"],
                         height,
                     )
                 else:
@@ -186,14 +186,14 @@ class TileOptimisation(WhileStep):
                         0,
                         0,
                         width,
-                        height - self.config["FABULOUS_OPTIMISATION_STEP_SIZE"],
+                        height - self.config["FABULOUS_OPTIMISATION_STEP_COUNT"],
                     )
             case OptMode.AGGRESSIVE:
                 die_area = (
                     0,
                     0,
-                    width - self.config["FABULOUS_OPTIMISATION_STEP_SIZE"],
-                    height - self.config["FABULOUS_OPTIMISATION_STEP_SIZE"],
+                    width - self.config["FABULOUS_OPTIMISATION_STEP_COUNT"],
+                    height - self.config["FABULOUS_OPTIMISATION_STEP_COUNT"],
                 )
             case OptMode.CUSTOM:
                 func = self.config["FABULOUS_CUSTOM_OPT_FUNC"]

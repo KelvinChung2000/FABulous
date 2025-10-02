@@ -274,7 +274,7 @@ class Fabric:
         fabric += f"tileDic: {list(self.tileDic.keys())}\n"
         return fabric
 
-    def getTileByName(self, name: str) -> Tile | None:
+    def getTileByName(self, name: str) -> Tile:
         """Get a tile by its name from the fabric.
 
         Search for the tile first in the used tiles dictionary, then in the unused tiles
@@ -303,7 +303,7 @@ class Fabric:
 
         return ret
 
-    def getSuperTileByName(self, name: str) -> SuperTile | None:
+    def getSuperTileByName(self, name: str) -> SuperTile:
         """Get a supertile by its name from the fabric.
 
         Searches for the supertile first in the used supertiles dictionary, then in the
@@ -329,6 +329,7 @@ class Fabric:
             ret = self.unusedSuperTileDic.get(name)
         if ret is None:
             raise KeyError(f"SuperTile {name} not found in fabric.")
+
         return ret
 
     def getAllUniqueBels(self) -> list[Bel]:

@@ -4,10 +4,12 @@ This module defines various enumerations used throughout FABulous for fabric def
 including I/O types, directions, sides, and configuration modes.
 """
 
-from enum import Enum, StrEnum
+from decimal import Decimal
+from enum import StrEnum
+from typing import NamedTuple
 
 
-class IO(Enum):
+class IO(StrEnum):
     """Enumeration for I/O port directions.
 
     Defines the direction of ports in fabric components:
@@ -23,7 +25,7 @@ class IO(Enum):
     NULL = "NULL"
 
 
-class Direction(Enum):
+class Direction(StrEnum):
     """Enumeration for wire and port directions in the fabric.
 
     Defines the directional flow of wires and ports:
@@ -41,7 +43,7 @@ class Direction(Enum):
     JUMP = "JUMP"
 
 
-class Side(Enum):
+class Side(StrEnum):
     """Enumeration for tile sides and placement.
 
     Defines the physical sides of tiles in the fabric:
@@ -59,7 +61,7 @@ class Side(Enum):
     ANY = "ANY"
 
 
-class MultiplexerStyle(Enum):
+class MultiplexerStyle(StrEnum):
     """Enumeration for multiplexer implementation styles.
 
     Defines how multiplexers are implemented in the fabric:
@@ -73,7 +75,7 @@ class MultiplexerStyle(Enum):
     GENERIC = "GENERIC"
 
 
-class ConfigBitMode(Enum):
+class ConfigBitMode(StrEnum):
     """Enumeration for configuration bit access modes.
 
     Defines how configuration bits are accessed and programmed:
@@ -123,3 +125,10 @@ class PinSortMode(StrEnum):
     BUS_MAJOR = "bus_major"
     BIT_MINOR = "bit_minor"
     CUSTOM = "custom"
+
+
+class TileSize(NamedTuple):
+    """Named tuple representing the size of a tile."""
+
+    width: Decimal
+    height: Decimal

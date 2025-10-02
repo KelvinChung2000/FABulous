@@ -1,12 +1,9 @@
 """Stitching flow to assemble FABulous tile macros into a complete fabric."""
 
-import re
-from dataclasses import dataclass, field
 from decimal import Decimal
 from pathlib import Path
-from typing import NamedTuple
 
-from librelane.config.variable import Variable
+from librelane.config.variable import Instance, Macro, Orientation, Variable
 from librelane.flows.classic import Classic
 from librelane.flows.flow import Flow
 from librelane.logging.logger import err, info
@@ -19,38 +16,14 @@ from FABulous.fabric_generator.gds_generator.steps.fabric_IO_placement import (
     FABulousManualIOPlacement,
 )
 
-
-@dataclass
-class MacroInstance:
-    """Represents a single instance of a macro with its placement information."""
-
-    location: tuple[Decimal, Decimal]
-    orientation: str = "N"
-
-
-@dataclass
-class MacroSettings:
-    """Represents a macro definition with its files and instances."""
-
-    size: tuple[Decimal, Decimal]
-    gds: str
-    lef: str
-    nl: str
-    spef: dict[str, list[str]]
-    instances: dict[str, MacroInstance] = field(default_factory=dict)
-
-
 # Add namedtuple for tile sizes
-class TileSize(NamedTuple):
-    width: Decimal
-    height: Decimal
 
 
 subs = {
     # Disable STA
-    "OpenROAD.STAPrePNR": None,
-    "OpenROAD.STAMidPNR": None,
-    "OpenROAD.STAPostPNR": None,
+    "OpenROAD.STAPrePNR*": None,
+    "OpenROAD.STAMidPNR*": None,
+    "OpenROAD.STAPostPNR*": None,
     # Custom PDN generation script
     "OpenROAD.GeneratePDN": FABulousPower,
     # Script to manually place single IOs
@@ -61,12 +34,17 @@ configs = Classic.config_vars + [
     Variable(
         "FABULOUS_FABRIC",
         Fabric,
-        "The fabric configuration file.",
+        "The fabric configuration object.",
     ),
     Variable(
-        "FABULOUS_MACRO_SETTINGS",
-        dict[str, MacroSettings],
+        "FABULOUS_MACROS_SETTINGS",
+        dict[str, Macro],
         "A dictionary mapping tile names to their macro views (GDS, LEF, NL, SPEF).",
+    ),
+    Variable(
+        "FABULOUS_TILE_SIZES",
+        dict[str, tuple[Decimal, Decimal]],
+        "A dictionary mapping tile names to their sizes (width, height).",
     ),
     Variable(
         "FABULOUS_TILE_SPACING",
@@ -75,14 +53,14 @@ configs = Classic.config_vars + [
     ),
     Variable(
         "FABULOUS_HALO_SPACING",
-        tuple[Decimal, Decimal, Decimal, Decimal] | None,
+        tuple[Decimal, Decimal, Decimal, Decimal],
         "The spacing around the fabric. [left, bottom, right, top]",
         units="µm",
-        default=[100, 100, 100, 100],
+        default=(100, 100, 100, 100),
     ),
     Variable(
         "FABULOUS_SPEF_CORNERS",
-        list[str] | None,
+        list[str],
         "The SPEF corners to use for the tile macros.",
         default=["nom"],
     ),
@@ -90,7 +68,7 @@ configs = Classic.config_vars + [
 
 
 @Flow.factory.register()
-class FABulousFabricStitchingFlow(Classic):
+class FABulousFabricMacroFlow(Classic):
     """Flow for stitching together individual tile macros into a complete fabric.
 
     This flow handles the placement and interconnection of pre-generated tile macros
@@ -101,9 +79,7 @@ class FABulousFabricStitchingFlow(Classic):
     config_vars = configs
 
     def _compute_row_and_column_sizes(
-        self,
-        fabric: Fabric,
-        tile_sizes: dict[str, TileSize],
+        self, fabric: Fabric, tile_sizes: dict[str, tuple[Decimal, Decimal]]
     ) -> tuple[list[Decimal], list[Decimal]]:
         """Compute row heights and column widths in a single pass.
 
@@ -132,9 +108,9 @@ class FABulousFabricStitchingFlow(Classic):
                 if t is None:
                     continue
                 if y not in row_heights_map:
-                    row_heights_map[y] = tile_sizes[t.name].height
+                    row_heights_map[y] = tile_sizes[t.name][1]
                 if x not in col_widths_map:
-                    col_widths_map[x] = tile_sizes[t.name].width
+                    col_widths_map[x] = tile_sizes[t.name][0]
 
         # Build ordered lists and validate completeness
         row_heights: list[Decimal] = []
@@ -189,50 +165,6 @@ class FABulousFabricStitchingFlow(Classic):
 
         return fabric_width, fabric_height
 
-    def _extract_size_from_lef(self, lef_path: Path) -> TileSize:
-        """Extract tile size from LEF file.
-
-        Parameters
-        ----------
-        lef_path : Path
-            Path to the LEF file
-
-        Returns
-        -------
-        TileSize
-            Tile dimensions (width, height) extracted from LEF
-
-        Raises
-        ------
-        FileNotFoundError
-            If LEF file doesn't exist
-        ValueError
-            If SIZE information cannot be found or parsed
-        """
-        if not lef_path.exists():
-            raise FileNotFoundError(f"LEF file not found: {lef_path}")
-
-        # Regex pattern to match SIZE directive: "SIZE 500.000 BY 500.000 ;"
-        size_pattern = re.compile(r"SIZE\s+(\d+(?:\.\d+)?)\s+BY\s+(\d+(?:\.\d+)?)\s*;")
-
-        try:
-            with lef_path.open() as f:
-                content = f.read()
-
-            match = size_pattern.search(content)
-            if not match:
-                raise ValueError(f"SIZE directive not found in LEF file: {lef_path}")
-
-            width = Decimal(match.group(1))
-            height = Decimal(match.group(2))
-
-            return TileSize(width, height)
-
-        except Exception as e:
-            if isinstance(e, (FileNotFoundError, ValueError)):
-                raise
-            raise ValueError(f"Error parsing LEF file {lef_path}: {e}") from e
-
     def run(self, initial_state: State, **kwargs: dict) -> tuple[State, list[Step]]:
         """Execute the fabric stitching flow.
 
@@ -251,7 +183,10 @@ class FABulousFabricStitchingFlow(Classic):
         fabric: Fabric = self.config["FABULOUS_FABRIC"]
 
         # Get macro configurations from config
-        macros: dict[str, MacroSettings] = self.config["FABULOUS_MACRO_SETTINGS"]
+        macros: dict[str, Macro] = self.config["FABULOUS_MACROS_SETTINGS"]
+        tile_sizes: dict[str, tuple[Decimal, Decimal]] = self.config[
+            "FABULOUS_TILE_SIZES"
+        ]
 
         # Tile Placement
         tile_spacing: Decimal = self.config["FABULOUS_TILE_SPACING"]
@@ -259,30 +194,6 @@ class FABulousFabricStitchingFlow(Classic):
             "FABULOUS_HALO_SPACING"
         ]
         (halo_left, halo_bottom, _, _) = halo_spacing
-
-        tile_sizes = {}
-
-        # Get the tile sizes for each individual tile by reading from LEF files
-        for tile_name in fabric.tileDic:
-            if tile_name not in macros:
-                err(f"Could not find {tile_name} in macros")
-                continue
-
-            lef_path = Path(macros[tile_name].lef)
-
-            try:
-                tile_size = self._extract_size_from_lef(lef_path)
-                tile_sizes[tile_name] = tile_size
-                info(
-                    f"Extracted size for {tile_name}: "
-                    f"{tile_size.width} x {tile_size.height}"
-                )
-            except (FileNotFoundError, ValueError) as e:
-                err(f"Failed to extract size for {tile_name} from {lef_path}: {e}")
-                # Use a default size to prevent complete failure
-                tile_sizes[tile_name] = TileSize(Decimal(0), Decimal(0))
-
-        info(f"Tile sizes: {tile_sizes}")
 
         # Compute per-row and per-column sizes once, then derive DIE_AREA
         row_heights, column_widths = self._compute_row_and_column_sizes(
@@ -343,12 +254,12 @@ class FABulousFabricStitchingFlow(Classic):
                     if tile_name not in macros:
                         err(f"Could not find {tile_name} in macros")
 
-                    macros[tile_name].instances[f"{prefix}{tile_name}"] = MacroInstance(
+                    macros[tile_name].instances[f"{prefix}{tile_name}"] = Instance(
                         location=(
                             halo_left + cur_x,
                             halo_bottom + cur_y,
                         ),
-                        orientation="N",
+                        orientation=Orientation.N,
                     )
 
                 cur_x += column_widths[x]
@@ -360,15 +271,11 @@ class FABulousFabricStitchingFlow(Classic):
 
         info(f"Setting DIE_AREA to {self.config['DIE_AREA']}")
         info(f"Setting FP_SIZING to {self.config['FP_SIZING']}")
+        info(f"Macros: {macros}")
 
-        # Set MACROS
         self.config = self.config.copy(MACROS=macros)
 
         info(f"Setting MACROS to {self.config['MACROS']}")
-
-        info(f"Setting VERILOG_FILES to {self.config['VERILOG_FILES']}")
-
-        info(f"Complete configuration: {self.config}")
 
         (final_state, steps) = super().run(initial_state, **kwargs)
 

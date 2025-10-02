@@ -72,6 +72,11 @@
             setuptools = [ ]; wheel = [ ];
           };
         });
+        librelane = prev.librelane.overrideAttrs (old: {
+          nativeBuildInputs = (old.nativeBuildInputs or []) ++ final.resolveBuildSystem {
+            setuptools = [ ]; wheel = [ ];
+          };
+        });
       };
 
       editableOverlay = workspace.mkEditablePyprojectOverlay {
@@ -105,7 +110,15 @@
         let
           pkgs = nixpkgs.legacyPackages.${system};
           pythonSet = pythonSets.${system}.overrideScope editableOverlay;
+          
+          # Get librelane Python package from the flake
+          librelanePythonPkg = if librelane.packages ? ${system} && librelane.packages.${system} ? librelane
+                               then librelane.packages.${system}.librelane
+                               else null;
+          
+          # Create virtualenv with all deps except librelane (which we'll add separately)
           virtualenv = pythonSet.mkVirtualEnv "FABulous-env" workspace.deps.all;
+          
           baseShell = if librelane.devShells ? ${system} && librelane.devShells.${system} ? dev
                       then librelane.devShells.${system}.dev
                       else null;
@@ -139,10 +152,10 @@
               UV_NO_SYNC = "1";
               UV_PYTHON = pythonSet.python.interpreter;
               UV_PYTHON_DOWNLOADS = "never";
+              # Prevent Python from automatically adding ~/.local to sys.path
+              PYTHONNOUSERSITE = "1";
             };
             shellHook = ''
-              # Clear any pre-existing PYTHONPATH to avoid leaking host paths
-              unset PYTHONPATH
               export REPO_ROOT=$(git rev-parse --show-toplevel)
               ORIGINAL_PS1="$PS1"
               . ${virtualenv}/bin/activate
@@ -154,15 +167,40 @@
 
               # Ensure the repository root and the virtualenv site-packages are importable
               # for external embedded interpreters (e.g. OpenROAD) that may invoke Python
-              # without inheriting the activated environment. We append rather than prepend
-              # to keep venv site-packages resolution order intact when PYTHONPATH is picked up.
-              VENV_SITE=$(python -c 'import site,sys; print(site.getsitepackages()[0])' 2>/dev/null || true)
+              # without inheriting the activated environment. We prepend the venv site-packages
+              # and repo root to ensure they take precedence.
+              VENV_SITE=$(python -c 'import site; print(site.getsitepackages()[0])' 2>/dev/null || true)
+              
+              # Add librelane from the flake since uv2nix cannot build it from PyPI
+              LIBRELANE_SITE=""
+              ${lib.optionalString (librelanePythonPkg != null) ''
+                # Add librelane's site-packages to both NIX_PYTHONPATH and PYTHONPATH
+                LIBRELANE_SITE="${librelanePythonPkg}/${pythonSet.python.sitePackages}"
+                if [ -d "$LIBRELANE_SITE" ]; then
+                  # Add to NIX_PYTHONPATH for sitecustomize.py
+                  export NIX_PYTHONPATH="$LIBRELANE_SITE''${NIX_PYTHONPATH:+:$NIX_PYTHONPATH}"
+                fi
+              ''}
+              
+              # Build PYTHONPATH with librelane, virtualenv site-packages, and repo root
+              # OpenROAD's embedded Python needs librelane in PYTHONPATH, not just NIX_PYTHONPATH
               if [ -n "$VENV_SITE" ]; then
-                export PYTHONPATH="$REPO_ROOT:$VENV_SITE"
+                if [ -n "$LIBRELANE_SITE" ]; then
+                  export PYTHONPATH="$LIBRELANE_SITE:$VENV_SITE:$REPO_ROOT"
+                else
+                  export PYTHONPATH="$VENV_SITE:$REPO_ROOT"
+                fi
               else
-                export PYTHONPATH="$REPO_ROOT"
+                if [ -n "$LIBRELANE_SITE" ]; then
+                  export PYTHONPATH="$LIBRELANE_SITE:$REPO_ROOT"
+                else
+                  export PYTHONPATH="$REPO_ROOT"
+                fi
               fi
+              
               echo "[flake shell] PYTHONPATH set to: $PYTHONPATH" >&2
+              echo "[flake shell] Python executable: $(which python)" >&2
+              echo "[flake shell] Python version: $(python --version)" >&2
 
               # macOS-specific environment setup
               ${lib.optionalString pkgs.stdenv.isDarwin ''

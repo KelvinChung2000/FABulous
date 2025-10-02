@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 from librelane.config.variable import Variable
 from librelane.flows.classic import Classic, VHDLClassic
@@ -38,12 +38,6 @@ configs = Classic.config_vars + [
         "FABULOUS_TILE_DIR",
         Path,
         "Path to the tile directory where the CSV file is located.",
-    ),
-    Variable(
-        "FABULOUS_SUPERTILE",
-        Optional[bool],
-        "Is the tile a supertile?",
-        default=False,
     ),
 ]
 

@@ -1269,10 +1269,16 @@ class FABulous_CLI(Cmd):
         help="Name of the PDK",
         choices=["sky130A", "sky130B", "ihp-sg13g2"],
     )
+    gds_parser.add_argument(
+        "--no-opt",
+        help="Optimize the GDS layout",
+        default=True,
+        action="store_false",
+    )
 
     @with_category(CMD_FABRIC_FLOW)
     @with_argparser(tile_single_parser)
-    def do_gen_tile_gds(self, args: argparse.Namespace) -> None:
+    def do_gen_tile_macro(self, args: argparse.Namespace) -> None:
         """Generate GDSII files for a specific tile.
 
         This command generates GDSII files for the specified tile, allowing for
@@ -1288,34 +1294,63 @@ class FABulous_CLI(Cmd):
             logger.error("Tile name must be specified")
             return
 
-        pin_order_file = (
-            self.projectDir / "Tile" / args.tile / f"{args.tile}_io_pin_order.yaml"
-        )
-        if t := self.fabulousAPI.getTile(args.tile):
-            self.fabulousAPI.gen_io_pin_order_config(t, pin_order_file)
+        tile_dir = self.projectDir / "Tile" / args.tile
+        pin_order_file = tile_dir / f"{args.tile}_io_pin_order.yaml"
 
-        self.fabulousAPI.genTileMarco(
-            self.projectDir / "Tile" / args.tile,
+        if not tile_dir.exists():
+            logger.error(f"Tile directory {tile_dir} does not exist")
+            return
+
+        if tile := self.fabulousAPI.getTile(args.tile):
+            self.fabulousAPI.gen_io_pin_order_config(tile, pin_order_file)
+        else:
+            super_tile = self.fabulousAPI.getSuperTile(args.tile)
+            if super_tile is None:
+                logger.error(f"Tile {args.tile} not found in fabric definition")
+                return
+            self.fabulousAPI.gen_io_pin_order_config(super_tile, pin_order_file)
+
+        self.fabulousAPI.genTileMacro(
+            tile_dir,
             pin_order_file,
-            self.projectDir / "Tile" / args.tile / "macro",
+            tile_dir / "macro",
             base_config_path=self.projectDir
             / "Tile"
             / "include"
             / "base_tile_gds_config.yaml",
+            optimisation=False,
         )
 
     @with_category(CMD_FABRIC_FLOW)
-    def do_gen_all_tile_gds(self, *_args: str) -> None:
+    def do_gen_all_tile_macros(self, *_args: str) -> None:
         """Generate GDSII files for all tiles in the fabric."""
         for i in self.allTile:
             logger.info(f"Generating GDS for tile {i}")
-            self.onecmd_plus_hooks(f"gen_tile_gds {i}")
+            self.onecmd_plus_hooks(f"gen_tile_macro {i}")
 
     @with_category(CMD_FABRIC_FLOW)
-    def do_gen_fabric_gds(self) -> None:
+    def do_gen_fabric_macro(self, *_args: str) -> None:
         """Generate GDSII files for the entire fabric."""
+        tile_macro_root = self.projectDir / "Tile"
+        tile_macro_paths: dict[str, Path] = {}
+
+        for tile_dir in tile_macro_root.iterdir():
+            if not tile_dir.is_dir():
+                continue
+            macro_dir = tile_dir / "macro" / "final_views"
+            if macro_dir.exists():
+                tile_macro_paths[tile_dir.name] = macro_dir
+
+        if not tile_macro_paths:
+            logger.error(
+                "No tile macro directories found. Generate tile GDS results first."
+            )
+            return
+
+        (self.projectDir / "gds").mkdir(exist_ok=True)
+        (self.projectDir / "Fabric" / "macro").mkdir(exist_ok=True)
         self.fabulousAPI.fabric_stitching(
-            self.projectDir / "Tile",
-            self.projectDir / "Fabric",
-            self.projectDir / "gds",
+            tile_macro_paths,
+            self.projectDir / "Fabric" / f"{self.fabulousAPI.fabric.name}.v",
+            self.projectDir / "Fabric" / "macro",
         )

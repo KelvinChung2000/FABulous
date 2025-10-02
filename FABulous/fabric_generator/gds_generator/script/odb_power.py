@@ -47,8 +47,6 @@ def power(
     vgnd_net = reader.block.findNet("VGND")
 
     # Create wires
-    # vpwr_wire = vpwr_net.getSWires()[0]
-    # vgnd_wire = vgnd_net.getSWires()[0]
     vpwr_wire = odb.dbSWire.create(vpwr_net, "ROUTED")
     vgnd_wire = odb.dbSWire.create(vgnd_net, "ROUTED")
 

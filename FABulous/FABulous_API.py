@@ -9,17 +9,21 @@ import json
 from collections.abc import Iterable
 from decimal import Decimal
 from pathlib import Path
+from typing import cast
 
 import yaml
+from librelane.config.variable import Macro
 from loguru import logger
 
 import FABulous.fabric_cad.gen_npnr_model as model_gen_npnr
 import FABulous.fabric_generator.parser.parse_csv as fileParser
 from FABulous.fabric_cad.gen_bitstream_spec import generateBitstreamSpec
 from FABulous.fabric_cad.gen_design_top_wrapper import generateUserDesignTopWrapper
+from FABulous.fabric_cad.gen_io_pin_config_yaml import generate_IO_pin_order_config
 
 # Importing Modules from FABulous Framework.
 from FABulous.fabric_definition.Bel import Bel
+from FABulous.fabric_definition.define import TileSize
 from FABulous.fabric_definition.Fabric import Fabric
 from FABulous.fabric_definition.SuperTile import SuperTile
 from FABulous.fabric_definition.Tile import Tile
@@ -27,11 +31,12 @@ from FABulous.fabric_generator.code_generator import CodeGenerator
 from FABulous.fabric_generator.code_generator.code_generator_VHDL import (
     VHDLCodeGenerator,
 )
-from FABulous.fabric_generator.gds_generator.flows.fabric_stitching_flow import (
-    MacroSettings,
+from FABulous.fabric_generator.gds_generator.flows.fabric_macro_flow import (
+    FABulousFabricMacroFlow,
 )
-from FABulous.fabric_generator.gds_generator.flows.tile_marco_flow import (
+from FABulous.fabric_generator.gds_generator.flows.tile_macro_flow import (
     FABulousTileVerilogMarcoFlow,
+    FABulousTileVerilogMarcoFlowClassic,
 )
 from FABulous.fabric_generator.gen_fabric.fabric_automation import genIOBel
 from FABulous.fabric_generator.gen_fabric.gen_configmem import generateConfigMem
@@ -299,7 +304,7 @@ class FABulous_API:
         """
         return self.fabric.getAllUniqueBels()
 
-    def getTile(self, tileName: str) -> Tile | None:
+    def getTile(self, tileName: str, raises_on_miss: bool = False) -> Tile | None:
         """Return Tile object based on tile name.
 
         Parameters
@@ -312,7 +317,12 @@ class FABulous_API:
         Tile | None
             Tile object based on tile name, or None if not found.
         """
-        return self.fabric.getTileByName(tileName)
+        try:
+            return self.fabric.getTileByName(tileName)
+        except KeyError as e:
+            if raises_on_miss:
+                raise KeyError from e
+            return None
 
     def getTiles(self) -> Iterable[Tile]:
         """Return all Tiles within a fabric.
@@ -324,7 +334,9 @@ class FABulous_API:
         """
         return self.fabric.tileDic.values()
 
-    def getSuperTile(self, tileName: str) -> SuperTile | None:
+    def getSuperTile(
+        self, tileName: str, raises_on_miss: bool = False
+    ) -> SuperTile | None:
         """Return SuperTile object based on tile name.
 
         Parameters
@@ -337,7 +349,12 @@ class FABulous_API:
         SuperTile | None
             SuperTile object based on tile name, or None if not found.
         """
-        return self.fabric.getSuperTileByName(tileName)
+        try:
+            return self.fabric.getSuperTileByName(tileName)
+        except KeyError as e:
+            if raises_on_miss:
+                raise KeyError from e
+            return None
 
     def getSuperTiles(self) -> Iterable[SuperTile]:
         """Return all SuperTiles within a fabric.
@@ -436,24 +453,26 @@ class FABulous_API:
                 logger.info(f"Generating IO BELs for tile {tile.name}")
                 self.genIOBelForTile(tile.name)
 
-    def gen_io_pin_order_config(self, tile: Tile, outfile: Path) -> None:
-        """Generate IO pin order configuration YAML for a tile.
+    def gen_io_pin_order_config(self, tile: Tile | SuperTile, outfile: Path) -> None:
+        """Generate IO pin order configuration YAML for a tile or super tile.
 
         Parameters
         ----------
-        tile : Tile
-            The tile for which to generate the configuration.
+        tile : Tile | SuperTile
+            The fabric element for which to generate the configuration.
         outfile : Path
             Output YAML path.
         """
-        tile.generateIOPinOrderConfig(outfile)
+        generate_IO_pin_order_config(tile, outfile)
 
-    def genTileMarco(
+    def genTileMacro(
         self,
         tile_dir: Path,
         io_pin_config: Path,
         out_folder: Path,
         *,
+        final_view: Path | None = None,
+        optimisation: bool = True,
         base_config_path: Path | None = None,
         tile_config_override: dict | None = None,
         pdk_root: Path | None = None,
@@ -478,7 +497,9 @@ class FABulous_API:
         logger.info(f"PDK root: {pdk_root}")
         logger.info(f"PDK: {pdk}")
         logger.info(f"Output folder: {out_folder.resolve()}")
-        final_config_args = {}
+        final_config_args: dict = {
+            "DIE_AREA": [0, 0, 250, 250],
+        }
         if base_config_path:
             final_config_args.update(
                 yaml.safe_load(base_config_path.read_text(encoding="utf-8"))
@@ -497,27 +518,43 @@ class FABulous_API:
         final_config_args["IO_PIN_ORDER_CFG"] = str(io_pin_config)
         final_config_args["FABULOUS_TILE_DIR"] = str(tile_dir)
         final_config_args["VERILOG_FILES"] = file_list
-        flow = FABulousTileVerilogMarcoFlow(
-            final_config_args,
-            name=tile_dir.name,
-            design_dir=str(out_folder.resolve()),
-            pdk=pdk,
-            pdk_root=str((pdk_root).resolve().parent),
-        )
+        if optimisation:
+            flow = FABulousTileVerilogMarcoFlow(
+                final_config_args,
+                name=tile_dir.name,
+                design_dir=str(out_folder.resolve()),
+                pdk=pdk,
+                pdk_root=str((pdk_root).resolve().parent),
+            )
+        else:
+            flow = FABulousTileVerilogMarcoFlowClassic(
+                final_config_args,
+                name=tile_dir.name,
+                design_dir=str(out_folder.resolve()),
+                pdk=pdk,
+                pdk_root=str((pdk_root).resolve().parent),
+            )
         result = flow.start()
-        logger.info(f"Saving final views for FABulous to {out_folder / 'final_views'}")
-        result.save_snapshot(out_folder / "final_views")
+        if final_view:
+            logger.info(f"Saving final view to {final_view}")
+            result.save_snapshot(final_view)
+        else:
+            logger.info(
+                f"Saving final views for FABulous to {out_folder / 'final_views'}"
+            )
+            result.save_snapshot(out_folder / "final_views")
         logger.info("Marco flow completed.")
 
-    def genFabricGDS(
+    def fabric_stitching(
         self,
         tile_marco_paths: dict[str, Path],
-        fabric_misc: Path,
+        fabric_path: Path,
         out_folder: Path,
         *,
         pdk_root: Path | None = None,
         pdk: str | None = None,
     ) -> None:
+        """Run the stitching flow to assemble tile macros into a fabric-level GDS."""
         if pdk_root is None:
             pdk_root = get_context().pdk_root
             if pdk_root is None:
@@ -529,12 +566,9 @@ class FABulous_API:
             if pdk is None:
                 raise ValueError("PDK must be specified either here or in settings.")
 
-        file_list = [str(fabric_misc / f) for f in fabric_misc.glob("*.v")]
-        if f := get_context().model_pack:
-            file_list.append(str(f.resolve()))
-
-        macros: dict[str, MacroSettings] = {}
-
+        file_list = [str(fabric_path)]
+        macros: dict[str, Macro] = {}
+        tile_sizes: dict[str, TileSize] = {}
         for name, tile_marco_path in tile_marco_paths.items():
             die_area = json.loads(
                 (tile_marco_path / "metrics.json").read_text(encoding="utf-8")
@@ -542,39 +576,86 @@ class FABulous_API:
 
             if die_area is None:
                 raise ValueError(f"metrics.json for {name} missing die bbox")
-            _, _, width, height = [Decimal(m) for m in die_area.split(",")]
+            _, _, width, height = [Decimal(m) for m in die_area.split(" ")]
 
             spef_dict = {}
             for i in (tile_marco_path / "spef").iterdir():
                 spef_dict[str(i.name)] = list(i.glob("*.spef"))
 
-            macros[name] = MacroSettings(
-                size=(width, height),
-                gds=str(tile_marco_path / f"{name}.gds"),
-                lef=str(tile_marco_path / f"{name}.lef"),
-                nl=str(tile_marco_path / f"{name}.nl"),
+            macros[name] = Macro(
+                gds=cast("list", [i for i in (tile_marco_path / "gds").glob("*.gds")]),
+                lef=cast(
+                    "list",
+                    [str(i) for i in (tile_marco_path / "lef").glob("*.lef")],
+                ),
+                # vh=cast(
+                #     "list", [str(i) for i in (tile_marco_path / "vh").glob("*.vh")]
+                # ),
+                nl=cast(
+                    "list", [str(i) for i in (tile_marco_path / "nl").glob("*.nl.v")]
+                ),
+                # pnl=cast(
+                #     "list",
+                #     [str(i) for i in (tile_marco_path / "pnl").glob("*.pnl.v")],
+                # ),
                 spef=spef_dict,
             )
 
-        # logger.info(f"PDK root: {pdk_root}")
-        # logger.info(f"PDK: {pdk}")
-        # logger.info(f"Output folder: {out_folder.resolve()}")
-        # flow = FABulousFabricGDS(
-        #     {
-        #         "DESIGN_NAME": self.fabric.name,
-        #         "VERILOG_FILES": file_list,
-        #         "DIE_AREA": get_context().die_area,
-        #         "FP_IO_HLAYER": get_context().fp_io_hlayer,
-        #         "FP_IO_VLAYER": get_context().fp_io_vlayer,
-        #         "FABULOUS_MACROS_SETTINGS": macros,
-        #         "FABULOUS_TILE_SPACING": 1.0,
-        #     },
-        #     name=self.fabric.name,
-        #     design_dir=str(out_folder.resolve()),
-        #     pdk=pdk,
-        #     pdk_root=str((pdk_root).resolve().parent),
-        # )
-        # result = flow.start()
-        # logger.info(f"Saving final views for FABulous to {out_folder / 'final_views'}")
-        # result.save_snapshot(out_folder / "final_views")
-        # logger.info("Stitching flow completed.")
+            tile_sizes[name] = TileSize(width=width, height=height)
+
+        logger.info(f"PDK root: {pdk_root}")
+        logger.info(f"PDK: {pdk}")
+        logger.info(f"Output folder: {out_folder.resolve()}")
+        final_config_args = {}
+        final_config_args["DESIGN_NAME"] = self.fabric.name
+        final_config_args["FABULOUS_FABRIC"] = self.fabric
+        final_config_args["VERILOG_FILES"] = file_list
+        final_config_args["FABULOUS_MACROS_SETTINGS"] = macros
+        final_config_args["FABULOUS_TILE_SIZES"] = tile_sizes
+        final_config_args["FABULOUS_TILE_SPACING"] = 0
+
+        final_config_args["RUN_POST_GPL_DESIGN_REPAIR"] = False
+        final_config_args["RUN_POST_CTS_RESIZER_TIMING"] = False
+        final_config_args["DESIGN_REPAIR_BUFFER_INPUT_PORTS"] = False
+        final_config_args["PDN_ENABLE_RAILS"] = False
+        final_config_args["RUN_ANTENNA_REPAIR"] = False
+        final_config_args["RUN_FILL_INSERTION"] = False
+        final_config_args["RUN_TAP_ENDCAP_INSERTION"] = False
+        final_config_args["RUN_CTS"] = False
+        final_config_args["RUN_IRDROP_REPORT"] = False
+        final_config_args["ERROR_ON_SYNTH_CHECKS"] = False
+
+        final_config_args["FP_PDN_VWIDTH"] = 1.6
+        final_config_args["FP_PDN_VSPACING"] = 3.7
+        final_config_args["FP_PDN_VPITCH"] = 30
+        final_config_args["FP_PDN_VOFFSET"] = 5
+
+        final_config_args["FP_PDN_HWIDTH"] = 1.6
+        final_config_args["FP_PDN_HSPACING"] = 3.7
+        final_config_args["FP_PDN_HPITCH"] = 30
+        final_config_args["FP_PDN_HOFFSET"] = 5
+
+        final_config_args["VDD_PIN"] = "VPWR"
+        final_config_args["GND_PIN"] = "VGND"
+
+        final_config_args["FP_PDN_VERTICAL_LAYER"] = "met4"
+        final_config_args["FP_PDN_HORIZONTAL_LAYER"] = "met5"
+
+        final_config_args["RT_CLOCK_MAX_LAYER"] = "met4"
+        final_config_args["RT_MAX_LAYER"] = "met4"
+        final_config_args["DRT_MAX_LAYER"] = "met4"
+
+        final_config_args["GRT_ALLOW_CONGESTION"] = True
+        final_config_args["MAGIC_NO_EXT_UNIQUE"] = True
+
+        flow = FABulousFabricMacroFlow(
+            final_config_args,
+            name=self.fabric.name,
+            design_dir=str(out_folder.resolve()),
+            pdk=pdk,
+            pdk_root=str((pdk_root).resolve().parent),
+        )
+        result = flow.start()
+        logger.info(f"Saving final views for FABulous to {out_folder / 'final_views'}")
+        result.save_snapshot(out_folder / "final_views")
+        logger.info("Stitching flow completed.")

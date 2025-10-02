@@ -1,12 +1,12 @@
+"""Custom IO placement step for FABulous tiles."""
+
 from decimal import Decimal
 from importlib import resources
 from typing import Literal, Optional
 
 from librelane.common.types import Path
 from librelane.config.variable import Variable
-from librelane.logging.logger import (
-    info,
-)
+from librelane.logging.logger import info
 from librelane.state.state import State
 from librelane.steps.common_variables import (
     io_layer_variables,

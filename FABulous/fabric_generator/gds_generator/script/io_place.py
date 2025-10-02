@@ -414,10 +414,9 @@ class PinPlacementPlan:
                 if neighbor_exists:
                     if segments:
                         raise ValueError(
-                            "Tile X"
-                            f"{x}Y{y} side {side.value} is not on the boundary; "
+                            f"Tile X{x}Y{y} side {side.value} is not on the boundary; "
                             "remove its configuration."
-                        )  # Raise ValueError if tile is not on boundary
+                        )
                     continue
 
                 if segments:
@@ -442,7 +441,8 @@ class PinPlacementPlan:
         """Allocate raw track coordinates for every segment on each side."""
         for side, segments in self.segments_by_side.items():
             if side not in specs:
-                raise KeyError(f"Missing track specification for side {side.value}")
+                # Skip sides that don't have track specifications
+                continue
             count_total, step, origin = specs[side]
             self.track_coordinates[side] = self._build_tracks_for_segments(
                 count_total, step, origin, segments
@@ -757,6 +757,15 @@ def io_place(
 
     origin_h, count_h, h_step = reader.block.findTrackGrid(h_layer).getGridPatternY(0)
     origin_v, count_v, v_step = reader.block.findTrackGrid(v_layer).getGridPatternX(0)
+
+    # Allocate tracks for all segments on each side
+    track_specs = {
+        Side.NORTH: (count_v, v_step, origin_v),
+        Side.SOUTH: (count_v, v_step, origin_v),
+        Side.EAST: (count_h, h_step, origin_h),
+        Side.WEST: (count_h, h_step, origin_h),
+    }
+    plan.allocate_tracks(track_specs)
 
     step_by_side = {
         Side.EAST: h_step,

@@ -184,6 +184,9 @@ class SegmentInfo:
     max_distance: float | None
     reverse_result: bool
     pin_entries: list
+    tile_index: int | None = None  # Enumerated index within this side
+    tile_x: int | None = None  # Actual X coordinate of the tile
+    tile_y: int | None = None  # Actual Y coordinate of the tile
 
     @classmethod
     def from_config(
@@ -193,6 +196,9 @@ class SegmentInfo:
         bterms: list,
         regex_by_bterm: dict,
         unmatched_regexes: set[str],
+        tile_index: int | None = None,
+        tile_x: int | None = None,
+        tile_y: int | None = None,
     ) -> "SegmentInfo":
         """Build a fully populated segment from a raw YAML entry."""
         sort_mode_str = segment.get("sort_mode", "bus_major")
@@ -234,6 +240,9 @@ class SegmentInfo:
             max_distance=segment.get("max_distance"),
             reverse_result=segment.get("reverse_result", False),
             pin_entries=entries,
+            tile_index=tile_index,
+            tile_x=tile_x,
+            tile_y=tile_y,
         )
 
     @property
@@ -278,6 +287,8 @@ class PinPlacementPlan:
         "unmatched_design_pin_names",
         "critical_errors_found",
         "track_coordinates",
+        "tile_counts_by_side",
+        "fabric_dimensions",
     )
 
     def __init__(
@@ -296,16 +307,25 @@ class PinPlacementPlan:
         self.track_coordinates: dict[Side, list[list[float]]] = {
             side: [] for side in Side
         }
+        self.tile_counts_by_side: dict[Side, int] = {side: 0 for side in Side}
+        self.fabric_dimensions: tuple[int, int] = (1, 1)  # (width, height)
 
-        normalized_config = self._normalize_config(config_data)
-        for side, segments in normalized_config.items():
-            for segment in segments:
+        normalized_config, tile_counts, fabric_dims = self._normalize_config(
+            config_data
+        )
+        self.tile_counts_by_side = tile_counts
+        self.fabric_dimensions = fabric_dims
+        for side, segment_list in normalized_config.items():
+            for segment_data in segment_list:
                 seg_info = SegmentInfo.from_config(
                     side,
-                    segment,
+                    segment_data["segment"],
                     bterms,
                     self.regex_by_bterm,
                     self.unmatched_config_patterns,
+                    tile_index=segment_data.get("tile_index"),
+                    tile_x=segment_data.get("tile_x"),
+                    tile_y=segment_data.get("tile_y"),
                 )
                 self.segments_by_side[side].append(seg_info)
 
@@ -341,34 +361,29 @@ class PinPlacementPlan:
             raise SystemExit(os.EX_DATAERR)
 
     @staticmethod
-    def _normalize_config(config_data: dict) -> dict[Side, list[dict]]:
-        """Return a side-indexed segment list regardless of config style."""
-        if not config_data:
-            return {side: [] for side in Side}  # Return empty list for each side
+    def _normalize_config(
+        config_data: dict,
+    ) -> tuple[dict[Side, list[dict]], dict[Side, int], tuple[int, int]]:
+        """Return side-indexed segment list, tile counts, and fabric dimensions.
 
-        side_keys = {side.value for side in Side}
-        if all(key in side_keys for key in config_data):
-            normalized: dict[Side, list[dict]] = {side: [] for side in Side}
-            for key, segments in config_data.items():
-                if segments is None:
-                    continue
-                if not isinstance(segments, list):
-                    raise TypeError(
-                        "Config for side "
-                        f"{key} must be a list of segments, got "
-                        f"{type(segments).__name__}"
-                    )  # Raise TypeError if segments are not a list
-                normalized[Side(key)] = segments
-            return normalized
+        Returns
+        -------
+        tuple
+            - config_by_side: Segments organized by side
+            - tile_counts: Number of tiles per side
+            - fabric_dims: (max_x + 1, max_y + 1) fabric dimensions in tiles
+        """
+        tile_counts = {side: 0 for side in Side}
+
+        if not config_data:
+            # Return empty list for each side
+            return {side: [] for side in Side}, tile_counts, (1, 1)
 
         tile_pattern = re.compile(r"^X(?P<x>\d+)Y(?P<y>\d+)$")
-        if not all(tile_pattern.match(key) for key in config_data):
-            raise ValueError(
-                "Configuration keys must either be sides (N/E/S/W) or tile "
-                "coordinates X#Y#"
-            )  # Raise ValueError if keys are invalid
 
         tiles: dict[tuple[int, int], dict] = {}
+        max_x = 0
+        max_y = 0
         for key, entry in config_data.items():
             match = tile_pattern.match(key)
             assert match is not None  # validated above
@@ -378,7 +393,15 @@ class PinPlacementPlan:
                     "Configuration for tile "
                     f"{key} must be a mapping of sides to segments"
                 )
-            tiles[(int(match.group("x")), int(match.group("y")))] = tile_config
+            x = int(match.group("x"))
+            y = int(match.group("y"))
+            max_x = max(max_x, x)
+            max_y = max(max_y, y)
+            tiles[(x, y)] = tile_config
+
+        # Fabric dimensions: max coordinate + 1
+        fabric_width = max_x + 1
+        fabric_height = max_y + 1
 
         neighbor_offsets = {
             Side.NORTH: (0, -1),
@@ -429,43 +452,164 @@ class PinPlacementPlan:
                 entries.sort(key=lambda item: item[0])  # sort by x coordinate
             else:
                 entries.sort(key=lambda item: item[1])  # sort by y coordinate
-            for _, _, segments in entries:
-                config_by_side[side].extend(segments)
 
-        return config_by_side
+            tile_counts[side] = len(entries)
+
+            for tile_idx, (x, y, segments) in enumerate(entries):
+                for segment in segments:
+                    config_by_side[side].append(
+                        {
+                            "segment": segment,
+                            "tile_index": tile_idx,
+                            "tile_x": x,
+                            "tile_y": y,
+                        }
+                    )
+
+        return config_by_side, tile_counts, (fabric_width, fabric_height)
 
     def allocate_tracks(
         self,
-        specs: dict[Side, tuple[int, float, float]],
+        specs: dict[Side, tuple[int, float, float, float]],
     ) -> None:
         """Allocate raw track coordinates for every segment on each side."""
         for side, segments in self.segments_by_side.items():
             if side not in specs:
                 # Skip sides that don't have track specifications
                 continue
-            count_total, step, origin = specs[side]
+            count_total, step, origin, physical_dimension = specs[side]
             self.track_coordinates[side] = self._build_tracks_for_segments(
-                count_total, step, origin, segments
+                count_total, step, origin, physical_dimension, segments, side
             )
 
-    @staticmethod
     def _build_tracks_for_segments(
+        self,
         count_total: int,
         step: float,
         origin: float,
+        physical_dimension: float,
         segments_for_side: list[SegmentInfo],
+        side: Side,
     ) -> list[list[float]]:
+        """Build track lists for segments using physical tile-based allocation.
+
+        Matches the original librelane approach: uses DIE_AREA physical dimensions
+        to compute tile offsets, ensuring tiles align based on actual physical size.
+
+        Each tile gets tracks proportional to its position in the physical die area.
+        """
+        if not segments_for_side:
+            return []
+
+        # Get fabric dimensions to calculate per-tile allocation
+        fabric_width, fabric_height = self.fabric_dimensions
+
+        # For North/South sides, width determines horizontal divisions
+        # For East/West sides, height determines vertical divisions
+        num_divisions = (
+            fabric_width if side in (Side.NORTH, Side.SOUTH) else fabric_height
+        )
+        if num_divisions <= 0:
+            return []
+
+        # Check if tracks can be evenly divided (librelane requirement)
+        if count_total % num_divisions != 0:
+            warn(
+                f"Track count {count_total} not evenly divisible by "
+                f"{num_divisions} tiles on {side.value} side. "
+                f"This may cause alignment issues."
+            )
+
+        # Each tile gets equal track count
+        tracks_per_tile = count_total // num_divisions
+
+        # Group segments by their tile position
+        segments_by_tile = self._group_segments_by_tile(segments_for_side)
+
+        # Allocate tracks for each tile in order
         tracks_container: list[list[float]] = []
-        num_segments = len(segments_for_side)
+        for tile_idx in sorted(segments_by_tile.keys()):
+            tile_x, tile_y, tile_segments = segments_by_tile[tile_idx]
+
+            division_index = self._get_division_index(
+                side, tile_x, tile_y, tile_idx, num_divisions
+            )
+
+            # Calculate offset based on PHYSICAL position (librelane approach)
+            # Proportional positioning in the die area
+            physical_offset = int(physical_dimension * division_index / num_divisions)
+            tile_origin = origin + physical_offset
+
+            tile_tracks = self._allocate_tracks_for_tile(
+                tracks_per_tile, step, tile_origin, tile_segments
+            )
+            tracks_container.extend(tile_tracks)
+
+        return tracks_container
+
+    @staticmethod
+    def _group_segments_by_tile(
+        segments: list[SegmentInfo],
+    ) -> dict[int, tuple[int | None, int | None, list[SegmentInfo]]]:
+        """Group segments by their tile index.
+
+        Returns
+        -------
+        dict[int, tuple[int | None, int | None, list[SegmentInfo]]]
+            Maps tile_index -> (tile_x, tile_y, [segments])
+        """
+        segments_by_tile: dict[
+            int, tuple[int | None, int | None, list[SegmentInfo]]
+        ] = {}
+
+        for segment in segments:
+            tile_idx = segment.tile_index if segment.tile_index is not None else 0
+            if tile_idx not in segments_by_tile:
+                segments_by_tile[tile_idx] = (segment.tile_x, segment.tile_y, [])
+            segments_by_tile[tile_idx][2].append(segment)
+
+        return segments_by_tile
+
+    @staticmethod
+    def _get_division_index(
+        side: Side,
+        tile_x: int | None,
+        tile_y: int | None,
+        tile_idx: int,
+        num_divisions: int,
+    ) -> int:
+        """Determine which division (tile position) a tile belongs to.
+
+        For N/S sides, use X coordinate; for E/W sides, use Y coordinate.
+        Falls back to tile_idx if coordinates are unavailable.
+        Clamps to valid range [0, num_divisions).
+        """
+        # Select coordinate based on side orientation
+        position_coord = tile_x if side in (Side.NORTH, Side.SOUTH) else tile_y
+        division_index = position_coord if position_coord is not None else tile_idx
+
+        # Clamp to valid range
+        return max(0, min(division_index, num_divisions - 1))
+
+    @staticmethod
+    def _allocate_tracks_for_tile(
+        track_count: int,
+        step: float,
+        origin: float,
+        segments: list[SegmentInfo],
+    ) -> list[list[float]]:
+        """Allocate tracks within a single tile for its segments."""
+        tracks_container: list[list[float]] = []
+        num_segments = len(segments)
         if num_segments == 0:
             return tracks_container
 
-        counts = [segment.actual_pin_count for segment in segments_for_side]
+        counts = [segment.actual_pin_count for segment in segments]
         total = sum(counts)
 
         if total == 0:
-            base = count_total // num_segments if num_segments else 0
-            remainder = count_total - base * num_segments
+            base = track_count // num_segments if num_segments else 0
+            remainder = track_count - base * num_segments
             slices = []
             start = 0
             for idx in range(num_segments):
@@ -473,9 +617,9 @@ class PinPlacementPlan:
                 slices.append((start, size))
                 start += size
         else:
-            fractional = [c / total * count_total for c in counts]
+            fractional = [c / total * track_count for c in counts]
             sizes = [max(1, int(round(fraction))) for fraction in fractional]
-            delta = count_total - sum(sizes)
+            delta = track_count - sum(sizes)
 
             while delta > 0:
                 for idx in range(num_segments):
@@ -500,6 +644,7 @@ class PinPlacementPlan:
         for start_idx, size in slices:
             start_coord = origin + start_idx * step
             tracks_container.append(grid_to_tracks(start_coord, size, step))
+
         return tracks_container
 
     def tracks_for_segment(self, side: Side, index: int) -> list[float]:
@@ -564,6 +709,7 @@ class PinPlacementPlan:
 
     def _create_empty_segment(self, side: Side) -> SegmentInfo:
         """Create a placeholder segment for unmatched pins on the given side."""
+        # Use tile_index=0 for single-tile fallback
         segment = SegmentInfo(
             side=side,
             sort_mode=PinSortMode.BUS_MAJOR,
@@ -571,8 +717,12 @@ class PinPlacementPlan:
             max_distance=None,
             reverse_result=False,
             pin_entries=[],
+            tile_index=0,
         )
         self.segments_by_side[side].append(segment)
+        # Ensure this side has at least 1 tile count
+        if self.tile_counts_by_side[side] == 0:
+            self.tile_counts_by_side[side] = 1
         return segment
 
 
@@ -662,16 +812,19 @@ def io_place(
     verbose: bool,
 ) -> None:
     """
-    Places the IOs in an input def with an optional config file that supports regexes.
+    Places the IOs in an input def with a config file using tile-based format.
 
-    Config format:
-    #N|#S|#E|#W
-    pin1_regex (low co-ordinates to high co-ordinates; e.g., bottom to top and
-    left to right)
-    pin2_regex
-    ...
+    Config format (YAML):
+    X0Y0:
+      N: [pin1_regex, pin2_regex, ...]
+      E: [pin3_regex, ...]
+      S: [...]
+      W: [...]
+    X1Y0:
+      N: [...]
+      ...
 
-    #S|#N|#E|#W
+    Pins are placed from low to high coordinates (bottom to top, left to right).
     """
     if verbose:
         logging.getLogger().setLevel(logging.DEBUG)
@@ -748,6 +901,10 @@ def io_place(
     BLOCK_UR_X = DIE_AREA.xMax()
     BLOCK_UR_Y = DIE_AREA.yMax()
 
+    # Physical dimensions for proportional track allocation
+    die_width = BLOCK_UR_X - BLOCK_LL_X
+    die_height = BLOCK_UR_Y - BLOCK_LL_Y
+
     origin_h: float
     count_h: int
     h_step: float
@@ -760,10 +917,10 @@ def io_place(
 
     # Allocate tracks for all segments on each side
     track_specs = {
-        Side.NORTH: (count_v, v_step, origin_v),
-        Side.SOUTH: (count_v, v_step, origin_v),
-        Side.EAST: (count_h, h_step, origin_h),
-        Side.WEST: (count_h, h_step, origin_h),
+        Side.NORTH: (count_v, v_step, origin_v, die_width),
+        Side.SOUTH: (count_v, v_step, origin_v, die_width),
+        Side.EAST: (count_h, h_step, origin_h, die_height),
+        Side.WEST: (count_h, h_step, origin_h, die_height),
     }
     plan.allocate_tracks(track_specs)
 

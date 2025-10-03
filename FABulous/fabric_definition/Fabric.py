@@ -12,6 +12,7 @@ from FABulous.fabric_definition.define import (
     ConfigBitMode,
     Direction,
     MultiplexerStyle,
+    Side,
 )
 from FABulous.fabric_definition.SuperTile import SuperTile
 from FABulous.fabric_definition.Tile import Tile
@@ -374,3 +375,77 @@ class Fabric:
             return []
 
         return self.tile[y][x].bels
+
+    def find_tile_positions(
+        self, tile: Tile | SuperTile
+    ) -> list[tuple[int, int]] | None:
+        """Find all positions where a tile or supertile appears in the fabric grid.
+
+        Parameters
+        ----------
+        tile : Tile | SuperTile
+            The tile or supertile to search for
+
+        Returns
+        -------
+        list[tuple[int, int]] | None
+            List of (x, y) positions where the tile/supertile appears,
+            or None if not found
+        """
+        positions = []
+        if isinstance(tile, SuperTile):
+            # For SuperTiles, find where they appear
+            for y, row in enumerate(self.tile):
+                for x, fabric_tile in enumerate(row):
+                    if fabric_tile is None:
+                        continue
+                    # Check if this fabric tile belongs to the supertile
+                    for st in self.superTileDic.values():
+                        if st == tile:
+                            # Check if fabric_tile is part of this supertile
+                            for st_row in st.tileMap:
+                                for st_tile in st_row:
+                                    if st_tile and st_tile.name == fabric_tile.name:
+                                        positions.append((x, y))
+        else:
+            # For regular Tiles, find where they appear
+            for y, row in enumerate(self.tile):
+                for x, fabric_tile in enumerate(row):
+                    if fabric_tile and fabric_tile.name == tile.name:
+                        positions.append((x, y))
+
+        return positions if positions else None
+
+    def determine_border_side(self, x: int, y: int) -> Side | None:
+        """Determine which border side a tile position is on, if any.
+
+        Parameters
+        ----------
+        x : int
+            X coordinate in the fabric grid
+        y : int
+            Y coordinate in the fabric grid
+
+        Returns
+        -------
+        Side | None
+            The border side (NORTH, SOUTH, EAST, or WEST) if the position is on
+            a border, None otherwise. If on a corner, returns the vertical side
+            (NORTH or SOUTH) as priority.
+        """
+        is_north = y == 0
+        is_south = y == self.numberOfRows - 1
+        is_east = x == self.numberOfColumns - 1
+        is_west = x == 0
+
+        # Priority: corners get vertical sides (NORTH/SOUTH)
+        if is_north:
+            return Side.NORTH
+        if is_south:
+            return Side.SOUTH
+        if is_east:
+            return Side.EAST
+        if is_west:
+            return Side.WEST
+
+        return None

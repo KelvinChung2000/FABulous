@@ -165,6 +165,79 @@ class FABulousFabricMacroFlow(Classic):
 
         return fabric_width, fabric_height
 
+    def _validate_no_macro_overlaps(
+        self,
+        macros: dict[str, Macro],
+        tile_sizes: dict[str, tuple[Decimal, Decimal]],
+    ) -> bool:
+        """Validate that no macros overlap in their placed positions.
+
+        Parameters
+        ----------
+        macros : dict[str, Macro]
+            Dictionary mapping tile names to their macro configurations with instances.
+        tile_sizes : dict[str, tuple[Decimal, Decimal]]
+            Dictionary mapping tile names to their sizes (width, height).
+
+        Returns
+        -------
+        bool
+            True if no overlaps detected, False otherwise.
+
+        Raises
+        ------
+        ValueError
+            If overlapping macros are detected.
+        """
+        # Collect all placed rectangles: (x1, y1, x2, y2, instance_name, tile_name)
+        rectangles: list[tuple[Decimal, Decimal, Decimal, Decimal, str, str]] = []
+
+        for tile_name, macro in macros.items():
+            if tile_name not in tile_sizes:
+                err(f"Tile {tile_name} not found in tile_sizes")
+                continue
+
+            width, height = tile_sizes[tile_name]
+
+            for instance_name, instance in macro.instances.items():
+                if instance.location is None:
+                    err(f"Instance {instance_name} has no location set")
+                    continue
+
+                x1, y1 = instance.location
+                x2 = x1 + width
+                y2 = y1 + height
+                rectangles.append((x1, y1, x2, y2, instance_name, tile_name))
+
+        # Check for overlaps between all pairs of rectangles
+        overlaps_found = False
+        for i in range(len(rectangles)):
+            x1_a, y1_a, x2_a, y2_a, name_a, tile_a = rectangles[i]
+
+            for j in range(i + 1, len(rectangles)):
+                x1_b, y1_b, x2_b, y2_b, name_b, tile_b = rectangles[j]
+
+                # Check if rectangles overlap
+                # Two rectangles overlap if they intersect in both X and Y dimensions
+                x_overlap = not (x2_a <= x1_b or x2_b <= x1_a)
+                y_overlap = not (y2_a <= y1_b or y2_b <= y1_a)
+
+                if x_overlap and y_overlap:
+                    overlaps_found = True
+                    err(
+                        f"Macro overlap detected between:\n"
+                        f"  {name_a} ({tile_a}): ({x1_a}, {y1_a}) to ({x2_a}, {y2_a})\n"
+                        f"  {name_b} ({tile_b}): ({x1_b}, {y1_b}) to ({x2_b}, {y2_b})"
+                    )
+
+        if overlaps_found:
+            raise ValueError(
+                "Macro placement validation failed: overlapping macros detected"
+            )
+
+        info("Macro overlap validation passed: no overlaps detected")
+        return True
+
     def run(self, initial_state: State, **kwargs: dict) -> tuple[State, list[Step]]:
         """Execute the fabric stitching flow.
 
@@ -262,9 +335,15 @@ class FABulousFabricMacroFlow(Classic):
                         orientation=Orientation.N,
                     )
 
-                cur_x += column_widths[x]
+                # Add column width and spacing (spacing added for all columns)
+                cur_x += column_widths[x] + tile_spacing
 
-            cur_y += row_heights[flipped_y]
+            # Add row height and spacing (spacing added for all rows)
+            cur_y += row_heights[flipped_y] + tile_spacing
+
+        # Validate that no macros overlap before proceeding
+        info("Validating macro placements for overlaps...")
+        self._validate_no_macro_overlaps(macros, tile_sizes)
 
         # Set DIE_AREA and FP_SIZING
         self.config = self.config.copy(FP_SIZING="absolute")

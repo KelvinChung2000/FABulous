@@ -23,7 +23,7 @@ from FABulous.fabric_cad.gen_io_pin_config_yaml import generate_IO_pin_order_con
 
 # Importing Modules from FABulous Framework.
 from FABulous.fabric_definition.Bel import Bel
-from FABulous.fabric_definition.define import TileSize
+from FABulous.fabric_definition.define import Side, TileSize
 from FABulous.fabric_definition.Fabric import Fabric
 from FABulous.fabric_definition.SuperTile import SuperTile
 from FABulous.fabric_definition.Tile import Tile
@@ -463,7 +463,45 @@ class FABulous_API:
         outfile : Path
             Output YAML path.
         """
-        generate_IO_pin_order_config(tile, outfile)
+        # Determine which side(s) to place external ports based on fabric position
+        positions = self.fabric.find_tile_positions(tile)
+
+        if isinstance(tile, SuperTile):
+            # For SuperTiles, determine side for each internal tile coordinate
+            external_port_sides: dict[tuple[int, int], Side] = {}
+            if positions:
+                # Use the position of the supertile's top-left tile
+                # to determine base position
+                base_x, base_y = positions[0] if len(positions) == 1 else (0, 0)
+
+                for st_y, row in enumerate(tile.tileMap):
+                    for st_x, st_tile in enumerate(row):
+                        if st_tile is None:
+                            continue
+                        # Calculate fabric position of this tile within the supertile
+                        fabric_x = base_x + st_x
+                        fabric_y = base_y + st_y
+                        border_side = self.fabric.determine_border_side(
+                            fabric_x, fabric_y
+                        )
+                        if border_side:
+                            external_port_sides[(st_x, st_y)] = border_side
+
+            generate_IO_pin_order_config(
+                tile, outfile, external_port_sides=external_port_sides
+            )
+        else:
+            # For regular Tiles, determine a single side
+            external_port_side = Side.SOUTH  # default
+            if positions:
+                # Use the first position found (tiles typically appear once)
+                x, y = positions[0]
+                if border_side := self.fabric.determine_border_side(x, y):
+                    external_port_side = border_side
+
+            generate_IO_pin_order_config(
+                tile, outfile, external_port_side=external_port_side
+            )
 
     def genTileMacro(
         self,

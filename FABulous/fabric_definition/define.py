@@ -54,10 +54,10 @@ class Side(StrEnum):
     - ANY: Any side (no specific placement)
     """
 
-    NORTH = "NORTH"
-    SOUTH = "SOUTH"
-    EAST = "EAST"
-    WEST = "WEST"
+    NORTH = "N"
+    SOUTH = "S"
+    EAST = "E"
+    WEST = "W"
     ANY = "ANY"
 
 

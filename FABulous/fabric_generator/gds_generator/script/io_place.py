@@ -419,10 +419,8 @@ class PinPlacementPlan:
                 neighbor_exists = (x + dx, y + dy) in tiles
 
                 value = None
-                for alias in (side.value, side.value[0]):
-                    if alias in tile_config:
-                        value = tile_config[alias]
-                        break
+                if side.name in tile_config:
+                    value = tile_config[side.name]
 
                 if value is None:
                     segments = []

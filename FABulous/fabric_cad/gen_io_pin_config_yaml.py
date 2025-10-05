@@ -1,4 +1,4 @@
-"""Utilities for emitting I/O pin ordering configuration files."""
+"""Generate IO pin order configuration files for FABulous tiles and fabrics."""
 
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -7,6 +7,7 @@ from typing import Self
 import yaml
 
 from FABulous.fabric_definition.define import PinSortMode, Side
+from FABulous.fabric_definition.Fabric import Fabric
 from FABulous.fabric_definition.SuperTile import SuperTile
 from FABulous.fabric_definition.Tile import Tile
 
@@ -41,7 +42,7 @@ class PinOrderConfig:
 def _serialize_tile_ports(
     tile: Tile, prefix: str = "", external_port_side: Side = Side.SOUTH
 ) -> dict[str, list[dict]]:
-    # Use string keys for sides (Side.name) so YAML emits plain string keys
+    """Serialize a single tile's ports for IO pin placement."""
     port_dict = {
         Side.NORTH.name: [],
         Side.EAST.name: [],
@@ -87,7 +88,7 @@ def _serialize_tile_ports(
         PinOrderConfig()([rf"{prefix}FrameData\[\d+\]"]).to_dict()
     )
 
-    # Place BEL external ports on the specified side (string key)
+    # Place BEL external ports on the specified side
     for bel in tile.bels:
         pin_regexes = [
             f"{prefix}{name}" for name in bel.externalInput + bel.externalOutput
@@ -105,24 +106,7 @@ def _serialize_supertile_ports(
     prefix: str = "",
     external_port_sides: dict[tuple[int, int], Side] | None = None,
 ) -> dict[str, dict[str, list[dict]]]:
-    """Serialize SuperTile ports, processing only the perimeter (external) sides.
-
-    Parameters
-    ----------
-    super_tile : SuperTile
-        The SuperTile to serialize
-    prefix : str
-        Prefix to add to port names
-    external_port_sides : dict[tuple[int, int], Side] | None
-        Mapping from tile coordinates (x, y) to the side where external BEL ports
-        should be placed. If None or if a coordinate is not in the dict, defaults to
-        using the perimeter side(s) of that tile.
-
-    Returns
-    -------
-    dict[str, dict[str, list[dict]]]
-        Dictionary mapping coordinate keys "X#Y#" to side configuration dictionaries
-    """
+    """Serialize SuperTile ports, processing only perimeter sides."""
     config_payload: dict[str, dict[str, list[dict]]] = {}
     ports_around = super_tile.getPortsAroundTile()
 
@@ -132,7 +116,6 @@ def _serialize_supertile_ports(
 
         x, y = coord_key.split(",")
         tile_key = f"X{x}Y{y}"
-        # Use string keys for sides here
         config_payload[tile_key] = {
             Side.NORTH.name: [],
             Side.EAST.name: [],
@@ -140,7 +123,6 @@ def _serialize_supertile_ports(
             Side.WEST.name: [],
         }
 
-        # Get the actual tile to access its pin order config and bels
         tile = super_tile.tileMap[int(y)][int(x)]
         if tile is None:
             continue
@@ -151,19 +133,16 @@ def _serialize_supertile_ports(
             if not port_list:
                 continue
 
-            # Determine which side this port list belongs to based on the first
-            # port's sideOfTile
             side = port_list[0].sideOfTile
             perimeter_sides.add(side)
 
-            # Process ports for this side (append to string-keyed dict)
             for port in port_list:
                 if regex := port.getPortRegex(indexed=True, prefix=tile_prefix):
                     config_payload[tile_key][side.name].append(
                         tile.pinOrderConfig[side]([regex]).to_dict()
                     )
 
-            # Add additional config pins based on side
+            # Add frame signals based on side
             if side == Side.NORTH:
                 config_payload[tile_key][side.name].append(
                     PinOrderConfig()([f"{tile_prefix}UserCLKo"]).to_dict()
@@ -187,24 +166,20 @@ def _serialize_supertile_ports(
                     PinOrderConfig()([rf"{tile_prefix}FrameData\[\d+\]"]).to_dict()
                 )
 
-        # Add BEL external ports (only for tiles that have them)
+        # Add BEL external ports
         if tile.bels:
             for bel in tile.bels:
                 pin_regexes = [
                     f"{prefix}{name}" for name in bel.externalInput + bel.externalOutput
                 ]
                 if pin_regexes:
-                    # Determine which side to place external ports
                     if external_port_sides and (int(x), int(y)) in external_port_sides:
                         external_side = external_port_sides[(int(x), int(y))]
                     elif perimeter_sides:
-                        # Default to first perimeter side if available
                         external_side = next(iter(perimeter_sides))
                     else:
-                        # Fallback to SOUTH if no perimeter sides
                         external_side = Side.SOUTH
 
-                    # append under string-keyed side
                     config_payload[tile_key][external_side.name].append(
                         tile.pinOrderConfig[external_side](pin_regexes).to_dict()
                     )
@@ -213,44 +188,189 @@ def _serialize_supertile_ports(
 
 
 def generate_IO_pin_order_config(
+    fabric: Fabric,
     tile_or_super_tile: Tile | SuperTile,
     outfile: Path,
     prefix: str = "",
-    external_port_side: Side = Side.SOUTH,
-    external_port_sides: dict[tuple[int, int], Side] | None = None,
 ) -> None:
-    """Generate I/O pin order configuration for a tile or super tile.
-
-    The resulting YAML maps coordinate keys of the form ``X#Y#`` to side
-    configuration dictionaries. Coordinates are enumerated from the top-left
-    corner (``X0Y0``).
+    """Generate IO pin order configuration for a tile or super tile.
 
     Parameters
     ----------
+    fabric : Fabric
+        The fabric containing the tile or super tile
     tile_or_super_tile : Tile | SuperTile
         The tile or super tile to generate configuration for
     outfile : Path
         Output YAML file path
     prefix : str
         Prefix to add to port names
-    external_port_side : Side
-        For a single Tile, which side to place external BEL ports on.
-        Defaults to SOUTH for backward compatibility.
-    external_port_sides : dict[tuple[int, int], Side] | None
-        For a SuperTile, mapping from tile coordinates (x, y) to the side
-        where external BEL ports should be placed. If None or if a coordinate
-        is not in the dict, defaults to using the perimeter side(s) of that tile.
     """
+    positions = fabric.find_tile_positions(tile_or_super_tile)
+
     if isinstance(tile_or_super_tile, SuperTile):
+        external_port_sides: dict[tuple[int, int], Side] = {}
+        if positions:
+            base_x, base_y = positions[0] if len(positions) == 1 else (0, 0)
+
+            for st_y, row in enumerate(tile_or_super_tile.tileMap):
+                for st_x, st_tile in enumerate(row):
+                    if st_tile is None:
+                        continue
+                    fabric_x = base_x + st_x
+                    fabric_y = base_y + st_y
+                    border_side = fabric.determine_border_side(fabric_x, fabric_y)
+                    if border_side:
+                        external_port_sides[(st_x, st_y)] = border_side
+
         config_payload = _serialize_supertile_ports(
             tile_or_super_tile, prefix, external_port_sides
         )
     else:
+        external_port_side = Side.SOUTH
+        if positions:
+            x, y = positions[0]
+            if border_side := fabric.determine_border_side(x, y):
+                external_port_side = border_side
+
         config_payload = {
             "X0Y0": _serialize_tile_ports(
                 tile_or_super_tile, prefix, external_port_side
             )
         }
+
+    with outfile.open("w") as file_descriptor:
+        yaml.dump(config_payload, file_descriptor)
+
+
+def generate_fabric_IO_pin_order_config(fabric: Fabric, outfile: Path) -> None:
+    """Generate fabric-level IO pin order configuration.
+
+    Treats the entire fabric as a single design (X0Y0) with all border IOs
+    collected into one segment per side, ordered by tile position.
+
+    Parameters
+    ----------
+    fabric : Fabric
+        The fabric object containing the tile grid
+    outfile : Path
+        Output YAML file path for the fabric-level configuration
+    """
+    # Frame signal widths per tile
+    frame_data_per_row = fabric.frameBitsPerRow
+    frame_strobe_per_col = fabric.maxFramesPerCol
+
+    # Collect all pins for each fabric side (in order)
+    north_pins: list[str] = []
+    south_pins: list[str] = []
+    east_pins: list[str] = []
+    west_pins: list[str] = []
+
+    frame_data_counter = fabric.frameBitsPerRow * fabric.numberOfRows - 1
+    frame_strobe_counter = 0
+
+    # Iterate through all tiles and collect border pins
+    for (x, y), tile in fabric:
+        if tile is None:
+            continue
+
+        # Determine which sides are on the fabric perimeter
+        is_north = y == 0
+        is_south = y == fabric.numberOfRows - 1
+        is_west = x == 0
+        is_east = x == fabric.numberOfColumns - 1
+
+        # Skip non-perimeter tiles
+        if not (is_north or is_south or is_west or is_east):
+            continue
+
+        prefix = f"Tile_X{x}Y{y}_"
+
+        # Check which sides have neighbors (don't add pins to those sides)
+        has_south_neighbor = (
+            y < fabric.numberOfRows - 1 and fabric.tile[y + 1][x] is not None
+        )
+        has_west_neighbor = x > 0 and fabric.tile[y][x - 1] is not None
+        has_east_neighbor = (
+            x < fabric.numberOfColumns - 1 and fabric.tile[y][x + 1] is not None
+        )
+
+        if not has_east_neighbor or not has_west_neighbor:
+            prefix = f"Tile_X{x}Y{fabric.numberOfRows - 1 - y}_"
+            if not has_south_neighbor:
+                for _ in range(fabric.maxFramesPerCol):
+                    south_pins.append(f"FrameStrobe\\[{frame_strobe_counter}\\]")
+                    frame_strobe_counter += 1
+
+            if not has_west_neighbor:
+                pin_to_add = []
+                for _ in range(fabric.frameBitsPerRow):
+                    pin_to_add.append(f"FrameData\\[{frame_data_counter}\\]")
+                    frame_data_counter -= 1
+                west_pins.extend(reversed(pin_to_add))
+            if tile.bels:
+                for bel in tile.bels:
+                    pin_regexes = [
+                        f"{prefix}{name}"
+                        for name in bel.externalInput + bel.externalOutput
+                    ]
+                    for pin in pin_regexes:
+                        if is_north:
+                            north_pins.append(pin)
+                        if is_south:
+                            south_pins.append(pin)
+                        if is_east:
+                            east_pins.append(pin)
+                        if is_west:
+                            west_pins.append(pin)
+
+        else:
+            if tile.bels:
+                for bel in tile.bels:
+                    pin_regexes = [
+                        f"{prefix}{name}"
+                        for name in bel.externalInput + bel.externalOutput
+                    ]
+                    for pin in pin_regexes:
+                        if is_north:
+                            north_pins.append(pin)
+                        if is_south:
+                            south_pins.append(pin)
+                        if is_east:
+                            east_pins.append(pin)
+                        if is_west:
+                            west_pins.append(pin)
+
+            if not has_south_neighbor:
+                for _ in range(fabric.maxFramesPerCol):
+                    south_pins.append(f"FrameStrobe\\[{frame_strobe_counter}\\]")
+                    frame_strobe_counter += 1
+
+            if not has_west_neighbor:
+                for _ in range(fabric.frameBitsPerRow):
+                    west_pins.append(f"FrameData\\[{frame_data_counter}\\]")
+                    frame_data_counter -= 1
+
+    # Add UserCLK to south side
+    south_pins.append("UserCLK")
+
+    # Create single X0Y0 config with all pins in one segment per side
+    config_payload = {
+        "X0Y0": {
+            Side.NORTH.name: (
+                [PinOrderConfig()(north_pins).to_dict()] if north_pins else []
+            ),
+            Side.SOUTH.name: (
+                [PinOrderConfig()(south_pins).to_dict()] if south_pins else []
+            ),
+            Side.EAST.name: (
+                [PinOrderConfig()(east_pins).to_dict()] if east_pins else []
+            ),
+            Side.WEST.name: (
+                [PinOrderConfig()(west_pins).to_dict()] if west_pins else []
+            ),
+        }
+    }
 
     with outfile.open("w") as file_descriptor:
         yaml.dump(config_payload, file_descriptor)

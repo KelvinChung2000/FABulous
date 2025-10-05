@@ -193,6 +193,7 @@ class FABulous_CLI(Cmd):
             persistent_history_file=f"{get_context().proj_dir}/{META_DATA_DIR}/.fabulous_history",
             allow_cli_args=False,
         )
+        self.self_in_py = True
         logger.info(f"Running at: {get_context().proj_dir}")
 
         if writerType == "verilog":
@@ -1258,26 +1259,19 @@ class FABulous_CLI(Cmd):
         completer=lambda self: self.fab.getTiles(),
     )
     gds_parser.add_argument(
-        "pdk_root",
-        type=Path,
-        help="Path to the PDK root directory",
-        completer=Cmd.path_complete,
-    )
-    gds_parser.add_argument(
-        "pdk",
-        type=str,
-        help="Name of the PDK",
-        choices=["sky130A", "sky130B", "ihp-sg13g2"],
-    )
-    gds_parser.add_argument(
         "--no-opt",
         help="Optimize the GDS layout",
         default=True,
         action="store_false",
     )
+    gds_parser.add_argument(
+        "--override",
+        help="Optimize the GDS layout",
+        type=Path,
+    )
 
     @with_category(CMD_FABRIC_FLOW)
-    @with_argparser(tile_single_parser)
+    @with_argparser(gds_parser)
     def do_gen_tile_macro(self, args: argparse.Namespace) -> None:
         """Generate GDSII files for a specific tile.
 
@@ -1314,19 +1308,17 @@ class FABulous_CLI(Cmd):
             tile_dir,
             pin_order_file,
             tile_dir / "macro",
-            base_config_path=self.projectDir
-            / "Tile"
-            / "include"
-            / "base_tile_gds_config.yaml",
+            base_config_path=self.projectDir / "Tile" / "include" / "gds_config.yaml",
             optimisation=False,
         )
 
     @with_category(CMD_FABRIC_FLOW)
     def do_gen_all_tile_macros(self, *_args: str) -> None:
         """Generate GDSII files for all tiles in the fabric."""
-        for i in self.allTile:
-            logger.info(f"Generating GDS for tile {i}")
-            self.onecmd_plus_hooks(f"gen_tile_macro {i}")
+        commands = CommandPipeline(self)
+        for i in sorted(self.allTile):
+            commands.add_step(f"gen_tile_macro {i}")
+        commands.execute()
 
     @with_category(CMD_FABRIC_FLOW)
     def do_gen_fabric_macro(self, *_args: str) -> None:
@@ -1346,11 +1338,19 @@ class FABulous_CLI(Cmd):
                 "No tile macro directories found. Generate tile GDS results first."
             )
             return
+        pin_order_file = self.projectDir / "Fabric" / "fabric_io_pin_order.yaml"
+        self.fabulousAPI.gen_fabric_io_pin_order_config(pin_order_file)
 
         (self.projectDir / "gds").mkdir(exist_ok=True)
         (self.projectDir / "Fabric" / "macro").mkdir(exist_ok=True)
         self.fabulousAPI.fabric_stitching(
             tile_macro_paths,
             self.projectDir / "Fabric" / f"{self.fabulousAPI.fabric.name}.v",
+            pin_order_file,
             self.projectDir / "Fabric" / "macro",
+            base_config_path=self.projectDir / "Fabric" / "gds_config.yaml",
         )
+
+    @with_category(CMD_FABRIC_FLOW)
+    def run_FABulous_eFPGA_marco(self):
+        self.fabulousAPI.fabric_full_flow(self.projectDir, self.projectDir / "macro")

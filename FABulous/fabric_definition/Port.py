@@ -131,9 +131,6 @@ class Port:
         else:
             wireCount = self.wireCount
 
-        if wireCount == 1 and self.name != "NULL":
-            return [f"{prefix}{self.name}"]
-
         if not indexed:
             return [
                 f"{prefix}{self.name}{i}"
@@ -178,9 +175,6 @@ class Port:
             startIndex = ((abs(self.xOffset) + abs(self.yOffset)) - 1) * self.wireCount
 
         wireCount = (abs(self.xOffset) + abs(self.yOffset)) * self.wireCount
-
-        if wireCount == 1 and self.name != "NULL":
-            return [f"{prefix}{self.name}"]
 
         if not indexed:
             return [

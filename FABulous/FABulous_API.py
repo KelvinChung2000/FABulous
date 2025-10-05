@@ -19,11 +19,14 @@ import FABulous.fabric_cad.gen_npnr_model as model_gen_npnr
 import FABulous.fabric_generator.parser.parse_csv as fileParser
 from FABulous.fabric_cad.gen_bitstream_spec import generateBitstreamSpec
 from FABulous.fabric_cad.gen_design_top_wrapper import generateUserDesignTopWrapper
-from FABulous.fabric_cad.gen_io_pin_config_yaml import generate_IO_pin_order_config
+from FABulous.fabric_cad.gen_io_pin_config_yaml import (
+    generate_fabric_IO_pin_order_config,
+    generate_IO_pin_order_config,
+)
 
 # Importing Modules from FABulous Framework.
 from FABulous.fabric_definition.Bel import Bel
-from FABulous.fabric_definition.define import Side, TileSize
+from FABulous.fabric_definition.define import TileSize
 from FABulous.fabric_definition.Fabric import Fabric
 from FABulous.fabric_definition.SuperTile import SuperTile
 from FABulous.fabric_definition.Tile import Tile
@@ -33,6 +36,9 @@ from FABulous.fabric_generator.code_generator.code_generator_VHDL import (
 )
 from FABulous.fabric_generator.gds_generator.flows.fabric_macro_flow import (
     FABulousFabricMacroFlow,
+)
+from FABulous.fabric_generator.gds_generator.flows.full_auto_fabric_flow import (
+    FABulousFabricMacroFullFlow,
 )
 from FABulous.fabric_generator.gds_generator.flows.tile_macro_flow import (
     FABulousTileVerilogMarcoFlow,
@@ -463,45 +469,24 @@ class FABulous_API:
         outfile : Path
             Output YAML path.
         """
-        # Determine which side(s) to place external ports based on fabric position
-        positions = self.fabric.find_tile_positions(tile)
+        generate_IO_pin_order_config(self.fabric, tile, outfile)
 
-        if isinstance(tile, SuperTile):
-            # For SuperTiles, determine side for each internal tile coordinate
-            external_port_sides: dict[tuple[int, int], Side] = {}
-            if positions:
-                # Use the position of the supertile's top-left tile
-                # to determine base position
-                base_x, base_y = positions[0] if len(positions) == 1 else (0, 0)
+    def gen_fabric_io_pin_order_config(self, outfile: Path) -> None:
+        """Generate fabric-level IO pin order configuration YAML.
 
-                for st_y, row in enumerate(tile.tileMap):
-                    for st_x, st_tile in enumerate(row):
-                        if st_tile is None:
-                            continue
-                        # Calculate fabric position of this tile within the supertile
-                        fabric_x = base_x + st_x
-                        fabric_y = base_y + st_y
-                        border_side = self.fabric.determine_border_side(
-                            fabric_x, fabric_y
-                        )
-                        if border_side:
-                            external_port_sides[(st_x, st_y)] = border_side
+        This generates a configuration file for placing IOs on the entire fabric,
+        covering all perimeter tiles. The pins are arranged to align with the
+        underlying tile IO positions.
 
-            generate_IO_pin_order_config(
-                tile, outfile, external_port_sides=external_port_sides
-            )
-        else:
-            # For regular Tiles, determine a single side
-            external_port_side = Side.SOUTH  # default
-            if positions:
-                # Use the first position found (tiles typically appear once)
-                x, y = positions[0]
-                if border_side := self.fabric.determine_border_side(x, y):
-                    external_port_side = border_side
+        Frame signals (FrameData and FrameStrobe) are automatically partitioned
+        across tiles based on their position in the fabric grid.
 
-            generate_IO_pin_order_config(
-                tile, outfile, external_port_side=external_port_side
-            )
+        Parameters
+        ----------
+        outfile : Path
+            Output YAML path for the fabric-level IO configuration.
+        """
+        generate_fabric_IO_pin_order_config(self.fabric, outfile)
 
     def genTileMacro(
         self,
@@ -512,7 +497,7 @@ class FABulous_API:
         final_view: Path | None = None,
         optimisation: bool = True,
         base_config_path: Path | None = None,
-        tile_config_override: dict | None = None,
+        config_override: dict | Path | None = None,
         pdk_root: Path | None = None,
         pdk: str | None = None,
     ) -> None:
@@ -549,8 +534,13 @@ class FABulous_API:
                 )
             )
 
-        if tile_config_override:
-            final_config_args.update(tile_config_override)
+        if config_override:
+            if isinstance(config_override, dict):
+                final_config_args.update(config_override)
+            else:
+                final_config_args.update(
+                    yaml.safe_load(config_override.read_text(encoding="utf-8"))
+                )
 
         final_config_args["DESIGN_NAME"] = tile_dir.name
         final_config_args["IO_PIN_ORDER_CFG"] = str(io_pin_config)
@@ -587,12 +577,37 @@ class FABulous_API:
         self,
         tile_marco_paths: dict[str, Path],
         fabric_path: Path,
+        fabric_io_config: Path,
         out_folder: Path,
         *,
+        base_config_path: Path | None = None,
+        config_override: dict | Path | None = None,
         pdk_root: Path | None = None,
         pdk: str | None = None,
     ) -> None:
-        """Run the stitching flow to assemble tile macros into a fabric-level GDS."""
+        """Run the stitching flow to assemble tile macros into a fabric-level GDS.
+
+        Parameters
+        ----------
+        tile_marco_paths : dict[str, Path]
+            Dictionary mapping tile names to their macro output directories.
+        fabric_path : Path
+            Path to the fabric-level Verilog file.
+        base_config_path : Path | None
+            Path to base configuration YAML file.
+        out_folder : Path
+            Output directory for the stitched fabric.
+        fabric_io_config : Path | None, optional
+            Path to fabric-level IO pin order configuration YAML.
+            If provided, will be used for fabric IO placement.
+            If None, no automatic IO placement will be performed.
+        pdk_root : Path | None, optional
+            Path to PDK root directory.
+        pdk : str | None, optional
+            PDK name to use.
+        config_override : dict | Path | None, optional
+            Additional configuration overrides.
+        """
         if pdk_root is None:
             pdk_root = get_context().pdk_root
             if pdk_root is None:
@@ -626,16 +641,16 @@ class FABulous_API:
                     "list",
                     [str(i) for i in (tile_marco_path / "lef").glob("*.lef")],
                 ),
-                # vh=cast(
-                #     "list", [str(i) for i in (tile_marco_path / "vh").glob("*.vh")]
-                # ),
+                vh=cast(
+                    "list", [str(i) for i in (tile_marco_path / "vh").glob("*.vh")]
+                ),
                 nl=cast(
                     "list", [str(i) for i in (tile_marco_path / "nl").glob("*.nl.v")]
                 ),
-                # pnl=cast(
-                #     "list",
-                #     [str(i) for i in (tile_marco_path / "pnl").glob("*.pnl.v")],
-                # ),
+                pnl=cast(
+                    "list",
+                    [str(i) for i in (tile_marco_path / "pnl").glob("*.pnl.v")],
+                ),
                 spef=spef_dict,
             )
 
@@ -645,46 +660,27 @@ class FABulous_API:
         logger.info(f"PDK: {pdk}")
         logger.info(f"Output folder: {out_folder.resolve()}")
         final_config_args = {}
+        if base_config_path:
+            final_config_args.update(
+                yaml.safe_load(base_config_path.read_text(encoding="utf-8"))
+            )
         final_config_args["DESIGN_NAME"] = self.fabric.name
         final_config_args["FABULOUS_FABRIC"] = self.fabric
         final_config_args["VERILOG_FILES"] = file_list
         final_config_args["FABULOUS_MACROS_SETTINGS"] = macros
         final_config_args["FABULOUS_TILE_SIZES"] = tile_sizes
         final_config_args["FABULOUS_TILE_SPACING"] = 0
+        final_config_args["FABULOUS_FABRIC_IO_PIN_ORDER_CFG"] = str(fabric_io_config)
+        final_config_args["FABULOUS_HALO_SPACING"] = (100, 100, 100, 100)
+        final_config_args["KLAYOUT_CONFLICT_RESOLUTION"] = "SkipNewCell"
 
-        final_config_args["RUN_POST_GPL_DESIGN_REPAIR"] = False
-        final_config_args["RUN_POST_CTS_RESIZER_TIMING"] = False
-        final_config_args["DESIGN_REPAIR_BUFFER_INPUT_PORTS"] = False
-        final_config_args["PDN_ENABLE_RAILS"] = False
-        final_config_args["RUN_ANTENNA_REPAIR"] = False
-        final_config_args["RUN_FILL_INSERTION"] = False
-        final_config_args["RUN_TAP_ENDCAP_INSERTION"] = False
-        final_config_args["RUN_CTS"] = False
-        final_config_args["RUN_IRDROP_REPORT"] = False
-        final_config_args["ERROR_ON_SYNTH_CHECKS"] = False
-
-        final_config_args["FP_PDN_VWIDTH"] = 1.6
-        final_config_args["FP_PDN_VSPACING"] = 3.7
-        final_config_args["FP_PDN_VPITCH"] = 30
-        final_config_args["FP_PDN_VOFFSET"] = 5
-
-        final_config_args["FP_PDN_HWIDTH"] = 1.6
-        final_config_args["FP_PDN_HSPACING"] = 3.7
-        final_config_args["FP_PDN_HPITCH"] = 30
-        final_config_args["FP_PDN_HOFFSET"] = 5
-
-        final_config_args["VDD_PIN"] = "VPWR"
-        final_config_args["GND_PIN"] = "VGND"
-
-        final_config_args["FP_PDN_VERTICAL_LAYER"] = "met4"
-        final_config_args["FP_PDN_HORIZONTAL_LAYER"] = "met5"
-
-        final_config_args["RT_CLOCK_MAX_LAYER"] = "met4"
-        final_config_args["RT_MAX_LAYER"] = "met4"
-        final_config_args["DRT_MAX_LAYER"] = "met4"
-
-        final_config_args["GRT_ALLOW_CONGESTION"] = True
-        final_config_args["MAGIC_NO_EXT_UNIQUE"] = True
+        if config_override:
+            if isinstance(config_override, dict):
+                final_config_args.update(config_override)
+            else:
+                final_config_args.update(
+                    yaml.safe_load(config_override.read_text(encoding="utf-8"))
+                )
 
         flow = FABulousFabricMacroFlow(
             final_config_args,
@@ -697,3 +693,64 @@ class FABulous_API:
         logger.info(f"Saving final views for FABulous to {out_folder / 'final_views'}")
         result.save_snapshot(out_folder / "final_views")
         logger.info("Stitching flow completed.")
+
+    def fabric_full_flow(
+        self,
+        project_dir: Path,
+        out_folder: Path,
+        *,
+        pdk_root: Path | None = None,
+        pdk: str | None = None,
+        config_override: dict | Path | None = None,
+    ) -> None:
+        """Run the stitching flow to assemble tile macros into a fabric-level GDS."""
+        if pdk_root is None:
+            pdk_root = get_context().pdk_root
+            if pdk_root is None:
+                raise ValueError(
+                    "PDK root must be specified either here or in settings."
+                )
+        if pdk is None:
+            pdk = get_context().pdk
+            if pdk is None:
+                raise ValueError("PDK must be specified either here or in settings.")
+
+        logger.info(f"PDK root: {pdk_root}")
+        logger.info(f"PDK: {pdk}")
+        logger.info(f"Output folder: {out_folder.resolve()}")
+        final_config_args = {}
+        final_config_args["FABULOUS_PROJ_DIR"] = str(project_dir.resolve())
+        final_config_args["FABULOUS_FABRIC"] = self.fabric
+        if config_override:
+            if isinstance(config_override, dict):
+                final_config_args.update(config_override)
+            else:
+                final_config_args.update(
+                    yaml.safe_load(config_override.read_text(encoding="utf-8"))
+                )
+        flow = FABulousFabricMacroFullFlow(
+            final_config_args,
+            name=self.fabric.name,
+            design_dir=str(out_folder.resolve()),
+            pdk=pdk,
+            pdk_root=str((pdk_root).resolve().parent),
+        )
+        result = flow.start()
+        logger.info(f"Saving final views for FABulous to {out_folder / 'final_views'}")
+        result.save_snapshot(out_folder / "final_views")
+        logger.info("Stitching flow completed.")
+
+    def get_most_frequent_tile(self) -> Tile:
+        """Get the most frequently used tile in the fabric.
+
+        Returns
+        -------
+        Tile
+            The most frequently used tile in the fabric.
+        """
+        from collections import Counter
+        from itertools import chain
+
+        counts = Counter(chain.from_iterable(row for row in self.fabric.tile))
+        most_common_tile, _ = counts.most_common(1)[0]
+        return most_common_tile

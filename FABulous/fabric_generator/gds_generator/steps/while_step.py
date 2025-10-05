@@ -67,7 +67,9 @@ class WhileStep(Step):
     def pre_iteration_callback(self, pre_iteration: State) -> State:
         return pre_iteration
 
-    def post_iteration_callback(self, post_iteration: State) -> State:
+    def post_iteration_callback(
+        self, post_iteration: State, full_iter_completed: bool
+    ) -> State:
         return post_iteration
 
     def run(
@@ -90,7 +92,7 @@ class WhileStep(Step):
                 break
             current_state = start_state.copy()
             current_state = self.pre_iteration_callback(current_state)
-
+            full_iter_completed = False
             # loop body
             for si, cStep in enumerate(self.Steps):
                 step = cStep(self.config, current_state)
@@ -113,17 +115,27 @@ class WhileStep(Step):
                         f"Step {step.name} failed with exception {e}, "
                         "but continuing as break_on_failure is False."
                     )
+            else:
+                full_iter_completed = True
 
-            current_state = self.post_iteration_callback(current_state)
+            current_state = self.post_iteration_callback(
+                current_state, full_iter_completed
+            )
             progress_bar.end_stage()
 
+        print(
+            f"pre post loop callback \n{current_state}",
+        )
         current_state = self.post_loop_callback(current_state)
+        print(
+            f"post loop callback \n{current_state}",
+        )
         for key in current_state:
             if (
                 state_in.get(key) != current_state.get(key)
                 and DesignFormat.factory.get(key) in self.outputs
             ):
-                total_metrics_update[key] = current_state[key]
+                total_views_update[key] = current_state[key]
         for key in current_state.metrics:
             if state_in.metrics.get(key) != current_state.metrics.get(key):
                 total_metrics_update[key] = current_state.metrics[key]

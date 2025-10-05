@@ -11,9 +11,11 @@ from librelane.state.state import State
 from librelane.steps.step import Step
 
 from FABulous.fabric_definition.Fabric import Fabric
-from FABulous.fabric_generator.gds_generator.steps.add_power import FABulousPower
 from FABulous.fabric_generator.gds_generator.steps.fabric_IO_placement import (
-    FABulousManualIOPlacement,
+    FABulousFabricIOPlacement,
+)
+from FABulous.fabric_generator.gds_generator.steps.odb_connect_power import (
+    FABulousPower,
 )
 
 # Add namedtuple for tile sizes
@@ -26,8 +28,11 @@ subs = {
     "OpenROAD.STAPostPNR*": None,
     # Custom PDN generation script
     "OpenROAD.GeneratePDN": FABulousPower,
-    # Script to manually place single IOs
-    "+OpenROAD.GlobalPlacementSkipIO": FABulousManualIOPlacement,
+    # Replace IO placement with FABulous fabric-level IO placement
+    "OpenROAD.IOPlacement": None,
+    "Odb.CustomIOPlacement": FABulousFabricIOPlacement,
+    # Script to manually place single IOs (for additional pins if needed)
+    # "+OpenROAD.GlobalPlacementSkipIO": FABulousManualIOPlacement,
 }
 
 configs = Classic.config_vars + [

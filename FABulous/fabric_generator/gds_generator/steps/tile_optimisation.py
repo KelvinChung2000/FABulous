@@ -15,6 +15,7 @@ from librelane.steps import openroad as OpenROAD
 from librelane.steps.step import Step
 
 from FABulous.fabric_generator.gds_generator.steps.add_buffer import AddBuffers
+from FABulous.fabric_generator.gds_generator.steps.custom_pdn import CustomGeneratePDN
 from FABulous.fabric_generator.gds_generator.steps.tile_IO_placement import (
     FABulousTileIOPlacement,
 )
@@ -33,7 +34,8 @@ var = [
     Variable(
         "FABULOUS_OPTIMISATION_STEP_COUNT",
         int,
-        "The size of which the tile size reduces by in each iteration.",
+        "The number of placement sites by which the tile size reduces in each iteration. "
+        "The actual reduction in DBU is this count multiplied by the PDK site dimensions.",
         default=5,
     ),
     Variable(
@@ -64,7 +66,6 @@ class TileOptimisation(WhileStep):
     name = "Tile Optimisation"
 
     inputs = [DesignFormat.NETLIST]
-    outputs = []
 
     Steps = [
         OpenROAD.CheckSDCFiles,
@@ -77,7 +78,7 @@ class TileOptimisation(WhileStep):
         OpenROAD.CutRows,
         OpenROAD.TapEndcapInsertion,
         Odb.AddPDNObstructions,
-        OpenROAD.GeneratePDN,
+        CustomGeneratePDN,  # Custom PDN default pdn_cfg.tcl
         Odb.RemovePDNObstructions,
         Odb.AddRoutingObstructions,
         OpenROAD.GlobalPlacementSkipIO,
@@ -128,7 +129,7 @@ class TileOptimisation(WhileStep):
 
     config_vars = var
 
-    max_iterations = 2
+    max_iterations = 5
 
     last_working_state: State | None = None
 
@@ -148,20 +149,36 @@ class TileOptimisation(WhileStep):
 
         return True
 
+    def post_iteration_callback(
+        self, post_iteration: State, full_iter_completed: bool
+    ) -> State:
+        if full_iter_completed:
+            self.last_working_state = post_iteration.copy()
+        return post_iteration
+
     def pre_iteration_callback(self, pre_iteration: State) -> State:
         """Pre iteration callback."""
-        self.last_working_state = pre_iteration
         die_area_raw: tuple[int, int, int, int] = self.config.get("DIE_AREA", None)
         _, _, width, height = die_area_raw
         die_area = (width, height)
         if die_area is None:
             raise ValueError("DIE_AREA metric not found in state.")
+
+        # Get PDK site dimensions from metrics (if available)
+        site_width_dbu = int(pre_iteration.metrics.get("pdk__site_width_dbu", 1))
+        site_height_dbu = int(pre_iteration.metrics.get("pdk__site_height_dbu", 1))
+
+        # Calculate step size based on PDK site dimensions
+        step_count = self.config["FABULOUS_OPTIMISATION_STEP_COUNT"]
+        width_step = site_width_dbu * step_count
+        height_step = site_height_dbu * step_count
+
         match self.config["FABULOUS_OPT_MODE"]:
             case OptMode.FIX_HEIGHT:
                 die_area = (
                     0,
                     0,
-                    width - self.config["FABULOUS_OPTIMISATION_STEP_COUNT"],
+                    width - width_step,
                     height,
                 )
             case OptMode.FIX_WIDTH:
@@ -169,7 +186,7 @@ class TileOptimisation(WhileStep):
                     0,
                     0,
                     width,
-                    height - self.config["FABULOUS_OPTIMISATION_STEP_COUNT"],
+                    height - height_step,
                 )
             case OptMode.BALANCED:
                 if (
@@ -178,7 +195,7 @@ class TileOptimisation(WhileStep):
                     die_area = (
                         0,
                         0,
-                        width - self.config["FABULOUS_OPTIMISATION_STEP_COUNT"],
+                        width - width_step,
                         height,
                     )
                 else:
@@ -186,14 +203,14 @@ class TileOptimisation(WhileStep):
                         0,
                         0,
                         width,
-                        height - self.config["FABULOUS_OPTIMISATION_STEP_COUNT"],
+                        height - height_step,
                     )
             case OptMode.AGGRESSIVE:
                 die_area = (
                     0,
                     0,
-                    width - self.config["FABULOUS_OPTIMISATION_STEP_COUNT"],
-                    height - self.config["FABULOUS_OPTIMISATION_STEP_COUNT"],
+                    width - width_step,
+                    height - height_step,
                 )
             case OptMode.CUSTOM:
                 func = self.config["FABULOUS_CUSTOM_OPT_FUNC"]
@@ -218,10 +235,10 @@ class TileOptimisation(WhileStep):
 
         return pre_iteration
 
-    def post_loop_callback(self, state: State) -> State:
+    def post_loop_callback(self, state: State) -> State:  # noqa: ARG002
         """Post loop callback."""
         if self.last_working_state is not None:
-            return state
+            return self.last_working_state
         raise RuntimeError("No working state found after tile optimisation.")
 
     def mid_iteration_break(self, state: State, step: type[Step]) -> bool:

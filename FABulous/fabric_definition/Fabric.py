@@ -5,6 +5,7 @@ including tile layout, configuration parameters, and connectivity information. T
 fabric is the top-level container for all tiles, BELs, and routing resources.
 """
 
+from collections.abc import Generator
 from dataclasses import dataclass, field
 
 from FABulous.fabric_definition.Bel import Bel
@@ -275,6 +276,18 @@ class Fabric:
         fabric += f"tileDic: {list(self.tileDic.keys())}\n"
         return fabric
 
+    def __iter__(self) -> Generator[tuple[tuple[int, int], Tile | None]]:
+        """Iterate over all tiles in the fabric in row-major order.
+
+        Yields
+        ------
+        Tile | None
+            The next tile in the fabric, or None if the position is empty.
+        """
+        for y, row in enumerate(self.tile):
+            for x, tile in enumerate(row):
+                yield (x, y), tile
+
     def getTileByName(self, name: str) -> Tile:
         """Get a tile by its name from the fabric.
 
@@ -449,3 +462,44 @@ class Fabric:
             return Side.WEST
 
         return None
+
+    def get_unique_tile_types(self) -> list[Tile]:
+        """Get list of unique tile types used in the fabric.
+
+        Returns
+        -------
+        list[Tile]
+            List of unique tile types (one instance per type name)
+        """
+        unique_tiles: dict[str, Tile] = {}
+
+        for row in self.tile:
+            for tile in row:
+                if tile is not None and tile.name not in unique_tiles:
+                    unique_tiles[tile.name] = tile
+
+        return list(unique_tiles.values())
+
+    def get_tile_row_column_indices(self, tile_name: str) -> tuple[set[int], set[int]]:
+        """Get all row and column indices where a tile type appears.
+
+        Parameters
+        ----------
+        tile_name : str
+            Name of the tile type to search for
+
+        Returns
+        -------
+        tuple[set[int], set[int]]
+            (row_indices, column_indices) where the tile type appears
+        """
+        rows: set[int] = set()
+        cols: set[int] = set()
+
+        for row_idx, row in enumerate(self.tile):
+            for col_idx, tile in enumerate(row):
+                if tile is not None and tile.name == tile_name:
+                    rows.add(row_idx)
+                    cols.add(col_idx)
+
+        return rows, cols

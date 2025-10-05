@@ -1006,7 +1006,6 @@ def io_place(
                 len(segment.pin_entries),
             )
             assert len(slots) == len(segment.pin_entries)
-
             for pin_index, bterm in enumerate(segment.pin_entries):
                 slot = slots[pin_index]
                 pin_name = bterm.getName()

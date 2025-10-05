@@ -1,12 +1,7 @@
 """
 FABulous GDS Generator - Tile to Macro Conversion Step
-
-This module contains a LibreLane step that converts FABulous tiles into macros.
-It prepares the tile configuration and either uses the Classic flow or runs
-essential steps to generate GDS, LEF, LIB, and DEF files for macro integration.
 """
 
-from librelane.config.variable import Variable
 from librelane.state.design_format import DesignFormat
 from librelane.state.state import State
 from librelane.steps.step import MetricsUpdate, Step, ViewsUpdate
@@ -37,31 +32,23 @@ class TileMarcoGen(Step):
         DesignFormat.DEF,
     ]
 
-    config_vars = [
-        Variable(
-            "TILE_CONFIG",
-            dict,
-            description="The full tile configuration dictionary.",
-        ),
-        Variable(
-            "TILE_OPTIMISATION",
-            bool,
-            description="Enable tile optimisation",
-            default=True,
-        ),
-    ]
-
     def run(self, state_in: State, **kwargs) -> tuple[ViewsUpdate, MetricsUpdate]:
         views_updates: ViewsUpdate = {}
         metrics_updates: MetricsUpdate = {}
 
-        tile_config = self.config["TILE_CONFIG"]
         if self.config["TILE_OPTIMISATION"]:
-            flow = FABulousTileVerilogMarcoFlowClassic(state_in, **kwargs)
+            flow = FABulousTileVerilogMarcoFlowClassic(self.config, **kwargs)
         else:
-            flow = FABulousTileVerilogMarcoFlow(state_in, **kwargs)
+            flow = FABulousTileVerilogMarcoFlow(self.config, **kwargs)
 
         final_state = flow.start(state_in)
-        metrics_updates.update({tile_config["DESIGN_NAME"]: final_state.metrics})
+        metrics_updates.update({self.config["DESIGN_NAME"]: final_state.metrics})
+
+        for key in final_state:
+            if (
+                state_in.get(key) != final_state.get(key)
+                and DesignFormat.factory.get(key) in self.outputs
+            ):
+                views_updates[key] = final_state[key]
 
         return (views_updates, metrics_updates)

@@ -13,6 +13,7 @@ from librelane.steps import verilator as Verilator
 from librelane.steps.step import Step
 
 from FABulous.fabric_generator.gds_generator.steps.add_buffer import AddBuffers
+from FABulous.fabric_generator.gds_generator.steps.custom_pdn import CustomGeneratePDN
 from FABulous.fabric_generator.gds_generator.steps.tile_IO_placement import (
     FABulousTileIOPlacement,
 )
@@ -24,6 +25,7 @@ subs = {
     # "OpenROAD.IOPlacement": FABulousTileIOPlacement,
     # Replace with FABulous IO Placement
     "Odb.CustomIOPlacement": FABulousTileIOPlacement,
+    "OpenROAD.GeneratePDN": CustomGeneratePDN,
     "OpenROAD.Resize*": None,
     "OpenROAD.RepairDesign*": None,
     "+OpenROAD.GlobalPlacement": AddBuffers,

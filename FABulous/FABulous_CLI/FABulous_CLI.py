@@ -22,6 +22,7 @@ simulation, and project management.
 
 import argparse
 import csv
+import os
 import pickle
 import pprint
 import shutil
@@ -175,6 +176,7 @@ class FABulous_CLI(Cmd):
     script: str = ""
     force: bool = False
     interactive: bool = True
+    max_job: int = 4
 
     def __init__(
         self,
@@ -183,6 +185,7 @@ class FABulous_CLI(Cmd):
         interactive: bool = False,
         verbose: bool = False,
         debug: bool = False,
+        max_job: int = 8,
     ) -> None:
         try:
             get_context()
@@ -195,6 +198,15 @@ class FABulous_CLI(Cmd):
         )
         self.self_in_py = True
         logger.info(f"Running at: {get_context().proj_dir}")
+
+        if max_job == -1:
+            if c := os.cpu_count():
+                self.max_job = c
+            else:
+                logger.warning("Unable to determine CPU count, defaulting to 4")
+                self.max_job = 4
+        else:
+            self.max_job = max_job
 
         if writerType == "verilog":
             self.fabulousAPI = FABulous_API(VerilogCodeGenerator())
@@ -1312,13 +1324,25 @@ class FABulous_CLI(Cmd):
             optimisation=False,
         )
 
+    gen_all_tile_parser = Cmd2ArgumentParser()
+    gen_all_tile_parser.add_argument(
+        "--parallel",
+        help="Optimize the GDS layout",
+        default=False,
+        action="store_true",
+    )
+
+    @with_argparser(gen_all_tile_parser)
     @with_category(CMD_FABRIC_FLOW)
-    def do_gen_all_tile_macros(self, *_args: str) -> None:
+    def do_gen_all_tile_macros(self, args: argparse.Namespace) -> None:
         """Generate GDSII files for all tiles in the fabric."""
         commands = CommandPipeline(self)
         for i in sorted(self.allTile):
             commands.add_step(f"gen_tile_macro {i}")
-        commands.execute()
+        if not args.parallel:
+            commands.execute()
+        else:
+            commands.execute_parallel()
 
     @with_category(CMD_FABRIC_FLOW)
     def do_gen_fabric_macro(self, *_args: str) -> None:

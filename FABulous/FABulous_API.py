@@ -661,19 +661,18 @@ class FABulous_API:
         logger.info(f"PDK: {pdk}")
         logger.info(f"Output folder: {out_folder.resolve()}")
         final_config_args = {}
+
         if base_config_path:
             final_config_args.update(
                 yaml.safe_load(base_config_path.read_text(encoding="utf-8"))
             )
+
         final_config_args["DESIGN_NAME"] = self.fabric.name
         final_config_args["FABULOUS_FABRIC"] = self.fabric
         final_config_args["VERILOG_FILES"] = file_list
         final_config_args["FABULOUS_MACROS_SETTINGS"] = macros
         final_config_args["FABULOUS_TILE_SIZES"] = tile_sizes
-        final_config_args["FABULOUS_TILE_SPACING"] = 0
         final_config_args["FABULOUS_IO_PIN_ORDER_CFG"] = str(fabric_io_config)
-        final_config_args["FABULOUS_HALO_SPACING"] = (100, 100, 100, 100)
-        final_config_args["KLAYOUT_CONFLICT_RESOLUTION"] = "SkipNewCell"
 
         if config_override:
             if isinstance(config_override, dict):

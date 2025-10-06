@@ -54,8 +54,10 @@ configs = Classic.config_vars + [
     ),
     Variable(
         "FABULOUS_TILE_SPACING",
-        Decimal,
-        "The spacing between tiles.",
+        tuple[Decimal, Decimal],
+        "The spacing between tiles. (x_spacing, y_spacing)",
+        units="µm",
+        default=(0, 0),
     ),
     Variable(
         "FABULOUS_HALO_SPACING",
@@ -142,7 +144,7 @@ class FABulousFabricMacroFlow(Classic):
         row_heights: list[Decimal],
         column_widths: list[Decimal],
         halo_spacing: tuple[Decimal, Decimal, Decimal, Decimal],
-        tile_spacing: Decimal,
+        tile_spacing: tuple[Decimal, Decimal],
     ) -> tuple[Decimal, Decimal]:
         """Compute overall fabric width and height from per-row/column sizes.
 
@@ -155,18 +157,19 @@ class FABulousFabricMacroFlow(Classic):
         rows = len(row_heights)
 
         (halo_left, halo_bottom, halo_right, halo_top) = halo_spacing
+        (tile_spacing_x, tile_spacing_y) = tile_spacing
 
         fabric_width = (
             halo_left
             + halo_right
             + sum(column_widths)
-            + (tile_spacing * (cols - 1) if cols > 0 else Decimal(0))
+            + (tile_spacing_x * (cols - 1) if cols > 0 else Decimal(0))
         )
         fabric_height = (
             halo_bottom
             + halo_top
             + sum(row_heights)
-            + (tile_spacing * (rows - 1) if rows > 0 else Decimal(0))
+            + (tile_spacing_y * (rows - 1) if rows > 0 else Decimal(0))
         )
 
         return fabric_width, fabric_height
@@ -329,7 +332,7 @@ class FABulousFabricMacroFlow(Classic):
         ]
 
         # Tile Placement
-        tile_spacing: Decimal = self.config["FABULOUS_TILE_SPACING"]
+        tile_spacing: tuple[Decimal, Decimal] = self.config["FABULOUS_TILE_SPACING"]
         halo_spacing: tuple[Decimal, Decimal, Decimal, Decimal] = self.config[
             "FABULOUS_HALO_SPACING"
         ]
@@ -410,6 +413,10 @@ class FABulousFabricMacroFlow(Classic):
             DIE_AREA=[0, 0, fabric_width_rounded, fabric_height_rounded]
         )
 
+        tile_spacing_x, tile_spacing_y = tile_spacing
+        tile_spacing_x = round_up_to_pitch(tile_spacing_x, pitch_x)
+        tile_spacing_y = round_up_to_pitch(tile_spacing_y, pitch_y)
+
         # Place macros
         cur_y = 0
         for y, row in enumerate(reversed(fabric.tile)):
@@ -453,10 +460,10 @@ class FABulousFabricMacroFlow(Classic):
                     )
 
                 # Add column width only (spacing is included in DIE_AREA calculation)
-                cur_x += column_widths[x]
+                cur_x += column_widths[x] + tile_spacing_x
 
             # Add row height only (spacing is included in DIE_AREA calculation)
-            cur_y += row_heights[flipped_y]
+            cur_y += row_heights[flipped_y] + tile_spacing_y
 
         # Validate that no macros overlap before proceeding
         info("Validating macro placements for overlaps...")

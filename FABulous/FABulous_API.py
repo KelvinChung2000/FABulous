@@ -527,6 +527,7 @@ class FABulous_API:
             final_config_args.update(
                 yaml.safe_load(base_config_path.read_text(encoding="utf-8"))
             )
+
         if (tile_dir / "gds_config.yaml").exists():
             final_config_args.update(
                 yaml.safe_load(
@@ -543,7 +544,7 @@ class FABulous_API:
                 )
 
         final_config_args["DESIGN_NAME"] = tile_dir.name
-        final_config_args["IO_PIN_ORDER_CFG"] = str(io_pin_config)
+        final_config_args["FABULOUS_IO_PIN_ORDER_CFG"] = str(io_pin_config)
         final_config_args["FABULOUS_TILE_DIR"] = str(tile_dir)
         final_config_args["VERILOG_FILES"] = file_list
         if optimisation:
@@ -670,7 +671,7 @@ class FABulous_API:
         final_config_args["FABULOUS_MACROS_SETTINGS"] = macros
         final_config_args["FABULOUS_TILE_SIZES"] = tile_sizes
         final_config_args["FABULOUS_TILE_SPACING"] = 0
-        final_config_args["FABULOUS_FABRIC_IO_PIN_ORDER_CFG"] = str(fabric_io_config)
+        final_config_args["FABULOUS_IO_PIN_ORDER_CFG"] = str(fabric_io_config)
         final_config_args["FABULOUS_HALO_SPACING"] = (100, 100, 100, 100)
         final_config_args["KLAYOUT_CONFLICT_RESOLUTION"] = "SkipNewCell"
 

@@ -404,8 +404,8 @@ class PinPlacementPlan:
         fabric_height = max_y + 1
 
         neighbor_offsets = {
-            Side.NORTH: (0, -1),
-            Side.SOUTH: (0, 1),
+            Side.NORTH: (0, -1),  # NORTH is toward smaller Y (top)
+            Side.SOUTH: (0, 1),  # SOUTH is toward larger Y (bottom)
             Side.EAST: (1, 0),
             Side.WEST: (-1, 0),
         }
@@ -581,9 +581,19 @@ class PinPlacementPlan:
         For N/S sides, use X coordinate; for E/W sides, use Y coordinate.
         Falls back to tile_idx if coordinates are unavailable.
         Clamps to valid range [0, num_divisions).
+
+        For E/W sides, Y=0 is at top but physical origin is at bottom,
+        so we invert the Y coordinate.
         """
         # Select coordinate based on side orientation
-        position_coord = tile_x if side in (Side.NORTH, Side.SOUTH) else tile_y
+        if side in (Side.NORTH, Side.SOUTH):
+            position_coord = tile_x
+        else:  # EAST or WEST
+            # Invert Y: Y=0 (top) should map to highest division index
+            position_coord = (
+                (num_divisions - 1 - tile_y) if tile_y is not None else None
+            )
+
         division_index = position_coord if position_coord is not None else tile_idx
 
         # Clamp to valid range
@@ -775,13 +785,13 @@ class PinPlacementPlan:
     "--hor-extension",
     default=0,
     type=float,
-    help="Extension for vertical pins in microns.",
+    help="Extension for horizontal pins in microns.",
 )
 @click.option(
     "--ver-extension",
     default=0,
     type=float,
-    help="Extension for horizontal pins in microns.",
+    help="Extension for vertical pins in microns.",
 )
 @click.option(
     "--ver-width-mult", default=2, type=float, help="Multiplier for vertical pins."

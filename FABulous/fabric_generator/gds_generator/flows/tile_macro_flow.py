@@ -1,3 +1,4 @@
+from collections.abc import Iterable
 from pathlib import Path
 from typing import Any
 
@@ -12,10 +13,11 @@ from librelane.steps import pyosys as Yosys
 from librelane.steps import verilator as Verilator
 from librelane.steps.step import Step
 
+from FABulous.fabric_generator.gds_generator.helper import round_die_area
 from FABulous.fabric_generator.gds_generator.steps.add_buffer import AddBuffers
 from FABulous.fabric_generator.gds_generator.steps.custom_pdn import CustomGeneratePDN
-from FABulous.fabric_generator.gds_generator.steps.tile_IO_placement import (
-    FABulousTileIOPlacement,
+from FABulous.fabric_generator.gds_generator.steps.IO_placement import (
+    FABulousIOPlacement,
 )
 from FABulous.fabric_generator.gds_generator.steps.tile_optimisation import (
     TileOptimisation,
@@ -24,7 +26,9 @@ from FABulous.fabric_generator.gds_generator.steps.tile_optimisation import (
 subs = {
     # "OpenROAD.IOPlacement": FABulousTileIOPlacement,
     # Replace with FABulous IO Placement
-    "Odb.CustomIOPlacement": FABulousTileIOPlacement,
+    # "-OpenRoad.Floorplan": RoundDieArea,
+    "OpenROAD.IOPlacement": None,
+    "Odb.CustomIOPlacement": FABulousIOPlacement,
     "OpenROAD.GeneratePDN": CustomGeneratePDN,
     "OpenROAD.Resize*": None,
     "OpenROAD.RepairDesign*": None,
@@ -260,6 +264,18 @@ class FABulousTileVerilogMarcoFlow(SequentialFlow):
         ],
     }
 
+    def run(
+        self,
+        initial_state: State,
+        frm: str | None = None,
+        to: str | None = None,
+        skip: Iterable[str] | None = None,
+        reproducible: str | None = None,
+        **kwargs,
+    ) -> tuple[State | list[Step]]:
+        self.config = round_die_area(self.config)
+        return super().run(initial_state, frm, to, skip, reproducible, **kwargs)
+
 
 @Flow.factory.register()
 class FABulousTileVerilogMarcoFlowClassic(Classic):
@@ -267,6 +283,7 @@ class FABulousTileVerilogMarcoFlowClassic(Classic):
     config_vars = configs
 
     def run(self, initial_state: State, **kwargs: Any) -> tuple[State, list[Step]]:  # noqa: ANN401
+        self.config = round_die_area(self.config)
         return super().run(initial_state, **kwargs)
 
 
@@ -277,4 +294,5 @@ class FABulousTileVHDLMarcoFlowClassic(VHDLClassic):
 
     def run(self, initial_state: State, **kwargs: Any) -> tuple[State, list[Step]]:  # noqa: ANN401
         warn("Linting and equivalence checking for VHDL files is disabled")
+        round_die_area(self.config)
         return super().run(initial_state, **kwargs)

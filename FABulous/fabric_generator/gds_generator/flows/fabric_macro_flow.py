@@ -11,8 +11,9 @@ from librelane.state.state import State
 from librelane.steps.step import Step
 
 from FABulous.fabric_definition.Fabric import Fabric
-from FABulous.fabric_generator.gds_generator.steps.fabric_IO_placement import (
-    FABulousFabricIOPlacement,
+from FABulous.fabric_generator.gds_generator.helper import get_pitch
+from FABulous.fabric_generator.gds_generator.steps.IO_placement import (
+    FABulousIOPlacement,
 )
 from FABulous.fabric_generator.gds_generator.steps.odb_connect_power import (
     FABulousPower,
@@ -30,7 +31,7 @@ subs = {
     "OpenROAD.GeneratePDN": FABulousPower,
     # Replace IO placement with FABulous fabric-level IO placement
     "OpenROAD.IOPlacement": None,
-    "Odb.CustomIOPlacement": FABulousFabricIOPlacement,
+    "Odb.CustomIOPlacement": FABulousIOPlacement,
     # Script to manually place single IOs (for additional pins if needed)
     # "+OpenROAD.GlobalPlacementSkipIO": FABulousManualIOPlacement,
 }
@@ -243,6 +244,67 @@ class FABulousFabricMacroFlow(Classic):
         info("Macro overlap validation passed: no overlaps detected")
         return True
 
+    def _validate_tile_sizes(
+        self,
+        tile_sizes: dict[str, tuple[Decimal, Decimal]],
+        pitch_x: Decimal,
+        pitch_y: Decimal,
+    ) -> bool:
+        """Validate that all tile sizes are aligned to the routing pitch grid.
+
+        This checks that each tile's width is a multiple of min_pitch_x and
+        each tile's height is a multiple of min_pitch_y.
+
+        Parameters
+        ----------
+        tile_sizes : dict[str, tuple[Decimal, Decimal]]
+            Dictionary mapping tile names to their sizes (width, height).
+        min_pitch_x : Decimal
+            Minimum pitch for horizontal (X) direction.
+        min_pitch_y : Decimal
+            Minimum pitch for vertical (Y) direction.
+
+        Returns
+        -------
+        bool
+            True if all tiles are aligned.
+
+        Raises
+        ------
+        ValueError
+            If any tile dimensions are not aligned to the pitch grid.
+        """
+        tile_size_errors: list[str] = []
+        for tile_name, (width, height) in tile_sizes.items():
+            width_dec = Decimal(str(width))
+            height_dec = Decimal(str(height))
+
+            width_remainder = str(round(width_dec / pitch_x, 2))[-2:]
+            height_remainder = str(round(height_dec / pitch_y, 2))[-2:]
+
+            if width_remainder != "00":
+                tile_size_errors.append(
+                    f"{tile_name}: width {width_dec} not aligned to {pitch_x} "
+                    f"(remainder: {width_remainder})"
+                )
+            if height_remainder != "00":
+                tile_size_errors.append(
+                    f"{tile_name}: height {height_dec} not aligned to {pitch_y} "
+                    f"(remainder: {height_remainder})"
+                )
+
+        if tile_size_errors:
+            err("Tile sizes are not aligned to pitch grid:")
+            for error in tile_size_errors:
+                err(f"  {error}")
+            raise ValueError(
+                "Tile size validation failed: tiles must be regenerated with "
+                "fixed round_die_area to ensure pitch alignment"
+            )
+
+        info("Tile size validation passed: all tiles aligned to pitch grid")
+        return True
+
     def run(self, initial_state: State, **kwargs: dict) -> tuple[State, list[Step]]:
         """Execute the fabric stitching flow.
 
@@ -271,7 +333,33 @@ class FABulousFabricMacroFlow(Classic):
         halo_spacing: tuple[Decimal, Decimal, Decimal, Decimal] = self.config[
             "FABULOUS_HALO_SPACING"
         ]
-        (halo_left, halo_bottom, _, _) = halo_spacing
+
+        # Get min_pitch_x/min_pitch_y from FP_TRACKS_INFO via helper.get_min_pitch
+        pitch_x, pitch_y = get_pitch(self.config)
+
+        # Round up halo_left and halo_bottom to ensure placement origins are aligned
+        def round_up_to_pitch(val: Decimal, pitch: Decimal) -> Decimal:
+            if pitch == 0:
+                return val
+            remainder = val % pitch
+            increment = Decimal(1) if remainder > 0 else Decimal(0)
+            return (val // pitch + increment) * pitch
+
+        halo_left, halo_bottom, halo_right, halo_top = halo_spacing
+        halo_left = round_up_to_pitch(halo_left, pitch_x)
+        halo_bottom = round_up_to_pitch(halo_bottom, pitch_y)
+
+        info(
+            f"Rounded placement origin halo: left={halo_left}, bottom={halo_bottom} "
+            f"(min_pitch_x={pitch_x}, min_pitch_y={pitch_y})"
+        )
+
+        # Validate that all tile sizes are pitch-aligned
+        info("Validating tile sizes are aligned to pitch grid...")
+        self._validate_tile_sizes(tile_sizes, pitch_x, pitch_y)
+
+        # Use rounded left/bottom and original right/top for initial calculation
+        halo_spacing = (halo_left, halo_bottom, halo_right, halo_top)
 
         # Compute per-row and per-column sizes once, then derive DIE_AREA
         row_heights, column_widths = self._compute_row_and_column_sizes(
@@ -288,15 +376,39 @@ class FABulousFabricMacroFlow(Classic):
                 f"{len(column_widths)}"
             )
 
+        # Calculate fabric dimensions with rounded left/bottom halo
         fabric_width, fabric_height = self._compute_die_area(
             row_heights,
             column_widths,
             halo_spacing,
             tile_spacing,
         )
-        info(f"FABRIC_WIDTH: {fabric_width}")
-        info(f"FABRIC_HEIGHT: {fabric_height}")
-        self.config = self.config.copy(DIE_AREA=[0, 0, fabric_width, fabric_height])
+        info(f"Computed FABRIC_WIDTH (before rounding): {fabric_width}")
+        info(f"Computed FABRIC_HEIGHT (before rounding): {fabric_height}")
+
+        # Round the total fabric dimensions UP to the next pitch multiple
+        fabric_width_rounded = round_up_to_pitch(fabric_width, pitch_x)
+        fabric_height_rounded = round_up_to_pitch(fabric_height, pitch_y)
+
+        # Calculate the adjustment needed and distribute it to the halo
+        # Add the extra space to the right and top halo (keeps origin at 0,0)
+        width_adjustment = fabric_width_rounded - fabric_width
+        height_adjustment = fabric_height_rounded - fabric_height
+
+        halo_right = halo_right + width_adjustment
+        halo_top = halo_top + height_adjustment
+        halo_spacing = (halo_left, halo_bottom, halo_right, halo_top)
+
+        info(
+            f"Adjusted halo_spacing to: {halo_spacing} "
+            f"(width adj: {width_adjustment}, height adj: {height_adjustment})"
+        )
+        info(f"Final FABRIC_WIDTH: {fabric_width_rounded}")
+        info(f"Final FABRIC_HEIGHT: {fabric_height_rounded}")
+
+        self.config = self.config.copy(
+            DIE_AREA=[0, 0, fabric_width_rounded, fabric_height_rounded]
+        )
 
         # Place macros
         cur_y = 0
@@ -340,11 +452,11 @@ class FABulousFabricMacroFlow(Classic):
                         orientation=Orientation.N,
                     )
 
-                # Add column width and spacing (spacing added for all columns)
-                cur_x += column_widths[x] + tile_spacing
+                # Add column width only (spacing is included in DIE_AREA calculation)
+                cur_x += column_widths[x]
 
-            # Add row height and spacing (spacing added for all rows)
-            cur_y += row_heights[flipped_y] + tile_spacing
+            # Add row height only (spacing is included in DIE_AREA calculation)
+            cur_y += row_heights[flipped_y]
 
         # Validate that no macros overlap before proceeding
         info("Validating macro placements for overlaps...")

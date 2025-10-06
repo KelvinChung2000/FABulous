@@ -2,7 +2,6 @@ from collections import Counter
 from decimal import Decimal
 from itertools import chain
 from pathlib import Path as PathLib
-from typing import Any
 
 import yaml
 from librelane.common import Path
@@ -19,8 +18,8 @@ from FABulous.fabric_cad.gen_io_pin_config_yaml import (
 )
 from FABulous.fabric_definition.Fabric import Fabric
 from FABulous.fabric_definition.Tile import Tile
-from FABulous.fabric_generator.gds_generator.steps.extract_pdk_site import (
-    ExtractPDKSite,
+from FABulous.fabric_generator.gds_generator.steps.extract_pdk_info import (
+    ExtractPDKInfo,
 )
 from FABulous.fabric_generator.gds_generator.steps.fabric_macro_gen import (
     FabricMacroGen,
@@ -73,7 +72,7 @@ configs = [
 ]
 
 
-@Flow.factory.register()
+# @Flow.factory.register()
 class FABulousFabricMacroFullFlow(Flow):
     """Full automatic fabric flow with progressive tile compilation.
 
@@ -85,7 +84,7 @@ class FABulousFabricMacroFullFlow(Flow):
     5. Stitches all tiles into final fabric
     """
 
-    Steps = [ExtractPDKSite]
+    Steps = [ExtractPDKInfo]
 
     config_vars = configs
 
@@ -140,7 +139,6 @@ class FABulousFabricMacroFullFlow(Flow):
                 )
 
         info(f"Updated {config_file} DIE_AREA to {list(die_area_dbu)}")
-
 
     def _compile_tile(
         self,
@@ -325,7 +323,7 @@ class FABulousFabricMacroFullFlow(Flow):
         # Step 1: Extract PDK site dimensions
         info("Extracting PDK site dimensions...")
         self.start_stage("PDK Site Extraction")
-        extract_site_step = ExtractPDKSite(self.config, state_in=initial_state)
+        extract_site_step = ExtractPDKInfo(self.config, state_in=initial_state)
         state = self.start_step(extract_site_step)
         step_list.append(extract_site_step)
         self.end_stage()
@@ -431,7 +429,9 @@ class FABulousFabricMacroFullFlow(Flow):
                     continue
 
                 tile_dir = proj_dir / "Tile" / tile_type.name
-                tile_rows, tile_cols = fabric.get_tile_row_column_indices(tile_type.name)
+                tile_rows, tile_cols = fabric.get_tile_row_column_indices(
+                    tile_type.name
+                )
 
                 # Get tile's initial die area
                 initial_die_area = self._get_tile_die_area_dbu(tile_dir)

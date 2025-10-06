@@ -211,7 +211,12 @@ def generate_IO_pin_order_config(
     if isinstance(tile_or_super_tile, SuperTile):
         external_port_sides: dict[tuple[int, int], Side] = {}
         if positions:
-            base_x, base_y = positions[0] if len(positions) == 1 else (0, 0)
+            # For multi-entry config, find top-left position (min x, min y)
+            if len(positions) == 1:
+                base_x, base_y = positions[0]
+            else:
+                base_x = min(pos[0] for pos in positions)
+                base_y = min(pos[1] for pos in positions)
 
             for st_y, row in enumerate(tile_or_super_tile.tileMap):
                 for st_x, st_tile in enumerate(row):

@@ -16,8 +16,11 @@ from librelane.steps.step import Step
 
 from FABulous.fabric_generator.gds_generator.steps.add_buffer import AddBuffers
 from FABulous.fabric_generator.gds_generator.steps.custom_pdn import CustomGeneratePDN
-from FABulous.fabric_generator.gds_generator.steps.tile_IO_placement import (
-    FABulousTileIOPlacement,
+from FABulous.fabric_generator.gds_generator.steps.IO_placement import (
+    FABulousIOPlacement,
+)
+from FABulous.fabric_generator.gds_generator.steps.round_die_area import (
+    RoundDieArea,
 )
 from FABulous.fabric_generator.gds_generator.steps.while_step import WhileStep
 
@@ -70,6 +73,7 @@ class TileOptimisation(WhileStep):
     Steps = [
         OpenROAD.CheckSDCFiles,
         OpenROAD.CheckMacroInstances,
+        RoundDieArea,
         OpenROAD.Floorplan,
         OpenROAD.DumpRCValues,
         Odb.CheckMacroAntennaProperties,
@@ -83,7 +87,7 @@ class TileOptimisation(WhileStep):
         Odb.AddRoutingObstructions,
         OpenROAD.GlobalPlacementSkipIO,
         OpenROAD.IOPlacement,
-        FABulousTileIOPlacement,  # Replace with FABulous IO Placement
+        FABulousIOPlacement,  # Replace with FABulous IO Placement
         Odb.ApplyDEFTemplate,
         OpenROAD.GlobalPlacement,
         AddBuffers,  # Add Buffers after Global Placement

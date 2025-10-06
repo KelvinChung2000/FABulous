@@ -156,11 +156,14 @@
               PYTHONNOUSERSITE = "1";
             };
             shellHook = ''
+              
+              
               export REPO_ROOT=$(git rev-parse --show-toplevel)
               ORIGINAL_PS1="$PS1"
+
               . ${virtualenv}/bin/activate
-              # Restore original PS1 to avoid double prompt decoration
-              export PS1="$ORIGINAL_PS1"
+               # Restore original PS1 to avoid double prompt decoration
+               export PS1="$ORIGINAL_PS1"
 
               # Put our Python first in PATH to avoid conflicts with system Python
               export PATH="${pythonSet.python}/bin:$PATH"

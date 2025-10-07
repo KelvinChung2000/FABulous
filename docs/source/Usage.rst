@@ -137,7 +137,7 @@ To use the FABulous Shell, you can run the following command:
 If you want to use a specific RTL language (Verilog or VHDL) for your project, you can use the ``--writer`` flag when creating the project.
 
 .. prompt:: bash (venv)$
-  
+
   FABulous create-project <name_of_project> --writer vhdl
   # or
   FABulous create-project <name_of_project> -w vhdl

@@ -131,6 +131,9 @@ To use the FABulous Shell, you can run the following command:
 
   FABulous --project-dir <name_of_project> start
 
+  # or an special alias for project starting
+  FABulous <name_of_project>
+
 If you want to use a specific RTL language (Verilog or VHDL) for your project, you can use the ``--writer`` flag when creating the project.
 
 .. prompt:: bash (venv)$

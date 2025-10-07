@@ -3,6 +3,7 @@
 This module exposes utilities used by the GDS generator flows.
 """
 
+from collections import defaultdict
 from decimal import Decimal
 from pathlib import Path
 
@@ -10,14 +11,11 @@ from librelane.config.config import Config
 from librelane.logging.logger import info
 
 
-def get_pitch(config: Config) -> tuple[Decimal, Decimal]:
-    """Read the FP_TRACKS_INFO file and return min pitches for X and Y.
+def get_layer_info(config: Config) -> dict[str, dict[str, tuple[Decimal, Decimal]]]:
+    """Read the FP_TRACKS_INFO file and return layer information.
 
-    Returns a tuple (x_pitch, y_pitch) where x_pitch is the
-    minimum pitch along X-axis (FP_IO_VLAYER X direction) and
-    y_pitch is minimum pitch along Y-axis (FP_IO_HLAYER Y direction).
-    The cardinal field in FP_TRACKS_INFO is expected
-    to be 'X' or 'Y' (case-insensitive).
+    Returns a dictionary mapping layer names to their cardinal directions
+    and corresponding (offset, pitch) tuples.
     """
     with Path(config["FP_TRACKS_INFO"]).open() as f:
         lines = f.readlines()
@@ -29,6 +27,20 @@ def get_pitch(config: Config) -> tuple[Decimal, Decimal]:
         layer, cardinal, offset, pitch = line.split()
         layers[layer] = layers.get(layer) or {}
         layers[layer][cardinal] = (Decimal(offset), Decimal(pitch))
+
+    return layers
+
+
+def get_pitch(config: Config) -> tuple[Decimal, Decimal]:
+    """Read the FP_TRACKS_INFO file and return min pitches for X and Y.
+
+    Returns a tuple (x_pitch, y_pitch) where x_pitch is the
+    minimum pitch along X-axis (FP_IO_VLAYER X direction) and
+    y_pitch is minimum pitch along Y-axis (FP_IO_HLAYER Y direction).
+    The cardinal field in FP_TRACKS_INFO is expected
+    to be 'X' or 'Y' (case-insensitive).
+    """
+    layers = get_layer_info(config)
 
     x_pitch = layers[config["FP_IO_VLAYER"]]["X"][1]
     y_pitch = layers[config["FP_IO_HLAYER"]]["Y"][1]
@@ -75,3 +87,41 @@ def round_die_area(config: Config) -> Config:
         f"(pitch_x={x_pitch}, pitch_y={y_pitch})"
     )
     return config.copy(DIE_AREA=(0, 0, width_rounded, height_rounded))
+
+
+def get_routing_obstructions(config: Config) -> list[tuple[int, int, int, int]]:
+    """Get the routing obstructions from the config.
+
+    Returns a list of tuples (x1, y1, x2, y2) representing
+    the obstructions in the routing area.
+    """
+    obstructions = config.get("ROUTING_OBSTRUCTIONS") or []
+    _, _, width, height = config["DIE_AREA"]
+
+    parsed_obstructions = defaultdict(list)
+    for obs in obstructions:
+        if len(obs) != 4:
+            raise ValueError(
+                f"Invalid obstruction {obs}. Each obstruction must be a tuple of 4 integers."
+            )
+        met, *box = obs
+        parsed_obstructions[met].append(box)
+
+    if (layer := config["FP_IO_VLAYER"]) not in parsed_obstructions:
+        parsed_obstructions[layer].append((0, -1, width, 0))
+
+    if (layer := config["FP_IO_HLAYER"]) not in parsed_obstructions:
+        parsed_obstructions[layer].append((0, 1, 0, height))
+
+    if (layer := config["PDN_VERTICAL_LAYER"]) not in parsed_obstructions:
+        parsed_obstructions[layer].append((0, -1, width, 0))
+
+    if (layer := config["PDN_HORIZONTAL_LAYER"]) not in parsed_obstructions:
+        parsed_obstructions[layer].append((0, 0, 0, height))
+
+    result = []
+    for layer, boxes in parsed_obstructions.items():
+        for box in boxes:
+            result.append((layer, *box))
+
+    return result

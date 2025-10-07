@@ -13,7 +13,10 @@ from librelane.steps import pyosys as Yosys
 from librelane.steps import verilator as Verilator
 from librelane.steps.step import Step
 
-from FABulous.fabric_generator.gds_generator.helper import round_die_area
+from FABulous.fabric_generator.gds_generator.helper import (
+    get_routing_obstructions,
+    round_die_area,
+)
 from FABulous.fabric_generator.gds_generator.steps.add_buffer import AddBuffers
 from FABulous.fabric_generator.gds_generator.steps.custom_pdn import CustomGeneratePDN
 from FABulous.fabric_generator.gds_generator.steps.IO_placement import (
@@ -274,6 +277,9 @@ class FABulousTileVerilogMarcoFlow(SequentialFlow):
         **kwargs,
     ) -> tuple[State | list[Step]]:
         self.config = round_die_area(self.config)
+        self.config = self.config.copy(
+            ROUTING_OBSTRUCTIONS=get_routing_obstructions(self.config)
+        )
         return super().run(initial_state, frm, to, skip, reproducible, **kwargs)
 
 
@@ -284,6 +290,9 @@ class FABulousTileVerilogMarcoFlowClassic(Classic):
 
     def run(self, initial_state: State, **kwargs: Any) -> tuple[State, list[Step]]:  # noqa: ANN401
         self.config = round_die_area(self.config)
+        self.config = self.config.copy(
+            ROUTING_OBSTRUCTIONS=get_routing_obstructions(self.config)
+        )
         return super().run(initial_state, **kwargs)
 
 
@@ -295,4 +304,7 @@ class FABulousTileVHDLMarcoFlowClassic(VHDLClassic):
     def run(self, initial_state: State, **kwargs: Any) -> tuple[State, list[Step]]:  # noqa: ANN401
         warn("Linting and equivalence checking for VHDL files is disabled")
         round_die_area(self.config)
+        self.config = self.config.copy(
+            ROUTING_OBSTRUCTIONS=get_routing_obstructions(self.config)
+        )
         return super().run(initial_state, **kwargs)

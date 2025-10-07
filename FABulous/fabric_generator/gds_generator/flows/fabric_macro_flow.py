@@ -12,8 +12,8 @@ from librelane.steps.step import Step
 
 from FABulous.fabric_definition.Fabric import Fabric
 from FABulous.fabric_generator.gds_generator.helper import get_pitch
-from FABulous.fabric_generator.gds_generator.steps.IO_placement import (
-    FABulousIOPlacement,
+from FABulous.fabric_generator.gds_generator.steps.manual_io_placement import (
+    FABulousManualIOPlacement,
 )
 from FABulous.fabric_generator.gds_generator.steps.odb_connect_power import (
     FABulousPower,
@@ -30,10 +30,10 @@ subs = {
     # Custom PDN generation script
     "OpenROAD.GeneratePDN": FABulousPower,
     # Replace IO placement with FABulous fabric-level IO placement
-    "OpenROAD.IOPlacement": None,
-    "Odb.CustomIOPlacement": FABulousIOPlacement,
+    # "OpenROAD.IOPlacement": None,
+    # "Odb.CustomIOPlacement": FABulousIOPlacement,
     # Script to manually place single IOs (for additional pins if needed)
-    # "+OpenROAD.GlobalPlacementSkipIO": FABulousManualIOPlacement,
+    "+OpenROAD.GlobalPlacementSkipIO": FABulousManualIOPlacement,
 }
 
 configs = Classic.config_vars + [

@@ -6,10 +6,9 @@ interface. It handles argument parsing, project setup, and CLI initialization.
 
 import os
 import sys
-from dataclasses import dataclass
 from importlib.metadata import version
 from pathlib import Path
-from typing import Annotated, Literal, cast
+from typing import Annotated
 
 import click
 import typer
@@ -27,7 +26,11 @@ from FABulous.FABulous_CLI.helper import (
     setup_logger,
     update_project_version,
 )
-from FABulous.FABulous_settings import FAB_USER_CONFIG_DIR, get_context, init_context
+from FABulous.FABulous_settings import (
+    FAB_USER_CONFIG_DIR,
+    get_context,
+    init_context,
+)
 
 APP_NAME = "FABulous"
 
@@ -39,22 +42,6 @@ app = typer.Typer(
     ),
     no_args_is_help=True,
 )
-
-
-@dataclass
-class SharedContext:
-    """Context object to hold shared CLI options."""
-
-    verbose: int = 0
-    debug: bool = False
-    log_file: Path | None = None
-    global_dot_env: Path | None = None
-    project_dot_env: Path | None = None
-    force: bool = False
-    writer: str = "verilog"
-
-
-shared_state = SharedContext()
 
 
 def version_callback(value: bool) -> None:
@@ -74,7 +61,9 @@ def validate_project_directory(value: str) -> Path | None:
 
 ProjectDirType = Annotated[
     Path | None,
-    typer.Argument(
+    typer.Option(
+        "--project-dir",
+        "-p",
         help="Directory path to project folder",
         parser=validate_project_directory,
         resolve_path=True,
@@ -82,9 +71,99 @@ ProjectDirType = Annotated[
     ),
 ]
 
+WriterType = Annotated[
+    HDLType,
+    typer.Option(
+        "--writer",
+        "-w",
+        help="Set type of HDL code generated. System Verilog is not supported yet.",
+        case_sensitive=False,
+    ),
+]
+
+ForceType = Annotated[bool, typer.Option("--force", help="Enable force mode")]
+
+
+GLOBAL_FLAGS = {
+    "--verbose",
+    "-v",
+    "--debug",
+    "--log",
+    "--global-dot-env",
+    "-gde",
+    "--project-dot-env",
+    "-pde",
+}
+
+
+def reorder_options(argv: list[str]) -> list[str]:
+    """Reorder global flags to be before subcommands.
+
+    Rules:
+    - Only flags whose (base) token (before any '=') is in GLOBAL_FLAGS are moved.
+    - Supports both --opt=value and --opt value forms (second handled heuristically:
+      if the next token does not start with '-' it is treated as that flag's value).
+    - Flags already before the subcommand are left untouched.
+    - Order among moved flags is preserved relative to their appearance after
+      the subcommand.
+    - If no registered subcommand is present, argv is returned unchanged.
+    """
+    if (
+        len(argv) == 2
+        and Path(argv[1]).exists()
+        and (Path(argv[1]) / ".FABulous").exists()
+    ):
+        return ["FABulous", "--project-dir", argv[1], "start"]
+
+    if len(argv) < 3:
+        return argv
+
+    command_names = {c.name for c in app.registered_commands}
+
+    # Find first subcommand occurrence
+    cmd_index = None
+    for i, tok in enumerate(argv[1:], start=1):
+        if tok in command_names:
+            cmd_index = i
+            break
+    if cmd_index is None:
+        return argv  # No subcommand -> nothing to reorder
+
+    before = argv[:cmd_index]  # program + any already-leading global flags
+    command = argv[cmd_index]
+    after = argv[cmd_index + 1 :]
+
+    moved: list[str] = []
+    remaining: list[str] = []
+    i = 0
+
+    while i < len(after):
+        tok = after[i]
+        base = tok.split("=", 1)[0] if tok.startswith("--") else tok
+        if base in GLOBAL_FLAGS:
+            # Move the flag
+            moved.append(tok)
+            # If value is separated (no '=' and next token not an option),
+            # treat as value
+            if "=" not in tok and (i + 1) < len(after):
+                nxt = after[i + 1]
+                if not nxt.startswith("-"):
+                    moved.append(nxt)
+                    i += 1
+        else:
+            remaining.append(tok)
+        i += 1
+
+    if not moved:
+        return argv
+
+    return before + moved + [command] + remaining
+
 
 @app.callback()
 def common_options(
+    ctx: typer.Context,
+    project_dir: ProjectDirType = None,
     _version: Annotated[
         bool | None,
         typer.Option(
@@ -97,12 +176,17 @@ def common_options(
     verbose: Annotated[
         int,
         typer.Option(
-            "--verbose", "-v", count=True, help="Show detailed log information"
+            "--verbose",
+            "-v",
+            count=True,
+            help="Show detailed log information",
         ),
     ] = 0,
     debug: Annotated[
         bool | None,
-        typer.Option("--debug/--no-debug", help="Enable/disable debug mode"),
+        typer.Option(
+            "--debug/--no-debug", help="Enable/disable debug mode", envvar="FAB_DEBUG"
+        ),
     ] = None,
     log_file: Annotated[
         Path | None, typer.Option("--log", help="Log all output to file")
@@ -115,32 +199,26 @@ def common_options(
         Path | None,
         typer.Option("--project-dot-env", "-pde", help="Set project .env file path"),
     ] = None,
-    force: Annotated[
-        bool,
-        typer.Option("--force", "-f", help="Force command execution and ignore errors"),
-    ] = False,
-    writer: Annotated[
-        HDLType,
-        typer.Option(
-            "--writer",
-            "-w",
-            help="Set type of HDL code generated. System Verilog is not supported yet.",
-            case_sensitive=False,
-        ),
-    ] = HDLType.VERILOG,
 ) -> None:
     """Provide common options for all FABulous commands."""
-    shared_state.verbose = verbose
-    shared_state.debug = os.getenv("FAB_DEBUG") is not None if debug is None else debug
-    shared_state.log_file = log_file
-    shared_state.global_dot_env = global_dot_env
-    shared_state.project_dot_env = project_dot_env
-    shared_state.force = force
-    shared_state.writer = writer
     setup_logger(
-        shared_state.verbose,
-        shared_state.debug,
-        log_file=shared_state.log_file or Path(),
+        verbose,
+        debug or False,
+        log_file=log_file or Path(),
+    )
+
+    if (s := ctx.invoked_subcommand) and (
+        s.startswith("install") or s == "create-project" or s == "c"
+    ):
+        return
+
+    if "--help" in sys.argv:
+        return
+
+    init_context(
+        project_dir=project_dir or Path().cwd(),
+        global_dot_env=global_dot_env,
+        project_dot_env=project_dot_env,
     )
 
 
@@ -154,7 +232,7 @@ def check_version_compatibility(_: Path) -> None:
         logger.error(
             f"Version incompatible! FABulous-FPGA version: {package_version}, "
             f"Project version: {project_version}\n"
-            r'Please run "FABulous <project_dir> --update-project-version" '
+            r'Please run "FABulous \<project_dir> --update-project-version" '
             r"to update the project version."
         )
         raise typer.Exit(1) from None
@@ -171,15 +249,22 @@ def check_version_compatibility(_: Path) -> None:
 @app.command("create-project")
 @app.command("c", hidden=True)
 def create_project_cmd(
-    project_dir: Annotated[
-        Path, typer.Argument(help="Directory to create a project")
-    ] = Path(),
+    project_dir: Annotated[Path, typer.Argument(help="Directory to create a project")],
+    writer: WriterType = HDLType.VERILOG,
+    overwrite: bool = False,
 ) -> None:
     """Create a new FABulous project.
 
     Alias: c
     """
-    create_project(project_dir, cast("Literal['verilog', 'vhdl']", shared_state.writer))
+    if project_dir.exists() and not overwrite:
+        delete_existing = typer.confirm(
+            f"Project directory {project_dir} already exists. Overwrite?"
+        )
+        if not delete_existing:
+            logger.info("Project creation cancelled.")
+            raise typer.Exit(0)
+    create_project(project_dir, writer)
     logger.info(f"FABulous project created successfully at {project_dir}")
 
 
@@ -223,12 +308,10 @@ def install_fabulator_cmd(
 
 
 @app.command("update-project-version")
-def update_project_version_cmd(
-    project_dir: ProjectDirType = Path(),
-) -> None:
+def update_project_version_cmd() -> None:
     """Update project version to match package version."""
-    logger.info(f"Using {project_dir} directory as project directory")
-    if not update_project_version(project_dir):
+    logger.info(f"Using {get_context().proj_dir} directory as project directory")
+    if not update_project_version(get_context().proj_dir):
         logger.error(
             "Failed to update project version. Please check the logs for more details."
         )
@@ -238,10 +321,15 @@ def update_project_version_cmd(
 
 @app.command("script")
 def script_cmd(
-    project_dir: ProjectDirType = None,
     script_file: Annotated[
-        Path, typer.Argument(help="Script file to execute", resolve_path=True)
-    ] = Path(),
+        Path,
+        typer.Argument(
+            help="Script file to execute",
+            resolve_path=True,
+            exists=True,
+            dir_okay=False,
+        ),
+    ],
     script_type: Annotated[
         str,
         typer.Option(
@@ -251,6 +339,7 @@ def script_cmd(
             click_type=click.Choice(["fabulous", "tcl"]),
         ),
     ] = "tcl",
+    force: ForceType = False,
 ) -> None:
     """Execute a script file with auto-detection of script type.
 
@@ -262,20 +351,13 @@ def script_cmd(
     """
     # Initialize context
     entering_dir = Path.cwd()
-    settings = init_context(
-        project_dir=project_dir,
-        global_dot_env=shared_state.global_dot_env,
-        project_dot_env=shared_state.project_dot_env,
-    )
     script_file = script_file.absolute()
-    if project_dir is not None:
-        os.chdir(project_dir)
+    os.chdir(get_context().proj_dir)
     fab_CLI = FABulous_CLI(
-        settings.proj_lang,
-        force=shared_state.force,
-        debug=shared_state.debug,
+        writerType=get_context().proj_lang,
+        force=force,
+        debug=get_context().debug,
     )
-    fab_CLI.debug = shared_state.debug
     # Change to project directory
 
     # Try to load fabric, but don't fail if it's not a valid FABulous project
@@ -320,31 +402,21 @@ def script_cmd(
 
 @app.command("start")
 @app.command("s", hidden=True)
-def start_cmd(project_dir: ProjectDirType = None) -> None:
+def start_cmd(force: ForceType = False) -> None:
     """Start FABulous in interactive mode. Alias: s.
 
     This is the main command for running FABulous in interactive mode or with scripts.
     If no project directory is specified, uses the current directory.
     """
-    # Initialize the global context with settings
-    settings = init_context(
-        project_dir=project_dir,
-        global_dot_env=shared_state.global_dot_env,
-        project_dot_env=shared_state.project_dot_env,
-    )
     entering_dir = Path.cwd()
     fab_CLI = FABulous_CLI(
-        settings.proj_lang,
-        force=shared_state.force,
+        get_context().proj_lang,
+        force=force,
         interactive=True,
-        verbose=shared_state.verbose >= 2,
-        debug=shared_state.debug,
+        verbose=get_context().verbose >= 2,
+        debug=get_context().debug,
     )
-    fab_CLI.debug = shared_state.debug
-
-    # Change to project directory
-    if settings.proj_dir is not None:
-        os.chdir(settings.proj_dir)
+    os.chdir(get_context().proj_dir)
     fab_CLI.onecmd_plus_hooks("load_fabric")
     fab_CLI.cmdloop()
     os.chdir(entering_dir)
@@ -353,7 +425,6 @@ def start_cmd(project_dir: ProjectDirType = None) -> None:
 @app.command("run")
 @app.command("r", hidden=True)
 def run_cmd(
-    project_dir: ProjectDirType = None,
     commands: Annotated[
         list[str] | None,
         typer.Argument(
@@ -367,32 +438,24 @@ def run_cmd(
             callback=lambda cmds: cmds[0] if cmds else None,
         ),
     ] = None,
+    force: ForceType = False,
 ) -> None:
     """Run commands directly in a FABulous project.
 
     Alias: r
     """
-    settings = init_context(
-        project_dir=project_dir,
-        global_dot_env=shared_state.global_dot_env,
-        project_dot_env=shared_state.project_dot_env,
-    )
-
     entering_dir = Path.cwd()
-
     fab_CLI = FABulous_CLI(
-        settings.proj_lang,
-        force=shared_state.force,
-        interactive=True,
-        verbose=shared_state.verbose >= 2,
-        debug=shared_state.debug,
+        get_context().proj_lang,
+        force=force,
+        interactive=False,
+        verbose=get_context().verbose >= 2,
+        debug=get_context().debug,
     )
-    fab_CLI.debug = shared_state.debug
 
     # Change to project directory
-    logger.info(f"Setting current working directory to: {settings.proj_dir}")
-    if settings.proj_dir is not None:
-        os.chdir(settings.proj_dir)
+    logger.info(f"Setting current working directory to: {get_context().proj_dir}")
+    os.chdir(get_context().proj_dir)
     fab_CLI.onecmd_plus_hooks("load_fabric")
     # Ensure commands is a list
     if isinstance(commands, str):
@@ -401,7 +464,7 @@ def run_cmd(
         return
 
     # Create and execute command pipeline
-    pipeline = CommandPipeline(fab_CLI, force=shared_state.force)
+    pipeline = CommandPipeline(fab_CLI, force=force)
 
     # Add all commands to pipeline
     for cmd in commands:
@@ -437,7 +500,7 @@ def main() -> None:
     try:
         if len(sys.argv) == 1:
             app()
-
+        sys.argv = reorder_options(sys.argv)
         for i in sys.argv[1:]:
             if i in [i.name for i in app.registered_commands] or i == "--help":
                 app()
@@ -544,12 +607,13 @@ def convert_legacy_args_with_deprecation_warning() -> None:
     parser.add_argument(
         "-w",
         "--writer",
-        choices=list(HDLType),
+        choices=["verilog", "vhdl"],
+        type=lambda s: s.lower(),
         help=(
             "Set the type of HDL code generated by the tool. Currently support Verilog "
             "and VHDL (Default using Verilog)"
         ),
-        default=HDLType.VERILOG,
+        default="verilog",
     )
 
     parser.add_argument(
@@ -611,16 +675,6 @@ def convert_legacy_args_with_deprecation_warning() -> None:
 
     args = parser.parse_args()
 
-    common_options(
-        verbose=args.verbose,
-        debug=args.debug,
-        log_file=args.log,
-        global_dot_env=args.globalDotEnv,
-        project_dot_env=args.projectDotEnv,
-        force=args.force,
-        writer=args.writer if args.writer is not None else HDLType.VERILOG,
-    )
-
     setup_logger(args.verbose, args.debug, log_file=args.log)
 
     # Show deprecation warning
@@ -631,10 +685,10 @@ def convert_legacy_args_with_deprecation_warning() -> None:
         "\n"
         r"  FABulous --install_oss_cad_suite → FABulous install-oss-cad-suite \<dir>"
         "\n"
-        r"  FABulous \<project_dir> --commands \<cmd> → FABulous run \<project_dir> "
+        r"  FABulous \<project_dir> --commands \<cmd> → FABulous -p \<project_dir> run "
         r"\<cmd>"
         "\n"
-        r"  FABulous \<project_dir>  → FABulous start \<project_dir>"
+        r"  FABulous \<project_dir>  → FABulous -p \<project_dir> start"
         "\n"
         r"  FABulous \<project_dir> --debug  → FABulous --debug start \<project_dir>"
         "\n"
@@ -648,12 +702,24 @@ def convert_legacy_args_with_deprecation_warning() -> None:
         if not args.project_dir:
             logger.error("Project directory is required when creating a project")
             raise typer.Exit(2) from None
-        create_project_cmd(project_dir)
+        create_project_cmd(project_dir, HDLType[args.writer.upper()])
+        sys.exit(0)
 
-    elif args.install_oss_cad_suite:
+    if args.install_oss_cad_suite:
         # Convert to: FABulous install-oss-cad-suite <directory> [options]
         install_oss_cad_suite_cmd(project_dir)
-    elif args.update_project_version:
+        sys.exit(0)
+
+    common_options(
+        ctx=typer.Context(click.Command("legacy_args")),
+        project_dir=Path(args.project_dir) if args.project_dir else None,
+        verbose=args.verbose,
+        debug=args.debug,
+        log_file=args.log,
+        global_dot_env=args.globalDotEnv,
+        project_dot_env=args.projectDotEnv,
+    )
+    if args.update_project_version:
         update_project_version_cmd(project_dir)
     elif args.FABulousScript:
         # Convert legacy --FABulousScript to new typer script command
@@ -661,9 +727,9 @@ def convert_legacy_args_with_deprecation_warning() -> None:
         # Pass None when no project directory provided to trigger dotenv resolution
         try:
             script_cmd(
-                project_dir=Path(args.project_dir) if args.project_dir else None,
                 script_file=args.FABulousScript,
                 script_type="fabulous",
+                force=args.force,
             )
         except typer.Exit as e:
             sys.exit(e.exit_code)
@@ -673,9 +739,9 @@ def convert_legacy_args_with_deprecation_warning() -> None:
         # Pass None when no project directory provided to trigger dotenv resolution
         try:
             script_cmd(
-                project_dir=Path(args.project_dir) if args.project_dir else None,
                 script_file=args.TCLScript,
                 script_type="tcl",
+                force=args.force,
             )
         except typer.Exit as e:
             sys.exit(e.exit_code)
@@ -688,15 +754,15 @@ def convert_legacy_args_with_deprecation_warning() -> None:
 
         # Handle empty commands case - exit gracefully
         if not parsed_commands:
-            logger.info("No commands provided, exiting gracefully")
+            logger.info("No commands provided, exiting")
             sys.exit(0)
 
         # Use the new Typer run command internally
         # Pass None when no project directory provided to trigger dotenv resolution
         try:
             run_cmd(
-                project_dir=Path(args.project_dir) if args.project_dir else None,
                 commands=parsed_commands,
+                force=args.force,
             )
         except typer.Exit as e:
             sys.exit(e.exit_code)
@@ -705,7 +771,7 @@ def convert_legacy_args_with_deprecation_warning() -> None:
         # Use the new Typer start command internally
         # Pass None when no project directory provided to trigger dotenv resolution
         try:
-            start_cmd(project_dir=Path(args.project_dir) if args.project_dir else None)
+            start_cmd(force=args.force)
         except typer.Exit as e:
             sys.exit(e.exit_code)
 

@@ -44,7 +44,7 @@ class FABulousSettings(BaseSettings):
     oss_cad_suite: Path | None = None
 
     proj_dir: Path = Field(default_factory=Path.cwd)
-    proj_lang: str = "verilog"
+    proj_lang: HDLType = HDLType.VERILOG
     models_pack: Path | None = None
     switch_matrix_debug_signal: bool = False
     proj_version_created: Version = Version("0.0.1")
@@ -56,6 +56,7 @@ class FABulousSettings(BaseSettings):
     )
 
     debug: bool = False
+    verbose: int = 0
 
     @field_validator("proj_version", "proj_version_created", "version", mode="before")
     @classmethod
@@ -179,6 +180,16 @@ class FABulousSettings(BaseSettings):
         if not (Path(value) / ".FABulous").exists():
             raise ValueError(f"{value} is not a FABulous project")
         return value.resolve()
+
+    @field_validator("proj_lang", mode="before")
+    @classmethod
+    def parse_proj_lang(cls, value: str | HDLType) -> str | HDLType:
+        """Parse project language from string or HDLType enum."""
+        if isinstance(value, HDLType):
+            return value
+        if isinstance(value, str):
+            return value.strip().lower()
+        raise ValueError("Project language must be a string or HDLType enum")
 
     @field_validator("proj_lang", mode="after")
     @classmethod

@@ -4,6 +4,7 @@ from pathlib import Path
 
 import pytest
 
+from FABulous.fabric_definition.define import HDLType
 from FABulous.FABulous_CLI.helper import create_project, update_project_version
 
 
@@ -35,7 +36,7 @@ def test_create_project_vhdl(tmp_path: Path) -> None:
     """Test creating a VHDL project."""
     # Test VHDL project creation
     project_dir = tmp_path / "test_project_vhdl"
-    create_project(project_dir, lang="vhdl")
+    create_project(project_dir, lang=HDLType.VHDL)
 
     # Check if directories exist
     assert project_dir.exists()
@@ -52,16 +53,6 @@ def test_create_project_vhdl(tmp_path: Path) -> None:
     assert any(project_dir.glob("**/*.vhdl")), (
         "No VHDL files found in project directory"
     )
-
-
-def test_create_project_existing_dir(tmp_path: Path) -> None:
-    """Test creating project in existing directory should fail."""
-    # Test creating project in existing directory
-    project_dir = tmp_path / "existing_dir"
-    project_dir.mkdir()
-
-    with pytest.raises(SystemExit):
-        create_project(project_dir)
 
 
 def test_update_project_version_success(

@@ -83,6 +83,12 @@ If you are using yosys oss-cad-suite, no need to install the following packages.
 :`Yosys ghdl plugin <https://github.com/ghdl/ghdl-yosys-plugin>`_:
  Only needed for VHDL synthesis
 
+We have also provided a command to install the above packages automatically.
+
+.. prompt:: bash $
+
+   FABulous install-cad-tools
+
 .. note::
 
    We recommend using the `OSS CAD Suite
@@ -115,8 +121,26 @@ To use the FABulous Shell, you can run the following command:
 
 .. prompt:: bash (venv)$
 
-  FABulous -c <name_of_project>
+  FABulous create-project <name_of_project>
+
+  # to start the shell
+  cd <name_of_project>
+  FABulous start
+
+  # or
+
+  FABulous --project-dir <name_of_project> start
+
+  # or an special alias for project starting
   FABulous <name_of_project>
+
+If you want to use a specific RTL language (Verilog or VHDL) for your project, you can use the ``--writer`` flag when creating the project.
+
+.. prompt:: bash (venv)$
+
+  FABulous create-project <name_of_project> --writer vhdl
+  # or
+  FABulous create-project <name_of_project> -w vhdl
 
 Inside the FABulous shell, run:
 
@@ -130,10 +154,13 @@ To run the FABulous flow directly from the command line, you can use the followi
 
 .. prompt:: bash (venv)$
 
-  FABulous -c <name_of_project>
-  FABulous <name_of_project> -p "run_FABulous_fabric; run_FABulous_bitstream user_design/sequential_16bit_en.v"
+  FABulous c <name_of_project> # alias for create-project
 
+  # -p is short for --project-dir
+  FABulous -p <name_of_project> run "run_FABulous_fabric; run_FABulous_bitstream user_design/sequential_16bit_en.v"
 
+  # or r is short for run
+  FABulous -p <name_of_project> r "run_FABulous_fabric; run_FABulous_bitstream user_design/sequential_16bit_en.v"
 
 .. note::
 
@@ -215,6 +242,7 @@ FAB_PROJ_DIR              The root directory of the FABulous project          Th
 FAB_MODELS_PACK           The model pack for the project                      Pointing to <project_dir>/Fabric/models_pack.<project_lang>
 FAB_OSS_CAD_SUITE         Path to the oss-cad-suite installation              <None>
 FAB_DEBUG                 Enable debug mode                                   False
+FAB_VERBOSE               Enable verbose mode                                 0
 ========================= =================================================== ===========================================================================
 
 Project Specific Environment Variables

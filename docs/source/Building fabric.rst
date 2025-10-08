@@ -16,7 +16,7 @@ completed.
 
    .. prompt:: bash (venv)$
 
-        FABulous -c demo
+        FABulous create-project demo
 
 This will create a new project named ``demo`` in the current directory.
 

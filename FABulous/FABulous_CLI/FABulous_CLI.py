@@ -1399,6 +1399,53 @@ class FABulous_CLI(Cmd):
         "--last-run", help="launch GUI to view last run", action="store_true"
     )
 
+    def get_file_path(self, args, file_extension: str) -> str:
+        def get_latest(directory: Path, file_extension: str) -> str:
+            """Get the latest modified file in a directory."""
+            files = list(directory.glob(f"**/*.{file_extension}"))
+            if not files:
+                raise FileNotFoundError(
+                    f"No .{file_extension} files found in the specified directory."
+                )
+            latest_file = max(files, key=lambda f: f.stat().st_mtime)
+            return str(latest_file)
+
+        def get_option(f: Path, file_extension: str) -> str:
+            title = "Select which file to view"
+            files_list = sorted(
+                f.glob(f"**/*.{file_extension}"),
+                key=lambda f: f.stat().st_mtime,
+                reverse=True,
+            )[:10]
+            _, idx = pick(
+                list(map(lambda x: str(x.relative_to(self.projectDir)), files_list)),
+                title,
+            )
+            return str(files_list[cast("int", idx)])
+
+        file: str = ""
+        if args.last_run:
+            if args.fabric:
+                file = get_latest(self.projectDir / "Fabric", file_extension)
+            elif args.tile is not None:
+                file = get_latest(self.projectDir / "Tile" / args.tile, file_extension)
+            else:
+                file = get_latest(self.projectDir, file_extension)
+        else:
+            if args.fabric:
+                file = get_option(self.projectDir / "Fabric", file_extension)
+            elif args.tile is not None:
+                file = get_option(self.projectDir / "Tile" / args.tile, file_extension)
+            elif args.tile is None and not args.fabric:
+                file = get_option(self.projectDir, file_extension)
+
+        if not file:
+            raise FileNotFoundError(
+                f"No .{file_extension} files found in the specified directory."
+            )
+
+        return file
+
     @with_argparser(gui_parser)
     @with_category(CMD_TOOLS)
     def do_start_openroad_gui(self, args) -> None:
@@ -1409,52 +1456,10 @@ class FABulous_CLI(Cmd):
         logger.info("Checking for OpenROAD installation")
         openroad = get_context().openroad_path
         file_name: str
-        db_file = ""
-
-        def get_latest(directory: Path) -> str:
-            """Get the latest modified file in a directory."""
-            files = list(directory.glob("**/*.odb"))
-            if not files:
-                raise FileNotFoundError(
-                    "No .db files found in the specified directory."
-                )
-            latest_file = max(files, key=lambda f: f.stat().st_mtime)
-            return str(latest_file)
-
         if args.fabric and args.tile is not None:
             raise CommandError("Please specify either --fabric or --tile, not both")
 
-        if args.last_run:
-            if args.fabric:
-                db_file = get_latest(self.projectDir / "Fabric")
-            elif args.tile is not None:
-                db_file = get_latest(self.projectDir / "Tile" / args.tile)
-            else:
-                db_file = get_latest(self.projectDir)
-        else:
-            title = "Select which file to view"
-
-            def get_option(f: Path) -> Path:
-                files_list = sorted(
-                    f.glob("**/*.odb"),
-                    key=lambda f: f.stat().st_mtime,
-                    reverse=True,
-                )[:10]
-                _, idx = pick(
-                    list(
-                        map(lambda x: str(x.relative_to(self.projectDir)), files_list)
-                    ),
-                    title,
-                )
-                return files_list[cast("int", idx)]
-
-            if args.fabric:
-                db_file = get_option(self.projectDir / "Fabric")
-            elif args.tile is not None:
-                db_file = get_option(self.projectDir / "Tile" / args.tile)
-            elif args.tile is None and not args.fabric:
-                db_file = get_option(self.projectDir)
-
+        db_file: str = self.get_file_path(args, "odb")
         with tempfile.NamedTemporaryFile(
             mode="w", suffix=".tcl", delete=False
         ) as script_file:
@@ -1467,5 +1472,32 @@ class FABulous_CLI(Cmd):
                 str(openroad),
                 "-gui",
                 str(file_name),
+            ]
+        )
+
+    @with_argparser(gui_parser)
+    @with_category(CMD_TOOLS)
+    def do_start_klayout_gui(self, args) -> None:
+        """Start OpenROAD GUI if an installation can be found.
+
+        If no installation can be found, a warning is produced.
+        """
+        logger.info("Checking for OpenROAD installation")
+        klayout = get_context().klayout_path
+        if args.fabric and args.tile is not None:
+            raise CommandError("Please specify either --fabric or --tile, not both")
+
+        gds_file: str = self.get_file_path(args, "gds")
+        logger.info(f"Start klayout GUI with odb: {gds_file}")
+        sp.run(
+            [
+                str(klayout),
+                "-l",
+                (get_context().pdk_root)
+                / "libs.tech"
+                / "klayout"
+                / "tech"
+                / f"{get_context().pdk}.lyt",
+                gds_file,
             ]
         )

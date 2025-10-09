@@ -44,6 +44,7 @@ class FABulousSettings(BaseSettings):
     fabulator_root: Path | None = None
     oss_cad_suite: Path | None = None
     openroad_path: Path | None = None
+    klayout_path: Path | None = None
 
     proj_dir: Path = Field(default_factory=Path.cwd)
     proj_lang: HDLType = HDLType.VERILOG
@@ -230,6 +231,7 @@ class FABulousSettings(BaseSettings):
         "vvp_path",
         "ghdl_path",
         "openroad_path",
+        "klayout_path",
         mode="before",
     )
     @classmethod
@@ -270,6 +272,7 @@ class FABulousSettings(BaseSettings):
             "vvp_path": "vvp",
             "ghdl_path": "ghdl",
             "openroad_path": "openroad",
+            "klayout_path": "klayout",
         }
         tool = tool_map.get(info.field_name, None)  # type: ignore[attr-defined]
         if tool is None:

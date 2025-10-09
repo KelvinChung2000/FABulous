@@ -514,7 +514,7 @@ class FABulous_API:
                 raise ValueError("PDK must be specified either here or in settings.")
 
         file_list = [str(f) for f in tile_dir.glob("**/*.v") if "macro" not in f.parts]
-        if f := get_context().model_pack:
+        if f := get_context().models_pack:
             file_list.append(str(f.resolve()))
         (tile_dir / "macro").mkdir(exist_ok=True)
         logger.info(f"PDK root: {pdk_root}")

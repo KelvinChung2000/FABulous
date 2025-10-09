@@ -1460,9 +1460,7 @@ class FABulous_CLI(Cmd):
         ) as script_file:
             # script_file.name contains the full filesystem path to the temp file
             script_file.write(f"read_db {db_file}\n")
-
             file_name = script_file.name
-
         logger.info(f"Start OpenROAD GUI with odb: {db_file}")
         sp.run(
             [

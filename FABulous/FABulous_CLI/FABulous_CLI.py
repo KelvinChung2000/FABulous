@@ -28,9 +28,11 @@ import pprint
 import shutil
 import subprocess as sp
 import sys
+import tempfile
 import tkinter as tk
 import traceback
 from pathlib import Path
+from typing import cast
 
 from cmd2 import (
     Cmd,
@@ -42,6 +44,7 @@ from cmd2 import (
     with_category,
 )
 from loguru import logger
+from pick import pick
 
 from FABulous.custom_exception import CommandError, EnvironmentNotSet, InvalidFileType
 from FABulous.fabric_cad.bit_gen import genBitstream
@@ -1378,3 +1381,93 @@ class FABulous_CLI(Cmd):
     @with_category(CMD_FABRIC_FLOW)
     def run_FABulous_eFPGA_marco(self):
         self.fabulousAPI.fabric_full_flow(self.projectDir, self.projectDir / "macro")
+
+    gui_parser = Cmd2ArgumentParser()
+    gui_parser.add_argument(
+        "--tile",
+        help="launch GUI to view a specific tile",
+        default=None,
+        completer=lambda self: self.fab.getTiles(),
+    )
+    gui_parser.add_argument(
+        "--fabric",
+        help="launch GUI to view the entire fabric",
+        default=False,
+        action="store_true",
+    )
+    gui_parser.add_argument(
+        "--last-run", help="launch GUI to view last run", action="store_true"
+    )
+
+    @with_argparser(gui_parser)
+    @with_category(CMD_TOOLS)
+    def do_start_openroad_gui(self, args) -> None:
+        """Start OpenROAD GUI if an installation can be found.
+
+        If no installation can be found, a warning is produced.
+        """
+        logger.info("Checking for OpenROAD installation")
+        openroad = get_context().openroad_path
+        file_name: str
+        db_file = ""
+
+        def get_latest(directory: Path) -> str:
+            """Get the latest modified file in a directory."""
+            files = list(directory.glob("**/*.odb"))
+            if not files:
+                raise FileNotFoundError(
+                    "No .db files found in the specified directory."
+                )
+            latest_file = max(files, key=lambda f: f.stat().st_mtime)
+            return str(latest_file)
+
+        if args.fabric and args.tile is not None:
+            raise CommandError("Please specify either --fabric or --tile, not both")
+
+        if args.last_run:
+            if args.fabric:
+                db_file = get_latest(self.projectDir / "Fabric")
+            elif args.tile is not None:
+                db_file = get_latest(self.projectDir / "Tile" / args.tile)
+            else:
+                db_file = get_latest(self.projectDir)
+        else:
+            title = "Select which file to view"
+
+            def get_option(f: Path) -> Path:
+                files_list = sorted(
+                    f.glob("**/*.odb"),
+                    key=lambda f: f.stat().st_mtime,
+                    reverse=True,
+                )[:10]
+                _, idx = pick(
+                    list(
+                        map(lambda x: str(x.relative_to(self.projectDir)), files_list)
+                    ),
+                    title,
+                )
+                return files_list[cast("int", idx)]
+
+            if args.fabric:
+                db_file = get_option(self.projectDir / "Fabric")
+            elif args.tile is not None:
+                db_file = get_option(self.projectDir / "Tile" / args.tile)
+            elif args.tile is None and not args.fabric:
+                db_file = get_option(self.projectDir)
+
+        with tempfile.NamedTemporaryFile(
+            mode="w", suffix=".tcl", delete=False
+        ) as script_file:
+            # script_file.name contains the full filesystem path to the temp file
+            script_file.write(f"read_db {db_file}\n")
+
+            file_name = script_file.name
+
+        logger.info(f"Start OpenROAD GUI with odb: {db_file}")
+        sp.run(
+            [
+                str(openroad),
+                "-gui",
+                str(file_name),
+            ]
+        )

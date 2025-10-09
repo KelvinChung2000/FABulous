@@ -43,6 +43,7 @@ class FABulousSettings(BaseSettings):
     ghdl_path: Path | None = None
     fabulator_root: Path | None = None
     oss_cad_suite: Path | None = None
+    openroad_path: Path | None = None
 
     proj_dir: Path = Field(default_factory=Path.cwd)
     proj_lang: HDLType = HDLType.VERILOG
@@ -60,6 +61,7 @@ class FABulousSettings(BaseSettings):
     editor: str | None = None
     verbose: int = 0
     debug: bool = False
+    verbose: int = 0
 
     # GDS variables
     pdk_root: Path = Path().home() / ".ciel"
@@ -227,6 +229,7 @@ class FABulousSettings(BaseSettings):
         "iverilog_path",
         "vvp_path",
         "ghdl_path",
+        "openroad_path",
         mode="before",
     )
     @classmethod
@@ -266,6 +269,7 @@ class FABulousSettings(BaseSettings):
             "iverilog_path": "iverilog",
             "vvp_path": "vvp",
             "ghdl_path": "ghdl",
+            "openroad_path": "openroad",
         }
         tool = tool_map.get(info.field_name, None)  # type: ignore[attr-defined]
         if tool is None:

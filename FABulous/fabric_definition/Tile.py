@@ -1,6 +1,7 @@
 """Store information about a tile."""
 
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import TYPE_CHECKING
 
 from FABulous.fabric_definition.Bel import Bel

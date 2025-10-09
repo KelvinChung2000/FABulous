@@ -2,26 +2,24 @@
 
 from __future__ import annotations
 
-import argparse
 import inspect
 from collections.abc import Callable
-from typing import Any, Protocol, cast
+from typing import Any, cast
 
 import click
 import typer
 from cmd2 import Cmd
-from cmd2.parsing import Statement, shlex_split
-from cmd2.plugin import PostparsingData
+from cmd2.parsing import Statement
 from loguru import logger
 
 from FABulous.custom_exception import CommandError
 
 
-class CompletionSpec:
+class CompleterSpec:
     """Specification for tab completion behavior.
 
-    Used to declare completion functions that the plugin will wire up to both
-    Click's autocompletion and cmd2's tab completion.
+    Used to declare completion functions that the plugin will wire up to both Click's
+    autocompletion and cmd2's tab completion.
     """
 
     def __init__(self, completer: Callable[[Cmd, str, str, int], list[str]]):
@@ -34,151 +32,22 @@ class CompletionSpec:
         self.completer = completer
 
 
-class _SupportsTyperConfig(Protocol):  # pragma: no cover
-    typer_auto_enable: bool
-    typer_skip_commands: set[str]
-    typer_command_kwargs: dict[str, dict[str, Any]]
+class Cmd2TyperPlugin(Cmd):
+    """Optional mixin supplying default Typer integration attributes.
+
+    Inherit alongside your ``cmd2.Cmd`` subclass if you want convenient defaults,
+    or simply define the same attributes on your class directly.
+    """
+
+    typer_auto_enable: bool = True
+    typer_skip_commands: set[str] = set()
+    typer_command_kwargs: dict[str, dict[str, Any]] = {}
     typer_command_builder: (
         Callable[[Callable[..., Any], str, dict[str, Any]], click.Command] | None
-    )
+    ) = None
 
+    __inner_app: typer.Typer
 
-def _split_line(line: str) -> list[str]:
-    # shlex_split from cmd2 already raises ValueError for malformed quotes;
-    # fall back to simple split.
-    try:
-        return shlex_split(line)
-    except ValueError:  # pragma: no cover
-        return line.strip().split()
-
-
-def _is_candidate(func: Callable[..., Any]) -> bool:
-    sig = inspect.signature(func)
-    params = list(sig.parameters.values())
-    if not params or params[0].name != "self":
-        return False
-    var_positional_count = 0
-    for p in params[1:]:
-        if p.kind is inspect.Parameter.VAR_KEYWORD:
-            return False
-        if p.kind is inspect.Parameter.VAR_POSITIONAL:
-            var_positional_count += 1
-            # allow exactly one *args annotated as str (variadic tokens)
-            ann = p.annotation
-            if ann not in (str, inspect.Signature.empty):
-                return False
-            continue
-        ann = p.annotation
-        if ann in {argparse.Namespace}:
-            return False
-        origin = getattr(ann, "__origin__", None)
-        if origin in {argparse.Namespace}:
-            return False
-    return var_positional_count <= 1
-
-
-def _default_builder(
-    cb: Callable[..., Any], name: str, kwargs: dict[str, Any]
-) -> click.Command:
-    """Return a Click command object for the method's Typer subcommand.
-
-    We build a transient Typer application, register the method as a subcommand
-    with the same name, then extract the underlying Click command for that
-    subcommand. This allows us to call ``click_cmd.main(args=...)`` directly
-    with the user's argument tokens (without inserting the command name).
-    No implicit normalization or fallback coercion is performed—argument
-    semantics are entirely driven by the function signature and annotations.
-    """
-    app = typer.Typer(add_completion=False, **kwargs)
-    app.command(name=name)(cb)
-    root = typer.main.get_command(app)
-    if isinstance(root, click.Group):
-        command = root.commands.get(name)
-        if command is not None:
-            return command
-    if isinstance(root, click.Command):
-        return root
-    raise RuntimeError(f"Failed to build Typer command for {name}")
-
-
-def _extract_completion_spec(func: Callable[..., Any]) -> CompletionSpec | None:
-    """Extract CompletionSpec from function annotations if present."""
-    sig = inspect.signature(func)
-
-    for param in sig.parameters.values():
-        if param.name == "self":
-            continue
-
-        # Check if annotation contains CompletionSpec
-        ann = param.annotation
-        if ann is inspect.Signature.empty:
-            continue
-
-        # Handle Annotated types
-        origin = getattr(ann, "__origin__", None)
-        if origin is not None:
-            # For Annotated[type, metadata...], check metadata
-            metadata = getattr(ann, "__metadata__", ())
-            for item in metadata:
-                if isinstance(item, CompletionSpec):
-                    return item
-
-    return None
-
-
-def _register_click_completer(
-    app: Cmd,
-    cmd_name: str,
-    click_cmd: click.Command,
-    completion_spec: CompletionSpec | None,
-) -> None:
-    """Register a cmd2 completer using the provided CompletionSpec.
-
-    Args:
-        app: The cmd2 application instance
-        cmd_name: Name of the command (without 'do_' prefix)
-        click_cmd: The Click command object
-        completion_spec: Optional completion specification with custom completer
-    """
-    if completion_spec is None:
-        # No custom completion, skip registration
-        return
-
-    def completer(text: str, line: str, begidx: int, endidx: int) -> list[str]:
-        try:
-            # Call the user-provided completion function
-            return completion_spec.completer(app, text, line, begidx)
-        except (AttributeError, TypeError, ValueError):
-            return []
-
-    # Register the completer with cmd2
-    completer_name = f"complete_{cmd_name}"
-    setattr(app, completer_name, completer)
-
-
-def reregister_completers(app: Cmd) -> None:
-    """Re-register all Typer command completers.
-
-    This is useful after cmd2 disables/enables categories, which replaces
-    completers with disabled stubs. Call this after enabling categories
-    to restore working completers.
-    """
-    cache = getattr(app, "typer_command_cache", None)
-    if not cache:
-        return
-
-    for cmd_name, (click_cmd, completion_spec) in cache.items():
-        _register_click_completer(app, cmd_name, click_cmd, completion_spec)
-
-
-def _build_cache(app: Cmd) -> dict[str, tuple[click.Command, CompletionSpec | None]]:
-    cfg = cast("_SupportsTyperConfig", app)
-    if not getattr(cfg, "typer_auto_enable", True):
-        return {}
-    skip_raw = getattr(cfg, "typer_skip_commands", set())
-    skip = {s if s.startswith("do_") else f"do_{s}" for s in skip_raw}
-
-    # Always skip standard cmd2 commands regardless of where they're defined
     standard_cmd2_commands = {
         "do_exit",
         "do_quit",
@@ -196,118 +65,93 @@ def _build_cache(app: Cmd) -> dict[str, tuple[click.Command, CompletionSpec | No
         "do_set",
         "do_settable",
     }
-    skip.update(standard_cmd2_commands)
 
-    overrides = getattr(cfg, "typer_command_kwargs", {})
-    builder = getattr(cfg, "typer_command_builder", None) or _default_builder
-    cache: dict[str, click.Command] = {}
-    for attr in dir(app):
-        if not attr.startswith("do_"):
-            continue
-        if attr in skip or attr[3:] in skip:
-            continue
-        func = getattr(type(app), attr, None)
-        if func is None or not inspect.isfunction(func):
-            continue
-        if func.__module__.startswith("cmd2."):
-            continue
-        if not _is_candidate(func):
-            continue
-        cmd_name = attr[3:]
-        bound_cb = cast("Callable[..., Any]", func.__get__(app))
-        try:
-            click_cmd = builder(bound_cb, cmd_name, dict(overrides.get(cmd_name, {})))
-            # Extract completion specification if present
-            completion_spec = _extract_completion_spec(func)
-            cache[cmd_name] = (click_cmd, completion_spec)
-        except (TypeError, ValueError) as e:  # pragma: no cover
-            logger.error("Failed to build Typer command '{}': {}", cmd_name, e)
-    return cache
+    def _extract_completion_spec(
+        self, func: Callable[..., Any]
+    ) -> CompleterSpec | None:
+        """Extract CompletionSpec from function annotations if present."""
+        # Extract completion specification if present
+        completion_spec = None
+        sig = inspect.signature(func)
+        for param in sig.parameters.values():
+            if param.name == "self":
+                continue
 
+            # Check if annotation contains CompletionSpec
+            ann = param.annotation
+            if ann is inspect.Signature.empty:
+                continue
 
-def plugin_start(app: Cmd) -> None:
-    """cmd2 plugin start: install a postparsing hook to delegate to Typer.
+            # Handle Annotated types
+            origin = getattr(ann, "__origin__", None)
+            if origin is not None:
+                # For Annotated[type, metadata...], check metadata
+                metadata = getattr(ann, "__metadata__", ())
+                for item in metadata:
+                    if isinstance(item, CompleterSpec):
+                        completion_spec = item
+        return completion_spec
 
-    We wait until cmd2 parses a Statement. If the command token matches a Typer
-    command we execute it immediately and prevent further cmd2 dispatch by
-    rewriting the statement into a harmless no-op and marking it as empty.
-    """
-    logger.debug("cmd2_typer plugin_start for {}", type(app).__name__)
-    cache = _build_cache(app)
-    app.typer_command_cache = cache  # type: ignore[attr-defined]
-    if not cache:
-        logger.debug("No Typer commands discovered – plugin idle")
-        return
+    def cmd_register(self) -> None:
+        """Register all cmd2 do_* methods as Typer commands."""
+        skip = set()
 
-    # Register shell completion handlers for each Typer command
-    for cmd_name, (click_cmd, completion_spec) in cache.items():
-        _register_click_completer(app, cmd_name, click_cmd, completion_spec)
+        # Always skip standard cmd2 commands regardless of where they're defined
+        skip.update(self.standard_cmd2_commands)
 
-    def _postparsing(data: PostparsingData) -> PostparsingData:  # pragma: no cover
-        """Postparsing hook compatible with cmd2 2.7.0.
+        for attr in dir(self):
+            if not attr.startswith("do_"):
+                continue
+            if attr in skip or attr[3:] in skip:
+                continue
+            func = getattr(type(self), attr, None)
+            if func is None or not inspect.isfunction(func):
+                continue
+            if func.__module__.startswith("cmd2."):
+                continue
 
-        Expects an object with a ``statement`` attribute (Statement) and a
-        ``stop`` flag.
-        """
-        statement = getattr(data, "statement", None)
-        if statement is None:
-            return data
-        cmd = statement.command
-        if not cmd:
-            return data
-        entry = cache.get(cmd)
-        if not entry:
-            return data
-        click_cmd, _ = entry  # Unpack (click_cmd, completion_spec)
-        arg_tokens = getattr(statement, "arg_list", None)
-        arg_list = list(arg_tokens) if arg_tokens else []
-        try:
-            click_cmd.main(
-                args=arg_list,
-                prog_name=cmd,
+            cmd_name = attr[3:]
+            bound_cb = cast("Callable[..., Any]", func.__get__(self))
+            completer_spec = self._extract_completion_spec(func)
+            self.__inner_app.command(name=cmd_name)(bound_cb)
+
+            if completer_spec is None:
+                continue
+
+            # bind completer_spec into function default to capture current loop value
+            def completer(
+                text: str,
+                line: str,
+                begidx: int,
+                endidx: int,
+                _completer_spec: CompleterSpec = completer_spec,
+            ) -> list[str]:
+                try:
+                    # Call the user-provided completion function
+                    return _completer_spec.completer(self, text, line, begidx)
+                except (AttributeError, TypeError, ValueError):
+                    return []
+
+            setattr(self, f"complete_{cmd_name}", completer)
+
+    def onecmd(
+        self, statement: Statement | str, *, add_to_history: bool = True
+    ) -> bool:
+        cmds = typer.main.get_command(self.__inner_app)
+        if isinstance(cmds, click.Group) and isinstance(statement, Statement):
+            if statement.command not in cmds.commands:
+                return super().onecmd(statement, add_to_history=add_to_history)
+            return cmds.commands[statement.command].main(
+                args=list(statement.arg_list),
+                prog_name=statement.command,
                 standalone_mode=False,
-                obj=app,
+                obj=self.__inner_app,
             )
-        except click.exceptions.Exit as exc:
-            if exc.exit_code not in (None, 0):
-                raise CommandError(f"{cmd} exited with status {exc.exit_code}") from exc
-        except click.ClickException as exc:
-            msg = exc.format_message()
-            logger.error(msg)
-            raise CommandError(msg) from exc
-        # Suppress further processing
-        try:
-            data.stop = True  # type: ignore[attr-defined]
-            data.statement = Statement("")  # type: ignore[attr-defined]
-        except AttributeError:
-            pass
-        return data
-
-    app.register_postparsing_hook(_postparsing)  # type: ignore[arg-type]
-    logger.debug("Registered Typer postparsing hook for: {}", sorted(cache))
-
-
-class Cmd2TyperPlugin:
-    """Optional mixin supplying default Typer integration attributes.
-
-    Inherit alongside your ``cmd2.Cmd`` subclass if you want convenient defaults,
-    or simply define the same attributes on your class directly.
-    """
-
-    typer_auto_enable: bool = True
-    typer_skip_commands: set[str] = set()
-    typer_command_kwargs: dict[str, dict[str, Any]] = {}
-    typer_command_builder: (
-        Callable[[Callable[..., Any], str, dict[str, Any]], click.Command] | None
-    ) = None
+        raise CommandError("Invalid command or statement")
 
     def __init__(self, *args: object, **kwargs: object) -> None:  # pragma: no cover
         super().__init__(*args, **kwargs)
-        if not getattr(self, "_typer_plugin_installed", False) and isinstance(
-            self, Cmd
-        ):
-            plugin_start(cast("Cmd", self))
-            self._typer_plugin_installed = True
+        logger.debug("cmd2_typer plugin_start for {}", type(self).__name__)
+        self.__inner_app = typer.Typer(add_completion=False)
 
-
-__all__ = ["plugin_start", "Cmd2TyperPlugin", "CompletionSpec", "reregister_completers"]
+        self.cmd_register()

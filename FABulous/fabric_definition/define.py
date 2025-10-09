@@ -115,3 +115,10 @@ class FABulousAttribute(StrEnum):
     GLOBAL = "GLOBAL"
     USER_CLK = "USER_CLK"
     CONFIG_BIT = "CONFIG_BIT"
+
+
+class WaveType(StrEnum):
+    """Enumeration for waveform output formats."""
+
+    VCD = "vcd"
+    FST = "fst"

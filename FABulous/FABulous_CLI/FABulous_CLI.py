@@ -20,7 +20,6 @@ includes interactive and batch mode support for fabric generation, bitstream cre
 simulation, and project management.
 """
 
-import argparse
 import csv
 import pickle
 import pprint
@@ -36,7 +35,6 @@ import typer
 from cmd2 import (
     Cmd,
     Settable,
-    Statement,
     categorize,
     with_category,
 )
@@ -44,6 +42,7 @@ from loguru import logger
 
 from FABulous.custom_exception import CommandError, EnvironmentNotSet, InvalidFileType
 from FABulous.fabric_cad.bit_gen import genBitstream
+from FABulous.fabric_definition.define import WaveType
 from FABulous.fabric_generator.code_generator.code_generator_Verilog import (
     VerilogCodeGenerator,
 )
@@ -55,11 +54,9 @@ from FABulous.fabric_generator.gen_fabric.fabric_automation import (
 )
 from FABulous.fabric_generator.parser.parse_csv import parseTilesCSV
 from FABulous.FABulous_API import FABulous_API
-from FABulous.FABulous_CLI import cmd_synthesis
 from FABulous.FABulous_CLI.cmd2_plugin import (
     Cmd2TyperPlugin,
-    CompletionSpec,
-    reregister_completers,
+    CompleterSpec,
 )
 from FABulous.FABulous_CLI.completion_helpers import (
     complete_bel_names,
@@ -285,12 +282,24 @@ class FABulous_CLI(Cmd2TyperPlugin, Cmd):
             CMD_HELPER, "Helper commands are disabled until fabric is loaded"
         )
 
-    def onecmd(
-        self, statement: Statement | str, *, add_to_history: bool = True
+    def onecmd_plus_hooks(
+        self,
+        line: str,
+        *,
+        add_to_history: bool = True,
+        raise_keyboard_interrupt: bool = False,
+        py_bridge_call: bool = False,
+        orig_rl_history_length: int | None = None,
     ) -> bool:
         """Override the onecmd method to handle exceptions."""
         try:
-            return super().onecmd(statement, add_to_history=add_to_history)
+            return super().onecmd_plus_hooks(
+                line,
+                add_to_history=add_to_history,
+                raise_keyboard_interrupt=raise_keyboard_interrupt,
+                py_bridge_call=py_bridge_call,
+                orig_rl_history_length=orig_rl_history_length,
+            )
         except Exception as e:  # noqa: BLE001 - Catching all exceptions is ok here
             logger.debug(traceback.format_exc())
             logger.opt(exception=e).error(str(e).replace("<", r"\<"))
@@ -298,14 +307,6 @@ class FABulous_CLI(Cmd2TyperPlugin, Cmd):
             if self.interactive:
                 return False
             return not self.force
-
-    # ------------------------------------------------------------------
-    # Completion is now handled by the Typer plugin via Click shell completion
-    # ------------------------------------------------------------------
-
-    def _complete_tile_names(self, _incomplete: str) -> list[str]:
-        """Provide tile name completions for Typer commands."""
-        return self.tiles
 
     def do_exit(self, *_ignored: str) -> bool:
         """Exit the FABulous shell and log info message."""
@@ -320,10 +321,10 @@ class FABulous_CLI(Cmd2TyperPlugin, Cmd):
         """Exit the FABulous shell and log info message."""
         self.onecmd_plus_hooks("exit")
 
-    # Import do_synthesis from cmd_synthesis
-    def do_synthesis(self, args: argparse.Namespace) -> None:
-        """Run synthesis on the specified design."""
-        cmd_synthesis.do_synthesis(self, args)
+    # # Import do_synthesis from cmd_synthesis
+    # def do_synthesis(self, args: argparse.Namespace) -> None:
+    #     """Run synthesis on the specified design."""
+    #     cmd_synthesis.do_synthesis(self, args)
 
     @with_category(CMD_SETUP)
     def do_install_oss_cad_suite(
@@ -407,10 +408,6 @@ class FABulous_CLI(Cmd2TyperPlugin, Cmd):
         self.enable_category(CMD_USER_DESIGN_FLOW)
         self.enable_category(CMD_HELPER)
 
-        # Re-register completers after enabling categories
-        # (cmd2 replaces completers with stubs when categories are disabled/enabled)
-        reregister_completers(self)
-
         logger.info("Complete")
 
     @with_category(CMD_HELPER)
@@ -418,7 +415,7 @@ class FABulous_CLI(Cmd2TyperPlugin, Cmd):
         self,
         bel: Annotated[
             str,
-            CompletionSpec(completer=complete_bel_names),
+            CompleterSpec(completer=complete_bel_names),
             typer.Argument(help="Name of the BEL to display"),
         ],
     ) -> None:
@@ -428,7 +425,7 @@ class FABulous_CLI(Cmd2TyperPlugin, Cmd):
 
         for bel_obj in self.fabulousAPI.getBels():
             if bel_obj.name == bel:
-                logger.info(f"\n{pprint.pformat(bel_obj, width=200)}")
+                logger.info("\n{}", pprint.pformat(bel_obj, width=200))
                 return
         raise CommandError(f"Bel {bel} not found in fabric")
 
@@ -437,7 +434,7 @@ class FABulous_CLI(Cmd2TyperPlugin, Cmd):
         self,
         tile: Annotated[
             str,
-            CompletionSpec(completer=complete_tile_names),
+            CompleterSpec(completer=complete_tile_names),
             typer.Argument(help="Name of the tile to display"),
         ],
     ) -> None:
@@ -449,14 +446,14 @@ class FABulous_CLI(Cmd2TyperPlugin, Cmd):
         if tile_obj is None:
             raise CommandError(f"Tile {tile} not found in fabric")
 
-        logger.info(f"\n{pprint.pformat(tile_obj, width=200)}")
+        logger.info("\n{}", pprint.pformat(tile_obj, width=200))
 
     @with_category(CMD_FABRIC_FLOW)
     def do_gen_config_mem(
         self,
         tiles: Annotated[
             list[str],
-            CompletionSpec(completer=complete_tile_names),
+            CompleterSpec(completer=complete_tile_names),
             typer.Argument(
                 ...,
                 metavar="TILE...",
@@ -486,7 +483,7 @@ class FABulous_CLI(Cmd2TyperPlugin, Cmd):
         self,
         tiles: Annotated[
             list[str],
-            CompletionSpec(completer=complete_tile_names),
+            CompleterSpec(completer=complete_tile_names),
             typer.Argument(
                 ...,
                 metavar="TILE...",
@@ -514,7 +511,7 @@ class FABulous_CLI(Cmd2TyperPlugin, Cmd):
         self,
         tiles: Annotated[
             list[str],
-            CompletionSpec(completer=complete_tile_names),
+            CompleterSpec(completer=complete_tile_names),
             typer.Argument(..., metavar="TILE...", help="Tiles to generate"),
         ],
     ) -> None:
@@ -941,13 +938,15 @@ class FABulous_CLI(Cmd2TyperPlugin, Cmd):
     def do_run_simulation(
         self,
         waveform_format: Annotated[
-            str,
+            WaveType,
+            CompleterSpec(completer=lambda *_: ["vcd", "fst"]),
             typer.Argument(help="Output format of the simulation"),
-        ] = "fst",
-        file: Annotated[
-            Path | None,
+        ],
+        bitstream: Annotated[
+            Path,
+            CompleterSpec(completer=Cmd.path_complete),
             typer.Argument(help="Path to the bitstream file"),
-        ] = None,
+        ],
     ) -> None:
         """Simulate given FPGA design using Icarus Verilog (iverilog).
 
@@ -960,29 +959,8 @@ class FABulous_CLI(Cmd2TyperPlugin, Cmd):
         Also logs simulation error and file not found error and value error.
         """
         logger.debug(
-            "run_simulation parsed args: file=%s, format=%s",
-            file,
-            waveform_format,
+            f"run_simulation parsed args: file={bitstream}, format={waveform_format!s}",
         )
-
-        bitstream = file
-        waveform_candidate = Path(waveform_format)
-
-        if bitstream is None:
-            if waveform_candidate.suffix == ".bin":
-                bitstream = waveform_candidate
-                waveform_format = "fst"
-            else:
-                raise InvalidFileType(
-                    "No bitstream file specified. "
-                    "Usage: run_simulation <format> <bitstream_file>"
-                )
-        elif bitstream.suffix != ".bin" and waveform_candidate.suffix == ".bin":
-            bitstream, waveform_format = waveform_candidate, str(bitstream)
-
-        waveform_format = waveform_format.lower()
-        if waveform_format not in {"vcd", "fst"}:
-            raise CommandError("waveform_format must be either 'vcd' or 'fst'")
 
         if not bitstream.is_relative_to(self.projectDir):
             bitstreamPath = self.projectDir / Path(bitstream)
@@ -1002,7 +980,7 @@ class FABulous_CLI(Cmd2TyperPlugin, Cmd):
                 "gen_bitStream_binary. Potentially the bitstream generation failed."
             )
 
-        defined_option = f"CREATE_{waveform_format.upper()}"
+        defined_option = f"CREATE_{str(waveform_format).upper()}"
 
         designFile = topModule + ".v"
         topModuleTB = topModule + "_tb"
@@ -1036,7 +1014,7 @@ class FABulous_CLI(Cmd2TyperPlugin, Cmd):
             f"{testPath}/{testBench}",
         ]
         if self.verbose or self.debug:
-            logger.info(f"Running simulation with {waveform_format} format")
+            logger.info(f"Running simulation with {waveform_format!s} format")
             logger.info(f"Running command: {' '.join(runCmd)}")
 
         result = sp.run(runCmd, check=True)
@@ -1260,7 +1238,7 @@ class FABulous_CLI(Cmd2TyperPlugin, Cmd):
         self,
         tiles: Annotated[
             list[str],
-            CompletionSpec(completer=complete_tile_names),
+            CompleterSpec(completer=complete_tile_names),
             typer.Argument(..., metavar="TILE...", help="Tiles to add I/O BELs"),
         ],
     ) -> None:
@@ -1283,8 +1261,7 @@ class FABulous_CLI(Cmd2TyperPlugin, Cmd):
         """Generate I/O BELs for the entire fabric.
 
         This command generates Input/Output Basic Elements of Logic (BELs) for all
-        applicable tiles in the fabric, providing external connectivity
-        across the entire FPGA design.
-
+        applicable tiles in the fabric, providing external connectivity across the
+        entire FPGA design.
         """
         self.fabulousAPI.genFabricIOBels()

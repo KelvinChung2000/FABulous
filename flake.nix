@@ -70,12 +70,23 @@
         sourcePreference = "wheel";
       };
 
-      pyprojectOverrides = final: prev: {
+      # Custom Python package overlay for packages that need special handling
+      pyproject_pkg_overlay = final: prev: {
+        # Override fasm to use GitHub source instead of PyPI and add missing build deps
         fasm = prev.fasm.overrideAttrs (old: {
+          # Use GitHub source for better compatibility
+          src = final.pkgs.fetchFromGitHub {
+            owner = "chipsalliance";
+            repo = "fasm";
+            rev = "v0.0.2";
+            sha256 = "sha256-AMG4+qMk2+40GllhE8UShagN/jxSVN+RNtJCW3vFLBU=";
+          };
+          # Add required build dependencies that may be missing
           nativeBuildInputs = (old.nativeBuildInputs or []) ++ final.resolveBuildSystem {
             setuptools = [ ]; wheel = [ ]; cython = [ ];
           };
         });
+
         pyperclip = prev.pyperclip.overrideAttrs (old: {
           nativeBuildInputs = (old.nativeBuildInputs or []) ++ final.resolveBuildSystem {
             setuptools = [ ]; wheel = [ ];
@@ -107,31 +118,48 @@
             lib.composeManyExtensions [
               pyproject-build-systems.overlays.wheel
               overlay
-              pyprojectOverrides
+              pyproject_pkg_overlay
             ]
           )
       );
 
+      nix-eda = librelane.inputs.nix-eda;
+      nix_eda_overlays = {
+        default = import ./nix/overlay.nix;
+      };
+      devshell-overlay = librelane.inputs.devshell;
+      # Build a per-system package set that already includes the EDA and
+      # librelane overlays plus our project overlays so downstream code can
+      # simply pick the per-system `pkgs` and find attributes like mkShell.
+      # IMPORTANT: Use nix-eda's nixpkgs (not our nixos-unstable) to match the gcc version
+      nix_eda_pkgs = nix-eda.forAllSystems (system:
+        import nix-eda.inputs.nixpkgs {
+          inherit system;
+          overlays = [
+            nix-eda.overlays.default
+            devshell-overlay.overlays.default
+            librelane.overlays.default
+            nix_eda_overlays.default
+          ];
+        }
+      );
+
     in
     {
+      packages = forAllSystems (system: {
+        default = pythonSets.${system}.mkVirtualEnv "FABulous-env" workspace.deps.default;
+      });
       devShells = forAllSystems (
         system:
         let
-          pkgs = nixpkgs.legacyPackages.${system};
+          # Use the per-system package set built above so mkShell and all
+          # overlays (including librelane and project overlays) are present.
+          pkgs = nix_eda_pkgs.${system};
           pythonSet = pythonSets.${system}.overrideScope editableOverlay;
-          
-          # Get librelane Python package from the flake
-          librelanePythonPkg = if librelane.packages ? ${system} && librelane.packages.${system} ? librelane
-                               then librelane.packages.${system}.librelane
-                               else null;
-          
-          # Create virtualenv with all deps except librelane (which we'll add separately)
+
+          # Create virtualenv with all deps
           virtualenv = pythonSet.mkVirtualEnv "FABulous-env" workspace.deps.all;
-          
-          baseShell = if librelane.devShells ? ${system} && librelane.devShells.${system} ? dev
-                      then librelane.devShells.${system}.dev
-                      else null;
-          
+
           # pass the current pkgs to the nix overlay so it returns a package set
           # also pass flake-locked sources so tags resolve to a fixed commit
           customPkgs = import ./nix {
@@ -141,96 +169,92 @@
               nextpnr = nextpnr-src;
             };
           };
-        in
-        {
-          default = pkgs.mkShell {
-            inputsFrom = lib.optionals (baseShell != null) [ baseShell ];
-            packages = [
+
+          # Get librelane from our patched pkgs (which includes our overlays)
+          librelane-pkg = pkgs.python3.pkgs.librelane;
+          # We need librelane's Python modules available for the EDA tools, but we don't
+          # want to include the full librelane-env in packages (would collide with virtualenv).
+          # Instead, we'll add it to NIX_PYTHONPATH.
+          librelane-python-path = "${librelane-pkg}/${pkgs.python3.sitePackages}";
+
+          # Combine all packages: librelane tools (with patched OpenROAD) + our custom tools + uv2nix env
+          # Note: We only include virtualenv for Python, not librelane-env, to avoid collisions
+          allPackages =
+            [
               virtualenv
               pkgs.uv
               pkgs.which
+              pkgs.git
+              pkgs.zsh
+
+              pkgs.delta
+              pkgs.gtkwave
+              pkgs.coreutils
+              pkgs.graphviz
               customPkgs.nextpnr
-            ] ++ lib.optionals pkgs.stdenv.isDarwin [
-              # Additional macOS-specific packages if needed
-              pkgs.darwin.cctools
-            ] ++ lib.optionals (pkgs.stdenv.isLinux || (pkgs.stdenv.isDarwin && pkgs.stdenv.isx86_64)) [
-              # GHDL is only available on Linux and x86_64-darwin due to GNAT limitations
               customPkgs.ghdl
+            ]
+            ++ librelane-pkg.includedTools; # This includes patched OpenROAD, yosys, klayout, etc.
+
+          prompt = ''\[\033[1;32m\][FABulous-nix:\w]\$\[\033[0m\] '';
+        in
+        {
+          default = pkgs.devshell.mkShell {
+            devshell.packages = allPackages;
+            env = [
+              {
+                name = "NIX_PYTHONPATH";
+                value = "${librelane-python-path}";
+              }
+              {
+                name = "UV_NO_SYNC";
+                value = "1";
+              }
+              {
+                name = "UV_PYTHON";
+                value = pythonSet.python.interpreter;
+              }
+              {
+                name = "UV_PYTHON_DOWNLOADS";
+                value = "never";
+              }
+              {
+                name = "PYTHONNOUSERSITE";
+                value = "1";
+              }
             ];
-            env = {
-              UV_NO_SYNC = "1";
-              UV_PYTHON = pythonSet.python.interpreter;
-              UV_PYTHON_DOWNLOADS = "never";
-              # Prevent Python from automatically adding ~/.local to sys.path
-              PYTHONNOUSERSITE = "1";
+            devshell.startup.fabulous-setup = {
+              text = ''
+                export REPO_ROOT=$(git rev-parse --show-toplevel)
+                ORIGINAL_PS1="$PS1"
+
+                . ${virtualenv}/bin/activate
+                # Restore original PS1 to avoid double prompt decoration
+                export PS1="$ORIGINAL_PS1"
+
+                # Ensure the repository root and the virtualenv site-packages are importable
+                VENV_SITE=$(python -c 'import site; print(site.getsitepackages()[0])' 2>/dev/null || true)
+
+                # Build PYTHONPATH: NIX_PYTHONPATH (librelane) + venv + repo root
+                if [ -n "$VENV_SITE" ]; then
+                  export PYTHONPATH="$NIX_PYTHONPATH:$VENV_SITE:$REPO_ROOT"
+                else
+                  export PYTHONPATH="$NIX_PYTHONPATH:$REPO_ROOT"
+                fi
+
+                echo "[FABulous shell] PYTHONPATH: $PYTHONPATH" >&2
+                echo "[FABulous shell] Python: $(which python)" >&2
+                echo "[FABulous shell] Python version: $(python --version)" >&2
+                echo "[FABulous shell] OpenROAD: $(which openroad)" >&2
+              '';
             };
-            shellHook = ''
-              
-              
-              export REPO_ROOT=$(git rev-parse --show-toplevel)
-              ORIGINAL_PS1="$PS1"
-
-              . ${virtualenv}/bin/activate
-               # Restore original PS1 to avoid double prompt decoration
-               export PS1="$ORIGINAL_PS1"
-
-              # Put our Python first in PATH to avoid conflicts with system Python
-              export PATH="${pythonSet.python}/bin:$PATH"
-
-              # Ensure the repository root and the virtualenv site-packages are importable
-              # for external embedded interpreters (e.g. OpenROAD) that may invoke Python
-              # without inheriting the activated environment. We prepend the venv site-packages
-              # and repo root to ensure they take precedence.
-              VENV_SITE=$(python -c 'import site; print(site.getsitepackages()[0])' 2>/dev/null || true)
-              
-              # Add librelane from the flake since uv2nix cannot build it from PyPI
-              LIBRELANE_SITE=""
-              ${lib.optionalString (librelanePythonPkg != null) ''
-                # Add librelane's site-packages to both NIX_PYTHONPATH and PYTHONPATH
-                LIBRELANE_SITE="${librelanePythonPkg}/${pythonSet.python.sitePackages}"
-                if [ -d "$LIBRELANE_SITE" ]; then
-                  # Add to NIX_PYTHONPATH for sitecustomize.py
-                  export NIX_PYTHONPATH="$LIBRELANE_SITE''${NIX_PYTHONPATH:+:$NIX_PYTHONPATH}"
-                fi
-              ''}
-              
-              # Build PYTHONPATH with librelane, virtualenv site-packages, and repo root
-              # OpenROAD's embedded Python needs librelane in PYTHONPATH, not just NIX_PYTHONPATH
-              if [ -n "$VENV_SITE" ]; then
-                if [ -n "$LIBRELANE_SITE" ]; then
-                  export PYTHONPATH="$LIBRELANE_SITE:$VENV_SITE:$REPO_ROOT"
-                else
-                  export PYTHONPATH="$VENV_SITE:$REPO_ROOT"
-                fi
-              else
-                if [ -n "$LIBRELANE_SITE" ]; then
-                  export PYTHONPATH="$LIBRELANE_SITE:$REPO_ROOT"
-                else
-                  export PYTHONPATH="$REPO_ROOT"
-                fi
-              fi
-              
-              echo "[flake shell] PYTHONPATH set to: $PYTHONPATH" >&2
-              echo "[flake shell] Python executable: $(which python)" >&2
-              echo "[flake shell] Python version: $(python --version)" >&2
-
-              # macOS-specific environment setup
-              ${lib.optionalString pkgs.stdenv.isDarwin ''
-                # Set up macOS-specific environment if needed
-                export MACOSX_DEPLOYMENT_TARGET="11.0"
-                ${lib.optionalString pkgs.stdenv.isAarch64 ''
-                  # Note: GHDL is not available on Apple Silicon due to GNAT limitations
-                  # Consider using alternative VHDL simulators or running via Docker
-                  echo "Warning: GHDL is not available on Apple Silicon Macs"
-                ''}
-              ''}
-            '';
+            devshell.interactive.PS1 = {
+              text = ''PS1="${prompt}"'';
+            };
+            motd = "";
           };
         }
       );
 
-      packages = forAllSystems (system: {
-        default = pythonSets.${system}.mkVirtualEnv "FABulous-env" workspace.deps.default;
-      });
     };
 }

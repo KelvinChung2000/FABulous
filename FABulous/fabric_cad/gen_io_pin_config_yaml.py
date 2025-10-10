@@ -266,16 +266,18 @@ def generate_fabric_IO_pin_order_config(fabric: Fabric, outfile: Path) -> None:
     frame_strobe_per_col = fabric.maxFramesPerCol
 
     # Collect all pins for each fabric side (in order)
-    north_pins: list[str] = []
-    south_pins: list[str] = []
-    east_pins: list[str] = []
-    west_pins: list[str] = []
 
-    frame_data_counter = fabric.frameBitsPerRow * fabric.numberOfRows - 1
+    config_payload = {}
+
+    frame_data_counter = 0
     frame_strobe_counter = 0
 
     # Iterate through all tiles and collect border pins
     for (x, y), tile in fabric:
+        north_pins: list[str] = []
+        south_pins: list[str] = []
+        east_pins: list[str] = []
+        west_pins: list[str] = []
         if tile is None:
             continue
 
@@ -289,6 +291,10 @@ def generate_fabric_IO_pin_order_config(fabric: Fabric, outfile: Path) -> None:
         if not (is_north or is_south or is_west or is_east):
             continue
 
+        # FIXME: hardcoded special case for UserCLK
+        if x == fabric.numberOfColumns // 2 and y == fabric.numberOfRows - 1:
+            south_pins.append("UserCLK")
+
         prefix = f"Tile_X{x}Y{y}_"
 
         # Check which sides have neighbors (don't add pins to those sides)
@@ -301,7 +307,7 @@ def generate_fabric_IO_pin_order_config(fabric: Fabric, outfile: Path) -> None:
         )
 
         if not has_east_neighbor or not has_west_neighbor:
-            prefix = f"Tile_X{x}Y{fabric.numberOfRows - 1 - y}_"
+            prefix = f"Tile_X{x}Y{y}_"
             if not has_south_neighbor:
                 for _ in range(fabric.maxFramesPerCol):
                     south_pins.append(f"FrameStrobe\\[{frame_strobe_counter}\\]")
@@ -310,8 +316,8 @@ def generate_fabric_IO_pin_order_config(fabric: Fabric, outfile: Path) -> None:
             if not has_west_neighbor:
                 pin_to_add = []
                 for _ in range(fabric.frameBitsPerRow):
-                    pin_to_add.append(f"FrameData\\[{frame_data_counter}\\]")
-                    frame_data_counter -= 1
+                    west_pins.append(f"FrameData\\[{frame_data_counter}\\]")
+                    frame_data_counter += 1
                 west_pins.extend(reversed(pin_to_add))
             if tile.bels:
                 for bel in tile.bels:
@@ -356,12 +362,7 @@ def generate_fabric_IO_pin_order_config(fabric: Fabric, outfile: Path) -> None:
                     west_pins.append(f"FrameData\\[{frame_data_counter}\\]")
                     frame_data_counter -= 1
 
-    # Add UserCLK to south side
-    south_pins.append("UserCLK")
-
-    # Create single X0Y0 config with all pins in one segment per side
-    config_payload = {
-        "X0Y0": {
+        config_payload[f"X{x}Y{y}"] = {
             Side.NORTH.name: (
                 [PinOrderConfig()(north_pins).to_dict()] if north_pins else []
             ),
@@ -375,7 +376,7 @@ def generate_fabric_IO_pin_order_config(fabric: Fabric, outfile: Path) -> None:
                 [PinOrderConfig()(west_pins).to_dict()] if west_pins else []
             ),
         }
-    }
 
+    # Create single X0Y0 config with all pins in one segment per side
     with outfile.open("w") as file_descriptor:
         yaml.dump(config_payload, file_descriptor)

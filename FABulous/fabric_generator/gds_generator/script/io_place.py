@@ -276,6 +276,14 @@ class SegmentInfo:
         self.pin_entries = entries
 
 
+@dataclass
+class RawSegmentData:
+    segment: dict
+    tile_index: int | None = None
+    tile_x: int | None = None
+    tile_y: int | None = None
+
+
 class PinPlacementPlan:
     """Collects processed segment definitions and related pin bookkeeping."""
 
@@ -319,13 +327,13 @@ class PinPlacementPlan:
             for segment_data in segment_list:
                 seg_info = SegmentInfo.from_config(
                     side,
-                    segment_data["segment"],
+                    segment_data.segment,
                     bterms,
                     self.regex_by_bterm,
                     self.unmatched_config_patterns,
-                    tile_index=segment_data.get("tile_index"),
-                    tile_x=segment_data.get("tile_x"),
-                    tile_y=segment_data.get("tile_y"),
+                    tile_index=segment_data.tile_index,
+                    tile_x=segment_data.tile_x,
+                    tile_y=segment_data.tile_y,
                 )
                 self.segments_by_side[side].append(seg_info)
 
@@ -363,7 +371,7 @@ class PinPlacementPlan:
     @staticmethod
     def _normalize_config(
         config_data: dict,
-    ) -> tuple[dict[Side, list[dict]], dict[Side, int], tuple[int, int]]:
+    ) -> tuple[dict[Side, list[RawSegmentData]], dict[Side, int], tuple[int, int]]:
         """Return side-indexed segment list, tile counts, and fabric dimensions.
 
         Returns
@@ -443,7 +451,7 @@ class PinPlacementPlan:
                 if segments:
                     side_entries[side].append((x, y, segments))
 
-        config_by_side: dict[Side, list[dict]] = {side: [] for side in Side}
+        config_by_side: dict[Side, list[RawSegmentData]] = {side: [] for side in Side}
 
         for side, entries in side_entries.items():
             if side in (Side.NORTH, Side.SOUTH):
@@ -456,12 +464,12 @@ class PinPlacementPlan:
             for tile_idx, (x, y, segments) in enumerate(entries):
                 for segment in segments:
                     config_by_side[side].append(
-                        {
-                            "segment": segment,
-                            "tile_index": tile_idx,
-                            "tile_x": x,
-                            "tile_y": y,
-                        }
+                        RawSegmentData(
+                            segment=segment,
+                            tile_index=tile_idx,
+                            tile_x=x,
+                            tile_y=y,
+                        )
                     )
 
         return config_by_side, tile_counts, (fabric_width, fabric_height)

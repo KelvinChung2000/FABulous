@@ -228,6 +228,7 @@ class FABulous_CLI(Cmd):
 
         self.interactive = interactive
         self.debug = debug
+        self.editor = get_context().editor
 
         if isinstance(self.fabulousAPI.writer, VHDLCodeGenerator):
             self.extension = "vhdl"

@@ -419,7 +419,6 @@ def run_cmd(
 
     Alias: r
     """
-    entering_dir = Path.cwd()
     fab_CLI = FABulous_CLI(
         get_context().proj_lang,
         force=force,

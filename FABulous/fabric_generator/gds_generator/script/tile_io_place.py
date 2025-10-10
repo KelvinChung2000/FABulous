@@ -858,11 +858,6 @@ class PinPlacementPlan:
     default=False,
     help="Enable verbose (DEBUG) logging output.",
 )
-@click.option(
-    "absolute",
-    default=False,
-    help="Use absolute coordinates instead of relative to die area.",
-)
 @click_odb
 def io_place(
     reader: OdbReaderLike,
@@ -877,7 +872,6 @@ def io_place(
     ver_extension: float,
     unmatched_error: str,
     verbose: bool,
-    absolute: bool,
 ) -> None:
     """
     Places the IOs in an input def with a config file using tile-based format.
@@ -961,20 +955,6 @@ def io_place(
     die_width = BLOCK_UR_X - BLOCK_LL_X
 
     die_height = BLOCK_UR_Y - BLOCK_LL_Y
-
-    if absolute:
-        absolute_place(
-            reader,
-            v_width,
-            v_length,
-            h_width,
-            h_length,
-            v_layer,
-            h_layer,
-            v_extension,
-            h_extension,
-        )
-        return
 
     plan = PinPlacementPlan(config_data, bterms, unmatched_error)
     debug("Segment plan: %s", plan.segments_by_side)

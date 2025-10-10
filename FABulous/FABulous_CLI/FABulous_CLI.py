@@ -1274,10 +1274,11 @@ class FABulous_CLI(Cmd):
         completer=lambda self: self.fab.getTiles(),
     )
     gds_parser.add_argument(
-        "--no-opt",
+        "--optimise",
+        "-opt",
         help="Optimize the GDS layout",
-        default=True,
-        action="store_false",
+        default=False,
+        action="store_true",
     )
     gds_parser.add_argument(
         "--override",
@@ -1324,13 +1325,21 @@ class FABulous_CLI(Cmd):
             pin_order_file,
             tile_dir / "macro",
             base_config_path=self.projectDir / "Tile" / "include" / "gds_config.yaml",
-            optimisation=False,
+            optimisation=args.optimise,
         )
 
     gen_all_tile_parser = Cmd2ArgumentParser()
     gen_all_tile_parser.add_argument(
         "--parallel",
-        help="Optimize the GDS layout",
+        "-p",
+        help="Generate tile macros in parallel",
+        default=False,
+        action="store_true",
+    )
+    gen_all_tile_parser.add_argument(
+        "--optimise",
+        "-opt",
+        help="Optimize the GDS layout of all tiles",
         default=False,
         action="store_true",
     )
@@ -1341,7 +1350,10 @@ class FABulous_CLI(Cmd):
         """Generate GDSII files for all tiles in the fabric."""
         commands = CommandPipeline(self)
         for i in sorted(self.allTile):
-            commands.add_step(f"gen_tile_macro {i}")
+            if args.optimise:
+                commands.add_step(f"gen_tile_macro {i} --optimise")
+            else:
+                commands.add_step(f"gen_tile_macro {i}")
         if not args.parallel:
             commands.execute()
         else:

@@ -277,9 +277,13 @@ class FABulousTileVerilogMarcoFlow(SequentialFlow):
         **kwargs,
     ) -> tuple[State | list[Step]]:
         self.config = round_die_area(self.config)
-        self.config = self.config.copy(
-            ROUTING_OBSTRUCTIONS=get_routing_obstructions(self.config)
-        )
+        if (
+            "ROUTING_OBSTRUCTIONS" not in self.config
+            or self.config["ROUTING_OBSTRUCTIONS"] is None
+        ):
+            self.config = self.config.copy(
+                ROUTING_OBSTRUCTIONS=get_routing_obstructions(self.config)
+            )
         return super().run(initial_state, frm, to, skip, reproducible, **kwargs)
 
 
@@ -290,9 +294,13 @@ class FABulousTileVerilogMarcoFlowClassic(Classic):
 
     def run(self, initial_state: State, **kwargs: Any) -> tuple[State, list[Step]]:  # noqa: ANN401
         self.config = round_die_area(self.config)
-        self.config = self.config.copy(
-            ROUTING_OBSTRUCTIONS=get_routing_obstructions(self.config)
-        )
+        if (
+            "ROUTING_OBSTRUCTIONS" not in self.config
+            or self.config["ROUTING_OBSTRUCTIONS"] is None
+        ):
+            self.config = self.config.copy(
+                ROUTING_OBSTRUCTIONS=get_routing_obstructions(self.config)
+            )
         return super().run(initial_state, **kwargs)
 
 
@@ -304,7 +312,11 @@ class FABulousTileVHDLMarcoFlowClassic(VHDLClassic):
     def run(self, initial_state: State, **kwargs: Any) -> tuple[State, list[Step]]:  # noqa: ANN401
         warn("Linting and equivalence checking for VHDL files is disabled")
         round_die_area(self.config)
-        self.config = self.config.copy(
-            ROUTING_OBSTRUCTIONS=get_routing_obstructions(self.config)
-        )
+        if (
+            "ROUTING_OBSTRUCTIONS" not in self.config
+            or self.config["ROUTING_OBSTRUCTIONS"] is None
+        ):
+            self.config = self.config.copy(
+                ROUTING_OBSTRUCTIONS=get_routing_obstructions(self.config)
+            )
         return super().run(initial_state, **kwargs)

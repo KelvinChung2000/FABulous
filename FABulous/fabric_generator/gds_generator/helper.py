@@ -108,16 +108,14 @@ def get_routing_obstructions(config: Config) -> list[tuple[int, int, int, int]]:
         parsed_obstructions[met].append(box)
 
     if (layer := config["FP_IO_VLAYER"]) not in parsed_obstructions:
+        # Add thin horizontal obstructions just outside bottom and top edges
         parsed_obstructions[layer].append((0, -1, width, 0))
+        parsed_obstructions[layer].append((0, height, width, height + 1))
 
     if (layer := config["FP_IO_HLAYER"]) not in parsed_obstructions:
-        parsed_obstructions[layer].append((0, 1, 0, height))
-
-    if (layer := config["PDN_VERTICAL_LAYER"]) not in parsed_obstructions:
-        parsed_obstructions[layer].append((0, -1, width, 0))
-
-    if (layer := config["PDN_HORIZONTAL_LAYER"]) not in parsed_obstructions:
-        parsed_obstructions[layer].append((0, 0, 0, height))
+        # Add thin vertical obstructions just outside left and right edges
+        parsed_obstructions[layer].append((-1, 0, 0, height))
+        parsed_obstructions[layer].append((width, 0, width + 1, height))
 
     result = []
     for layer, boxes in parsed_obstructions.items():

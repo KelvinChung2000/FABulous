@@ -1500,16 +1500,21 @@ class FABulous_CLI(Cmd):
             raise CommandError("Please specify either --fabric or --tile, not both")
 
         gds_file: str = self.get_file_path(args, "gds")
-        logger.info(f"Start klayout GUI with odb: {gds_file}")
+        layer_file = (
+            (get_context().pdk_root)
+            / "libs.tech"
+            / "klayout"
+            / "tech"
+            / f"{get_context().pdk}.lyt"
+        )
+        logger.info(f"Start klayout GUI with gds: {gds_file}")
+        logger.debug(f"Using PDK root: {get_context().pdk_root}")
+        logger.debug(f"Using PDK: {get_context().pdk}")
         sp.run(
             [
                 str(klayout),
                 "-l",
-                (get_context().pdk_root)
-                / "libs.tech"
-                / "klayout"
-                / "tech"
-                / f"{get_context().pdk}.lyt",
+                str(layer_file),
                 gds_file,
             ]
         )

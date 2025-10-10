@@ -31,6 +31,7 @@ import yaml
 from librelane.logging.logger import debug, err, info, warn
 from librelane.scripts.odbpy.reader import click_odb
 
+from FABulous.fabric_cad.gen_io_pin_config_yaml import PinOrderConfig
 from FABulous.fabric_definition.define import PinSortMode, Side
 
 
@@ -41,6 +42,12 @@ class OdbReaderLike(Protocol):
     tech: Any
     block: Any
     name: str
+
+
+class odbBTermLike(Protocol):
+    """Protocol describing the odb.dbBTerm object."""
+
+    def getName(self) -> str: ...
 
 
 def grid_to_tracks(origin: float, count: int, step: float) -> list[float]:
@@ -58,7 +65,7 @@ def grid_to_tracks(origin: float, count: int, step: float) -> list[float]:
 
 def equally_spaced_sequence(
     side: str, side_pin_placement: list, possible_locations: list
-) -> tuple[list, list]:
+) -> tuple[list, list[odbBTermLike]]:
     """Select evenly spaced slots for the given pins on a single side."""
     virtual_pin_count = 0
     actual_pin_count = len(side_pin_placement)
@@ -77,8 +84,8 @@ def equally_spaced_sequence(
 
     if total_pin_count > tracks:
         err(
-            f"The {side} side of the floorplan doesn't have enough slots for all "
-            f"the pins: {total_pin_count} pins/{tracks} slots."
+            f"The {side} side of the floorplan doesn't have enough tracks for all "
+            f"the pins: {total_pin_count} pins/{tracks} tracks."
         )
         err(
             "Try re-assigning pins to other sides, enabling proportional allocation, "
@@ -137,7 +144,7 @@ def equally_spaced_sequence(
                 map_str.append(f"{location}, ")
         map_str.append("]")
         debug("".join(map_str))
-        debug("Used track indices: %s", used_track_indices)
+        debug(f"Used track indices: {used_track_indices}")
 
     return result, side_pin_placement
 
@@ -183,7 +190,7 @@ class SegmentInfo:
     min_distance: float | None
     max_distance: float | None
     reverse_result: bool
-    pin_entries: list
+    pin_entries: list[odbBTermLike | int]  # odbTerm or int virtual pins
     tile_index: int | None = None  # Enumerated index within this side
     tile_x: int | None = None  # Actual X coordinate of the tile
     tile_y: int | None = None  # Actual Y coordinate of the tile
@@ -192,7 +199,7 @@ class SegmentInfo:
     def from_config(
         cls,
         side: Side,
-        segment: dict,
+        segment: PinOrderConfig,
         bterms: list,
         regex_by_bterm: dict,
         unmatched_regexes: set[str],
@@ -201,16 +208,16 @@ class SegmentInfo:
         tile_y: int | None = None,
     ) -> "SegmentInfo":
         """Build a fully populated segment from a raw YAML entry."""
-        sort_mode_str = segment.get("sort_mode", "bus_major")
-        if sort_mode_str == "bus_major":
-            sort_mode = PinSortMode.BUS_MAJOR
-        elif sort_mode_str == "bit_minor":
-            sort_mode = PinSortMode.BIT_MINOR
-        else:
-            raise ValueError(f"Unknown sort mode {sort_mode_str}")
+        try:
+            sort_mode = PinSortMode[segment.sort_mode.upper()]
+        except ValueError as e:
+            raise ValueError(
+                f"Invalid sort_mode '{segment.sort_mode}' in segment "
+                f"on side {side.value}"
+            ) from e
 
-        entries: list = []
-        for pattern in segment.get("pins", []):
+        entries: list[odbBTermLike | int] = []
+        for pattern in segment.pins:
             if isinstance(pattern, int):
                 entries.append(pattern)
                 continue
@@ -236,9 +243,9 @@ class SegmentInfo:
         return cls(
             side=side,
             sort_mode=sort_mode,
-            min_distance=segment.get("min_distance"),
-            max_distance=segment.get("max_distance"),
-            reverse_result=segment.get("reverse_result", False),
+            min_distance=segment.min_distance,
+            max_distance=segment.max_distance,
+            reverse_result=segment.reverse_result,
             pin_entries=entries,
             tile_index=tile_index,
             tile_x=tile_x,
@@ -278,7 +285,7 @@ class SegmentInfo:
 
 @dataclass
 class RawSegmentData:
-    segment: dict
+    segment: PinOrderConfig
     tile_index: int | None = None
     tile_x: int | None = None
     tile_y: int | None = None
@@ -389,7 +396,7 @@ class PinPlacementPlan:
 
         tile_pattern = re.compile(r"^X(?P<x>\d+)Y(?P<y>\d+)$")
 
-        tiles: dict[tuple[int, int], dict] = {}
+        tiles: dict[tuple[int, int], dict[str, list[PinOrderConfig]]] = {}
         max_x = 0
         max_y = 0
         for key, entry in config_data.items():
@@ -405,7 +412,13 @@ class PinPlacementPlan:
             y = int(match.group("y"))
             max_x = max(max_x, x)
             max_y = max(max_y, y)
-            tiles[(x, y)] = tile_config
+            entry_dict = {}
+            for side, segments in tile_config.items():
+                entries = []
+                for e in segments:
+                    entries.append(PinOrderConfig(**e))
+                entry_dict[side] = entries
+            tiles[(x, y)] = entry_dict
 
         # Fabric dimensions: max coordinate + 1
         fabric_width = max_x + 1
@@ -418,7 +431,7 @@ class PinPlacementPlan:
             Side.WEST: (-1, 0),
         }
 
-        side_entries: dict[Side, list[tuple[int, int, list[dict]]]] = {
+        side_entries: dict[Side, list[tuple[int, int, list[PinOrderConfig]]]] = {
             side: [] for side in Side
         }
 
@@ -812,6 +825,11 @@ class PinPlacementPlan:
     default=False,
     help="Enable verbose (DEBUG) logging output.",
 )
+@click.option(
+    "--halo-ring-dimensions",
+    default=(Decimal(100), Decimal(100), Decimal(100), Decimal(100)),
+    help="Dimensions of the halo ring to remove (N, E, S, W).",
+)
 @click_odb
 def io_place(
     reader: OdbReaderLike,
@@ -826,6 +844,7 @@ def io_place(
     ver_extension: float,
     unmatched_error: str,
     verbose: bool,
+    halo_ring_dimensions: str,
 ) -> None:
     """
     Places the IOs in an input def with a config file using tile-based format.
@@ -917,9 +936,24 @@ def io_place(
     BLOCK_UR_X = DIE_AREA.xMax()
     BLOCK_UR_Y = DIE_AREA.yMax()
 
+    halo_left, halo_bottom, halo_right, halo_top = map(
+        Decimal, halo_ring_dimensions.split(",")
+    )
+
     # Physical dimensions for proportional track allocation
-    die_width = BLOCK_UR_X - BLOCK_LL_X
-    die_height = BLOCK_UR_Y - BLOCK_LL_Y
+    die_width = (
+        BLOCK_UR_X
+        - BLOCK_LL_X
+        - int(halo_left * Decimal(micron_in_units))
+        - int(halo_right * Decimal(micron_in_units))
+    )
+
+    die_height = (
+        BLOCK_UR_Y
+        - BLOCK_LL_Y
+        - int(halo_bottom * Decimal(micron_in_units))
+        - int(halo_top * Decimal(micron_in_units))
+    )
 
     origin_h: float
     count_h: int
@@ -1011,24 +1045,24 @@ def io_place(
                 len(pin_tracks[side][segment_index]) if pin_tracks[side] else 0,
             )
 
+            resolved_pins: list[odbBTermLike]
             slots, resolved_pins = equally_spaced_sequence(
                 side.value,
                 segment.pin_entries,
                 pin_tracks[side][segment_index],
             )
-            segment.replace_pin_entries(resolved_pins)
 
             debug(
                 "Slots assigned = %d (pins=%d)",
                 len(slots),
                 len(segment.pin_entries),
             )
-            assert len(slots) == len(segment.pin_entries)
-            for pin_index, bterm in enumerate(segment.pin_entries):
+            assert len(slots) == len(resolved_pins)
+            for pin_index, bterm in enumerate(resolved_pins):
                 slot = slots[pin_index]
                 pin_name = bterm.getName()
                 debug(f"{pin_name} -> {slot}")
-                pins = bterm.getBPins()
+                pins = bterm.getBPins()  # type: ignore
                 if len(pins) > 0:
                     warn(f"{pin_name} already has shapes. Modifying existing shape.")
                     assert len(pins) == 1

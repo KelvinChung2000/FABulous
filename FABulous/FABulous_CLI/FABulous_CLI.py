@@ -1508,7 +1508,7 @@ class FABulous_CLI(Cmd):
             / f"{get_context().pdk}.lyp"
         )
         logger.info(f"Start klayout GUI with gds: {gds_file}")
-        logger.info(f"Layer file: {layer_file!s}")
+        logger.info(f"Layer property file: {layer_file!s}")
         sp.run(
             [
                 str(klayout),

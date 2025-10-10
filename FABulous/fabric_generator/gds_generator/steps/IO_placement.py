@@ -79,6 +79,13 @@ class FABulousIOPlacement(OdbpyStep):
                 ("QUIT_ON_UNMATCHED_IO", _migrate_unmatched_io),
             ],
         ),
+        Variable(
+            "SPACING_TO_IGNORE",
+            tuple[Decimal, Decimal, Decimal, Decimal],
+            "Dimensions of spacing to ignore (left, bottom, right, top).",
+            default=(Decimal(0), Decimal(0), Decimal(0), Decimal(0)),
+            units="µm",
+        ),
     ]
 
     def get_script_path(self) -> str:
@@ -113,6 +120,8 @@ class FABulousIOPlacement(OdbpyStep):
                 str(self.config["IO_PIN_V_EXTENSION"]),
                 "--unmatched-error",
                 self.config["ERRORS_ON_UNMATCHED_IO"],
+                "--halo-ring-dimensions",
+                ",".join([str(i) for i in self.config["SPACING_TO_IGNORE"]]),
             ]
             + length_args
         )

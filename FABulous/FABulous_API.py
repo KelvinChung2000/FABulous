@@ -535,6 +535,11 @@ class FABulous_API:
                 )
             )
 
+        final_config_args["DESIGN_NAME"] = tile_dir.name
+        final_config_args["FABULOUS_IO_PIN_ORDER_CFG"] = str(io_pin_config)
+        final_config_args["FABULOUS_TILE_DIR"] = str(tile_dir)
+        final_config_args["VERILOG_FILES"] = file_list
+
         if config_override:
             if isinstance(config_override, dict):
                 final_config_args.update(config_override)
@@ -543,10 +548,6 @@ class FABulous_API:
                     yaml.safe_load(config_override.read_text(encoding="utf-8"))
                 )
 
-        final_config_args["DESIGN_NAME"] = tile_dir.name
-        final_config_args["FABULOUS_IO_PIN_ORDER_CFG"] = str(io_pin_config)
-        final_config_args["FABULOUS_TILE_DIR"] = str(tile_dir)
-        final_config_args["VERILOG_FILES"] = file_list
         if optimisation:
             flow = FABulousTileVerilogMarcoFlow(
                 final_config_args,

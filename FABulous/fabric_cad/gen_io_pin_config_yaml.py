@@ -18,11 +18,11 @@ class PinOrderConfig:
 
     min_distance: int | None = None
     max_distance: int | None = None
-    pins: list[str] = field(default_factory=list)
+    pins: list[str | int] = field(default_factory=list)
     sort_mode: PinSortMode = PinSortMode.BUS_MAJOR
     reverse_result: bool = False
 
-    def __call__(self, pins: list[str]) -> Self:
+    def __call__(self, pins: list[str | int]) -> Self:
         """Bind a concrete pin list to this configuration instance."""
         self.pins = pins
         return self
@@ -261,23 +261,19 @@ def generate_fabric_IO_pin_order_config(fabric: Fabric, outfile: Path) -> None:
     outfile : Path
         Output YAML file path for the fabric-level configuration
     """
-    # Frame signal widths per tile
-    frame_data_per_row = fabric.frameBitsPerRow
-    frame_strobe_per_col = fabric.maxFramesPerCol
-
     # Collect all pins for each fabric side (in order)
-
     config_payload = {}
 
     frame_data_counter = 0
     frame_strobe_counter = 0
+    virtual_pin_count = 0
 
     # Iterate through all tiles and collect border pins
     for (x, y), tile in fabric:
-        north_pins: list[str] = []
-        south_pins: list[str] = []
-        east_pins: list[str] = []
-        west_pins: list[str] = []
+        north_pins: list[str | int] = []
+        south_pins: list[str | int] = []
+        east_pins: list[str | int] = []
+        west_pins: list[str | int] = []
         if tile is None:
             continue
 
@@ -319,6 +315,9 @@ def generate_fabric_IO_pin_order_config(fabric: Fabric, outfile: Path) -> None:
                     west_pins.append(f"FrameData\\[{frame_data_counter}\\]")
                     frame_data_counter += 1
                 west_pins.extend(reversed(pin_to_add))
+            if not has_east_neighbor:
+                east_pins.append(fabric.frameBitsPerRow)
+
             if tile.bels:
                 for bel in tile.bels:
                     pin_regexes = [

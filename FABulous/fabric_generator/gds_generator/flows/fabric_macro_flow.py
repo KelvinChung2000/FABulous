@@ -476,7 +476,7 @@ class FABulousFabricMacroFlow(Classic):
         info(f"Setting FP_SIZING to {self.config['FP_SIZING']}")
         info(f"Macros: {macros}")
 
-        self.config = self.config.copy(MACROS=macros)
+        self.config = self.config.copy(MACROS=macros, SPACING_TO_IGNORE=halo_spacing)
 
         info(f"Setting MACROS to {self.config['MACROS']}")
 

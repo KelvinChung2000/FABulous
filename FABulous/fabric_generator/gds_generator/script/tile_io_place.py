@@ -48,6 +48,28 @@ class odbBTermLike(Protocol):
     """Protocol describing the odb.dbBTerm object."""
 
     def getName(self) -> str: ...
+    def getBPins(self) -> list[Any]: ...
+
+
+class odbPointLike(Protocol):
+    def x(self) -> int: ...
+    def y(self) -> int: ...
+
+
+class odbRectLike(Protocol):
+    def xMin(self) -> int: ...
+    def yMin(self) -> int: ...
+    def xMax(self) -> int: ...
+    def yMax(self) -> int: ...
+    def dx(self) -> int: ...
+    def dy(self) -> int: ...
+    def xCenter(self) -> int: ...
+    def yCenter(self) -> int: ...
+    def ll(self) -> odbPointLike: ...
+    def ul(self) -> odbPointLike: ...
+    def ur(self) -> odbPointLike: ...
+    def lr(self) -> odbPointLike: ...
+    def center(self) -> odbPointLike: ...
 
 
 def grid_to_tracks(origin: float, count: int, step: float) -> list[float]:
@@ -545,8 +567,15 @@ class PinPlacementPlan:
         # Group segments by their tile position
         segments_by_tile = self._group_segments_by_tile(segments_for_side)
 
+        # Create result array to maintain correct segment ordering
+        tracks_container: list[list[float]] = [
+            [] for _ in range(len(segments_for_side))
+        ]
+
+        # Map global segment index to its position in segments_for_side
+        segment_to_index = {id(seg): i for i, seg in enumerate(segments_for_side)}
+
         # Allocate tracks for each tile in order
-        tracks_container: list[list[float]] = []
         for tile_idx in sorted(segments_by_tile.keys()):
             tile_x, tile_y, tile_segments = segments_by_tile[tile_idx]
 
@@ -562,7 +591,11 @@ class PinPlacementPlan:
             tile_tracks = self._allocate_tracks_for_tile(
                 tracks_per_tile, step, tile_origin, tile_segments
             )
-            tracks_container.extend(tile_tracks)
+
+            # Assign tracks to correct segment positions
+            for seg_idx, segment in enumerate(tile_segments):
+                global_idx = segment_to_index[id(segment)]
+                tracks_container[global_idx] = tile_tracks[seg_idx]
 
         return tracks_container
 
@@ -826,9 +859,9 @@ class PinPlacementPlan:
     help="Enable verbose (DEBUG) logging output.",
 )
 @click.option(
-    "--halo-ring-dimensions",
-    default=(Decimal(100), Decimal(100), Decimal(100), Decimal(100)),
-    help="Dimensions of the halo ring to remove (N, E, S, W).",
+    "absolute",
+    default=False,
+    help="Use absolute coordinates instead of relative to die area.",
 )
 @click_odb
 def io_place(
@@ -844,7 +877,7 @@ def io_place(
     ver_extension: float,
     unmatched_error: str,
     verbose: bool,
-    halo_ring_dimensions: str,
+    absolute: bool,
 ) -> None:
     """
     Places the IOs in an input def with a config file using tile-based format.
@@ -917,9 +950,34 @@ def io_place(
         if bterm.getSigType() not in ["POWER", "GROUND"]
     ]
 
+    # generate slots
+    DIE_AREA = reader.block.getDieArea()
+    BLOCK_LL_X = DIE_AREA.xMin()
+    BLOCK_LL_Y = DIE_AREA.yMin()
+    BLOCK_UR_X = DIE_AREA.xMax()
+    BLOCK_UR_Y = DIE_AREA.yMax()
+
+    # Physical dimensions for proportional track allocation
+    die_width = BLOCK_UR_X - BLOCK_LL_X
+
+    die_height = BLOCK_UR_Y - BLOCK_LL_Y
+
+    if absolute:
+        absolute_place(
+            reader,
+            v_width,
+            v_length,
+            h_width,
+            h_length,
+            v_layer,
+            h_layer,
+            v_extension,
+            h_extension,
+        )
+        return
+
     plan = PinPlacementPlan(config_data, bterms, unmatched_error)
     debug("Segment plan: %s", plan.segments_by_side)
-
     min_by_side = {
         Side.NORTH: (v_width + v_layer.getSpacing()) / reader.dbunits,
         Side.SOUTH: (v_width + v_layer.getSpacing()) / reader.dbunits,
@@ -928,32 +986,6 @@ def io_place(
     }
     plan.assign_unmatched_pins()
     plan.ensure_min_distances(min_by_side)
-
-    # generate slots
-    DIE_AREA = reader.block.getDieArea()
-    BLOCK_LL_X = DIE_AREA.xMin()
-    BLOCK_LL_Y = DIE_AREA.yMin()
-    BLOCK_UR_X = DIE_AREA.xMax()
-    BLOCK_UR_Y = DIE_AREA.yMax()
-
-    halo_left, halo_bottom, halo_right, halo_top = map(
-        Decimal, halo_ring_dimensions.split(",")
-    )
-
-    # Physical dimensions for proportional track allocation
-    die_width = (
-        BLOCK_UR_X
-        - BLOCK_LL_X
-        - int(halo_left * Decimal(micron_in_units))
-        - int(halo_right * Decimal(micron_in_units))
-    )
-
-    die_height = (
-        BLOCK_UR_Y
-        - BLOCK_LL_Y
-        - int(halo_bottom * Decimal(micron_in_units))
-        - int(halo_top * Decimal(micron_in_units))
-    )
 
     origin_h: float
     count_h: int
@@ -1062,7 +1094,7 @@ def io_place(
                 slot = slots[pin_index]
                 pin_name = bterm.getName()
                 debug(f"{pin_name} -> {slot}")
-                pins = bterm.getBPins()  # type: ignore
+                pins = bterm.getBPins()
                 if len(pins) > 0:
                     warn(f"{pin_name} already has shapes. Modifying existing shape.")
                     assert len(pins) == 1

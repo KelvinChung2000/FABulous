@@ -9,6 +9,12 @@ from librelane.flows.sequential import SequentialFlow
 from librelane.logging.logger import warn
 from librelane.state.state import State
 from librelane.steps import checker as Checker
+from librelane.steps import klayout as KLayout
+from librelane.steps import magic as Magic
+from librelane.steps import misc as Misc
+from librelane.steps import netgen as Netgen
+from librelane.steps import odb as Odb
+from librelane.steps import openroad as OpenROAD
 from librelane.steps import pyosys as Yosys
 from librelane.steps import verilator as Verilator
 from librelane.steps.step import Step
@@ -19,8 +25,8 @@ from FABulous.fabric_generator.gds_generator.helper import (
 )
 from FABulous.fabric_generator.gds_generator.steps.add_buffer import AddBuffers
 from FABulous.fabric_generator.gds_generator.steps.custom_pdn import CustomGeneratePDN
-from FABulous.fabric_generator.gds_generator.steps.IO_placement import (
-    FABulousIOPlacement,
+from FABulous.fabric_generator.gds_generator.steps.tile_IO_placement import (
+    FABulousTileIOPlacement,
 )
 from FABulous.fabric_generator.gds_generator.steps.tile_optimisation import (
     TileOptimisation,
@@ -31,7 +37,7 @@ subs = {
     # Replace with FABulous IO Placement
     # "-OpenRoad.Floorplan": RoundDieArea,
     "OpenROAD.IOPlacement": None,
-    "Odb.CustomIOPlacement": FABulousIOPlacement,
+    "Odb.CustomIOPlacement": FABulousTileIOPlacement,
     "OpenROAD.GeneratePDN": CustomGeneratePDN,
     "OpenROAD.Resize*": None,
     "OpenROAD.RepairDesign*": None,
@@ -63,7 +69,29 @@ class FABulousTileVerilogMarcoFlow(SequentialFlow):
         Checker.YosysUnmappedCells,
         Checker.YosysSynthChecks,
         Checker.NetlistAssignStatements,
+        OpenROAD.CheckSDCFiles,
+        OpenROAD.CheckMacroInstances,
         TileOptimisation,
+        OpenROAD.FillInsertion,
+        Odb.CellFrequencyTables,
+        OpenROAD.RCX,
+        OpenROAD.IRDropReport,
+        Magic.StreamOut,
+        KLayout.StreamOut,
+        Magic.WriteLEF,
+        Magic.SpiceExtraction,
+        Odb.CheckDesignAntennaProperties,
+        KLayout.XOR,
+        KLayout.DRC,
+        Checker.KLayoutDRC,
+        Checker.IllegalOverlap,
+        Netgen.LVS,
+        Checker.LVS,
+        Checker.SetupViolations,
+        Checker.HoldViolations,
+        Checker.MaxSlewViolations,
+        Checker.MaxCapViolations,
+        Misc.ReportManufacturability,
     ]
 
     config_vars = [

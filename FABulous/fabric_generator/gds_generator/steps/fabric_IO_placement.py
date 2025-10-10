@@ -1,10 +1,7 @@
-"""Custom IO placement step for FABulous tiles."""
-
 from decimal import Decimal
 from importlib import resources
-from typing import Literal, Optional
+from typing import Optional
 
-from librelane.common.types import Path
 from librelane.config.variable import Variable
 from librelane.state.state import State
 from librelane.steps.common_variables import (
@@ -23,14 +20,8 @@ def _migrate_unmatched_io(x: object) -> str:
 
 
 @Step.factory.register()
-class FABulousIOPlacement(OdbpyStep):
-    """Place I/O pins using a custom script, which uses a "pin order configuration"
-    file.
-
-    Check the reference documentation for the structure of said file.
-    """
-
-    id = "Odb.FABulousIOPlacement"
+class FABulousFabricIOPlacement(OdbpyStep):
+    id = "Odb.FABulousFabricIOPlacement"
     name = "FABulous I/O Placement"
     long_name = "FABulous I/O Pin Placement Script"
 
@@ -61,37 +52,12 @@ class FABulousIOPlacement(OdbpyStep):
             units="µm",
             pdk=True,
         ),
-        Variable(
-            "FABULOUS_IO_PIN_ORDER_CFG",
-            Path,
-            "Path to a custom pin configuration file.",
-        ),
-        Variable(
-            "ERRORS_ON_UNMATCHED_IO",
-            Literal["none", "unmatched_design", "unmatched_cfg", "both"],
-            "Controls whether to emit an error in: no situation, when pins exist in "
-            "the design that do not exist in the config file, when pins exist in the "
-            "config file that do not exist in the design, and both respectively. "
-            "`both` is recommended, as the default is only for backwards compatibility "
-            "with librelane 1.",
-            default="unmatched_design",  # Backwards compatible with librelane 1
-            deprecated_names=[
-                ("QUIT_ON_UNMATCHED_IO", _migrate_unmatched_io),
-            ],
-        ),
-        Variable(
-            "SPACING_TO_IGNORE",
-            tuple[Decimal, Decimal, Decimal, Decimal],
-            "Dimensions of spacing to ignore (left, bottom, right, top).",
-            default=(Decimal(0), Decimal(0), Decimal(0), Decimal(0)),
-            units="µm",
-        ),
     ]
 
     def get_script_path(self) -> str:
         return str(
             resources.files("FABulous.fabric_generator.gds_generator.script")
-            / "io_place.py"
+            / "fabric_io_place.py"
         )
 
     def get_command(self) -> list[str]:
@@ -104,8 +70,6 @@ class FABulousIOPlacement(OdbpyStep):
         return (
             super().get_command()
             + [
-                "--config",
-                self.config["FABULOUS_IO_PIN_ORDER_CFG"],
                 "--hor-layer",
                 self.config["FP_IO_HLAYER"],
                 "--ver-layer",
@@ -118,10 +82,6 @@ class FABulousIOPlacement(OdbpyStep):
                 str(self.config["IO_PIN_H_EXTENSION"]),
                 "--ver-extension",
                 str(self.config["IO_PIN_V_EXTENSION"]),
-                "--unmatched-error",
-                self.config["ERRORS_ON_UNMATCHED_IO"],
-                "--halo-ring-dimensions",
-                ",".join([str(i) for i in self.config["SPACING_TO_IGNORE"]]),
             ]
             + length_args
         )

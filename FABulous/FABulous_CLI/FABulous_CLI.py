@@ -1505,11 +1505,10 @@ class FABulous_CLI(Cmd):
             / "libs.tech"
             / "klayout"
             / "tech"
-            / f"{get_context().pdk}.lyt"
+            / f"{get_context().pdk}.lyp"
         )
         logger.info(f"Start klayout GUI with gds: {gds_file}")
-        logger.debug(f"Using PDK root: {get_context().pdk_root}")
-        logger.debug(f"Using PDK: {get_context().pdk}")
+        logger.info(f"Layer file: {layer_file!s}")
         sp.run(
             [
                 str(klayout),

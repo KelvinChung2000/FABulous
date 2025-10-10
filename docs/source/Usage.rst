@@ -83,8 +83,6 @@ If you are using yosys oss-cad-suite, no need to install the following packages.
 :`Yosys ghdl plugin <https://github.com/ghdl/ghdl-yosys-plugin>`_:
  Only needed for VHDL synthesis
 
-We have also provided a command to install the above packages automatically.
-
 .. prompt:: bash $
 
    FABulous install-cad-tools

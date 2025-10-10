@@ -228,7 +228,9 @@ class FABulous_CLI(Cmd):
 
         self.interactive = interactive
         self.debug = debug
-        self.editor = get_context().editor
+        if e := get_context().editor:
+            logger.info("Setting to use editor from .FABulous/.env file")
+            self.editor = e
 
         if isinstance(self.fabulousAPI.writer, VHDLCodeGenerator):
             self.extension = "vhdl"

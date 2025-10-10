@@ -58,7 +58,7 @@ class FABulousSettings(BaseSettings):
     # CLI options
     debug: bool = False
     verbose: int = 0
-    editor: str = "gedit"
+    editor: str | None = None
 
     @field_validator("proj_version", "proj_version_created", "version", mode="before")
     @classmethod

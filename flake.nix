@@ -186,11 +186,7 @@
               pkgs.which
               pkgs.git
               pkgs.zsh
-
-              pkgs.delta
               pkgs.gtkwave
-              pkgs.coreutils
-              pkgs.graphviz
               customPkgs.nextpnr
               customPkgs.ghdl
             ]

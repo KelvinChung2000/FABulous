@@ -63,9 +63,6 @@ ProjectDirType = Annotated[
     typer.Option(
         "--project-dir",
         "-p",
-    typer.Option(
-        "--project-dir",
-        "-p",
         help="Directory path to project folder",
         parser=validate_project_directory,
         resolve_path=True,
@@ -337,12 +334,10 @@ def script_cmd(
     If no project directory is specified, uses the current directory.
     """
     # Initialize context
-    entering_dir = Path.cwd()
     script_file = script_file.absolute()
     fab_CLI = FABulous_CLI(
         writerType=get_context().proj_lang,
         force=force,
-        debug=get_context().debug,
         debug=get_context().debug,
     )
     # Change to project directory

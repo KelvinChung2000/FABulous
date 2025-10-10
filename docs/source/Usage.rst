@@ -243,6 +243,7 @@ FAB_MODELS_PACK           The models pack for the project                      P
 FAB_OSS_CAD_SUITE         Path to the oss-cad-suite installation              <None>
 FAB_DEBUG                 Enable debug mode                                   False
 FAB_VERBOSE               Enable verbose mode                                 0
+FAB_EDITOR                Set the editor to be used by the `edit` command     <None>
 ========================= =================================================== ===========================================================================
 
 Project Specific Environment Variables

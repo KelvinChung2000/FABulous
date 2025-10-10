@@ -218,9 +218,6 @@ def create_project(project_dir: Path, lang: HDLType = HDLType.VERILOG) -> None:
         str(project_dir.absolute() / "Fabric" / f"models_pack.{new_suffix}"),
     )
 
-    if e := os.getenv("EDITOR", None):
-        set_key(env_file, "FAB_EDITOR", e)
-
     logger.info(
         f"New FABulous project created in {project_dir} with {lang!s} language."
     )

@@ -288,7 +288,7 @@ class Fabric:
             for x, tile in enumerate(row):
                 yield (x, y), tile
 
-    def getTileByName(self, name: str) -> Tile:
+    def getTileByName(self, name: str) -> Tile | SuperTile:
         """Get a tile by its name from the fabric.
 
         Search for the tile first in the used tiles dictionary, then in the unused tiles
@@ -313,8 +313,9 @@ class Fabric:
         if ret is None:
             ret = self.unusedTileDic.get(name)
         if ret is None:
+            ret = self.getSuperTileByName(name)  # Check if it's a supertile
+        if ret is None:
             raise KeyError(f"Tile {name} not found in fabric.")
-
         return ret
 
     def getSuperTileByName(self, name: str) -> SuperTile:

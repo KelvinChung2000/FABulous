@@ -112,3 +112,11 @@ class SuperTile:
             index += 1
             userCLK.append(tile.withUserCLK)
         return ports, userCLK
+
+    def maxWidth(self) -> int:
+        """Return the maximum width of the supertile."""
+        return max(len(i) for i in self.tileMap)
+
+    def maxHeight(self) -> int:
+        """Return the maximum height of the supertile."""
+        return len(self.tileMap)

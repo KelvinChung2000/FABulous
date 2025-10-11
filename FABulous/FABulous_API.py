@@ -539,6 +539,15 @@ class FABulous_API:
         final_config_args["FABULOUS_IO_PIN_ORDER_CFG"] = str(io_pin_config)
         final_config_args["FABULOUS_TILE_DIR"] = str(tile_dir)
         final_config_args["VERILOG_FILES"] = file_list
+        tile = self.fabric.getTileByName(tile_dir.name)
+        if isinstance(tile, Tile):
+            final_config_args["FABULOUS_TILE_LOGICAL_WIDTH"] = 1
+            final_config_args["FABULOUS_TILE_LOGICAL_HEIGHT"] = 1
+        elif isinstance(tile, SuperTile):
+            final_config_args["FABULOUS_TILE_LOGICAL_WIDTH"] = tile.maxWidth()
+            final_config_args["FABULOUS_TILE_LOGICAL_HEIGHT"] = tile.maxHeight()
+        else:
+            raise TypeError(f"Tile {tile_dir.name} not found in fabric.")
 
         if config_override:
             if isinstance(config_override, dict):

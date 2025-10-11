@@ -24,7 +24,7 @@ from FABulous.fabric_generator.gds_generator.helper import (
     round_die_area,
 )
 from FABulous.fabric_generator.gds_generator.steps.add_buffer import AddBuffers
-from FABulous.fabric_generator.gds_generator.steps.condition_klayout_drc import (
+from FABulous.fabric_generator.gds_generator.steps.condition_magic_drc import (
     ConditionalMagicDRC,
 )
 from FABulous.fabric_generator.gds_generator.steps.custom_pdn import CustomGeneratePDN
@@ -57,6 +57,15 @@ configs = Classic.config_vars + [
         "FABULOUS_TILE_DIR",
         Path,
         "Path to the tile directory where the CSV file is located.",
+    ),
+    Variable(
+        "FABULOUS_TILE_LOGICAL_WIDTH", int, "The logical width of the tile.", default=1
+    ),
+    Variable(
+        "FABULOUS_TILE_LOGICAL_HEIGHT",
+        int,
+        "The logical height of the tile.",
+        default=1,
     ),
 ]
 

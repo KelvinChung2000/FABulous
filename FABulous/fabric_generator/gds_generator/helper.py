@@ -10,9 +10,6 @@ from pathlib import Path
 from librelane.config.config import Config
 from librelane.logging.logger import info
 
-from FABulous.fabric_definition.SuperTile import SuperTile
-from FABulous.fabric_definition.Tile import Tile
-
 
 def get_layer_info(config: Config) -> dict[str, dict[str, tuple[Decimal, Decimal]]]:
     """Read the FP_TRACKS_INFO file and return layer information.
@@ -65,8 +62,6 @@ def round_die_area(config: Config) -> Config:
         raise ValueError("DIE_AREA metric not found in state.")
     _, _, width, height = die_area
 
-    tile = config.get("FABULOUS_TILE")
-
     # Round width (X) and height (Y) to the next multiple of the
     # respective minimum pitches using pure Decimal arithmetic
     def round_up_decimal(value: Decimal, pitch: Decimal) -> Decimal:
@@ -79,27 +74,10 @@ def round_die_area(config: Config) -> Config:
             quotient += 1
         return quotient * pitch
 
-    if isinstance(tile, Tile):
-        # Convert to Decimal for precise arithmetic
-        width = Decimal(str(width))
-        height = Decimal(str(height))
-
-        width_rounded = round_up_decimal(width, x_pitch)
-        height_rounded = round_up_decimal(height, y_pitch)
-
-    elif isinstance(tile, SuperTile):
-        mWidth = tile.maxWidth()
-        mHeight = tile.maxHeight()
-        if width % mWidth != 0 or height % mHeight != 0:
-            raise ValueError(
-                f"DIE_AREA width {width} and height {height} must be multiples of "
-                f"the supertile's max width {mWidth} and max height {mHeight}."
-            )
-        width_rounded = round_up_decimal(width / mWidth, x_pitch) * mWidth
-        height_rounded = round_up_decimal(height / mHeight, y_pitch) * mHeight
-    else:
-        raise TypeError("FABULOUS_TILE must be set to a Tile or SuperTile object.")
-
+    mWidth = config["FABULOUS_TILE_LOGICAL_WIDTH"]
+    mHeight = config["FABULOUS_TILE_LOGICAL_HEIGHT"]
+    width_rounded = round_up_decimal(width / mWidth, x_pitch) * mWidth
+    height_rounded = round_up_decimal(height / mHeight, y_pitch) * mHeight
     info(
         f"Rounding DIE_AREA from ({width}, {height}) to "
         f"({width_rounded}, {height_rounded}) "

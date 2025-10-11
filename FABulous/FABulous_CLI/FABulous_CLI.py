@@ -939,8 +939,14 @@ class FABulous_CLI(Cmd2TyperPlugin, Cmd):
         self,
         waveform_format: Annotated[
             WaveType,
-            CompleterSpec(completer=lambda *_: ["vcd", "fst"]),
-            typer.Argument(help="Output format of the simulation"),
+            CompleterSpec(
+                completer=lambda _self, text, _line, _begidx, *_args: [
+                    option for option in ["vcd", "fst"] if option.startswith(text)
+                ]
+            ),
+            typer.Argument(
+                help="Output format of the simulation",
+            ),
         ],
         bitstream: Annotated[
             Path,

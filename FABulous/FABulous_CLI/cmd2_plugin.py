@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import inspect
 from collections.abc import Callable
+from types import MethodType
 from typing import Any, cast
 
 import click
@@ -22,12 +23,13 @@ class CompleterSpec:
     autocompletion and cmd2's tab completion.
     """
 
-    def __init__(self, completer: Callable[[Cmd, str, str, int], list[str]]):
+    def __init__(self, completer: Callable[..., list[str]]) -> None:
         """Initialize completion specification.
 
         Args:
-            completer: Function that takes (app, text, line, begidx) and returns
-                      list of completion strings. Compatible with cmd2 completer signature.
+            completer: Function that takes (app, text, line, begidx[, endidx])
+                      and returns a list of completion strings. Compatible with
+                      cmd2 completer signature and tolerant of 3 or 4 args.
         """
         self.completer = completer
 
@@ -66,18 +68,16 @@ class Cmd2TyperPlugin(Cmd):
         "do_settable",
     }
 
-    def _extract_completion_spec(
+    def _extract_completion_specs(
         self, func: Callable[..., Any]
-    ) -> CompleterSpec | None:
-        """Extract CompletionSpec from function annotations if present."""
-        # Extract completion specification if present
-        completion_spec = None
+    ) -> dict[str, CompleterSpec]:
+        """Extract CompletionSpecs from function parameter annotations."""
+        specs = {}
         sig = inspect.signature(func)
         for param in sig.parameters.values():
             if param.name == "self":
                 continue
 
-            # Check if annotation contains CompletionSpec
             ann = param.annotation
             if ann is inspect.Signature.empty:
                 continue
@@ -89,15 +89,12 @@ class Cmd2TyperPlugin(Cmd):
                 metadata = getattr(ann, "__metadata__", ())
                 for item in metadata:
                     if isinstance(item, CompleterSpec):
-                        completion_spec = item
-        return completion_spec
+                        specs[param.name] = item
+        return specs
 
     def cmd_register(self) -> None:
         """Register all cmd2 do_* methods as Typer commands."""
-        skip = set()
-
-        # Always skip standard cmd2 commands regardless of where they're defined
-        skip.update(self.standard_cmd2_commands)
+        skip = set(self.standard_cmd2_commands)
 
         for attr in dir(self):
             if not attr.startswith("do_"):
@@ -112,31 +109,84 @@ class Cmd2TyperPlugin(Cmd):
 
             cmd_name = attr[3:]
             bound_cb = cast("Callable[..., Any]", func.__get__(self))
-            completer_spec = self._extract_completion_spec(func)
+            completer_specs = self._extract_completion_specs(func)
             self.__inner_app.command(name=cmd_name)(bound_cb)
 
-            if completer_spec is None:
+            if not completer_specs:
                 continue
 
-            # bind completer_spec into function default to capture current loop value
-            def completer(
+            # Parameter names in order (excluding self)
+            param_names = [
+                p.name
+                for p in inspect.signature(func).parameters.values()
+                if p.name != "self"
+            ]
+
+            # cmd2 expects a complete_* callable with signature
+            # (text, line, begidx, endidx). We'll close over `self`.
+            def _completer(
+                self: Cmd2TyperPlugin,
                 text: str,
                 line: str,
                 begidx: int,
                 endidx: int,
-                _completer_spec: CompleterSpec = completer_spec,
+                _param_names: list[str] = param_names,
+                _specs: dict[str, CompleterSpec] = completer_specs,
             ) -> list[str]:
                 try:
-                    # Call the user-provided completion function
-                    return _completer_spec.completer(self, text, line, begidx)
-                except (AttributeError, TypeError, ValueError):
+                    parts = line.split()
+                    if not parts:
+                        return []
+                    cmd_part = parts[0]
+                    args = parts[1:] if len(parts) > 1 else []
+                    current_pos = len(cmd_part) + 1
+
+                    # Within an existing arg?
+                    for i, arg in enumerate(args):
+                        arg_start = current_pos
+                        arg_end = arg_start + len(arg)
+                        if arg_start <= begidx <= arg_end:
+                            pname = _param_names[i] if i < len(_param_names) else None
+                            if pname:
+                                spec = _specs.get(pname)
+                                if spec is not None:
+                                    try:
+                                        return spec.completer(
+                                            self, text, line, begidx, endidx
+                                        )
+                                    except TypeError:
+                                        return spec.completer(self, text, line, begidx)
+                            break
+                        current_pos = arg_end + 1
+
+                    # Starting a new arg?
+                    if begidx >= current_pos:
+                        idx = len(args)
+                        pname = _param_names[idx] if idx < len(_param_names) else None
+                        if pname:
+                            spec = _specs.get(pname)
+                            if spec is not None:
+                                try:
+                                    return spec.completer(
+                                        self, text, line, begidx, endidx
+                                    )
+                                except TypeError:
+                                    return spec.completer(self, text, line, begidx)
+                except Exception as e:  # noqa: BLE001
+                    logger.debug("Completer wrapper error: %s", e)
+                    return []
+                else:
                     return []
 
-            setattr(self, f"complete_{cmd_name}", completer)
+            # Bind as instance method so cmd2 will pass `self` correctly
+            bound_completer = MethodType(_completer, self)
+            setattr(self, f"complete_{cmd_name}", bound_completer)
+            logger.debug("Registered completer for command: %s", cmd_name)
 
     def onecmd(
         self, statement: Statement | str, *, add_to_history: bool = True
     ) -> bool:
+        """Route commands through Typer when possible, falling back to cmd2."""
         cmds = typer.main.get_command(self.__inner_app)
         if isinstance(cmds, click.Group) and isinstance(statement, Statement):
             if statement.command not in cmds.commands:
@@ -150,8 +200,15 @@ class Cmd2TyperPlugin(Cmd):
         raise CommandError("Invalid command or statement")
 
     def __init__(self, *args: object, **kwargs: object) -> None:  # pragma: no cover
-        super().__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)  # type: ignore[arg-type]
         logger.debug("cmd2_typer plugin_start for {}", type(self).__name__)
         self.__inner_app = typer.Typer(add_completion=False)
 
         self.cmd_register()
+
+        # Debug: List all completion methods
+        completers = [attr for attr in dir(self) if attr.startswith("complete_")]
+        logger.debug(f"Available completers: {completers}")
+
+        # Note: to test completion wiring, create a do_test_cmd and a corresponding
+        # complete_test_cmd method on your Cmd subclass if needed.

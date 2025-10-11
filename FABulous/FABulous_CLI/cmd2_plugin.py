@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import inspect
 from collections.abc import Callable
-from types import MethodType
 from typing import Any, cast
 
 import click
@@ -15,6 +14,8 @@ from loguru import logger
 
 from FABulous.custom_exception import CommandError
 
+# TYPE_CHECKING block removed as it's no longer needed
+
 
 class CompleterSpec:
     """Specification for tab completion behavior.
@@ -23,13 +24,16 @@ class CompleterSpec:
     autocompletion and cmd2's tab completion.
     """
 
-    def __init__(self, completer: Callable[..., list[str]]) -> None:
+    def __init__(
+        self,
+        completer: Callable[..., list[str]],
+    ) -> None:
         """Initialize completion specification.
 
         Args:
-            completer: Function that takes (app, text, line, begidx[, endidx])
-                      and returns a list of completion strings. Compatible with
-                      cmd2 completer signature and tolerant of 3 or 4 args.
+            completer: Function that takes either (text, line, begidx, endidx) or
+                      (self, text, line, begidx, endidx) and returns a list of
+                      completion strings. Both signatures are supported.
         """
         self.completer = completer
 
@@ -125,11 +129,10 @@ class Cmd2TyperPlugin(Cmd):
             # cmd2 expects a complete_* callable with signature
             # (text, line, begidx, endidx). We'll close over `self`.
             def _completer(
-                self: Cmd2TyperPlugin,
                 text: str,
                 line: str,
                 begidx: int,
-                endidx: int,
+                endidx: int = -1,
                 _param_names: list[str] = param_names,
                 _specs: dict[str, CompleterSpec] = completer_specs,
             ) -> list[str]:
@@ -150,12 +153,30 @@ class Cmd2TyperPlugin(Cmd):
                             if pname:
                                 spec = _specs.get(pname)
                                 if spec is not None:
+                                    # Access self from outer scope
+                                    outer_self = self
                                     try:
+                                        # Try with self first (for methods)
                                         return spec.completer(
-                                            self, text, line, begidx, endidx
+                                            outer_self, text, line, begidx, endidx
                                         )
                                     except TypeError:
-                                        return spec.completer(self, text, line, begidx)
+                                        try:
+                                            # Try with self but 3 args
+                                            return spec.completer(
+                                                outer_self, text, line, begidx
+                                            )
+                                        except TypeError:
+                                            try:
+                                                # Try without self, 4 args
+                                                return spec.completer(
+                                                    text, line, begidx, endidx
+                                                )
+                                            except TypeError:
+                                                # Try without self, 3 args
+                                                return spec.completer(
+                                                    text, line, begidx
+                                                )
                             break
                         current_pos = arg_end + 1
 
@@ -166,22 +187,37 @@ class Cmd2TyperPlugin(Cmd):
                         if pname:
                             spec = _specs.get(pname)
                             if spec is not None:
+                                # Access self from outer scope
+                                outer_self = self
                                 try:
+                                    # Try with self first (for methods)
                                     return spec.completer(
-                                        self, text, line, begidx, endidx
+                                        outer_self, text, line, begidx, endidx
                                     )
                                 except TypeError:
-                                    return spec.completer(self, text, line, begidx)
+                                    try:
+                                        # Try with self but 3 args
+                                        return spec.completer(
+                                            outer_self, text, line, begidx
+                                        )
+                                    except TypeError:
+                                        try:
+                                            # Try without self, 4 args
+                                            return spec.completer(
+                                                text, line, begidx, endidx
+                                            )
+                                        except TypeError:
+                                            # Try without self, 3 args
+                                            return spec.completer(text, line, begidx)
                 except Exception as e:  # noqa: BLE001
-                    logger.debug("Completer wrapper error: %s", e)
+                    logger.debug(f"Completer wrapper error: {e}")
                     return []
                 else:
                     return []
 
-            # Bind as instance method so cmd2 will pass `self` correctly
-            bound_completer = MethodType(_completer, self)
-            setattr(self, f"complete_{cmd_name}", bound_completer)
-            logger.debug("Registered completer for command: %s", cmd_name)
+            # Set the completer function directly
+            setattr(self, f"complete_{cmd_name}", _completer)
+            logger.debug(f"Registered completer for command: {cmd_name}")
 
     def onecmd(
         self, statement: Statement | str, *, add_to_history: bool = True

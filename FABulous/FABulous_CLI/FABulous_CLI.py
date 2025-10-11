@@ -58,10 +58,6 @@ from FABulous.FABulous_CLI.cmd2_plugin import (
     Cmd2TyperPlugin,
     CompleterSpec,
 )
-from FABulous.FABulous_CLI.completion_helpers import (
-    complete_bel_names,
-    complete_tile_names,
-)
 from FABulous.FABulous_CLI.helper import (
     CommandPipeline,
     copy_verilog_files,
@@ -116,6 +112,20 @@ To run the complete FABulous flow with the default project, run the following co
     run_FABulous_bitstream ./user_design/sequential_16bit_en.v
     run_simulation fst ./user_design/sequential_16bit_en.bin
 """
+
+
+def tile_completer(
+    cls: "FABulous_CLI", text: str, _line: str, _begidx: int, _endidx: int
+) -> list[str]:
+    """Completer for tile names."""
+    return [tile for tile in cls.allTile if tile.startswith(text)]
+
+
+def bel_completer(
+    cls: "FABulous_CLI", text: str, _line: str, _begidx: int, _endidx: int
+) -> list[str]:
+    """Completer for BEL names."""
+    return [bel.name for bel in cls.fabulousAPI.getBels() if bel.name.startswith(text)]
 
 
 class FABulous_CLI(Cmd2TyperPlugin, Cmd):
@@ -415,7 +425,7 @@ class FABulous_CLI(Cmd2TyperPlugin, Cmd):
         self,
         bel: Annotated[
             str,
-            CompleterSpec(completer=complete_bel_names),
+            CompleterSpec(completer=bel_completer),
             typer.Argument(help="Name of the BEL to display"),
         ],
     ) -> None:
@@ -434,7 +444,7 @@ class FABulous_CLI(Cmd2TyperPlugin, Cmd):
         self,
         tile: Annotated[
             str,
-            CompleterSpec(completer=complete_tile_names),
+            CompleterSpec(completer=tile_completer),
             typer.Argument(help="Name of the tile to display"),
         ],
     ) -> None:
@@ -453,7 +463,7 @@ class FABulous_CLI(Cmd2TyperPlugin, Cmd):
         self,
         tiles: Annotated[
             list[str],
-            CompleterSpec(completer=complete_tile_names),
+            CompleterSpec(completer=tile_completer),
             typer.Argument(
                 ...,
                 metavar="TILE...",
@@ -483,7 +493,7 @@ class FABulous_CLI(Cmd2TyperPlugin, Cmd):
         self,
         tiles: Annotated[
             list[str],
-            CompleterSpec(completer=complete_tile_names),
+            CompleterSpec(completer=tile_completer),
             typer.Argument(
                 ...,
                 metavar="TILE...",
@@ -511,8 +521,8 @@ class FABulous_CLI(Cmd2TyperPlugin, Cmd):
         self,
         tiles: Annotated[
             list[str],
-            CompleterSpec(completer=complete_tile_names),
-            typer.Argument(..., metavar="TILE...", help="Tiles to generate"),
+            CompleterSpec(completer=tile_completer),
+            typer.Argument(metavar="TILE...", help="Tiles to generate"),
         ],
     ) -> None:
         """Generate given tile with switch matrix and configuration memory.
@@ -798,7 +808,7 @@ class FABulous_CLI(Cmd2TyperPlugin, Cmd):
         self,
         file: Annotated[
             Path,
-            typer.Argument(..., help="Path to the Nextpnr JSON file"),
+            typer.Argument(help="Path to the Nextpnr JSON file"),
         ],
     ) -> None:
         """Run place and route with Nextpnr for a given JSON file.
@@ -878,7 +888,7 @@ class FABulous_CLI(Cmd2TyperPlugin, Cmd):
         self,
         file: Annotated[
             Path,
-            typer.Argument(..., help="Path to the FASM file"),
+            typer.Argument(help="Path to the FASM file"),
         ],
     ) -> None:
         """Generate bitstream of a given design.
@@ -940,7 +950,7 @@ class FABulous_CLI(Cmd2TyperPlugin, Cmd):
         waveform_format: Annotated[
             WaveType,
             CompleterSpec(
-                completer=lambda _self, text, _line, _begidx, *_args: [
+                completer=lambda _self, text, _line, _begidx, _endidx: [
                     option for option in ["vcd", "fst"] if option.startswith(text)
                 ]
             ),
@@ -1066,7 +1076,7 @@ class FABulous_CLI(Cmd2TyperPlugin, Cmd):
         self,
         file: Annotated[
             Path,
-            typer.Argument(..., help="Path to the top-level Verilog module"),
+            typer.Argument(help="Path to the top-level Verilog module"),
         ],
     ) -> None:
         """Run FABulous to generate bitstream on a given design.
@@ -1110,7 +1120,7 @@ class FABulous_CLI(Cmd2TyperPlugin, Cmd):
         self,
         file: Annotated[
             Path,
-            typer.Argument(..., help="Path to the TCL script"),
+            typer.Argument(help="Path to the TCL script"),
         ],
     ) -> None:
         """Execute TCL script relative to the project directory.
@@ -1142,7 +1152,7 @@ class FABulous_CLI(Cmd2TyperPlugin, Cmd):
         self,
         file: Annotated[
             Path,
-            typer.Argument(..., help="Path to the CLI script"),
+            typer.Argument(help="Path to the CLI script"),
         ],
     ) -> None:
         """Execute script."""
@@ -1175,11 +1185,11 @@ class FABulous_CLI(Cmd2TyperPlugin, Cmd):
         self,
         user_design: Annotated[
             Path,
-            typer.Argument(..., help="Path to the user design file"),
+            typer.Argument(help="Path to the user design file"),
         ],
         user_design_top_wrapper: Annotated[
             Path,
-            typer.Argument(..., help="Output path for the generated wrapper"),
+            typer.Argument(help="Output path for the generated wrapper"),
         ],
     ) -> None:
         """Generate a user design wrapper for the specified user design.
@@ -1211,7 +1221,7 @@ class FABulous_CLI(Cmd2TyperPlugin, Cmd):
         self,
         tile_path: Annotated[
             Path,
-            typer.Argument(..., help="Path to the target tile directory"),
+            typer.Argument(help="Path to the target tile directory"),
         ],
         no_switch_matrix: Annotated[
             bool,
@@ -1244,8 +1254,8 @@ class FABulous_CLI(Cmd2TyperPlugin, Cmd):
         self,
         tiles: Annotated[
             list[str],
-            CompleterSpec(completer=complete_tile_names),
-            typer.Argument(..., metavar="TILE...", help="Tiles to add I/O BELs"),
+            CompleterSpec(completer=tile_completer),
+            typer.Argument(metavar="TILE...", help="Tiles to add I/O BELs"),
         ],
     ) -> None:
         """Generate I/O BELs for specified tiles.

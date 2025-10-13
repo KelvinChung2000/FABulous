@@ -221,6 +221,7 @@
             ];
             devshell.startup.fabulous-setup = {
               text = ''
+
                 export REPO_ROOT=$(git rev-parse --show-toplevel)
                 ORIGINAL_PS1="$PS1"
 
@@ -238,10 +239,6 @@
                   export PYTHONPATH="$NIX_PYTHONPATH:$REPO_ROOT"
                 fi
 
-                echo "[FABulous shell] PYTHONPATH: $PYTHONPATH" >&2
-                echo "[FABulous shell] Python: $(which python)" >&2
-                echo "[FABulous shell] Python version: $(python --version)" >&2
-                echo "[FABulous shell] OpenROAD: $(which openroad)" >&2
               '';
             };
             devshell.interactive.PS1 = {

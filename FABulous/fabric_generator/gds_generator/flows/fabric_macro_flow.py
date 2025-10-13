@@ -18,9 +18,6 @@ from FABulous.fabric_generator.gds_generator.flows.flow_define import (
     write_out_steps,
 )
 from FABulous.fabric_generator.gds_generator.helper import get_pitch
-from FABulous.fabric_generator.gds_generator.steps.condition_magic_drc import (
-    ConditionalMagicDRC,
-)
 from FABulous.fabric_generator.gds_generator.steps.fabric_IO_placement import (
     FABulousFabricIOPlacement,
 )
@@ -41,7 +38,6 @@ subs = {
     # Replace IO placement with FABulous fabric-level IO placement
     "OpenROAD.IOPlacement": None,
     "Odb.CustomIOPlacement": FABulousFabricIOPlacement,
-    "Magic.DRC": ConditionalMagicDRC,
     # Script to manually place single IOs (for additional pins if needed)
     # "+OpenROAD.GlobalPlacementSkipIO": FABulousManualIOPlacement,
 }
@@ -289,12 +285,27 @@ class FABulousFabricMacroFlow(Classic):
             If any tile dimensions are not aligned to the pitch grid.
         """
         tile_size_errors: list[str] = []
+        # Collect decimals for further multiple-of checks
+        widths: list[Decimal] = []
+        heights: list[Decimal] = []
+
         for tile_name, (width, height) in tile_sizes.items():
             width_dec = Decimal(str(width))
             height_dec = Decimal(str(height))
 
-            width_remainder = str(round(width_dec / pitch_x, 2))[-2:]
-            height_remainder = str(round(height_dec / pitch_y, 2))[-2:]
+            widths.append(width_dec)
+            heights.append(height_dec)
+
+            # Existing pitch alignment check (rounded division -> check fractional part)
+            if pitch_x != 0:
+                width_remainder = str(round(width_dec / pitch_x, 2))[-2:]
+            else:
+                width_remainder = "00"
+
+            if pitch_y != 0:
+                height_remainder = str(round(height_dec / pitch_y, 2))[-2:]
+            else:
+                height_remainder = "00"
 
             if width_remainder != "00":
                 tile_size_errors.append(
@@ -307,16 +318,52 @@ class FABulousFabricMacroFlow(Classic):
                     f"(remainder: {height_remainder})"
                 )
 
+        # Additional check: ensure widths/heights are integer multiples of the
+        # smallest corresponding dimension.
+        if widths:
+            min_width = min(widths)
+            if min_width == 0:
+                tile_size_errors.append(
+                    "Tile has zero width; cannot validate multiples"
+                )
+            else:
+                for tile_name, (width, _) in tile_sizes.items():
+                    width_dec = Decimal(str(width))
+                    # Compute ratio and check it's an integer within tolerance
+                    ratio = width_dec / min_width
+                    # Use to_integral_value to check integer-ness
+                    if ratio != ratio.to_integral_value():
+                        tile_size_errors.append(
+                            f"{tile_name}: width {width_dec} is not an integer "
+                            f"multiple of smallest width {min_width} (ratio: {ratio})"
+                        )
+
+        if heights:
+            min_height = min(heights)
+            if min_height == 0:
+                tile_size_errors.append(
+                    "Tile has zero height; cannot validate multiples"
+                )
+            else:
+                for tile_name, (_, height) in tile_sizes.items():
+                    height_dec = Decimal(str(height))
+                    ratio = height_dec / min_height
+                    if ratio != ratio.to_integral_value():
+                        tile_size_errors.append(
+                            f"{tile_name}: height {height_dec} is not an integer "
+                            f"multiple of smallest height {min_height} (ratio: {ratio})"
+                        )
+
         if tile_size_errors:
-            err("Tile sizes are not aligned to pitch grid:")
+            err("Tile sizes validation failed:")
             for error in tile_size_errors:
                 err(f"  {error}")
             raise ValueError(
                 "Tile size validation failed: tiles must be regenerated with "
-                "fixed round_die_area to ensure pitch alignment"
+                "fixed round_die_area to ensure pitch alignment and consistent "
+                "multiples"
             )
-
-        info("Tile size validation passed: all tiles aligned to pitch grid")
+        info("Tile size validation passed: aligned and multiples OK")
         return True
 
     def run(self, initial_state: State, **kwargs: dict) -> tuple[State, list[Step]]:

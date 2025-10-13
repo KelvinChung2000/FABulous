@@ -281,8 +281,9 @@ class Fabric:
 
         Yields
         ------
-        Tile | None
-            The next tile in the fabric, or None if the position is empty.
+        tuple[tuple[int, int], Tile | None]
+            The next tile in the fabric and it's coordinates,
+            or None if the position is empty.
         """
         for y, row in enumerate(self.tile):
             for x, tile in enumerate(row):

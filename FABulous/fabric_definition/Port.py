@@ -91,11 +91,13 @@ class Port:
             If True, wire names use bracket notation (e.g., `port[0]`).
             If False, wire names use simple concatenation (e.g., `port0`).
             Defaults to False.
+        prefix : str, optional
+            A prefix to prepend to the port name, by default "".
 
         Returns
         -------
-        list[str]
-            List of individual wire names for this port.
+        str
+            A regex expression matching the port's wire names.
         """
         wireCount = (abs(self.xOffset) + abs(self.yOffset)) * self.wireCount
 

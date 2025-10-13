@@ -310,13 +310,17 @@ class FABulous_API:
         """
         return self.fabric.getAllUniqueBels()
 
-    def getTile(self, tileName: str, raises_on_miss: bool = False) -> Tile | None:
+    def getTile(
+        self, tileName: str, raises_on_miss: bool = False
+    ) -> Tile | SuperTile | None:
         """Return Tile object based on tile name.
 
         Parameters
         ----------
         tileName : str
             Name of the Tile.
+        rise_on_miss : bool, optional
+            Whether to raise an error if the tile is not found, by default False.
 
         Returns
         -------

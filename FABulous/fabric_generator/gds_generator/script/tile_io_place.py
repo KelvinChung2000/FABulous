@@ -334,7 +334,6 @@ class PinPlacementPlan:
         bterms: list,
         unmatched_error: str,
     ) -> None:
-        """Initialise the plan by expanding all regex patterns."""
         self.segments_by_side: dict[Side, list[SegmentInfo]] = {
             side: [] for side in Side
         }
@@ -403,12 +402,24 @@ class PinPlacementPlan:
     ) -> tuple[dict[Side, list[RawSegmentData]], dict[Side, int], tuple[int, int]]:
         """Return side-indexed segment list, tile counts, and fabric dimensions.
 
+        Parameters
+        ----------
+        config_data : dict
+            Raw configuration data loaded from YAML.
+
         Returns
         -------
-        tuple
+        tuple[dict[Side, list[RawSegmentData]], dict[Side, int], tuple[int, int]]
             - config_by_side: Segments organized by side
             - tile_counts: Number of tiles per side
             - fabric_dims: (max_x + 1, max_y + 1) fabric dimensions in tiles
+
+        Raises
+        ------
+        TypeError
+            If the configuration format is invalid.
+        ValueError
+            If the configuration contains logical errors.
         """
         tile_counts = {side: 0 for side in Side}
 
@@ -605,6 +616,11 @@ class PinPlacementPlan:
     ) -> dict[int, tuple[int | None, int | None, list[SegmentInfo]]]:
         """Group segments by their tile index.
 
+        Parameters
+        ----------
+        segments : list[SegmentInfo]
+            List of segments to group.
+
         Returns
         -------
         dict[int, tuple[int | None, int | None, list[SegmentInfo]]]
@@ -632,12 +648,12 @@ class PinPlacementPlan:
     ) -> int:
         """Determine which division (tile position) a tile belongs to.
 
-        For N/S sides, use X coordinate; for E/W sides, use Y coordinate.
-        Falls back to tile_idx if coordinates are unavailable.
-        Clamps to valid range [0, num_divisions).
+        For N/S sides, use X coordinate; for E/W sides, use Y coordinate. Falls back to
+        tile_idx if coordinates are unavailable. Clamps to valid range [0,
+        num_divisions).
 
-        For E/W sides, Y=0 is at top but physical origin is at bottom,
-        so we invert the Y coordinate.
+        For E/W sides, Y=0 is at top but physical origin is at bottom, so we invert the
+        Y coordinate.
         """
         # Select coordinate based on side orientation
         if side in (Side.NORTH, Side.SOUTH):
@@ -873,8 +889,7 @@ def io_place(
     unmatched_error: str,
     verbose: bool,
 ) -> None:
-    """
-    Places the IOs in an input def with a config file using tile-based format.
+    """Places the IOs in an input def with a config file using tile-based format.
 
     Config format (YAML):
     X0Y0:

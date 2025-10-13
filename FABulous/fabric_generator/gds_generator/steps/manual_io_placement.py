@@ -8,8 +8,8 @@ from librelane.steps.step import Step
 
 @Step.factory.register()
 class FABulousManualIOPlacement(OpenROADStep):
-    """
-    Manually place I/O pins on a floor-planned ODB file using OpenROAD's built-in placer.
+    """Manually place I/O pins on a floor-planned ODB file using OpenROAD's built-in
+    placer.
     """
 
     id = "OpenROAD.ManualIOPlacement"

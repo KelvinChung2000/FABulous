@@ -111,10 +111,10 @@ def io_place(
 ) -> None:
     """Place each BTerm's BPin on the die edge corresponding to the mTerm's position.
 
-    Determines the side by checking where the mTerm is positioned relative to the
-    master tile center. If the mTerm is on the north side of the master, place
-    the BPin on the north edge of the die, and so on. Falls back to distance-based
-    placement if mTerm information is unavailable.
+    Determines the side by checking where the mTerm is positioned relative to the master
+    tile center. If the mTerm is on the north side of the master, place the BPin on the
+    north edge of the die, and so on. Falls back to distance-based placement if mTerm
+    information is unavailable.
     """
     if verbose:
         logging.getLogger().setLevel(logging.DEBUG)

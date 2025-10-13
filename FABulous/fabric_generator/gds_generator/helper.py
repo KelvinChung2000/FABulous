@@ -14,8 +14,8 @@ from librelane.logging.logger import info
 def get_layer_info(config: Config) -> dict[str, dict[str, tuple[Decimal, Decimal]]]:
     """Read the FP_TRACKS_INFO file and return layer information.
 
-    Returns a dictionary mapping layer names to their cardinal directions
-    and corresponding (offset, pitch) tuples.
+    Returns a dictionary mapping layer names to their cardinal directions and
+    corresponding (offset, pitch) tuples.
     """
     with Path(config["FP_TRACKS_INFO"]).open() as f:
         lines = f.readlines()
@@ -34,11 +34,10 @@ def get_layer_info(config: Config) -> dict[str, dict[str, tuple[Decimal, Decimal
 def get_pitch(config: Config) -> tuple[Decimal, Decimal]:
     """Read the FP_TRACKS_INFO file and return min pitches for X and Y.
 
-    Returns a tuple (x_pitch, y_pitch) where x_pitch is the
-    minimum pitch along X-axis (FP_IO_VLAYER X direction) and
-    y_pitch is minimum pitch along Y-axis (FP_IO_HLAYER Y direction).
-    The cardinal field in FP_TRACKS_INFO is expected
-    to be 'X' or 'Y' (case-insensitive).
+    Returns a tuple (x_pitch, y_pitch) where x_pitch is the minimum pitch along X-axis
+    (FP_IO_VLAYER X direction) and y_pitch is minimum pitch along Y-axis (FP_IO_HLAYER Y
+    direction). The cardinal field in FP_TRACKS_INFO is expected to be 'X' or 'Y' (case-
+    insensitive).
     """
     layers = get_layer_info(config)
 
@@ -51,9 +50,8 @@ def get_pitch(config: Config) -> tuple[Decimal, Decimal]:
 def round_die_area(config: Config) -> Config:
     """Round the DIE_AREA to multiples of the minimum pitch.
 
-    This reads the minimum pitch from FP_TRACKS_INFO and updates the
-    config DIE_AREA to start at (0,0) with width/height rounded up to
-    the next multiple of that pitch.
+    This reads the minimum pitch from FP_TRACKS_INFO and updates the config DIE_AREA to
+    start at (0,0) with width/height rounded up to the next multiple of that pitch.
     """
     x_pitch, y_pitch = get_pitch(config)
 
@@ -89,8 +87,8 @@ def round_die_area(config: Config) -> Config:
 def get_routing_obstructions(config: Config) -> list[tuple[int, int, int, int]]:
     """Get the routing obstructions from the config.
 
-    Returns a list of tuples (x1, y1, x2, y2) representing
-    the obstructions in the routing area.
+    Returns a list of tuples (x1, y1, x2, y2) representing the obstructions in the
+    routing area.
     """
     obstructions = config.get("ROUTING_OBSTRUCTIONS") or []
     _, _, width, height = config["DIE_AREA"]

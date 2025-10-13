@@ -8,8 +8,8 @@ from librelane.steps.step import (
 
 
 class ConditionalMagicDRC(DRC):
-    """Run Magic DRC and conditionally continue the flow based on whether DRC
-    passes or not.
+    """Run Magic DRC and conditionally continue the flow based on whether DRC passes or
+    not.
     """
 
     id = "Condition.MagicDRC"

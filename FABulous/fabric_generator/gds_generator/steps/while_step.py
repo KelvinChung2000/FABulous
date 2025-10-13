@@ -56,8 +56,9 @@ class WhileStep(Step):
 
     def mid_iteration_break(self, state: State, step: type[Step]) -> bool:
         """Callback that takes in a state and returns a boolean.
-        If True, breaks the current iteration and starts the next iteration.
-        Breaking mid-iteration will not trigger the post_iteration_callback.
+
+        If True, breaks the current iteration and starts the next iteration. Breaking
+        mid-iteration will not trigger the post_iteration_callback.
         """
         return False
 

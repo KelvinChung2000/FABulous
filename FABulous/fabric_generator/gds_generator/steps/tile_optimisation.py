@@ -6,10 +6,6 @@ from librelane.config.variable import Variable
 from librelane.state.design_format import DesignFormat
 from librelane.state.state import State
 from librelane.steps import checker as Checker
-from librelane.steps import klayout as KLayout
-from librelane.steps import magic as Magic
-from librelane.steps import misc as Misc
-from librelane.steps import netgen as Netgen
 from librelane.steps import odb as Odb
 from librelane.steps import openroad as OpenROAD
 from librelane.steps.step import Step
@@ -52,14 +48,14 @@ var = [
         " - 'custom': user defined function by supplying FABULOUS_CUSTOM_OPT_FUNC.",
         default=OptMode.FIX_HEIGHT,
     ),
-    # Variable(
-    #     "FABULOUS_CUSTOM_OPT_FUNC",
-    #     Callable,
-    #     "A custom python function that takes in the current width and height "
-    #     "and returns the new width and height. "
-    #     "Only used when FABULOUS_OPT_MODE is 'custom'.",
-    #     default="",
-    # ),
+    Variable(
+        "FABULOUS_CUSTOM_OPT_FUNC",
+        Callable,
+        "A custom python function that takes in the current width and height "
+        "and returns the new width and height. "
+        "Only used when FABULOUS_OPT_MODE is 'custom'.",
+        default="",
+    ),
 ]
 
 

@@ -1,8 +1,8 @@
 """Extract PDK placement site dimensions step.
 
-This step extracts standard cell placement site dimensions from the PDK
-technology LEF using OpenROAD's ODB API. The dimensions are written to
-metrics for use by flows that need to work with site-aligned dimensions.
+This step extracts standard cell placement site dimensions from the PDK technology LEF
+using OpenROAD's ODB API. The dimensions are written to metrics for use by flows that
+need to work with site-aligned dimensions.
 """
 
 from importlib import resources

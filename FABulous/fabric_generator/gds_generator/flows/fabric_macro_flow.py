@@ -85,8 +85,8 @@ configs = Classic.config_vars + [
 class FABulousFabricMacroFlow(Classic):
     """Flow for stitching together individual tile macros into a complete fabric.
 
-    This flow handles the placement and interconnection of pre-generated tile macros
-    to create the final fabric layout, including power distribution and IO placement.
+    This flow handles the placement and interconnection of pre-generated tile macros to
+    create the final fabric layout, including power distribution and IO placement.
     """
 
     Steps = prep_steps + physical_steps + write_out_steps + check_steps
@@ -102,7 +102,7 @@ class FABulousFabricMacroFlow(Classic):
         ----------
         fabric : Fabric
             The fabric object with tile grid and dimensions.
-        tile_sizes : dict[str, TileSize]
+        tile_sizes : dict[str, tuple[Decimal, Decimal]]
             Mapping from tile name to (width, height).
 
         Returns
@@ -154,6 +154,17 @@ class FABulousFabricMacroFlow(Classic):
         tile_spacing: tuple[Decimal, Decimal],
     ) -> tuple[Decimal, Decimal]:
         """Compute overall fabric width and height from per-row/column sizes.
+
+        Parameters
+        ----------
+        row_heights : list[Decimal]
+            Heights of each row in the fabric.
+        column_widths : list[Decimal]
+            Widths of each column in the fabric.
+        halo_spacing : tuple[Decimal, Decimal, Decimal, Decimal]
+            (left, bottom, right, top) halo spacing around the fabric.
+        tile_spacing : tuple[Decimal, Decimal]
+            (x_spacing, y_spacing) between tiles.
 
         Returns
         -------
@@ -269,10 +280,10 @@ class FABulousFabricMacroFlow(Classic):
         ----------
         tile_sizes : dict[str, tuple[Decimal, Decimal]]
             Dictionary mapping tile names to their sizes (width, height).
-        min_pitch_x : Decimal
-            Minimum pitch for horizontal (X) direction.
-        min_pitch_y : Decimal
-            Minimum pitch for vertical (Y) direction.
+        pitch_x : Decimal
+            Pitch for horizontal (X) direction.
+        pitch_y : Decimal
+            Pitch for vertical (Y) direction.
 
         Returns
         -------

@@ -11,8 +11,8 @@ from FABulous.fabric_generator.gds_generator.flows.fabric_macro_flow import (
 class FabricMacroGen(Step):
     """LibreLane step for stitching FABulous tile macros into a complete fabric.
 
-    This step takes pre-compiled tile macros and stitches them together into
-    the final fabric layout, including power distribution and IO placement.
+    This step takes pre-compiled tile macros and stitches them together into the final
+    fabric layout, including power distribution and IO placement.
     """
 
     id = "FABulous.FabricMacroGen"

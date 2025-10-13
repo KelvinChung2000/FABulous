@@ -36,6 +36,9 @@ class Tile:
         True if the tile uses a clk signal
     configBit : int, optional
         Number of configuration bits for the switch matrix. Default is 0.
+    pinOrderConfig : dict[Side, PinOrderConfig] | None, optional
+        Configuration for pin ordering on each side of the tile. If None, defaults to
+        BUS_MAJOR sorting on all sides.
 
     Attributes
     ----------
@@ -57,8 +60,10 @@ class Tile:
         The list of wires of the tile
     tileDir : Path
         The path to the tile folder
-    partOfSuperTile : bool
+    partOfSuperTile : bool, optional
         Whether the tile is part of a super tile. Default is False.
+    pinOrderConfig : dict, optional
+        Configuration for pin ordering on each side of the tile.
     """
 
     name: str

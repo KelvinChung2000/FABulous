@@ -1,13 +1,15 @@
 #!/usr/bin/env python3
 """Extract PDK placement site dimensions using ODB.
 
-This script runs within the OpenROAD Python interpreter to extract
-standard cell placement site dimensions from the loaded technology LEF.
-The dimensions are written as metrics for use by the flow.
+This script runs within the OpenROAD Python interpreter to extract standard cell
+placement site dimensions from the loaded technology LEF. The dimensions are written as
+metrics for use by the flow.
 """
 
+from typing import Any
 
-def main(reader, **_):
+
+def main(reader: Any, **_: dict) -> None:  # noqa: ANN401
     """Extract placement site dimensions and write to metrics.
 
     Parameters
@@ -50,9 +52,8 @@ def main(reader, **_):
         )
 
     # Write metrics for use by the flow
-    print(f"%OL_METRIC pdk__site_width {site_width_dbu}")
-    print(f"%OL_METRIC pdk__site_height {site_height_dbu}")
-    # print(f"%OL_METRIC pdk__site_name {site_name}")
+    print(f"%OL_METRIC pdk__site_width {site_width_dbu}")  # noqa: T201
+    print(f"%OL_METRIC pdk__site_height {site_height_dbu}")  # noqa: T201
 
     # Also print for debugging
     print(

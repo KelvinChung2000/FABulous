@@ -39,10 +39,10 @@ class FABulousTileIOPlacement(OdbpyStep):
             "IO_PIN_V_LENGTH",
             Optional[Decimal],
             """
-            The length of the pins with a north or south orientation. If unspecified by 
+            The length of the pins with a north or south orientation. If unspecified by
             a PDK, the script will use whichever is higher of the following two values:
                 * The pin width
-                * The minimum value satisfying the minimum area constraint given the 
+                * The minimum value satisfying the minimum area constraint given the
                   pin width
             """,
             units="µm",
@@ -52,10 +52,10 @@ class FABulousTileIOPlacement(OdbpyStep):
             "IO_PIN_H_LENGTH",
             Optional[Decimal],
             """
-            The length of the pins with an east or west orientation. If unspecified by 
+            The length of the pins with an east or west orientation. If unspecified by
             a PDK, the script will use whichever is higher of the following two values:
                 * The pin width
-                * The minimum value satisfying the minimum area constraint given the 
+                * The minimum value satisfying the minimum area constraint given the
                   pin width
             """,
             units="µm",

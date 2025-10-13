@@ -122,6 +122,11 @@ class Port:
             If True, wire names use bracket notation (e.g., `port[0]`).
             If False, wire names use simple concatenation (e.g., `port0`).
             Defaults to False.
+        prefix : str, optional
+            A prefix to prepend to the port name, by default "".
+        escape : bool, optional
+            If True, escape special characters in the port names (e.g., for regex),
+            by default False.
 
         Returns
         -------
@@ -165,6 +170,11 @@ class Port:
             If True, wire names use bracket notation (e.g., `port[0]`).
             If False, wire names use simple concatenation (e.g., `port0`).
             Defaults to False.
+        prefix : str, optional
+            A prefix to prepend to the port name, by default "".
+        escape : bool, optional
+            If True, escape special characters in the port names (e.g., for regex),
+            by default False.
 
         Returns
         -------

@@ -1,12 +1,20 @@
+"""A template for while loop steps.
+
+Will be replaced into librelane eventually.
+"""
+
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 from librelane.common.misc import slugify
-from librelane.config.variable import Variable
 from librelane.flows.flow import FlowProgressBar
 from librelane.logging.logger import warn
 from librelane.state.design_format import DesignFormat
 from librelane.state.state import State
 from librelane.steps.step import MetricsUpdate, Step, ViewsUpdate
+
+if TYPE_CHECKING:
+    from librelane.config.variable import Variable
 
 
 class WhileStep(Step):
@@ -18,7 +26,7 @@ class WhileStep(Step):
 
     break_on_failure: bool = True
 
-    def __init_subclass__(Self):
+    def __init_subclass__(Self):  # noqa: ANN204, D105
         super().__init_subclass__()
         available_inputs = set()
 
@@ -26,7 +34,7 @@ class WhileStep(Step):
         output_set: set[DesignFormat] = set()
         config_var_dict: dict[str, Variable] = {}
         for step in Self.Steps:
-            for input in step.inputs:
+            for input in step.inputs:  # noqa: A001
                 if input not in available_inputs:
                     input_set.add(input)
                     available_inputs.add(input)
@@ -50,12 +58,12 @@ class WhileStep(Step):
             config_var_dict.update({v.name: v for v in Self.config_vars})
         Self.config_vars = list(config_var_dict.values())
 
-    def condition(self, state: State) -> bool:
-        """A callable that takes in a state and returns a boolean."""
+    def condition(self, _state: State) -> bool:
+        """Return true if the condition is met and keep the loop going."""
         return True
 
-    def mid_iteration_break(self, state: State, step: type[Step]) -> bool:
-        """Callback that takes in a state and returns a boolean.
+    def mid_iteration_break(self, _state: State, _step: type[Step]) -> bool:
+        """Return True to break the current iteration and start the next iteration.
 
         If True, breaks the current iteration and starts the next iteration. Breaking
         mid-iteration will not trigger the post_iteration_callback.
@@ -63,24 +71,28 @@ class WhileStep(Step):
         return False
 
     def post_loop_callback(self, state: State) -> State:
+        """Modify the state after all iterations are complete."""
         return state
 
     def pre_iteration_callback(self, pre_iteration: State) -> State:
+        """Modify the state before each iteration."""
         return pre_iteration
 
     def post_iteration_callback(
-        self, post_iteration: State, full_iter_completed: bool
+        self, post_iteration: State, _full_iter_completed: bool
     ) -> State:
+        """Modify the state after each iteration."""
         return post_iteration
 
     def run(
         self,
         state_in: State,
-        **kwargs,
+        **_kwargs: dict,
     ) -> tuple[ViewsUpdate, MetricsUpdate]:
+        """Run the while loop step."""
         current_state = state_in
-        total_views_update: ViewsUpdate = {}
-        total_metrics_update: MetricsUpdate = {}
+        total_views_update: dict = {}
+        total_metrics_update: dict = {}
         progress_bar = FlowProgressBar(self.name)
 
         ordinal_length = len(str(len(self.Steps) - 1))
@@ -123,14 +135,7 @@ class WhileStep(Step):
                 current_state, full_iter_completed
             )
             progress_bar.end_stage()
-
-        print(
-            f"pre post loop callback \n{current_state}",
-        )
         current_state = self.post_loop_callback(current_state)
-        print(
-            f"post loop callback \n{current_state}",
-        )
         for key in current_state:
             if (
                 state_in.get(key) != current_state.get(key)

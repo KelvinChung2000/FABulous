@@ -1259,12 +1259,8 @@ class FABulous_CLI(Cmd):
         """
         self.fabulousAPI.genFabricIOBels()
 
-    # @with_category(CMD_FABRIC_FLOW)
-    # def do_gen_gds(self, args: str) -> None:
-    #     gdsFAB = gdsGenerator(
-    #         self, args, self.fabulousAPI, self.allTile, self.csvFile, self.projectDir
-    #     )
-    #     gdsFAB.run()
+    # The `do_gen_gds` command was removed; restore if GDS generation via CLI
+    # is required in the future.
 
     gds_parser = Cmd2ArgumentParser()
     gds_parser.add_argument(

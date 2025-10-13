@@ -1,3 +1,4 @@
+"""OpenDB script to connect power rails for FABulous fabric."""
 #
 # OpenDB script for custom Power for FABulous fabric
 # This script places vertical PDN straps on top
@@ -8,6 +9,8 @@
 # Copyright (c) 2025 Leo Moser <leo.moser@pm.me>
 # SPDX-License-Identifier: Apache-2.0
 #
+
+from typing import Any
 
 import click
 import odb
@@ -24,9 +27,10 @@ from librelane.scripts.odbpy.reader import click_odb
 @click.command()
 @click_odb
 def power(
-    reader,
+    reader: Any,  # noqa: ANN401
     metal_layer_name: str,
-):
+) -> None:
+    """Connect power rails for the tiles using a custom script."""
     # Create ground / power nets
     tech = reader.db.getTech()
 

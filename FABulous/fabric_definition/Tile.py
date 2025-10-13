@@ -75,7 +75,7 @@ class Tile:
     withUserCLK: bool = False
     wireList: list[Wire] = field(default_factory=list)
     tileDir: Path = Path()
-    partOfSuperTile = False
+    partOfSuperTile: bool = False
     pinOrderConfig: dict = field(default_factory=dict)
 
     def __init__(

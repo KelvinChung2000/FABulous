@@ -1,3 +1,5 @@
+"""Place I/O pins on the die edge based on mTerm positions."""
+
 import logging
 import math
 from decimal import Decimal
@@ -21,29 +23,33 @@ class OdbReaderLike(Protocol):
 class odbBTermLike(Protocol):
     """Protocol describing the odb.dbBTerm object."""
 
-    def getName(self) -> str: ...
-    def getBPins(self) -> list[Any]: ...
+    def getName(self) -> str: ...  # noqa: D102
+    def getBPins(self) -> list[Any]: ...  # noqa: D102
 
 
 class odbPointLike(Protocol):
-    def x(self) -> int: ...
-    def y(self) -> int: ...
+    """Protocol describing the odb.dbPoint object."""
+
+    def x(self) -> int: ...  # noqa: D102
+    def y(self) -> int: ...  # noqa: D102
 
 
 class odbRectLike(Protocol):
-    def xMin(self) -> int: ...
-    def yMin(self) -> int: ...
-    def xMax(self) -> int: ...
-    def yMax(self) -> int: ...
-    def dx(self) -> int: ...
-    def dy(self) -> int: ...
-    def xCenter(self) -> int: ...
-    def yCenter(self) -> int: ...
-    def ll(self) -> odbPointLike: ...
-    def ul(self) -> odbPointLike: ...
-    def ur(self) -> odbPointLike: ...
-    def lr(self) -> odbPointLike: ...
-    def center(self) -> odbPointLike: ...
+    """Protocol describing the odb.dbRect object."""
+
+    def xMin(self) -> int: ...  # noqa: D102
+    def yMin(self) -> int: ...  # noqa: D102
+    def xMax(self) -> int: ...  # noqa: D102
+    def yMax(self) -> int: ...  # noqa: D102
+    def dx(self) -> int: ...  # noqa: D102
+    def dy(self) -> int: ...  # noqa: D102
+    def xCenter(self) -> int: ...  # noqa: D102
+    def yCenter(self) -> int: ...  # noqa: D102
+    def ll(self) -> odbPointLike: ...  # noqa: D102
+    def ul(self) -> odbPointLike: ...  # noqa: D102
+    def ur(self) -> odbPointLike: ...  # noqa: D102
+    def lr(self) -> odbPointLike: ...  # noqa: D102
+    def center(self) -> odbPointLike: ...  # noqa: D102
 
 
 @click.command()

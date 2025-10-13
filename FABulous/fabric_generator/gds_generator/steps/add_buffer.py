@@ -1,6 +1,9 @@
+"""FABulous GDS Generator - Add Buffers Step."""
+
 from importlib import resources
 
 from librelane.config.variable import Variable
+from librelane.state.state import State
 from librelane.steps.common_variables import (
     grt_variables,
     rsz_variables,
@@ -53,9 +56,10 @@ class AddBuffers(OpenROADStep):
 
     def run(
         self,
-        state_in,
-        **kwargs,
+        state_in: State,
+        **kwargs: dict,
     ) -> tuple[ViewsUpdate, MetricsUpdate]:
+        """Run the AddBuffers step."""
         kwargs, env = self.extract_env(kwargs)
         return super().run(
             state_in,
@@ -65,6 +69,7 @@ class AddBuffers(OpenROADStep):
         )
 
     def get_script_path(self) -> str:
+        """Get the path to the add buffers script."""
         return str(
             resources.files("FABulous.fabric_generator.gds_generator.script")
             / "add_buffers.tcl"

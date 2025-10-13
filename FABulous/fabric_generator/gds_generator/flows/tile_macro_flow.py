@@ -1,3 +1,5 @@
+"""Tile optimisation flows for FABulous fabric generation."""
+
 from collections.abc import Iterable
 from pathlib import Path
 from typing import Any
@@ -68,6 +70,8 @@ configs = Classic.config_vars + [
 
 @Flow.factory.register()
 class FABulousTileVerilogMarcoFlow(SequentialFlow):
+    """A tile optimisation flow for FABulous fabric generation from Verilog."""
+
     Steps = (
         prep_steps
         + [
@@ -92,8 +96,9 @@ class FABulousTileVerilogMarcoFlow(SequentialFlow):
         to: str | None = None,
         skip: Iterable[str] | None = None,
         reproducible: str | None = None,
-        **kwargs,
-    ) -> tuple[State | list[Step]]:
+        **kwargs: dict,
+    ) -> tuple[State, list[Step]]:
+        """Run the FABulous tile optimisation flow."""
         self.config = round_die_area(self.config)
         if (
             "ROUTING_OBSTRUCTIONS" not in self.config
@@ -107,6 +112,8 @@ class FABulousTileVerilogMarcoFlow(SequentialFlow):
 
 @Flow.factory.register()
 class FABulousTileVerilogMarcoFlowClassic(SequentialFlow):
+    """Classic LibreLane flow for FABulous fabric generation from Verilog."""
+
     Steps = prep_steps + physical_steps + write_out_steps + check_steps
     Substitutions = subs
     config_vars = configs
@@ -126,6 +133,8 @@ class FABulousTileVerilogMarcoFlowClassic(SequentialFlow):
 
 @Flow.factory.register()
 class FABulousTileVHDLMarcoFlowClassic(SequentialFlow):
+    """Classic LibreLane flow for FABulous fabric generation from VHDL."""
+
     Steps = prep_steps + physical_steps + write_out_steps + check_steps
     Substitutions = subs
     config_vars = configs

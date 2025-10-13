@@ -22,6 +22,8 @@ from FABulous.fabric_generator.gds_generator.steps.while_step import WhileStep
 
 
 class OptMode(StrEnum):
+    """Optimisation modes for tile size reduction."""
+
     FIX_HEIGHT = "fix_height"
     FIX_WIDTH = "fix_width"
     BALANCED = "balanced"
@@ -33,8 +35,9 @@ var = [
     Variable(
         "FABULOUS_OPTIMISATION_STEP_COUNT",
         int,
-        "The number of placement sites by which the tile size reduces in each iteration. "
-        "The actual reduction in DBU is this count multiplied by the PDK site dimensions.",
+        "The number of placement sites by which the tile size reduces in each "
+        "iteration. The actual reduction in DBU is this count multiplied by the PDK "
+        "site dimensions.",
         default=5,
     ),
     Variable(
@@ -61,12 +64,14 @@ var = [
 
 @Step.factory.register()
 class TileOptimisation(WhileStep):
+    """Tile size optimisation step."""
+
     id = "FABulous.TileOptimisation"
     name = "Tile Optimisation"
 
     inputs = [DesignFormat.NETLIST]
 
-    Steps = [
+    Stepss = [
         RoundDieArea,
         OpenROAD.Floorplan,
         OpenROAD.DumpRCValues,
@@ -130,6 +135,7 @@ class TileOptimisation(WhileStep):
     def post_iteration_callback(
         self, post_iteration: State, full_iter_completed: bool
     ) -> State:
+        """Save state if iteration completed successfully."""
         if full_iter_completed:
             self.last_working_state = post_iteration.copy()
         return post_iteration

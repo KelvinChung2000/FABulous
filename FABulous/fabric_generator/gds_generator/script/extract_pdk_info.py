@@ -8,6 +8,8 @@ metrics for use by the flow.
 
 from typing import Any
 
+from librelane.logging.logger import info
+
 
 def main(reader: Any, **_: dict) -> None:  # noqa: ANN401
     """Extract placement site dimensions and write to metrics.
@@ -56,7 +58,7 @@ def main(reader: Any, **_: dict) -> None:  # noqa: ANN401
     print(f"%OL_METRIC pdk__site_height {site_height_dbu}")  # noqa: T201
 
     # Also print for debugging
-    print(
+    info(
         f"Found placement site '{site_name}': {site_width_dbu} x {site_height_dbu} DBU"
     )
 

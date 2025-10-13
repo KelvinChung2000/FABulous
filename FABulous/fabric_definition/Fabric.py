@@ -281,9 +281,10 @@ class Fabric:
 
         Yields
         ------
-        tuple[tuple[int, int], Tile | None]
-            The next tile in the fabric and it's coordinates,
-            or None if the position is empty.
+        Generator[tuple[tuple[int, int], Tile | None]]
+            Generator yielding a tuple where the first element is the (x, y)
+            coordinates and the second is the Tile at that position or None
+            if the position is empty.
         """
         for y, row in enumerate(self.tile):
             for x, tile in enumerate(row):
@@ -302,8 +303,8 @@ class Fabric:
 
         Returns
         -------
-        Tile | None
-            The tile object if found.
+        Tile | SuperTile
+            The tile or supertile object if found.
 
         Raises
         ------
@@ -332,7 +333,7 @@ class Fabric:
 
         Returns
         -------
-        SuperTile | None
+        SuperTile
             The super tile object if found.
 
         Raises

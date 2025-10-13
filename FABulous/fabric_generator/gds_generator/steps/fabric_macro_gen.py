@@ -1,3 +1,5 @@
+"""FABulous GDS Generator - Fabric Macro Generation Step."""
+
 from librelane.state.design_format import DesignFormat
 from librelane.state.state import State
 from librelane.steps.step import MetricsUpdate, Step, ViewsUpdate
@@ -31,9 +33,10 @@ class FabricMacroGen(Step):
         DesignFormat.DEF,
     ]
 
-    def run(self, state_in: State, **kwargs) -> tuple[ViewsUpdate, MetricsUpdate]:
-        views_updates: ViewsUpdate = {}
-        metrics_updates: MetricsUpdate = {}
+    def run(self, state_in: State, **kwargs: str) -> tuple[ViewsUpdate, MetricsUpdate]:
+        """Run the fabric macro generation process."""
+        views_updates: dict = {}
+        metrics_updates: dict = {}
 
         flow = FABulousFabricMacroFlow(self.config, **kwargs)
         final_state = flow.start(state_in)

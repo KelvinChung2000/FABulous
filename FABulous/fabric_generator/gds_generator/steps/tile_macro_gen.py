@@ -1,6 +1,4 @@
-"""
-FABulous GDS Generator - Tile to Macro Conversion Step
-"""
+"""FABulous GDS Generator - Tile to Macro Conversion Step."""
 
 from librelane.state.design_format import DesignFormat
 from librelane.state.state import State
@@ -32,9 +30,10 @@ class TileMarcoGen(Step):
         DesignFormat.DEF,
     ]
 
-    def run(self, state_in: State, **kwargs) -> tuple[ViewsUpdate, MetricsUpdate]:
-        views_updates: ViewsUpdate = {}
-        metrics_updates: MetricsUpdate = {}
+    def run(self, state_in: State, **kwargs: str) -> tuple[ViewsUpdate, MetricsUpdate]:
+        """Run the tile to macro conversion process."""
+        views_updates: dict = {}
+        metrics_updates: dict = {}
 
         if self.config["TILE_OPTIMISATION"]:
             flow = FABulousTileVerilogMarcoFlowClassic(self.config, **kwargs)

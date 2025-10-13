@@ -319,13 +319,18 @@ class FABulous_API:
         ----------
         tileName : str
             Name of the Tile.
-        rise_on_miss : bool, optional
+        raises_on_miss : bool, optional
             Whether to raise an error if the tile is not found, by default False.
 
         Returns
         -------
-        Tile | None
+        Tile | SuperTile | None
             Tile object based on tile name, or None if not found.
+
+        Raises
+        ------
+        KeyError
+            If tile is not found and 'raises_on_miss' is True.
         """
         try:
             return self.fabric.getTileByName(tileName)
@@ -353,11 +358,18 @@ class FABulous_API:
         ----------
         tileName : str
             Name of the SuperTile.
+        raises_on_miss : bool, optional
+            Whether to raise an error if the supertile is not found, by default False.
 
         Returns
         -------
         SuperTile | None
             SuperTile object based on tile name, or None if not found.
+
+        Raises
+        ------
+        KeyError
+            If tile is not found and 'raises_on_miss' is True.
         """
         try:
             return self.fabric.getSuperTileByName(tileName)
@@ -608,20 +620,25 @@ class FABulous_API:
             Dictionary mapping tile names to their macro output directories.
         fabric_path : Path
             Path to the fabric-level Verilog file.
-        base_config_path : Path | None
-            Path to base configuration YAML file.
-        out_folder : Path
-            Output directory for the stitched fabric.
-        fabric_io_config : Path | None, optional
+        fabric_io_config : Path
             Path to fabric-level IO pin order configuration YAML.
             If provided, will be used for fabric IO placement.
             If None, no automatic IO placement will be performed.
+        out_folder : Path
+            Output directory for the stitched fabric.
+        base_config_path : Path | None
+            Path to base configuration YAML file.
+        config_override : dict | Path | None, optional
+            Additional configuration overrides.
         pdk_root : Path | None, optional
             Path to PDK root directory.
         pdk : str | None, optional
             PDK name to use.
-        config_override : dict | Path | None, optional
-            Additional configuration overrides.
+
+        Raises
+        ------
+        ValueError
+            If PDK root or PDK is not specified.
         """
         if pdk_root is None:
             pdk_root = get_context().pdk_root

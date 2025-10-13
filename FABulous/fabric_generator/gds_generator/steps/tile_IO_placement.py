@@ -2,7 +2,7 @@
 
 from decimal import Decimal
 from importlib import resources
-from typing import Literal, Optional
+from typing import Literal
 
 from librelane.common.types import Path
 from librelane.config.variable import Variable
@@ -24,10 +24,10 @@ def _migrate_unmatched_io(x: object) -> str:
 
 @Step.factory.register()
 class FABulousTileIOPlacement(OdbpyStep):
-    """Place I/O pins using a custom script, which uses a "pin order configuration"
-    file.
+    """Place I/O pins using a custom script.
 
-    Check the reference documentation for the structure of said file.
+    This step uses a custom Python script to place I/O pins according to a user-defined
+    configuration file.
     """
 
     id = "Odb.FABulousTileIOPlacement"
@@ -37,7 +37,7 @@ class FABulousTileIOPlacement(OdbpyStep):
     config_vars = io_layer_variables + [
         Variable(
             "IO_PIN_V_LENGTH",
-            Optional[Decimal],
+            Decimal | None,
             """
             The length of the pins with a north or south orientation. If unspecified by
             a PDK, the script will use whichever is higher of the following two values:
@@ -50,7 +50,7 @@ class FABulousTileIOPlacement(OdbpyStep):
         ),
         Variable(
             "IO_PIN_H_LENGTH",
-            Optional[Decimal],
+            Decimal | None,
             """
             The length of the pins with an east or west orientation. If unspecified by
             a PDK, the script will use whichever is higher of the following two values:
@@ -82,12 +82,14 @@ class FABulousTileIOPlacement(OdbpyStep):
     ]
 
     def get_script_path(self) -> str:
+        """Get the path to the I/O placement script."""
         return str(
             resources.files("FABulous.fabric_generator.gds_generator.script")
             / "tile_io_place.py"
         )
 
     def get_command(self) -> list[str]:
+        """Get the command to run the I/O placement script."""
         length_args = []
         if self.config["IO_PIN_V_LENGTH"] is not None:
             length_args += ["--ver-length", self.config["IO_PIN_V_LENGTH"]]
@@ -117,5 +119,6 @@ class FABulousTileIOPlacement(OdbpyStep):
             + length_args
         )
 
-    def run(self, state_in: State, **kwargs) -> tuple[ViewsUpdate, MetricsUpdate]:
+    def run(self, state_in: State, **kwargs: str) -> tuple[ViewsUpdate, MetricsUpdate]:
+        """Run the I/O placement step."""
         return super().run(state_in, **kwargs)

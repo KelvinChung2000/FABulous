@@ -266,7 +266,6 @@ def generate_fabric_IO_pin_order_config(fabric: Fabric, outfile: Path) -> None:
 
     frame_data_counter = 0
     frame_strobe_counter = 0
-    virtual_pin_count = 0
 
     # Iterate through all tiles and collect border pins
     for (x, y), tile in fabric:

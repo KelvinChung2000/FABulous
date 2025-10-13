@@ -1,3 +1,5 @@
+"""FABulous GDS Generator - Round Die Area Step."""
+
 import math
 from decimal import Decimal
 from pathlib import Path
@@ -8,6 +10,8 @@ from librelane.steps.step import MetricsUpdate, ViewsUpdate
 
 
 class RoundDieArea(OpenROAD.Floorplan):
+    """Round the die area to the nearest multiple of the smallest track pitch."""
+
     id = "FABulous.RoundDieArea"
     name = "Round Die Area"
     long_name = "Round Die Area to Nearest PDK Site"
@@ -15,7 +19,12 @@ class RoundDieArea(OpenROAD.Floorplan):
     inputs = []
     outputs = []
 
-    def run(self, state_in: State, **kwargs) -> tuple[ViewsUpdate, MetricsUpdate]:
+    def run(
+        self,
+        state_in: State,  # noqa: ARG002
+        **kwargs: str,  # noqa: ARG002
+    ) -> tuple[ViewsUpdate, MetricsUpdate]:
+        """Round the die area to the nearest multiple of the smallest track pitch."""
         with Path(self.config["FP_TRACKS_INFO"]).open() as f:
             lines = f.readlines()
 

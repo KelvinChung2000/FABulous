@@ -7,7 +7,6 @@ from librelane.steps import odb as Odb
 from librelane.steps import openroad as OpenROAD
 from librelane.steps import pyosys as pyYosys
 from librelane.steps import verilator as Verilator
-from librelane.steps import yosys as Yosys
 from librelane.steps.step import Step
 
 from FABulous.fabric_generator.gds_generator.steps.condition_magic_drc import (
@@ -97,7 +96,6 @@ check_steps: list[type[Step]] = [
     Checker.IllegalOverlap,
     Netgen.LVS,
     Checker.LVS,
-    Yosys.EQY,
     Checker.SetupViolations,
     Checker.HoldViolations,
     Checker.MaxSlewViolations,

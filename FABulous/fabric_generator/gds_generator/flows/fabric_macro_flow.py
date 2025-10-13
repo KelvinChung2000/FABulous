@@ -11,7 +11,16 @@ from librelane.state.state import State
 from librelane.steps.step import Step
 
 from FABulous.fabric_definition.Fabric import Fabric
+from FABulous.fabric_generator.gds_generator.flows.flow_define import (
+    check_steps,
+    physical_steps,
+    prep_steps,
+    write_out_steps,
+)
 from FABulous.fabric_generator.gds_generator.helper import get_pitch
+from FABulous.fabric_generator.gds_generator.steps.condition_magic_drc import (
+    ConditionalMagicDRC,
+)
 from FABulous.fabric_generator.gds_generator.steps.fabric_IO_placement import (
     FABulousFabricIOPlacement,
 )
@@ -32,6 +41,7 @@ subs = {
     # Replace IO placement with FABulous fabric-level IO placement
     "OpenROAD.IOPlacement": None,
     "Odb.CustomIOPlacement": FABulousFabricIOPlacement,
+    "Magic.DRC": ConditionalMagicDRC,
     # Script to manually place single IOs (for additional pins if needed)
     # "+OpenROAD.GlobalPlacementSkipIO": FABulousManualIOPlacement,
 }
@@ -64,7 +74,7 @@ configs = Classic.config_vars + [
         tuple[Decimal, Decimal, Decimal, Decimal],
         "The spacing around the fabric. [left, bottom, right, top]",
         units="µm",
-        default=(100, 100, 100, 100),
+        default=(0, 0, 0, 0),
     ),
     Variable(
         "FABULOUS_SPEF_CORNERS",
@@ -83,6 +93,7 @@ class FABulousFabricMacroFlow(Classic):
     to create the final fabric layout, including power distribution and IO placement.
     """
 
+    Steps = prep_steps + physical_steps + write_out_steps + check_steps
     Substitutions = subs
     config_vars = configs
 

@@ -1500,13 +1500,22 @@ class FABulous_CLI(Cmd):
             raise CommandError("Please specify either --fabric or --tile, not both")
 
         gds_file: str = self.get_file_path(args, "gds")
-        layer_file = (
-            (get_context().pdk_root)
-            / "libs.tech"
-            / "klayout"
-            / "tech"
-            / f"{get_context().pdk}.lyp"
-        )
+        if get_context().pdk == "ihp-sg13g2":
+            layer_file = (
+                (get_context().pdk_root)
+                / "libs.tech"
+                / "klayout"
+                / "tech"
+                / "sg12g2.lyp"
+            )
+        else:
+            layer_file = (
+                (get_context().pdk_root)
+                / "libs.tech"
+                / "klayout"
+                / "tech"
+                / f"{get_context().pdk}.lyp"
+            )
         logger.info(f"Start klayout GUI with gds: {gds_file}")
         logger.info(f"Layer property file: {layer_file!s}")
         sp.run(

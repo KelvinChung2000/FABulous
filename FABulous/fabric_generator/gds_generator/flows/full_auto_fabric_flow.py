@@ -301,7 +301,7 @@ class FABulousFabricMacroFullFlow(Flow):
 
         return True
 
-    def run(self, initial_state: State, **_kwargs) -> tuple[State, list[Step]]:
+    def run(self, initial_state: State, **_kwargs: dict) -> tuple[State, list[Step]]:
         """Execute the full automatic fabric flow.
 
         Parameters
@@ -520,7 +520,8 @@ class FABulousFabricMacroFullFlow(Flow):
 
                         warn(
                             f"✗ {tile_type.name} failed "
-                            f"(attempt {failed_tile_types[tile_type.name]}/{max_retries})"
+                            "(attempt"
+                            f"{failed_tile_types[tile_type.name]}/{max_retries})"
                         )
                         warn("  Relaxing constraints for all instances...")
 

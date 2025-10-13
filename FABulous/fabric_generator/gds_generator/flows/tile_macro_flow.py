@@ -120,6 +120,7 @@ class FABulousTileVerilogMarcoFlowClassic(SequentialFlow):
     gating_config_vars = classic_gating_config_vars
 
     def run(self, initial_state: State, **kwargs: Any) -> tuple[State, list[Step]]:  # noqa: ANN401
+        """Run the no optimisation FABulous verilog tile flow."""
         self.config = round_die_area(self.config)
         if (
             "ROUTING_OBSTRUCTIONS" not in self.config
@@ -141,6 +142,7 @@ class FABulousTileVHDLMarcoFlowClassic(SequentialFlow):
     gating_config_vars = classic_gating_config_vars
 
     def run(self, initial_state: State, **kwargs: Any) -> tuple[State, list[Step]]:  # noqa: ANN401
+        """Run the FABulous tile VHDL flow."""
         warn("Linting and equivalence checking for VHDL files is disabled")
         round_die_area(self.config)
         if (

@@ -1387,7 +1387,8 @@ class FABulous_CLI(Cmd):
         )
 
     @with_category(CMD_FABRIC_FLOW)
-    def run_FABulous_eFPGA_marco(self):
+    def run_FABulous_eFPGA_macro(self) -> None:
+        """Run the full FABulous eFPGA macro generation flow."""
         self.fabulousAPI.fabric_full_flow(self.projectDir, self.projectDir / "macro")
 
     gui_parser = Cmd2ArgumentParser()
@@ -1407,7 +1408,9 @@ class FABulous_CLI(Cmd):
         "--last-run", help="launch GUI to view last run", action="store_true"
     )
 
-    def get_file_path(self, args, file_extension: str) -> str:
+    def _get_file_path(self, args: argparse.Namespace, file_extension: str) -> str:
+        """Get the file path for the specified file extension."""
+
         def get_latest(directory: Path, file_extension: str) -> str:
             """Get the latest modified file in a directory."""
             files = list(directory.glob(f"**/*.{file_extension}"))
@@ -1467,7 +1470,7 @@ class FABulous_CLI(Cmd):
         if args.fabric and args.tile is not None:
             raise CommandError("Please specify either --fabric or --tile, not both")
 
-        db_file: str = self.get_file_path(args, "odb")
+        db_file: str = self._get_file_path(args, "odb")
         with tempfile.NamedTemporaryFile(
             mode="w", suffix=".tcl", delete=False
         ) as script_file:
@@ -1485,7 +1488,7 @@ class FABulous_CLI(Cmd):
 
     @with_argparser(gui_parser)
     @with_category(CMD_TOOLS)
-    def do_start_klayout_gui(self, args) -> None:
+    def do_start_klayout_gui(self, args: argparse.Namespace) -> None:
         """Start OpenROAD GUI if an installation can be found.
 
         If no installation can be found, a warning is produced.
@@ -1495,7 +1498,7 @@ class FABulous_CLI(Cmd):
         if args.fabric and args.tile is not None:
             raise CommandError("Please specify either --fabric or --tile, not both")
 
-        gds_file: str = self.get_file_path(args, "gds")
+        gds_file: str = self._get_file_path(args, "gds")
         if get_context().pdk == "ihp-sg13g2":
             layer_file = (
                 (get_context().pdk_root)

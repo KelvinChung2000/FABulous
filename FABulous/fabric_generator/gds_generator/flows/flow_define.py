@@ -1,3 +1,5 @@
+"""Defines the standard flow for generating GDS from RTL."""
+
 from librelane.steps import checker as Checker
 from librelane.steps import klayout as KLayout
 from librelane.steps import magic as Magic

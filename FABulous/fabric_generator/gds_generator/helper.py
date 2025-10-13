@@ -97,7 +97,8 @@ def get_routing_obstructions(config: Config) -> list[tuple[int, int, int, int]]:
     for obs in obstructions:
         if len(obs) != 4:
             raise ValueError(
-                f"Invalid obstruction {obs}. Each obstruction must be a tuple of 4 integers."
+                f"Invalid obstruction {obs}. Each obstruction must be a tuple of "
+                "4 integers."
             )
         met, *box = obs
         parsed_obstructions[met].append(box)

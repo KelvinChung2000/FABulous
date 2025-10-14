@@ -98,7 +98,7 @@ jobs:
             rm -f .coverage* || true
             pytest \
               --splits ${{ strategy.job-total }} --group ${{ matrix.job-index }} \
-              --store-durations --clean-durations -v -x \
+              --store-durations --clean-durations -v -x --runslow \
               --cov=FABulous --cov-branch --cov-config=pyproject.toml --cov-report= \
               || {
               exit_code=$?

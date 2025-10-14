@@ -61,14 +61,6 @@ You can deactivate the virtual environment with the ``deactivate`` command.
 Please note, that you always have to enable the virtual environment
 with ``source venv/bin/activate`` to use FABulous.
 
-:Python dependencies:
-
-.. prompt:: bash (venv)$
-
-    pip install -r requirements.txt
-
-
-
 The following packages need to be installed for the CAD toolchain:
 
 
@@ -87,7 +79,7 @@ We have also provided a command to install the above packages automatically.
 
 .. prompt:: bash $
 
-   FABulous install-cad-tools
+   FABulous install-oss-cad-suite
 
 .. note::
 

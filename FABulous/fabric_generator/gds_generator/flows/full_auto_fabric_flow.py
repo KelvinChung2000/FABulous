@@ -24,9 +24,6 @@ from librelane.state.design_format import DesignFormat
 from librelane.state.state import State
 from librelane.steps.step import Step
 
-from FABulous.fabric_cad.gen_io_pin_config_yaml import (
-    generate_IO_pin_order_config,
-)
 from FABulous.fabric_definition.Fabric import Fabric
 from FABulous.fabric_definition.SuperTile import SuperTile
 from FABulous.fabric_definition.Tile import Tile
@@ -34,6 +31,9 @@ from FABulous.fabric_generator.gds_generator.flows.flow_define import (
     check_steps,
     physical_steps,
     write_out_steps,
+)
+from FABulous.fabric_generator.gds_generator.gen_io_pin_config_yaml import (
+    generate_IO_pin_order_config,
 )
 from FABulous.fabric_generator.gds_generator.steps.fabric_macro_gen import (
     FabricMacroGen,

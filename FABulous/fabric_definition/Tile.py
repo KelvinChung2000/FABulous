@@ -11,7 +11,9 @@ from FABulous.fabric_definition.Port import Port
 from FABulous.fabric_definition.Wire import Wire
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
-    from FABulous.fabric_cad.gen_io_pin_config_yaml import PinOrderConfig
+    from FABulous.fabric_generator.gds_generator.gen_io_pin_config_yaml import (
+        PinOrderConfig,
+    )
 
 
 @dataclass
@@ -101,7 +103,9 @@ class Tile:
         self.tileDir = tileDir
 
         if pinOrderConfig is None:
-            from FABulous.fabric_cad.gen_io_pin_config_yaml import PinOrderConfig
+            from FABulous.fabric_generator.gds_generator.gen_io_pin_config_yaml import (
+                PinOrderConfig,
+            )
 
             self.pinOrderConfig = {
                 Side.NORTH: PinOrderConfig(sort_mode=PinSortMode.BUS_MAJOR),

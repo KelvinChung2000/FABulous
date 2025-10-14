@@ -19,9 +19,6 @@ import FABulous.fabric_cad.gen_npnr_model as model_gen_npnr
 import FABulous.fabric_generator.parser.parse_csv as fileParser
 from FABulous.fabric_cad.gen_bitstream_spec import generateBitstreamSpec
 from FABulous.fabric_cad.gen_design_top_wrapper import generateUserDesignTopWrapper
-from FABulous.fabric_cad.gen_io_pin_config_yaml import (
-    generate_IO_pin_order_config,
-)
 
 # Importing Modules from FABulous Framework.
 from FABulous.fabric_definition.Bel import Bel
@@ -42,6 +39,9 @@ from FABulous.fabric_generator.gds_generator.flows.full_auto_fabric_flow import 
 from FABulous.fabric_generator.gds_generator.flows.tile_macro_flow import (
     FABulousTileVerilogMarcoFlow,
     FABulousTileVerilogMarcoFlowClassic,
+)
+from FABulous.fabric_generator.gds_generator.gen_io_pin_config_yaml import (
+    generate_IO_pin_order_config,
 )
 from FABulous.fabric_generator.gen_fabric.fabric_automation import genIOBel
 from FABulous.fabric_generator.gen_fabric.gen_configmem import generateConfigMem

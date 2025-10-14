@@ -126,7 +126,7 @@ class FABulous_API:
             If 'fabric_dir' does not end with '.csv'
         """
         if fabric_dir.suffix == ".csv":
-            self.fabric = fileParser.parseFabricCSV(str(fabric_dir))
+            self.fabric = fileParser.parseFabricCSV(fabric_dir)
             self.geometryGenerator = GeometryGenerator(self.fabric)
         else:
             logger.error("Only .csv files are supported for fabric loading")
@@ -270,7 +270,7 @@ class FABulous_API:
             Padding value for geometry generation, by default 8.
         """
         self.geometryGenerator.generateGeometry(geomPadding)
-        self.geometryGenerator.saveToCSV(str(self.writer.outFileName))
+        self.geometryGenerator.saveToCSV(self.writer.outFileName)
 
     def genTopWrapper(self) -> None:
         """Generate the top wrapper for the fabric.

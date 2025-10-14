@@ -1,6 +1,5 @@
 """Tile size optimisation step for FABulous fabric generator."""
 
-from collections.abc import Callable
 from enum import StrEnum
 from typing import cast
 
@@ -86,7 +85,6 @@ class TileOptimisation(WhileStep):
         Odb.RemovePDNObstructions,
         Odb.AddRoutingObstructions,
         OpenROAD.GlobalPlacementSkipIO,
-        OpenROAD.IOPlacement,
         FABulousTileIOPlacement,  # Replace with FABulous IO Placement
         Odb.ApplyDEFTemplate,
         OpenROAD.GlobalPlacement,
@@ -199,21 +197,6 @@ class TileOptimisation(WhileStep):
                     width + (direction * width_step),
                     height + (direction * height_step),
                 )
-            case OptMode.CUSTOM:
-                func = self.config["FABULOUS_CUSTOM_OPT_FUNC"]
-                if func == "":
-                    raise ValueError(
-                        "FABULOUS_CUSTOM_OPT_FUNC is not set but "
-                        "FABULOUS_OPT_MODE is 'custom'."
-                    )
-                if not isinstance(func, Callable):
-                    raise TypeError("FABULOUS_CUSTOM_OPT_FUNC is not a callable.")
-                new_width, new_height = func(die_area[0], die_area[1])
-                if not isinstance(new_width, int) or not isinstance(new_height, int):
-                    raise TypeError(
-                        "FABULOUS_CUSTOM_OPT_FUNC must return two integers."
-                    )
-                die_area = (0, 0, new_width, new_height)
             case _:
                 raise ValueError(
                     f"Unknown FABULOUS_OPT_MODE: {self.config['FABULOUS_OPT_MODE']}"

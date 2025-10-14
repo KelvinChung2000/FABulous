@@ -47,7 +47,6 @@ physical_steps: list[type[Step]] = [
     Odb.RemovePDNObstructions,
     Odb.AddRoutingObstructions,
     OpenROAD.GlobalPlacementSkipIO,
-    OpenROAD.IOPlacement,
     Odb.CustomIOPlacement,
     Odb.ApplyDEFTemplate,
     OpenROAD.GlobalPlacement,

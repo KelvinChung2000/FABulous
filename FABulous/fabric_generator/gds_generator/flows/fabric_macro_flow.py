@@ -33,13 +33,10 @@ subs = {
     "OpenROAD.STAPrePNR*": None,
     "OpenROAD.STAMidPNR*": None,
     "OpenROAD.STAPostPNR*": None,
-    # Custom PDN generation script
-    "OpenROAD.GeneratePDN": FABulousPower,
-    # Replace IO placement with FABulous fabric-level IO placement
-    "OpenROAD.IOPlacement": None,
+    # IO placement
     "Odb.CustomIOPlacement": FABulousFabricIOPlacement,
-    # Script to manually place single IOs (for additional pins if needed)
-    # "+OpenROAD.GlobalPlacementSkipIO": FABulousManualIOPlacement,
+    # Power
+    "OpenROAD.GeneratePDN": FABulousPower,
 }
 
 configs = Classic.config_vars + [

@@ -34,19 +34,17 @@ from FABulous.fabric_generator.gds_generator.steps.tile_optimisation import (
 )
 
 subs = {
-    # "OpenROAD.IOPlacement": FABulousTileIOPlacement,
-    # Replace with FABulous IO Placement
-    # "-OpenRoad.Floorplan": RoundDieArea,
-    "OpenROAD.IOPlacement": None,
-    "Odb.CustomIOPlacement": FABulousTileIOPlacement,
-    "OpenROAD.GeneratePDN": CustomGeneratePDN,
-    "OpenROAD.Resize*": None,
-    "OpenROAD.RepairDesign*": None,
-    "+OpenROAD.GlobalPlacement": AddBuffers,
     # Disable STA
     "OpenROAD.STAPrePNR*": None,
     "OpenROAD.STAMidPNR*": None,
     "OpenROAD.STAPostPNR*": None,
+    # IO placement
+    "Odb.CustomIOPlacement": FABulousTileIOPlacement,
+    # Power
+    "OpenROAD.GeneratePDN": CustomGeneratePDN,
+    "OpenROAD.Resize*": None,
+    "OpenROAD.RepairDesign*": None,
+    "+OpenROAD.GlobalPlacement": AddBuffers,
 }
 
 configs = Classic.config_vars + [

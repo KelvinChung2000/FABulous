@@ -2,7 +2,7 @@
 
 from decimal import Decimal
 from importlib import resources
-from typing import Literal
+from typing import Literal, Optional
 
 from librelane.common.types import Path
 from librelane.config.variable import Variable
@@ -37,7 +37,7 @@ class FABulousTileIOPlacement(OdbpyStep):
     config_vars = io_layer_variables + [
         Variable(
             "IO_PIN_V_LENGTH",
-            Decimal | None,
+            Optional[Decimal],  # librelane limitation # noqa: UP045
             """
             The length of the pins with a north or south orientation. If unspecified by
             a PDK, the script will use whichever is higher of the following two values:
@@ -50,7 +50,7 @@ class FABulousTileIOPlacement(OdbpyStep):
         ),
         Variable(
             "IO_PIN_H_LENGTH",
-            Decimal | None,
+            Optional[Decimal],  # librelane limitation # noqa: UP045
             """
             The length of the pins with an east or west orientation. If unspecified by
             a PDK, the script will use whichever is higher of the following two values:

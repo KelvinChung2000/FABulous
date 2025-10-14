@@ -32,15 +32,16 @@ from pathlib import Path
 from typing import Annotated
 
 import typer
-from cmd2 import (
-    Cmd,
-    Settable,
-    categorize,
-    with_category,
-)
+
+# Third-party
+from cmd2 import Cmd, Settable, categorize, with_category
 from loguru import logger
 
-from FABulous.custom_exception import CommandError, EnvironmentNotSet, InvalidFileType
+from FABulous.custom_exception import (
+    CommandError,
+    EnvironmentNotSet,
+    InvalidFileType,
+)
 from FABulous.fabric_cad.bit_gen import genBitstream
 from FABulous.fabric_definition.define import WaveType
 from FABulous.fabric_generator.code_generator.code_generator_Verilog import (
@@ -53,11 +54,11 @@ from FABulous.fabric_generator.gen_fabric.fabric_automation import (
     generateCustomTileConfig,
 )
 from FABulous.fabric_generator.parser.parse_csv import parseTilesCSV
+
+# Local application imports (alphabetical by module path)
 from FABulous.FABulous_API import FABulous_API
-from FABulous.FABulous_CLI.cmd2_plugin import (
-    Cmd2TyperPlugin,
-    CompleterSpec,
-)
+from FABulous.FABulous_CLI import cmd_synthesis
+from FABulous.FABulous_CLI.cmd2_plugin import Cmd2TyperPlugin, CompleterSpec
 from FABulous.FABulous_CLI.helper import (
     CommandPipeline,
     copy_verilog_files,
@@ -270,6 +271,7 @@ class FABulous_CLI(Cmd2TyperPlugin, Cmd):
         categorize(self.do_macro, CMD_OTHER)
         categorize(self.do_run_tcl, CMD_SCRIPT)
         categorize(self.do_run_pyscript, CMD_SCRIPT)
+        categorize(self.do_synthesis, CMD_USER_DESIGN_FLOW)
 
         self.tcl = tk.Tcl()
         for fun in dir(self.__class__):
@@ -331,10 +333,8 @@ class FABulous_CLI(Cmd2TyperPlugin, Cmd):
         """Exit the FABulous shell and log info message."""
         self.onecmd_plus_hooks("exit")
 
-    # # Import do_synthesis from cmd_synthesis
-    # def do_synthesis(self, args: argparse.Namespace) -> None:
-    #     """Run synthesis on the specified design."""
-    #     cmd_synthesis.do_synthesis(self, args)
+    # Import do_synthesis from cmd_synthesis; keep parameters in that module
+    do_synthesis = cmd_synthesis.do_synthesis
 
     @with_category(CMD_SETUP)
     def do_install_oss_cad_suite(

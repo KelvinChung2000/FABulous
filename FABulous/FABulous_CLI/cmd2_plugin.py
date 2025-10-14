@@ -3,8 +3,7 @@
 from __future__ import annotations
 
 import inspect
-from collections.abc import Callable
-from typing import Any, cast
+from typing import TYPE_CHECKING, Any, cast
 
 import click
 import typer
@@ -13,6 +12,9 @@ from cmd2.parsing import Statement
 from loguru import logger
 
 from FABulous.custom_exception import CommandError
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 # TYPE_CHECKING block removed as it's no longer needed
 

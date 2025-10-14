@@ -9,34 +9,75 @@ final netlist generation, with options for LUT mapping, FSM optimization, carry 
 mapping, and memory inference.
 """
 
-import argparse
 import subprocess as sp
+from enum import StrEnum
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import Annotated
 
-from cmd2 import Cmd, Cmd2ArgumentParser, with_argparser, with_category
+import typer
+from cmd2 import Cmd, with_category
 from loguru import logger
 
 from FABulous.custom_exception import CommandError
+from FABulous.FABulous_CLI.cmd2_plugin import CompleterSpec
 from FABulous.FABulous_settings import get_context
 
-if TYPE_CHECKING:
-    from FABulous.FABulous_CLI.FABulous_CLI import FABulous_CLI
+PathType = Annotated[
+    Path | None,
+    CompleterSpec(completer=Cmd.path_complete),
+    typer.Option(resolve_path=True),
+]
 
 CMD_USER_DESIGN_FLOW = "User Design Flow"
-HELP = """
-Runs Yosys using the Nextpnr JSON backend to synthesise the Verilog design
-specified by <files> and generates a Nextpnr-compatible JSON file for the
-further place and route process. By default the name of the JSON file generated
-will be <first_file_provided_stem>.json.
 
-Also logs usage errors or synthesis failures.
 
-The following commands are executed by when executing the synthesis command:
-    read_verilog <"projectDir"/user_design/top_wrapper.v>
-    read_verilog <file>                 (for each file in files)
-    read_verilog  -lib +/fabulous/prims.v
-    read_verilog -lib <extra_plib.v>    (for each -extra-plib)
+class CarryType(StrEnum):
+    """Carry chain mapping options."""
+
+    NONE = "none"
+    HA = "ha"
+
+
+@with_category(CMD_USER_DESIGN_FLOW)
+def do_synthesis(
+    self,
+    files: list[Path],
+    top: str = "top_wrapper",
+    auto_top: bool = False,
+    blif: PathType = None,
+    edif: PathType = None,
+    json: PathType = None,
+    lut: Annotated[int, typer.Option(min=2, max=7)] = 4,
+    plib: Annotated[Path | None, typer.Option(resolve_path=True, exists=True)] = None,
+    extra_plib: list[Path] | None = None,
+    extra_map: list[Path] | None = None,
+    encfile: PathType = None,
+    nofsm: bool = False,
+    noalumacc: bool = False,
+    carry: Annotated[CarryType, typer.Option()] = CarryType.NONE,
+    noregfile: bool = False,
+    iopad: bool = False,
+    complex_dff: bool = False,
+    noflatten: bool = False,
+    nordff: bool = False,
+    noshare: bool = False,
+    run: str | None = None,
+    no_rw_check: bool = False,
+) -> None:
+    """Run Yosys synthesis for the specified Verilog files.
+
+    Runs Yosys using the Nextpnr JSON backend to synthesise the Verilog design
+    specified by <files> and generates a Nextpnr-compatible JSON file for the
+    further place and route process. By default the name of the JSON file generated
+    will be <first_file_provided_stem>.json.
+
+    Also logs usage errors or synthesis failures.
+
+    The following commands are executed by when executing the synthesis command:
+        read_verilog <"projectDir"/user_design/top_wrapper.v>
+        read_verilog <file>                 (for each file in files)
+        read_verilog  -lib +/fabulous/prims.v
+        read_verilog -lib <extra_plib.v>    (for each -extra-plib)
 
     begin:
         hierarchy -check
@@ -113,187 +154,23 @@ The following commands are executed by when executing the synthesis command:
 
     json:
         write_json <file-name>
-"""
-
-synthesis_parser = Cmd2ArgumentParser(description=HELP)
-synthesis_parser.add_argument(
-    "files",
-    type=Path,
-    help="Path to the target files.",
-    completer=Cmd.path_complete,
-    nargs="+",
-)
-synthesis_parser.add_argument(
-    "-top",
-    type=str,
-    help="Use the specified module as the top module (default='top_wrapper').",
-    default="top_wrapper",
-)
-synthesis_parser.add_argument(
-    "-auto-top",
-    help="Automatically determine the top of the design hierarchy.",
-    action="store_true",
-)
-synthesis_parser.add_argument(
-    "-blif",
-    type=Path,
-    help="Write the design to the specified BLIF file. "
-    "Writing of an output file is omitted if this parameter is not specified.",
-    completer=Cmd.path_complete,
-)
-synthesis_parser.add_argument(
-    "-edif",
-    type=Path,
-    help="Write the design to the specified EDIF file. "
-    "Writing of an output file is omitted if this parameter is not specified.",
-    completer=Cmd.path_complete,
-)
-synthesis_parser.add_argument(
-    "-json",
-    type=Path,
-    help="Write the design to the specified JSON file. "
-    "If this parameter is not specified it will default to <first_file_stem>.json",
-    completer=Cmd.path_complete,
-)
-synthesis_parser.add_argument(
-    "-lut",
-    type=str,
-    default="4",
-    help="Perform synthesis for a k-LUT architecture (default 4).",
-)
-synthesis_parser.add_argument(
-    "-plib",
-    type=str,
-    help="Use the specified Verilog file as a primitive library.",
-    completer=Cmd.path_complete,
-)
-synthesis_parser.add_argument(
-    "-extra-plib",
-    type=Path,
-    help="Use the specified Verilog file for extra primitives "
-    "(can be specified multiple times).",
-    action="append",
-    completer=Cmd.path_complete,
-)
-synthesis_parser.add_argument(
-    "-extra-map",
-    type=Path,
-    help="Use the specified Verilog file for extra techmap rules "
-    "(can be specified multiple times).",
-    action="append",
-    completer=Cmd.path_complete,
-)
-synthesis_parser.add_argument(
-    "-encfile",
-    type=Path,
-    help="Passed to 'fsm_recode' via 'fsm'.",
-    completer=Cmd.path_complete,
-)
-synthesis_parser.add_argument(
-    "-nofsm",
-    help="Do not run FSM optimization.",
-    action="store_true",
-)
-synthesis_parser.add_argument(
-    "-noalumacc",
-    help="Do not run 'alumacc' pass. I.e., keep arithmetic operators in "
-    "their direct form ($add, $sub, etc.).",
-    action="store_true",
-)
-synthesis_parser.add_argument(
-    "-carry",
-    type=str,
-    required=False,
-    choices=["none", "ha"],
-    default="none",
-    help="Carry mapping style (none, half-adders, ...) default=none.",
-)
-synthesis_parser.add_argument(
-    "-noregfile",
-    help="Do not map register files.",
-    action="store_true",
-)
-synthesis_parser.add_argument(
-    "-iopad",
-    help="Enable automatic insertion of IO buffers (otherwise a wrapper with "
-    "manually inserted and constrained IO should be used.)",
-    action="store_true",
-)
-synthesis_parser.add_argument(
-    "-complex-dff",
-    help="Enable support for FFs with enable and synchronous SR "
-    "(must also be supported by the target fabric).",
-    action="store_true",
-)
-synthesis_parser.add_argument(
-    "-noflatten",
-    help="Do not flatten the design after elaboration.",
-    action="store_true",
-)
-synthesis_parser.add_argument(
-    "-nordff",
-    help="Passed to 'memory'. Prohibits merging of FFs into memory read ports.",
-    action="store_true",
-)
-synthesis_parser.add_argument(
-    "-noshare",
-    help="Do not run SAT-based resource sharing",
-    action="store_true",
-)
-synthesis_parser.add_argument(
-    "-run",
-    type=str,
-    help="Only run the commands between the labels (see above). An empty from label is "
-    "synonymous to 'begin',"
-    " and empty to label is synonymous to the end of the command list.",
-)
-synthesis_parser.add_argument(
-    "-no-rw-check",
-    help="Marks all recognized read ports as 'return don't-care value on read/write"
-    "collision' (same result as setting 'no_rw_check' attribute on all memories).",
-    action="store_true",
-)
-
-
-@with_category(CMD_USER_DESIGN_FLOW)
-@with_argparser(synthesis_parser)
-def do_synthesis(self: "FABulous_CLI", args: argparse.Namespace) -> None:
-    """Run Yosys synthesis for the specified Verilog files.
-
-    Performs FPGA synthesis using Yosys with the nextpnr JSON backend
-    to synthesize Verilog designs and generate nextpnr-compatible JSON files for
-    place and route. It supports various synthesis options including LUT architecture,
-    FSM optimization, carry mapping, and different output formats.
-
-    Parameters
-    ----------
-    self : FABulous_CLI
-        The CLI instance containing project and fabric information.
-    args : argparse.Namespace
-        Command arguments containing:
-        - files: List of Verilog files to synthesize
-        - top: Top module name (default: 'top_wrapper')
-        - auto_top: Whether to automatically determine top module
-        - json: Output JSON file path
-        - blif: Output BLIF file path (optional)
-        - edif: Output EDIF file path (optional)
-        - lut: LUT architecture size (default: 4)
-        - And various other synthesis options
-
-    Notes
-    -----
-    The synthesis process includes multiple stages: hierarchy checking,
-    flattening, coarse synthesis, RAM mapping, gate mapping, FF mapping,
-    LUT mapping, and final netlist generation. See the module docstring
-    for detailed synthesis flow information.
     """
     logger.info(
-        f"Running synthesis targeting Nextpnr with design{[str(i) for i in args.files]}"
+        "Running synthesis targeting Nextpnr with design %s",
+        [str(i) for i in files],
     )
+
+    # Some flags are accepted for API compatibility but not yet implemented.
+    if auto_top:
+        logger.warning("--auto-top requested but not implemented; using provided top")
+    if nordff:
+        logger.warning(
+            "--nordff requested but not implemented; proceeding without nordff"
+        )
 
     p: Path
     paths: list[Path] = []
-    for p in args.files:
+    for p in files:
         if not p.is_absolute():
             p = self.projectDir / p
         resolvePath: Path = p.absolute()
@@ -306,34 +183,30 @@ def do_synthesis(self: "FABulous_CLI", args: argparse.Namespace) -> None:
     json_file = paths[0].with_suffix(".json")
     yosys = get_context().yosys_path
 
-    cmd = [
+    cmd_parts = [
         "synth_fabulous",
-        f"-top {args.top}",
-        f"-blif {args.blif}" if args.blif else "",
-        f"-edif {args.edif}" if args.edif else "",
-        f"-json {args.json}" if args.json else f"-json {json_file}",
-        f"-lut {args.lut}" if args.lut else "",
-        f"-plib {args.plib}" if args.plib else "",
-        (
-            " ".join([f"-extra-plib {i}" for i in args.extra_plib])
-            if args.extra_plib
-            else ""
-        ),
-        " ".join([f"-extra-map {i}" for i in args.extra_map]) if args.extra_map else "",
-        f"-encfile {args.encfile}" if args.encfile else "",
-        "-nofsm" if args.nofsm else "",
-        "-noalumacc" if args.noalumacc else "",
-        f"-carry {args.carry}" if args.carry else "",
-        "-noregfile" if args.noregfile else "",
-        "-iopad" if args.iopad else "",
-        "-complex-dff" if args.complex_dff else "",
-        "-noflatten" if args.noflatten else "",
-        "-noshare" if args.noshare else "",
-        f"-run {args.run}" if args.run else "",
-        "-no-rw-check" if args.no_rw_check else "",
+        f"-top {top}",
+        f"-blif {blif!s}" if blif else "",
+        f"-edif {edif!s}" if edif else "",
+        f"-json {json}" if json else f"-json {json_file}",
+        f"-lut {lut!s}" if lut else "",
+        f"-plib {plib}" if plib else "",
+        (" ".join([f"-extra-plib {i}" for i in extra_plib]) if extra_plib else ""),
+        " ".join([f"-extra-map {i}" for i in extra_map]) if extra_map else "",
+        f"-encfile {encfile}" if encfile else "",
+        "-nofsm" if nofsm else "",
+        "-noalumacc" if noalumacc else "",
+        f"-carry {carry!s}" if carry else "",
+        "-noregfile" if noregfile else "",
+        "-iopad" if iopad else "",
+        "-complex-dff" if complex_dff else "",
+        "-noflatten" if noflatten else "",
+        "-noshare" if noshare else "",
+        f"-run {run}" if run else "",
+        "-no-rw-check" if no_rw_check else "",
     ]
 
-    cmd = " ".join([i for i in cmd if i != ""])
+    cmd = " ".join([i for i in cmd_parts if i != ""])
 
     runCmd = [
         f"{yosys!s}",

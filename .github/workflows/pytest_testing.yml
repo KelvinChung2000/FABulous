@@ -74,7 +74,7 @@ jobs:
           else
             echo ".test_durations_fallback does not exist! Run with default even splits."
           fi
-      
+
       - name: Setup Nix
         uses: ./.github/actions/setup-nix
 
@@ -96,7 +96,7 @@ jobs:
             which uv
             # Ensure no stale coverage data from previous attempts (no coverage module needed)
             rm -f .coverage* || true
-            uv run pytest \
+            pytest \
               --splits ${{ strategy.job-total }} --group ${{ matrix.job-index }} \
               --store-durations --clean-durations -v -x \
               --cov=FABulous --cov-branch --cov-config=pyproject.toml --cov-report= \

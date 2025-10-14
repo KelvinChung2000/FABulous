@@ -11,7 +11,4 @@ jobs:
         uses: ./.github/actions/setup-nix
       - name: Run pre-commit hooks
         run: |
-          # Ensure flakes and nix command experimental features are enabled in this session
-          export NIXPKGS_ALLOW_BROKEN=1
-          nix --version
           nix develop --command pre-commit run --all-files

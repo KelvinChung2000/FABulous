@@ -62,7 +62,6 @@ class FABulousSettings(BaseSettings):
     editor: str | None = None
     verbose: int = 0
     debug: bool = False
-    verbose: int = 0
 
     # GDS variables
     pdk_root: Path = Path().home() / ".ciel"

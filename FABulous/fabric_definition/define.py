@@ -5,11 +5,11 @@ including I/O types, directions, sides, and configuration modes.
 """
 
 from decimal import Decimal
-from enum import StrEnum
+from enum import Enum, StrEnum
 from typing import NamedTuple
 
 
-class IO(StrEnum):
+class IO(Enum):
     """Enumeration for I/O port directions.
 
     Defines the direction of ports in fabric components:
@@ -25,7 +25,7 @@ class IO(StrEnum):
     NULL = "NULL"
 
 
-class Direction(StrEnum):
+class Direction(Enum):
     """Enumeration for wire and port directions in the fabric.
 
     Defines the directional flow of wires and ports:
@@ -61,7 +61,7 @@ class Side(StrEnum):
     ANY = "ANY"
 
 
-class MultiplexerStyle(StrEnum):
+class MultiplexerStyle(Enum):
     """Enumeration for multiplexer implementation styles.
 
     Defines how multiplexers are implemented in the fabric:
@@ -75,7 +75,7 @@ class MultiplexerStyle(StrEnum):
     GENERIC = "GENERIC"
 
 
-class ConfigBitMode(StrEnum):
+class ConfigBitMode(Enum):
     """Enumeration for configuration bit access modes.
 
     Defines how configuration bits are accessed and programmed:

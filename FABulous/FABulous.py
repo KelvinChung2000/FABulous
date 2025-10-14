@@ -107,6 +107,13 @@ def reorder_options(argv: list[str]) -> list[str]:
       the subcommand.
     - If no registered subcommand is present, argv is returned unchanged.
     """
+    if (
+        len(argv) == 2
+        and Path(argv[1]).exists()
+        and (Path(argv[1]) / ".FABulous").exists()
+    ):
+        return ["FABulous", "--project-dir", argv[1], "start"]
+
     if len(argv) < 3:
         return argv
 

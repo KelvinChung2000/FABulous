@@ -1,3 +1,5 @@
+"""Tile size optimisation step for FABulous fabric generator."""
+
 from collections.abc import Callable
 from enum import StrEnum
 from typing import cast
@@ -28,7 +30,6 @@ class OptMode(StrEnum):
     FIX_WIDTH = "fix_width"
     BALANCED = "balanced"
     AGGRESSIVE = "aggressive"
-    CUSTOM = "custom"
 
 
 var = [
@@ -47,17 +48,17 @@ var = [
         " - 'fix_height': default, keeps height constant and reduces width. "
         " - 'fix_width': keeps width constant and reduces height. "
         " - 'balanced': alternate width and height reduction. "
-        " - 'aggressive': reduces both height and width at the same time."
-        " - 'custom': user defined function by supplying FABULOUS_CUSTOM_OPT_FUNC.",
+        " - 'aggressive': reduces both height and width at the same time.",
         default=OptMode.FIX_HEIGHT,
     ),
     Variable(
-        "FABULOUS_CUSTOM_OPT_FUNC",
-        Callable,
-        "A custom python function that takes in the current width and height "
-        "and returns the new width and height. "
-        "Only used when FABULOUS_OPT_MODE is 'custom'.",
-        default="",
+        "FABULOUS_OPT_RELAX",
+        bool,
+        "When True, increases dimensions instead of reducing (relaxation mode). "
+        "When False, reduces dimensions for area minimization. "
+        "The OptMode still controls which dimension changes (width/height/both). "
+        "Default: False (area minimization)",
+        default=False,
     ),
 ]
 
@@ -71,7 +72,7 @@ class TileOptimisation(WhileStep):
 
     inputs = [DesignFormat.NETLIST]
 
-    Stepss = [
+    Steps = [
         RoundDieArea,
         OpenROAD.Floorplan,
         OpenROAD.DumpRCValues,
@@ -98,7 +99,6 @@ class TileOptimisation(WhileStep):
         OpenROAD.GlobalRouting,
         OpenROAD.CheckAntennas,
         Odb.DiodesOnPorts,
-        Odb.HeuristicDiodeInsertion,
         OpenROAD.RepairAntennas,
         OpenROAD.DetailedRouting,
         Odb.RemoveRoutingObstructions,
@@ -149,20 +149,23 @@ class TileOptimisation(WhileStep):
             raise ValueError("DIE_AREA metric not found in state.")
 
         # Get PDK site dimensions from metrics (if available)
-        site_width_dbu = int(pre_iteration.metrics.get("pdk__site_width_dbu", 1))
-        site_height_dbu = int(pre_iteration.metrics.get("pdk__site_height_dbu", 1))
+        site_width_dbu = int(pre_iteration.metrics.get("pdk__site_width", 1))
+        site_height_dbu = int(pre_iteration.metrics.get("pdk__site_height", 1))
 
         # Calculate step size based on PDK site dimensions
         step_count = self.config["FABULOUS_OPTIMISATION_STEP_COUNT"]
         width_step = site_width_dbu * step_count
         height_step = site_height_dbu * step_count
 
+        # Determine direction: relaxation (+) or minimization (-)
+        direction = 1 if self.config["FABULOUS_OPT_RELAX"] else -1
+
         match self.config["FABULOUS_OPT_MODE"]:
             case OptMode.FIX_HEIGHT:
                 die_area = (
                     0,
                     0,
-                    width - width_step,
+                    width + (direction * width_step),
                     height,
                 )
             case OptMode.FIX_WIDTH:
@@ -170,16 +173,16 @@ class TileOptimisation(WhileStep):
                     0,
                     0,
                     width,
-                    height - height_step,
+                    height + (direction * height_step),
                 )
             case OptMode.BALANCED:
                 if (
-                    width > height  # Reduce the larger dimension first
+                    width > height  # Adjust the larger dimension first
                 ):
                     die_area = (
                         0,
                         0,
-                        width - width_step,
+                        width + (direction * width_step),
                         height,
                     )
                 else:
@@ -187,14 +190,14 @@ class TileOptimisation(WhileStep):
                         0,
                         0,
                         width,
-                        height - height_step,
+                        height + (direction * height_step),
                     )
             case OptMode.AGGRESSIVE:
                 die_area = (
                     0,
                     0,
-                    width - width_step,
-                    height - height_step,
+                    width + (direction * width_step),
+                    height + (direction * height_step),
                 )
             case OptMode.CUSTOM:
                 func = self.config["FABULOUS_CUSTOM_OPT_FUNC"]

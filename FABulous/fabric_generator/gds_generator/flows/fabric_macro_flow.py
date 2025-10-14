@@ -380,8 +380,8 @@ class FABulousFabricMacroFlow(Classic):
     def run(self, initial_state: State, **kwargs: dict) -> tuple[State, list[Step]]:
         """Execute the fabric stitching flow.
 
-        Args
-        ----
+        Parameters
+        ----------
         initial_state : State
             Initial state for the flow
         **kwargs : dict

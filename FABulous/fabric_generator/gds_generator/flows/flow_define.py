@@ -14,6 +14,9 @@ from librelane.steps.step import Step
 from FABulous.fabric_generator.gds_generator.steps.condition_magic_drc import (
     ConditionalMagicDRC,
 )
+from FABulous.fabric_generator.gds_generator.steps.extract_pdk_info import (
+    ExtractPDKInfo,
+)
 
 prep_steps: list[type[Step]] = [
     Verilator.Lint,
@@ -27,6 +30,7 @@ prep_steps: list[type[Step]] = [
     Checker.NetlistAssignStatements,
     OpenROAD.CheckSDCFiles,
     OpenROAD.CheckMacroInstances,
+    ExtractPDKInfo,
 ]
 
 physical_steps: list[type[Step]] = [

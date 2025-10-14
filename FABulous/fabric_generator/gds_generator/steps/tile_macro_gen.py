@@ -1,5 +1,6 @@
 """FABulous GDS Generator - Tile to Macro Conversion Step."""
 
+from librelane.config.variable import Variable
 from librelane.state.design_format import DesignFormat
 from librelane.state.state import State
 from librelane.steps.step import MetricsUpdate, Step, ViewsUpdate
@@ -22,6 +23,16 @@ class TileMarcoGen(Step):
     id = "FABulous.TileMarcoGen"
     name = "FABulous Tile to Macro Conversion"
 
+    config_vars = [
+        Variable(
+            "FABULOUS_RUN_TILE_OPTIMISATION",
+            bool,
+            description="Whether to run tile size optimisation "
+            "before macro generation.",
+            default=True,
+        ),
+    ]
+
     inputs = []
     outputs = [
         DesignFormat.GDS,
@@ -34,12 +45,10 @@ class TileMarcoGen(Step):
         """Run the tile to macro conversion process."""
         views_updates: dict = {}
         metrics_updates: dict = {}
-
-        if self.config["TILE_OPTIMISATION"]:
-            flow = FABulousTileVerilogMarcoFlowClassic(self.config, **kwargs)
-        else:
+        if self.config["FABULOUS_RUN_TILE_OPTIMISATION"]:
             flow = FABulousTileVerilogMarcoFlow(self.config, **kwargs)
-
+        else:
+            flow = FABulousTileVerilogMarcoFlowClassic(self.config, **kwargs)
         final_state = flow.start(state_in)
         metrics_updates.update({self.config["DESIGN_NAME"]: final_state.metrics})
 

@@ -8,11 +8,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1758194402,
-        "narHash": "sha256-QoaS950TbRvvtndqHf8yz9VrQOZoTJCTPl4wWHgpRDM=",
+        "lastModified": 1759919060,
+        "narHash": "sha256-/B4s0X+/2rTkR81zK5fwFKmMAgfFYH2n/6etH7WYyik=",
         "owner": "fossi-foundation",
         "repo": "ciel",
-        "rev": "f4990f916c29f1cb7d890ab5b0716f63ce9de1b4",
+        "rev": "9620877bdf6792affd7b7941b4a5cc4c1004c5ba",
         "type": "github"
       },
       "original": {
@@ -82,16 +82,16 @@
         "nix-eda": "nix-eda"
       },
       "locked": {
-        "lastModified": 1759165000,
-        "narHash": "sha256-9FJIGti98u8FWh5jKJXMgr8EIHbNnfJNxcnVhl5p6CE=",
-        "owner": "librelane",
+        "lastModified": 1760452960,
+        "narHash": "sha256-SB5K2rxtMfj8nXsIc6vpKcz5iLQz0vvG5yVZBsi2TSA=",
+        "owner": "kelvinchung2000",
         "repo": "librelane",
-        "rev": "6ddb888275df60a5c7d426f119e4809b9a9bf66b",
+        "rev": "bec6ea9cd61287071be17e0d74dcab7c9923325d",
         "type": "github"
       },
       "original": {
-        "owner": "librelane",
-        "ref": "dev",
+        "owner": "kelvinchung2000",
+        "ref": "my-dev",
         "repo": "librelane",
         "type": "github"
       }

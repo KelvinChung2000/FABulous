@@ -745,7 +745,13 @@ class PinPlacementPlan:
             yield from self.segments_by_side[side]
 
     def ensure_min_distances(self, min_by_side: dict[Side, float]) -> None:
-        """Ensure each segment meets technology minimum spacing requirements."""
+        """Ensure each segment meets technology minimum spacing requirements.
+
+        Parameters
+        ----------
+        min_by_side : dict[Side, float]
+            Minimum spacing required for each side.
+        """
         for side, segments in self.segments_by_side.items():
             for segment in segments:
                 segment.ensure_min_distance(min_by_side[side])
@@ -792,7 +798,18 @@ class PinPlacementPlan:
         return self._create_empty_segment(side_choice)
 
     def _create_empty_segment(self, side: Side) -> SegmentInfo:
-        """Create a placeholder segment for unmatched pins on the given side."""
+        """Create a placeholder segment for unmatched pins on the given side.
+
+        Parameters
+        ----------
+        side : Side
+            Side to create the segment on.
+
+        Returns
+        -------
+        SegmentInfo
+            Newly created empty segment.
+        """
         # Use tile_index=0 for single-tile fallback
         segment = SegmentInfo(
             side=side,

@@ -16,8 +16,16 @@ def main(reader: Any, **_: dict) -> None:  # noqa: ANN401
 
     Parameters
     ----------
-    reader : OdbReader
+    reader : Any
         Reader object provided by OdbpyStep with loaded database
+    **_ : dict
+        Additional unused keyword arguments
+
+    Raises
+    ------
+    RuntimeError
+        If no database is available or no libraries/sites are found
+        or if no CORE placement site is found.
     """
     db = reader.block.getDb()
 

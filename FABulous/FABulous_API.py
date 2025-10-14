@@ -20,7 +20,6 @@ import FABulous.fabric_generator.parser.parse_csv as fileParser
 from FABulous.fabric_cad.gen_bitstream_spec import generateBitstreamSpec
 from FABulous.fabric_cad.gen_design_top_wrapper import generateUserDesignTopWrapper
 from FABulous.fabric_cad.gen_io_pin_config_yaml import (
-    generate_fabric_IO_pin_order_config,
     generate_IO_pin_order_config,
 )
 
@@ -487,23 +486,6 @@ class FABulous_API:
         """
         generate_IO_pin_order_config(self.fabric, tile, outfile)
 
-    def gen_fabric_io_pin_order_config(self, outfile: Path) -> None:
-        """Generate fabric-level IO pin order configuration YAML.
-
-        This generates a configuration file for placing IOs on the entire fabric,
-        covering all perimeter tiles. The pins are arranged to align with the
-        underlying tile IO positions.
-
-        Frame signals (FrameData and FrameStrobe) are automatically partitioned
-        across tiles based on their position in the fabric grid.
-
-        Parameters
-        ----------
-        outfile : Path
-            Output YAML path for the fabric-level IO configuration.
-        """
-        generate_fabric_IO_pin_order_config(self.fabric, outfile)
-
     def genTileMacro(
         self,
         tile_dir: Path,
@@ -604,7 +586,6 @@ class FABulous_API:
         self,
         tile_marco_paths: dict[str, Path],
         fabric_path: Path,
-        fabric_io_config: Path,
         out_folder: Path,
         *,
         base_config_path: Path | None = None,
@@ -620,10 +601,6 @@ class FABulous_API:
             Dictionary mapping tile names to their macro output directories.
         fabric_path : Path
             Path to the fabric-level Verilog file.
-        fabric_io_config : Path
-            Path to fabric-level IO pin order configuration YAML.
-            If provided, will be used for fabric IO placement.
-            If None, no automatic IO placement will be performed.
         out_folder : Path
             Output directory for the stitched fabric.
         base_config_path : Path | None
@@ -703,7 +680,6 @@ class FABulous_API:
         final_config_args["VERILOG_FILES"] = file_list
         final_config_args["FABULOUS_MACROS_SETTINGS"] = macros
         final_config_args["FABULOUS_TILE_SIZES"] = tile_sizes
-        final_config_args["FABULOUS_IO_PIN_ORDER_CFG"] = str(fabric_io_config)
 
         if config_override:
             if isinstance(config_override, dict):
@@ -725,7 +701,7 @@ class FABulous_API:
         result.save_snapshot(out_folder / "final_views")
         logger.info("Stitching flow completed.")
 
-    def fabric_full_flow(
+    def full_fabric_automation(
         self,
         project_dir: Path,
         out_folder: Path,
@@ -752,6 +728,7 @@ class FABulous_API:
         final_config_args = {}
         final_config_args["FABULOUS_PROJ_DIR"] = str(project_dir.resolve())
         final_config_args["FABULOUS_FABRIC"] = self.fabric
+        final_config_args["DESIGN_NAME"] = self.fabric.name
         if config_override:
             if isinstance(config_override, dict):
                 final_config_args.update(config_override)

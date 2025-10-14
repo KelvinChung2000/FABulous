@@ -294,7 +294,7 @@ class Fabric:
         """Get a tile by its name from the fabric.
 
         Search for the tile first in the used tiles dictionary, then in the unused tiles
-        dictionary if not found.
+        dictionary then in the supertiles if not found.
 
         Parameters
         ----------

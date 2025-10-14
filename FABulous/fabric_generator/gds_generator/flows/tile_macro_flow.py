@@ -1,6 +1,5 @@
 """Tile optimisation flows for FABulous fabric generation."""
 
-from collections.abc import Iterable
 from pathlib import Path
 from typing import Any
 
@@ -92,10 +91,7 @@ class FABulousTileVerilogMarcoFlow(SequentialFlow):
     def run(
         self,
         initial_state: State,
-        frm: str | None = None,
-        to: str | None = None,
-        skip: Iterable[str] | None = None,
-        reproducible: str | None = None,
+        *args: Any,  # noqa: ANN401
         **kwargs: dict,
     ) -> tuple[State, list[Step]]:
         """Run the FABulous tile optimisation flow."""
@@ -107,7 +103,7 @@ class FABulousTileVerilogMarcoFlow(SequentialFlow):
             self.config = self.config.copy(
                 ROUTING_OBSTRUCTIONS=get_routing_obstructions(self.config)
             )
-        return super().run(initial_state, frm, to, skip, reproducible, **kwargs)
+        return super().run(initial_state, *args, **kwargs)
 
 
 @Flow.factory.register()
@@ -119,7 +115,12 @@ class FABulousTileVerilogMarcoFlowClassic(SequentialFlow):
     config_vars = configs
     gating_config_vars = classic_gating_config_vars
 
-    def run(self, initial_state: State, **kwargs: Any) -> tuple[State, list[Step]]:  # noqa: ANN401
+    def run(
+        self,
+        initial_state: State,
+        *args: Any,  # noqa: ANN401
+        **kwargs: dict,
+    ) -> tuple[State, list[Step]]:
         """Run the no optimisation FABulous verilog tile flow."""
         self.config = round_die_area(self.config)
         if (
@@ -129,7 +130,7 @@ class FABulousTileVerilogMarcoFlowClassic(SequentialFlow):
             self.config = self.config.copy(
                 ROUTING_OBSTRUCTIONS=get_routing_obstructions(self.config)
             )
-        return super().run(initial_state, **kwargs)
+        return super().run(initial_state, *args, **kwargs)
 
 
 @Flow.factory.register()
@@ -141,7 +142,12 @@ class FABulousTileVHDLMarcoFlowClassic(SequentialFlow):
     config_vars = configs
     gating_config_vars = classic_gating_config_vars
 
-    def run(self, initial_state: State, **kwargs: Any) -> tuple[State, list[Step]]:  # noqa: ANN401
+    def run(
+        self,
+        initial_state: State,
+        *args: Any,  # noqa: ANN401
+        **kwargs: dict,
+    ) -> tuple[State, list[Step]]:  # noqa: ANN401
         """Run the FABulous tile VHDL flow."""
         warn("Linting and equivalence checking for VHDL files is disabled")
         round_die_area(self.config)
@@ -152,4 +158,4 @@ class FABulousTileVHDLMarcoFlowClassic(SequentialFlow):
             self.config = self.config.copy(
                 ROUTING_OBSTRUCTIONS=get_routing_obstructions(self.config)
             )
-        return super().run(initial_state, **kwargs)
+        return super().run(initial_state, *args, **kwargs)

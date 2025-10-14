@@ -1373,23 +1373,23 @@ class FABulous_CLI(Cmd):
                 "No tile macro directories found. Generate tile GDS results first."
             )
             return
-        pin_order_file = self.projectDir / "Fabric" / "fabric_io_pin_order.yaml"
-        self.fabulousAPI.gen_fabric_io_pin_order_config(pin_order_file)
 
         (self.projectDir / "gds").mkdir(exist_ok=True)
         (self.projectDir / "Fabric" / "macro").mkdir(exist_ok=True)
         self.fabulousAPI.fabric_stitching(
             tile_macro_paths,
             self.projectDir / "Fabric" / f"{self.fabulousAPI.fabric.name}.v",
-            pin_order_file,
             self.projectDir / "Fabric" / "macro",
             base_config_path=self.projectDir / "Fabric" / "gds_config.yaml",
         )
 
     @with_category(CMD_FABRIC_FLOW)
-    def run_FABulous_eFPGA_macro(self) -> None:
+    def do_run_FABulous_eFPGA_macro(self, *_arg: str) -> None:
         """Run the full FABulous eFPGA macro generation flow."""
-        self.fabulousAPI.fabric_full_flow(self.projectDir, self.projectDir / "macro")
+        (self.projectDir / "Fabric" / "macro").mkdir(exist_ok=True)
+        self.fabulousAPI.full_fabric_automation(
+            self.projectDir, self.projectDir / "Fabric" / "macro"
+        )
 
     gui_parser = Cmd2ArgumentParser()
     gui_parser.add_argument(
@@ -1459,7 +1459,7 @@ class FABulous_CLI(Cmd):
 
     @with_argparser(gui_parser)
     @with_category(CMD_TOOLS)
-    def do_start_openroad_gui(self, args) -> None:
+    def do_start_openroad_gui(self, args: argparse.Namespace) -> None:
         """Start OpenROAD GUI if an installation can be found.
 
         If no installation can be found, a warning is produced.

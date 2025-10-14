@@ -59,10 +59,13 @@ def round_die_area(config: Config) -> Config:
     if die_area is None:
         raise ValueError("DIE_AREA metric not found in state.")
     _, _, width, height = die_area
+    width = Decimal(width)
+    height = Decimal(height)
 
     # Round width (X) and height (Y) to the next multiple of the
     # respective minimum pitches using pure Decimal arithmetic
     def round_up_decimal(value: Decimal, pitch: Decimal) -> Decimal:
+        """Round up value to the next multiple of pitch."""
         if pitch == 0:
             return value
         quotient = value // pitch
@@ -72,8 +75,8 @@ def round_die_area(config: Config) -> Config:
             quotient += 1
         return quotient * pitch
 
-    mWidth = config["FABULOUS_TILE_LOGICAL_WIDTH"]
-    mHeight = config["FABULOUS_TILE_LOGICAL_HEIGHT"]
+    mWidth = int(config["FABULOUS_TILE_LOGICAL_WIDTH"])
+    mHeight = int(config["FABULOUS_TILE_LOGICAL_HEIGHT"])
     width_rounded = round_up_decimal(width / mWidth, x_pitch) * mWidth
     height_rounded = round_up_decimal(height / mHeight, y_pitch) * mHeight
     info(

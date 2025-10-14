@@ -16,10 +16,6 @@ from librelane.steps.step import (
 )
 
 
-def _migrate_unmatched_io(x: object) -> str:
-    return "unmatched_design" if x else "none"
-
-
 @Step.factory.register()
 class FABulousFabricIOPlacement(OdbpyStep):
     """Place I/O pins using a custom script. This is the fabric-level version.

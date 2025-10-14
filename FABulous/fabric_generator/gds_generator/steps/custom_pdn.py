@@ -2,6 +2,7 @@
 
 from importlib import resources
 from pathlib import Path
+from typing import Optional
 
 from librelane.config.variable import Variable
 from librelane.steps.common_variables import pdn_variables
@@ -25,7 +26,7 @@ class CustomGeneratePDN(OpenROADStep):
         + [
             Variable(
                 "PDN_CFG",
-                Path | None,
+                Optional[Path],  # librelane limitation  # noqa: UP045
                 "A custom PDN configuration file. If not provided, "
                 "the default PDN config will be used. This default config is a custom "
                 "config that differ from the librelane default.",

@@ -25,7 +25,7 @@
       inputs.uv2nix.follows = "uv2nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    librelane.url = "github:librelane/librelane/dev";
+    librelane.url = "github:kelvinchung2000/librelane/my-dev";
 
     # Tag-pinned sources for custom tools (locked in flake.lock)
     ghdl-src = {
@@ -185,6 +185,7 @@
               pkgs.uv
               pkgs.which
               pkgs.git
+              pkgs.fish
               pkgs.zsh
               pkgs.gtkwave
               customPkgs.nextpnr
@@ -194,8 +195,9 @@
 
           prompt = ''\[\033[1;32m\][FABulous-nix:\w]\$\[\033[0m\] '';
         in
-        {
-          default = pkgs.devshell.mkShell {
+        let
+          # Common devshell configuration (bash by default)
+          baseShellConfig = {
             devshell.packages = allPackages;
             env = [
               {
@@ -246,6 +248,25 @@
             };
             motd = "";
           };
+        in
+        {
+          # Default: bash
+          default = pkgs.devshell.mkShell baseShellConfig;
+
+          # Start in fish: nix develop .#fish
+          fish = pkgs.devshell.mkShell (baseShellConfig // {
+            devshell.interactive."zzz-switch-shell" = {
+              # Run last so we exec into fish after env is set up
+              text = ''exec fish -l'';
+            };
+          });
+
+          # Start in zsh: nix develop .#zsh
+          zsh = pkgs.devshell.mkShell (baseShellConfig // {
+            devshell.interactive."zzz-switch-shell" = {
+              text = ''exec zsh -l'';
+            };
+          });
         }
       );
 

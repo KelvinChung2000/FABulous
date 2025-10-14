@@ -10,7 +10,7 @@ from FABulous.fabric_definition.Gen_IO import Gen_IO
 from FABulous.fabric_definition.Port import Port
 from FABulous.fabric_definition.Wire import Wire
 
-if TYPE_CHECKING:  # pragma: no cover - typing only
+if TYPE_CHECKING:
     from FABulous.fabric_generator.gds_generator.gen_io_pin_config_yaml import (
         PinOrderConfig,
     )

@@ -83,11 +83,11 @@ If you are using yosys oss-cad-suite, no need to install the following packages.
 :`Yosys ghdl plugin <https://github.com/ghdl/ghdl-yosys-plugin>`_:
  Only needed for VHDL synthesis
 
+We have also provided a command to install the above packages automatically.
 .. prompt:: bash $
 
    FABulous install-cad-tools
 
-We have also provided a command to install the above packages automatically.
 
 .. note::
 
@@ -156,8 +156,6 @@ To run the FABulous flow directly from the command line, you can use the followi
 
   FABulous c <name_of_project> # alias for create-project
 
-  # -p is short for --project-dir
-  FABulous -p <name_of_project> run "run_FABulous_fabric; run_FABulous_bitstream user_design/sequential_16bit_en.v"
   # -p is short for --project-dir
   FABulous -p <name_of_project> run "run_FABulous_fabric; run_FABulous_bitstream user_design/sequential_16bit_en.v"
 

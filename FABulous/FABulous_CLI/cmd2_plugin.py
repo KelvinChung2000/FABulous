@@ -24,19 +24,19 @@ class CompleterSpec:
 
     Used to declare completion functions that the plugin will wire up to both Click's
     autocompletion and cmd2's tab completion.
+
+    Parameters
+    ----------
+    completer: Callable[..., list[str]]
+        Function that takes either (text, line, begidx, endidx) or
+                (self, text, line, begidx, endidx) and returns a list of
+                completion strings. Both signatures are supported.
     """
 
     def __init__(
         self,
         completer: Callable[..., list[str]],
     ) -> None:
-        """Initialize completion specification.
-
-        Args:
-            completer: Function that takes either (text, line, begidx, endidx) or
-                      (self, text, line, begidx, endidx) and returns a list of
-                      completion strings. Both signatures are supported.
-        """
         self.completer = completer
 
 
@@ -69,7 +69,6 @@ class Cmd2TyperPlugin(Cmd):
         "do_shortcuts",
         "do_macro",
         "do_run_pyscript",
-        "do_run_script",
         "do_set",
         "do_settable",
     }
@@ -117,7 +116,6 @@ class Cmd2TyperPlugin(Cmd):
             bound_cb = cast("Callable[..., Any]", func.__get__(self))
             completer_specs = self._extract_completion_specs(func)
             self.__inner_app.command(name=cmd_name)(bound_cb)
-
             if not completer_specs:
                 continue
 
@@ -138,6 +136,7 @@ class Cmd2TyperPlugin(Cmd):
                 _param_names: list[str] = param_names,
                 _specs: dict[str, CompleterSpec] = completer_specs,
             ) -> list[str]:
+                """Tab completion handler routing to appropriate completer functions."""
                 try:
                     parts = line.split()
                     if not parts:

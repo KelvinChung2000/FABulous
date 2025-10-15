@@ -28,9 +28,11 @@ import subprocess as sp
 import sys
 import tkinter as tk
 import traceback
+from collections.abc import Callable
 from pathlib import Path
 from typing import Annotated
 
+import click
 import typer
 
 # Third-party
@@ -274,11 +276,45 @@ class FABulous_CLI(Cmd2TyperPlugin, Cmd):
         categorize(self.do_synthesis, CMD_USER_DESIGN_FLOW)
 
         self.tcl = tk.Tcl()
-        for fun in dir(self.__class__):
-            f = getattr(self, fun)
-            if fun.startswith("do_") and callable(f):
-                name = fun.strip("do_")
-                self.tcl.createcommand(name, wrap_with_except_handling(f))
+        inner_app = getattr(self, "_Cmd2TyperPlugin__inner_app", None)
+        if inner_app is not None:
+            typer_commands = typer.main.get_command(inner_app)
+            if isinstance(typer_commands, click.Group):
+                for cmd_name, cmd_obj in typer_commands.commands.items():
+
+                    def make_wrapper(
+                        command: click.Command, name: str
+                    ) -> Callable[..., None]:
+                        """Wrap function for a Click command to be used in Tcl."""
+
+                        def wrapper(*args: str) -> None:
+                            try:
+                                command.main(
+                                    args=list(args),
+                                    prog_name=name,
+                                    standalone_mode=False,
+                                    obj=inner_app,
+                                )
+                            except Exception as e:
+                                logger.debug(traceback.format_exc())
+                                error_msg = str(e).replace("<", r"\<")
+                                logger.opt(exception=e).error(error_msg)
+                                raise
+
+                        return wrapper
+
+                    self.tcl.createcommand(cmd_name, make_wrapper(cmd_obj, cmd_name))
+
+        # Also register standard cmd2 commands that might be useful in TCL
+        # These are not in the inner_app but exist as do_* methods
+        standard_commands = ["help", "history", "set", "alias", "shortcuts"]
+        for cmd_name in standard_commands:
+            do_method_name = f"do_{cmd_name}"
+            if hasattr(self, do_method_name):
+                f = getattr(self, do_method_name)
+                existing_cmds = self.tcl.eval(f"info commands {cmd_name}")
+                if not existing_cmds:
+                    self.tcl.createcommand(cmd_name, wrap_with_except_handling(f))
 
         self.disable_category(
             CMD_FABRIC_FLOW, "Fabric Flow commands are disabled until fabric is loaded"
@@ -1162,23 +1198,22 @@ class FABulous_CLI(Cmd2TyperPlugin, Cmd):
             )
 
         logger.info(f"Execute script {file}")
-
         with file.open() as f:
-            for i in f:
-                if i.startswith("#"):
+            for raw_line in f:
+                line = raw_line.strip()
+                if not line or line.startswith("#"):
                     continue
-                self.onecmd_plus_hooks(i.strip())
+
+                # Route through cmd2 so Cmd2TyperPlugin can dispatch to Typer
+                self.onecmd_plus_hooks(line)
+
                 if self.exit_code != 0:
                     if not self.force:
-                        raise CommandError(
-                            f"Script execution failed at line: {i.strip()}"
-                        )
+                        raise CommandError(f"Script execution failed at line: {line}")
                     logger.error(
-                        f"Script execution failed at line: {i.strip()} "
+                        f"Script execution failed at line: {line} "
                         "but continuing due to force mode"
                     )
-
-        logger.info("Script executed")
 
     @with_category(CMD_USER_DESIGN_FLOW)
     def do_gen_user_design_wrapper(

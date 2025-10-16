@@ -25,6 +25,9 @@ from FABulous.fabric_generator.gds_generator.helper import (
     round_die_area,
 )
 from FABulous.fabric_generator.gds_generator.steps.add_buffer import AddBuffers
+from FABulous.fabric_generator.gds_generator.steps.auto_diode import (
+    AutoEcoDiodeInsertion,
+)
 from FABulous.fabric_generator.gds_generator.steps.custom_pdn import CustomGeneratePDN
 from FABulous.fabric_generator.gds_generator.steps.tile_IO_placement import (
     FABulousTileIOPlacement,
@@ -45,6 +48,7 @@ subs = {
     "OpenROAD.Resize*": None,
     "OpenROAD.RepairDesign*": None,
     "+OpenROAD.GlobalPlacement": AddBuffers,
+    "+OpenROAD.DetailedRouting": AutoEcoDiodeInsertion,
 }
 
 configs = Classic.config_vars + [

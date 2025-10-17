@@ -1135,8 +1135,8 @@ class FABulous_CLI(Cmd2TyperPlugin, Cmd):
 
         do_synth_args = str(file)
 
-        primsLib = f"{self.projectDir}/user_design/custom_prims.v"
-        if Path(primsLib).exists():
+        primsLib = self.projectDir / "user_design" / "custom_prims.v"
+        if primsLib.exists():
             do_synth_args += f" -extra-plib {primsLib}"
         else:
             logger.info("No external primsLib found.")

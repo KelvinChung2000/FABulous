@@ -12,6 +12,9 @@ from librelane.steps import openroad as OpenROAD
 from librelane.steps.step import Step
 
 from FABulous.fabric_generator.gds_generator.steps.add_buffer import AddBuffers
+from FABulous.fabric_generator.gds_generator.steps.auto_diode import (
+    AutoEcoDiodeInsertion,
+)
 from FABulous.fabric_generator.gds_generator.steps.custom_pdn import CustomGeneratePDN
 from FABulous.fabric_generator.gds_generator.steps.round_die_area import (
     RoundDieArea,
@@ -59,6 +62,13 @@ var = [
         "Default: False (area minimization)",
         default=False,
     ),
+    Variable(
+        "IGNORE_ANTENNA_VIOLATIONS",
+        bool,
+        "If True, antenna violations are ignored during tile optimisation. "
+        "Default is False.",
+        default=False,
+    ),
 ]
 
 
@@ -99,6 +109,7 @@ class TileOptimisation(WhileStep):
         Odb.DiodesOnPorts,
         OpenROAD.RepairAntennas,
         OpenROAD.DetailedRouting,
+        AutoEcoDiodeInsertion,
         Odb.RemoveRoutingObstructions,
         OpenROAD.CheckAntennas,
         Checker.TrDRC,
@@ -116,12 +127,13 @@ class TileOptimisation(WhileStep):
 
     def condition(self, state: State) -> bool:
         """Loop condition."""
-        for i in [
-            "antenna__violating__pins",
-            "antenna__violating__nets",
-            "route__antenna_violation__count",
-            "route__drc_errors",
-        ]:
+        checklist = []
+        if not self.config["IGNORE_ANTENNA_VIOLATIONS"]:
+            checklist.append("antenna__violating__pins")
+            checklist.append("antenna__violating__nets")
+
+        checklist.append("route__drc_errors")
+        for i in checklist:
             if v := state.metrics.get(i):
                 if cast("int", v) > 0:
                     return False

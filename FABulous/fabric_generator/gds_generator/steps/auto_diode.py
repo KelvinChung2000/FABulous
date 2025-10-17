@@ -4,7 +4,7 @@ import sys
 from pathlib import Path
 
 from librelane.config.variable import Variable
-from librelane.logging.logger import info, warn
+from librelane.logging.logger import info
 from librelane.state.state import State
 from librelane.steps import odb as Odb
 from librelane.steps import openroad as OpenROAD
@@ -29,9 +29,10 @@ class AutoEcoDiodeInsertion(WhileStep):
         Variable(
             "AUTO_ECO_DIODE_INSERT_MODE",
             str,
-            "Mode for diode insertion, options are 'ratio' or 'all'. 'ratio' inserts "
-            "diodes based on the ratio of partial to required antenna area, "
-            "while 'all' inserts diodes for all violating pins. Default is 'all'.",
+            "Mode for diode insertion, options are 'none', 'ratio' or 'all'. "
+            "'ratio' inserts diodes based on the ratio of partial to required antenna "
+            "area, 'all' inserts diodes for all violating pins, "
+            "'none' inserts no diodes. Default is 'all'.",
             default="all",
         )
     ]
@@ -99,7 +100,7 @@ class AutoEcoDiodeInsertion(WhileStep):
         self.config = self.config.copy(INSERT_ECO_DIODES=to_insert)
         if len(to_insert) == 0:
             self.done_enough = True
-            info("No more diodes to insert, ending insertion.")
+            info("No more diodes to insert, ending insertion with a final report.")
         return self.previous_state
 
     def post_iteration_callback(
@@ -122,10 +123,11 @@ class AutoEcoDiodeInsertion(WhileStep):
 
         Currently unimplemented.
         """
-        if state.metrics["antenna__violating__nets"] > 1:
-            warn("Warning: Antenna violations remain after auto-diode insertion.")
-        if state.metrics["antenna__violating__pins"] > 1:
-            warn("Warning: Antenna violations remain after auto-diode insertion.")
+        if self.config["AUTO_ECO_DIODE_INSERT_MODE"] == "all" and (
+            (state.metrics["antenna__violating__nets"] > 1)
+            or (state.metrics["antenna__violating__pins"] > 1)
+        ):
+            raise RuntimeError("Antenna violations remain after auto-diode insertion.")
         return state
 
     def run(
@@ -134,5 +136,9 @@ class AutoEcoDiodeInsertion(WhileStep):
         **_kwargs: dict,
     ) -> tuple[ViewsUpdate, MetricsUpdate]:
         """Run the step, initializing previous_state before looping."""
+        if self.config["AUTO_ECO_DIODE_INSERT_MODE"] == "none":
+            info("AUTO_ECO_DIODE_INSERT_MODE is 'none', skipping diode insertion.")
+            return {}, {}
+
         self.previous_state = state_in
         return super().run(state_in)

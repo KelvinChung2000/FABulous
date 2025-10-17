@@ -336,6 +336,7 @@ dependencies = [
     { name = "loguru" },
     { name = "packaging" },
     { name = "pick" },
+    { name = "pulp" },
     { name = "pydantic" },
     { name = "pydantic-settings" },
     { name = "pyreadline3", marker = "sys_platform == 'win32'" },
@@ -369,6 +370,7 @@ requires-dist = [
     { name = "loguru", specifier = ">=0.7.0" },
     { name = "packaging", specifier = ">=25.0" },
     { name = "pick", specifier = ">=2.4.0" },
+    { name = "pulp", specifier = ">=3.3.0" },
     { name = "pydantic", specifier = "<2.12" },
     { name = "pydantic-settings", specifier = ">=2.10.1" },
     { name = "pyreadline3", marker = "sys_platform == 'win32'", specifier = ">=3.4.0" },
@@ -803,6 +805,15 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/47/da/99f4345d4ddf2845cb5b5bd0d93d554e84542d116934fde07a0c50bd4e9f/psutil-6.1.1-cp36-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:33431e84fee02bc84ea36d9e2c4a6d395d479c9dd9bba2376c1f6ee8f3a4e0b3", size = 289017, upload-time = "2024-12-19T18:21:57.875Z" },
     { url = "https://files.pythonhosted.org/packages/38/53/bd755c2896f4461fd4f36fa6a6dcb66a88a9e4b9fd4e5b66a77cf9d4a584/psutil-6.1.1-cp37-abi3-win32.whl", hash = "sha256:eaa912e0b11848c4d9279a93d7e2783df352b082f40111e078388701fd479e53", size = 250602, upload-time = "2024-12-19T18:22:08.808Z" },
     { url = "https://files.pythonhosted.org/packages/7b/d7/7831438e6c3ebbfa6e01a927127a6cb42ad3ab844247f3c5b96bea25d73d/psutil-6.1.1-cp37-abi3-win_amd64.whl", hash = "sha256:f35cfccb065fff93529d2afb4a2e89e363fe63ca1e4a5da22b603a85833c2649", size = 254444, upload-time = "2024-12-19T18:22:11.335Z" },
+]
+
+[[package]]
+name = "pulp"
+version = "3.3.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/16/1c/d880b739b841a8aa81143091c9bdda5e72e226a660aa13178cb312d4b27f/pulp-3.3.0.tar.gz", hash = "sha256:7eb99b9ce7beeb8bbb7ea9d1c919f02f003ab7867e0d1e322f2f2c26dd31c8ba", size = 16301847, upload-time = "2025-09-18T08:14:57.552Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/99/6c/64cafaceea3f99927e84b38a362ec6a8f24f33061c90bda77dfe1cd4c3c6/pulp-3.3.0-py3-none-any.whl", hash = "sha256:dd6ad2d63f196d1254eddf9dcff5cd224912c1f046120cb7c143c5b0eda63fae", size = 16387700, upload-time = "2025-09-18T08:14:53.368Z" },
 ]
 
 [[package]]

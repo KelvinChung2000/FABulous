@@ -466,23 +466,6 @@ class Fabric:
 
         return None
 
-    def get_unique_tile_types(self) -> list[Tile]:
-        """Get list of unique tile types used in the fabric.
-
-        Returns
-        -------
-        list[Tile]
-            List of unique tile types (one instance per type name)
-        """
-        unique_tiles: dict[str, Tile] = {}
-
-        for row in self.tile:
-            for tile in row:
-                if tile is not None and tile.name not in unique_tiles:
-                    unique_tiles[tile.name] = tile
-
-        return list(unique_tiles.values())
-
     def get_tile_row_column_indices(self, tile_name: str) -> tuple[set[int], set[int]]:
         """Get all row and column indices where a tile type appears.
 

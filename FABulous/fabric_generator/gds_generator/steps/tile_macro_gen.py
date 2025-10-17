@@ -49,7 +49,8 @@ class TileMarcoGen(Step):
             flow = FABulousTileVerilogMarcoFlow(self.config, **kwargs)
         else:
             flow = FABulousTileVerilogMarcoFlowClassic(self.config, **kwargs)
-        final_state = flow.start(state_in)
+
+        final_state = flow.start(state_in, _force_run_dir=self.step_dir)
         metrics_updates.update({self.config["DESIGN_NAME"]: final_state.metrics})
 
         for key in final_state:

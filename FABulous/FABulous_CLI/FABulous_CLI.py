@@ -1281,6 +1281,12 @@ class FABulous_CLI(Cmd):
         help="Optimize the GDS layout",
         type=Path,
     )
+    gds_parser.add_argument(
+        "--ignore-antenna",
+        help="Ignore antenna effects during GDS generation",
+        default=False,
+        action="store_true",
+    )
 
     @with_category(CMD_FABRIC_FLOW)
     @with_argparser(gds_parser)
@@ -1322,6 +1328,7 @@ class FABulous_CLI(Cmd):
             tile_dir / "macro",
             base_config_path=self.projectDir / "Tile" / "include" / "gds_config.yaml",
             optimisation=args.optimise,
+            ignore_antenna=args.ignore_antenna,
         )
 
     gen_all_tile_parser = Cmd2ArgumentParser()
@@ -1339,6 +1346,12 @@ class FABulous_CLI(Cmd):
         default=False,
         action="store_true",
     )
+    gen_all_tile_parser.add_argument(
+        "--ignore-antenna",
+        help="Ignore antenna effects during GDS generation",
+        default=False,
+        action="store_true",
+    )
 
     @with_argparser(gen_all_tile_parser)
     @with_category(CMD_FABRIC_FLOW)
@@ -1346,10 +1359,12 @@ class FABulous_CLI(Cmd):
         """Generate GDSII files for all tiles in the fabric."""
         commands = CommandPipeline(self)
         for i in sorted(self.allTile):
+            cmd = f"gen_tile_macro {i}"
             if args.optimise:
-                commands.add_step(f"gen_tile_macro {i} --optimise")
-            else:
-                commands.add_step(f"gen_tile_macro {i}")
+                cmd += "--optimise"
+            if args.ignore_antenna:
+                cmd += "--ignore-antenna"
+            commands.add_step(cmd)
         if not args.parallel:
             commands.execute()
         else:

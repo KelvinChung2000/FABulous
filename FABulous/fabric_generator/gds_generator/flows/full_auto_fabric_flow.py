@@ -715,20 +715,37 @@ class FABulousFabricMacroFullFlow(Flow):
             if not options:
                 raise RuntimeError(f"Tile {tile_name} failed all optimization modes")
 
-            # Extract minimum width, height, and area from all optimization modes
-            min_width = min(w for w, h, _ in options)
-            min_height = min(h for w, h, _ in options)
-            min_area = min(w * h for w, h, _ in options)
+            # Find the result with minimum area (most aggressive optimization)
+            min_area_result = min(options, key=lambda x: x[0] * x[1])
+            min_area_width, min_area_height, min_area_mode = min_area_result
+            min_area = min_area_width * min_area_height
 
-            min_tile_widths[tile_name] = min_width
-            min_tile_heights[tile_name] = min_height
+            # Find absolute minimum width across all modes
+            min_width_result = min(options, key=lambda x: x[0])
+            abs_min_width = min_width_result[0]
+
+            # Find absolute minimum height across all modes
+            min_height_result = min(options, key=lambda x: x[1])
+            abs_min_height = min_height_result[1]
+
+            # Use the minimum area result as the baseline dimensions
+            # The ILP will only increase from these dimensions, never decrease
+            min_tile_widths[tile_name] = min_area_width
+            min_tile_heights[tile_name] = min_area_height
             min_tile_areas[tile_name] = min_area
 
-            # Log the results
-            info(
-                f"  {tile_name}: min_width={min_width}, "
-                f"min_height={min_height}, min_area={min_area} DBU"
-            )
+            # Log the results with analysis
+            if abs_min_width < min_area_width or abs_min_height < min_area_height:
+                info(
+                    f"  {tile_name}: base={min_area_width}×{min_area_height} "
+                    f"(area={min_area}, from {min_area_mode}), "
+                    f"abs_min_w={abs_min_width}, abs_min_h={abs_min_height}"
+                )
+            else:
+                info(
+                    f"  {tile_name}: min={min_area_width}×{min_area_height} "
+                    f"(area={min_area}, from {min_area_mode})"
+                )
 
         self.progress_bar.end_stage()
         info(

@@ -494,6 +494,7 @@ class FABulous_API:
         *,
         final_view: Path | None = None,
         optimisation: bool = True,
+        ignore_antenna: bool = False,
         base_config_path: Path | None = None,
         config_override: dict | Path | None = None,
         pdk_root: Path | None = None,
@@ -546,7 +547,6 @@ class FABulous_API:
             final_config_args["FABULOUS_TILE_LOGICAL_HEIGHT"] = tile.maxHeight()
         else:
             raise TypeError(f"Tile {tile_dir.name} not found in fabric.")
-
         if config_override:
             if isinstance(config_override, dict):
                 final_config_args.update(config_override)
@@ -556,6 +556,7 @@ class FABulous_API:
                 )
 
         if optimisation:
+            final_config_args["IGNORE_ANTENNA_VIOLATIONS"] = ignore_antenna
             flow = FABulousTileVerilogMarcoFlow(
                 final_config_args,
                 name=tile_dir.name,

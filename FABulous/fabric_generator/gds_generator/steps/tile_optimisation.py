@@ -4,12 +4,13 @@ from enum import StrEnum
 from typing import cast
 
 from librelane.config.variable import Variable
+from librelane.logging.logger import info
 from librelane.state.design_format import DesignFormat
 from librelane.state.state import State
 from librelane.steps import checker as Checker
 from librelane.steps import odb as Odb
 from librelane.steps import openroad as OpenROAD
-from librelane.steps.step import Step
+from librelane.steps.step import MetricsUpdate, Step, ViewsUpdate
 
 from FABulous.fabric_generator.gds_generator.steps.add_buffer import AddBuffers
 from FABulous.fabric_generator.gds_generator.steps.auto_diode import (
@@ -226,9 +227,23 @@ class TileOptimisation(WhileStep):
     def mid_iteration_break(self, state: State, step: type[Step]) -> bool:
         """Mid iteration callback."""
         if isinstance(step, Checker.TrDRC):
+            if self.config["IGNORE_ANTENNA_VIOLATIONS"]:
+                return cast("int", state.metrics.get("route__drc_errors")) > 0
+
             return (cast("int", state.metrics.get("antenna__violating__nets")) > 0) or (
                 cast("int", state.metrics.get("antenna__violating__pins")) > 0
                 or cast("int", state.metrics.get("route__drc_errors")) > 0
             )
 
         return False
+
+    def run(
+        self,
+        state_in: State,
+        **_kwargs: dict,
+    ) -> tuple[ViewsUpdate, MetricsUpdate]:
+        """Run the tile optimisation step."""
+        if self.config["IGNORE_ANTENNA_VIOLATIONS"]:
+            info("Ignoring antenna violations during tile optimisation.")
+            self.config = self.config.copy(ERROR_ON_TR_DRC=False)
+        return super().run(state_in, **_kwargs)

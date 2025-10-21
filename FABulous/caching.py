@@ -786,7 +786,9 @@ def cache_with(
                 The function result.
             """
             cache_key = (
-                func.__name__
+                func.__module__
+                + "."
+                + func.__name__
                 + "_"
                 + hashlib.sha256(repr((args, kwargs)).encode()).hexdigest()
             )

@@ -81,9 +81,8 @@ class Port:
     def getPortRegex(self, indexed: bool = False, prefix: str = "") -> str:
         """Expand port information to individual wire names.
 
-        Generates a list of individual wire names for this port, accounting for
-        wire count and offset calculations. For termination ports (NULL), the
-        wire count is multiplied by the Manhattan distance.
+        Generates a regex expression for this port, accounting for wire count and
+        offset calculations.
 
         Parameters
         ----------

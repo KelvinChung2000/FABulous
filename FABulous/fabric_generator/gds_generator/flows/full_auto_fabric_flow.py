@@ -684,7 +684,7 @@ class FABulousFabricMacroFullFlow(Flow):
         # Start all compilation steps asynchronously
         async_handles: list[tuple[Future[State], Step]] = []
         for step in min_dim_steps:
-            handle = self.start_step_async(step, silent=True)
+            handle = self.start_step_async(step)
             async_handles.append((handle, step))
         # Wait for all compilations and collect results
         # Store multiple dimension options per tile

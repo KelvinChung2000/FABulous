@@ -628,6 +628,15 @@ class FABulousFabricMacroFullFlow(Flow):
 
             # Load base config
             tile_config_overrides = {}
+            if (proj_dir / "Tile" / "include" / "gds_config.yaml").exists():
+                tile_config_overrides.update(
+                    yaml.safe_load(
+                        (proj_dir / "Tile" / "include" / "gds_config.yaml").read_text(
+                            encoding="utf-8"
+                        )
+                    )
+                )
+
             gds_config_file = tile_dir / "gds_config.yaml"
             if gds_config_file.exists():
                 tile_config_overrides.update(
@@ -672,13 +681,11 @@ class FABulousFabricMacroFullFlow(Flow):
                     _no_filter_conf=True,
                 )
                 min_dim_steps.append(tile_step)
-
         # Start all compilation steps asynchronously
         async_handles: list[tuple[Future[State], Step]] = []
         for step in min_dim_steps:
-            handle = self.start_step_async(step)
+            handle = self.start_step_async(step, silent=True)
             async_handles.append((handle, step))
-
         # Wait for all compilations and collect results
         # Store multiple dimension options per tile
         tile_dimension_options: dict[str, list[tuple[int, int, str]]] = {}
@@ -793,6 +800,15 @@ class FABulousFabricMacroFullFlow(Flow):
             fabric,
         )
 
+        info(f"Number of rows: {num_rows}, Number of columns: {num_cols}")
+        info(f"Row to types mapping:{row_to_types}")
+        info(f"Column to types mapping:{col_to_types}")
+        info(f"Tile type to positions mapping:{type_to_positions}")
+        info(f"Minimum tile widths: {min_tile_widths}")
+        info(f"Minimum tile heights: {min_tile_heights}")
+        info(f"Optimal tile width: {optimal_widths}")
+        info(f"Optimal tile height: {optimal_heights}")
+
         # Step 4: Recompile tiles with optimal dimensions
         info("\n=== Step 4: Recompiling tiles with optimal dimensions ===")
         self.progress_bar.start_stage("Recompiling with Optimal Dimensions")
@@ -822,6 +838,15 @@ class FABulousFabricMacroFullFlow(Flow):
 
             # Load base config
             tile_config_overrides = {}
+            if (proj_dir / "Tile" / "include" / "gds_config.yaml").exists():
+                tile_config_overrides.update(
+                    yaml.safe_load(
+                        (proj_dir / "Tile" / "include" / "gds_config.yaml").read_text(
+                            encoding="utf-8"
+                        )
+                    )
+                )
+
             gds_config_file = tile_dir / "gds_config.yaml"
             if gds_config_file.exists():
                 tile_config_overrides.update(
@@ -932,7 +957,6 @@ class FABulousFabricMacroFullFlow(Flow):
             FABULOUS_TILE_SIZES=tile_sizes,
             FABULOUS_TILE_SPACING=self.config["FABULOUS_TILE_SPACING"],
             FABULOUS_HALO_SPACING=self.config["FABULOUS_HALO_SPACING"],
-            FABULOUS_FABRIC_IO_PIN_ORDER_CFG=str(fabric_io_config_path),
         )
 
         fabric_step = FabricMacroGen(

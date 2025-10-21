@@ -665,12 +665,12 @@ class FABulousFabricMacroFullFlow(Flow):
                     FABULOUS_OPT_MODE=opt_mode,
                     FABULOUS_OPT_RELAX=False,
                     IGNORE_ANTENNA_VIOLATIONS=True,
-                    AUTO_ECO_DIODE_INSERT_MODE="none",
                     RUN_DIR_OVERWRITE=str(
                         Path(self.design_dir)
                         / "runs"
                         / f"TileMarcoGen_MinDim_{tile_type.name}_{opt_mode.value}"
                     ),
+                    YOSYS_LOG_LEVEL="ERROR",
                     **tile_config_overrides,
                 )
                 # Create step with unique ID for each mode

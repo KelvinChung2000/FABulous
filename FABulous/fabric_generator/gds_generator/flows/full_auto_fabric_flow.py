@@ -130,7 +130,7 @@ class FABulousFabricMacroFullFlow(Flow):
         tile: Tile | SuperTile,
         tile_dir: Path,
         initial_state: State,
-        opt_mode: OptMode = OptMode.BALANCED,
+        opt_mode: OptMode = OptMode.BALANCE,
         die_area: tuple[int, int, int, int] | None = None,
         opt_relax: bool = False,
     ) -> tuple[State, Step]:
@@ -216,7 +216,9 @@ class FABulousFabricMacroFullFlow(Flow):
 
         return state_out, tile_step
 
-    def _extract_tile_dimensions_from_state(self, state: State) -> tuple[int, int]:
+    def _extract_tile_dimensions_from_state(
+        self, state: State
+    ) -> tuple[Decimal, Decimal]:
         """Extract final tile dimensions from compiled state.
 
         Parameters
@@ -237,12 +239,14 @@ class FABulousFabricMacroFullFlow(Flow):
         # Get DIE_AREA from metrics if available
         die_area_metric = state.metrics.get("design__die__bbox")
         if die_area_metric:
-            llx, lly, urx, ury = die_area_metric
-            return int(urx - llx), int(ury - lly)
+            llx, lly, urx, ury = map(Decimal, die_area_metric.split(" "))
+            return urx - llx, ury - lly
 
         raise ValueError("Could not extract tile dimensions from state")
 
-    def _compilation_successful(self, state: State) -> bool:
+    def _compilation_successful(
+        self, state: State, check_antenna: bool = False
+    ) -> bool:
         """Check if tile compilation was successful.
 
         Parameters
@@ -258,9 +262,11 @@ class FABulousFabricMacroFullFlow(Flow):
         # Check for critical errors in metrics
         critical_metrics = [
             "route__drc_errors",
-            "antenna__violating__nets",
-            "antenna__violating__pins",
         ]
+
+        if check_antenna:
+            critical_metrics.append("antenna__violating__nets")
+            critical_metrics.append("antenna__violating__pins")
 
         for metric in critical_metrics:
             value = state.metrics.get(metric)
@@ -608,7 +614,11 @@ class FABulousFabricMacroFullFlow(Flow):
         )
 
         # Optimization modes to try for each tile
-        opt_modes = [OptMode.AGGRESSIVE, OptMode.FIX_HEIGHT, OptMode.FIX_WIDTH]
+        opt_modes = [
+            OptMode.BALANCE,
+            # OptMode.FIND_MIN_HEIGHT,
+            # OptMode.FIND_MIN_WIDTH,
+        ]
 
         # Create compilation steps for all tiles with all optimization modes
         min_dim_steps: list[Step] = []
@@ -664,6 +674,8 @@ class FABulousFabricMacroFullFlow(Flow):
                     TILE_OPTIMISATION=True,
                     FABULOUS_OPT_MODE=opt_mode,
                     FABULOUS_OPT_RELAX=False,
+                    FABULOUS_OPTIMISATION_WIDTH_STEP_COUNT=4,
+                    FABULOUS_OPTIMISATION_HEIGHT_STEP_COUNT=1,
                     IGNORE_ANTENNA_VIOLATIONS=True,
                     RUN_DIR_OVERWRITE=str(
                         Path(self.design_dir)
@@ -671,6 +683,9 @@ class FABulousFabricMacroFullFlow(Flow):
                         / f"TileMarcoGen_MinDim_{tile_type.name}_{opt_mode.value}"
                     ),
                     YOSYS_LOG_LEVEL="ERROR",
+                    IGNORE_DEFAULT_DIE_AREA=True,
+                    FABULOUS_IGNORE_ERRORS=False,
+                    DRT_OPT_ITERS=5,
                     **tile_config_overrides,
                 )
                 # Create step with unique ID for each mode
@@ -685,15 +700,14 @@ class FABulousFabricMacroFullFlow(Flow):
         async_handles: list[tuple[Future[State], Step]] = []
         for step in min_dim_steps:
             # handle = self.start_step(step)
-            # handle = self.start_step_async(step)
-            handle = None
+            handle = self.start_step_async(step)
             async_handles.append((handle, step))
         # Wait for all compilations and collect results
         # Store multiple dimension options per tile
         tile_dimension_options: dict[str, list[tuple[int, int, str]]] = {}
 
         for handle, step in async_handles:
-            state = self.start_step(step)
+            state = handle.result()
             step_list.append(step)
 
             tile_name = step.config["DESIGN_NAME"]

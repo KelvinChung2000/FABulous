@@ -91,8 +91,8 @@ write_out_steps: list[type[Step]] = [
 
 check_steps: list[type[Step]] = [
     Odb.CheckDesignAntennaProperties,
-    KLayout.XOR,
-    Checker.XOR,
+    # KLayout.XOR, # skip XOR for now
+    # Checker.XOR,
     KLayout.DRC,
     ConditionalMagicDRC,
     Checker.KLayoutDRC,

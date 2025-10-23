@@ -1,9 +1,9 @@
-"""Full automatic fabric flow with ILP-based tile optimization.
+"""Full automatic fabric flow with LP-based tile optimization.
 
-This flow uses Integer Linear Programming to optimize tile dimensions:
-1. Compiles all tiles in parallel to find minimum dimensions
-2. Formulates ILP problem to minimize total fabric area
-3. Solves for optimal tile dimensions with row/column constraints
+This flow uses Linear Programming to optimize tile dimensions:
+1. Compiles all tiles with 3 modes (balance, min-width, min-height) in parallel
+2. Formulates LP problem to minimize total fabric perimeter as area proxy
+3. Solves for optimal tile dimensions with row/column grid constraints
 4. Recompiles tiles with optimal dimensions in parallel
 5. Stitches all tiles into final fabric
 """
@@ -13,6 +13,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 import yaml
+from librelane.config.config import Config
 from librelane.config.flow import flow_common_variables
 from librelane.config.variable import Macro, Variable
 from librelane.flows.classic import Classic
@@ -37,6 +38,7 @@ from FABulous.fabric_definition.Tile import Tile
 from FABulous.fabric_generator.gds_generator.gen_io_pin_config_yaml import (
     generate_IO_pin_order_config,
 )
+from FABulous.fabric_generator.gds_generator.helper import get_pitch, round_die_area
 from FABulous.fabric_generator.gds_generator.steps.fabric_macro_gen import (
     FabricMacroGen,
 )
@@ -86,14 +88,13 @@ configs = (
 
 @Flow.factory.register()
 class FABulousFabricMacroFullFlow(Flow):
-    """Full automatic fabric flow with progressive tile compilation.
+    """Full automatic fabric flow with LP-optimized tile dimensions.
 
     This flow automatically:
-    1. Extracts PDK site dimensions
-    2. Finds most frequent tile and compiles it first
-    3. Progressively compiles all tiles with row/column constraints
-    4. Relaxes constraints when tiles fail to compile
-    5. Stitches all tiles into final fabric
+    1. Compiles all tiles with 3 optimization modes to explore dimension space
+    2. Solves LP problem to find optimal dimensions minimizing fabric perimeter
+    3. Recompiles tiles with optimal dimensions from LP solution
+    4. Stitches all tiles into final fabric with minimal area
     """
 
     Steps = [TileMarcoGen, FabricMacroGen]
@@ -244,6 +245,85 @@ class FABulousFabricMacroFullFlow(Flow):
 
         raise ValueError("Could not extract tile dimensions from state")
 
+    def _compute_io_min_dimensions(
+        self, fabric: Fabric, config: Config
+    ) -> dict[str, tuple[Decimal, Decimal]]:
+        """Compute minimum tile dimensions based on IO pin density.
+
+        For each tile type, calculates the minimum physical width and height
+        required to accommodate all IO pins at the PDK's track pitch.
+
+        Parameters
+        ----------
+        fabric : Fabric
+            Fabric configuration with all tiles
+        config : Config
+            Configuration containing FP_TRACKS_INFO for pitch information
+
+        Returns
+        -------
+        dict[str, tuple[Decimal, Decimal]]
+            Map from tile_type to (min_width_io, min_height_io) where:
+            - min_width_io: minimum width needed for north/south edge IO pins
+            - min_height_io: minimum height needed for west/east edge IO pins
+
+        Notes
+        -----
+        The minimum dimensions are calculated as:
+        - min_width = max(north_pins, south_pins) × x_pitch
+        - min_height = max(west_pins, east_pins) × y_pitch
+
+        These constraints prevent the LP solver from suggesting dimensions
+        that are physically impossible due to IO pin spacing requirements.
+        """
+        x_pitch, y_pitch = get_pitch(config)
+
+        io_min_dims: dict[str, tuple[Decimal, Decimal]] = {}
+
+        # Process regular tiles
+        for tile in fabric.tileDic.values():
+            # Count ports on each physical side
+            north_ports = len(tile.getNorthSidePorts())
+            south_ports = len(tile.getSouthSidePorts())
+            west_ports = len(tile.getWestSidePorts())
+            east_ports = len(tile.getEastSidePorts())
+
+            # Min width constrained by north/south edges
+            min_width_io = Decimal(max(north_ports, south_ports)) * x_pitch
+
+            # Min height constrained by west/east edges
+            min_height_io = Decimal(max(west_ports, east_ports)) * y_pitch
+
+            io_min_dims[tile.name] = (min_width_io, min_height_io)
+
+        # Process SuperTiles
+        for supertile in fabric.superTileDic.values():
+            # For SuperTiles, we need to aggregate IO pins from all constituent tiles
+            # that appear on the outer edges of the SuperTile
+            # For now, we use a conservative estimate based on the largest tile
+            max_north = 0
+            max_south = 0
+            max_west = 0
+            max_east = 0
+
+            for subtile in supertile.tiles:
+                north_ports = len(subtile.getNorthSidePorts())
+                south_ports = len(subtile.getSouthSidePorts())
+                west_ports = len(subtile.getWestSidePorts())
+                east_ports = len(subtile.getEastSidePorts())
+
+                max_north = max(max_north, north_ports)
+                max_south = max(max_south, south_ports)
+                max_west = max(max_west, west_ports)
+                max_east = max(max_east, east_ports)
+
+            min_width_io = Decimal(max(max_north, max_south)) * x_pitch
+            min_height_io = Decimal(max(max_west, max_east)) * y_pitch
+
+            io_min_dims[supertile.name] = (min_width_io, min_height_io)
+
+        return io_min_dims
+
     def _compilation_successful(
         self, state: State, check_antenna: bool = False
     ) -> bool:
@@ -359,14 +439,22 @@ class FABulousFabricMacroFullFlow(Flow):
         min_tile_widths: dict[str, int],
         min_tile_heights: dict[str, int],
         fabric: Fabric,
+        tile_mode_options: dict[str, list[tuple[int, int, str]]] | None = None,
+        io_min_dimensions: dict[str, tuple[Decimal, Decimal]] | None = None,
     ) -> tuple[dict[str, int], dict[str, int]]:
-        """Solve ILP problem to find optimal tile dimensions.
+        """Solve LP problem to find optimal tile dimensions in continuous space.
 
-        The ILP formulation minimizes total fabric area subject to:
+        The LP formulation minimizes total fabric perimeter (sum of dimensions) as
+        a proxy for area minimization, subject to linear constraints only:
+        - Each tile type has continuous width and height variables
+        - Variables bounded by [w_min, w_max] × [h_min, h_max] from compiled modes
         - All tiles in the same row have the same height
         - All tiles in the same column have the same width
-        - Each tile's dimensions >= its minimum dimensions
-        - SuperTiles match surrounding tile dimensions
+        - SuperTiles span multiple rows/columns with dimension matching
+
+        Note: Minimizing Σ(row_heights) + Σ(col_widths) serves as a linear proxy
+        for minimizing area = Σ(row_heights) × Σ(col_widths). The grid constraints
+        force both sums to decrease together, making this effective.
 
         Parameters
         ----------
@@ -386,27 +474,33 @@ class FABulousFabricMacroFullFlow(Flow):
             Minimum height for each tile type (from compilation)
         fabric : Fabric
             Fabric object
+        tile_mode_options : dict[str, list[tuple[int, int, str]]] | None
+            Map of tile type to list of feasible (width, height, mode_name) tuples
+            Used to determine dimension bounds [w_min, w_max] × [h_min, h_max]
+        io_min_dimensions : dict[str, tuple[Decimal, Decimal]] | None
+            Map of tile type to (min_width_io, min_height_io) based on IO pin density
+            These are hard lower bounds from physical IO pin spacing constraints
 
         Returns
         -------
         tuple[dict[str, int], dict[str, int]]
             (optimal_widths, optimal_heights) for each tile type
+            Note: Continuous values will be rounded to physical constraints in Step 4
 
         Raises
         ------
         RuntimeError
-            If ILP problem formulation fails
+            If LP solver fails to find optimal or feasible solution
         """
-        info("Formulating ILP problem...")
+        info("Formulating LP problem in continuous space...")
 
         # Create the problem
-        prob = LpProblem("Fabric_Tile_Optimization", LpMinimize)
+        prob = LpProblem("Fabric_Tile_Optimization_LP", LpMinimize)
 
         # Decision variables: row heights and column widths
         row_heights = {}
         for r in range(num_rows):
             if r in row_to_types and row_to_types[r]:
-                # Get minimum height needed for this row
                 min_height = max(min_tile_heights.get(t, 0) for t in row_to_types[r])
                 row_heights[r] = LpVariable(
                     f"row_height_{r}", lowBound=min_height, cat="Integer"
@@ -415,23 +509,78 @@ class FABulousFabricMacroFullFlow(Flow):
         col_widths = {}
         for c in range(num_cols):
             if c in col_to_types and col_to_types[c]:
-                # Get minimum width needed for this column
                 min_width = max(min_tile_widths.get(t, 0) for t in col_to_types[c])
                 col_widths[c] = LpVariable(
                     f"col_width_{c}", lowBound=min_width, cat="Integer"
                 )
 
-        # This is a linear objective that correlates with area minimization
-        # Direct area minimization (width * height) would require bilinear programming
+        # Tile-level dimension variables (continuous in feasible ranges)
+        # Using continuous variables allows finding optimal solutions that will be
+        # rounded to physical constraints in Step 4 recompilation
+        tile_widths: dict[str, LpVariable] = {}
+        tile_heights: dict[str, LpVariable] = {}
+
+        for tile_type in type_to_positions:
+            # Get bounds from available modes
+            if tile_mode_options and tile_type in tile_mode_options:
+                modes = tile_mode_options[tile_type]
+                widths = [w for w, _, _ in modes]
+                heights = [h for _, h, _ in modes]
+
+                w_min, w_max = min(widths), max(widths)
+                h_min, h_max = min(heights), max(heights)
+            else:
+                w_min = w_max = min_tile_widths[tile_type]
+                h_min = h_max = min_tile_heights[tile_type]
+
+            # Tile dimension variables in continuous space
+            # Bounds are set from the range of compiled modes (min to max observed)
+            # This implicitly constrains feasibility without quadratic area constraints
+            tile_widths[tile_type] = LpVariable(
+                f"tile_width_{tile_type}",
+                lowBound=w_min,
+                upBound=w_max,
+                cat="Continuous",
+            )
+            tile_heights[tile_type] = LpVariable(
+                f"tile_height_{tile_type}",
+                lowBound=h_min,
+                upBound=h_max,
+                cat="Continuous",
+            )
+
+        # Add IO-based minimum dimension constraints
+        # These are hard lower bounds from physical IO pin spacing requirements
+        if io_min_dimensions:
+            for tile_type in type_to_positions:
+                if tile_type in io_min_dimensions:
+                    min_width_io, min_height_io = io_min_dimensions[tile_type]
+
+                    # Add IO width constraint
+                    prob += (
+                        tile_widths[tile_type] >= min_width_io,
+                        f"io_min_width_{tile_type}",
+                    )
+
+                    # Add IO height constraint
+                    prob += (
+                        tile_heights[tile_type] >= min_height_io,
+                        f"io_min_height_{tile_type}",
+                    )
+
+        # Objective: minimize total fabric perimeter
         total_width = lpSum([col_widths[c] for c in col_widths])
         total_height = lpSum([row_heights[r] for r in row_heights])
         prob += total_width + total_height, "Minimize_Fabric_Perimeter"
 
-        # Constraints: Each tile type must fit in its row/column dimensions
+        # Constraints: Row/column dimensions must equal tile dimensions
+        # (seamless grid: all tiles in same row have same height,
+        # all tiles in same column have same width)
+        #
+        # Note: Area constraints are NOT needed here. The box constraints
+        # [w_min, w_max] × [h_min, h_max] already bound the feasible space.
+        # Quadratic constraints W×H would be invalid for linear solver CBC.
         for tile_type, positions in type_to_positions.items():
-            min_w = min_tile_widths[tile_type]
-            min_h = min_tile_heights[tile_type]
-
             # Check if this is a SuperTile
             is_supertile = tile_type in fabric.superTileDic
             if is_supertile:
@@ -445,23 +594,19 @@ class FABulousFabricMacroFullFlow(Flow):
             # For each position this tile appears at
             for row, col in positions:
                 if logical_width == 1 and logical_height == 1:
-                    # Regular tile: single cell constraint
+                    # Regular tile: must equal row height and column width
                     if row in row_heights:
                         prob += (
-                            row_heights[row] >= min_h,
-                            f"tile_{tile_type}_at_{row}_{col}_height",
+                            row_heights[row] == tile_heights[tile_type],
+                            f"tile_{tile_type}_at_{row}_{col}_height_eq",
                         )
                     if col in col_widths:
                         prob += (
-                            col_widths[col] >= min_w,
-                            f"tile_{tile_type}_at_{row}_{col}_width",
+                            col_widths[col] == tile_widths[tile_type],
+                            f"tile_{tile_type}_at_{row}_{col}_width_eq",
                         )
                 else:
-                    # SuperTile: spanning constraint
-                    # SuperTile width = sum of column widths it spans
-                    # SuperTile height = sum of row heights it spans
-
-                    # Width constraint: sum of spanned columns
+                    # SuperTile: sum of spanned rows/cols must equal tile dimensions
                     spanned_cols = [
                         col_widths[c]
                         for c in range(col, col + logical_width)
@@ -469,11 +614,10 @@ class FABulousFabricMacroFullFlow(Flow):
                     ]
                     if spanned_cols:
                         prob += (
-                            lpSum(spanned_cols) >= min_w,
-                            f"supertile_{tile_type}_at_{row}_{col}_width",
+                            lpSum(spanned_cols) == tile_widths[tile_type],
+                            f"supertile_{tile_type}_at_{row}_{col}_width_eq",
                         )
 
-                    # Height constraint: sum of spanned rows
                     spanned_rows = [
                         row_heights[r]
                         for r in range(row, row + logical_height)
@@ -481,100 +625,68 @@ class FABulousFabricMacroFullFlow(Flow):
                     ]
                     if spanned_rows:
                         prob += (
-                            lpSum(spanned_rows) >= min_h,
-                            f"supertile_{tile_type}_at_{row}_{col}_height",
+                            lpSum(spanned_rows) == tile_heights[tile_type],
+                            f"supertile_{tile_type}_at_{row}_{col}_height_eq",
                         )
 
         # Solve the problem
         time_limit = self.config.get("FABULOUS_ILP_SOLVER_TIME_LIMIT", 300)
-        info(f"Solving ILP with time limit of {time_limit}s...")
+        info(f"Solving LP with time limit of {time_limit}s...")
 
-        solver = PULP_CBC_CMD(msg=1, timeLimit=time_limit)
+        solver = PULP_CBC_CMD(msg=True, timeLimit=time_limit)
         prob.solve(solver)
 
         status = LpStatus[prob.status]
-        info(f"ILP solver status: {status}")
+        info(f"LP solver status: {status}")
 
         if status not in ["Optimal", "Feasible"]:
-            raise RuntimeError(f"ILP solver failed with status: {status}")
+            raise RuntimeError(f"LP solver failed with status: {status}")
 
         # Warn if solution is not optimal
         if status == "Feasible":
             warn(
-                "ILP solver returned a feasible but potentially suboptimal solution. "
+                "LP solver returned a feasible but potentially suboptimal solution. "
                 "Consider increasing FABULOUS_ILP_SOLVER_TIME_LIMIT for better results."
             )
 
-        # Extract optimal dimensions for each tile type
-        optimal_widths: dict[str, int] = {}
-        optimal_heights: dict[str, int] = {}
+        # Extract optimal dimensions for each tile type (continuous values)
+        optimal_widths: dict[str, float] = {}
+        optimal_heights: dict[str, float] = {}
 
-        for tile_type, positions in type_to_positions.items():
-            # Get the row/col this tile appears in (use first position)
-            row, col = positions[0]
-
-            # Check if this is a SuperTile
-            is_supertile = tile_type in fabric.superTileDic
-            if is_supertile:
-                supertile = fabric.superTileDic[tile_type]
-                logical_width = supertile.maxWidth()
-                logical_height = supertile.maxHeight()
-            else:
-                logical_width = 1
-                logical_height = 1
-
-            if logical_width == 1 and logical_height == 1:
-                # Regular tile: single cell dimension
-                if col in col_widths:
-                    optimal_widths[tile_type] = int(col_widths[col].varValue)
-                else:
-                    optimal_widths[tile_type] = min_tile_widths[tile_type]
-
-                if row in row_heights:
-                    optimal_heights[tile_type] = int(row_heights[row].varValue)
-                else:
-                    optimal_heights[tile_type] = min_tile_heights[tile_type]
-            else:
-                # SuperTile: sum of spanned cells
-                width = sum(
-                    int(col_widths[c].varValue)
-                    for c in range(col, col + logical_width)
-                    if c in col_widths
-                )
-                height = sum(
-                    int(row_heights[r].varValue)
-                    for r in range(row, row + logical_height)
-                    if r in row_heights
-                )
-
-                optimal_widths[tile_type] = (
-                    width if width > 0 else min_tile_widths[tile_type]
-                )
-                optimal_heights[tile_type] = (
-                    height if height > 0 else min_tile_heights[tile_type]
-                )
+        for tile_type in type_to_positions:
+            # Get continuous values from LP (will be rounded in Step 4)
+            optimal_widths[tile_type] = tile_widths[tile_type].varValue or 0.0
+            optimal_heights[tile_type] = tile_heights[tile_type].varValue or 0.0
 
         # Report results
         total_area = sum(
-            optimal_widths[t] * optimal_heights[t] * len(positions)
+            int(optimal_widths[t]) * int(optimal_heights[t]) * len(positions)
             for t, positions in type_to_positions.items()
         )
-        info("ILP optimization complete:")
-        info(f"  Total fabric area: {total_area}")
-        row_heights_list = [row_heights[r].varValue for r in sorted(row_heights.keys())]
-        col_widths_list = [col_widths[c].varValue for c in sorted(col_widths.keys())]
+        info("LP optimization complete:")
+        info(f"  Total fabric area (est): {total_area}")
+        row_heights_list = [
+            int(row_heights[r].varValue or 0) for r in sorted(row_heights.keys())
+        ]
+        col_widths_list = [
+            int(col_widths[c].varValue or 0) for c in sorted(col_widths.keys())
+        ]
         info(f"  Optimal row heights: {row_heights_list}")
         info(f"  Optimal col widths: {col_widths_list}")
 
-        return optimal_widths, optimal_heights
+        # Return as integers (will be refined by rounding in Step 4)
+        return (
+            {t: int(optimal_widths[t]) for t in optimal_widths},
+            {t: int(optimal_heights[t]) for t in optimal_heights},
+        )
 
     def run(self, initial_state: State, **_kwargs: dict) -> tuple[State, list[Step]]:
-        """Execute the ILP-based fabric flow.
+        """Execute the LP-based fabric flow.
 
         Flow steps:
-        1. Compile all tiles in parallel to find minimum dimensions
-        2. Formulate ILP problem to minimize total fabric area
-        3. Solve for optimal tile dimensions with row/column constraints
+        1. Compile all tiles with 3 modes (balance, min-width, min-height) in parallel
+        2. Formulate LP problem to minimize total fabric perimeter (area proxy)
+        3. Solve for optimal tile dimensions with row/column grid constraints
         4. Recompile tiles with optimal dimensions in parallel
         5. Stitch all tiles into final fabric
 
@@ -593,7 +705,7 @@ class FABulousFabricMacroFullFlow(Flow):
         Raises
         ------
         RuntimeError
-            If tile compilation or ILP optimization fails
+            If tile compilation or LP optimization fails
         """
         step_list: list[Step] = []
         fabric: Fabric = self.config["FABULOUS_FABRIC"]
@@ -601,6 +713,17 @@ class FABulousFabricMacroFullFlow(Flow):
         self.progress_bar.set_max_stage_count(4)
 
         self._validate_project_dir(proj_dir, fabric)
+
+        # Compute IO-based minimum dimensions upfront
+        # This ensures TileOptimisation starts from IO-aware bounds
+        info("\n=== Computing IO pin density constraints ===")
+        io_min_dimensions = self._compute_io_min_dimensions(fabric, self.config)
+
+        for tile_name, (min_w_io, min_h_io) in io_min_dimensions.items():
+            info(
+                f"  {tile_name}: IO constraints: "
+                f"min_width={min_w_io} DBU, min_height={min_h_io} DBU"
+            )
 
         # Step 1: Parallel compilation to find minimum dimensions
         info("\n=== Step 1: Finding minimum tile dimensions ===")
@@ -616,8 +739,8 @@ class FABulousFabricMacroFullFlow(Flow):
         # Optimization modes to try for each tile
         opt_modes = [
             OptMode.BALANCE,
-            # OptMode.FIND_MIN_HEIGHT,
-            # OptMode.FIND_MIN_WIDTH,
+            OptMode.FIND_MIN_HEIGHT,
+            OptMode.FIND_MIN_WIDTH,
         ]
 
         # Create compilation steps for all tiles with all optimization modes
@@ -661,6 +784,12 @@ class FABulousFabricMacroFullFlow(Flow):
                 logical_width = 1
                 logical_height = 1
 
+            # Get IO constraints for this tile
+            io_min_width = Decimal(0)
+            io_min_height = Decimal(0)
+            if tile_type.name in io_min_dimensions:
+                io_min_width, io_min_height = io_min_dimensions[tile_type.name]
+
             # Create one compilation step for each optimization mode
             for opt_mode in opt_modes:
                 step_id = f"TileMarcoGen_MinDim_{tile_type.name}_{opt_mode.value}"
@@ -677,10 +806,12 @@ class FABulousFabricMacroFullFlow(Flow):
                     FABULOUS_OPTIMISATION_WIDTH_STEP_COUNT=4,
                     FABULOUS_OPTIMISATION_HEIGHT_STEP_COUNT=1,
                     IGNORE_ANTENNA_VIOLATIONS=True,
+                    FABULOUS_IO_MIN_WIDTH=io_min_width,
+                    FABULOUS_IO_MIN_HEIGHT=io_min_height,
                     RUN_DIR_OVERWRITE=str(
                         Path(self.design_dir)
                         / "runs"
-                        / f"TileMarcoGen_MinDim_{tile_type.name}_{opt_mode.value}"
+                        / f"TileMacroGen_MinDim_{tile_type.name}_{opt_mode.value}"
                     ),
                     YOSYS_LOG_LEVEL="ERROR",
                     IGNORE_DEFAULT_DIE_AREA=True,
@@ -803,8 +934,8 @@ class FABulousFabricMacroFullFlow(Flow):
         info(f"  Fabric grid: {num_rows} rows x {num_cols} columns")
         info(f"  Unique tile types: {len(type_to_positions)}")
 
-        # Step 3: Formulate and solve ILP problem
-        info("\n=== Step 3: Solving ILP optimization ===")
+        # Step 3: Formulate and solve LP problem
+        info("\n=== Step 3: Solving LP optimization ===")
         optimal_widths, optimal_heights = self._solve_ilp_optimization(
             num_rows,
             num_cols,
@@ -814,6 +945,8 @@ class FABulousFabricMacroFullFlow(Flow):
             min_tile_widths,
             min_tile_heights,
             fabric,
+            tile_mode_options=tile_dimension_options,
+            io_min_dimensions=io_min_dimensions,
         )
 
         info(f"Number of rows: {num_rows}, Number of columns: {num_cols}")
@@ -836,11 +969,21 @@ class FABulousFabricMacroFullFlow(Flow):
             tile_dir = proj_dir / "Tile" / tile_type.name
             tile_name = tile_type.name
 
-            # Get optimal dimensions for this tile
-            optimal_width = optimal_widths[tile_name]
-            optimal_height = optimal_heights[tile_name]
+            # Get optimal dimensions from ILP
+            optimal_width_float = optimal_widths[tile_name]
+            optimal_height_float = optimal_heights[tile_name]
 
-            info(f"  {tile_name}: optimal={optimal_width}x{optimal_height} DBU")
+            # Round to pitch grid using helper's round_die_area
+            temp_config = self.config.copy(
+                DIE_AREA=[0, 0, int(optimal_width_float), int(optimal_height_float)]
+            )
+            rounded_config = round_die_area(temp_config)
+            _, _, optimal_width, optimal_height = rounded_config["DIE_AREA"]
+
+            info(
+                f"  {tile_name}: ILP optimal={optimal_width_float:.1f}x"
+                f"{optimal_height_float:.1f}, rounded={optimal_width}x{optimal_height} DBU"
+            )
 
             # Generate IO pin configuration (reuse from Step 1)
             out_file = tile_dir / "io_pin_order.yaml"
@@ -888,7 +1031,7 @@ class FABulousFabricMacroFullFlow(Flow):
                 VERILOG_FILES=file_list,
                 FABULOUS_TILE_LOGICAL_WIDTH=logical_width,
                 FABULOUS_TILE_LOGICAL_HEIGHT=logical_height,
-                TILE_OPTIMISATION=False,  # Use exact dimensions, no optimization
+                TILE_OPTIMISATION=False,  # Use exact dimensions
                 **tile_config_overrides,
             )
 
@@ -910,7 +1053,7 @@ class FABulousFabricMacroFullFlow(Flow):
         tile_type_states: dict[str, State] = {}
 
         for handle, step in final_async_handles:
-            state = self.await_step(handle)
+            state = handle.result()
             step_list.append(step)
 
             tile_name = step.config["DESIGN_NAME"]
@@ -985,6 +1128,6 @@ class FABulousFabricMacroFullFlow(Flow):
 
         info("\n✓ Fabric flow completed successfully!")
         info(f"  Total tiles: {len(unique_tile_types)}")
-        info("  Fabric area optimized using ILP")
+        info("  Fabric area optimized using LP")
 
         return final_state, step_list

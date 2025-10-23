@@ -240,7 +240,6 @@ class TileOptimisation(WhileStep):
         if die_area_raw is None:
             raise ValueError("DIE_AREA metric not found in state.")
 
-        print(die_area_raw)
         _, _, width, height = die_area_raw
 
         # Get PDK site dimensions from metrics (if available)
@@ -262,10 +261,10 @@ class TileOptimisation(WhileStep):
         new_width: Decimal
 
         if height == 0:
-            height = instance_area.sqrt() / 2
+            height = instance_area.sqrt()
 
         if width == 0:
-            width = instance_area.sqrt() / 2
+            width = instance_area.sqrt()
 
         match self.config["FABULOUS_OPT_MODE"]:
             case OptMode.FIND_MIN_WIDTH:

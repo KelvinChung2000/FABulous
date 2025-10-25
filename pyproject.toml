@@ -37,7 +37,7 @@ dependencies = [
   "click>=8.1.8",
   "librelane>=2.4.2",
   "pick>=2.4.0",
-  "pulp>=3.3.0",
+  "pymoo>=0.6.1.5",
 ]
 
 [project.urls]

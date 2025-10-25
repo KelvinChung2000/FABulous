@@ -90,6 +90,24 @@ var = [
         "Default is False.",
         default=False,
     ),
+    Variable(
+        "FABULOUS_IO_MIN_WIDTH",
+        Decimal,
+        "Minimum width required for IO pin spacing constraints. "
+        "This is the physical lower bound based on the number of IO pins "
+        "on the north/south edges and track pitch. "
+        "Default is 0 (no IO constraint).",
+        default=Decimal(0),
+    ),
+    Variable(
+        "FABULOUS_IO_MIN_HEIGHT",
+        Decimal,
+        "Minimum height required for IO pin spacing constraints. "
+        "This is the physical lower bound based on the number of IO pins "
+        "on the west/east edges and track pitch. "
+        "Default is 0 (no IO constraint).",
+        default=Decimal(0),
+    ),
 ]
 
 
@@ -185,7 +203,7 @@ class TileOptimisation(WhileStep):
         core_vals = list(map(Decimal, core_bbox))
         if post_iteration.metrics.get(
             "design__core__area", 0
-        ) < post_iteration.metrics.get("design__instance__area", 0):
+        ) < post_iteration.metrics.get("design__instance__area__stdcell", 0):
             extra = tuple(abs(a - b) for a, b in zip(die_vals, core_vals, strict=True))
             # Update config DIE_AREA to make core area at least equal to instance area
             self.config = self.config.copy(
@@ -196,38 +214,6 @@ class TileOptimisation(WhileStep):
                     die_vals[3] + extra[1] + extra[3],
                 )
             )
-            return post_iteration
-
-        if post_iteration.metrics.get("route__drc_errors") is None:
-            # cannot get route error, likely floor plane problem, relax die area
-            match self.config["FABULOUS_OPT_MODE"]:
-                case OptMode.FIND_MIN_WIDTH:
-                    self.config = self.config.copy(
-                        DIE_AREA=(
-                            Decimal(0),
-                            Decimal(0),
-                            die_vals[2],
-                            die_vals[3] * Decimal(1.1),
-                        )
-                    )
-                case OptMode.FIND_MIN_HEIGHT:
-                    self.config = self.config.copy(
-                        DIE_AREA=(
-                            Decimal(0),
-                            Decimal(0),
-                            die_vals[2] * Decimal(1.1),
-                            die_vals[3],
-                        )
-                    )
-                case _:
-                    self.config = self.config.copy(
-                        DIE_AREA=(
-                            Decimal(0),
-                            Decimal(0),
-                            die_vals[2] * Decimal(1.05),
-                            die_vals[3] * Decimal(1.05),
-                        )
-                    )
             return post_iteration
 
         return post_iteration
@@ -243,18 +229,14 @@ class TileOptimisation(WhileStep):
         _, _, width, height = die_area_raw
 
         # Get PDK site dimensions from metrics (if available)
-        site_width_dbu = Decimal(
-            pre_iteration.metrics.get("pdk__site_width", Decimal(1))
-        )
-        site_height_dbu = Decimal(
-            pre_iteration.metrics.get("pdk__site_height", Decimal(1))
-        )
+        site_width = Decimal(pre_iteration.metrics.get("pdk__site_width", Decimal(1)))
+        site_height = Decimal(pre_iteration.metrics.get("pdk__site_height", Decimal(1)))
 
         # Calculate step size based on PDK site dimensions
         width_step_count = self.config["FABULOUS_OPTIMISATION_WIDTH_STEP_COUNT"]
         height_step_count = self.config["FABULOUS_OPTIMISATION_HEIGHT_STEP_COUNT"]
-        width_step = site_width_dbu * width_step_count
-        height_step = site_height_dbu * height_step_count
+        width_step = site_width * width_step_count
+        height_step = site_height * height_step_count
 
         instance_area = Decimal(pre_iteration.metrics.get("design__instance__area", 0))
         new_height: Decimal
@@ -300,11 +282,19 @@ class TileOptimisation(WhileStep):
                     f"Unknown FABULOUS_OPT_MODE: {self.config['FABULOUS_OPT_MODE']}"
                 )
 
+        new_width = max(
+            new_width, self.config["FABULOUS_IO_MIN_WIDTH"], site_width * 10
+        )
+
+        new_height = max(
+            new_height, self.config["FABULOUS_IO_MIN_HEIGHT"], site_height * 10
+        )
+
         die_area = (
             Decimal(0),
             Decimal(0),
-            round_up_decimal(new_width, Decimal(site_width_dbu)),
-            round_up_decimal(new_height, Decimal(site_height_dbu)),
+            round_up_decimal(new_width, Decimal(site_width)),
+            round_up_decimal(new_height, Decimal(site_height)),
         )
         self.config = self.config.copy(DIE_AREA=die_area)
 
@@ -343,8 +333,25 @@ class TileOptimisation(WhileStep):
             info("Ignoring antenna violations during tile optimisation.")
             self.config = self.config.copy(ERROR_ON_TR_DRC=False)
         if self.config["IGNORE_DEFAULT_DIE_AREA"]:
+            if not (i := self.config.get("FABULOUS_IO_MIN_HEIGHT")) or (i < 0):
+                raise ValueError(
+                    "FABULOUS_IO_MIN_HEIGHT must be set to a positive value when "
+                    "IGNORE_DEFAULT_DIE_AREA is True."
+                )
+            if not (i := self.config.get("FABULOUS_IO_MIN_WIDTH")) or (i < 0):
+                raise ValueError(
+                    "FABULOUS_IO_MIN_WIDTH must be set to a positive value when "
+                    "IGNORE_DEFAULT_DIE_AREA is True."
+                )
+
+            info("Using instance area for initial die area sizing.")
             self.config = self.config.copy(
-                DIE_AREA=(Decimal(0), Decimal(0), Decimal(0), Decimal(0))
+                DIE_AREA=(
+                    Decimal(0),
+                    Decimal(0),
+                    Decimal(0),
+                    Decimal(0),
+                )
             )
         result = super().run(state_in, **_kwargs)
         (Path(self.step_dir) / "runtime.txt").write_text(

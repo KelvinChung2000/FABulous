@@ -25,7 +25,7 @@
       inputs.uv2nix.follows = "uv2nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    librelane.url = "github:kelvinchung2000/librelane/my-dev";
+    librelane.url = "github:kelvinchung2000/librelane/dev-test";
 
     # Tag-pinned sources for custom tools (locked in flake.lock)
     ghdl-src = {
@@ -96,6 +96,18 @@
           nativeBuildInputs = (old.nativeBuildInputs or []) ++ final.resolveBuildSystem {
             setuptools = [ ]; wheel = [ ];
           };
+        });
+
+        # Remove LICENSE files from packages that cause collisions
+        alive-progress = prev.alive-progress.overrideAttrs (old: {
+          postInstall = (old.postInstall or "") + ''
+            rm -f $out/LICENSE
+          '';
+        });
+        about-time = prev.about-time.overrideAttrs (old: {
+          postInstall = (old.postInstall or "") + ''
+            rm -f $out/LICENSE
+          '';
         });
       };
 

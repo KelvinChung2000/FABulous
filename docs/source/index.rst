@@ -39,3 +39,4 @@ Contents
     misc/contact
     misc/publications
     generated_doc/index
+    nix-env

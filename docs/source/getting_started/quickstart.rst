@@ -77,6 +77,7 @@ If you are using yosys oss-cad-suite, no need to install the following packages.
  Only needed for VHDL synthesis
 
 We have also provided a command to install the above packages automatically.
+
 .. prompt:: bash $
 
    FABulous install-oss-cad-suite

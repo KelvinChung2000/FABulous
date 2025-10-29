@@ -31,9 +31,9 @@ To perform synthesis, place and route and simulation you will need the following
   - [ghdl-yosys-plugin](https://github.com/ghdl/ghdl-yosys-plugin)
   - [nextnpr-generic](https://github.com/YosysHQ/nextpnr?tab=readme-ov-file#nextpnr-generic)
   - [ghdl](https://github.com/ghdl/ghdl/releases/tag/nightly)
-  
+
 As mentioned in the previous section, using the `FABulous install-oss-cad-suite` will install all the required software.
 
 :::{note}
-For GHDL we suggest using the `mcode` backend, as the simulation time is short using the `mcode` backend then any other backend. If you are a Mac user, the `mcode` backend is not available, and we recommend going with the `llvm-jit` backend instead.  
+For GHDL we suggest using the `mcode` backend, as the simulation time is short using the `mcode` backend then any other backend. If you are a Mac user, the `mcode` backend is not available, and we recommend going with the `llvm-jit` backend instead.
 :::

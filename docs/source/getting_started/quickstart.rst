@@ -7,7 +7,7 @@ Quick start
 Prerequisites
 -------------
 
-The following packages need to be installed for generating fabric HDLs. 
+The following packages need to be installed for generating fabric HDLs.
 If you have encounter problems during installation, please refer to the `Installation` section.
 
 :Python:

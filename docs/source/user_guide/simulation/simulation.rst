@@ -40,7 +40,7 @@ FABulous comes with 3 different simulation methods _`configuration module`,
 
    We have produced a quick asynchronous serial configuration port interface that is ideal for microcontroller configuration. It uses the original CPU interface that we have in our TSMC chip. The idea of the protocol is as follows:
 
-   .. figure:: ../figs/bitbang1.*
+   .. figure:: ./figs/bitbang1.*
        :alt: Bitbang description
        :align: center
 
@@ -54,6 +54,6 @@ FABulous comes with 3 different simulation methods _`configuration module`,
    * the control shift register and
    * the data shift register.
 
-   .. figure:: ../figs/bitbang2.*
+   .. figure:: ./figs/bitbang2.*
        :alt: Bitbang schematic
        :align: center

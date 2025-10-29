@@ -1,5 +1,3 @@
-.. _simulation_setup:
-
 Simulation setup
 ================
 

@@ -145,7 +145,7 @@ Fabric CSV description
 
     For the frame-based configuration mode, this will specify the number of configurations frames a tile may use. The total number of configuration bits usable is:
 
-      ``FrameBitsPerRow`` x ``MaxFramesPerCol``
+    ``FrameBitsPerRow`` x ``MaxFramesPerCol``
 
     Note that we can leave possible configuration bits unused and that no configuration latches will be generated for unused bits.
 

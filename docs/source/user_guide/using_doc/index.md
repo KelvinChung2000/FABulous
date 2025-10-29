@@ -1,6 +1,7 @@
-# RTL to Bitstream
+(fabric-using)=
+# Using the eFPGA
 
-Tools related information
+Guide and information on using the eFPGA.
 
 ```{toctree}
 synthesis/index

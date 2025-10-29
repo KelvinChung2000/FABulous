@@ -1,7 +1,7 @@
 (CLI-usage)=
 # CLI Usage Guide
 
-## TODO
+%TODO
 
 ```{toctree}
 fabulous_variable

@@ -1,7 +1,7 @@
 (fabric-building)=
 # Building your eFPGA
 
-Guide and information on building your custom eFPGA
+This contains a guide and information on building your custom eFPGA.
 
 ```{toctree}
 fabric_definition

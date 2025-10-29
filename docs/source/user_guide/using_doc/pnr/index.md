@@ -1,6 +1,6 @@
 # Place and Route
 
-This module contains information related to place and route.
+This contains information related to the place and route step.
 
 ```{toctree}
 nextpnr

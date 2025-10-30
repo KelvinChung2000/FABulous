@@ -147,7 +147,7 @@ def test_run_simulation(
     assert m.call_count == 4
 
 
-def test_run_tcl(
+def test_run_tcl_with_tcl_command(
     cli: FABulous_CLI, caplog: pytest.LogCaptureFixture, tmp_path: Path
 ) -> None:
     """Test running a Tcl scripti."""
@@ -162,7 +162,7 @@ def test_run_tcl(
     assert "TCL script executed" in log[-1]
 
 
-def test_run_tcl_with_actual_command(
+def test_run_tcl_with_fabulous_command(
     cli: FABulous_CLI, caplog: pytest.LogCaptureFixture, tmp_path: Path
 ) -> None:
     """Test running a Tcl command directly."""

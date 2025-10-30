@@ -1,0 +1,56 @@
+files: ^(FABulous)|(docs)/
+default_language_version:
+  python: python3.12
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: check-ast
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+      - id: check-merge-conflict
+      - id: check-toml
+      - id: no-commit-to-branch
+
+  - repo: https://github.com/PyCQA/docformatter.git
+    rev: "v1.7.7"
+    hooks:
+      - id: docformatter
+        name: docformatter
+        description: "Formats docstrings to follow PEP 257."
+        args: [--in-place, --black]
+        language: python
+        types: [python]
+
+  - repo: local
+    hooks:
+      - id: interrogate
+        name: interrogate
+        entry: interrogate
+        language: python
+        args: [-vv, -c, pyproject.toml]
+        pass_filenames: false # needed if excluding files with pyproject.toml or setup.cfg
+  - repo: https://github.com/Lucas-C/pre-commit-hooks
+    rev: v1.5.5
+    hooks:
+      - id: forbid-crlf
+      - id: remove-crlf
+      - id: forbid-tabs
+      - id: remove-tabs
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    # Ruff version.
+    rev: v0.12.12
+    hooks:
+      # Run the linter.
+      - id: ruff
+        args: [--fix]
+      # Run the formatter.
+      - id: ruff-format
+
+  - repo: https://github.com/jsh9/pydoclint
+    rev: 0.7.3
+    hooks:
+      - id: pydoclint
+        args: [--style=numpy]
+        exclude: ^(tests/|FABulous/FABulous_CLI/FABulous_CLI\.py$)

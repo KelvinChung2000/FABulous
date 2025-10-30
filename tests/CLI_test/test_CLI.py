@@ -150,7 +150,7 @@ def test_run_simulation(
 def test_run_tcl(
     cli: FABulous_CLI, caplog: pytest.LogCaptureFixture, tmp_path: Path
 ) -> None:
-    """Test running a Tcl script."""
+    """Test running a Tcl scripti."""
     script_content = '# Dummy Tcl script\nputs "Text from tcl"'
     tcl_script_path = tmp_path / "test_script.tcl"
     with tcl_script_path.open("w") as f:
@@ -159,6 +159,22 @@ def test_run_tcl(
     run_cmd(cli, f"run_tcl {str(tcl_script_path)}")
     log = normalize_and_check_for_errors(caplog.text)
     assert f"Execute TCL script {str(tcl_script_path)}" in log[0]
+    assert "TCL script executed" in log[-1]
+
+
+def test_run_tcl_with_actual_command(
+    cli: FABulous_CLI, caplog: pytest.LogCaptureFixture, tmp_path: Path
+) -> None:
+    """Test running a Tcl command directly."""
+    test_script = tmp_path / "test_script.tcl"
+    test_script.write_text(
+        "load_fabric\n"
+        "gen_user_design_wrapper user_design/sequential_16bit_en.v "
+        "user_design/top_wrapper.v\n"
+    )
+    run_cmd(cli, f"run_tcl {test_script}")
+    log = normalize_and_check_for_errors(caplog.text)
+    assert "Generated user design top wrapper" in log[-2]
     assert "TCL script executed" in log[-1]
 
 

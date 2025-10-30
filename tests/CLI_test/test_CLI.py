@@ -150,7 +150,7 @@ def test_run_simulation(
 def test_run_tcl_with_tcl_command(
     cli: FABulous_CLI, caplog: pytest.LogCaptureFixture, tmp_path: Path
 ) -> None:
-    """Test running a Tcl scripti."""
+    """Test running a Tcl script with tcl command."""
     script_content = '# Dummy Tcl script\nputs "Text from tcl"'
     tcl_script_path = tmp_path / "test_script.tcl"
     with tcl_script_path.open("w") as f:
@@ -165,7 +165,7 @@ def test_run_tcl_with_tcl_command(
 def test_run_tcl_with_fabulous_command(
     cli: FABulous_CLI, caplog: pytest.LogCaptureFixture, tmp_path: Path
 ) -> None:
-    """Test running a Tcl command directly."""
+    """Test running a Tcl script with FABulous command."""
     test_script = tmp_path / "test_script.tcl"
     test_script.write_text(
         "load_fabric\n"

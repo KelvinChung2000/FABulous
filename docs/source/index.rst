@@ -13,7 +13,7 @@ This guide describes everything you need to set up your system to develop for FA
     :alt: Fabulous workflows and dependencies
     :width: 80%
     :align: center
-    
+
     FABulous workflows and dependencies.
 
 .. figure:: figs/fabulous_ecosystem.*
@@ -30,17 +30,17 @@ Contents
 --------
 
 .. toctree::
-   :maxdepth: 2
+    :maxdepth: 2
 
-   Usage
-   Building fabric
-   fabric_definition
-   FPGA_CAD-tools/index
-   FPGA-to-bitstream/index
-   simulation/index
-   gallery/index
-   references/index
-   definitions
-   contact
-   publications
-
+    Usage
+    development
+    Building fabric
+    fabric_definition
+    fabric_automation
+    FPGA_CAD-tools/index
+    FPGA-to-bitstream/index
+    simulation/index
+    gallery/index
+    definitions
+    contact
+    publications

@@ -1,8 +1,151 @@
 [build-system]
-requires = ["flit_core >=3.2,<4"]
-build-backend = "flit_core.buildapi"
+requires = ["setuptools>=64", "setuptools_scm>=8", "wheel"]
+build-backend = "setuptools.build_meta"
 
 [project]
-name = "FABulous Documentation"
-authors = [{name = "Jing, Nguyen, Bea, Bardia, Dirk", email = "dirk.koch@manchester.ac.uk"}]
-dynamic = ["version", "description"]
+name = "FABulous-FPGA"
+authors = [
+  { name = "Jing, Nguyen, Bea, Bardia, Dirk", email = "dirk.koch@manchester.ac.uk" },
+]
+description = "FABulous FPGA Fabric generator"
+readme = "README.md"
+requires-python = ">=3.12"
+dynamic = ["version"]
+
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: Apache Software License",
+  "Operating System :: OS Independent",
+]
+
+
+dependencies = [
+  'python-dotenv>=1.0.0',
+  'loguru>=0.7.0',
+  'fasm>=0.0.2',
+  'requests>=2.0.0',
+  'cmd2>=2',
+  'bitarray>=3.3.0',
+  # in pydantic v2.12 the fieldvalidators info.field_name property is broken
+  "pydantic<2.12",
+  "pydantic-settings>=2.10.1",
+  "packaging>=25.0",
+  "typer>=0.16.1",
+  # OS-aware readline dependencies
+  'pyreadline3>=3.4.0; sys_platform == "win32"',
+  'gnureadline>=8.2.0; sys_platform != "win32"',
+]
+
+[project.urls]
+Repository = "https://github.com/FPGA-Research/FABulous"
+Documentation = "https://fabulous.readthedocs.io"
+Releases = "https://github.com/FPGA-Research/FABulous/releases"
+Issues = "https://github.com/FPGA-Research/FABulous/issues"
+Discussions = "https://github.com/FPGA-Research/FABulous/discussions"
+
+
+[project.scripts]
+FABulous = "FABulous.FABulous:main"
+bit_gen = "FABulous.fabric_cad.bit_gen:bit_gen"
+
+[tool.setuptools_scm]
+version_scheme = "guess-next-dev"
+local_scheme = "node-and-date"
+
+[tool.setuptools.packages.find]
+exclude = [
+  "docs, demo",
+] # exclude packages matching these glob patterns (empty by default)
+
+[tool.setuptools.package-data]
+mypkg = ["FABulous/**/*"]
+
+[tool.interrogate]
+ignore-init-method = false
+ignore-init-module = false
+ignore-magic = false
+ignore-semiprivate = false
+ignore-private = true
+ignore-property-decorators = false
+ignore-module = false
+ignore-nested-functions = false
+ignore-nested-classes = true
+ignore-setters = true
+ignore-overloaded-functions = true
+fail-under = 95
+exclude = ["setup.py", "docs", "build", ".venv", "demo/*", "tests"]
+
+[dependency-groups]
+dev = [
+  "cocotb>=1.9.2",
+  "cocotb-test>=0.2.6",
+  "pre-commit>=4.2.0",
+  "pytest>=8.4.1",
+  "pytest-cov>=6.2.1",
+  "pytest-mock>=3.14.1",
+  "pytest-split>=0.10.0",
+  "ruff>=0.12.7",
+  "taskipy>=1.14.0",
+  "pyyaml>=6.0.0",
+  "interrogate>=1.7.0",
+]
+
+[tool.coverage.run]
+branch = true
+parallel = true
+source = ["FABulous"]
+
+[tool.coverage.report]
+omit = ["*/__init__.py", "*/__pycache__/*", "tests/*", "demo/*", "docs/*"]
+show_missing = true
+skip_covered = true
+
+[tool.coverage.xml]
+output = "coverage.xml"
+
+[tool.coverage.html]
+directory = "coverage_html"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = ["slow: marks tests as slow (use --runslow to include)"]
+addopts = "-m 'not slow'"
+
+[tool.taskipy.tasks]
+# Development and quality tasks
+format = "ruff format ."
+lint = "ruff check . --fix && pre-commit run --all-files"
+check = "ruff check ."
+qa = "task format && task check"
+
+# Documentation tasks  
+docs-setup = "cd docs && uv sync"
+docs-build = "cd docs && make clean && make html"
+docs-server = "cd docs && make clean && uv run --directory . make livehtml"
+docs-clean = "cd docs && make clean"
+
+fab-proj = "FABulous -c demo"
+
+# FABulous fabric generation tasks
+fab-build = "task fab-proj && FABulous demo -p 'run_FABulous_fabric'"
+fab-build-clean = "rm -r demo && task fab-proj && FABulous demo -p 'run_FABulous_fabric'"
+
+# Test and simulation tasks (using Make targets)
+fab-sim = "task fab-proj && cd ./demo/Test && make FAB_sim"
+fab-sim-clean = "rm -r demo && task fab-proj && cd ./demo/Test && make FAB_sim"
+
+# CI/Development helper tasks
+pre-commit = "task format && task check"
+ci-check = "task check && task test && task docs-build"
+install-dev = "uv sync --group dev"
+clean-all = "find . -type d -name '__pycache__' -exec rm -rf {} + 2>/dev/null || true && find . -name '*.pyc' -delete && rm -rf build/ dist/ *.egg-info/ .pytest_cache/ .ruff_cache/"
+
+# Unified test runner task (pytest-split + durations maintenance)
+# Usage examples:
+#   task test -- --dry-run
+#   task test -- --refresh-durations
+#   task test -- --splits 8 --group 3 -k foo -vv
+#   task test -- --splits 8 --group 3 --maxfail=1
+# Provide flags after first '--'.
+
+test = "uv run scripts/run_tests.py"

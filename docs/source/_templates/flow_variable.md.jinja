@@ -1,0 +1,33 @@
+# Flow related variable
+
+The following are all the variables that is used by our flow.
+
+## FABulous Tile generation flow specific variables
+
+|---------------|-------------|---------------|
+| Variable Name | Description | Default Value |
+|---------------|-------------|---------------|
+{% for (var_name, description, default_value) in fab_tile_variables %}
+| {{ var_name }} | {{ description }} | {{ default_value }} |
+{% endfor %}
+|---------------|-------------|---------------|
+
+## FABulous Tile Stitching flow specific variables
+
+|---------------|-------------|---------------|
+| Variable Name | Description | Default Value |
+|---------------|-------------|---------------|
+{% for (var_name, description, default_value) in fab_stitch_variables %}
+| {{ var_name }} | {{ description }} | {{ default_value }} |
+{% endfor %}
+|---------------|-------------|---------------|
+
+## Common librelane variables
+
+|---------------|-------------|---------------|
+| Variable Name | Description | Default Value |
+|---------------|-------------|---------------|
+{% for (var_name, description, default_value) in librelane_variables %}
+| {{ var_name }} | {{ description }} | {{ default_value }} |
+{% endfor %}
+|---------------|-------------|---------------|

@@ -17,11 +17,12 @@
 
 import os
 import traceback
+from pathlib import Path
 
 import jinja2
 import librelane
 import librelane.config
-import librelane.flows
+import librelane.flows.flow
 import librelane.steps
 from librelane.common import slugify
 from sphinx.application import Sphinx
@@ -33,14 +34,14 @@ def setup(app: Sphinx):
     return {"version": "1.0"}
 
 
-def generate_module_docs(app: Sphinx, conf: Config):
+def generate_module_docs(app: Sphinx, conf: Config) -> None:
     try:
         conf_py_path: str = conf._raw_config["__file__"]
-        doc_root_dir: str = os.path.dirname(conf_py_path)
+        doc_root_dir: Path = Path(conf_py_path).parent
 
         template_relpath: str = conf.templates_path[0]
-        all_templates_path = os.path.abspath(template_relpath)
-        template_path = os.path.join(all_templates_path, "generate_configvar_docs")
+        all_templates_path = Path(template_relpath).absolute()
+        template_path = all_templates_path / "flow_variable"
 
         lookup = jinja2.FileSystemLoader(searchpath=template_path)
 
@@ -61,20 +62,18 @@ def generate_module_docs(app: Sphinx, conf: Config):
 
         # 1. Flows
         template = env.get_template("flows.md")
-        flow_factory = librelane.flows.Flow.factory
+        flow_factory = librelane.flows.flow.Flow.factory
 
-        with open(os.path.join(doc_root_dir, "reference", "flows.md"), "w") as f:
-            f.write(
-                template.render(
-                    slugify=slugify,
-                    flows=[
-                        flow_factory.get(key)
-                        for key in flow_factory.list()
-                        if flow_factory.get(key).__doc__ is not None
-                    ],
-                )
+        (doc_root_dir / "reference" / "flow_variable.md").write_text(
+            template.render(
+                slugify=slugify,
+                fab_tile_variables=[
+                    flow_factory.get(key)
+                    for key in flow_factory.list()
+                    if flow_factory.get(key).__doc__ is not None
+                ],
             )
-
+        )
         # 2. Common PDK Vars
         template = env.get_template("common_pdk_vars.md")
         with open(

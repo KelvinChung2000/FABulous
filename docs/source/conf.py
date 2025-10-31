@@ -34,6 +34,10 @@ _repo_root = Path(__file__).resolve().parents[2].as_posix()
 if _repo_root not in sys.path:
     sys.path.insert(0, _repo_root)
 
+custom_extensions = [
+    "generate_configvar_docs",
+]
+
 extensions = [
     # Core Sphinx extensions (scikit-learn style)
     "sphinx.ext.autodoc",

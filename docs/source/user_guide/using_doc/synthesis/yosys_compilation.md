@@ -42,7 +42,7 @@ For Verilog projects run this command:
 yosys -p "synth_fabulous -top <toplevel> -json <out.json>" <files.v>
 ```
 
-For VHDL projects run the following command: 
+For VHDL projects run the following command:
 
 ```bash
 yosys -m ghdl -p ghdl <files.vhdl> -e <top-entity>;read_verilog <top_wrapper(verilog constraint)>

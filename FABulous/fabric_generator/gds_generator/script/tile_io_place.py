@@ -436,7 +436,14 @@ class PinPlacementPlan:
         self,
         specs: dict[Side, tuple[int, float, float, float]],
     ) -> None:
-        """Allocate raw track coordinates for every segment on each side."""
+        """Allocate tracks for all segments based on physical tile-based allocation.
+
+        Parameters
+        ----------
+        specs : dict[Side, tuple[int, float, float, float]]
+            Track specifications per side:
+            side -> (total_track_count, track_step, origin, physical_dimension)
+        """
         for side, segments in self.segments_by_side.items():
             if side not in specs:
                 # Skip sides that don't have track specifications

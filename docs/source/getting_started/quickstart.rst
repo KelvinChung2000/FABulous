@@ -65,7 +65,7 @@ with ``source venv/bin/activate`` to use FABulous.
 The following packages need to be installed for the CAD toolchain:
 
 
-If you are using yosys oss-cad-suite, no need to install the following packages.
+If you are using OSS CAD suite, no need to install the following packages.
 
 :`Yosys <https://github.com/YosysHQ/yosys>`_:
  version > 0.26+0
@@ -75,6 +75,12 @@ If you are using yosys oss-cad-suite, no need to install the following packages.
 
 :`Yosys ghdl plugin <https://github.com/ghdl/ghdl-yosys-plugin>`_:
  Only needed for VHDL synthesis
+
+:`Iverilog <https://github.com/steveicarus/iverilog>`_:
+ For Verilog simulation
+
+:`GHDL mcode backend <https://github.com/ghdl/ghdl>`_:`
+ For VHDL simulation (we recommend using the mcode backend)
 
 We have also provided a command to install the above packages automatically.
 

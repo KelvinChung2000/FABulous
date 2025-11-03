@@ -313,7 +313,8 @@ def install_nix_cmd() -> None:
     import subprocess
 
     if which := shutil.which("nix"):
-        logger.info(f"Nix is already installed at {which}, skipping installation")
+        logger.warning(f"Nix is already installed at {which}, skipping installation."
+           "Please follow the docs to setup the nix cache!" )
         return
 
     try:

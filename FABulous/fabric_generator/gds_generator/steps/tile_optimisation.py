@@ -1,9 +1,7 @@
 """Tile size optimisation step for FABulous fabric generator."""
 
-import datetime
 from decimal import Decimal
 from enum import StrEnum
-from pathlib import Path
 from typing import cast
 
 from librelane.config.variable import Variable
@@ -328,7 +326,6 @@ class TileOptimisation(WhileStep):
         **_kwargs: dict,
     ) -> tuple[ViewsUpdate, MetricsUpdate]:
         """Run the tile optimisation step."""
-        t = datetime.datetime.now()
         if self.config["IGNORE_ANTENNA_VIOLATIONS"]:
             info("Ignoring antenna violations during tile optimisation.")
             self.config = self.config.copy(ERROR_ON_TR_DRC=False)
@@ -353,8 +350,4 @@ class TileOptimisation(WhileStep):
                     Decimal(0),
                 )
             )
-        result = super().run(state_in, **_kwargs)
-        (Path(self.step_dir) / "runtime.txt").write_text(
-            str(datetime.datetime.now() - t)
-        )
-        return result
+        return super().run(state_in, **_kwargs)

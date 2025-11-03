@@ -1,3 +1,4 @@
+(nix-install)=
 # Nix-based Development Environment
 
 For the GDS backend flow, we use [Nix](https://nixos.org/) as our environment manager and development tool. Nix provides a reproducible, isolated environment for development and usage, ensuring that all dependencies are correctly managed. This is especially useful for complex EDA toolchains that have many dependencies and require specific versions of libraries and tools to function correctly. If you are only interested in using FABulous as a code generator and not in generating GDS files nor using [Librelane](https://github.com/librelane/librelane), you can use the Python virtual environment + OSS CAD suite installation method described in the [Usage](./Usage.rst).

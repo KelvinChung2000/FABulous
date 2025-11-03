@@ -4,7 +4,7 @@ After the FABulous flow has run successfully, the `bel.txt` and `pips.txt` which
 
 `bel.txt` is the primitive description file in order of tiles
 
-```{code-block} none
+```{code} python
 :emphasize-lines: 7
 
     #Tile_X0Y1
@@ -40,7 +40,7 @@ After the FABulous flow has run successfully, the `bel.txt` and `pips.txt` which
 
 `pips.txt` is the routing resource description.
 
-```{code-block} none
+```{code} python
 :emphasize-lines: 1
 
     X1Y1,N1BEG0,X1Y0,N1END0,8,N1BEG0.N1END0

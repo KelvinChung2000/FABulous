@@ -13,7 +13,7 @@ The bitstream in both Verilog and VHDL follow the original order of configuratio
 
 - Verilog: Users should define the global macro value of `EMULATION_MODE` to enable the emulation function in the fabric testing.
 
-  ```verilog
+  ```{code} verilog
   :emphasize-lines: 1
 
      `ifdef EMULATION_MODE
@@ -23,7 +23,7 @@ The bitstream in both Verilog and VHDL follow the original order of configuratio
 
 - VHDL: Users should set the generic `Mode` to **ASIC** or **EMULATE** in `fabric.vhdl` to disable or enable the emulation function.
 
-  ```vhdl
+  ```{code} vhdl
   :emphasize-lines: 5
 
      entity  eFPGA  is

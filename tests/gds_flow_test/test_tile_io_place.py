@@ -1,9 +1,14 @@
 """Tests for tile_io_place module."""
+# ruff: noqa: E402, SLF001, E501, F841
 
 import sys
 from unittest.mock import MagicMock, Mock
 
 import pytest
+
+# Mock external dependencies BEFORE importing the module under test
+sys.modules["odb"] = MagicMock()
+sys.modules["openroad"] = MagicMock()
 
 from FABulous.fabric_definition.define import PinSortMode, Side
 from FABulous.fabric_generator.gds_generator.gen_io_pin_config_yaml import (
@@ -16,9 +21,6 @@ from FABulous.fabric_generator.gds_generator.script.tile_io_place import (
     grid_to_tracks,
     sorter,
 )
-
-sys.modules["odb"] = MagicMock()
-sys.modules["openroad"] = MagicMock()
 
 
 class TestGridToTracks:

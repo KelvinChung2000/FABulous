@@ -29,7 +29,7 @@ The full model of a fabric is described by the following files:
 
 The following block provides a fabric.csv example.
 
-```{code} python
+```{code-block} python
 :emphasize-lines: 1,6,8,32
 
 FabricBegin      # explained in subsection Fabric layout
@@ -68,7 +68,7 @@ ParametersEnd
 
 And the following block provides a tile.csv example (in this case LUT4AB.csv).
 
-```{code} python
+```{code-block} python
 :emphasize-lines: 1,8
 
 TILE, LUT4AB      # explained in subsection Tiles
@@ -195,7 +195,7 @@ The following figure shows the fabric.csv representation of our example fabric a
 :width: 60%
 :::
 
-```{code} python
+```{code-block} python
 :emphasize-lines: 1,8
 
 FabricBegin
@@ -249,7 +249,7 @@ Multiple smaller tiles can be combined into [supertiles](#supertiles) to accommo
 
 Each tile that is referred to in the [fabric layout](#fabric-layout) requires specification of the corresponding tile description in a tile.csv file that has the following format:
 
-```{code} text
+```{code-block} text
 :emphasize-lines: 1,12
 
 TILE, LUT4AB      # define tile name
@@ -277,7 +277,7 @@ JUMP,       J2_BEG,      0,        0,        J2_END,           12
 
 The above configuration is equivalent to:
 
-```{code} python
+```{code-block} python
 :emphasize-lines: 1,12
 
 TILE, LUT4AB      # define tile name
@@ -413,7 +413,7 @@ specifying:
 
 A metric that is important for FPGA ASIC implementations is the channel *cut* number, which denotes the number of wires that must be accommodated between two adjacent tiles. The cut number is an indicator for the congestion to be expected when stitching together the fabric. Let us take the following example:
 
-```{code} python
+```{code-block} python
 :emphasize-lines: 1
 
 TILE, Example_tile      # define tile name
@@ -438,7 +438,7 @@ Furthermore, the wires needed to write the configuration into the configuration 
 
 The switch matrices see only the `wires` amount of wires, regardless of the span. However, the tile-to-tile interfaces include all nested wires concatenated together to a wide vector. FABulous connects the `wires` LSBs to the switch matrix inputs and the switch matrix outputs are connected to the `wires` MSBs. Inside the tile, the wide vector is shifted by `wires` before routing it to the next tile, as shown in the following figure for an EAST hex-wire example:
 
-```{code} python
+```{code-block} python
 :emphasize-lines: 1
 
 TILE, CLB
@@ -611,7 +611,7 @@ Primitives are used to manipulate, store and input/output data. Examples for pri
 
 Primitives are added with `BEL` statements (BEL stands for Basic Element of Logic and the phrase is adopted from Xilinx), as shown in the following tile definition fragment:
 
-```{code} python
+```{code-block} python
 :emphasize-lines: 1,6,7,10
 
 TILE, LUT4AB      # explained in subsection Tiles
@@ -696,7 +696,7 @@ FABulous defines the following coding rules for BELs:
     two blocks provide an OutBlock tile with two BEL statements and the
     corresponding Out_Pad module:
 
-    ```{code} python
+    ```{code-block} python
     :emphasize-lines: 1,4,5
 
     TILE, OutBlock      # explained in subsection Tiles
@@ -782,7 +782,7 @@ However, users can influence the mapping of configuration bits into the bitstrea
 
 In the code example for a LUT, it was shown that the configuration bits are exported into the LUT interface:
 
-```{code} VHDL
+```{code-block} VHDL
 :emphasize-lines: 5
 
 entity LUT4 is
@@ -887,7 +887,7 @@ In any case: supertiles must provide wire interfaces that match the surroundings
 
 Supertiles are modelled from elementary tiles in a supertile.csv file similar to how we model the whole FPGA fabric. Shapes can be defined arbitrary and NULL tiles can be used to skip fields. Examples:
 
-```{code} python
+```{code-block} python
 :emphasize-lines: 1,5,7,11,13,17
 
 SuperTILE, my_Z      # define supertile name
@@ -925,7 +925,7 @@ A basic tile instantiated in a supertile may not implement interfaces to all NOR
 
 Tile ports that are declared `EXTERNAL` in the basic tiles will be exported all the way to the top-level, in the same way it is done for {ref}`tiles`
 
-```{code} VHDL
+```{code-block} VHDL
 :emphasize-lines: 1
 
 VHDL example:
@@ -947,7 +947,7 @@ With the instantiation of multiple basic tiles, we define mostly the part relate
 The left example concentrates the DSP functionality in the bottom tile and is modelled as shown in the next code block.
 (Note the two extra NORTH and SOUTH wires that provide the connections between the DSP BEL (located bot) and the top basic tile).
 
-```{code} python
+```{code-block} python
 :emphasize-lines: 1,5,9,13,15,19,23,28
 
 TILE,       DSP_top
@@ -980,7 +980,7 @@ MATRIX,     DSP_bot_switch_matrix.vhdl
 EndTILE
 ```
 
-```{code} python
+```{code-block} python
 :emphasize-lines: 1,4
 
 SuperTILE   DSP  # declace supertile  (Functionality concentrated in DSP_bot)
@@ -992,7 +992,7 @@ EndTILE
 The right example provides the tile functionality in the supertile wrapper and is modelled as shown in the next code block.
 (Note the two wire entries with the LOCAL attribute in each basic tile to define that these wires are usable in the supertile wrapper. Furthermore, configuration bits for the DSP primitive will be provided through a ConfigBits BEL. This allows it to distribute the number of configuration bits among the basic tiles as needed. Note that configuration bits are organized at basic tile level.)
 
-```{code} python
+```{code-block} python
 :emphasize-lines: 1,8,9,12,14,21,22,25
 
 TILE,       DSP_top
@@ -1022,7 +1022,7 @@ MATRIX,     DSP_top_switch_matrix.vhdl
 EndTILE
 ```
 
-```{code} python
+```{code-block} python
 :emphasize-lines: 1,4,5
 
 SuperTILE   DSP     # declare supertile DSP

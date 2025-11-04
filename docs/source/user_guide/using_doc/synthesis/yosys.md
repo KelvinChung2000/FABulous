@@ -21,7 +21,7 @@ Chapter 5.2). User should also define different types of DFF in the `ff_map.v` f
 | $_SDFFCE_PP?P_ | Positive Clock edge, High active Enable and Set/Reset |
 
 
-We have made a comparison between synthesis with and without **ENABLE** and **SET/RESET** DFF on the `Murax core` benchmark, as shown below:
+We have made a comparison between synthesis with and without `ENABLE` and `SET/RESET DFF` on the `Murax core` benchmark, as shown below:
 
 | Name         | LUT1 | LUT2 | LUT3 | LUT4 | LUT_total | LUTFF | LUTFF_E | LUTFF_SR | LUTFF_SS | LUTFF_ESR | LUTFF_ESS | RegFile_32x4 |
 | ------------ | ---- | ---- | ---- | ---- | --------- | ----- | ------- | -------- | -------- | --------- | --------- | ------------ |
@@ -36,6 +36,3 @@ We have made a comparison between synthesis with and without **ENABLE** and **SE
 | LUTFF_SS        | synchronous set to 1                         |
 | LUTFF_ESR       | synchronous enable, synchronous reset to 0   |
 | LUTFF_ESS       | synchronous enable, synchronous set to 1     |
-
-
-Around 30% LUT resources can be saved by *ENABLE* and *SET/RESET* functions added, so it is supported in version 3.

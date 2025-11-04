@@ -10,7 +10,7 @@ Environment variables can be set in the shell before running FABulous. Shell env
 
 ## Global Environment Variables
 
-Global environment variables always start with `` FAB_` `` and are used to configure FABulous itself.
+Global environment variables always start with `FAB_` and are used to configure FABulous itself.
 To add a global .env file, create a file named `.env` in the root directory of the FABulous repository or use the `--globalDotEnv` command line argument when running FABulous.
 The following global environment variables are available:
 

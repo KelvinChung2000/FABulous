@@ -1,3 +1,4 @@
+(install)=
 # Installation Method
 
 We provide multiple ways to install and use FABulous.

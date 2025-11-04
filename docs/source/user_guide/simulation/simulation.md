@@ -54,5 +54,5 @@ FABulous comes with 3 different simulation methods:
 
    :::{figure} ./figs/bitbang2.*
    :align: center
-   :alt: Bitbang schematic
+   :alt: An illustration of the signals used in the custom bitbang protocol as well as the decoding of these signals.
    :::

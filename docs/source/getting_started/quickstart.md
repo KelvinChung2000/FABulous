@@ -1,5 +1,4 @@
 (quick-start)=
-
 # Quick start
 
 (setup)=
@@ -88,33 +87,13 @@ To use the FABulous Shell, you can run the following command:
 
 ```bash
 FABulous create-project <name_of_project>
-
-# to start the shell
-cd <name_of_project>
-FABulous start
-
-# or
-
-FABulous --project-dir <name_of_project> start
-
-# or an special alias for project starting
-FABulous <name_of_project>
-```
-
-If you want to use a specific RTL language (Verilog or VHDL) for your project, you can use the `--writer` flag when creating the project.
-
-```bash
-FABulous create-project <name_of_project> --writer vhdl
-# or
-FABulous create-project <name_of_project> -w vhdl
 ```
 
 Inside the FABulous shell, run:
 
 ```bash
-run_FABulous_fabric
-run_FABulous_bitstream user_design/sequential_16bit_en.v
-
+fabulous>run_FABulous_fabric
+fabulous>run_FABulous_bitstream user_design/sequential_16bit_en.v
 ```
 
 To run the FABulous flow directly from the command line, you can use the following commands:

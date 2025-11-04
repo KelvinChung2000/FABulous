@@ -8,7 +8,7 @@ Our nextpnr implementation uses nextpnr-generic for place and route.
 
 ## Building
 
-Please refer to the [Nextpnr-generic](https://github.com/YosysHQ/nextpnr#nextpnr-generic):
+Please refer to the official [nextpnr-generic build instructions](https://github.com/YosysHQ/nextpnr#nextpnr-generic):
 
 :::{note}
 Any new version architecture should be declared in `$FAB_ROOT/nextpnr/CMakeLists.txt`
@@ -36,13 +36,13 @@ FAB_ROOT=demo nextpnr-generic --uarch fabulous --json demo/user_design/sequentia
 
 ## Primitive instantiation
 
-As described in more detail in the yosys documentation, the (\* keep \*) attribute can be used to instantiate a component and clarify that yosys should not try to optimise it away. This can be used to directly instantiate components as blackbox models, and is done in the format
+As described in more detail in the yosys documentation, the `(* keep *)` attribute can be used to instantiate a component and clarify that yosys should not try to optimise it away. This can be used to directly instantiate components as blackbox models, and is done in the format
 
 ```verilog
 (* keep *) COMPONENT_TYPE #(PARAMETER = VALUE)  COMPONENT_NAME(.PORT_NAME1(WIRE_NAME1), .PORT_NAME2(WIRE_NAME2), ...);
 ```
 
-## Constraints for the placement of IO/bels
+## Constraints for the placement of IO/BELs
 
 Constraints for your architecture can be put in place using Absolute Placement Constraints `(* BEL="X2/Y5/lc0" *)`. For example,
 
@@ -50,7 +50,7 @@ Constraints for your architecture can be put in place using Absolute Placement C
 (* BEL="X7Y3.C" *) FABULOUS_LC #(.INIT(16'b1010101010101010), .DFF_ENABLE(1'b0)) constraint_test (.CLK(clk), .I0(enable), .O (enable_i));
 ```
 
-We can constrain which BEL should be used - LUT "C" is constrained to be used in Tile X7Y3 in the example. With the same constraint method, we can also instantiate `InPass4_frame_config, OutPass4_frame_config and IO_1_bidirectional_frame_config_pass` blocks for IO constraints.
+We can constrain which BEL should be used - LUT `C` is constrained to be used in Tile X7Y3 in the example. With the same constraint method, we can also instantiate `InPass4_frame_config, OutPass4_frame_config and IO_1_bidirectional_frame_config_pass` blocks for IO constraints.
 
 The following example is a 16-bit counter output to Block_RAM, and then Block_RAM to W_IO in a 10x10 fabric.
 

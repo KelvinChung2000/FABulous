@@ -1,7 +1,7 @@
 (bitstream-generation)=
 # FASM to Bitstream
 
-Generate Bitstream \<-- Meta Data
+This section contains information on how to generate a bitstream from a FASM file.
 
 ## User guide
 
@@ -9,7 +9,7 @@ We have provided two methods for the user to generate bitstreams. The first meth
 the second method which the user calls the script manually. The first method is recommended, as it provides all the necessary information to generate the bitstream. The second method is provided for cases where the user has
 decided not to work with the FABulous project structure.
 
-### Generate bitstream using CLI
+### Generating a bitstream using the CLI
 
 To generate a bitstream using the CLI, the user must first generate the bitstream specification using the CLI. To
 generate the bitstream specification, we can call the `gen_bitstream_spec` command from the CLI. It is expected that
@@ -21,7 +21,7 @@ To generate the bitstream, the user can call the `gen_bitstream_binary <design.f
 The resulting bitstream is placed in the same directory as where the `fasm` file is located and named as
 `design.bin`.
 
-### Manually generate bitstream
+### Manually generating a bitstream
 
 To generate the necessary materials to generate a bitstream, run `$FAB_ROOT/fabric_generator/fabric_gen.py` with the `-GenBitstreamSpec` flag.
 
@@ -46,7 +46,7 @@ The following command lowers the FASM representation of the placed and routed `s
 
 (belmap)=
 
-## Changes in the primitives or adding new primitives
+## Changing or adding new primitives
 
 For a change in the primitives or adding new primitives, you can simply add them within the primitive file. As an
 example, in the `LUT4c_frame_config` primitive description below there are 16 configuration bits for INIT values,

@@ -333,7 +333,7 @@ specifying:
 
   :::{figure} figs/east_terminate.*
   :align: center
-  :alt: Basic tile illustration
+  :alt: Reflection of horizontal quad wires at the east border of the fabric.
   :width: 100%
   :::
 
@@ -366,7 +366,7 @@ specifying:
 
   :::{figure} figs/Ibex_eFPGA.*
   :align: center
-  :alt: Basic tile illustration
+  :alt: Illustration showing the coupling between an Ibex RISC-V core and the eFPGA fabric.
   :width: 90%
   :::
 
@@ -385,7 +385,7 @@ specifying:
 
   :::{figure} figs/mid_wires.*
   :align: center
-  :alt: Basic tile illustration
+  :alt: A screenshot take from the FABulator GUI illustrating the tap connection of a MID wire in the middle tile of three.
   :width: 100%
   :::
 
@@ -395,7 +395,7 @@ specifying:
 
   :::{figure} figs/wire_tile_grid.*
   :align: center
-  :alt: Basic tile illustration
+  :alt: An illustration of the Wire-Tile-Grid used in FABulous.
   :width: 40%
   :::
 
@@ -427,7 +427,7 @@ Note that a wire with a span greater 1 is usually nested.
 
 :::{figure} figs/wires_model.*
 :align: center
-:alt: Example of a 6 single East wires and 3 quad west wires
+:alt: Example of 6 single east wires and 3 quad west wires.
 :width: 40%
 :::
 
@@ -448,7 +448,7 @@ EAST,       E6B,         6,        0,        E6E,              2
 
 :::{figure} figs/wire_nesting_indexing.*
 :align: center
-:alt: Wire nesting and wire indexing
+:alt: Wire nesting and wire indexing.
 :width: 100%
 :::
 
@@ -566,7 +566,7 @@ The following figure shows a list file and the corresponding adjacency matrix:
 
 :::{figure} figs/adjacency.*
 :align: center
-:alt: Basic tile illustration
+:alt: An illustration of the mapping between a list file and the corresponding adjacency matrix.
 :width: 90%
 :::
 
@@ -586,6 +586,7 @@ Note that we can define the port names `VCC` and `GND` in [wires](#wires), which
 JUMP,       NULL,        0,        0,        GND,              1
 JUMP,       NULL,        0,        0,        VCC,              1
 ```
+
 :::
 
 :::{note}
@@ -818,8 +819,7 @@ Where the fields mean:
 - \<ConfigBits_ranges> denotes a comma-separated list of configuration bits (given by their index) from the tile bitstream. The field can be individual bits or ranges of tile bitstream bits in the form \<left_index>:\<right_index>. The number of specified bits has to match the number of used configuration bits as specified by the mask and the mapping is performed in the order the configuration bits are listed, as illustrated in the following figure:
 
   :::{figure} figs/bitstream_mask_mapping.*
-  :align: center
-  :alt: bitstream_mask_mapping
+  :alt: An illustration of the mapping of configuration bits as specified by the mask in the order of listing.
   :width: 60%
   :::
 
@@ -911,7 +911,7 @@ EndSuperTILE
 
 :::{figure} figs/SuperTILE_examples.*
 :align: center
-:alt: SuperTILE examples
+:alt: An illustration of different Supertile examples in an example fabric.csv file.
 :width: 80%
 :::
 
@@ -940,7 +940,7 @@ With the instantiation of multiple basic tiles, we define mostly the part relate
 
 :::{figure} figs/SuperTILE_functionality.*
 :align: center
-:alt: Supertile Functionality through basic tiles of a dedicated module
+:alt: An illustration comparing having the Supertile functionality in one basic tile to having it in a Supertile wrapper.
 :width: 90%
 :::
 

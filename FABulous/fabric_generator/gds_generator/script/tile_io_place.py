@@ -46,18 +46,15 @@ def equally_spaced_sequence(
 
     Parameters
     ----------
-    sdie: str
-        side of the floorplan being processed.
-    side_pin_placement: list[int | str]
+    side_pin_placement: list[int | odbBTermLike]
         the actual pin placement list for the side, including virtual pins as integers.
     possible_locations: list[float]
         the possible locations on the side to place pins.
 
     Returns
     -------
-    tuple[list[float], list[odbBTermLike]]
-        - list of selected locations for actual pins
-        - list of actual pins (with virtual pins removed)
+    list[tuple[float, odbBTermLike]]
+        list of (pin_location, pin) tuples for actual pins placed.
     """
     virtual_pin_count = 0
     actual_pin_count = len(side_pin_placement)

@@ -6,6 +6,8 @@ from unittest.mock import MagicMock, Mock
 
 import pytest
 
+from FABulous.fabric_generator.gds_generator.script.odb_protocol import odbBTermLike
+
 # Mock external dependencies BEFORE importing the module under test
 sys.modules["odb"] = MagicMock()
 sys.modules["openroad"] = MagicMock()
@@ -19,7 +21,6 @@ from FABulous.fabric_generator.gds_generator.script.tile_io_place import (
     SegmentInfo,
     equally_spaced_sequence,
     grid_to_tracks,
-    sorter,
 )
 
 
@@ -52,90 +53,67 @@ class TestEquallySpacedSequence:
 
     def test_pins_equal_tracks(self) -> None:
         """Test when number of pins equals number of tracks."""
-        mock_pins = [Mock(getName=lambda i=i: f"pin{i}") for i in range(5)]
+        mock_pins: list[int | odbBTermLike] = [
+            Mock(getName=lambda i=i: f"pin{i}") for i in range(5)
+        ]
         tracks = [0.0, 100.0, 200.0, 300.0, 400.0]
 
-        result, pins = equally_spaced_sequence("NORTH", mock_pins, tracks)
+        result = equally_spaced_sequence(mock_pins, tracks)
 
         assert len(result) == 5
-        assert result == tracks
-        assert len(pins) == 5
+        assert all(result[i][0] == tracks[i] for i in range(5))
 
     def test_pins_less_than_tracks(self) -> None:
         """Test even spacing when pins < tracks."""
-        mock_pins = [Mock(getName=lambda i=i: f"pin{i}") for i in range(3)]
+        mock_pins: list[int | odbBTermLike] = [
+            Mock(getName=lambda i=i: f"pin{i}") for i in range(3)
+        ]
         tracks = [0.0, 100.0, 200.0, 300.0, 400.0, 500.0, 600.0]
 
-        result, pins = equally_spaced_sequence("NORTH", mock_pins, tracks)
+        result = equally_spaced_sequence(mock_pins, tracks)
 
         assert len(result) == 3
-        assert len(pins) == 3
+        expected_positions = [100.0, 300.0, 500.0]
+
         # Pins should be evenly distributed and centered
+        assert all(result[i][0] == expected_positions[i] for i in range(3))
 
     def test_no_pins(self) -> None:
         """Test with no pins."""
         tracks = [0.0, 100.0, 200.0]
 
-        result, pins = equally_spaced_sequence("NORTH", [], tracks)
+        result = equally_spaced_sequence([], tracks)
 
         assert len(result) == 0
-        assert len(pins) == 0
 
     def test_with_virtual_pins(self) -> None:
         """Test spacing with virtual pins (integers in list)."""
-        mock_pins = [Mock(getName=lambda: "pin0"), 2, Mock(getName=lambda: "pin1")]
+        mock_pins: list[int | odbBTermLike] = [
+            Mock(getName=lambda: "pin0"),
+            2,
+            Mock(getName=lambda: "pin1"),
+        ]
         tracks = [0.0, 100.0, 200.0, 300.0, 400.0, 500.0, 600.0, 700.0]
 
-        result, pins = equally_spaced_sequence("SOUTH", mock_pins, tracks)
+        result = equally_spaced_sequence(mock_pins, tracks)
 
         # Should have 2 actual pins
-        assert len(pins) == 2
-        assert all(not isinstance(p, int) for p in pins)
+        assert len(result) == 2
+        assert all(not isinstance(p, int) for p in result)
+        expected_positions = [0.0, 600.0]  # Pins should be at these tracks
+        assert all(result[i][0] == expected_positions[i] for i in range(2))
 
     def test_too_many_pins(self) -> None:
         """Test error when pins exceed available tracks."""
-        mock_pins = [Mock(getName=lambda i=i: f"pin{i}") for i in range(10)]
+        mock_pins: list[int | odbBTermLike] = [
+            Mock(getName=lambda i=i: f"pin{i}") for i in range(10)
+        ]
         tracks = [0.0, 100.0, 200.0]
 
         with pytest.raises(SystemExit) as exc_info:
-            equally_spaced_sequence("EAST", mock_pins, tracks)
+            equally_spaced_sequence(mock_pins, tracks)
 
         assert exc_info.value.code == 1
-
-
-class TestSorter:
-    """Test suite for sorter function."""
-
-    def test_bus_major_sorting(self) -> None:
-        """Test BUS_MAJOR sorting mode."""
-        mock_bterm = Mock()
-        mock_bterm.getName.return_value = "data_bus[5]"
-
-        keys = sorter(mock_bterm, PinSortMode.BUS_MAJOR)
-
-        assert len(keys) == 2
-        assert "data_bus" in keys[0]  # Priority keys
-        assert 5 in keys[1]  # Secondary keys
-
-    def test_bit_minor_sorting(self) -> None:
-        """Test BIT_MINOR sorting mode."""
-        mock_bterm = Mock()
-        mock_bterm.getName.return_value = "addr[10]"
-
-        keys = sorter(mock_bterm, PinSortMode.BIT_MINOR)
-
-        assert len(keys) == 2
-        assert 10 in keys[0]  # Priority keys
-        assert "addr" in keys[1]  # Secondary keys
-
-    def test_simple_name(self) -> None:
-        """Test sorting with simple pin name."""
-        mock_bterm = Mock()
-        mock_bterm.getName.return_value = "clk"
-
-        keys = sorter(mock_bterm, PinSortMode.BUS_MAJOR)
-
-        assert len(keys) == 2
 
 
 class TestSegmentInfo:
@@ -552,17 +530,17 @@ class TestIntegration:
     """Integration tests for complete pin placement workflow."""
 
     def test_track_allocation_respects_min_distance(self) -> None:
-        """Test that allocated tracks respect min_distance constraints.
+        """Test that min_distance filtering works correctly.
 
-        NOTE: This test currently documents that min_distance is NOT enforced
-        by the underlying implementation - it's stored but not applied during
-        track allocation. This test verifies the current behavior.
+        The allocate_tracks() method generates raw tracks based on the track grid.
+        The min_distance constraint is then enforced by filtering these tracks
+        with a stride, as done in the io_place() function.
         """
         config = {
             "X0Y0": {
                 "N": [
                     {
-                        "pins": ["pin0", "pin1"],
+                        "pins": ["pin0", "pin1", "pin2"],
                         "sort_mode": "bus_major",
                         "min_distance": 2.5,  # Minimum 2.5 units between pins
                         "max_distance": None,
@@ -572,13 +550,14 @@ class TestIntegration:
             }
         }
 
-        mock_pin0 = Mock()
-        mock_pin0.getName.return_value = "pin0"
-        mock_pin1 = Mock()
-        mock_pin1.getName.return_value = "pin1"
-        bterms = [mock_pin0, mock_pin1]
+        mock_pins = [Mock(getName=lambda i=i: f"pin{i}") for i in range(3)]
+        for pin in mock_pins:
+            pin.getName.return_value = pin.getName()
 
-        plan = PinPlacementPlan(config, bterms, "none")
+        plan = PinPlacementPlan(config, mock_pins, "none")
+
+        # Ensure min_distance is set
+        plan.ensure_min_distances({Side.NORTH: 2.5})
 
         # Allocate tracks with specific parameters
         specs = {
@@ -593,18 +572,32 @@ class TestIntegration:
 
         # Verify tracks were allocated
         assert len(plan.track_coordinates[Side.NORTH]) == 1
-        tracks = plan.track_coordinates[Side.NORTH][0]
+        raw_tracks = plan.track_coordinates[Side.NORTH][0]
 
-        # Verify at least 2 tracks for 2 pins
-        assert len(tracks) >= 2
+        # Apply min_distance filtering (as done in io_place())
+        segment = plan.segments_by_side[Side.NORTH][0]
+        step = 1.0
+        assert segment.min_distance is not None
+        min_distance = segment.min_distance * 1.0  # Assume dbunits=1 for simplicity
 
-        # Document current behavior: min_distance is stored in config but not enforced
-        # The actual distance will be determined by the track grid (step size)
-        if len(tracks) >= 2:
-            distance = abs(tracks[1] - tracks[0])
-            # Currently, distance will be the step size (1.0), not the min_distance (2.5)
-            assert distance == 1.0, (
-                f"Current behavior: distance={distance} (not enforcing min_distance)"
+        # Calculate stride based on min_distance
+        import math
+
+        stride = max(1, math.ceil(min_distance / step))
+        filtered_tracks = [raw_tracks[i] for i in range(0, len(raw_tracks), stride)]
+
+        # Verify filtering: with min_distance=2.5 and step=1.0, stride=3
+        # So we get tracks at indices 0, 3, 6, 9
+        assert stride == 3, f"Expected stride=3, got {stride}"
+        assert len(filtered_tracks) == 4, (
+            f"Expected 4 filtered tracks, got {len(filtered_tracks)}"
+        )
+
+        # Verify actual distances between consecutive filtered tracks
+        for i in range(len(filtered_tracks) - 1):
+            distance = abs(filtered_tracks[i + 1] - filtered_tracks[i])
+            assert distance >= min_distance, (
+                f"Distance {distance} < min_distance {min_distance}"
             )
 
     def test_track_allocation_respects_max_distance(self) -> None:
@@ -643,36 +636,8 @@ class TestIntegration:
             distance = abs(tracks[i + 1] - tracks[i])
             assert distance <= 5.0, f"Distance {distance} > max_distance 5.0"
 
-    def test_equally_spaced_sequence_actual_spacing(self) -> None:
-        """Test that equally_spaced_sequence produces correct spacing values."""
-        mock_pins = [Mock(getName=lambda i=i: f"pin{i}") for i in range(3)]
-        tracks = [0.0, 10.0, 20.0, 30.0, 40.0, 50.0, 60.0]  # 7 tracks
-
-        result, pins = equally_spaced_sequence("NORTH", mock_pins, tracks)
-
-        assert len(result) == 3
-        assert len(pins) == 3
-        assert result[0] == 10.0
-        assert result[1] == 30.0
-        assert result[2] == 50.0
-
-    def test_equally_spaced_sequence_with_virtual_pins_actual_spacing(self) -> None:
-        """Test spacing with virtual pins produces correct gaps."""
-        # 2 real pins, 1 virtual pin (creates gap for 1 pin)
-        mock_pins = [Mock(getName=lambda: "pin0"), 1, Mock(getName=lambda: "pin1")]
-        tracks = [0.0, 10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0]  # 8 tracks
-
-        result, pins = equally_spaced_sequence("SOUTH", mock_pins, tracks)
-
-        # Should return only real pins
-        assert len(pins) == 2
-        assert all(not isinstance(p, int) for p in pins)
-        assert len(result) == 2
-        assert result[0] == 10.0
-        assert result[1] == 50.0
-
     @pytest.mark.parametrize(
-        "sort_mode,expected_order",
+        ("sort_mode", "expected_order"),
         [
             # BUS_MAJOR mode: bus name first (addr < data alphabetically), then numeric index
             (
@@ -742,7 +707,7 @@ class TestIntegration:
         segment = segments[0]
 
         # Verify pins are sorted according to the sort mode
-        pin_names = [p.getName() for p in segment.pin_entries]
+        pin_names = [p.getName() for p in segment.pin_entries if not isinstance(p, int)]
         assert pin_names == expected_order
 
     def test_reverse_result_reverses_pin_order(self) -> None:

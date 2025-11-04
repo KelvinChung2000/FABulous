@@ -40,9 +40,25 @@ def grid_to_tracks(origin: float, count: int, step: float) -> list[float]:
 
 
 def equally_spaced_sequence(
-    side: str, side_pin_placement: list, possible_locations: list
-) -> tuple[list, list[odbBTermLike]]:
-    """Select evenly spaced slots for the given pins on a single side."""
+    side_pin_placement: list[int | odbBTermLike], possible_locations: list[float]
+) -> list[tuple[float, odbBTermLike]]:
+    """Equally space pins along possible locations on a side.
+
+    Parameters
+    ----------
+    sdie: str
+        side of the floorplan being processed.
+    side_pin_placement: list[int | str]
+        the actual pin placement list for the side, including virtual pins as integers.
+    possible_locations: list[float]
+        the possible locations on the side to place pins.
+
+    Returns
+    -------
+    tuple[list[float], list[odbBTermLike]]
+        - list of selected locations for actual pins
+        - list of actual pins (with virtual pins removed)
+    """
     virtual_pin_count = 0
     actual_pin_count = len(side_pin_placement)
     total_pin_count = actual_pin_count + virtual_pin_count
@@ -57,59 +73,58 @@ def equally_spaced_sequence(
 
     total_pin_count = actual_pin_count + virtual_pin_count
 
-    result = []
-    tracks = len(possible_locations)
+    result: list[tuple[float, odbBTermLike]] = []
+    tracks_count = len(possible_locations)
 
-    if total_pin_count > tracks:
+    if total_pin_count > tracks_count:
         err(
-            f"The {side} side of the floorplan doesn't have enough tracks for all "
-            f"the pins: {total_pin_count} pins/{tracks} tracks."
+            f"The floorplan doesn't have enough tracks for all "
+            f"the pins: {total_pin_count} pins/{tracks_count} tracks."
         )
         err(
             "Try re-assigning pins to other sides, enabling proportional allocation, "
             "or making the floorplan larger."
         )
         sys.exit(1)
-    elif total_pin_count == tracks:
-        return possible_locations, side_pin_placement  # All positions.
+    elif total_pin_count == tracks_count:
+        idx = 0
+        for p in side_pin_placement:
+            if not isinstance(p, int):  # We have an actual pin
+                result.append((possible_locations[idx], p))
+                idx += 1
+            else:  # Virtual Pins, so just leave their needed spaces
+                idx += p
+        return result
     elif total_pin_count == 0:
-        return result, side_pin_placement
+        return []
 
     # From this point, pin_count always < tracks.
-    tracks_per_pin = math.floor(tracks / total_pin_count)  # >=1
+    tracks_per_pin = math.floor(tracks_count / total_pin_count)  # >=1
     # O| | | O| | | O| | |
     # Example scenario where tracks_per_pin equals 3
     # notice the last two tracks are unused
     # thus:
     used_tracks = tracks_per_pin * (total_pin_count - 1) + 1
-    unused_tracks = tracks - used_tracks
+    unused_tracks = tracks_count - used_tracks
 
     # Place the pins at those tracks...
     current_track = unused_tracks // 2  # So that the tracks used are centered
     starting_track_index = current_track
-    if virtual_pin_count == 0:  # No virtual pins
-        for _ in range(total_pin_count):
-            result.append(possible_locations[current_track])
+    for i in side_pin_placement:
+        if isinstance(i, int):
+            current_track += tracks_per_pin * i
+        else:
+            result.append((possible_locations[current_track], i))
             current_track += tracks_per_pin
-    else:  # There are virtual pins
-        for i in range(len(side_pin_placement)):
-            if not isinstance(side_pin_placement[i], int):  # We have an actual pin
-                result.append(possible_locations[current_track])
-                current_track += tracks_per_pin
-            else:  # Virtual Pins, so just leave their needed spaces
-                current_track += tracks_per_pin * side_pin_placement[i]
-        side_pin_placement = [
-            pin for pin in side_pin_placement if not isinstance(pin, int)
-        ]  # Remove the virtual pins from the side_pin_placement list
 
     info(
-        f"Placement details {side} | "
+        f"Placement details: "
         f"{virtual_pin_count=} {actual_pin_count=} {total_pin_count=} "
         f"possible_locations={len(possible_locations)} "
         f"{tracks_per_pin=} {used_tracks=} {unused_tracks=} {starting_track_index=}",
     )
 
-    return result, side_pin_placement
+    return result
 
 
 _identifiers = re.compile(r"\b[A-Za-z_][A-Za-z_0-9]*\b")
@@ -986,21 +1001,12 @@ def io_place(
                 len(pin_tracks[side][segment_index]) if pin_tracks[side] else 0,
             )
 
-            resolved_pins: list[odbBTermLike]
-            slots, resolved_pins = equally_spaced_sequence(
-                side.value,
+            allocation_result = equally_spaced_sequence(
                 segment.pin_entries,
                 pin_tracks[side][segment_index],
             )
 
-            debug(
-                "Slots assigned = %d (pins=%d)",
-                len(slots),
-                len(segment.pin_entries),
-            )
-            assert len(slots) == len(resolved_pins)
-            for pin_index, bterm in enumerate(resolved_pins):
-                slot = slots[pin_index]
+            for slot, bterm in allocation_result:
                 pin_name = bterm.getName()
                 debug(f"{pin_name} -> {slot}")
                 pins = bterm.getBPins()

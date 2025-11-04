@@ -15,7 +15,7 @@ FABulous workflows and dependencies.
 
 :::{figure} figs/fabulous_ecosystem.*
 :align: center
-:alt: An Illustration of the FABulous ASIC, emulation and bitstream generation flows.  
+:alt: An Illustration of the FABulous ASIC, emulation and bitstream generation flows.
 :width: 80%
 :::
 

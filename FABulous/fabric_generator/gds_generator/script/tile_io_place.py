@@ -44,7 +44,9 @@ def equally_spaced_sequence(
 ) -> list[tuple[float, odbBTermLike]]:
     """Equally space pins along possible locations on a side.
 
-    side_pin_placement: list[int | str]
+    Parameters
+    ----------
+    side_pin_placement: list[int | odbBTermLike]
         The actual pin placement list for the side, including virtual pins as integers.
     possible_locations: list[float]
         The possible locations on the side to place pins.

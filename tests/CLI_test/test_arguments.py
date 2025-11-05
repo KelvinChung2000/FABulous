@@ -771,7 +771,7 @@ def test_default_writer_is_verilog(
                 "run",
             ],
             False,
-            1,
+            0,
             id="run-none",
         ),
         pytest.param(

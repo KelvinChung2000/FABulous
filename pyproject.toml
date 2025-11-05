@@ -153,3 +153,5 @@ clean-all = "find . -type d -name '__pycache__' -exec rm -rf {} + 2>/dev/null ||
 # Provide flags after first '--'.
 
 test = "uv run scripts/run_tests.py"
+
+project-upgrade = "uv lock --upgrade && nix flake update && task test"

@@ -16,9 +16,10 @@ environment management and to ensure consistent dependency resolution with CI.
 Linux/macOS:
 
 ```console
-$ curl -LsSf https://astral.sh/uv/install.sh | sh
-# restart your shell or source the env snippet the installer prints
+curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
+
+Restart your shell or source the `env` snippet the installer prints.
 
 macOS with Homebrew:
 
@@ -61,12 +62,12 @@ You can either:
 Common development commands:
 
 ```console
-# Using uv run (recommended):
-$ uv run FABulous -h           # run CLI with project dependencies
-$ uv run pytest               # run test suite
-$ uv run pytest -k test_name  # run specific test
-$ uv run ruff check           # lint code
-$ uv run ruff format          # format code
+# Using uv run:
+uv run FABulous -h           # run CLI with project dependencies
+uv run pytest               # run test suite
+uv run pytest -k test_name  # run specific test
+uv run ruff check           # lint code
+uv run ruff format          # format code
 
 # Or with activated environment:
 (.venv) $ FABulous -h
@@ -148,10 +149,10 @@ task fab-proj               # Create demo project
 
 ```console
 # Fabric generation and simulation
-$ task fab-build              # Create demo project + run FABulous fabric generation
-$ task fab-build-clean        # Clean build + create project + run fabric generation
-$ task fab-sim                # Create demo project + run full simulation
-$ task fab-sim-clean          # Clean build + create project + run simulation
+task fab-build              # Create demo project + run FABulous fabric generation
+task fab-build-clean        # Clean build + create project + run fabric generation
+task fab-sim                # Create demo project + run full simulation
+task fab-sim-clean          # Clean build + create project + run simulation
 ```
 
 ### Example Development Workflows
@@ -160,30 +161,30 @@ $ task fab-sim-clean          # Clean build + create project + run simulation
 
 ```console
 # Format and check your code
-$ task qa
+task qa
 
 # Run full CI validation before submitting PR
-$ task ci-check
+task ci-check
 ```
 
 **Quick FABulous testing:**
 
 ```console
 # Create demo project and test fabric generation
-$ task fab-build
+task fab-build
 
 # Run full simulation workflow
-$ task fab-sim
+task fab-sim
 ```
 
 **Documentation development:**
 
 ```console
 # Setup docs environment (first time)
-$ task docs-setup
+task docs-setup
 
 # Build and serve docs with auto-reload
-$ task docs-server
+task docs-server
 ```
 
 **Clean development environment:**

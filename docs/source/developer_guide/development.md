@@ -23,13 +23,13 @@ $ curl -LsSf https://astral.sh/uv/install.sh | sh
 macOS with Homebrew:
 
 ```console
-$ brew install uv
+brew install uv
 ```
 
 Windows:
 
 ```console
-$ powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
+powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
 ```
 
 PyPI:
@@ -78,10 +78,10 @@ $ uv run ruff format          # format code
 Dependency management:
 
 ```console
-$ uv add <package>             # add runtime dependency
-$ uv add --group dev <package> # add development dependency
-$ uv remove <package>          # remove dependency
-$ uv lock                      # refresh lock file after manual edits
+uv add <package>             # add runtime dependency
+uv add --group dev <package> # add development dependency
+uv remove <package>          # remove dependency
+uv lock                      # refresh lock file after manual edits
 ```
 
 (pre-commit)=
@@ -94,19 +94,19 @@ These hooks automatically run formatters and linters before each commit.
 Install pre-commit hooks:
 
 ```console
-$ uv run pre-commit install
+uv run pre-commit install
 ```
 
 The hooks will now run automatically on `git commit`. You can also run them manually:
 
 ```console
-$ uv run pre-commit run --all-files
+uv run pre-commit run --all-files
 ```
 
 If you need to bypass the hooks temporarily (not recommended):
 
 ```console
-$ git commit --no-verify
+git commit --no-verify
 ```
 
 (task-automation)=
@@ -118,30 +118,30 @@ FABulous includes pre-configured [taskipy](https://github.com/taskipy/taskipy) t
 ### Development and Quality Tasks
 
 ```console
-$ task format          # Format code with ruff
-$ task lint            # Lint and fix code issues + run pre-commit
-$ task check           # Check code without fixing
-$ task qa              # Run format and check in sequence
-$ task pre-commit      # Run format and check (for pre-commit hooks)
-$ task ci-check        # Full CI check (format, lint, test, docs)
-$ task install-dev     # Install development dependencies
-$ task clean-all       # Clean all build artifacts and cache files
+task format          # Format code with ruff
+task lint            # Lint and fix code issues + run pre-commit
+task check           # Check code without fixing
+task qa              # Run format and check in sequence
+task pre-commit      # Run format and check (for pre-commit hooks)
+task ci-check        # Full CI check (format, lint, test, docs)
+task install-dev     # Install development dependencies
+task clean-all       # Clean all build artifacts and cache files
 ```
 
 ### Documentation Tasks
 
 ```console
-$ task docs-setup      # Setup documentation environment
-$ task docs-apidoc     # Generate API documentation only
-$ task docs-build      # Generate API docs + build documentation
-$ task docs-server     # Serve docs with live reload for development
-$ task docs-clean      # Clean documentation build artifacts
+task docs-setup      # Setup documentation environment
+task docs-apidoc     # Generate API documentation only
+task docs-build      # Generate API docs + build documentation
+task docs-server     # serve docs with live reload for development
+task docs-clean      # Clean documentation build artifacts
 ```
 
 ### Project Creation and Setup
 
 ```console
-$ task fab-proj               # Create demo project
+task fab-proj               # Create demo project
 ```
 
 ### FABulous Workflow Tasks
@@ -183,7 +183,7 @@ $ task fab-sim
 $ task docs-setup
 
 # Build and serve docs with auto-reload
-$ task docs-serve
+$ task docs-server
 ```
 
 **Clean development environment:**
@@ -211,14 +211,14 @@ The configuration is defined in `ruff.toml` in the repository root.
 Format your code before committing:
 
 ```console
-$ uv run ruff format
+uv run ruff format
 ```
 
 Check for linting issues:
 
 ```console
-$ uv run ruff check
-$ uv run ruff check --fix  # auto-fix issues where possible
+uv run ruff check
+uv run ruff check --fix  # auto-fix issues where possible
 ```
 
 ### Documentation Style
@@ -253,7 +253,7 @@ We follow a standard Git workflow for contributions. Please ensure you're famili
 1. Create a new branch for your feature or bug fix:
 
    ```console
-   $ git checkout -b feature/your-feature-name
+   git checkout -b feature/your-feature-name
    ```
 
 2. Set up the development environment as described above.
@@ -271,7 +271,7 @@ We follow a standard Git workflow for contributions. Please ensure you're famili
 1. Push your changes to your forked repository:
 
    ```console
-   $ git push origin feature/your-feature-name
+   git push origin feature/your-feature-name
    ```
 
 2. Submit a pull request to the main repository.

@@ -488,7 +488,8 @@ def run_cmd(
     # Ensure commands is a list
     if isinstance(commands, str):
         commands = [commands]
-    if commands is None:
+    if commands is None or commands == [""] or commands == []:
+        logger.warning("No commands provided, exiting")
         return
 
     # Create and execute command pipeline

@@ -28,11 +28,10 @@ dependencies = [
   'requests>=2.0.0',
   'cmd2>=2',
   'bitarray>=3.3.0',
-  # in pydantic v2.12 the fieldvalidators info.field_name property is broken
-  "pydantic<2.12",
+  "pydantic>=2.12.1",
   "pydantic-settings>=2.10.1",
   "packaging>=25.0",
-  "typer>=0.16.1,<0.19.0",
+  "typer>=0.20.0",
   "FABulous-bit-gen>=0.1.0",
   # OS-aware readline dependencies
   'pyreadline3>=3.4.0; sys_platform == "win32"',
@@ -82,8 +81,7 @@ exclude = ["setup.py", "docs", "build", ".venv", "demo/*", "tests"]
 
 [dependency-groups]
 dev = [
-  "cocotb>=1.9.2,<2.0.0",
-  "cocotb-test>=0.2.6",
+  "cocotb>=2.0.0",
   "pre-commit>=4.2.0",
   "pytest>=8.4.1",
   "pytest-cov>=6.2.1",
@@ -154,3 +152,5 @@ clean-all = "find . -type d -name '__pycache__' -exec rm -rf {} + 2>/dev/null ||
 # Provide flags after first '--'.
 
 test = "uv run scripts/run_tests.py"
+
+project-upgrade = "uv lock --upgrade && nix flake update && task test"

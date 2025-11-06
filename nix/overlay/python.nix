@@ -23,14 +23,4 @@ final: prev: {
         setuptools = [ ]; wheel = [ ];
         };
     });
-    cocotb-test = prev.cocotb-test.overrideAttrs (old: {
-        nativeBuildInputs = (old.nativeBuildInputs or []) ++ final.resolveBuildSystem {
-        setuptools = [ ]; wheel = [ ];
-        };
-    });
-    cocotb = prev.cocotb-test.overrideAttrs (old: {
-        nativeBuildInputs = (old.nativeBuildInputs or []) ++ final.resolveBuildSystem {
-        setuptools = [ ]; wheel = [ ];
-        };
-    });
 }

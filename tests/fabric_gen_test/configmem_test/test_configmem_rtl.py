@@ -60,7 +60,7 @@ async def initialize_configmem(dut: ConfigMemDUT) -> None:
 
 
 @cocotb.test
-async def configmem_settings_test(dut: ConfigMemDUT) -> None:
+async def cocotb_test_configmem_settings(dut: ConfigMemDUT) -> None:
     """Test exact bit mapping from FrameData to ConfigBits using direct mapping."""
     await initialize_configmem(dut)
 

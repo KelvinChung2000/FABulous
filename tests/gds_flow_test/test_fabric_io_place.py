@@ -8,7 +8,6 @@ This tests the real production code, not a reimplementation.
 
 import contextlib
 from types import SimpleNamespace
-from unittest.mock import patch
 
 import pytest
 from conftest import (
@@ -28,28 +27,20 @@ from conftest import (
 
 
 @pytest.fixture
-def _io_place_setup(mock_odb_io_place: SimpleNamespace):  # noqa: ANN001, ANN202
+def _io_place_setup(
+    mock_odb_io_place: SimpleNamespace, monkeypatch: pytest.MonkeyPatch
+):  # noqa: ANN001, ANN202
     """Setup io_place with mocked OdbReader and odb module."""
-    from librelane.scripts.odbpy.reader import OdbReader
 
     from FABulous.fabric_generator.gds_generator.script import fabric_io_place
 
-    # Store original to restore later
-    original_odb = fabric_io_place.odb
-    original_init = OdbReader.__init__
-
-    # Patch odb module
-    fabric_io_place.odb = mock_odb_io_place
-
-    yield  # noqa: PYI049
-
-    # Restore
-    fabric_io_place.odb = original_odb
-    OdbReader.__init__ = original_init
+    # Patch odb module using monkeypatch
+    monkeypatch.setattr(fabric_io_place, "odb", mock_odb_io_place)
 
 
 def _call_io_place(
     reader: MockReaderIoPlace,
+    monkeypatch: pytest.MonkeyPatch,
     **kwargs: object,
 ) -> None:
     """Call the actual io_place function with mocked dependencies."""
@@ -64,37 +55,36 @@ def _call_io_place(
                 with contextlib.suppress(AttributeError):
                     setattr(self, attr, getattr(reader, attr))
 
-    with patch.object(OdbReader, "__init__", mock_odbreader_init):
-        io_place_func = fabric_io_place.io_place
+    monkeypatch.setattr(OdbReader, "__init__", mock_odbreader_init)
+    io_place_func = fabric_io_place.io_place
 
-        # Get the actual function from Click command
-        actual_func = (
-            io_place_func.callback
-            if hasattr(io_place_func, "callback")
-            else io_place_func
-        )
+    # Get the actual function from Click command
+    actual_func = (
+        io_place_func.callback if hasattr(io_place_func, "callback") else io_place_func
+    )
 
-        # Call with parameters
-        actual_func(
-            input_db="dummy.odb",
-            input_lefs=[],
-            config_path=None,
-            reader=reader,
-            ver_layer=str(kwargs.get("ver_layer", "V")),
-            hor_layer=str(kwargs.get("hor_layer", "H")),
-            ver_width_mult=float(kwargs.get("ver_width_mult", 2.0)),  # type: ignore
-            hor_width_mult=float(kwargs.get("hor_width_mult", 2.0)),  # type: ignore
-            hor_length=kwargs.get("hor_length"),
-            ver_length=kwargs.get("ver_length"),
-            hor_extension=float(kwargs.get("hor_extension", 0.0)),  # type: ignore
-            ver_extension=float(kwargs.get("ver_extension", 0.0)),  # type: ignore
-            verbose=bool(kwargs.get("verbose", False)),
-        )
+    # Call with parameters
+    actual_func(
+        input_db="dummy.odb",
+        input_lefs=[],
+        config_path=None,
+        reader=reader,
+        ver_layer=str(kwargs.get("ver_layer", "V")),
+        hor_layer=str(kwargs.get("hor_layer", "H")),
+        ver_width_mult=float(kwargs.get("ver_width_mult", 2.0)),  # type: ignore
+        hor_width_mult=float(kwargs.get("hor_width_mult", 2.0)),  # type: ignore
+        hor_length=kwargs.get("hor_length"),
+        ver_length=kwargs.get("ver_length"),
+        hor_extension=float(kwargs.get("hor_extension", 0.0)),  # type: ignore
+        ver_extension=float(kwargs.get("ver_extension", 0.0)),  # type: ignore
+        verbose=bool(kwargs.get("verbose", False)),
+    )
 
 
 @pytest.mark.usefixtures("_io_place_setup")
 def test_io_place_north_side_placement(
     pin_placement_recorder: PinPlacementRecorder,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """Test pin placement on NORTH side - validates coordinates and layer selection."""
     h_layer = MockLayer(width=50, area=10000, name="H")
@@ -115,6 +105,7 @@ def test_io_place_north_side_placement(
 
     _call_io_place(
         reader,
+        monkeypatch,
         ver_layer="V",
         hor_layer="H",
         ver_width_mult=2.0,
@@ -138,6 +129,7 @@ def test_io_place_north_side_placement(
 @pytest.mark.usefixtures("_io_place_setup")
 def test_io_place_all_four_sides(
     pin_placement_recorder: PinPlacementRecorder,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """Test that pins can be placed on all four sides."""
     h_layer = MockLayer(width=50, area=10000, name="H")
@@ -166,6 +158,7 @@ def test_io_place_all_four_sides(
 
     _call_io_place(
         reader,
+        monkeypatch,
         ver_layer="V",
         hor_layer="H",
         ver_width_mult=2.0,

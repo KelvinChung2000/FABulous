@@ -1,27 +1,25 @@
 """Tests for tile_io_place module."""
-# ruff: noqa: E402, SLF001, E501, F841
 
 import sys
 from unittest.mock import MagicMock, Mock
 
 import pytest
 
-from FABulous.fabric_generator.gds_generator.script.odb_protocol import odbBTermLike
-
 # Mock external dependencies BEFORE importing the module under test
-sys.modules["odb"] = MagicMock()
-sys.modules["openroad"] = MagicMock()
-
 from FABulous.fabric_definition.define import PinSortMode, Side
 from FABulous.fabric_generator.gds_generator.gen_io_pin_config_yaml import (
     PinOrderConfig,
 )
+from FABulous.fabric_generator.gds_generator.script.odb_protocol import odbBTermLike
 from FABulous.fabric_generator.gds_generator.script.tile_io_place import (
     PinPlacementPlan,
     SegmentInfo,
     equally_spaced_sequence,
     grid_to_tracks,
 )
+
+sys.modules["odb"] = MagicMock()
+sys.modules["openroad"] = MagicMock()
 
 
 class TestGridToTracks:
@@ -198,7 +196,7 @@ class TestSegmentInfo:
         """Test error on invalid sort mode."""
         segment_config = PinOrderConfig(
             pins=["pin.*"],
-            sort_mode=PinSortMode.BUS_MAJOR,  # Valid mode, but we'll test the error in from_config
+            sort_mode=PinSortMode.BUS_MAJOR,
             min_distance=None,
             max_distance=None,
             reverse_result=False,
@@ -215,7 +213,6 @@ class TestSegmentInfo:
         }
 
         with pytest.raises(KeyError):
-            # This will fail when trying to access PinSortMode[segment_config_dict["sort_mode"]]
             PinSortMode[segment_config_dict["sort_mode"]]
 
     def test_duplicate_regex_match(self) -> None:
@@ -639,7 +636,6 @@ class TestIntegration:
     @pytest.mark.parametrize(
         ("sort_mode", "expected_order"),
         [
-            # BUS_MAJOR mode: bus name first (addr < data alphabetically), then numeric index
             (
                 "bus_major",
                 [
@@ -650,7 +646,6 @@ class TestIntegration:
                     "data[8]",
                 ],
             ),
-            # BIT_MINOR mode: numeric index first, then bus name (addr < data alphabetically)
             (
                 "bit_minor",
                 [
@@ -741,7 +736,7 @@ class TestIntegration:
         assert segment.reverse_result is True
 
     def test_multi_tile_fabric_dimensions(self) -> None:
-        """Test that fabric dimensions are calculated correctly for multi-tile configs."""
+        """Test fabric dimensions are calculated correctly for multi-tile configs."""
         config = {
             "X0Y0": {"N": [{"pins": ["pin0"], "sort_mode": "bus_major"}]},
             "X2Y0": {"N": [{"pins": ["pin1"], "sort_mode": "bus_major"}]},

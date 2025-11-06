@@ -362,7 +362,7 @@ requires-dist = [
     { name = "gnureadline", marker = "sys_platform != 'win32'", specifier = ">=8.2.0" },
     { name = "loguru", specifier = ">=0.7.0" },
     { name = "packaging", specifier = ">=25.0" },
-    { name = "pydantic", specifier = ">=2.12" },
+    { name = "pydantic", specifier = ">=2.12.1" },
     { name = "pydantic-settings", specifier = ">=2.10.1" },
     { name = "pyreadline3", marker = "sys_platform == 'win32'", specifier = ">=3.4.0" },
     { name = "python-dotenv", specifier = ">=1.0.0" },

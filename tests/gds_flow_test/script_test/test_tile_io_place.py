@@ -297,7 +297,7 @@ class TestPinPlacementPlan:
         """Test initialization with basic tile config."""
         config = {
             "X0Y0": {
-                "N": [
+                "NORTH": [
                     {
                         "pins": ["clk", "rst"],
                         "sort_mode": "bus_major",
@@ -324,9 +324,9 @@ class TestPinPlacementPlan:
     def test_init_multi_tile_config(self) -> None:
         """Test initialization with multiple tiles."""
         config = {
-            "X0Y0": {"N": [{"pins": ["pin0"], "sort_mode": "bus_major"}]},
-            "X1Y0": {"N": [{"pins": ["pin1"], "sort_mode": "bus_major"}]},
-            "X2Y1": {"E": [{"pins": ["pin2"], "sort_mode": "bus_major"}]},
+            "X0Y0": {"NORTH": [{"pins": ["pin0"], "sort_mode": "bus_major"}]},
+            "X1Y0": {"NORTH": [{"pins": ["pin1"], "sort_mode": "bus_major"}]},
+            "X2Y1": {"EAST": [{"pins": ["pin2"], "sort_mode": "bus_major"}]},
         }
 
         pins = [Mock(getName=lambda n=f"pin{i}": n) for i in range(3)]
@@ -341,7 +341,7 @@ class TestPinPlacementPlan:
 
     def test_unmatched_design_pins(self) -> None:
         """Test handling of unmatched design pins."""
-        config = {"X0Y0": {"N": [{"pins": ["clk"], "sort_mode": "bus_major"}]}}
+        config = {"X0Y0": {"NORTH": [{"pins": ["clk"], "sort_mode": "bus_major"}]}}
 
         mock_clk = Mock()
         mock_clk.getName.return_value = "clk"
@@ -355,7 +355,9 @@ class TestPinPlacementPlan:
 
     def test_unmatched_config_pins_error(self) -> None:
         """Test error on unmatched config pins."""
-        config = {"X0Y0": {"N": [{"pins": ["nonexistent"], "sort_mode": "bus_major"}]}}
+        config = {
+            "X0Y0": {"NORTH": [{"pins": ["nonexistent"], "sort_mode": "bus_major"}]}
+        }
 
         with pytest.raises(SystemExit):
             PinPlacementPlan(config, [], "unmatched_cfg")
@@ -364,7 +366,7 @@ class TestPinPlacementPlan:
         """Test that non-boundary tiles cannot have pin configs."""
         config = {
             "X0Y0": {
-                "E": [{"pins": ["pin0"], "sort_mode": "bus_major"}]
+                "EAST": [{"pins": ["pin0"], "sort_mode": "bus_major"}]
             },  # X0Y0 East neighbor is X1Y0, which doesn't exist in config
         }
 
@@ -377,7 +379,9 @@ class TestPinPlacementPlan:
 
     def test_allocate_tracks_single_tile(self) -> None:
         """Test track allocation for a single tile."""
-        config = {"X0Y0": {"N": [{"pins": ["pin0", "pin1"], "sort_mode": "bus_major"}]}}
+        config = {
+            "X0Y0": {"NORTH": [{"pins": ["pin0", "pin1"], "sort_mode": "bus_major"}]}
+        }
 
         pins = [Mock(getName=lambda n=f"pin{i}": n) for i in range(2)]
         for pin in pins:
@@ -396,8 +400,8 @@ class TestPinPlacementPlan:
     def test_allocate_tracks_multiple_tiles(self) -> None:
         """Test track allocation across multiple tiles."""
         config = {
-            "X0Y0": {"N": [{"pins": ["pin0"], "sort_mode": "bus_major"}]},
-            "X1Y0": {"N": [{"pins": ["pin1"], "sort_mode": "bus_major"}]},
+            "X0Y0": {"NORTH": [{"pins": ["pin0"], "sort_mode": "bus_major"}]},
+            "X1Y0": {"NORTH": [{"pins": ["pin1"], "sort_mode": "bus_major"}]},
         }
 
         pins = [Mock(getName=lambda n=f"pin{i}": n) for i in range(2)]
@@ -417,7 +421,9 @@ class TestPinPlacementPlan:
         """Test ensuring minimum distances for segments."""
         config = {
             "X0Y0": {
-                "N": [{"pins": ["pin0"], "sort_mode": "bus_major", "min_distance": 0.5}]
+                "NORTH": [
+                    {"pins": ["pin0"], "sort_mode": "bus_major", "min_distance": 0.5}
+                ]
             }
         }
 
@@ -433,7 +439,7 @@ class TestPinPlacementPlan:
 
     def test_assign_unmatched_pins(self) -> None:
         """Test assigning unmatched pins to segments."""
-        config = {"X0Y0": {"N": [{"pins": ["pin0"], "sort_mode": "bus_major"}]}}
+        config = {"X0Y0": {"NORTH": [{"pins": ["pin0"], "sort_mode": "bus_major"}]}}
 
         mock_pin0 = Mock()
         mock_pin0.getName.return_value = "pin0"
@@ -560,7 +566,7 @@ class TestIntegration:
         """
         config = {
             "X0Y0": {
-                "N": [
+                "NORTH": [
                     {
                         "pins": ["pin0", "pin1"],
                         "sort_mode": "bus_major",
@@ -611,7 +617,7 @@ class TestIntegration:
         """Test that allocated tracks respect max_distance constraints."""
         config = {
             "X0Y0": {
-                "N": [
+                "NORTH": [
                     {
                         "pins": ["pin0", "pin1", "pin2"],
                         "sort_mode": "bus_major",
@@ -714,7 +720,7 @@ class TestIntegration:
         """
         config = {
             "X0Y0": {
-                "N": [
+                "NORTH": [
                     {
                         "pins": [".*\\[.*\\]"],  # Single regex matching both buses
                         "sort_mode": sort_mode,
@@ -749,7 +755,7 @@ class TestIntegration:
         """Test that reverse_result actually reverses the pin order."""
         config = {
             "X0Y0": {
-                "S": [
+                "SOUTH": [
                     {
                         "pins": ["pin0", "pin1", "pin2"],
                         "sort_mode": "bus_major",
@@ -778,9 +784,9 @@ class TestIntegration:
     def test_multi_tile_fabric_dimensions(self) -> None:
         """Test that fabric dimensions are calculated correctly for multi-tile configs."""
         config = {
-            "X0Y0": {"N": [{"pins": ["pin0"], "sort_mode": "bus_major"}]},
-            "X2Y0": {"N": [{"pins": ["pin1"], "sort_mode": "bus_major"}]},
-            "X1Y3": {"E": [{"pins": ["pin2"], "sort_mode": "bus_major"}]},
+            "X0Y0": {"NORTH": [{"pins": ["pin0"], "sort_mode": "bus_major"}]},
+            "X2Y0": {"NORTH": [{"pins": ["pin1"], "sort_mode": "bus_major"}]},
+            "X1Y3": {"EAST": [{"pins": ["pin2"], "sort_mode": "bus_major"}]},
         }
 
         mock_pins = []
@@ -798,7 +804,7 @@ class TestIntegration:
         """Test handling of multiple segments on the same tile side."""
         config = {
             "X0Y0": {
-                "N": [
+                "NORTH": [
                     {"pins": ["clk"], "sort_mode": "bus_major"},
                     {"pins": ["rst"], "sort_mode": "bus_major"},
                     {"pins": ["data.*"], "sort_mode": "bus_major"},

@@ -29,7 +29,7 @@ from conftest import (
 @pytest.fixture
 def _io_place_setup(
     mock_odb_io_place: SimpleNamespace, monkeypatch: pytest.MonkeyPatch
-):  # noqa: ANN001, ANN202
+) -> None:  # noqa: ANN001, ANN202
     """Setup io_place with mocked OdbReader and odb module."""
 
     from FABulous.fabric_generator.gds_generator.script import fabric_io_place

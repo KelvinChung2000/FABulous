@@ -1,9 +1,9 @@
 """Tests for tile_io_place module."""
 
 import sys
-from unittest.mock import MagicMock, Mock
 
 import pytest
+from pytest_mock import MockerFixture
 
 # Mock external dependencies BEFORE importing the module under test
 from FABulous.fabric_definition.define import PinSortMode, Side
@@ -18,8 +18,11 @@ from FABulous.fabric_generator.gds_generator.script.tile_io_place import (
     grid_to_tracks,
 )
 
-sys.modules["odb"] = MagicMock()
-sys.modules["openroad"] = MagicMock()
+
+@pytest.fixture(autouse=True)
+def mock_modules(mocker: MockerFixture) -> None:
+    sys.modules["odb"] = mocker.MagicMock()
+    sys.modules["openroad"] = mocker.MagicMock()
 
 
 class TestGridToTracks:
@@ -49,10 +52,10 @@ class TestGridToTracks:
 class TestEquallySpacedSequence:
     """Test suite for equally_spaced_sequence function."""
 
-    def test_pins_equal_tracks(self) -> None:
+    def test_pins_equal_tracks(self, mocker: MockerFixture) -> None:
         """Test when number of pins equals number of tracks."""
         mock_pins: list[int | odbBTermLike] = [
-            Mock(getName=lambda i=i: f"pin{i}") for i in range(5)
+            mocker.Mock(getName=lambda i=i: f"pin{i}") for i in range(5)
         ]
         tracks = [0.0, 100.0, 200.0, 300.0, 400.0]
 
@@ -61,10 +64,10 @@ class TestEquallySpacedSequence:
         assert len(result) == 5
         assert all(result[i][0] == tracks[i] for i in range(5))
 
-    def test_pins_less_than_tracks(self) -> None:
+    def test_pins_less_than_tracks(self, mocker: MockerFixture) -> None:
         """Test even spacing when pins < tracks."""
         mock_pins: list[int | odbBTermLike] = [
-            Mock(getName=lambda i=i: f"pin{i}") for i in range(3)
+            mocker.Mock(getName=lambda i=i: f"pin{i}") for i in range(3)
         ]
         tracks = [0.0, 100.0, 200.0, 300.0, 400.0, 500.0, 600.0]
 
@@ -84,12 +87,12 @@ class TestEquallySpacedSequence:
 
         assert len(result) == 0
 
-    def test_with_virtual_pins(self) -> None:
+    def test_with_virtual_pins(self, mocker: MockerFixture) -> None:
         """Test spacing with virtual pins (integers in list)."""
         mock_pins: list[int | odbBTermLike] = [
-            Mock(getName=lambda: "pin0"),
+            mocker.Mock(getName=lambda: "pin0"),
             2,
-            Mock(getName=lambda: "pin1"),
+            mocker.Mock(getName=lambda: "pin1"),
         ]
         tracks = [0.0, 100.0, 200.0, 300.0, 400.0, 500.0, 600.0, 700.0]
 
@@ -101,10 +104,10 @@ class TestEquallySpacedSequence:
         expected_positions = [0.0, 600.0]  # Pins should be at these tracks
         assert all(result[i][0] == expected_positions[i] for i in range(2))
 
-    def test_too_many_pins(self) -> None:
+    def test_too_many_pins(self, mocker: MockerFixture) -> None:
         """Test error when pins exceed available tracks."""
         mock_pins: list[int | odbBTermLike] = [
-            Mock(getName=lambda i=i: f"pin{i}") for i in range(10)
+            mocker.Mock(getName=lambda i=i: f"pin{i}") for i in range(10)
         ]
         tracks = [0.0, 100.0, 200.0]
 
@@ -117,7 +120,7 @@ class TestEquallySpacedSequence:
 class TestSegmentInfo:
     """Test suite for SegmentInfo dataclass."""
 
-    def test_from_config_basic(self) -> None:
+    def test_from_config_basic(self, mocker: MockerFixture) -> None:
         """Test basic SegmentInfo creation from config."""
         segment_config = PinOrderConfig(
             pins=["pin.*"],
@@ -127,7 +130,7 @@ class TestSegmentInfo:
             reverse_result=False,
         )
 
-        mock_bterm = Mock()
+        mock_bterm = mocker.Mock()
         mock_bterm.getName.return_value = "pin_test"
         bterms = [mock_bterm]
         regex_by_bterm = {}
@@ -146,7 +149,7 @@ class TestSegmentInfo:
         assert len(seg_info.pin_entries) == 1
         assert mock_bterm in regex_by_bterm
 
-    def test_from_config_with_virtual_pins(self) -> None:
+    def test_from_config_with_virtual_pins(self, mocker: MockerFixture) -> None:
         """Test SegmentInfo with virtual pins."""
         segment_config = PinOrderConfig(
             pins=["pin1", 3, "pin2"],
@@ -156,9 +159,9 @@ class TestSegmentInfo:
             reverse_result=True,
         )
 
-        mock_bterm1 = Mock()
+        mock_bterm1 = mocker.Mock()
         mock_bterm1.getName.return_value = "pin1"
-        mock_bterm2 = Mock()
+        mock_bterm2 = mocker.Mock()
         mock_bterm2.getName.return_value = "pin2"
         bterms = [mock_bterm1, mock_bterm2]
 
@@ -179,7 +182,7 @@ class TestSegmentInfo:
         assert 3 in seg_info.pin_entries  # Virtual pin
         assert seg_info.reverse_result is True
 
-    def test_actual_pin_count(self) -> None:
+    def test_actual_pin_count(self, mocker: MockerFixture) -> None:
         """Test actual_pin_count property."""
         seg_info = SegmentInfo(
             side=Side.NORTH,
@@ -187,7 +190,7 @@ class TestSegmentInfo:
             min_distance=None,
             max_distance=None,
             reverse_result=False,
-            pin_entries=[Mock(), 2, Mock(), 3, Mock()],
+            pin_entries=[mocker.Mock(), 2, mocker.Mock(), 3, mocker.Mock()],
         )
 
         assert seg_info.actual_pin_count == 3
@@ -215,7 +218,7 @@ class TestSegmentInfo:
         with pytest.raises(KeyError):
             PinSortMode[segment_config_dict["sort_mode"]]
 
-    def test_duplicate_regex_match(self) -> None:
+    def test_duplicate_regex_match(self, mocker: MockerFixture) -> None:
         """Test error when multiple regexes match same pin."""
         segment_config1 = PinOrderConfig(
             pins=["pin.*"],
@@ -232,7 +235,7 @@ class TestSegmentInfo:
             reverse_result=False,
         )
 
-        mock_bterm = Mock()
+        mock_bterm = mocker.Mock()
         mock_bterm.getName.return_value = "pin_test"
         bterms = [mock_bterm]
         regex_by_bterm = {}
@@ -268,7 +271,7 @@ class TestPinPlacementPlan:
         assert all(len(segs) == 0 for segs in plan.segments_by_side.values())
         assert plan.fabric_dimensions == (1, 1)
 
-    def test_init_basic_config(self) -> None:
+    def test_init_basic_config(self, mocker: MockerFixture) -> None:
         """Test initialization with basic tile config."""
         config = {
             "X0Y0": {
@@ -284,9 +287,9 @@ class TestPinPlacementPlan:
             }
         }
 
-        mock_clk = Mock()
+        mock_clk = mocker.Mock()
         mock_clk.getName.return_value = "clk"
-        mock_rst = Mock()
+        mock_rst = mocker.Mock()
         mock_rst.getName.return_value = "rst"
         bterms = [mock_clk, mock_rst]
 
@@ -296,7 +299,7 @@ class TestPinPlacementPlan:
         assert plan.tile_counts_by_side[Side.NORTH] == 1
         assert plan.fabric_dimensions == (1, 1)
 
-    def test_init_multi_tile_config(self) -> None:
+    def test_init_multi_tile_config(self, mocker: MockerFixture) -> None:
         """Test initialization with multiple tiles."""
         config = {
             "X0Y0": {"N": [{"pins": ["pin0"], "sort_mode": "bus_major"}]},
@@ -304,7 +307,7 @@ class TestPinPlacementPlan:
             "X2Y1": {"E": [{"pins": ["pin2"], "sort_mode": "bus_major"}]},
         }
 
-        pins = [Mock(getName=lambda n=f"pin{i}": n) for i in range(3)]
+        pins = [mocker.Mock(getName=lambda n=f"pin{i}": n) for i in range(3)]
         for pin in pins:
             pin.getName.return_value = pin.getName()
 
@@ -314,13 +317,13 @@ class TestPinPlacementPlan:
         assert plan.tile_counts_by_side[Side.NORTH] == 2
         assert plan.tile_counts_by_side[Side.EAST] == 1
 
-    def test_unmatched_design_pins(self) -> None:
+    def test_unmatched_design_pins(self, mocker: MockerFixture) -> None:
         """Test handling of unmatched design pins."""
         config = {"X0Y0": {"N": [{"pins": ["clk"], "sort_mode": "bus_major"}]}}
 
-        mock_clk = Mock()
+        mock_clk = mocker.Mock()
         mock_clk.getName.return_value = "clk"
-        mock_rst = Mock()
+        mock_rst = mocker.Mock()
         mock_rst.getName.return_value = "rst"
         bterms = [mock_clk, mock_rst]
 
@@ -335,7 +338,7 @@ class TestPinPlacementPlan:
         with pytest.raises(SystemExit):
             PinPlacementPlan(config, [], "unmatched_cfg")
 
-    def test_boundary_validation(self) -> None:
+    def test_boundary_validation(self, mocker: MockerFixture) -> None:
         """Test that non-boundary tiles cannot have pin configs."""
         config = {
             "X0Y0": {
@@ -343,18 +346,18 @@ class TestPinPlacementPlan:
             },  # X0Y0 East neighbor is X1Y0, which doesn't exist in config
         }
 
-        mock_pin0 = Mock()
+        mock_pin0 = mocker.Mock()
         mock_pin0.getName.return_value = "pin0"
 
         # This should work - X0Y0 is on the East boundary
         plan = PinPlacementPlan(config, [mock_pin0], "none")
         assert len(plan.segments_by_side[Side.EAST]) == 1
 
-    def test_allocate_tracks_single_tile(self) -> None:
+    def test_allocate_tracks_single_tile(self, mocker: MockerFixture) -> None:
         """Test track allocation for a single tile."""
         config = {"X0Y0": {"N": [{"pins": ["pin0", "pin1"], "sort_mode": "bus_major"}]}}
 
-        pins = [Mock(getName=lambda n=f"pin{i}": n) for i in range(2)]
+        pins = [mocker.Mock(getName=lambda n=f"pin{i}": n) for i in range(2)]
         for pin in pins:
             pin.getName.return_value = pin.getName()
 
@@ -368,14 +371,14 @@ class TestPinPlacementPlan:
         assert len(plan.track_coordinates[Side.NORTH]) == 1
         assert len(plan.track_coordinates[Side.NORTH][0]) > 0
 
-    def test_allocate_tracks_multiple_tiles(self) -> None:
+    def test_allocate_tracks_multiple_tiles(self, mocker: MockerFixture) -> None:
         """Test track allocation across multiple tiles."""
         config = {
             "X0Y0": {"N": [{"pins": ["pin0"], "sort_mode": "bus_major"}]},
             "X1Y0": {"N": [{"pins": ["pin1"], "sort_mode": "bus_major"}]},
         }
 
-        pins = [Mock(getName=lambda n=f"pin{i}": n) for i in range(2)]
+        pins = [mocker.Mock(getName=lambda n=f"pin{i}": n) for i in range(2)]
         for pin in pins:
             pin.getName.return_value = pin.getName()
 
@@ -388,7 +391,7 @@ class TestPinPlacementPlan:
 
         assert len(plan.track_coordinates[Side.NORTH]) == 2
 
-    def test_ensure_min_distances(self) -> None:
+    def test_ensure_min_distances(self, mocker: MockerFixture) -> None:
         """Test ensuring minimum distances for segments."""
         config = {
             "X0Y0": {
@@ -396,7 +399,7 @@ class TestPinPlacementPlan:
             }
         }
 
-        mock_pin = Mock()
+        mock_pin = mocker.Mock()
         mock_pin.getName.return_value = "pin0"
 
         plan = PinPlacementPlan(config, [mock_pin], "none")
@@ -406,13 +409,13 @@ class TestPinPlacementPlan:
 
         assert plan.segments_by_side[Side.NORTH][0].min_distance == 1.0
 
-    def test_assign_unmatched_pins(self) -> None:
+    def test_assign_unmatched_pins(self, mocker: MockerFixture) -> None:
         """Test assigning unmatched pins to segments."""
         config = {"X0Y0": {"N": [{"pins": ["pin0"], "sort_mode": "bus_major"}]}}
 
-        mock_pin0 = Mock()
+        mock_pin0 = mocker.Mock()
         mock_pin0.getName.return_value = "pin0"
-        mock_unmatched = Mock()
+        mock_unmatched = mocker.Mock()
         mock_unmatched.getName.return_value = "unmatched_pin"
 
         plan = PinPlacementPlan(config, [mock_pin0, mock_unmatched], "none")
@@ -434,7 +437,7 @@ class TestPinPlacementPlan:
 class TestPinPlacementPlanPrivateMethods:
     """Test suite for PinPlacementPlan private methods."""
 
-    def test_group_segments_by_tile(self) -> None:
+    def test_group_segments_by_tile(self, mocker: MockerFixture) -> None:
         """Test _group_segments_by_tile method."""
         seg1 = SegmentInfo(
             side=Side.NORTH,
@@ -442,7 +445,7 @@ class TestPinPlacementPlanPrivateMethods:
             min_distance=None,
             max_distance=None,
             reverse_result=False,
-            pin_entries=[Mock()],
+            pin_entries=[mocker.Mock()],
             tile_index=0,
             tile_x=0,
             tile_y=0,
@@ -453,7 +456,7 @@ class TestPinPlacementPlanPrivateMethods:
             min_distance=None,
             max_distance=None,
             reverse_result=False,
-            pin_entries=[Mock()],
+            pin_entries=[mocker.Mock()],
             tile_index=1,
             tile_x=1,
             tile_y=0,
@@ -492,7 +495,7 @@ class TestPinPlacementPlanPrivateMethods:
         )
         assert index == 4  # Should be clamped to max
 
-    def test_allocate_tracks_for_tile(self) -> None:
+    def test_allocate_tracks_for_tile(self, mocker: MockerFixture) -> None:
         """Test _allocate_tracks_for_tile method."""
         seg1 = SegmentInfo(
             side=Side.NORTH,
@@ -500,7 +503,7 @@ class TestPinPlacementPlanPrivateMethods:
             min_distance=None,
             max_distance=None,
             reverse_result=False,
-            pin_entries=[Mock(), Mock()],
+            pin_entries=[mocker.Mock(), mocker.Mock()],
         )
         seg2 = SegmentInfo(
             side=Side.NORTH,
@@ -508,7 +511,7 @@ class TestPinPlacementPlanPrivateMethods:
             min_distance=None,
             max_distance=None,
             reverse_result=False,
-            pin_entries=[Mock()],
+            pin_entries=[mocker.Mock()],
         )
 
         tracks = PinPlacementPlan._allocate_tracks_for_tile(
@@ -526,7 +529,9 @@ class TestPinPlacementPlanPrivateMethods:
 class TestIntegration:
     """Integration tests for complete pin placement workflow."""
 
-    def test_track_allocation_respects_min_distance(self) -> None:
+    def test_track_allocation_respects_min_distance(
+        self, mocker: MockerFixture
+    ) -> None:
         """Test that min_distance filtering works correctly.
 
         The allocate_tracks() method generates raw tracks based on the track grid.
@@ -547,7 +552,7 @@ class TestIntegration:
             }
         }
 
-        mock_pins = [Mock(getName=lambda i=i: f"pin{i}") for i in range(3)]
+        mock_pins = [mocker.Mock(getName=lambda i=i: f"pin{i}") for i in range(3)]
         for pin in mock_pins:
             pin.getName.return_value = pin.getName()
 
@@ -597,7 +602,9 @@ class TestIntegration:
                 f"Distance {distance} < min_distance {min_distance}"
             )
 
-    def test_track_allocation_respects_max_distance(self) -> None:
+    def test_track_allocation_respects_max_distance(
+        self, mocker: MockerFixture
+    ) -> None:
         """Test that allocated tracks respect max_distance constraints."""
         config = {
             "X0Y0": {
@@ -613,7 +620,7 @@ class TestIntegration:
             }
         }
 
-        mock_pins = [Mock(getName=lambda i=i: f"pin{i}") for i in range(3)]
+        mock_pins = [mocker.Mock(getName=lambda i=i: f"pin{i}") for i in range(3)]
         for pin in mock_pins:
             pin.getName.return_value = pin.getName()
 
@@ -662,6 +669,7 @@ class TestIntegration:
         self,
         sort_mode: str,
         expected_order: list[str],
+        mocker: MockerFixture,
     ) -> None:
         """Test that pins are sorted correctly in different sort modes.
 
@@ -690,7 +698,7 @@ class TestIntegration:
         pin_names_input = ["data[5]", "addr[2]", "data[8]", "addr[5]", "data[2]"]
         mock_pins = []
         for name in pin_names_input:
-            pin = Mock()
+            pin = mocker.Mock()
             pin.getName.return_value = name
             mock_pins.append(pin)
 
@@ -705,7 +713,7 @@ class TestIntegration:
         pin_names = [p.getName() for p in segment.pin_entries if not isinstance(p, int)]
         assert pin_names == expected_order
 
-    def test_reverse_result_reverses_pin_order(self) -> None:
+    def test_reverse_result_reverses_pin_order(self, mocker: MockerFixture) -> None:
         """Test that reverse_result actually reverses the pin order."""
         config = {
             "X0Y0": {
@@ -723,7 +731,7 @@ class TestIntegration:
 
         mock_pins = []
         for i in range(3):
-            pin = Mock()
+            pin = mocker.Mock()
             pin.getName.return_value = f"pin{i}"
             mock_pins.append(pin)
 
@@ -735,7 +743,7 @@ class TestIntegration:
         # Verify reverse_result is set
         assert segment.reverse_result is True
 
-    def test_multi_tile_fabric_dimensions(self) -> None:
+    def test_multi_tile_fabric_dimensions(self, mocker: MockerFixture) -> None:
         """Test fabric dimensions are calculated correctly for multi-tile configs."""
         config = {
             "X0Y0": {"N": [{"pins": ["pin0"], "sort_mode": "bus_major"}]},
@@ -745,7 +753,7 @@ class TestIntegration:
 
         mock_pins = []
         for i in range(3):
-            pin = Mock()
+            pin = mocker.Mock()
             pin.getName.return_value = f"pin{i}"
             mock_pins.append(pin)
 
@@ -754,7 +762,7 @@ class TestIntegration:
         # Fabric should be (3, 4) because X goes 0-2 and Y goes 0-3
         assert plan.fabric_dimensions == (3, 4)
 
-    def test_multi_segment_per_tile(self) -> None:
+    def test_multi_segment_per_tile(self, mocker: MockerFixture) -> None:
         """Test handling of multiple segments on the same tile side."""
         config = {
             "X0Y0": {
@@ -766,13 +774,13 @@ class TestIntegration:
             }
         }
 
-        mock_clk = Mock()
+        mock_clk = mocker.Mock()
         mock_clk.getName.return_value = "clk"
-        mock_rst = Mock()
+        mock_rst = mocker.Mock()
         mock_rst.getName.return_value = "rst"
-        mock_data0 = Mock()
+        mock_data0 = mocker.Mock()
         mock_data0.getName.return_value = "data0"
-        mock_data1 = Mock()
+        mock_data1 = mocker.Mock()
         mock_data1.getName.return_value = "data1"
 
         bterms = [mock_clk, mock_rst, mock_data0, mock_data1]

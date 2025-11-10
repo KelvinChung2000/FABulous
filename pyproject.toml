@@ -80,6 +80,7 @@ ignore-nested-classes = true
 ignore-setters = true
 ignore-overloaded-functions = true
 fail-under = 95
+ignore-regex = ".*Like$"
 exclude = ["setup.py", "docs", "build", ".venv", "demo/*", "tests"]
 
 [dependency-groups]
@@ -95,6 +96,7 @@ dev = [
   "taskipy>=1.14.0",
   "pyyaml>=6.0.0",
   "interrogate>=1.7.0",
+  "librelane>=3.0.0.dev43",
 ]
 
 [tool.coverage.run]
@@ -162,6 +164,7 @@ project-upgrade = "uv lock --upgrade && nix flake update && task test"
 [tool.deptry]
 # Ignore platform-specific readline dependencies for DEP002 (defined but not used)
 # These are indirect requirements needed by cmd2 and other interactive CLI tools
+extend_exclude = ["FABulous/fabric_generator/gds_generator/script"]
 
 [tool.deptry.per_rule_ignores]
 DEP002 = ["pyreadline3", "gnureadline"]

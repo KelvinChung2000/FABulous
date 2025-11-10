@@ -11,6 +11,11 @@ from decimal import Decimal
 from pathlib import Path
 from typing import cast
 
+import pickle
+from pathlib import Path
+import tempfile
+import os
+
 import yaml
 from librelane.config.variable import Macro
 from loguru import logger
@@ -125,6 +130,20 @@ class FABulous_API:
         if fabric_dir.suffix == ".csv":
             self.fabric = fileParser.parseFabricCSV(fabric_dir)
             self.geometryGenerator = GeometryGenerator(self.fabric)
+            
+            # Save fabric object as fabric.pkl in the same directory as fabric.csv
+            # We will use pickle to serialize the fabric object to avoid re-parsing the CSV file
+            path_dir = os.path.dirname(fabric_dir)
+            path = Path(f"{path_dir}/fabric.pkl")
+            obj = self.fabric
+            
+            # Use a temporary file to ensure atomic write
+            with tempfile.NamedTemporaryFile(dir=path_dir, delete=False) as tmp:
+                tmp_path = Path(tmp.name)
+                
+                pickle.dump(obj, tmp, protocol=pickle.HIGHEST_PROTOCOL)
+            os.replace(tmp_path, path)
+            
         else:
             logger.error("Only .csv files are supported for fabric loading")
             raise ValueError

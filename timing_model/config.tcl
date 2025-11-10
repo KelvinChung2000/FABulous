@@ -1,0 +1,13 @@
+set env(CLK_FREQ_MHZ) 40
+set env(TILES_DIR) "./IHP/fabrics/RRAM_FPGA-main/MFPGA_fabric_for_tapeout/IP/Tiles/E_IO"
+set env(FINAL_NL) "./IHP/fabrics/RRAM_FPGA-main/MFPGA_fabric_for_tapeout/IP/Tiles/E_IO/macro/nl/E_IO.nl.v"
+set env(NOM_SPEF) "./IHP/fabrics/RRAM_FPGA-main/MFPGA_fabric_for_tapeout/IP/Tiles/E_IO/macro/spef/nom/E_IO.nom.spef"
+set env(OUTPUT_DIR) "./IHP/output"
+set env(PIPS_FILE) "./IHP/fabrics/RRAM_FPGA-main/MFPGA_fabric_for_tapeout/IP/Tiles/E_IO/npnr_times/pips.txt"
+set env(TOP_NAME) "E_IO"
+set env(EXTRA_VERILOG_FILES) "./IHP/fabrics/RRAM_FPGA-main/MFPGA_fabric_for_tapeout/IP/Tiles/*.v"
+set env(LIB_CORNER_FILE) "./IHP/IHP-Open-PDK/ihp-sg13g2/libs.ref/sg13g2_stdcell/lib/sg13g2_stdcell_typ_1p20V_25C.lib"
+set env(TECHMAP_FILES) "./IHP/IHP-Open-PDK/ihp-sg13g2/libs.tech/librelane/sg13g2_stdcell/*.v"
+set env(TIEHI_CELL_AND_PORT) "sg13g2_tiehi L_HI"
+set env(TIELO_CELL_AND_PORT) "sg13g2_tielo L_LO"
+set env(MIN_BUF_CELL_AND_PORTS) "sg13g2_buf_1 A X"

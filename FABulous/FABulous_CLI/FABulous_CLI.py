@@ -1272,8 +1272,9 @@ class FABulous_CLI(Cmd):
         "--optimise",
         "-opt",
         help="Optimize the GDS layout",
-        default=OptMode.BALANCE,
+        default=OptMode.NO_OPT,
         type=OptMode,
+        const=OptMode.BALANCE,
     )
     gds_parser.add_argument(
         "--override",
@@ -1338,6 +1339,7 @@ class FABulous_CLI(Cmd):
         help="Optimize the GDS layout of all tiles",
         default=OptMode.NO_OPT,
         type=OptMode,
+        const=OptMode.BALANCE,
     )
 
     @with_argparser(gen_all_tile_parser)

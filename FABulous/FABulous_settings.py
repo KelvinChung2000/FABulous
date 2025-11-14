@@ -312,50 +312,34 @@ def init_context(
     if api_mode:
         logger.debug("API mode: skipping all validation")
         return FABulousSettings.model_construct()
+
     # 1. User config .env file (global)
     user_config_env = FAB_USER_CONFIG_DIR / ".env"
     if user_config_env.exists():
         env_files.append(user_config_env)
 
     # 2. User-provided global .env file
-    if global_dot_env:
-        if global_dot_env.exists():
-            env_files.append(global_dot_env)
-        else:
-            logger.warning(
-                f"Global .env file not found: {global_dot_env} this is ignored"
-            )
-    if global_dot_env and global_dot_env.exists():
+    if global_dot_env is not None and global_dot_env.exists():
         env_files.append(global_dot_env)
-    elif global_dot_env is not None:
+    else:
         logger.warning(
-            f"Global .env file not found: {global_dot_env} this entry is ignored"
+            f"Explicit Global .env file: {global_dot_env} is provided, "
+            "but this is not found, this entry is ignored"
         )
 
     # 3. cwd project dir .env
-    if project_dir is None:
-        if (Path().cwd() / ".FABulous" / ".env").exists():
-            env_files.append(Path().cwd() / ".FABulous" / ".env")
-    else:
-        logger.warning(
-            f"Project .env file not found: {Path().cwd() / '.FABulous' / '.env'} "
-            f"this entry is ignored"
-        )
+    if project_dir is None and (Path().cwd() / ".FABulous" / ".env").exists():
+        env_files.append(Path().cwd() / ".FABulous" / ".env")
 
     # 4. explicit project dir .env
     if project_dir is not None and (project_dir / ".FABulous" / ".env").exists():
         env_files.append(project_dir / ".FABulous" / ".env")
-    elif project_dir is not None:
-        logger.warning(
-            f"Project .env file not found: {project_dir / '.FABulous' / '.env'} "
-            f"this entry is ignored"
-        )
 
     # 5. User-provided project .env file (highest .env priority)
     if project_dot_env and project_dot_env.exists():
         env_files.append(project_dot_env)
         logger.info(f"Loading project .env file from {project_dot_env}")
-    elif project_dot_env is not None:
+    else:
         logger.warning(
             f"Project .env file not found: {project_dot_env} this entry is ignored"
         )
@@ -367,7 +351,6 @@ def init_context(
     else:
         _context_instance = FABulousSettings(_env_file=tuple(env_files))
 
-    logger.debug("FABulous context initialized")
     return _context_instance
 
 

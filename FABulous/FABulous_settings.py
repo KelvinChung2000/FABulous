@@ -35,11 +35,11 @@ class FABulousSettings(BaseSettings):
 
     user_config_dir: Path = Field(default_factory=lambda: FAB_USER_CONFIG_DIR)
 
-    yosys_path: Path | None = None
-    nextpnr_path: Path | None = None
-    iverilog_path: Path | None = None
-    vvp_path: Path | None = None
-    ghdl_path: Path | None = None
+    yosys_path: Path | str = Field(default="yosys", validate_default=True)
+    nextpnr_path: Path | str = Field(default="nextpnr-generic", validate_default=True)
+    iverilog_path: Path | str = Field(default="iverilog", validate_default=True)
+    vvp_path: Path | str = Field(default="vvp", validate_default=True)
+    ghdl_path: Path | str = Field(default="ghdl", validate_default=True)
     fabulator_root: Path | None = None
     oss_cad_suite: Path | None = None
 
@@ -225,8 +225,8 @@ class FABulousSettings(BaseSettings):
     )
     @classmethod
     def resolve_tool_paths(
-        cls, value: Path | None, info: ValidationInfo
-    ) -> Path | None:
+        cls, value: Path | str | None, info: ValidationInfo
+    ) -> Path | str:
         """Resolve tool paths by checking if tools are available in `PATH`.
 
         This method is used as a field validator to automatically resolve tool paths
@@ -250,8 +250,10 @@ class FABulousSettings(BaseSettings):
         This method logs a warning if a tool is not found in `PATH`, as some
         features may be unavailable without the tool.
         """
-        if value is not None:
+        if isinstance(value, Path):
             return value
+        if isinstance(value, str) and value != "" and Path(value).exists():
+            return Path(value).resolve()
         tool_map = {
             "yosys_path": "yosys",
             "nextpnr_path": "nextpnr-generic",
@@ -260,12 +262,6 @@ class FABulousSettings(BaseSettings):
             "ghdl_path": "ghdl",
         }
         tool = tool_map.get(info.field_name, None)  # type: ignore[attr-defined]
-        if tool is None:
-            logger.warning(
-                f"No tool found for {info.field_name} during settings initialisation. "
-                f"Some features may be unavailable."
-            )
-            return None
         tool_path = which(tool)
         if tool_path is not None:
             return Path(tool_path).resolve()
@@ -274,7 +270,7 @@ class FABulousSettings(BaseSettings):
             f"{tool} not found in PATH during settings initialisation. "
             f"Some features may be unavailable."
         )
-        return None
+        return tool_map[info.field_name]
 
 
 # Module-level singleton pattern for settings management
@@ -285,6 +281,7 @@ def init_context(
     project_dir: Path | None = None,
     global_dot_env: Path | None = None,
     project_dot_env: Path | None = None,
+    api_mode: bool = False,
 ) -> FABulousSettings:
     """Initialize the global FABulous context with settings.
 
@@ -310,6 +307,9 @@ def init_context(
     # Gather .env files in priority order
     env_files: list[Path] = []
 
+    if api_mode:
+        logger.debug("API mode: skipping all validation")
+        return FABulousSettings.model_construct()
     # 1. User config .env file (global)
     user_config_env = FAB_USER_CONFIG_DIR / ".env"
     if user_config_env.exists():
@@ -334,11 +334,11 @@ def init_context(
     if project_dir is None:
         if (Path().cwd() / ".FABulous" / ".env").exists():
             env_files.append(Path().cwd() / ".FABulous" / ".env")
-        elif project_dir is not None:
-            logger.warning(
-                f"Project .env file not found: {Path().cwd() / '.FABulous' / '.env'} "
-                f"this entry is ignored"
-            )
+    else:
+        logger.warning(
+            f"Project .env file not found: {Path().cwd() / '.FABulous' / '.env'} "
+            f"this entry is ignored"
+        )
 
     # 4. explicit project dir .env
     if project_dir is not None and (project_dir / ".FABulous" / ".env").exists():
@@ -385,10 +385,7 @@ def get_context() -> FABulousSettings:
     global _context_instance
 
     if _context_instance is None:
-        raise RuntimeError(
-            "FABulous context not initialized. Call init_context() first."
-        )
-
+        _context_instance = init_context(api_mode=True)
     return _context_instance
 
 

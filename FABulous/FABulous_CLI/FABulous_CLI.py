@@ -66,7 +66,7 @@ from FABulous.FABulous_CLI.helper import (
     remove_dir,
     wrap_with_except_handling,
 )
-from FABulous.FABulous_settings import get_context, init_context
+from FABulous.FABulous_settings import get_context
 
 META_DATA_DIR = ".FABulous"
 

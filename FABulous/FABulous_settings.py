@@ -317,32 +317,39 @@ def init_context(
     user_config_env = FAB_USER_CONFIG_DIR / ".env"
     if user_config_env.exists():
         env_files.append(user_config_env)
+        logger.debug(f"Loading user config .env file from {user_config_env}")
 
     # 2. User-provided global .env file
     if global_dot_env is not None and global_dot_env.exists():
         env_files.append(global_dot_env)
+        logger.info(f"Loading global .env file from {global_dot_env}")
     else:
-        logger.warning(
-            f"Explicit Global .env file: {global_dot_env} is provided, "
-            "but this is not found, this entry is ignored"
-        )
+        if global_dot_env is not None:
+            logger.warning(
+                f"Explicit Global .env file: {global_dot_env} is provided, "
+                "but this is not found, this entry is ignored"
+            )
 
     # 3. cwd project dir .env
     if project_dir is None and (Path().cwd() / ".FABulous" / ".env").exists():
         env_files.append(Path().cwd() / ".FABulous" / ".env")
+        logger.debug("Loading project .env file from cwd")
 
     # 4. explicit project dir .env
     if project_dir is not None and (project_dir / ".FABulous" / ".env").exists():
         env_files.append(project_dir / ".FABulous" / ".env")
+        logger.debug(f"Loading project .env file from project_dir: {project_dir}")
 
     # 5. User-provided project .env file (highest .env priority)
     if project_dot_env and project_dot_env.exists():
         env_files.append(project_dot_env)
         logger.info(f"Loading project .env file from {project_dot_env}")
     else:
-        logger.warning(
-            f"Project .env file not found: {project_dot_env} this entry is ignored"
-        )
+        if project_dot_env is not None:
+            logger.warning(
+                f"Explicit project .env file: {project_dot_env} is provided, "
+                "but this is not found, this entry is ignored"
+            )
 
     if project_dir:
         _context_instance = FABulousSettings(

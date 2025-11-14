@@ -644,8 +644,9 @@ class TestContextMethods:
         # Create global .env file with typical settings
         global_env = tmp_path / "global.env"
         global_env.touch()
-        set_key(global_env, "FAB_YOSYS_PATH", "/opt/oss-cad-suite/bin/yosys")
-        set_key(global_env, "FAB_OSS_CAD_SUITE", "/opt/oss-cad-suite")
+        set_key(global_env, "FAB_YOSYS_PATH", str(tmp_path / "yosys"))
+        set_key(global_env, "FAB_OSS_CAD_SUITE", str(tmp_path / "oss-cad-suite"))
+        (tmp_path / "yosys").touch()
 
         project_env = project / ".FABulous" / ".env"
         project_env.touch()
@@ -664,7 +665,7 @@ class TestContextMethods:
         assert settings.proj_dir == project
         assert settings.proj_lang == "verilog"
         assert settings.proj_version_created == Version("1.0.0")
-        assert str(settings.yosys_path) == "/opt/oss-cad-suite/bin/yosys"
+        assert str(settings.yosys_path) == str(tmp_path / "yosys")
 
     def test_debug_env_variable(
         self, project: Path, monkeypatch: pytest.MonkeyPatch

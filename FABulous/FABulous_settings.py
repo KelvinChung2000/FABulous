@@ -235,15 +235,15 @@ class FABulousSettings(BaseSettings):
 
         Parameters
         ----------
-        value : Path | None
+        value : Path | str | None
             The explicitly provided tool path, if any.
         info : ValidationInfo
             Validation context containing field information.
 
         Returns
         -------
-        Path | None
-            The resolved path to the tool if found, `None` otherwise.
+        Path | str
+            The resolved path to the tool if found, tool name otherwise.
 
         Notes
         -----
@@ -296,6 +296,8 @@ def init_context(
         Path to a global .env file (if any)
     project_dot_env : Path | None
         Path to a project-specific .env file (if any)
+    api_mode: bool
+        If True, skips all validation for API mode
 
     Returns
     -------
@@ -376,11 +378,6 @@ def get_context() -> FABulousSettings:
     -------
     FABulousSettings
         The current FABulousSettings instance
-
-    Raises
-    ------
-    RuntimeError
-        If context has not been initialized with init_context()
     """
     global _context_instance
 

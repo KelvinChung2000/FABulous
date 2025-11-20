@@ -1397,9 +1397,6 @@ class FABulous_CLI(Cmd):
             self.projectDir,
             self.projectDir / "Fabric" / "macro",
             base_config_path=self.projectDir / "Fabric" / "gds_config.yaml",
-            tile_opt_config=self.projectDir
-            / "Fabric"
-            / "tile_optimisation_summary.json",
         )
 
     gui_parser = Cmd2ArgumentParser()

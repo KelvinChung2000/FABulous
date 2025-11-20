@@ -14,6 +14,8 @@ import typer
 from loguru import logger
 from packaging.version import Version
 
+import timing_model.FABulousTimingModel as FAB_TimingModel
+
 from FABulous.custom_exception import PipelineCommandError
 from FABulous.fabric_definition.define import HDLType
 from FABulous.FABulous_CLI import FABulous_CLI
@@ -207,7 +209,7 @@ def common_options(
     )
 
     if (s := ctx.invoked_subcommand) and (
-        s.startswith("install") or s == "create-project" or s == "c"
+        s.startswith("install") or s.startswith("timing") or s == "create-project" or s == "c"
     ):
         return
 
@@ -244,6 +246,46 @@ def check_version_compatibility(_: Path) -> None:
             "compatible with the current FABulous-FPGA version."
         )
 
+@app.command("timing-model")
+def timing_model_cmd(
+    project_dir:            Annotated[Path,  typer.Argument(                          help="Directory to create a project")],
+    out_file:               Annotated[Path,  typer.Option("--out_file",               help="normally project_dir/.Fabulous/pips.txt")],
+    lib_corner_file:        Annotated[Path,  typer.Option("--lib_corner_file",        help="path to PDK stdcell lib file")],
+    techmaps:               Annotated[str,   typer.Option("--techmaps",               help="PDK techmaps like tribuf mux...")],
+    tiehi_cell_and_port:    Annotated[str,   typer.Option("--tiehi_cell_and_port",    help="e.g sg13g2_tiehi L_HI")],
+    tielo_cell_and_port:    Annotated[str,   typer.Option("--tielo_cell_and_port",    help="e.g sg13g2_tielo L_LO")],
+    min_buf_cell_and_ports: Annotated[str,   typer.Option("--min_buf_cell_and_ports", help="e.g sg13g2_buf_1 A X")],
+    clk_freq_mhz:           Annotated[str,   typer.Option("--clk_freq_mhz",           help="e.g 40")],
+    tiles:                  Annotated[str,   typer.Option("--tiles",                  help="e.g N_term_single,S_term_single or ALL, no spaces")]
+) -> None:
+    """Calculates the delay times between PIPs.
+    Example usage for IHP SG13G2 PDK:
+    
+    export FAB_PROJ_DIR=.../demo
+    export FAB_PDK_ROOT=.../IHP-Open-PDK/ihp-sg13g2
+    
+    FABulous timing-model $FAB_PROJ_DIR \\
+        --out_file $FAB_PROJ_DIR/.Fabulous/pips.txt \\
+        --lib_corner_file $FAB_PDK_ROOT/libs.ref/sg13g2_stdcell/lib/sg13g2_stdcell_typ_1p20V_25C.lib \\
+        --techmaps ".$FAB_PDK_ROOT/libs.tech/librelane/sg13g2_stdcell/*.v" \\
+        --tiehi_cell_and_port "sg13g2_tiehi L_HI" \\
+        --tielo_cell_and_port "sg13g2_tielo L_LO" \\
+        --min_buf_cell_and_ports "sg13g2_buf_1 A X" \\
+        --clk_freq_mhz "40" \\
+        --tiles "N_term_single,S_term_single"
+    """
+    
+    FAB_TimingModel.write_tile_pips(
+        project_dir=project_dir,
+        out_file=out_file,
+        lib_corner_file=lib_corner_file,
+        techmaps=techmaps,
+        tiehi_cell_and_port=tiehi_cell_and_port,
+        tielo_cell_and_port=tielo_cell_and_port,
+        min_buf_cell_and_ports=min_buf_cell_and_ports,
+        clk_freq_mhz=clk_freq_mhz,
+        tiles=tiles
+    )
 
 @app.command("create-project")
 @app.command("c", hidden=True)

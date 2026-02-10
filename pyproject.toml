@@ -135,8 +135,11 @@ directory = "coverage_html"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-markers = ["slow: marks tests as slow (use --runslow to include)"]
-addopts = "-m 'not slow'"
+markers = [
+    "slow: marks tests as slow (use --runslow to include)",
+    "superslow: marks tests as superslow (use --runsuperslow to include)"
+]
+addopts = "-m 'not slow and not superslow'"
 
 [tool.taskipy.tasks]
 # Development and quality tasks

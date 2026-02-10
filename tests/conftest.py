@@ -14,10 +14,12 @@ from FABulous.FABulous_settings import init_context, reset_context
 
 
 def pytest_addoption(parser: pytest.Parser) -> None:  # type: ignore[name-defined]
-    """Add command line option to include slow tests explicitly.
+    """Add command line options to include slow and superslow tests explicitly.
 
-    Usage: pytest --runslow
-    Without this flag, tests marked with @pytest.mark.slow are skipped via addopts filter.
+    Usage: pytest --runslow (includes slow tests only)
+           pytest --runsuperslow (includes slow and superslow tests)
+    Without these flags, tests marked with @pytest.mark.slow or @pytest.mark.superslow
+    are skipped via addopts filter.
     """
     parser.addoption(
         "--runslow",
@@ -25,15 +27,31 @@ def pytest_addoption(parser: pytest.Parser) -> None:  # type: ignore[name-define
         default=False,
         help="run tests marked as slow (overrides default '-m not slow')",
     )
+    parser.addoption(
+        "--runsuperslow",
+        action="store_true",
+        default=False,
+        help="run tests marked as superslow (overrides default '-m not superslow')",
+    )
 
 
 def pytest_configure(config: pytest.Config) -> None:  # type: ignore[name-defined]
-    # If --runslow is given, remove the '-m not slow' filter so slow tests run.
-    if (
-        config.getoption("runslow")
-        and getattr(config.option, "markexpr", None) == "not slow"
-    ):
+    """Configure marker filtering based on command line flags.
+
+    Default: exclude both slow and superslow tests
+    --runslow: exclude only superslow tests
+    --runsuperslow: include everything (slow and superslow)
+    """
+    run_slow = config.getoption("runslow")
+    run_superslow = config.getoption("runsuperslow")
+
+    if run_superslow:
+        # Run everything including superslow tests
         config.option.markexpr = ""
+    elif run_slow:
+        # Run slow tests but not superslow
+        if getattr(config.option, "markexpr", None) == "not slow and not superslow":
+            config.option.markexpr = "not superslow"
 
 
 def normalize(block: str) -> list[str]:

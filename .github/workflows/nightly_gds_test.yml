@@ -1,0 +1,179 @@
+name: Nightly GDS Generation Test
+
+on:
+  schedule:
+    # Run every day at 12:00 UTC (noon)
+    - cron: '0 12 * * *'
+  workflow_dispatch: # Allow manual triggering
+
+jobs:
+  gds_generation_test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 720  # 12 hour timeout for full GDS generation
+    permissions:
+      issues: write
+      contents: read
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Prepare FABulous container
+        uses: ./.github/actions/prepare_FABulous_container
+
+      - name: Setup Nix
+        uses: cachix/install-nix-action@v27
+        with:
+          nix_path: nixpkgs=channel:nixos-unstable
+
+      - name: Cache IHP PDK
+        id: cache-ihp-pdk
+        uses: actions/cache@v4
+        with:
+          path: ~/.ciel/pdk/ihp-sg13g2
+          key: ihp-sg13g2-pdk-${{ hashFiles('.github/workflows/nightly_gds_test.yml') }}
+          restore-keys: |
+            ihp-sg13g2-pdk-
+
+      - name: Install IHP-SG13G2 PDK via ciel
+        if: steps.cache-ihp-pdk.outputs.cache-hit != 'true'
+        run: |
+          echo "Installing IHP-SG13G2 PDK using ciel..."
+          export GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}
+          nix develop --command ciel install ihp-sg13g2
+          echo "IHP-SG13G2 PDK installed successfully"
+
+      - name: Verify PDK installation
+        run: |
+          echo "Verifying PDK installation..."
+          nix develop --command ciel list
+
+          # Check if PDK directory exists
+          if [ -d "$HOME/.ciel/pdk/ihp-sg13g2" ]; then
+            echo "✓ IHP-SG13G2 PDK found at $HOME/.ciel/pdk/ihp-sg13g2"
+            ls -la "$HOME/.ciel/pdk/ihp-sg13g2"
+          else
+            echo "✗ IHP-SG13G2 PDK not found!"
+            exit 1
+          fi
+
+      - name: Capture installed dependency versions
+        run: |
+          echo "## Installed Dependency Versions" > dependency_versions.txt
+          echo "\`\`\`" >> dependency_versions.txt
+          uv pip list >> dependency_versions.txt
+          echo "\`\`\`" >> dependency_versions.txt
+
+      - name: Run GDS generation tests
+        id: gds_test
+        continue-on-error: true
+        run: |
+          uv run pytest -v --runsuperslow --tb=short \
+            tests/gds_flow_test/flow_test/test_gds_integration.py \
+            2>&1 | tee gds_test_output.txt
+          echo "exit_code=$?" >> $GITHUB_OUTPUT
+
+      - name: Check test results
+        id: check_results
+        run: |
+          if [ "${{ steps.gds_test.outputs.exit_code }}" != "0" ]; then
+            echo "tests_failed=true" >> $GITHUB_OUTPUT
+          else
+            echo "tests_failed=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create issue on failure
+        if: steps.check_results.outputs.tests_failed == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+
+            let depVersions = '';
+            try {
+              depVersions = fs.readFileSync('dependency_versions.txt', 'utf8');
+            } catch (error) {
+              depVersions = 'Could not read dependency versions';
+            }
+
+            let testOutput = '';
+            try {
+              const fullOutput = fs.readFileSync('gds_test_output.txt', 'utf8');
+              testOutput = fullOutput.slice(-8000);
+              if (fullOutput.length > 8000) {
+                testOutput = '... (truncated)\n\n' + testOutput;
+              }
+            } catch (error) {
+              testOutput = 'Could not read test output';
+            }
+
+            const date = new Date().toISOString().split('T')[0];
+            const title = `Nightly GDS Generation Test Failed - ${date}`;
+
+            const body = `## Nightly GDS Generation Test Failed
+
+            The nightly GDS generation test with minimal fabric has failed.
+
+            **Workflow Run:** ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+            ${depVersions}
+
+            ### Test Output (last 8000 characters)
+
+            <details>
+            <summary>Click to expand test output</summary>
+
+            \`\`\`
+            ${testOutput}
+            \`\`\`
+
+            </details>
+
+            ### Action Items
+
+            - [ ] Review the test output above
+            - [ ] Check if issue is reproducible locally
+            - [ ] Verify tool versions and dependencies
+            - [ ] Check for recent changes to GDS flows
+            - [ ] Update fabric configuration if needed
+            - [ ] Close this issue once resolved
+
+            ---
+            *This issue was automatically created by the nightly GDS generation test workflow.*`;
+
+            const issues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: ['nightly-gds-failure'],
+              per_page: 100
+            });
+
+            const todayIssue = issues.data.find(issue => issue.title === title);
+
+            if (!todayIssue) {
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: title,
+                body: body,
+                labels: ['nightly-gds-failure', 'gds-flow', 'automated']
+              });
+              console.log('Created new issue for GDS test failure');
+            } else {
+              console.log('Issue already exists for today, skipping creation');
+            }
+
+      - name: Upload test artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nightly-gds-test-results
+          path: |
+            gds_test_output.txt
+            dependency_versions.txt
+          if-no-files-found: warn

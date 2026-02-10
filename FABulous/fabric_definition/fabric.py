@@ -9,16 +9,16 @@ from collections.abc import Generator
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from FABulous.fabric_definition.Bel import Bel
+from FABulous.fabric_definition.bel import Bel
 from FABulous.fabric_definition.define import (
     ConfigBitMode,
     Direction,
     MultiplexerStyle,
     Side,
 )
-from FABulous.fabric_definition.SuperTile import SuperTile
-from FABulous.fabric_definition.Tile import Tile
-from FABulous.fabric_definition.Wire import Wire
+from FABulous.fabric_definition.super_tile import SuperTile
+from FABulous.fabric_definition.tile import Tile
+from FABulous.fabric_definition.wire import Wire
 
 
 @dataclass

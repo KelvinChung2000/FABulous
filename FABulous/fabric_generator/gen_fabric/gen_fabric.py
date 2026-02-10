@@ -16,9 +16,9 @@ Key features:
 from pathlib import Path
 
 from FABulous.fabric_definition.define import IO, ConfigBitMode, Direction
-from FABulous.fabric_definition.Fabric import Fabric
+from FABulous.fabric_definition.fabric import Fabric
 from FABulous.fabric_generator.code_generator.code_generator import CodeGenerator
-from FABulous.fabric_generator.code_generator.code_generator_VHDL import (
+from FABulous.fabric_generator.code_generator.code_generator_vhdl import (
     VHDLCodeGenerator,
 )
 

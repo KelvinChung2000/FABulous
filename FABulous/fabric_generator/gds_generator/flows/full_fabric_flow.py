@@ -25,9 +25,9 @@ from librelane.state.state import State
 from librelane.steps.openroad import Floorplan
 from librelane.steps.step import Step
 
-from FABulous.fabric_definition.Fabric import Fabric
-from FABulous.fabric_definition.SuperTile import SuperTile
-from FABulous.fabric_definition.Tile import Tile
+from FABulous.fabric_definition.fabric import Fabric
+from FABulous.fabric_definition.super_tile import SuperTile
+from FABulous.fabric_definition.tile import Tile
 from FABulous.fabric_generator.gds_generator.flows.fabric_macro_flow import (
     FABulousFabricMacroFlow,
 )
@@ -44,7 +44,7 @@ from FABulous.fabric_generator.gds_generator.steps.global_tile_opitmisation impo
     GlobalTileSizeOptimization,
 )
 from FABulous.fabric_generator.gds_generator.steps.tile_optimisation import OptMode
-from FABulous.FABulous_settings import init_context
+from FABulous.fabulous_settings import init_context
 from FABulous.processpool import DillProcessPoolExecutor
 
 if TYPE_CHECKING:
@@ -97,7 +97,7 @@ def _run_tile_flow_worker(
         (compiled_state, error_trace) for result processing.
     """
     try:
-        from FABulous.FABulous_settings import FABulousSettings
+        from FABulous.fabulous_settings import FABulousSettings
 
         context: FABulousSettings = init_context(project_dir=proj_dir)
         # Reconstruct the flow in the worker process with serializable data

@@ -6,11 +6,11 @@ from decimal import Decimal
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-from FABulous.fabric_definition.Bel import Bel
+from FABulous.fabric_definition.bel import Bel
 from FABulous.fabric_definition.define import IO, Direction, PinSortMode, Side
-from FABulous.fabric_definition.Gen_IO import Gen_IO
-from FABulous.fabric_definition.Port import Port
-from FABulous.fabric_definition.Wire import Wire
+from FABulous.fabric_definition.gen_io import Gen_IO
+from FABulous.fabric_definition.port import Port
+from FABulous.fabric_definition.wire import Wire
 
 if TYPE_CHECKING:
     from FABulous.fabric_generator.gds_generator.gen_io_pin_config_yaml import (

@@ -17,7 +17,7 @@ from FABulous.custom_exception import (
     InvalidSwitchMatrixDefinition,
 )
 from FABulous.fabric_definition.define import IO, Direction, Side
-from FABulous.fabric_definition.Port import Port
+from FABulous.fabric_definition.port import Port
 
 oppositeDic = {"NORTH": "SOUTH", "SOUTH": "NORTH", "EAST": "WEST", "WEST": "EAST"}
 

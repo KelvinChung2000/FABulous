@@ -46,10 +46,10 @@ from FABulous_bit_gen import genBitstream
 from loguru import logger
 
 from FABulous.custom_exception import CommandError, EnvironmentNotSet, InvalidFileType
-from FABulous.fabric_generator.code_generator.code_generator_Verilog import (
+from FABulous.fabric_generator.code_generator.code_generator_verilog import (
     VerilogCodeGenerator,
 )
-from FABulous.fabric_generator.code_generator.code_generator_VHDL import (
+from FABulous.fabric_generator.code_generator.code_generator_vhdl import (
     VHDLCodeGenerator,
 )
 from FABulous.fabric_generator.gds_generator.steps.tile_optimisation import OptMode
@@ -57,9 +57,9 @@ from FABulous.fabric_generator.gen_fabric.fabric_automation import (
     generateCustomTileConfig,
 )
 from FABulous.fabric_generator.parser.parse_csv import parseTilesCSV
-from FABulous.FABulous_API import FABulous_API
-from FABulous.FABulous_CLI import cmd_synthesis
-from FABulous.FABulous_CLI.helper import (
+from FABulous.fabulous_api import FABulous_API
+from FABulous.fabulous_cli import cmd_synthesis
+from FABulous.fabulous_cli.helper import (
     CommandPipeline,
     allow_blank,
     copy_verilog_files,
@@ -70,7 +70,7 @@ from FABulous.FABulous_CLI.helper import (
     remove_dir,
     wrap_with_except_handling,
 )
-from FABulous.FABulous_settings import get_context
+from FABulous.fabulous_settings import get_context
 
 META_DATA_DIR = ".FABulous"
 

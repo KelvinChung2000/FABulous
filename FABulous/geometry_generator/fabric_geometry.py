@@ -5,7 +5,7 @@ from pathlib import Path
 
 from loguru import logger
 
-from FABulous.fabric_definition.Fabric import Fabric
+from FABulous.fabric_definition.fabric import Fabric
 from FABulous.geometry_generator.geometry_obj import Border, Location
 from FABulous.geometry_generator.tile_geometry import TileGeometry
 

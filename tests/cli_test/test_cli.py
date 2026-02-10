@@ -11,9 +11,9 @@ from pathlib import Path
 import pytest
 from pytest_mock import MockerFixture
 
-from FABulous.FABulous_CLI.FABulous_CLI import FABulous_CLI
-from FABulous.FABulous_settings import init_context
-from tests.CLI_test.conftest import TILE
+from FABulous.fabulous_cli.fabulous_cli import FABulous_CLI
+from FABulous.fabulous_settings import init_context
+from tests.cli_test.conftest import TILE
 from tests.conftest import (
     normalize_and_check_for_errors,
     run_cmd,

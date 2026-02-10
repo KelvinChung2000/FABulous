@@ -21,12 +21,12 @@ from pymoo.optimize import minimize
 from pymoo.termination.ftol import SingleObjectiveSpaceTermination
 from pymoo.termination.max_gen import MaximumGenerationTermination
 
-from FABulous.fabric_definition.Fabric import Fabric
+from FABulous.fabric_definition.fabric import Fabric
 from FABulous.fabric_generator.gds_generator.helper import round_up_decimal
 from FABulous.fabric_generator.gds_generator.steps.tile_optimisation import OptMode
 
 if TYPE_CHECKING:
-    from FABulous.fabric_definition.Tile import Tile
+    from FABulous.fabric_definition.tile import Tile
 
 
 class NLPTileProblem(ElementwiseProblem):

@@ -8,7 +8,7 @@ supports CSV serialization for integration with geometry files.
 from csv import writer as csvWriter
 
 from FABulous.custom_exception import InvalidPortType
-from FABulous.fabric_definition.Fabric import Direction
+from FABulous.fabric_definition.fabric import Direction
 from FABulous.geometry_generator.geometry_obj import Location
 
 

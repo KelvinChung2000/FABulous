@@ -32,12 +32,12 @@ from pick import pick
 
 from FABulous.custom_exception import PipelineCommandError
 from FABulous.fabric_definition.define import HDLType
-from FABulous.FABulous_settings import add_var_to_global_env
+from FABulous.fabulous_settings import add_var_to_global_env
 
 if TYPE_CHECKING:
     from loguru import Record
 
-    from FABulous.FABulous_CLI.FABulous_CLI import FABulous_CLI
+    from FABulous.fabulous_cli.fabulous_cli import FABulous_CLI
 
 MAX_BITBYTES = 16384
 

@@ -11,7 +11,7 @@ from dataclasses import dataclass, field
 
 from FABulous.custom_exception import InvalidPortType
 from FABulous.fabric_definition.define import Direction, Side
-from FABulous.fabric_definition.Tile import Tile
+from FABulous.fabric_definition.tile import Tile
 from FABulous.geometry_generator.bel_geometry import BelGeometry
 from FABulous.geometry_generator.geometry_obj import Border, Location
 from FABulous.geometry_generator.port_geometry import PortGeometry

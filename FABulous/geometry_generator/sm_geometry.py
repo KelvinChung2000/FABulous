@@ -5,8 +5,8 @@ from pathlib import Path
 from loguru import logger
 
 from FABulous.fabric_definition.define import IO, Direction, Side
-from FABulous.fabric_definition.Port import Port
-from FABulous.fabric_definition.Tile import Tile
+from FABulous.fabric_definition.port import Port
+from FABulous.fabric_definition.tile import Tile
 from FABulous.geometry_generator.bel_geometry import BelGeometry
 from FABulous.geometry_generator.geometry_obj import Border, oppositeIO
 from FABulous.geometry_generator.port_geometry import PortGeometry, PortType

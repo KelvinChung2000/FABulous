@@ -13,7 +13,7 @@ from pathlib import Path
 from loguru import logger
 
 from FABulous.fabric_definition.define import Direction
-from FABulous.fabric_definition.Tile import Tile
+from FABulous.fabric_definition.tile import Tile
 from FABulous.fabric_generator.parser.parse_switchmatrix import parseList
 
 

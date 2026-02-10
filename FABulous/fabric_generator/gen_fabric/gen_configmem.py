@@ -14,16 +14,16 @@ from bitarray import bitarray
 from loguru import logger
 
 from FABulous.fabric_definition.define import IO
-from FABulous.fabric_definition.Fabric import Fabric
-from FABulous.fabric_definition.Tile import Tile
+from FABulous.fabric_definition.fabric import Fabric
+from FABulous.fabric_definition.tile import Tile
 from FABulous.fabric_generator.code_generator.code_generator import CodeGenerator
-from FABulous.fabric_generator.code_generator.code_generator_Verilog import (
+from FABulous.fabric_generator.code_generator.code_generator_verilog import (
     VerilogCodeGenerator,
 )
 from FABulous.fabric_generator.parser.parse_configmem import parseConfigMem
 
 if TYPE_CHECKING:
-    from FABulous.fabric_definition.ConfigMem import ConfigMem
+    from FABulous.fabric_definition.config_mem import ConfigMem
 
 
 def generateConfigMemInit(fabric: Fabric, file: Path, tileConfigBitsCount: int) -> None:

@@ -16,10 +16,10 @@ from FABulous.custom_exception import (
     InvalidTileDefinition,
 )
 from FABulous.fabric_definition.define import IO, ConfigBitMode, MultiplexerStyle
-from FABulous.fabric_definition.Fabric import Fabric
-from FABulous.fabric_definition.Gen_IO import Gen_IO
-from FABulous.fabric_definition.SuperTile import SuperTile
-from FABulous.fabric_definition.Tile import Tile
+from FABulous.fabric_definition.fabric import Fabric
+from FABulous.fabric_definition.gen_io import Gen_IO
+from FABulous.fabric_definition.super_tile import SuperTile
+from FABulous.fabric_definition.tile import Tile
 from FABulous.fabric_generator.gen_fabric.fabric_automation import (
     addBelsToPrim,
     generateCustomTileConfig,
@@ -31,11 +31,11 @@ from FABulous.fabric_generator.parser.parse_switchmatrix import (
     parseMatrix,
     parsePortLine,
 )
-from FABulous.FABulous_settings import get_context
+from FABulous.fabulous_settings import get_context
 
 if TYPE_CHECKING:
-    from FABulous.fabric_definition.Bel import Bel
-    from FABulous.fabric_definition.Port import Port
+    from FABulous.fabric_definition.bel import Bel
+    from FABulous.fabric_definition.port import Port
 
 
 def parseTilesCSV(fileName: Path) -> tuple[list[Tile], list[tuple[str, str]]]:

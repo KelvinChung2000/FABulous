@@ -7,9 +7,9 @@ from typing import Self
 import yaml
 
 from FABulous.fabric_definition.define import PinSortMode, Side
-from FABulous.fabric_definition.Fabric import Fabric
-from FABulous.fabric_definition.SuperTile import SuperTile
-from FABulous.fabric_definition.Tile import Tile
+from FABulous.fabric_definition.fabric import Fabric
+from FABulous.fabric_definition.super_tile import SuperTile
+from FABulous.fabric_definition.tile import Tile
 
 
 @dataclass

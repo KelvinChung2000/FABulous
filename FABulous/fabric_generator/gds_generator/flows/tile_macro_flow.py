@@ -15,8 +15,8 @@ from librelane.steps import odb as Odb
 from librelane.steps import openroad as OpenROAD
 from librelane.steps.step import Step
 
-from FABulous.fabric_definition.SuperTile import SuperTile
-from FABulous.fabric_definition.Tile import Tile
+from FABulous.fabric_definition.super_tile import SuperTile
+from FABulous.fabric_definition.tile import Tile
 from FABulous.fabric_generator.gds_generator.flows.flow_define import (
     check_steps,
     classic_gating_config_vars,
@@ -32,14 +32,14 @@ from FABulous.fabric_generator.gds_generator.helper import (
 )
 from FABulous.fabric_generator.gds_generator.steps.add_buffer import AddBuffers
 from FABulous.fabric_generator.gds_generator.steps.custom_pdn import CustomGeneratePDN
-from FABulous.fabric_generator.gds_generator.steps.tile_IO_placement import (
+from FABulous.fabric_generator.gds_generator.steps.tile_io_placement import (
     FABulousTileIOPlacement,
 )
 from FABulous.fabric_generator.gds_generator.steps.tile_optimisation import (
     OptMode,
     TileOptimisation,
 )
-from FABulous.FABulous_settings import get_context
+from FABulous.fabulous_settings import get_context
 
 subs = {
     # Disable STA

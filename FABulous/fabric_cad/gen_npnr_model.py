@@ -12,7 +12,7 @@ placement and routing for user designs.
 import string
 
 from FABulous.custom_exception import InvalidFileType, InvalidState
-from FABulous.fabric_definition.Fabric import Fabric
+from FABulous.fabric_definition.fabric import Fabric
 from FABulous.fabric_generator.parser.parse_switchmatrix import parseList, parseMatrix
 
 

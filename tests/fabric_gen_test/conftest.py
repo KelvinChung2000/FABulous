@@ -10,9 +10,9 @@ import pytest
 from cocotb_tools.runner import get_runner
 from pytest_mock import MockerFixture
 
-from FABulous.fabric_definition.ConfigMem import ConfigMem
-from FABulous.fabric_definition.Fabric import Fabric
-from FABulous.fabric_definition.Tile import Tile
+from FABulous.fabric_definition.config_mem import ConfigMem
+from FABulous.fabric_definition.fabric import Fabric
+from FABulous.fabric_definition.tile import Tile
 from FABulous.fabric_generator.code_generator.code_generator import CodeGenerator
 
 
@@ -369,10 +369,10 @@ def code_generator_factory(tmp_path: Path) -> Callable[[str, str], CodeGenerator
     """Create code generators with temporary output files."""
 
     def _create_generator(extension: str, name: str = "test_output") -> CodeGenerator:
-        from FABulous.fabric_generator.code_generator.code_generator_Verilog import (
+        from FABulous.fabric_generator.code_generator.code_generator_verilog import (
             VerilogCodeGenerator,
         )
-        from FABulous.fabric_generator.code_generator.code_generator_VHDL import (
+        from FABulous.fabric_generator.code_generator.code_generator_vhdl import (
             VHDLCodeGenerator,
         )
 

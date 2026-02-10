@@ -507,7 +507,7 @@ class TestFlowConfiguration:
 
     def test_io_placement_substitution(self) -> None:
         """Test IO placement substitution."""
-        from FABulous.fabric_generator.gds_generator.steps.fabric_IO_placement import (
+        from FABulous.fabric_generator.gds_generator.steps.fabric_io_placement import (
             FABulousFabricIOPlacement,
         )
 

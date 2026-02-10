@@ -15,8 +15,8 @@ import typer
 from dotenv import set_key
 from pytest_mock import MockerFixture
 
-from FABulous.FABulous import main
-from FABulous.FABulous_settings import init_context, reset_context
+from FABulous.fabulous import main
+from FABulous.fabulous_settings import init_context, reset_context
 
 
 @pytest.mark.parametrize(
@@ -480,7 +480,7 @@ def test_install_oss_cad_suite(
 
     # Ensure default-dir uses a clean temp user config directory
     tmp_user_dir = tmp_path / "user_config"
-    monkeypatch.setattr("FABulous.FABulous.FAB_USER_CONFIG_DIR", tmp_user_dir)
+    monkeypatch.setattr("FABulous.fabulous.FAB_USER_CONFIG_DIR", tmp_user_dir)
 
     monkeypatch.setattr(sys, "argv", test_argv)
     with pytest.raises(SystemExit) as exc_info:
@@ -623,7 +623,7 @@ def test_update_project_version_cases(
 ) -> None:
     test_argv = [s.replace("{project}", str(project)) for s in argv]
     monkeypatch.setattr(
-        "FABulous.FABulous.update_project_version", lambda _p: not bool(expected_code)
+        "FABulous.fabulous.update_project_version", lambda _p: not bool(expected_code)
     )
     monkeypatch.setattr(sys, "argv", test_argv)
     if chdir_flag:
@@ -708,7 +708,7 @@ def test_start(
     def mock_cmdloop(self: object) -> None:  # noqa: ARG001
         pass
 
-    monkeypatch.setattr("FABulous.FABulous_CLI.FABulous_CLI.cmdloop", mock_cmdloop)
+    monkeypatch.setattr("FABulous.fabulous_cli.FABulous_CLI.cmdloop", mock_cmdloop)
 
     test_args = [s.replace("{project}", str(project)) for s in argv]
     monkeypatch.setattr(sys, "argv", test_args)
@@ -938,7 +938,7 @@ def test_subcommand_help(
 
 def test_version_callback() -> None:
     """Test version_callback function behavior"""
-    from FABulous.FABulous import version_callback
+    from FABulous.fabulous import version_callback
 
     # Test that version_callback raises typer.Exit when value is True
     with pytest.raises(typer.Exit):
@@ -950,7 +950,7 @@ def test_version_callback() -> None:
 
 def test_validate_project_directory_success(project: Path) -> None:
     """Test validate_project_directory with valid project"""
-    from FABulous.FABulous import validate_project_directory
+    from FABulous.fabulous import validate_project_directory
 
     result = validate_project_directory(str(project))
     assert result == project
@@ -958,7 +958,7 @@ def test_validate_project_directory_success(project: Path) -> None:
 
 def test_validate_project_directory_invalid(tmp_path: Path) -> None:
     """Test validate_project_directory with invalid project"""
-    from FABulous.FABulous import validate_project_directory
+    from FABulous.fabulous import validate_project_directory
 
     invalid_dir = tmp_path / "not_a_project"
     invalid_dir.mkdir()
@@ -985,8 +985,8 @@ def test_check_version_compatibility_cases(
 ) -> None:
     """Test version compatibility checking with different version scenarios"""
 
-    from FABulous.FABulous import check_version_compatibility
-    from FABulous.FABulous_settings import init_context, reset_context
+    from FABulous.fabulous import check_version_compatibility
+    from FABulous.fabulous_settings import init_context, reset_context
 
     reset_context()
 
@@ -998,7 +998,7 @@ def test_check_version_compatibility_cases(
     # Initialize context
     init_context(project_dir=project)
 
-    monkeypatch.setattr("FABulous.FABulous.version", lambda _: package_ver)
+    monkeypatch.setattr("FABulous.fabulous.version", lambda _: package_ver)
     monkeypatch.setattr("importlib.metadata.version", lambda _: package_ver)
     # Mock the package version
     if should_exit:
@@ -1074,7 +1074,7 @@ def test_main_function_exception_handling(monkeypatch: pytest.MonkeyPatch) -> No
 
     # Mock app to raise an unexpected exception
     mock_app = Mock(side_effect=RuntimeError("Unexpected error"))
-    monkeypatch.setattr("FABulous.FABulous.app", mock_app)
+    monkeypatch.setattr("FABulous.fabulous.app", mock_app)
     monkeypatch.setattr(sys, "argv", ["FABulous", "--help"])
 
     with pytest.raises(SystemExit) as exc_info:

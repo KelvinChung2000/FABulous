@@ -9,8 +9,8 @@ from pathlib import Path
 import pytest
 from pytest_mock import MockerFixture
 
-from FABulous.fabric_definition.Fabric import Fabric
-from FABulous.fabric_definition.Tile import Tile
+from FABulous.fabric_definition.fabric import Fabric
+from FABulous.fabric_definition.tile import Tile
 from FABulous.fabric_generator.gen_fabric.gen_switchmatrix import genTileSwitchMatrix
 from tests.fabric_gen_test.conftest import (
     create_switchmatrix_csv,

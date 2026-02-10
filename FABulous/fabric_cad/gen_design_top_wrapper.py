@@ -10,7 +10,7 @@ from pathlib import Path
 from loguru import logger
 
 from FABulous.custom_exception import InvalidFileType
-from FABulous.fabric_definition.Fabric import Fabric
+from FABulous.fabric_definition.fabric import Fabric
 from FABulous.fabric_generator.parser.parse_hdl import parseBelFile
 
 

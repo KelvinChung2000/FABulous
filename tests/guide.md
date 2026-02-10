@@ -36,7 +36,7 @@ For more details on what option can be used please check the pytest documentatio
 
 ## Testing Infrastructure
 
-We use `pytest` as our testing framework. Our testing infrastructure is set up in `tests/CLI_test/conftest.py`, which provides several useful fixtures and utilities.
+We use `pytest` as our testing framework. Our testing infrastructure is set up in `tests/cli_test/conftest.py`, which provides several useful fixtures and utilities.
 
 ### Key Testing Components
 

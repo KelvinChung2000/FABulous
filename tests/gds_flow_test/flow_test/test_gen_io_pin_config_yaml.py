@@ -426,7 +426,7 @@ class TestGenerateIOPinOrderConfig:
         self, mock_fabric, mocker: MockerFixture, tmp_path
     ):
         """Test generation for a SuperTile."""
-        from FABulous.fabric_definition.SuperTile import SuperTile
+        from FABulous.fabric_definition.super_tile import SuperTile
 
         # Create mock supertile
         mock_supertile = mocker.MagicMock(spec=SuperTile)
@@ -497,7 +497,7 @@ class TestGenerateIOPinOrderConfig:
         self, mock_fabric, mocker: MockerFixture, tmp_path
     ):
         """Test supertile with multiple positions uses top-left."""
-        from FABulous.fabric_definition.SuperTile import SuperTile
+        from FABulous.fabric_definition.super_tile import SuperTile
 
         mock_supertile = mocker.MagicMock(spec=SuperTile)
 

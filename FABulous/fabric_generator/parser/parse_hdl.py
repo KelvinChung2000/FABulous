@@ -7,9 +7,9 @@ from FABulous.custom_exception import (
     FabricParsingError,
     InvalidBelDefinition,
 )
-from FABulous.fabric_definition.Bel import Bel
+from FABulous.fabric_definition.bel import Bel
 from FABulous.fabric_definition.define import IO, FABulousAttribute
-from FABulous.fabric_definition.Yosys_obj import YosysJson, YosysModule
+from FABulous.fabric_definition.yosys_obj import YosysJson, YosysModule
 
 
 def belMapProcessing(module_info: YosysModule) -> dict:

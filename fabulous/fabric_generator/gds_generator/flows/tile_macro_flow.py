@@ -25,7 +25,6 @@ from fabulous.fabric_generator.gds_generator.flows.flow_define import (
     write_out_steps,
 )
 from fabulous.fabric_generator.gds_generator.helper import (
-    get_offset,
     get_pitch,
     get_routing_obstructions,
     round_die_area,

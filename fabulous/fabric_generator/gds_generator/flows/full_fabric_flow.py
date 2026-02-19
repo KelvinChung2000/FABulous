@@ -15,8 +15,8 @@ from itertools import product
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+from librelane.common.misc import get_latest_file
 from librelane.config.flow import flow_common_variables
-from librelane.config.variable import Macro
 from librelane.flows.classic import Classic
 from librelane.flows.flow import Flow, FlowException
 from librelane.logging.logger import err, info
@@ -96,12 +96,13 @@ def _run_tile_flow_worker(
     tuple[State | None, str | None]
         (compiled_state, error_trace) for result processing.
     """
+    flow: FABulousTileVerilogMacroFlow | None = None
     try:
         from fabulous.fabulous_settings import FABulousSettings
 
         context: FABulousSettings = init_context(project_dir=proj_dir)
         # Reconstruct the flow in the worker process with serializable data
-        flow: FABulousTileVerilogMacroFlow = FABulousTileVerilogMacroFlow(
+        flow = FABulousTileVerilogMacroFlow(
             tile_type,
             io_pin_config,
             optimisation,
@@ -109,10 +110,17 @@ def _run_tile_flow_worker(
             pdk_root=context.pdk_root.parent,
             base_config_path=base_config_path,
             override_config_path=override_config_path,
-            **custom_config_overrides or {},
+            **custom_config_overrides,
         )
         state: State = flow.start()
     except Exception:  # noqa: BLE001
+        # Try to recover the state from disk - deferred errors (e.g. XOR
+        # differences) raise after the state has already been saved.
+        if flow is not None and flow.run_dir is not None:
+            latest_state = get_latest_file(flow.run_dir, "state_out.json")
+            if latest_state is not None:
+                recovered = State.loads(Path(latest_state).read_text(encoding="utf-8"))
+                return recovered, traceback.format_exc()
         return None, traceback.format_exc()
     else:
         return state, None
@@ -255,8 +263,7 @@ class FABulousFabricMacroFullFlow(Flow):
             except Exception as e:  # noqa: BLE001
                 error = str(e)
                 error_trace = traceback.format_exc()
-            # Try to save snapshot if state exists
-            # Always build the metrics dict
+            # Build metrics dict from state if available
             metrics_dict: dict[str, object] = {}
             if state is not None:
                 metrics_dict = {
@@ -275,6 +282,7 @@ class FABulousFabricMacroFullFlow(Flow):
                 metrics_dict["error_traceback"] = error_trace
 
             info(f"opt_mode={opt_mode.value}, tile={tile_name}, metrics={metrics_dict}")
+            result_summary[opt_mode.value][tile_name] = metrics_dict
 
         def custom_serializer(obj: object) -> float | object:
             if isinstance(obj, Decimal):
@@ -358,9 +366,7 @@ class FABulousFabricMacroFullFlow(Flow):
         ] = []
         with DillProcessPoolExecutor(max_workers=None) as executor:
             for tile_type in fabric.get_all_unique_tiles():
-                io_config_path: Path = (
-                    tile_type.tileDir.parent / f"{tile_type.name}_io_pin_order.yaml"
-                )
+                io_config_path: Path = tile_type.tileDir.parent / "io_pin_order.yaml"
                 base_config_path: Path = (
                     proj_dir / "Tile" / "include" / "gds_config.yaml"
                 )
@@ -391,9 +397,14 @@ class FABulousFabricMacroFullFlow(Flow):
             state: State | None
             error_trace: str | None
             state, error_trace = state_future.result()
-            if error_trace or state is None:
+            if state is None:
                 raise RuntimeError(
                     f"Tile {tile_name} compilation failed:\n{error_trace}"
+                )
+            if error_trace:
+                err(
+                    f"Tile {tile_name} had errors but state was recovered:\n"
+                    f"{error_trace}"
                 )
 
             # Verify compilation succeeded
@@ -410,49 +421,24 @@ class FABulousFabricMacroFullFlow(Flow):
 
         self.progress_bar.end_stage()
 
-        # Step 4: Collect tile macros for fabric stitching
-        macros: dict[str, Macro] = {}
-        tile_sizes: dict[str, tuple[Decimal, Decimal]] = {}
+        # Step 4: Create final_views symlinks for each tile so the
+        # fabric stitching flow can find them at the standard path.
+        for tile_name, tile_state in tile_type_states.items():
+            gds_path: Path | None = tile_state.get(DesignFormat.GDS)
+            if gds_path is None:
+                raise RuntimeError(
+                    f"Tile {tile_name} has no GDS output after recompilation"
+                )
+            # GDS path is .../runs/RUN_xxx/<step>/tile.gds
+            # final/ is a sibling of the step directory at run_dir/final/
+            # librelane's Path is a UserString (not pathlib.Path), so wrap it
+            final_dir: Path = Path(str(gds_path)).parent.parent / "final"
+            final_views: Path = proj_dir / "Tile" / tile_name / "macro" / "final_views"
+            if final_views.is_symlink() or final_views.exists():
+                final_views.unlink()
+            final_views.symlink_to(final_dir)
 
-        for tile_type_name, tile_state in tile_type_states.items():
-            width: Decimal = Decimal(
-                tile_type_states[tile_type_name]
-                .metrics["design__die__bbox"]
-                .split(" ")[2]
-            )
-            height: Decimal = Decimal(
-                tile_type_states[tile_type_name]
-                .metrics["design__die__bbox"]
-                .split(" ")[3]
-            )
-            tile_sizes[tile_type_name] = (width, height)
-
-            # Get tile output files
-            gds_file: Path | None = tile_state.get(DesignFormat.GDS)
-            lef_file: Path | None = tile_state.get(DesignFormat.LEF)
-            lib_files: dict[str, list[Path]] | list[Path] | Path | None = (
-                tile_state.get(DesignFormat.LIB)
-            )
-
-            # Build lib dict
-            lib_dict: dict[str, list[Path]] = {}
-            if lib_files:
-                if isinstance(lib_files, dict):
-                    for corner, paths in lib_files.items():
-                        lib_dict[corner] = [Path(str(p)) for p in paths]
-                elif isinstance(lib_files, list):
-                    lib_dict["default"] = [Path(str(p)) for p in lib_files]
-                else:
-                    lib_dict["default"] = [Path(str(lib_files))]
-
-            macros[tile_type_name] = Macro(
-                gds=[Path(str(gds_file))] if gds_file else [],
-                lef=[Path(str(lef_file))] if lef_file else [],
-                lib=lib_dict,
-                instances={},
-            )
-
-        info(f"Collected {len(macros)} tile macros")
+        info(f"Created final_views symlinks for {len(tile_type_states)} tiles")
 
         # Generate fabric-level IO pin configuration
         fabric_io_config_path: Path = proj_dir / "Fabric" / "fabric_io_pin_order.yaml"

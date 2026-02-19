@@ -164,11 +164,25 @@ class TileOptimisation(WhileStep):
         self.iter_count += 1
         return post_iteration
 
+    def _refresh_routing_obstructions(self) -> None:
+        """Clear existing routing obstructions and recompute from current config.
+
+        The two-step process is required because get_routing_obstructions reads
+        ROUTING_OBSTRUCTIONS from config and appends edge obstructions. Clearing
+        first prevents stale obstructions from accumulating across iterations.
+        """
+        self.config = self.config.copy(ROUTING_OBSTRUCTIONS=None)
+        self.config = self.config.copy(
+            ROUTING_OBSTRUCTIONS=get_routing_obstructions(self.config)
+        )
+
     def pre_iteration_callback(self, pre_iteration: State) -> State:
         """Pre iteration callback."""
         if self.config["FABULOUS_OPT_MODE"] == OptMode.NO_OPT:
             self.config = self.config.copy(DRT_OPT_ITERS=64)
+            self._refresh_routing_obstructions()
             return pre_iteration
+
         die_area_raw: tuple[Decimal, Decimal, Decimal, Decimal] = self.config.get(
             "DIE_AREA", None
         )
@@ -177,20 +191,35 @@ class TileOptimisation(WhileStep):
 
         _, _, width, height = die_area_raw
 
-        # Get PDK site dimensions from metrics (if available)
         site_width = Decimal(pre_iteration.metrics.get("pdk__site_width", Decimal(1)))
         site_height = Decimal(pre_iteration.metrics.get("pdk__site_height", Decimal(1)))
         x_pitch, y_pitch = get_pitch(self.config)
 
-        # Calculate step size based on PDK site dimensions
-        width_step_count = self.config["FABULOUS_OPTIMISATION_WIDTH_STEP_COUNT"]
-        height_step_count = self.config["FABULOUS_OPTIMISATION_HEIGHT_STEP_COUNT"]
-        width_step = site_width * width_step_count
-        height_step = site_height * height_step_count
+        width_step = site_width * self.config["FABULOUS_OPTIMISATION_WIDTH_STEP_COUNT"]
+        height_step = (
+            site_height * self.config["FABULOUS_OPTIMISATION_HEIGHT_STEP_COUNT"]
+        )
 
         instance_area = Decimal(pre_iteration.metrics.get("design__instance__area", 0))
-        new_height: Decimal
-        new_width: Decimal
+
+        # Scale up initial dimensions when the stdcell area exceeds the
+        # pin-based die area.  The scaling strategy depends on the
+        # optimisation mode so that the search starts from the correct
+        # baseline:
+        #   FIND_MIN_WIDTH  – keep width at pin minimum, grow height
+        #   FIND_MIN_HEIGHT – keep height at pin minimum, grow width
+        #   BALANCE / LARGE – scale both using pin aspect ratio
+        pin_area = width * height
+        if instance_area > 0 and pin_area > 0 and pin_area < instance_area:
+            opt_mode = self.config["FABULOUS_OPT_MODE"]
+            if opt_mode == OptMode.FIND_MIN_WIDTH:
+                height = max(height, instance_area / width)
+            elif opt_mode == OptMode.FIND_MIN_HEIGHT:
+                width = max(width, instance_area / height)
+            else:
+                pin_ratio = width / height
+                width = max(width, (instance_area * pin_ratio).sqrt())
+                height = max(height, (instance_area / pin_ratio).sqrt())
 
         if height == 0:
             height = instance_area.sqrt()
@@ -198,45 +227,9 @@ class TileOptimisation(WhileStep):
         if width == 0:
             width = instance_area.sqrt()
 
-        match self.config["FABULOUS_OPT_MODE"]:
-            case OptMode.FIND_MIN_WIDTH:
-                if width == 0:
-                    new_width, new_height = (instance_area / height, height)
-                else:
-                    new_width, new_height = (width + width_step, height)
-            case OptMode.FIND_MIN_HEIGHT:
-                # Initialize height based on instance area if not yet set properly
-                if height == 0:
-                    new_width, new_height = (width, instance_area / width)
-                else:
-                    new_width, new_height = (width, height + height_step)
-            case OptMode.BALANCE:
-                # Initialize to square bounding box if not yet set properly
-                if width == 0 or height == 0:
-                    if width == 0 and height == 0:
-                        side = instance_area.sqrt()
-                        new_width, new_height = side, side
-                    elif width > height:
-                        new_width, new_height = width, instance_area / width
-                    else:
-                        new_width, new_height = instance_area / height, height
-                else:
-                    if self.to_change_width:
-                        new_width, new_height = (width + width_step, height)
-                    else:
-                        new_width, new_height = (width, height + height_step)
-            case OptMode.LARGE:
-                # Initialize to square bounding box if not yet set properly
-                if width == 0 or height == 0:
-                    initial_side = instance_area.sqrt()
-                    new_width, new_height = (initial_side, initial_side)
-                else:
-                    new_width, new_height = (width + width_step, height + height_step)
-
-            case _:
-                raise ValueError(
-                    f"Unknown FABULOUS_OPT_MODE: {self.config['FABULOUS_OPT_MODE']}"
-                )
+        new_width, new_height = self._compute_new_dimensions(
+            width, height, width_step, height_step, instance_area
+        )
 
         die_area = (
             Decimal(0),
@@ -244,16 +237,59 @@ class TileOptimisation(WhileStep):
             round_up_decimal(new_width, x_pitch),
             round_up_decimal(new_height, y_pitch),
         )
-        self.config = self.config.copy(DRT_OPT_ITERS=5 + self.iter_count)
-        self.config = self.config.copy(DIE_AREA=die_area)
-        self.config = self.config.copy(ROUTING_OBSTRUCTIONS=None)
         self.config = self.config.copy(
-            ROUTING_OBSTRUCTIONS=get_routing_obstructions(self.config)
+            DRT_OPT_ITERS=5 + self.iter_count,
+            DIE_AREA=die_area,
         )
+        self._refresh_routing_obstructions()
+
         if p := self.get_current_iteration_dir():
             (p / "config.json").write_text(self.config.dumps())
 
         return pre_iteration
+
+    def _compute_new_dimensions(
+        self,
+        width: Decimal,
+        height: Decimal,
+        width_step: Decimal,
+        height_step: Decimal,
+        instance_area: Decimal,
+    ) -> tuple[Decimal, Decimal]:
+        """Compute the next tile dimensions based on the optimization mode."""
+        match self.config["FABULOUS_OPT_MODE"]:
+            case OptMode.FIND_MIN_WIDTH:
+                if width == 0:
+                    return instance_area / height, height
+                return width + width_step, height
+
+            case OptMode.FIND_MIN_HEIGHT:
+                if height == 0:
+                    return width, instance_area / width
+                return width, height + height_step
+
+            case OptMode.BALANCE:
+                if width == 0 or height == 0:
+                    if width == 0 and height == 0:
+                        side = instance_area.sqrt()
+                        return side, side
+                    if width > height:
+                        return width, instance_area / width
+                    return instance_area / height, height
+                if self.to_change_width:
+                    return width + width_step, height
+                return width, height + height_step
+
+            case OptMode.LARGE:
+                if width == 0 or height == 0:
+                    side = instance_area.sqrt()
+                    return side, side
+                return width + width_step, height + height_step
+
+            case _:
+                raise ValueError(
+                    f"Unknown FABULOUS_OPT_MODE: {self.config['FABULOUS_OPT_MODE']}"
+                )
 
     def post_loop_callback(self, state: State) -> State:  # noqa: ARG002
         """Post loop callback."""

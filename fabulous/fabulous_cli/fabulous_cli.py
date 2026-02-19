@@ -1384,14 +1384,25 @@ class FABulous_CLI(Cmd):
             base_config_path=self.projectDir / "Fabric" / "gds_config.yaml",
         )
 
+    eFPGA_macro_parser = Cmd2ArgumentParser()
+    eFPGA_macro_parser.add_argument(
+        "--tile-opt-info",
+        type=str,
+        default=None,
+        help="Path to tile optimisation summary JSON to skip Step 1",
+    )
+
+    @with_argparser(eFPGA_macro_parser)
     @with_category(CMD_FABRIC_FLOW)
-    def do_run_FABulous_eFPGA_macro(self, *_arg: str) -> None:
+    def do_run_FABulous_eFPGA_macro(self, args: argparse.Namespace) -> None:
         """Run the full FABulous eFPGA macro generation flow."""
         (self.projectDir / "Fabric" / "macro").mkdir(exist_ok=True)
+        tile_opt_config = Path(args.tile_opt_info) if args.tile_opt_info else None
         self.fabulousAPI.full_fabric_automation(
             self.projectDir,
             self.projectDir / "Fabric" / "macro",
             base_config_path=self.projectDir / "Fabric" / "gds_config.yaml",
+            tile_opt_config=tile_opt_config,
         )
 
     gui_parser = Cmd2ArgumentParser()

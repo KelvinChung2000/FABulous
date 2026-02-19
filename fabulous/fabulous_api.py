@@ -604,6 +604,8 @@ class FABulous_API:
         base_config_path: Path | None = None,
         config_override_path: Path | None = None,
         tile_opt_config: Path | None = None,
+        nlp_only: bool = False,
+        nlp_area_margin: float = 0.05,
         **config_overrides: dict,
     ) -> None:
         """Run the stitching flow to assemble tile macros into a fabric-level GDS."""

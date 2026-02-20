@@ -109,7 +109,7 @@ def sync_tile_metrics(project: str, apply: bool) -> int:
     # Collect metrics and compute updates in one pass
     rows: list[dict] = []
     for entry in sorted(tile_dir.iterdir()):
-        if not entry.is_dir():
+        if not entry.is_dir() or "include" in str(entry):
             continue
 
         metrics_path = entry / "macro" / "final_views" / "metrics.json"

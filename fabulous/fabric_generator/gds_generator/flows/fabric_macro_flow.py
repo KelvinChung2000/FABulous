@@ -637,7 +637,7 @@ class FABulousFabricMacroFlow(Classic):
         (final_state, steps) = super().run(initial_state, **kwargs)
 
         final_views_path = (
-            get_context().proj_dir / "fabric" / "macro" / self.config["PDK"]
+            get_context().proj_dir / "fabric" / "macro" / "final_views"
         ).resolve()
         info(f"Saving final views for FABulous to {final_views_path}")
         final_state.save_snapshot(final_views_path)

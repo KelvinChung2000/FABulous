@@ -90,6 +90,7 @@ extensions = [
     "sphinx_prompt",
     # Utility extensions
     "sphinxcontrib.bibtex",
+    "sphinx_llm.txt",
     # Custom FABulous extensions
     "generate_cli_docs",
     "generate_configvar_docs",

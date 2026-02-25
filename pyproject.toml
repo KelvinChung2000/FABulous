@@ -181,6 +181,8 @@ sync-demo = "uv run scripts/sync_demo_tile_gds_config.py"
 
 test = "uv run scripts/run_tests.py"
 
+hdl-coverage = "verilator_coverage --annotate coverage_hdl/ --annotate-min 1 coverage_hdl/*.dat"
+
 project-upgrade = "uv lock --upgrade && nix flake update && task test"
 
 [tool.deptry]

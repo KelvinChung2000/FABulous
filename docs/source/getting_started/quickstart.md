@@ -38,8 +38,18 @@ sudo apt-get install python3-tk
 
 :::
 
+## Recommended setup with uv
+
+Install uv as described in the [Installation section](#uv-install).
+
 ```bash
-git clone https://github.com/FPGA-Research/FABulous
+uv tool install fabulous-efpga 
+```
+
+Run FABulous using uv:
+
+```bash
+uv run FABulous
 ```
 
 We recommend using python virtual environments for the usage of FABulous.
@@ -122,8 +132,8 @@ If there is a warning like the following:
 
   Getting the faster antlr parser can normally be done by installing the
   required dependencies and then reinstalling the fasm package with:
-    pip uninstall
-    pip install -v fasm
+   uv pip uninstall fasm
+   uv pip install -v fasm
 ```
 
 This is expected if the FASM package, that we have as a dependency,

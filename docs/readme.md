@@ -1,6 +1,26 @@
 # FABulous docs
 
+FABulous is an open-source embedded FPGA (eFPGA) framework for generating silicon-proven FPGA fabrics, with a full-stack flow from CSV-based fabric definition to GDSII.
+
 The upstream FABulous documentation is available at [https://fabulous.readthedocs.io](https://fabulous.readthedocs.io/en/latest/)
+
+## TL;DR
+
+```bash
+git clone https://github.com/FPGA-Research/FABulous
+cd FABulous/docs
+uv sync
+make html
+xdg-open build/html/index.html
+```
+
+## What to search for
+
+- Quick start and installation: docs/source/getting_started
+- CLI commands: docs/source/user_guide/cli_doc
+- Fabric build flow: docs/source/user_guide/building_doc
+- Bitstream and configuration: docs/source/user_guide/using_doc
+- Simulation and emulation: docs/source/user_guide/simulation
 
 ## General
 
@@ -9,20 +29,12 @@ The documentation is written in [reStructuredText](https://docutils.sourceforge.
 
 ## Prerequisites
 
-To build the documentation, you should already have set up your virtual environment and installed the required packages to use FABulous
-as described in the [README](../README.md). Make sure you have picked the right FABulous branch, you want to build the documentation for.
+To build the documentation, you should already have set up your environment and installed the required packages to use FABulous as described in the [README](../README.md). Make sure you have picked the right FABulous branch you want to build the documentation for.
 
-First source your virtual environment:
-
-```bash
-$ source venv/bin/activate
-```
-
-Then navigate to the `docs` directory and install the required pacakges:
+Install the documentation dependencies with uv:
 
 ```bash
-(venv) $ cd docs
-(vevn) $ pip install -r requirements.txt
+uv sync
 ```
 
 ## Building the documentation
@@ -32,7 +44,7 @@ Then navigate to the `docs` directory and install the required pacakges:
 To build the documentation in HTML format, run:
 
 ```bash
-(venv) $ make html
+make html
 ```
 
 This should create a `build/html/` directory path in the `docs` directory for the HTML documentation.
@@ -40,7 +52,7 @@ This should create a `build/html/` directory path in the `docs` directory for th
 Open it with your browser:
 
 ```bash
-(venv) $ xdg-open build/html/index.html
+xdg-open build/html/index.html
 ```
 
 ### PDF format
@@ -51,13 +63,13 @@ and a working LaTeX installation on your system, you can find the needed package
 You also need to install [Imagemagic](https://imagemagick.org/script/index.php), which you can install via `apt-get`:
 
 ```bash
-$ sudo apt-get install imagemagick
+sudo apt-get install imagemagick
 ```
 
 To build the documentation in PDF format, run:
 
 ```bash
-(venv) $ make latexpdf
+make latexpdf
 ```
 
 This should create a `build/latex/` directory path in the `docs` directory for the PDF documentation.
@@ -66,7 +78,7 @@ The PDF file is named `fabulous.pdf`.
 Open it with your PDF viewer:
 
 ```bash
-(venv) $ xdg-open build/latex/fabulous.pdf
+xdg-open build/latex/fabulous.pdf
 ```
 
 ### Clean the build directory
@@ -74,7 +86,7 @@ Open it with your PDF viewer:
 To clean the build directory, run:
 
 ```bash
-(venv) $ make clean
+make clean
 ```
 
 This will remove the `build/` directory.

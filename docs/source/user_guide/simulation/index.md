@@ -1,7 +1,7 @@
 (simulation_setup)=
 # Simulation and emulation
 
-Running FABulous fabrics and user designs on commercial FPGAs.
+FABulous supports pre-silicon validation through simulation and emulation on commercial FPGA boards, enabling system-level verification of generated fabrics and user designs before tapeout.
 
 ```{toctree}
 simulation

@@ -166,13 +166,19 @@ module cus_mux41 (A0, A1, A2, A3, S0, S0N, S1, S1N, X);
     input S1;
     input S1N;
     output X;
-    wire [1:0] SEL;
     wire [3:0] AIN;
 
+`ifndef DISABLE_BREAK_COMB_LOOP
     break_comb_loop break_comb_loop_inst0(.A (A0), .X (AIN[0]));
     break_comb_loop break_comb_loop_inst1(.A (A1), .X (AIN[1]));
     break_comb_loop break_comb_loop_inst2(.A (A2), .X (AIN[2]));
     break_comb_loop break_comb_loop_inst3(.A (A3), .X (AIN[3]));
+`else
+    assign AIN[0] = A0;
+    assign AIN[1] = A1;
+    assign AIN[2] = A2;
+    assign AIN[3] = A3;
+`endif
 
     wire B0 = S0 ? AIN[1] : AIN[0];
     wire B1 = S0 ? AIN[3] : AIN[2];
@@ -191,10 +197,17 @@ module cus_mux41_buf (A0, A1, A2, A3, S0, S0N, S1, S1N, X);
     output X;
     wire [3:0] AIN;
 
+`ifndef DISABLE_BREAK_COMB_LOOP
     break_comb_loop break_comb_loop_inst0(.A (A0), .X (AIN[0]));
     break_comb_loop break_comb_loop_inst1(.A (A1), .X (AIN[1]));
     break_comb_loop break_comb_loop_inst2(.A (A2), .X (AIN[2]));
     break_comb_loop break_comb_loop_inst3(.A (A3), .X (AIN[3]));
+`else
+    assign AIN[0] = A0;
+    assign AIN[1] = A1;
+    assign AIN[2] = A2;
+    assign AIN[3] = A3;
+`endif
 
     wire B0 = S0 ? AIN[1] : AIN[0];
     wire B1 = S0 ? AIN[3] : AIN[2];
@@ -208,8 +221,13 @@ module cus_mux21 (A0, A1, S, X);
     output X;
     wire [1:0] AIN;
 
+`ifndef DISABLE_BREAK_COMB_LOOP
     break_comb_loop break_comb_loop_inst0(.A (A0), .X (AIN[0]));
     break_comb_loop break_comb_loop_inst1(.A (A1), .X (AIN[1]));
+`else
+    assign AIN[0] = A0;
+    assign AIN[1] = A1;
+`endif
 
     assign X = S ? AIN[1] : AIN[0];
 endmodule

@@ -261,6 +261,8 @@ entity cus_mux41 is
 end entity;
 
 architecture from_verilog of cus_mux41 is
+  -- Set to true to disable break_comb_loop insertion
+  constant DISABLE_BREAK_COMB_LOOP : boolean := false;
   signal AIN : std_logic_vector(3 downto 0);
   signal B0 : std_logic;
   signal B1 : std_logic;
@@ -274,26 +276,22 @@ architecture from_verilog of cus_mux41 is
   end component;
 
 begin
-  break_comb_loop_inst0: break_comb_loop
-    port map (
-      A => A0,
-      X => AIN(0)
-    );
-  break_comb_loop_inst1: break_comb_loop
-    port map (
-      A => A1,
-      X => AIN(1)
-    );
-  break_comb_loop_inst2: break_comb_loop
-    port map (
-      A => A2,
-      X => AIN(2)
-    );
-  break_comb_loop_inst3: break_comb_loop
-    port map (
-      A => A3,
-      X => AIN(3)
-    );
+  gen_bcl: if not DISABLE_BREAK_COMB_LOOP generate
+    break_comb_loop_inst0: break_comb_loop
+      port map (A => A0, X => AIN(0));
+    break_comb_loop_inst1: break_comb_loop
+      port map (A => A1, X => AIN(1));
+    break_comb_loop_inst2: break_comb_loop
+      port map (A => A2, X => AIN(2));
+    break_comb_loop_inst3: break_comb_loop
+      port map (A => A3, X => AIN(3));
+  end generate;
+  gen_no_bcl: if DISABLE_BREAK_COMB_LOOP generate
+    AIN(0) <= A0;
+    AIN(1) <= A1;
+    AIN(2) <= A2;
+    AIN(3) <= A3;
+  end generate;
 
   B0 <= AIN(1) when S0 = '1' else AIN(0);
   B1 <= AIN(3) when S0 = '1' else AIN(2);
@@ -443,6 +441,8 @@ entity cus_mux41_buf is
 end entity;
 
 architecture from_verilog of cus_mux41_buf is
+  -- Set to true to disable break_comb_loop insertion
+  constant DISABLE_BREAK_COMB_LOOP : boolean := false;
   signal AIN : std_logic_vector(3 downto 0);
   signal B0 : std_logic;
   signal B1 : std_logic;
@@ -456,26 +456,22 @@ architecture from_verilog of cus_mux41_buf is
   end component;
 
 begin
-  break_comb_loop_inst0: break_comb_loop
-    port map (
-      A => A0,
-      X => AIN(0)
-    );
-  break_comb_loop_inst1: break_comb_loop
-    port map (
-      A => A1,
-      X => AIN(1)
-    );
-  break_comb_loop_inst2: break_comb_loop
-    port map (
-      A => A2,
-      X => AIN(2)
-    );
-  break_comb_loop_inst3: break_comb_loop
-    port map (
-      A => A3,
-      X => AIN(3)
-    );
+  gen_bcl: if not DISABLE_BREAK_COMB_LOOP generate
+    break_comb_loop_inst0: break_comb_loop
+      port map (A => A0, X => AIN(0));
+    break_comb_loop_inst1: break_comb_loop
+      port map (A => A1, X => AIN(1));
+    break_comb_loop_inst2: break_comb_loop
+      port map (A => A2, X => AIN(2));
+    break_comb_loop_inst3: break_comb_loop
+      port map (A => A3, X => AIN(3));
+  end generate;
+  gen_no_bcl: if DISABLE_BREAK_COMB_LOOP generate
+    AIN(0) <= A0;
+    AIN(1) <= A1;
+    AIN(2) <= A2;
+    AIN(3) <= A3;
+  end generate;
 
   B0 <= AIN(1) when S0 = '1' else AIN(0);
   B1 <= AIN(3) when S0 = '1' else AIN(2);
@@ -585,6 +581,8 @@ entity cus_mux21 is
 end entity;
 
 architecture from_verilog of cus_mux21 is
+  -- Set to true to disable break_comb_loop insertion
+  constant DISABLE_BREAK_COMB_LOOP : boolean := false;
   signal SEL : std_logic;
 
   component break_comb_loop is
@@ -599,16 +597,16 @@ architecture from_verilog of cus_mux21 is
 begin
   SEL <= S;
 
-  break_comb_loop_inst0: break_comb_loop
-    port map (
-      A => A0,
-      X => AIN(0)
-    );
-  break_comb_loop_inst1: break_comb_loop
-    port map (
-      A => A1,
-      X => AIN(1)
-    );
+  gen_bcl: if not DISABLE_BREAK_COMB_LOOP generate
+    break_comb_loop_inst0: break_comb_loop
+      port map (A => A0, X => AIN(0));
+    break_comb_loop_inst1: break_comb_loop
+      port map (A => A1, X => AIN(1));
+  end generate;
+  gen_no_bcl: if DISABLE_BREAK_COMB_LOOP generate
+    AIN(0) <= A0;
+    AIN(1) <= A1;
+  end generate;
 
   with SEL select
     X <= AIN(0)  when '0',

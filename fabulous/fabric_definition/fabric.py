@@ -66,6 +66,9 @@ class Fabric:
         Whether the fabric has super tile.
     disableUserCLK : bool
         Whether to disable UserCLK generation in the fabric.
+    useBufferedMux : bool
+        Whether to use buffered mux variants (_buf) for muxes larger than 2.
+        When False, uses non-buffered variants instead.
     tileDic : dict[str, Tile]
         A dictionary of tiles used in the fabric. The key is the name of the tile and
         the value is the tile.
@@ -102,6 +105,7 @@ class Fabric:
     numberOfBRAMs: int = 10
     superTileEnable: bool = True
     disableUserCLK: bool = False
+    useBufferedMux: bool = True
 
     tileDic: dict[str, Tile] = field(default_factory=dict)
     superTileDic: dict[str, SuperTile] = field(default_factory=dict)
@@ -281,6 +285,7 @@ class Fabric:
         fabric += f"multiplexerStyle: {self.multiplexerStyle}\n"
         fabric += f"superTileEnable: {self.superTileEnable}\n"
         fabric += f"disableUserCLK: {self.disableUserCLK}\n"
+        fabric += f"useBufferedMux: {self.useBufferedMux}\n"
         fabric += f"tileDic: {list(self.tileDic.keys())}\n"
         return fabric
 

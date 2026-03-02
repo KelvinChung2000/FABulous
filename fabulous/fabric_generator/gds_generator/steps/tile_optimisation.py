@@ -72,6 +72,18 @@ var = [
         "Default is False.",
         default=False,
     ),
+    Variable(
+        "FABULOUS_PIN_MIN_WIDTH",
+        Decimal,
+        "Minimum tile width based on pin requirements.",
+        default=Decimal(0),
+    ),
+    Variable(
+        "FABULOUS_PIN_MIN_HEIGHT",
+        Decimal,
+        "Minimum tile height based on pin requirements.",
+        default=Decimal(0),
+    ),
 ]
 
 
@@ -135,6 +147,8 @@ class TileOptimisation(WhileStep):
 
     iter_count: int = 0
 
+    last_core_area: Decimal | None = None
+
     def condition(self, state: State) -> bool:
         """Loop condition."""
         if state.metrics.get("route__drc_errors") is None:
@@ -156,6 +170,12 @@ class TileOptimisation(WhileStep):
         self, post_iteration: State, full_iter_completed: bool
     ) -> State:
         """Save state if iteration completed successfully."""
+        # Capture core area for the next iteration's scaling check.
+        # The WhileStep resets state each iteration, so we persist this
+        # on the instance to carry it across resets.
+        if (ca := post_iteration.metrics.get("design__core__area")) is not None:
+            self.last_core_area = Decimal(ca)
+
         if full_iter_completed:
             self.last_working_state = post_iteration.copy()
             return post_iteration
@@ -165,7 +185,7 @@ class TileOptimisation(WhileStep):
         return post_iteration
 
     def _refresh_routing_obstructions(self) -> None:
-        """Clear existing routing obstructions and recompute from current config.
+        """Clear and recompute routing obstructions from current config.
 
         The two-step process is required because get_routing_obstructions reads
         ROUTING_OBSTRUCTIONS from config and appends edge obstructions. Clearing
@@ -201,34 +221,17 @@ class TileOptimisation(WhileStep):
         )
 
         instance_area = Decimal(pre_iteration.metrics.get("design__instance__area", 0))
-
-        # Scale up initial dimensions when the stdcell area exceeds the
-        # pin-based die area.  The scaling strategy depends on the
-        # optimisation mode so that the search starts from the correct
-        # baseline:
-        #   FIND_MIN_WIDTH  – keep width at pin minimum, grow height
-        #   FIND_MIN_HEIGHT – keep height at pin minimum, grow width
-        #   BALANCE / LARGE – scale both using pin aspect ratio
-        pin_area = width * height
-        if instance_area > 0 and pin_area > 0 and pin_area < instance_area:
-            opt_mode = self.config["FABULOUS_OPT_MODE"]
-            if opt_mode == OptMode.FIND_MIN_WIDTH:
-                height = max(height, instance_area / width)
-            elif opt_mode == OptMode.FIND_MIN_HEIGHT:
-                width = max(width, instance_area / height)
-            else:
-                pin_ratio = width / height
-                width = max(width, (instance_area * pin_ratio).sqrt())
-                height = max(height, (instance_area / pin_ratio).sqrt())
-
-        if height == 0:
-            height = instance_area.sqrt()
-
-        if width == 0:
-            width = instance_area.sqrt()
+        core_area = (
+            self.last_core_area if self.last_core_area is not None else width * height
+        )
 
         new_width, new_height = self._compute_new_dimensions(
-            width, height, width_step, height_step, instance_area
+            width,
+            height,
+            width_step,
+            height_step,
+            instance_area,
+            core_area,
         )
 
         die_area = (
@@ -255,64 +258,91 @@ class TileOptimisation(WhileStep):
         width_step: Decimal,
         height_step: Decimal,
         instance_area: Decimal,
+        core_area: Decimal,
     ) -> tuple[Decimal, Decimal]:
-        """Compute the next tile dimensions based on the optimization mode."""
-        match self.config["FABULOUS_OPT_MODE"]:
+        """Compute the next tile dimensions based on the optimisation mode.
+
+        First ensures the die can accommodate the instance area by scaling
+        dimensions proportionally, then applies the iterative growth step
+        for the active mode. The scaling check uses core area (the placeable
+        region after margins/PDN) rather than die area, since utilization
+        is determined by instance_area / core_area.
+        """
+        opt_mode = self.config["FABULOUS_OPT_MODE"]
+
+        # Scale up if instance area exceeds the placeable core area.
+        # The scale factor accounts for fixed margins/PDN that reduce
+        # the usable placement region inside the die boundary.
+        if core_area > 0 and instance_area > core_area:
+            overshoot = instance_area / core_area
+            if opt_mode == OptMode.FIND_MIN_WIDTH:
+                height = height * overshoot
+            elif opt_mode == OptMode.FIND_MIN_HEIGHT:
+                width = width * overshoot
+            else:
+                scale = overshoot.sqrt()
+                width = width * scale
+                height = height * scale
+
+        # Apply iterative step
+        match opt_mode:
             case OptMode.FIND_MIN_WIDTH:
-                if width == 0:
-                    return instance_area / height, height
                 return width + width_step, height
-
             case OptMode.FIND_MIN_HEIGHT:
-                if height == 0:
-                    return width, instance_area / width
                 return width, height + height_step
-
             case OptMode.BALANCE:
-                if width == 0 or height == 0:
-                    if width == 0 and height == 0:
-                        side = instance_area.sqrt()
-                        return side, side
-                    if width > height:
-                        return width, instance_area / width
-                    return instance_area / height, height
                 if self.to_change_width:
                     return width + width_step, height
                 return width, height + height_step
-
             case OptMode.LARGE:
-                if width == 0 or height == 0:
-                    side = instance_area.sqrt()
-                    return side, side
                 return width + width_step, height + height_step
-
             case _:
-                raise ValueError(
-                    f"Unknown FABULOUS_OPT_MODE: {self.config['FABULOUS_OPT_MODE']}"
-                )
+                raise ValueError(f"Unknown FABULOUS_OPT_MODE: {opt_mode}")
 
     def post_loop_callback(self, state: State) -> State:  # noqa: ARG002
         """Post loop callback."""
-        if self.last_working_state is not None:
-            return self.last_working_state
-        if self.config["FABULOUS_OPT_MODE"] == OptMode.NO_OPT:
-            raise RuntimeError(
-                "Fail to find a clean state after the physical implementation"
-            )
-        raise RuntimeError("No working state found after tile optimisation.")
+        if self.last_working_state is None:
+            if self.config["FABULOUS_OPT_MODE"] == OptMode.NO_OPT:
+                raise RuntimeError(
+                    "Fail to find a clean state after the physical implementation"
+                )
+            raise RuntimeError("No working state found after tile optimisation.")
+
+        result = self.last_working_state
+
+        # Update config with actual die area so downstream steps
+        # (e.g. Magic/KLayout stream-out) use the correct boundary.
+        die_bbox_str = result.metrics.get("design__die__bbox")
+        if die_bbox_str is not None:
+            new_die_area = tuple(Decimal(x) for x in die_bbox_str.split())
+            old_die_area = self.config.get("DIE_AREA")
+            if (
+                old_die_area is None
+                or tuple(Decimal(x) for x in old_die_area) != new_die_area
+            ):
+                info(
+                    f"Updating DIE_AREA from {old_die_area} to {new_die_area} "
+                    "based on TileOptimisation output."
+                )
+                self.config = self.config.copy(DIE_AREA=new_die_area)
+
+        return result
 
     def mid_iteration_break(self, state: State, step: type[Step]) -> bool:
         """Mid iteration callback."""
-        if isinstance(step, Checker.TrDRC):
-            if self.config["IGNORE_ANTENNA_VIOLATIONS"]:
-                return cast("int", state.metrics.get("route__drc_errors")) > 0
+        if not isinstance(step, Checker.TrDRC):
+            return False
 
-            return (cast("int", state.metrics.get("antenna__violating__nets")) > 0) or (
-                cast("int", state.metrics.get("antenna__violating__pins")) > 0
-                or cast("int", state.metrics.get("route__drc_errors")) > 0
+        metrics_to_check = ["route__drc_errors"]
+        if not self.config["IGNORE_ANTENNA_VIOLATIONS"]:
+            metrics_to_check.extend(
+                [
+                    "antenna__violating__nets",
+                    "antenna__violating__pins",
+                ]
             )
 
-        return False
+        return any(cast("int", state.metrics.get(m, 0)) > 0 for m in metrics_to_check)
 
     def run(
         self,

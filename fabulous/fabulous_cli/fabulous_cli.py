@@ -1391,6 +1391,17 @@ class FABulous_CLI(Cmd):
         default=None,
         help="Path to tile optimisation summary JSON to skip Step 1",
     )
+    eFPGA_macro_parser.add_argument(
+        "--nlp-only",
+        action="store_true",
+        help="Run exploration and NLP only, skip recompilation",
+    )
+    eFPGA_macro_parser.add_argument(
+        "--nlp-area-margin",
+        type=float,
+        default=0.05,
+        help="Area margin for NLP constraint (default: 0.05 = 5%%)",
+    )
 
     @with_argparser(eFPGA_macro_parser)
     @with_category(CMD_FABRIC_FLOW)
@@ -1403,6 +1414,8 @@ class FABulous_CLI(Cmd):
             self.projectDir / "Fabric" / "macro",
             base_config_path=self.projectDir / "Fabric" / "gds_config.yaml",
             tile_opt_config=tile_opt_config,
+            nlp_only=args.nlp_only,
+            nlp_area_margin=args.nlp_area_margin,
         )
 
     gui_parser = Cmd2ArgumentParser()

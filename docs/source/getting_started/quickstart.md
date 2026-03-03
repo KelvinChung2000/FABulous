@@ -16,6 +16,8 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 uv tool install fabulous-fpga
 ```
 
+If you already have [pipx](https://pipx.pypa.io/) installed, `pipx install fabulous-fpga` works as well.
+
 Verify the installation:
 
 ```bash

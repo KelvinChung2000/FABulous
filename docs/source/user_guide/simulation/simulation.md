@@ -1,6 +1,17 @@
 # Simulation setup
 
-FABulous provides a simulation environment to test the fabric and the bitstream generated for it.
+FABulous provides a simulation environment to validate that the generated
+FPGA fabric works correctly. The simulation loads a test bitstream into the
+fabric RTL and verifies that configuration, routing, and primitive behavior
+function as intended.
+
+:::{important}
+The purpose of FABulous simulation is to verify the **generated fabric
+implementation**, not to validate user designs mapped onto it. If you need to
+test your own design logic, use a standard HDL testbench for your design
+before mapping it to the fabric.
+:::
+
 For simple use cases, there is the `run_simulation` command in the FABulous shell.
 For more complex use cases it can be useful to create an own flow, like the following example `make` based flow.
 

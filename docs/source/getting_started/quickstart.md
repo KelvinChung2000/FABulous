@@ -13,7 +13,7 @@ Install [uv](https://github.com/astral-sh/uv) (if you don't have it already), th
 curl -LsSf https://astral.sh/uv/install.sh | sh
 
 # Install FABulous
-uv tool install fabulous-efpga
+uv tool install fabulous-fpga
 ```
 
 Verify the installation:

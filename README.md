@@ -18,7 +18,7 @@
 
 ## Overview and Features
 
-FABulous is an open-source embedded FPGA (eFPGA) framework for generating silicon-proven FPGA fabrics. It provides a full-stack toolchain integration that handles everything from fabric definition to GDSII generation, utilising industry-standard open-source tools.
+FABulous is an open-source embedded FPGA (eFPGA) framework for generating FPGA fabric and integrates the open source CAD tools Yosys and nextpnr for the user desing flow. It is silicon-proven through multiple successful tapeouts across TSMC 180nm, Skywater 130nm, and 28nm CMOS (and an IHP SG13G2 tapeout pending bring-up), FABulous provides a full-stack toolchain from CSV-based fabric definition to production-ready GDSII. The framework supports frame-based partial reconfiguration for runtime reconfiguration of individual FPGA regions.
 
 ### Key Capabilities
 
@@ -32,7 +32,7 @@ FABulous is an open-source embedded FPGA (eFPGA) framework for generating silico
 
 ## Silicon Proven
 
-FABulous has been validated through 8+ successful tapeouts across multiple process nodes.
+FABulous has been validated through 12+ successful tapeouts across multiple process nodes.
 
 | Process Node | Project | Description |
 | :--- | :--- | :--- |
@@ -56,7 +56,7 @@ See the [Chip Gallery](https://fabulous.readthedocs.io/en/latest/gallery/index.h
 | Fabric definition format | CSV | XML |
 | Partial reconfiguration | Frame-based | Not supported |
 | GDS generation | Integrated LibreLane flow | External flow required |
-| Silicon tapeouts | 8+ across 3+ process nodes | SOFA series (Skywater 130nm) |
+| Silicon tapeouts | 12+ across 5+ process nodes | SOFA series (Skywater 130nm) |
 | CAD tools | Yosys + nextpnr | Yosys + VTR |
 | License | Apache 2.0 | MIT |
 
@@ -102,7 +102,7 @@ Interacting with FABulous is typically done via its interactive shell or through
 | :---- | :---- |
 | Create a new project | FABulous create-project \<name> |
 | Launch interactive shell | FABulous start |
-| Run a non-interactive flow | FABulous -p \<dir> run "..." |
+| Run a non-interactive flow | FABulous -p \<dir> run "<cmd1>; <cmd2>; ..." |
 | Execute a TCL script | FABulous -p \<dir> script custom_flow.tcl |
 | View help documentation | FABulous --help |
 

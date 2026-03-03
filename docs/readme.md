@@ -1,6 +1,6 @@
 # FABulous docs
 
-FABulous is an open-source embedded FPGA (eFPGA) framework for generating silicon-proven FPGA fabrics, with a full-stack flow from CSV-based fabric definition to GDSII.
+FABulous is an open-source embedded FPGA (eFPGA) framework for generating FPGA fabric and integrates the open source CAD tools Yosys and nextpnr for the user desing flow. It is silicon-proven through multiple successful tapeouts across TSMC 180nm, Skywater 130nm, and 28nm CMOS (and an IHP SG13G2 tapeout pending bring-up), FABulous provides a full-stack toolchain from CSV-based fabric definition to production-ready GDSII. The framework supports frame-based partial reconfiguration for runtime reconfiguration of individual FPGA regions.
 
 The upstream FABulous documentation is available at [https://fabulous.readthedocs.io](https://fabulous.readthedocs.io/en/latest/)
 

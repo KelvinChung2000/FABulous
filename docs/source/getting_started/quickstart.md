@@ -34,7 +34,7 @@ FABulous requires [Yosys](https://github.com/YosysHQ/yosys) and [nextpnr-generic
 FABulous install-oss-cad-suite
 ```
 
-This installs the [OSS CAD Suite](https://github.com/YosysHQ/oss-cad-suite-build), which includes Yosys, nextpnr, simulators, and all other required tools. For manual installation or more details, see [CAD tool installation](#cad-tool-install).
+This installs the [OSS CAD Suite](https://github.com/YosysHQ/oss-cad-suite-build), which includes Yosys, nextpnr, simulators, and all other required tools. VHDL users will also get [ghdl](https://github.com/ghdl/ghdl) and the [ghdl-yosys-plugin](https://github.com/ghdl/ghdl-yosys-plugin) through this installer. For manual installation or more details, see [CAD tool installation](#cad-tool-install).
 
 ## 3. Create a project
 

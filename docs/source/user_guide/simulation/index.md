@@ -16,6 +16,7 @@ bitstream is hardwired into the design at synthesis time. This provides a way
 to test the fabric in actual hardware without needing a configuration
 controller.
 
+
 ```{toctree}
 simulation
 emulation

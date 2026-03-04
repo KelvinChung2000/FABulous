@@ -4,7 +4,6 @@ from pathlib import Path
 
 import pytest
 from dotenv import set_key
-from pytest_mock import MockerFixture
 
 from fabulous.fabulous_cli.helper import create_project
 

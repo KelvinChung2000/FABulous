@@ -8,9 +8,9 @@ configuration, routing, and primitive behavior function as intended.
 ```{mermaid}
 flowchart TB
     subgraph design ["User Design Flow"]
-        A[User Design\nVerilog/VHDL] --> B[Yosys\nSynthesis]
-        B --> C[nextpnr\nPlace & Route]
-        C --> D[Bitstream\nGeneration]
+        A[User Design Verilog/VHDL] --> B[Yosys Synthesis]
+        B --> C[nextpnr Place & Route]
+        C --> D[Bitstream Generation]
     end
 
     subgraph fabric ["Fabric Generation"]
@@ -19,14 +19,14 @@ flowchart TB
 
     subgraph sim ["Simulation"]
         direction LR
-        E[Test Bitstream] --> H[Testbench]
+        E[Test Bitstream] --> H[Icarus Testbench]
         H --> I{Pass / Fail}
     end
 
     subgraph emu ["Emulation"]
         direction LR
-        J[Hardwired\nBitstream] --> K[Fabric RTL +\nBitstream]
-        K --> L[Commercial\nFPGA Board]
+        J[Hardwired Bitstream] --> K[Fabric RTL + Bitstream]
+        K --> L[Commercial FPGA Board]
     end
 
     D --> E

@@ -91,6 +91,7 @@ extensions = [
     # Utility extensions
     "sphinxcontrib.bibtex",
     "sphinx_llm.txt",
+    'sphinxcontrib.mermaid',
     # Custom FABulous extensions
     "generate_cli_docs",
     "generate_configvar_docs",

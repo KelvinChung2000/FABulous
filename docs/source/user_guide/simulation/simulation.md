@@ -47,14 +47,14 @@ components interact.
 
 ```{mermaid}
 flowchart LR
-    A[User Design\nVerilog/VHDL] --> B[Yosys\nSynthesis]
-    B --> C[nextpnr\nPlace & Route]
-    C --> D[Bitstream\nGeneration]
+    A[User Design Verilog/VHDL] --> B[Yosys Synthesis]
+    B --> C[nextpnr Place & Route]
+    C --> D[Bitstream Generation]
     D --> E[Test Bitstream]
 
     F[FABulous] --> G[Fabric RTL]
 
-    E --> H[Testbench\nSimulation]
+    E --> H[Testbench Simulation]
     G --> H
     H --> I{Pass / Fail}
 ```

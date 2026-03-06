@@ -49,5 +49,3 @@ When FABulous loads its settings, the following rules determine how the PDK is r
 
 ```{include} /generated_doc/fabulous_variable.md
 ```
-
-```

@@ -274,9 +274,7 @@ _jsonld = {
 
 import json as _json
 
-html_context = {
-    "jsonld": _json.dumps(_jsonld),
-}
+html_context["jsonld"] = _json.dumps(_jsonld)
 
 # -- AutoAPI Configuration (Modern replacement for autosummary)
 autoapi_type = "python"

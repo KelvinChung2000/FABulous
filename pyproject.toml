@@ -159,9 +159,9 @@ fab-proj = "FABulous -c demo"
 fab-build = "task fab-proj && FABulous demo -p 'run_FABulous_fabric'"
 fab-build-clean = "rm -r demo && task fab-proj && FABulous demo -p 'run_FABulous_fabric'"
 
-# Test and simulation tasks (using Make targets)
-fab-sim = "task fab-proj && cd ./demo/Test && make FAB_sim"
-fab-sim-clean = "rm -r demo && task fab-proj && cd ./demo/Test && make FAB_sim"
+# Test and simulation tasks (using Taskfile)
+fab-sim = "task fab-proj && cd ./demo/Test && task fab-sim"
+fab-sim-clean = "rm -r demo && task fab-proj && cd ./demo/Test && task fab-sim"
 
 # CI/Development helper tasks
 pre-commit = "task format && task check"

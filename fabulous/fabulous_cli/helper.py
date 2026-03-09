@@ -257,8 +257,9 @@ def run_task(
     """
     if shutil.which("task") is None:
         raise EnvironmentNotSet(
-            "The 'task' command (go-task) is not installed. "
-            "Install it from https://taskfile.dev or use 'nix develop'."
+            "The 'task' command (go-task) is not found on PATH. "
+            "It ships with FABulous; reinstall with "
+            "'pip install FABulous-FPGA'."
         )
 
     cmd: list[str] = ["task", task_name]

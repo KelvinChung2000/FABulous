@@ -22,28 +22,12 @@ in
   nextpnr = buildTool "nextpnr";
   fabulator = buildTool "fabulator";
   
-  # GHDL: Build from source on Linux, use pre-built binaries on macOS
+  # GHDL: pre-built binaries for both platforms
   ghdl = let
-    # Always use the commit hash from flake lock for reproducibility
-    flakeLocked = srcs.ghdl;
-    commit = flakeLocked.rev;
-    
-    # Choose derivation based on platform
-    isLinux = pkgs.stdenv.isLinux;
-    ghdlDerivation = if isLinux then
-      ./tools/ghdl-src.nix
-    else if pkgs.stdenv.isDarwin then
-      ./tools/ghdl-bin.nix
-    else
-      throw "Unsupported platform for GHDL";
-    
-    # Platform-specific arguments
-    args = if isLinux then {
-      # Only pass prefetchedSrc if available
-      prefetchedSrc = flakeLocked;
-    } else {
-      prefetchedTarball = srcs.ghdl-darwin-bin or null;
-    };
-    
-  in pkgs.callPackage ghdlDerivation args;
+    tarball = if pkgs.stdenv.isLinux then srcs.ghdl-linux-bin
+      else if pkgs.stdenv.isDarwin then srcs.ghdl-darwin-bin
+      else throw "Unsupported platform for GHDL";
+  in pkgs.callPackage ./tools/ghdl-bin.nix {
+    prefetchedTarball = tarball;
+  };
 }

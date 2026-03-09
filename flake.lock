@@ -77,31 +77,27 @@
     "ghdl-bin-aarch64-darwin": {
       "flake": false,
       "locked": {
-        "lastModified": 1771278188,
-        "narHash": "sha256-O6QOsoV6k9LJPar6VxZ1LMJjnPAADhTGzaj5RiS/zns=",
+        "lastModified": 1772908613,
+        "narHash": "sha256-2qfMjiGlOxRLoDuMNBwBefABuE61i9ZtPYw4tOhaDFI=",
         "type": "tarball",
-        "url": "https://github.com/ghdl/ghdl/releases/download/nightly/ghdl-llvm-jit-6.0.0-dev-macos15-aarch64.tar.gz"
+        "url": "https://github.com/ghdl/ghdl/releases/download/v6.0.0/ghdl-llvm-jit-6.0.0-macos15-aarch64.tar.gz"
       },
       "original": {
         "type": "tarball",
-        "url": "https://github.com/ghdl/ghdl/releases/download/nightly/ghdl-llvm-jit-6.0.0-dev-macos15-aarch64.tar.gz"
+        "url": "https://github.com/ghdl/ghdl/releases/download/v6.0.0/ghdl-llvm-jit-6.0.0-macos15-aarch64.tar.gz"
       }
     },
-    "ghdl-src": {
+    "ghdl-bin-x86_64-linux": {
       "flake": false,
       "locked": {
-        "lastModified": 1761160029,
-        "narHash": "sha256-aOxJ4Jmngo4ceVjVZy69kNP54MIU4EV8kghNidYOQ28=",
-        "owner": "ghdl",
-        "repo": "ghdl",
-        "rev": "c01020b2d3f2bf00d97c759e854b434181358c27",
-        "type": "github"
+        "lastModified": 1772908664,
+        "narHash": "sha256-KwP6SEPS4tssAJIW46GmJpWe41zEyRQFGWv6/0eFTwQ=",
+        "type": "tarball",
+        "url": "https://github.com/ghdl/ghdl/releases/download/v6.0.0/ghdl-mcode-6.0.0-ubuntu24.04-x86_64.tar.gz"
       },
       "original": {
-        "owner": "ghdl",
-        "repo": "ghdl",
-        "rev": "c01020b2d3f2bf00d97c759e854b434181358c27",
-        "type": "github"
+        "type": "tarball",
+        "url": "https://github.com/ghdl/ghdl/releases/download/v6.0.0/ghdl-mcode-6.0.0-ubuntu24.04-x86_64.tar.gz"
       }
     },
     "librelane": {
@@ -262,7 +258,7 @@
       "inputs": {
         "fabulator-src": "fabulator-src",
         "ghdl-bin-aarch64-darwin": "ghdl-bin-aarch64-darwin",
-        "ghdl-src": "ghdl-src",
+        "ghdl-bin-x86_64-linux": "ghdl-bin-x86_64-linux",
         "librelane": "librelane",
         "nextpnr-src": "nextpnr-src",
         "nix-eda": "nix-eda",

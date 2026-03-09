@@ -2,7 +2,7 @@
 # https://taskfile.dev
 #
 # VHDL simulation and build tasks for FABulous projects.
-# Override any variable via CLI: task run-simulation DESIGN=my_design
+# Override any variable via CLI: task run-simulation DESIGN=my_design WAVEFORM_TYPE=vcd
 version: "3"
 
 dotenv: ["../.FABulous/.env"]
@@ -15,6 +15,7 @@ vars:
   TESTBENCH: "{{.DESIGN}}_tb"
   TOP_WRAPPER: '{{.TOP_WRAPPER | default "top_wrapper"}}'
   USER_DESIGN_DIR: "{{.FAB_PROJ_ROOT}}/user_design"
+  WAVEFORM_TYPE: '{{.WAVEFORM_TYPE | default "fst"}}'
   GHDL_FLAGS: '{{.GHDL_FLAGS | default "--std=08 -O2"}}'
   EXTRA_GHDL_FLAGS: '{{.EXTRA_GHDL_FLAGS | default ""}}'
 
@@ -123,12 +124,12 @@ tasks:
       - >-
         ghdl -r {{.GHDL_FLAGS}} {{.EXTRA_GHDL_FLAGS}} --workdir={{.BUILD_DIR}} {{.TESTBENCH}}
         --stats --ieee-asserts=disable
-        --fst={{.BUILD_DIR}}/{{.TESTBENCH}}.fst
+        --{{.WAVEFORM_TYPE}}={{.BUILD_DIR}}/{{.TESTBENCH}}.{{.WAVEFORM_TYPE}}
 
   gtkwave:
     desc: Open waveform in GTKWave
     cmds:
-      - gtkwave {{.BUILD_DIR}}/{{.TESTBENCH}}.fst
+      - gtkwave {{.BUILD_DIR}}/{{.TESTBENCH}}.{{.WAVEFORM_TYPE}}
 
   mkdir-build:
     internal: true

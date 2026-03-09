@@ -116,7 +116,7 @@ The available variables are:
 |---|---|---|
 | `DESIGN` | `sequential_16bit_en` | Name of the user design (without extension) |
 | `TOP_WRAPPER` | `top_wrapper` | Top-level wrapper module name |
-| `WAVEFORM_TYPE` | `fst` | Waveform output format (`fst` or `vcd`, Verilog only) |
+| `WAVEFORM_TYPE` | `fst` | Waveform output format (`fst` or `vcd`) |
 | `BUILD_DIR` | `build` | Build output directory |
 | `FAB_PROJ_ROOT` | `..` | Path to the project root |
 | `GHDL_FLAGS` | `--std=08 -O2` | GHDL compilation flags (VHDL only) |

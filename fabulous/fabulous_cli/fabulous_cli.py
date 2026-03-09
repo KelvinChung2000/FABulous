@@ -964,6 +964,24 @@ class FABulous_CLI(Cmd):
         completer=Cmd.path_complete,
         help="Path to the bitstream file",
     )
+    simulation_parser.add_argument(
+        "-d",
+        "--design",
+        default="",
+        help="Design name to simulate (default: inferred from bitstream filename)",
+    )
+    simulation_parser.add_argument(
+        "-if",
+        "--extra-iverilog-flag",
+        default="",
+        help="Extra flags to pass to iverilog (Verilog projects)",
+    )
+    simulation_parser.add_argument(
+        "-gf",
+        "--extra-ghdl-flag",
+        default="",
+        help="Extra flags to pass to GHDL (VHDL projects)",
+    )
 
     @with_category(CMD_USER_DESIGN_FLOW)
     @with_argparser(simulation_parser)
@@ -995,9 +1013,16 @@ class FABulous_CLI(Cmd):
         taskfile = testPath / "Taskfile.yml"
         makefile = testPath / "Makefile"
 
+        design_name = args.design or bitstreamPath.stem
+
         task_vars = {
             "WAVEFORM_TYPE": args.format,
+            "DESIGN": design_name,
         }
+        if args.extra_iverilog_flag:
+            task_vars["EXTRA_IVERILOG_FLAGS"] = args.extra_iverilog_flag
+        if args.extra_ghdl_flag:
+            task_vars["EXTRA_GHDL_FLAGS"] = args.extra_ghdl_flag
 
         if taskfile.exists():
             logger.info(f"Running simulation for {bitstreamPath.stem} via Taskfile")

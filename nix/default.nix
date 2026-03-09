@@ -21,13 +21,16 @@ in
   # Custom builds only for these tools
   nextpnr = buildTool "nextpnr";
   fabulator = buildTool "fabulator";
-  
+
   # GHDL: pre-built binaries for both platforms
-  ghdl = let
-    tarball = if pkgs.stdenv.isLinux then srcs.ghdl-linux-bin
-      else if pkgs.stdenv.isDarwin then srcs.ghdl-darwin-bin
-      else throw "Unsupported platform for GHDL";
-  in pkgs.callPackage ./tools/ghdl-bin.nix {
-    prefetchedTarball = tarball;
-  };
+  ghdl =
+    let
+      tarball =
+        if pkgs.stdenv.isLinux then srcs.ghdl-linux-bin
+        else if pkgs.stdenv.isDarwin then srcs.ghdl-darwin-bin
+        else throw "Unsupported platform for GHDL: ${pkgs.stdenv.hostPlatform.system}";
+    in
+    pkgs.callPackage ./tools/ghdl-bin.nix {
+      prefetchedTarball = tarball;
+    };
 }

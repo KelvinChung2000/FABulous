@@ -175,8 +175,8 @@
               pkgs.gtkwave
               customPkgs.nextpnr
               customPkgs.fabulator
+              customPkgs.ghdl
             ]
-            ++ (lib.optional (builtins.elem system [ "x86_64-linux" "aarch64-darwin" ]) customPkgs.ghdl)
             ++ (builtins.filter systemSupported librelane-pkg.includedTools);
 
           prompt = ''\[\033[1;32m\][FABulous-nix:\w]\$\[\033[0m\] '';

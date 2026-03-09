@@ -65,20 +65,6 @@ module BlockRAM_1KB (clk, rd_en, rd_addr, rd_data, wr_en, wr_addr, wr_data, C0, 
                 mem_wr_mask = 4'b1000;
                 muxedDataIn[31:24] = wr_data[7:0];
             end
-        end else begin // 4-bit (wr_port_configuration == 3)
-            // addr[10:9] selects byte, addr[8] selects nibble within byte
-            // NOTE: writes a full byte; adjacent nibble in same byte is zeroed
-            case (wr_addr_topbits)
-                3'd0: begin mem_wr_mask = 4'b0001; muxedDataIn[3:0]   = wr_data[3:0]; end
-                3'd1: begin mem_wr_mask = 4'b0001; muxedDataIn[7:4]   = wr_data[3:0]; end
-                3'd2: begin mem_wr_mask = 4'b0010; muxedDataIn[11:8]  = wr_data[3:0]; end
-                3'd3: begin mem_wr_mask = 4'b0010; muxedDataIn[15:12] = wr_data[3:0]; end
-                3'd4: begin mem_wr_mask = 4'b0100; muxedDataIn[19:16] = wr_data[3:0]; end
-                3'd5: begin mem_wr_mask = 4'b0100; muxedDataIn[23:20] = wr_data[3:0]; end
-                3'd6: begin mem_wr_mask = 4'b1000; muxedDataIn[27:24] = wr_data[3:0]; end
-                3'd7: begin mem_wr_mask = 4'b1000; muxedDataIn[31:28] = wr_data[3:0]; end
-                default: begin mem_wr_mask = 4'b0000; muxedDataIn = 32'd0; end
-            endcase
         end
     end
 
@@ -123,18 +109,6 @@ module BlockRAM_1KB (clk, rd_en, rd_addr, rd_data, wr_en, wr_addr, wr_data, C0, 
             end else begin
                 rd_dout_muxed[7:0] = mem_dout[31:24];
             end
-        end else begin // 4-bit (rd_port_configuration == 3)
-            case (rd_dout_sel)
-                3'd0: rd_dout_muxed[3:0] = mem_dout[3:0];
-                3'd1: rd_dout_muxed[3:0] = mem_dout[7:4];
-                3'd2: rd_dout_muxed[3:0] = mem_dout[11:8];
-                3'd3: rd_dout_muxed[3:0] = mem_dout[15:12];
-                3'd4: rd_dout_muxed[3:0] = mem_dout[19:16];
-                3'd5: rd_dout_muxed[3:0] = mem_dout[23:20];
-                3'd6: rd_dout_muxed[3:0] = mem_dout[27:24];
-                3'd7: rd_dout_muxed[3:0] = mem_dout[31:28];
-                default: rd_dout_muxed = 32'd0;
-            endcase
         end
     end
 

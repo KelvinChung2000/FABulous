@@ -16,6 +16,7 @@ vars:
   TOP_WRAPPER: '{{.TOP_WRAPPER | default "top_wrapper"}}'
   USER_DESIGN_DIR: "{{.FAB_PROJ_ROOT}}/user_design"
   WAVEFORM_TYPE: '{{.WAVEFORM_TYPE | default "fst"}}'
+  EXTRA_IVERILOG_FLAGS: '{{.EXTRA_IVERILOG_FLAGS | default ""}}'
   FABRIC_FILES_DIR: "{{.BUILD_DIR}}/fabric_files"
 
 tasks:
@@ -118,6 +119,7 @@ tasks:
     cmds:
       - >-
         iverilog -g2012
+        {{.EXTRA_IVERILOG_FLAGS}}
         -s {{.TESTBENCH}}
         -o {{.BUILD_DIR}}/{{.DESIGN}}.vvp
         {{.FABRIC_FILES_DIR}}/*
@@ -135,6 +137,7 @@ tasks:
     cmds:
       - >-
         iverilog -g2012 -D EMULATION
+        {{.EXTRA_IVERILOG_FLAGS}}
         -s {{.TESTBENCH}}
         -o {{.BUILD_DIR}}/{{.DESIGN}}.vvp
         {{.BUILD_DIR}}/{{.DESIGN}}.vh

@@ -16,6 +16,7 @@ vars:
   TOP_WRAPPER: '{{.TOP_WRAPPER | default "top_wrapper"}}'
   USER_DESIGN_DIR: "{{.FAB_PROJ_ROOT}}/user_design"
   GHDL_FLAGS: '{{.GHDL_FLAGS | default "--std=08 -O2"}}'
+  EXTRA_GHDL_FLAGS: '{{.EXTRA_GHDL_FLAGS | default ""}}'
 
 tasks:
   default:
@@ -104,23 +105,23 @@ tasks:
     deps: [mkdir-build]
     cmds:
       # 1. Compile packages first (models_pack defines shared types)
-      - ghdl -a {{.GHDL_FLAGS}} --workdir={{.BUILD_DIR}} {{.FAB_PROJ_ROOT}}/Fabric/models_pack.vhdl
+      - ghdl -a {{.GHDL_FLAGS}} {{.EXTRA_GHDL_FLAGS}} --workdir={{.BUILD_DIR}} {{.FAB_PROJ_ROOT}}/Fabric/models_pack.vhdl
       # 2. Compile tile files (self-contained, depend only on packages)
       - |
         for f in $(find {{.FAB_PROJ_ROOT}}/Tile/ -name '*.vhdl' -type f); do
-          ghdl -a {{.GHDL_FLAGS}} --workdir={{.BUILD_DIR}} "$f"
+          ghdl -a {{.GHDL_FLAGS}} {{.EXTRA_GHDL_FLAGS}} --workdir={{.BUILD_DIR}} "$f"
         done
       # 3. Compile fabric infrastructure (depends on tiles)
       - |
         for f in $(find {{.FAB_PROJ_ROOT}}/Fabric/ -name '*.vhdl' -type f ! -name 'models_pack.vhdl'); do
-          ghdl -a {{.GHDL_FLAGS}} --workdir={{.BUILD_DIR}} "$f"
+          ghdl -a {{.GHDL_FLAGS}} {{.EXTRA_GHDL_FLAGS}} --workdir={{.BUILD_DIR}} "$f"
         done
       # 4. Compile user design and testbench (depends on fabric)
-      - ghdl -a {{.GHDL_FLAGS}} --workdir={{.BUILD_DIR}} {{.USER_DESIGN_DIR}}/{{.DESIGN}}.vhdl {{.TESTBENCH}}.vhdl
+      - ghdl -a {{.GHDL_FLAGS}} {{.EXTRA_GHDL_FLAGS}} --workdir={{.BUILD_DIR}} {{.USER_DESIGN_DIR}}/{{.DESIGN}}.vhdl {{.TESTBENCH}}.vhdl
       # 5. Elaborate and run
-      - ghdl -e {{.GHDL_FLAGS}} --workdir={{.BUILD_DIR}} -fexplicit {{.TESTBENCH}}
+      - ghdl -e {{.GHDL_FLAGS}} {{.EXTRA_GHDL_FLAGS}} --workdir={{.BUILD_DIR}} -fexplicit {{.TESTBENCH}}
       - >-
-        ghdl -r {{.GHDL_FLAGS}} --workdir={{.BUILD_DIR}} {{.TESTBENCH}}
+        ghdl -r {{.GHDL_FLAGS}} {{.EXTRA_GHDL_FLAGS}} --workdir={{.BUILD_DIR}} {{.TESTBENCH}}
         --stats --ieee-asserts=disable
         --fst={{.BUILD_DIR}}/{{.TESTBENCH}}.fst
 

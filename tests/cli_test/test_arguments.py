@@ -967,6 +967,53 @@ def test_validate_project_directory_invalid(tmp_path: Path) -> None:
         validate_project_directory(str(invalid_dir))
 
 
+def test_invalid_project_dir_option_shows_typer_error(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capfd: pytest.CaptureFixture[str],
+) -> None:
+    """Test that using -p with an invalid project shows a Typer usage error."""
+    reset_context()
+    invalid_dir = tmp_path / "not_a_project"
+    invalid_dir.mkdir()
+
+    monkeypatch.setattr(sys, "argv", ["FABulous", "-p", str(invalid_dir), "start"])
+
+    with pytest.raises(SystemExit) as exc_info:
+        main()
+
+    # Typer's option parser catches this with exit code 2 (usage error)
+    assert exc_info.value.code == 2
+    # Typer writes usage errors to stderr
+    captured = capfd.readouterr().err
+    assert "Invalid value for '--project-dir'" in captured
+
+
+def test_no_project_dir_in_non_project_cwd_shows_friendly_error(
+    tmp_path: Path,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """Test that _log_settings_validation_error produces user-friendly messages."""
+    from pydantic import ValidationError
+
+    from fabulous.fabulous_settings import (
+        FABulousSettings,
+        _log_settings_validation_error,
+    )
+
+    invalid_dir = tmp_path / "not_a_project"
+    invalid_dir.mkdir()
+
+    with pytest.raises(ValidationError) as exc_info:
+        FABulousSettings(proj_dir=invalid_dir)
+
+    _log_settings_validation_error(exc_info.value, invalid_dir)
+
+    assert "Failed to initialize project settings" in caplog.text
+    assert "not a valid FABulous project" in caplog.text
+    assert "FABulous create-project" in caplog.text
+
+
 @pytest.mark.parametrize(
     ("package_ver", "project_ver", "should_exit"),
     [

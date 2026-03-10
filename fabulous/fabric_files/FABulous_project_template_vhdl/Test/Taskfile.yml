@@ -18,6 +18,7 @@ vars:
   WAVEFORM_TYPE: '{{.WAVEFORM_TYPE | default "fst"}}'
   GHDL_FLAGS: '{{.GHDL_FLAGS | default "--std=08 -O2"}}'
   EXTRA_GHDL_FLAGS: '{{.EXTRA_GHDL_FLAGS | default ""}}'
+  BITSTREAM_BIN: '{{.BITSTREAM_BIN | default "{{.BUILD_DIR}}/{{.DESIGN}}.bin"}}'
 
 tasks:
   default:

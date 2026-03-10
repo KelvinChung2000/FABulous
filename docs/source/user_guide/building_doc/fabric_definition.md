@@ -652,6 +652,11 @@ to BRAMs and the Verilog multiply operator directly to our DSP blocks.
 
 The BEL statements in the previous example instantiate a LUT4 in VHDL:
 
+:::{note}
+This VHDL example uses the legacy inline comment style for port attributes.
+New BEL files should use {ref}`native VHDL attribute syntax <vhdl-attributes>` instead.
+:::
+
 ```VHDL
 entity LUT4 is
  Generic ( NoConfigBits : integer := 18 );   -- has to be adjusted manually
@@ -718,6 +723,11 @@ FABulous defines the following coding rules for BELs:
     BEL,              tristate_pin.vhdl,       A_
     BEL,              tristate_pin.vhdl,       B_
     ```
+
+    :::{note}
+    This VHDL example uses the legacy inline comment style for port attributes.
+    New BEL files should use {ref}`native VHDL attribute syntax <vhdl-attributes>` instead.
+    :::
 
     ```VHDL
     entity Out_Pad is
@@ -878,7 +888,7 @@ entity LUT4c_frame_config_dffesr is
 end entity LUT4c_frame_config_dffesr;
 ```
 
-:::{deprecated} 3.0
+:::{deprecated}
 The older plain comment style for port attributes is deprecated and should
 not be used in new BEL files:
 

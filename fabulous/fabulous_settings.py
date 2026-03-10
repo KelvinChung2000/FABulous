@@ -586,7 +586,7 @@ def _log_settings_validation_error(error: ValidationError, project_dir: Path) ->
         if field == "proj_dir":
             error_messages.append(
                 f"'{project_dir}' is not a valid FABulous project "
-                f"(missing .FABulous directory)."
+                "(missing .FABulous directory)."
             )
         elif field == "models_pack":
             error_messages.append(

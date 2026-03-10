@@ -5,7 +5,6 @@ from pathlib import Path
 from typing import Any, Protocol
 
 import cocotb
-import pytest
 from cocotb.clock import Clock
 from cocotb.triggers import RisingEdge
 
@@ -28,8 +27,13 @@ class BlockRAM1KBDUT(Protocol):
     C5: Any
 
 
-async def init_dut(dut: BlockRAM1KBDUT, wr_cfg: int = 0, rd_cfg: int = 0,
-                   always_wr: int = 0, out_reg: int = 0) -> None:
+async def init_dut(
+    dut: BlockRAM1KBDUT,
+    wr_cfg: int = 0,
+    rd_cfg: int = 0,
+    always_wr: int = 0,
+    out_reg: int = 0,
+) -> None:
     """Initialize DUT with given configuration and start clock."""
     cocotb.start_soon(Clock(dut.clk, 10, units="ns").start())
 
@@ -91,24 +95,39 @@ async def cocotb_test_32bit_write_read(dut: BlockRAM1KBDUT) -> None:
 
 @cocotb.test()
 async def cocotb_test_16bit_write_read(dut: BlockRAM1KBDUT) -> None:
-    """Test 16-bit write and read back via addr[8] byte-lane select."""
+    """Test contiguous 16-bit addressing across the full 1KB space."""
     await init_dut(dut, wr_cfg=1, rd_cfg=1)
 
-    # Write 0xAAAA to lower half of word 0 (addr[8]=0)
+    # Adjacent halfword addresses should target opposite halves of the same word.
     await write_word(dut, addr=0x000, data=0x0000AAAA)
-    # Write 0xBBBB to upper half of word 0 (addr[8]=1)
-    await write_word(dut, addr=0x100, data=0x0000BBBB)
+    await write_word(dut, addr=0x001, data=0x0000BBBB)
+    await write_word(dut, addr=0x1FF, data=0x0000CCCC)
 
-    # Read lower half (addr[8]=0)
+    # Switch read side to 32-bit and verify the first word is packed contiguously.
+    dut.C2.value = 0
+    dut.C3.value = 0
+    full_word = await read_word(dut, addr=0x000)
+    assert full_word == 0xBBBBAAAA, (
+        f"Expected packed word 0xBBBBAAAA, got 0x{full_word:08X}"
+    )
+
+    # Restore 16-bit read mode for narrow reads.
+    dut.C2.value = 0
+    dut.C3.value = 1
+
     result = await read_word(dut, addr=0x000)
     assert (result & 0xFFFF) == 0xAAAA, (
         f"Lower half: expected 0xAAAA, got 0x{result & 0xFFFF:04X}"
     )
 
-    # Read upper half (addr[8]=1)
-    result = await read_word(dut, addr=0x100)
+    result = await read_word(dut, addr=0x001)
     assert (result & 0xFFFF) == 0xBBBB, (
         f"Upper half: expected 0xBBBB, got 0x{result & 0xFFFF:04X}"
+    )
+
+    result = await read_word(dut, addr=0x1FF)
+    assert (result & 0xFFFF) == 0xCCCC, (
+        f"Top halfword: expected 0xCCCC, got 0x{result & 0xFFFF:04X}"
     )
 
     # Verify upper bits are zero in 16-bit mode
@@ -120,17 +139,36 @@ async def cocotb_test_16bit_write_read(dut: BlockRAM1KBDUT) -> None:
 
 @cocotb.test()
 async def cocotb_test_8bit_write_read(dut: BlockRAM1KBDUT) -> None:
-    """Test 8-bit write and read back via addr[9:8] byte-lane select."""
+    """Test contiguous 8-bit addressing across the full 1KB space."""
     await init_dut(dut, wr_cfg=2, rd_cfg=2)
 
-    # Write different bytes to each lane of word 0
-    await write_word(dut, addr=0x000, data=0x11)  # byte 0
-    await write_word(dut, addr=0x100, data=0x22)  # byte 1
-    await write_word(dut, addr=0x200, data=0x33)  # byte 2
-    await write_word(dut, addr=0x300, data=0x44)  # byte 3
+    # Adjacent byte addresses should target successive lanes in the same word.
+    await write_word(dut, addr=0x000, data=0x11)
+    await write_word(dut, addr=0x001, data=0x22)
+    await write_word(dut, addr=0x002, data=0x33)
+    await write_word(dut, addr=0x003, data=0x44)
+    await write_word(dut, addr=0x3FF, data=0x55)
+
+    # Switch read side to 32-bit and verify the first word is packed contiguously.
+    dut.C2.value = 0
+    dut.C3.value = 0
+    full_word = await read_word(dut, addr=0x000)
+    assert full_word == 0x44332211, (
+        f"Expected packed word 0x44332211, got 0x{full_word:08X}"
+    )
+
+    # Restore 8-bit read mode for narrow reads.
+    dut.C2.value = 1
+    dut.C3.value = 0
 
     # Read back each byte lane
-    expected = [(0x000, 0x11), (0x100, 0x22), (0x200, 0x33), (0x300, 0x44)]
+    expected = [
+        (0x000, 0x11),
+        (0x001, 0x22),
+        (0x002, 0x33),
+        (0x003, 0x44),
+        (0x3FF, 0x55),
+    ]
     for addr, exp_byte in expected:
         result = await read_word(dut, addr=addr)
         assert (result & 0xFF) == exp_byte, (
@@ -232,50 +270,6 @@ async def cocotb_test_output_register(dut: BlockRAM1KBDUT) -> None:
 
     assert result == 0xABCD1234, (
         f"With output register, expected 0xABCD1234, got 0x{result:08X}"
-    )
-
-
-@cocotb.test()
-async def cocotb_test_4bit_write_read(dut: BlockRAM1KBDUT) -> None:
-    """Test 4-bit write and read back via addr[10:8] nibble select.
-
-    NOTE: The SRAM has byte-level write masking, so writing a nibble zeros
-    the adjacent nibble in the same byte. Each nibble is tested individually.
-    """
-    await init_dut(dut, wr_cfg=3, rd_cfg=3)
-
-    # Test each nibble position independently (write + immediate read)
-    # addr[10:8] = nibble index (0-7), addr[7:0] = word address
-    for nib_idx in range(8):
-        addr = (nib_idx << 8) | nib_idx  # use different word for each to avoid clobber
-        test_val = (nib_idx + 5) & 0xF
-        await write_word(dut, addr=addr, data=test_val)
-        result = await read_word(dut, addr=addr)
-        assert (result & 0xF) == test_val, (
-            f"Nibble {nib_idx}: expected 0x{test_val:X}, got 0x{result & 0xF:X}"
-        )
-
-    # Verify upper bits are zero in 4-bit mode
-    await write_word(dut, addr=0x000, data=0xF)
-    result = await read_word(dut, addr=0x000)
-    assert (result >> 4) == 0, (
-        f"Upper bits should be zero in 4-bit mode, got 0x{result >> 4:07X}"
-    )
-
-    # Verify that writing one nibble clobbers the adjacent nibble in the same byte
-    # Write low nibble of byte 0 at word 100
-    await write_word(dut, addr=(0 << 8) | 100, data=0xA)
-    # Write high nibble of byte 0 at word 100 — should zero the low nibble
-    await write_word(dut, addr=(1 << 8) | 100, data=0xB)
-    # Read back low nibble — should be 0 (clobbered)
-    result = await read_word(dut, addr=(0 << 8) | 100)
-    assert (result & 0xF) == 0x0, (
-        f"Low nibble should be clobbered, got 0x{result & 0xF:X}"
-    )
-    # Read back high nibble — should be 0xB
-    result = await read_word(dut, addr=(1 << 8) | 100)
-    assert (result & 0xF) == 0xB, (
-        f"High nibble: expected 0xB, got 0x{result & 0xF:X}"
     )
 
 

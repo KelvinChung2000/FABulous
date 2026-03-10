@@ -113,7 +113,8 @@
       );
 
       devshell-overlay = librelane.inputs.devshell;
-      nix_eda_pkgs = nix-eda.forAllSystems (system:
+      nix_eda_pkgs = nix-eda.forAllSystems (
+        system:
         import nix-eda.inputs.nixpkgs {
           inherit system;
           overlays = [
@@ -160,9 +161,12 @@
           # Combine all packages: librelane tools (with patched OpenROAD) + our custom tools + uv2nix env
           # Note: We only include virtualenv for Python, not librelane-env, to avoid collisions
           # Filter by platform support: include if no platforms specified or current system matches
-          systemSupported = tool:
-            let platforms = tool.meta.platforms or [];
-            in platforms == [] || (builtins.elem system platforms);
+          systemSupported =
+            tool:
+            let
+              platforms = tool.meta.platforms or [ ];
+            in
+            platforms == [ ] || (builtins.elem system platforms);
 
           allPackages =
             [
@@ -213,7 +217,7 @@
             ];
             devshell.startup.fabulous-setup = {
               text = ''
-                
+
                 export REPO_ROOT=$(git rev-parse --show-toplevel)
                 ORIGINAL_PS1="$PS1"
 
@@ -244,19 +248,25 @@
           default = pkgs.devshell.mkShell baseShellConfig;
 
           # Start in fish: nix develop .#fish
-          fish = pkgs.devshell.mkShell (baseShellConfig // {
-            devshell.interactive."zzz-switch-shell" = {
-              # Run last so we exec into fish after env is set up
-              text = ''exec fish -l'';
-            };
-          });
+          fish = pkgs.devshell.mkShell (
+            baseShellConfig
+            // {
+              devshell.interactive."zzz-switch-shell" = {
+                # Run last so we exec into fish after env is set up
+                text = "exec fish -l";
+              };
+            }
+          );
 
           # Start in zsh: nix develop .#zsh
-          zsh = pkgs.devshell.mkShell (baseShellConfig // {
-            devshell.interactive."zzz-switch-shell" = {
-              text = ''exec zsh -l'';
-            };
-          });
+          zsh = pkgs.devshell.mkShell (
+            baseShellConfig
+            // {
+              devshell.interactive."zzz-switch-shell" = {
+                text = "exec zsh -l";
+              };
+            }
+          );
         }
       );
 

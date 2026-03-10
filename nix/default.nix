@@ -1,20 +1,26 @@
 # Systematic EDA tool dependency management
 # Version-controlled builds with easy hash management
-{ pkgs, srcs ? { } }:
+{
+  pkgs,
+  srcs ? { },
+}:
 
 let
   # Helper function to build a tool from flake-locked sources
-  buildTool = toolName:
+  buildTool =
+    toolName:
     let
-      pinnedSrc = srcs.${toolName};  # Assume always provided by flake
+      pinnedSrc = srcs.${toolName}; # Assume always provided by flake
       baseArgs = {
         prefetchedSrc = pinnedSrc;
       };
     in
-      if builtins.match "^[0-9a-f]{40}$" pinnedSrc.rev == null then
-        builtins.error ("Resolved rev for " + toString toolName + " is not a commit SHA: " + toString pinnedSrc.rev)
-      else
-        pkgs.callPackage (./tools + "/${toolName}.nix") baseArgs;
+    if builtins.match "^[0-9a-f]{40}$" pinnedSrc.rev == null then
+      builtins.error (
+        "Resolved rev for " + toString toolName + " is not a commit SHA: " + toString pinnedSrc.rev
+      )
+    else
+      pkgs.callPackage (./tools + "/${toolName}.nix") baseArgs;
 
 in
 {

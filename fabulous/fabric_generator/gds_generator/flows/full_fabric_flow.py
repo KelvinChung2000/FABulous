@@ -9,6 +9,7 @@ This flow uses non-Linear Programming (NLP) to optimize tile dimensions:
 """
 
 import json
+import shutil
 import traceback
 from decimal import Decimal
 from itertools import product
@@ -410,7 +411,9 @@ class FABulousFabricMacroFullFlow(Flow):
         handlers: list[tuple[Future[WorkerResult], Tile | SuperTile]] = []
         with DillProcessPoolExecutor(max_workers=None) as executor:
             for tile_type in fabric.get_all_unique_tiles():
-                io_config_path: Path = tile_type.tileDir.parent / "io_pin_order.yaml"
+                io_config_path: Path = (
+                    tile_type.tileDir.parent / f"{tile_type.name}_io_pin_order.yaml"
+                )
                 base_config_path: Path = (
                     proj_dir / "Tile" / "include" / "gds_config.yaml"
                 )
@@ -490,8 +493,10 @@ class FABulousFabricMacroFullFlow(Flow):
                     f"from GDS path {gds_path}"
                 )
             final_views: Path = proj_dir / "Tile" / tile_name / "macro" / "final_views"
-            if final_views.is_symlink() or final_views.exists():
+            if final_views.is_symlink():
                 final_views.unlink()
+            elif final_views.is_dir():
+                shutil.rmtree(final_views)
             final_views.symlink_to(final_dir)
 
         info(f"Created final_views symlinks for {len(tile_type_states)} tiles")

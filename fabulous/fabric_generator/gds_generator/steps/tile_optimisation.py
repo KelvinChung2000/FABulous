@@ -119,9 +119,7 @@ class TileOptimisation(WhileStep):
         OpenROAD.DetailedPlacement,
         OpenROAD.CTS,
         OpenROAD.GlobalRouting,
-        # AutoEcoDiodeInsertion,
         OpenROAD.CheckAntennas,
-        Odb.DiodesOnPorts,
         OpenROAD.RepairAntennas,
         OpenROAD.DetailedRouting,
         Odb.RemoveRoutingObstructions,
@@ -154,17 +152,13 @@ class TileOptimisation(WhileStep):
         if state.metrics.get("route__drc_errors") is None:
             return True
 
-        checklist = []
+        metrics_to_check = ["route__drc_errors"]
         if not self.config["IGNORE_ANTENNA_VIOLATIONS"]:
-            checklist.append("antenna__violating__pins")
-            checklist.append("antenna__violating__nets")
+            metrics_to_check.extend(
+                ["antenna__violating__pins", "antenna__violating__nets"]
+            )
 
-        checklist.append("route__drc_errors")
-        for i in checklist:
-            if (v := state.metrics.get(i)) and cast("int", v) > 0:
-                return True
-
-        return False
+        return any(cast("int", state.metrics.get(m, 0)) > 0 for m in metrics_to_check)
 
     def post_iteration_callback(
         self, post_iteration: State, full_iter_completed: bool
@@ -221,9 +215,16 @@ class TileOptimisation(WhileStep):
         )
 
         instance_area = Decimal(pre_iteration.metrics.get("design__instance__area", 0))
-        core_area = (
-            self.last_core_area if self.last_core_area is not None else width * height
-        )
+        if self.last_core_area is not None:
+            core_area = self.last_core_area
+        else:
+            # First iteration: no actual core area yet. Estimate core area
+            # from die area minus floorplan margins (site insets on each side)
+            # so the overshoot scaling triggers when cells barely fit.
+            sites_per_side_x = 6
+            margin_x = Decimal(2) * site_width * sites_per_side_x
+            margin_y = Decimal(2) * site_height
+            core_area = (width - margin_x) * (height - margin_y)
 
         new_width, new_height = self._compute_new_dimensions(
             width,

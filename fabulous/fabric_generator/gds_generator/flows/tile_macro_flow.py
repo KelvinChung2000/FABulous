@@ -25,7 +25,6 @@ from fabulous.fabric_generator.gds_generator.flows.flow_define import (
     write_out_steps,
 )
 from fabulous.fabric_generator.gds_generator.helper import (
-    get_offset,
     get_pitch,
     get_routing_obstructions,
     round_die_area,
@@ -122,7 +121,6 @@ class FABulousTileVerilogMacroFlow(SequentialFlow):
             "FABULOUS_IO_PIN_ORDER_CFG": str(io_pin_config),
             "VERILOG_FILES": file_list,
             "FABULOUS_OPT_MODE": opt_mode,
-            "RUN_MAGIC_STREAMOUT": False,
         }
 
         # Load base config
@@ -161,14 +159,11 @@ class FABulousTileVerilogMacroFlow(SequentialFlow):
             FABULOUS_TILE_LOGICAL_HEIGHT=logical_height,
         )
         x_pitch, y_pitch = get_pitch(self.config)
-        x_spacing, y_spacing = get_offset(self.config)
         min_x, min_y = tile_type.get_min_die_area(
             x_pitch=x_pitch,
             y_pitch=y_pitch,
             x_pin_thickness_mult=self.config.get("IO_PIN_V_THINKNESS_MULT", Decimal(1)),
             y_pin_thickness_mult=self.config.get("IO_PIN_H_THINKNESS_MULT", Decimal(1)),
-            x_spacing=x_spacing,
-            y_spacing=y_spacing,
         )
         self.config = self.config.copy(
             FABULOUS_PIN_MIN_WIDTH=min_x,

@@ -600,9 +600,3 @@ def _log_settings_validation_error(error: ValidationError, project_dir: Path) ->
         "Failed to initialize project settings:\n"
         + "\n".join(f"  - {msg}" for msg in error_messages)
     )
-    logger.info(
-        "Hint: Make sure you are inside a FABulous project directory or "
-        "specify one with '-p PROJECT_DIR'.\n"
-        "  To create a new project: FABulous create-project PROJECT_DIR\n"
-        "  For more information: FABulous --help"
-    )

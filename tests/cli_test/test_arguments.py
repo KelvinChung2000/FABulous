@@ -989,11 +989,11 @@ def test_non_project_cwd_without_p_flag_exits_with_code_1(
     assert "FABulous create-project" in captured
 
 
-def test_log_settings_validation_error_messages(
+def test_log_settings_validation_error_proj_dir_hint(
     tmp_path: Path,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
-    """_log_settings_validation_error produces user-friendly messages."""
+    """_log_settings_validation_error shows project-dir hint for proj_dir errors."""
     from pydantic import ValidationError
 
     from fabulous.fabulous_settings import (

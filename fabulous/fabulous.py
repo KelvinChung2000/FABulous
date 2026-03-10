@@ -209,12 +209,11 @@ def common_options(
         log_file=log_file or Path(),
     )
 
-    if (s := ctx.invoked_subcommand) and (
-        s.startswith("install") or s == "create-project" or s == "c"
-    ):
+    if ctx.invoked_subcommand is None or "--help" in sys.argv:
         return
 
-    if "--help" in sys.argv:
+    subcommand = ctx.invoked_subcommand
+    if subcommand.startswith("install") or subcommand in {"create-project", "c"}:
         return
 
     resolved_dir = project_dir or Path.cwd()

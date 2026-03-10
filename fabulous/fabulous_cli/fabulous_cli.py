@@ -66,6 +66,7 @@ from fabulous.fabulous_cli.helper import (
     get_file_path,
     install_fabulator,
     install_oss_cad_suite,
+    make_hex,
     run_task,
     wrap_with_except_handling,
 )
@@ -1015,9 +1016,17 @@ class FABulous_CLI(Cmd):
 
         design_name = args.design or bitstreamPath.stem
 
+        # Prepare build directory and convert .bin to .hex for simulation
+        buildDir = testPath / "build"
+        buildDir.mkdir(parents=True, exist_ok=True)
+        hexPath = buildDir / f"{design_name}.hex"
+        make_hex(bitstreamPath, hexPath)
+        logger.info(f"Converted {bitstreamPath} to {hexPath}")
+
         task_vars = {
             "WAVEFORM_TYPE": args.format,
             "DESIGN": design_name,
+            "BITSTREAM_BIN": str(bitstreamPath.resolve()),
         }
         if args.extra_iverilog_flag:
             task_vars["EXTRA_IVERILOG_FLAGS"] = args.extra_iverilog_flag
@@ -1025,7 +1034,7 @@ class FABulous_CLI(Cmd):
             task_vars["EXTRA_GHDL_FLAGS"] = args.extra_ghdl_flag
 
         if taskfile.exists():
-            logger.info(f"Running simulation for {bitstreamPath.stem} via Taskfile")
+            logger.info(f"Running simulation for {design_name} via Taskfile")
             run_task(
                 "run-simulation",
                 task_dir=testPath,

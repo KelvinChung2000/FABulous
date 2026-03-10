@@ -104,14 +104,13 @@ def project_directories(tmp_path: Path) -> dict[str, Path]:
 
 
 @pytest.fixture
-def simulation_mock(cli: FABulous_CLI, mocker: MockerFixture) -> MockerFixture:
+def simulation_mock(cli: FABulous_CLI, mocker: MockerFixture) -> None:
     """Prepare a CLI instance for simulation tests.
 
     Mocks subprocess.run, generates the fabric, creates the required design
     artifacts (.json, .fasm, .bin), and runs bitstream generation.
-    Returns the mock so tests can inspect subprocess calls.
     """
-    m = mocker.patch("subprocess.run", return_value=MOCK_COMPLETED_PROCESS)
+    mocker.patch("subprocess.run", return_value=MOCK_COMPLETED_PROCESS)
     run_cmd(cli, "run_FABulous_fabric")
 
     user_design = cli.projectDir / "user_design"
@@ -119,13 +118,17 @@ def simulation_mock(cli: FABulous_CLI, mocker: MockerFixture) -> MockerFixture:
         (user_design / f"sequential_16bit_en{suffix}").touch()
 
     run_cmd(cli, "run_FABulous_bitstream ./user_design/sequential_16bit_en.v")
-    return m
 
 
-def find_task_calls(
-    mock: MockerFixture,
-) -> list[list[str]]:
-    """Return the command lists from subprocess calls that invoked ``task``."""
+def find_task_calls() -> list[list[str]]:
+    """Return the command lists from subprocess calls that invoked ``task``.
+
+    Must be called while ``subprocess.run`` is patched by ``simulation_mock``.
+    """
+    mock = subprocess.run  # already patched by simulation_mock
+    assert hasattr(mock, "call_args_list"), "subprocess.run is not mocked"
     return [
-        c.args[0] for c in mock.call_args_list if c.args and "task" in str(c.args[0])
+        c.args[0]
+        for c in mock.call_args_list
+        if c.args and isinstance(c.args[0], (list, tuple)) and c.args[0][0] == "task"
     ]

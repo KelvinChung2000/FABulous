@@ -17,6 +17,7 @@ vars:
   USER_DESIGN_DIR: "{{.FAB_PROJ_ROOT}}/user_design"
   WAVEFORM_TYPE: '{{.WAVEFORM_TYPE | default "fst"}}'
   EXTRA_IVERILOG_FLAGS: '{{.EXTRA_IVERILOG_FLAGS | default ""}}'
+  BITSTREAM_BIN: '{{.BITSTREAM_BIN | default "{{.BUILD_DIR}}/{{.DESIGN}}.bin"}}'
   FABRIC_FILES_DIR: "{{.BUILD_DIR}}/fabric_files"
 
 tasks:
@@ -116,7 +117,7 @@ tasks:
 
   run-simulation:
     desc: Run simulation using Icarus Verilog (iverilog)
-    deps: [mkdir-build]
+    deps: [mkdir-build, copy-files]
     cmds:
       - >-
         iverilog -g2012

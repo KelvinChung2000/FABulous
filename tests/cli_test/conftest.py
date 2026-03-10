@@ -25,6 +25,8 @@ def _mock_ciel_home(tmp_path: Path, mocker: MockerFixture) -> None:
         "fabulous.fabulous_cli.helper.get_ciel_home",
         return_value=str(ciel_home),
     )
+    # Prevent ciel from attempting real PDK downloads during settings validation
+    mocker.patch("ciel.manage.enable")
 
 
 @pytest.fixture

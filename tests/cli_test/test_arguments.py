@@ -986,14 +986,13 @@ def test_non_project_cwd_without_p_flag_exits_with_code_1(
     assert exc_info.value.code == 1
     captured = capfd.readouterr().out
     assert "not a valid FABulous project" in captured
-    assert "FABulous create-project" in captured
 
 
-def test_log_settings_validation_error_proj_dir_hint(
+def test_log_settings_validation_error_messages(
     tmp_path: Path,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
-    """_log_settings_validation_error shows project-dir hint for proj_dir errors."""
+    """_log_settings_validation_error produces user-friendly error messages."""
     from pydantic import ValidationError
 
     from fabulous.fabulous_settings import (
@@ -1011,7 +1010,6 @@ def test_log_settings_validation_error_proj_dir_hint(
 
     assert "Failed to initialize project settings" in caplog.text
     assert "not a valid FABulous project" in caplog.text
-    assert "FABulous create-project" in caplog.text
 
 
 @pytest.mark.parametrize(

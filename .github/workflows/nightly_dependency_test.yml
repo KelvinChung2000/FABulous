@@ -40,23 +40,11 @@ jobs:
         id: pytest
         continue-on-error: true
         run: |
+          set -o pipefail
           uv run pytest -v --runslow --tb=short 2>&1 | tee pytest_output.txt
-          # Capture the exit code of pytest
-          # We need to do this because continue-on-error makes the step outcome always 'success'
-          echo "exit_code=$?" >> $GITHUB_OUTPUT
-
-      - name: Check test results
-        id: check_results
-        run: |
-          # Check the actual pytest exit code to determine if tests failed
-          if [ "${{ steps.pytest.outputs.exit_code }}" != "0" ]; then
-            echo "tests_failed=true" >> $GITHUB_OUTPUT
-          else
-            echo "tests_failed=false" >> $GITHUB_OUTPUT
-          fi
 
       - name: Create issue on failure
-        if: steps.check_results.outputs.tests_failed == 'true'
+        if: steps.pytest.outcome == 'failure'
         uses: actions/github-script@v7
         with:
           script: |
@@ -118,6 +106,27 @@ jobs:
             ---
             *This issue was automatically created by the nightly dependency test workflow.*`;
 
+            // Ensure required labels exist (create is idempotent; 422 means it already exists)
+            const labels = ['nightly-test-failure', 'dependencies', 'automated'];
+            const labelColors = {
+              'nightly-test-failure': 'd93f0b',
+              'dependencies': '0075ca',
+              'automated': 'e4e669',
+            };
+            for (const label of labels) {
+              try {
+                await github.rest.issues.createLabel({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  name: label,
+                  color: labelColors[label],
+                });
+                console.log(`Created label: ${label}`);
+              } catch (e) {
+                if (e.status !== 422) throw e;
+              }
+            }
+
             // Check if there's already an open issue for today
             const issues = await github.rest.issues.listForRepo({
               owner: context.repo.owner,
@@ -130,13 +139,12 @@ jobs:
             const todayIssue = issues.data.find(issue => issue.title === title);
 
             if (!todayIssue) {
-              // Create new issue
               await github.rest.issues.create({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 title: title,
                 body: body,
-                labels: ['nightly-test-failure', 'dependencies', 'automated']
+                labels: labels,
               });
               console.log('Created new issue for test failure');
             } else {

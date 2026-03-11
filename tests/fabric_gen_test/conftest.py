@@ -225,6 +225,51 @@ def create_switchmatrix_csv(
 
 
 @pytest.fixture
+def run_switchmatrix(
+    mocker: MockerFixture, tmp_path: Path
+) -> Callable[[dict[str, list[str]], bool], list[str]]:
+    """Run genTileSwitchMatrix and return instantiated mux names."""
+    from fabulous.fabric_definition.define import MultiplexerStyle
+    from fabulous.fabric_generator.gen_fabric.gen_switchmatrix import (
+        genTileSwitchMatrix,
+    )
+
+    def _run(
+        connections: dict[str, list[str]],
+        use_buffered: bool,
+    ) -> list[str]:
+        mocker.patch(
+            "fabulous.fabric_generator.gen_fabric.gen_switchmatrix.parseMatrix",
+            return_value=connections,
+        )
+
+        csv_file = tmp_path / "test_matrix.csv"
+        csv_file.write_text("dummy")
+
+        tile = mocker.MagicMock()
+        tile.name = "TestTile"
+        tile.matrixDir = csv_file
+        tile.portsInfo = []
+        tile.bels = []
+
+        fabric = mocker.MagicMock()
+        fabric.useBufferedMux = use_buffered
+        fabric.multiplexerStyle = MultiplexerStyle.CUSTOM
+
+        writer = mocker.MagicMock()
+
+        genTileSwitchMatrix(writer, fabric, tile, False)
+
+        return [
+            c.kwargs["compName"]
+            for c in writer.addInstantiation.call_args_list
+            if c.kwargs.get("compName", "").startswith("cus_mux")
+        ]
+
+    return _run
+
+
+@pytest.fixture
 def connections_factory() -> Callable[..., dict[str, list[str]]]:
     """Factory fixture for creating switch matrix connection dictionaries.
 

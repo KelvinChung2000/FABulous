@@ -199,7 +199,7 @@ Both HDL flavors use the same convention: `break_comb_loop` is **enabled by defa
 
 **Verilog:** Define the macro `DISABLE_BREAK_COMB_LOOP` when compiling the fabric. The multiplexer models use `` `ifndef DISABLE_BREAK_COMB_LOOP `` guards, so adding `-DDISABLE_BREAK_COMB_LOOP` to your simulator or synthesis invocation replaces the `break_comb_loop` instances with direct wire assignments.
 
-**VHDL:** Each multiplexer architecture contains a `DISABLE_BREAK_COMB_LOOP` boolean constant (default `false`). Set it to `true` to use direct signal assignments instead of `break_comb_loop` component instantiations.
+**VHDL:** The architectures of `cus_mux21`, `cus_mux41`, and `cus_mux41_buf` contain a `DISABLE_BREAK_COMB_LOOP` boolean constant (default `false`). Set it to `true` to use direct signal assignments instead of `break_comb_loop` component instantiations; wider multiplexers such as `cus_mux81(_buf)` and `cus_mux161(_buf)` are built hierarchically from these primitives and inherit the same behavior.
 
 (fabric-layout)=
 

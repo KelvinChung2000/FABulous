@@ -654,7 +654,7 @@ The BEL statements in the previous example instantiate a LUT4 in VHDL:
 
 :::{note}
 This VHDL example uses the legacy inline comment style for port attributes.
-New BEL files should use {ref}`native VHDL attribute syntax <vhdl-attributes>` instead.
+New BEL files should use [native VHDL attribute syntax](#vhdl-attributes) instead.
 :::
 
 ```VHDL
@@ -726,7 +726,7 @@ FABulous defines the following coding rules for BELs:
 
     :::{note}
     This VHDL example uses the legacy inline comment style for port attributes.
-    New BEL files should use {ref}`native VHDL attribute syntax <vhdl-attributes>` instead.
+    New BEL files should use [native VHDL attribute syntax](#vhdl-attributes) instead.
     :::
 
     ```VHDL
@@ -808,11 +808,13 @@ FABulous defines the following coding rules for BELs:
     enable signal within a tile. Can only be used on input ports.
 
     In Verilog:
+
     ```verilog
     input EN; // SHARED_ENABLE
     ```
 
     In VHDL, use a signal-level attribute:
+
     ```VHDL
     attribute SHARED_ENABLE of EN : signal is "TRUE";
     ```
@@ -821,11 +823,13 @@ FABulous defines the following coding rules for BELs:
     reset signal within a tile. Can only be used on input ports.
 
     In Verilog:
+
     ```verilog
     input SR; // SHARED_RESET
     ```
 
     In VHDL, use a signal-level attribute:
+
     ```VHDL
     attribute SHARED_RESET of SR : signal is "TRUE";
     ```

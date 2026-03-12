@@ -32,9 +32,12 @@ in
   ghdl =
     let
       tarball =
-        if pkgs.stdenv.isLinux then srcs.ghdl-linux-bin
-        else if pkgs.stdenv.isDarwin then srcs.ghdl-darwin-bin
-        else throw "Unsupported platform for GHDL: ${pkgs.stdenv.hostPlatform.system}";
+        if pkgs.stdenv.isLinux then
+          srcs.ghdl-linux-bin
+        else if pkgs.stdenv.isDarwin then
+          srcs.ghdl-darwin-bin
+        else
+          throw "Unsupported platform for GHDL: ${pkgs.stdenv.hostPlatform.system}";
     in
     pkgs.callPackage ./tools/ghdl-bin.nix {
       prefetchedTarball = tarball;

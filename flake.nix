@@ -168,20 +168,19 @@
             in
             platforms == [ ] || (builtins.elem system platforms);
 
-          allPackages =
-            [
-              virtualenv
-              pkgs.uv
-              pkgs.which
-              pkgs.git
-              pkgs.fish
-              pkgs.zsh
-              pkgs.gtkwave
-              customPkgs.nextpnr
-              customPkgs.fabulator
-              customPkgs.ghdl
-            ]
-            ++ (builtins.filter systemSupported librelane-pkg.includedTools);
+          allPackages = [
+            virtualenv
+            pkgs.uv
+            pkgs.which
+            pkgs.git
+            pkgs.fish
+            pkgs.zsh
+            pkgs.gtkwave
+            customPkgs.nextpnr
+            customPkgs.fabulator
+            customPkgs.ghdl
+          ]
+          ++ (builtins.filter systemSupported librelane-pkg.includedTools);
 
           prompt = ''\[\033[1;32m\][FABulous-nix:\w]\$\[\033[0m\] '';
         in

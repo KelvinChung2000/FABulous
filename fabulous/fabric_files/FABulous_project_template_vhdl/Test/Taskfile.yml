@@ -21,14 +21,8 @@ vars:
   BITSTREAM_BIN: '{{.BITSTREAM_BIN | default "{{.BUILD_DIR}}/{{.DESIGN}}.bin"}}'
 
 tasks:
-  default:
-    desc: Build test design, run simulation, then clean up
-    cmds:
-      - task: build-test-design
-      - task: run-simulation
-      - task: clean
-
   fab-sim:
+    aliases: ["default"]
     desc: Build demo fabric, build test design, run simulation, then clean up
     cmds:
       - task: build-demo-fabric

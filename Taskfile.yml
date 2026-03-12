@@ -27,6 +27,14 @@ tasks:
       - uv run FABulous -p demo run "run_FABulous_fabric"
       - task --dir ./demo/Test fab-sim
 
+  smoke-test-vhdl:
+    desc: Create the demo project and run the simulation flow
+    cmds:
+      - rm -rf demo
+      - uv run FABulous c demo -w vhdl
+      - uv run FABulous -p demo run "run_FABulous_fabric"
+      - task --dir ./demo/Test fab-sim
+
   ci:
     desc: Run code checks, tests, and the docs build
     cmds:

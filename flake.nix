@@ -173,7 +173,6 @@
               pkgs.fish
               pkgs.zsh
               pkgs.gtkwave
-              pkgs.go-task
               customPkgs.nextpnr
               customPkgs.fabulator
               customPkgs.ghdl

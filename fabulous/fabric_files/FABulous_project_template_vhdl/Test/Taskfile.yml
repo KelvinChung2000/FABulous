@@ -115,12 +115,14 @@ tasks:
       # 4. Compile user design and testbench (depends on fabric)
       - ghdl -a {{.GHDL_FLAGS}} {{.EXTRA_GHDL_FLAGS}} --workdir={{.BUILD_DIR}} {{.USER_DESIGN_DIR}}/{{.DESIGN}}.vhdl {{.TESTBENCH}}.vhdl
       # 5. Elaborate and run (ulimit needed for large designs)
-      - ulimit -s unlimited && ghdl -e {{.GHDL_FLAGS}} {{.EXTRA_GHDL_FLAGS}} --workdir={{.BUILD_DIR}} -fexplicit {{.TESTBENCH}}
       - >-
-        ulimit -s unlimited &&
+        sh -c 'ulimit -s unlimited &&
+        ghdl -e {{.GHDL_FLAGS}} {{.EXTRA_GHDL_FLAGS}} --workdir={{.BUILD_DIR}} -fexplicit {{.TESTBENCH}}'
+      - >-
+        sh -c 'ulimit -s unlimited &&
         ghdl -r {{.GHDL_FLAGS}} {{.EXTRA_GHDL_FLAGS}} --workdir={{.BUILD_DIR}} {{.TESTBENCH}}
         --stats --ieee-asserts=disable
-        --{{.WAVEFORM_TYPE}}={{.BUILD_DIR}}/{{.TESTBENCH}}.{{.WAVEFORM_TYPE}}
+        --{{.WAVEFORM_TYPE}}={{.BUILD_DIR}}/{{.TESTBENCH}}.{{.WAVEFORM_TYPE}}'
 
   gtkwave:
     desc: Open waveform in GTKWave

@@ -259,7 +259,7 @@ def run_task(
         raise EnvironmentNotSet(
             "The 'task' command (go-task) is not found on PATH. "
             "It ships with FABulous; reinstall with "
-            "'pip install FABulous-FPGA'."
+            "'uv tool install FABulous-FPGA'."
         )
 
     cmd: list[str] = ["task", task_name]

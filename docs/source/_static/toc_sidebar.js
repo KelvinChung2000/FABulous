@@ -1,3 +1,17 @@
+/**
+ * Collapsible TOC sidebar for the Furo theme.
+ *
+ * Adds a toggle button (❯) to the right-hand "Contents" sidebar. On desktop
+ * viewports (> 82 em), users can manually collapse/expand the sidebar and the
+ * preference persists via localStorage. The sidebar also auto-collapses when
+ * article content overflows horizontally (e.g. wide tables).
+ *
+ * On narrow viewports, Furo's built-in responsive layout takes over and the
+ * toggle button is hidden via CSS.
+ *
+ * See _static/custom.css for the corresponding styles (body.toc-toggle-enabled
+ * and body.toc-collapsed selectors).
+ */
 document.addEventListener("DOMContentLoaded", () => {
     const storageKey = "fabulous-docs-toc-collapsed";
     const manualStateKey = "fabulous-docs-toc-manual";
@@ -21,6 +35,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const isDesktopLayout = () => window.getComputedStyle(tocDrawer).position !== "fixed";
 
+    /** True if the article or any table wrapper overflows horizontally. */
     const articleNeedsMoreWidth = () => {
         const tableWrappers = Array.from(
             article.querySelectorAll(".table-wrapper"),
@@ -37,6 +52,7 @@ document.addEventListener("DOMContentLoaded", () => {
         return article.scrollWidth > article.clientWidth + 2;
     };
 
+    /** Apply the correct collapsed/expanded state based on layout and preferences. */
     const syncState = () => {
         const isDesktop = isDesktopLayout();
         const manualPreference = getManualPreference();
@@ -71,6 +87,7 @@ document.addEventListener("DOMContentLoaded", () => {
     window.addEventListener("resize", syncState);
     window.addEventListener("load", syncState);
 
+    // Re-evaluate when article layout shifts (lazy images, dynamic tables).
     const resizeObserver = new ResizeObserver(() => {
         syncState();
     });

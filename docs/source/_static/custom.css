@@ -104,6 +104,7 @@ article[role="main"] .table-wrapper>table {
     width: max-content !important;
 }
 
+/* Collapsible TOC sidebar -- works with toc_sidebar.js */
 body.toc-toggle-enabled .toc-drawer {
     flex: 0 0 15rem;
     width: 15rem;

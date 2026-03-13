@@ -175,10 +175,6 @@ It is planned to remove these limitations in future versions of FABulous.
 
     Disable the generation of the UserCLK port, regardless the fabric uses them or not.
 
-  - `UseBufferedMux`, `[TRUE|FALSE]`
-
-    Controls whether buffered multiplexer variants (`_buf`) are used for muxes larger than 2-input in the switch matrix. When set to `TRUE` (the default), muxes with more than 2 inputs use the buffered variant (e.g., `cus_mux41_buf`), which inserts an output buffer to improve drive strength at the cost of additional area. When set to `FALSE`, all muxes use the non-buffered variant (e.g., `cus_mux41`), which may be preferable for area-constrained designs or when custom physical design handles buffering externally.
-
   - `Tile`, `path`
 
     Specify a path to a tile configuration file that will be loaded.
@@ -190,16 +186,6 @@ It is planned to remove these limitations in future versions of FABulous.
     :::{warning}
     Previously, tile definitions were contained in the fabric.csv file. This has been deprecated and it is recommended to move the tile descriptions to the respective tile.csv files.
     :::
-
-### Disabling break_comb_loop in multiplexer models
-
-The switch matrix multiplexer primitives in `models_pack` (`cus_mux21`, `cus_mux41`, `cus_mux41_buf`) instantiate `break_comb_loop` cells at every input. These cells prevent combinational loops from causing problems during simulation but are transparent for synthesis. If your flow does not require these cells (e.g., when targeting ASIC synthesis or when the simulator can handle the loops), they can be disabled at the HDL level.
-
-Both HDL flavors use the same convention: `break_comb_loop` is **enabled by default** and can be disabled with `DISABLE_BREAK_COMB_LOOP`.
-
-**Verilog:** Define the macro `DISABLE_BREAK_COMB_LOOP` when compiling the fabric. The multiplexer models use `` `ifndef DISABLE_BREAK_COMB_LOOP `` guards, so adding `-DDISABLE_BREAK_COMB_LOOP` to your simulator or synthesis invocation replaces the `break_comb_loop` instances with direct wire assignments.
-
-**VHDL:** The architectures of `cus_mux21`, `cus_mux41`, and `cus_mux41_buf` contain a `DISABLE_BREAK_COMB_LOOP` boolean constant (default `false`). Set it to `true` to use direct signal assignments instead of `break_comb_loop` component instantiations; wider multiplexers such as `cus_mux81(_buf)` and `cus_mux161(_buf)` are built hierarchically from these primitives and inherit the same behavior.
 
 (fabric-layout)=
 

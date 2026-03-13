@@ -1,11 +1,9 @@
 """Tests for genTileSwitchMatrix.
 
 Tests the feature that allows users to redirect CSV output to a custom
-directory when converting .list files to .csv for switch matrix generation,
-and tests that the useBufferedMux flag controls mux component selection.
+directory when converting .list files to .csv for switch matrix generation.
 """
 
-from collections.abc import Callable
 from pathlib import Path
 
 import pytest
@@ -165,42 +163,3 @@ class TestListFileCsvOutputDirectory:
         # Verify tile.matrixDir unchanged and no new CSV created
         assert default_tile.matrixDir == csv_file
         assert not (custom_output_dir / "test_matrix.csv").exists()
-
-
-class TestUseBufferedMux:
-    """Test that useBufferedMux controls mux component selection.
-
-    The logic is: ``if paddedMuxSize == 2 or not fabric.useBufferedMux``
-    So _buf variants are only used when BOTH mux size > 2 AND useBufferedMux is True.
-    """
-
-    def test_mixed_mux_sizes_buffered(
-        self,
-        run_switchmatrix: Callable,
-    ) -> None:
-        """With useBufferedMux=True, only muxes > size 2 get _buf."""
-        connections = {
-            "SMALL_OUT": ["SRC0", "SRC1"],  # paddedMuxSize = 2 -> no _buf
-            "LARGE_OUT": ["SRC0", "SRC1", "SRC2"],  # paddedMuxSize = 4 -> _buf
-        }
-        comp_names = run_switchmatrix(connections, use_buffered=True)
-
-        assert "cus_mux21" in comp_names
-        assert "cus_mux41_buf" in comp_names
-        assert len(comp_names) == 2
-
-    def test_mixed_mux_sizes_unbuffered(
-        self,
-        run_switchmatrix: Callable,
-    ) -> None:
-        """With useBufferedMux=False, no muxes get _buf."""
-        connections = {
-            "SMALL_OUT": ["SRC0", "SRC1"],  # paddedMuxSize = 2
-            "LARGE_OUT": ["SRC0", "SRC1", "SRC2"],  # paddedMuxSize = 4
-        }
-        comp_names = run_switchmatrix(connections, use_buffered=False)
-
-        assert "cus_mux21" in comp_names
-        assert "cus_mux41" in comp_names
-        assert all("_buf" not in name for name in comp_names)
-        assert len(comp_names) == 2

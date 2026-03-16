@@ -138,17 +138,17 @@ filename unless overridden with `-d`.
 
 ```console
 # Basic usage (converts design.bin to hex and simulates)
-run_simulation fst path/to/design.bin
+FABulous> run_simulation fst path/to/design.bin
 
 # Specify a different design name
-run_simulation fst path/to/design.bin -d my_design
+FABulous> run_simulation fst path/to/design.bin -d my_design
 
 # Pass extra simulator flags
-run_simulation fst path/to/design.bin --extra-iverilog-flag="-DDEBUG"
-run_simulation fst path/to/design.bin --extra-ghdl-flag="--warn-error"
+FABulous> run_simulation fst path/to/design.bin --extra-iverilog-flag="-DDEBUG"
+FABulous> run_simulation fst path/to/design.bin --extra-ghdl-flag="--warn-error"
 
 # Combine options
-run_simulation vcd path/to/design.bin -d my_design -if "-DDEBUG -DTRACE"
+FABulous> run_simulation vcd path/to/design.bin -d my_design -if "-DDEBUG -DTRACE"
 ```
 
 | Flag | Short | Description |

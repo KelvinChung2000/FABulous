@@ -13,7 +13,7 @@ When creating a Codespace, make sure to select the correct dev container configu
 ![Selecting Codespace Configuration-1](../figs/dev-container/step1.png)
 ![Selecting Codespace Configuration-2](../figs/dev-container/step2.png)
 
-GitHub will automatically create and configure your development environment. The setup process will take a while. 
+GitHub will automatically create and configure your development environment. The setup process will take a while.
 ```{note}
 If you don't see the configuration options, you can change them after creation by rebuilding the container.
 ```

@@ -4,6 +4,7 @@ import subprocess
 from pathlib import Path
 
 import pytest
+from pytest_mock import MockerFixture
 
 from fabulous.custom_exception import EnvironmentNotSet
 from fabulous.fabric_definition.define import HDLType

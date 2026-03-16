@@ -30,7 +30,7 @@ FABulous is an open-source embedded FPGA (eFPGA) framework for generating FPGA f
 - **Production-ready GDS flow** -- Generate GDSII layout directly from fabric definitions using the integrated OpenROAD flow, ready for ASIC fabrication.
 - **Apache 2.0 licence** -- Freely available for both commercial and academic use.
 
-## Silicon Proven
+### Silicon Proven
 
 FABulous has been validated through 12+ successful tapeouts across multiple process nodes.
 
@@ -50,17 +50,6 @@ FABulous has been validated through 12+ successful tapeouts across multiple proc
 | GF180MCU | [gf180mcu-fabulous-fpga](https://github.com/mole99/gf180mcu-fabulous-fpga) | eFPGA on wafer.space GF180 run |
 
 See the [Chip Gallery](https://fabulous.readthedocs.io/en/latest/gallery/index.html) for detailed descriptions and links to each tapeout.
-
-## FABulous and Alternative Offerings
-
-| Feature | FABulous | OpenFPGA | PRGA |
-| :--- | :--- | :--- | :--- |
-| Fabric definition format | CSV + Python API | XML | Python API |
-| Partial reconfiguration | Frame-based | Not supported | Not supported |
-| GDS generation | Integrated LibreLane flow | External flow required | External flow required |
-| Silicon tapeouts | 12+ across 5+ process nodes | SOFA series (Skywater 130nm) | None published |
-| CAD tools | Yosys + nextpnr | Yosys + VTR | Yosys + VTR |
-| License | Apache 2.0 | MIT | BSD-3-Clause |
 
 ## System Requirements
 
@@ -150,6 +139,17 @@ Dirk Koch, Nguyen Dao, Bea Healy, Jing Yu, and Andrew Attwood. 2021. FABulous: A
   year={2021}
 }
 ```
+
+## FABulous and Alternative Offerings
+
+| Feature | FABulous | OpenFPGA | PRGA |
+| :--- | :--- | :--- | :--- |
+| Fabric definition format | CSV + Python API | XML | Python API |
+| Partial reconfiguration | Frame-based | Not supported | Not supported |
+| GDS generation | Integrated LibreLane flow | External flow required | External flow required |
+| Silicon tapeouts | 12+ across 5+ process nodes | SOFA series (Skywater 130nm) | None published |
+| CAD tools | Yosys + nextpnr | Yosys + VTR | Yosys + VTR |
+| License | Apache 2.0 | MIT | BSD-3-Clause |
 
 ## Disclaimer and Limitation of Liability
 

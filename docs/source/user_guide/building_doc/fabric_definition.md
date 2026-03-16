@@ -806,11 +806,12 @@ FABulous defines the following coding rules for BELs:
 
   - `SHARED_ENABLE`: This directive marks an input port as a locally shared
     enable signal within a tile. Can only be used on input ports.
+    This only works for custom tile config generation.
 
     In Verilog:
 
     ```verilog
-    input EN; // SHARED_ENABLE
+    (* FABulous, SHARED_ENABLE *) input EN;
     ```
 
     In VHDL, use a signal-level attribute:
@@ -825,7 +826,7 @@ FABulous defines the following coding rules for BELs:
     In Verilog:
 
     ```verilog
-    input SR; // SHARED_RESET
+    (* FABulous, SHARED_RESET *) input SR;
     ```
 
     In VHDL, use a signal-level attribute:

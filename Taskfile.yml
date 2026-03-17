@@ -22,18 +22,18 @@ tasks:
   smoke-test:
     desc: Create the demo project and run the simulation flow
     cmds:
-      - rm -rf smoke-test
-      - uv run FABulous c smoke-test
-      - uv run FABulous -p smoke-test run "run_FABulous_fabric"
-      - task --dir ./smoke-test/Test fab-sim
+      - rm -rf demo-smoke-test
+      - uv run FABulous c demo-smoke-test
+      - uv run FABulous -p demo-smoke-test run "run_FABulous_fabric"
+      - task --dir ./demo-smoke-test/Test fab-sim
 
   smoke-test-vhdl:
     desc: Create the demo project and run the simulation flow
     cmds:
-      - rm -rf smoke-test
-      - uv run FABulous c smoke-test -w vhdl
-      - uv run FABulous -p smoke-test run "run_FABulous_fabric"
-      - task --dir ./smoke-test/Test fab-sim
+      - rm -rf demo-smoke-test
+      - uv run FABulous c demo-smoke-test -w vhdl
+      - uv run FABulous -p demo-smoke-test run "run_FABulous_fabric"
+      - task --dir ./demo-smoke-test/Test fab-sim
 
   ci:
     desc: Run code checks, tests, and the docs build

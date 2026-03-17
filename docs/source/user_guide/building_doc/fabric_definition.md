@@ -822,6 +822,7 @@ FABulous defines the following coding rules for BELs:
 
   - `SHARED_RESET`: This directive marks an input port as a locally shared
     reset signal within a tile. Can only be used on input ports.
+     This only works for custom tile config generation.
 
     In Verilog:
 

@@ -123,16 +123,6 @@ class Fabric:
         # upper bits for column select, a single desync bit,
         # and lower bits for one-hot frame strobe.
         # See docs/fabric_definition.md for the bit layout.
-        if self.desync_flag >= self.frameBitsPerRow:
-            raise ValueError(
-                f"desync_flag bit position "
-                f"({self.desync_flag}) exceeds "
-                f"FrameAddressRegister width "
-                f"({self.frameBitsPerRow}). "
-                f"Reduce desync_flag or increase "
-                f"frameBitsPerRow."
-            )
-
         col_select_lo = self.frameBitsPerRow - self.frameSelectWidth
         if self.maxFramesPerCol > col_select_lo:
             raise ValueError(
@@ -173,8 +163,8 @@ class Fabric:
                 f"frameSelectWidth ({self.frameSelectWidth})"
                 f" can address {max_cols} columns, "
                 f"but fabric has {self.numberOfColumns} "
-                f"columns. Increase frameSelectWidth or "
-                f"frameBitsPerRow."
+                f"columns. Increase maxFramesPerCol to "
+                f"widen frameSelectWidth."
             )
 
         for row in self.tile:

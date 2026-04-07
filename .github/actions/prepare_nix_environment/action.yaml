@@ -35,7 +35,7 @@ runs:
         sudo rm -rf /usr/share/swift
 
     - name: Cache Nix store
-      uses: actions/cache@v4
+      uses: actions/cache@v5
       with:
         path: |
           /nix/store

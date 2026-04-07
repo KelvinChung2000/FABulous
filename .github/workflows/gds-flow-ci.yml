@@ -44,17 +44,49 @@ jobs:
 
       - name: Generate tile GDS
         run: |
-          set -o pipefail
           nix develop --command bash -c "
             FABulous --project-dir test_project run 'gen_all_tile_macros'
-          " 2>&1 | tee tile_hardening_output.txt
+          " > tile_hardening_output.txt 2>&1
+
+      - name: Verify tile manufacturability
+        if: always()
+        run: |
+          # Extract all manufacturability report sections
+          sed -n '/Report Manufacturability/,$p' tile_hardening_output.txt > tile_report.txt
+
+          tail -300 tile_report.txt
+
+          # Verify all 3 checks passed
+          for check in "Antenna" "LVS" "DRC"; do
+            if ! grep -A1 "^\* ${check}" tile_report.txt | grep -q "Passed"; then
+              echo "FAIL: ${check} did not pass"
+              exit 1
+            fi
+          done
+          echo "All tile manufacturability checks passed"
 
       - name: Stitch fabric GDS
         run: |
-          set -o pipefail
           nix develop --command bash -c "
             FABulous --project-dir test_project run 'gen_fabric_macro'
-          " 2>&1 | tee fabric_stitching_output.txt
+          " > fabric_stitching_output.txt 2>&1
+
+      - name: Verify fabric manufacturability
+        if: always()
+        run: |
+          # Extract manufacturability report section
+          sed -n '/Report Manufacturability/,$p' fabric_stitching_output.txt > fabric_report.txt
+
+          tail -300 fabric_report.txt
+
+          # Verify all 3 checks passed
+          for check in "Antenna" "LVS" "DRC"; do
+            if ! grep -A1 "^\* ${check}" fabric_report.txt | grep -q "Passed"; then
+              echo "FAIL: ${check} did not pass"
+              exit 1
+            fi
+          done
+          echo "All fabric manufacturability checks passed"
 
       - name: Upload GDS artifacts
         if: always()
@@ -66,6 +98,8 @@ jobs:
             test_project/Fabric/macro/*/final_views/gds/
             tile_hardening_output.txt
             fabric_stitching_output.txt
+            tile_report.txt
+            fabric_report.txt
           if-no-files-found: warn
           retention-days: 2
 
@@ -74,14 +108,18 @@ jobs:
         id: failure_body
         shell: bash
         run: |
-          # Read and truncate log files for the issue body
+          # Use manufacturability reports if available, fall back to last 100 lines of full output
           TILE_OUTPUT="No output captured"
-          if [ -f tile_hardening_output.txt ]; then
+          if [ -f tile_report.txt ] && [ -s tile_report.txt ]; then
+            TILE_OUTPUT=$(cat tile_report.txt)
+          elif [ -f tile_hardening_output.txt ]; then
             TILE_OUTPUT=$(tail -100 tile_hardening_output.txt)
           fi
 
           FABRIC_OUTPUT="No output captured"
-          if [ -f fabric_stitching_output.txt ]; then
+          if [ -f fabric_report.txt ] && [ -s fabric_report.txt ]; then
+            FABRIC_OUTPUT=$(cat fabric_report.txt)
+          elif [ -f fabric_stitching_output.txt ]; then
             FABRIC_OUTPUT=$(tail -100 fabric_stitching_output.txt)
           fi
 
@@ -99,7 +137,7 @@ jobs:
           **PDK:** \`${PDK}\`
           **Workflow Run:** ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
-          ### Tile Hardening Output (last 100 lines)
+          ### Tile Hardening Manufacturability Report
           <details><summary>Click to expand</summary>
 
           \`\`\`
@@ -107,7 +145,7 @@ jobs:
           \`\`\`
           </details>
 
-          ### Fabric Stitching Output (last 100 lines)
+          ### Fabric Stitching Manufacturability Report
           <details><summary>Click to expand</summary>
 
           \`\`\`

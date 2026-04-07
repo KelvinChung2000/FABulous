@@ -46,4 +46,4 @@ runs:
 
     - name: Build nix environment
       shell: bash
-      run: nix build
+      run: nix develop --command true

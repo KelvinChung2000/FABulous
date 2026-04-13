@@ -7,7 +7,6 @@ various fabric-related operations.
 
 from collections.abc import Iterable
 from pathlib import Path
-from typing import Any
 
 from librelane.config import Config
 from librelane.flows import Flow
@@ -39,10 +38,14 @@ from fabulous.fabric_generator.code_generator.code_generator_VHDL import (
 from fabulous.fabric_generator.gds_generator.flows.fabric_macro_flow import (
     FABulousFabricMacroFlow,
 )
+from fabulous.fabric_generator.gds_generator.flows.fabulous_sequential_flow import (
+    FABulousSequentialFlow,
+)
 from fabulous.fabric_generator.gds_generator.flows.full_fabric_flow import (
     FABulousFabricMacroFullFlow,
 )
 from fabulous.fabric_generator.gds_generator.flows.tile_macro_flow import (
+    FABulousTileFlowVHDL,
     FABulousTileVerilogMacroFlow,
 )
 from fabulous.fabric_generator.gds_generator.gen_io_pin_config_yaml import (
@@ -520,8 +523,22 @@ class FABulous_API:
         Returns the (possibly substituted) flow class. ``Flow.Substitute`` returns
         a new subclass rather than mutating the original, so the return value
         must be used when instantiating the flow.
+
+        If the target flow is not a :class:`FABulousSequentialFlow` subclass, a
+        loud warning is emitted whenever substitutions are requested — without
+        the FABulous engine, LibreLane's flat substitution will silently skip
+        any step nested inside a :class:`WhileStep` or other composite step.
         """
         flow_name = flow.__name__
+
+        def _warn_if_shallow() -> None:
+            if not issubclass(flow, FABulousSequentialFlow):
+                logger.warning(
+                    f"Flow '{flow_name}' is not a FABulousSequentialFlow, so "
+                    "substituting_steps will only be applied to the top-level "
+                    "Steps list. Rules targeting nested (WhileStep/composite) "
+                    "steps will be silently ignored."
+                )
 
         def _apply_meta(config_path: Path, label: str) -> None:
             nonlocal flow
@@ -534,6 +551,7 @@ class FABulous_API:
                 )
                 return
             if meta.substituting_steps:
+                _warn_if_shallow()
                 flow = flow.Substitute(meta.substituting_steps)
 
         if base_config_path:
@@ -545,6 +563,7 @@ class FABulous_API:
         if custom_config_overrides:
             substituting_steps = custom_config_overrides.get("substituting_steps")
             if substituting_steps:
+                _warn_if_shallow()
                 flow = flow.Substitute(substituting_steps)
 
         return flow
@@ -567,11 +586,16 @@ class FABulous_API:
         logger.info(f"PDK root: {pdk_root}")
         logger.info(f"PDK: {pdk}")
         logger.info(f"Output folder: {out_folder.resolve()}")
+        base_flow_cls = (
+            FABulousTileFlowVHDL
+            if isinstance(self.writer, VHDLCodeGenerator)
+            else FABulousTileVerilogMacroFlow
+        )
         flow_cls = self._flow_sub(
             base_config_path,
             config_override_path,
             custom_config_overrides,
-            FABulousTileVerilogMacroFlow,
+            base_flow_cls,
         )
 
         flow = flow_cls(
@@ -675,7 +699,7 @@ class FABulous_API:
             config_paths.append(base_config_path)
         if config_override_path is not None:
             config_paths.append(config_override_path)
-        base_args: dict[str, Any] = {
+        base_args: dict[str, str | Fabric] = {
             "FABULOUS_PROJ_DIR": str(project_dir.resolve()),
             "FABULOUS_FABRIC": self.fabric,
             "DESIGN_NAME": self.fabric.name,

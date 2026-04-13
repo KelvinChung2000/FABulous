@@ -15,27 +15,57 @@ and Config.load to avoid requiring actual PDK files.
 
 from decimal import Decimal
 from pathlib import Path
-from typing import Any
+from typing import TypedDict
 from unittest.mock import MagicMock
 
 import pytest
 from librelane.flows.flow import FlowException
+from librelane.steps import pyosys as pyYosys
+from pytest_mock import MockerFixture
 
+from fabulous.fabric_generator.code_generator.code_generator_VHDL import (
+    VHDLCodeGenerator,
+)
+from fabulous.fabric_generator.gds_generator.flows.fabulous_sequential_flow import (
+    FABulousSequentialFlow,
+)
 from fabulous.fabric_generator.gds_generator.flows.tile_macro_flow import (
+    FABulousTileFlow,
+    FABulousTileFlowVerilog,
+    FABulousTileFlowVHDL,
+    FABulousTileMacroFlow,
     FABulousTileVerilogMacroFlow,
 )
-from fabulous.fabric_generator.gds_generator.steps.tile_optimisation import OptMode
+from fabulous.fabric_generator.gds_generator.steps.custom_pdn import CustomGeneratePDN
+from fabulous.fabric_generator.gds_generator.steps.tile_optimisation import (
+    OptMode,
+    TileOptimisation,
+)
+from fabulous.fabulous_api import FABulous_API
+
+
+class MockPdkRoot(TypedDict):
+    pdk_root: Path
+    pdk: str
+    tracks_file: Path
+    config_vars: dict[str, str]
 
 
 @pytest.mark.usefixtures("mock_config_load")
 class TestFABulousTileVerilogMacroFlowInit:
     """Tests for FABulousTileVerilogMacroFlow initialization and configuration."""
 
+    def test_verilog_aliases_point_at_base_flow(self) -> None:
+        """The old and new Verilog names all resolve to the shared base flow."""
+        assert FABulousTileFlow is FABulousTileMacroFlow
+        assert FABulousTileFlowVerilog is FABulousTileMacroFlow
+        assert FABulousTileVerilogMacroFlow is FABulousTileMacroFlow
+
     def test_init_with_basic_tile(
         self,
         mock_tile: MagicMock,
         io_pin_config: Path,
-        mock_pdk_root: dict[str, Any],
+        mock_pdk_root: MockPdkRoot,
     ) -> None:
         """Test initialization with a basic Tile."""
         flow: FABulousTileVerilogMacroFlow = FABulousTileVerilogMacroFlow(
@@ -56,7 +86,7 @@ class TestFABulousTileVerilogMacroFlowInit:
         self,
         mock_supertile: MagicMock,
         io_pin_config: Path,
-        mock_pdk_root: dict[str, Any],
+        mock_pdk_root: MockPdkRoot,
     ) -> None:
         """Test initialization with a SuperTile sets correct logical dimensions."""
         flow: FABulousTileVerilogMacroFlow = FABulousTileVerilogMacroFlow(
@@ -77,7 +107,7 @@ class TestFABulousTileVerilogMacroFlowInit:
         io_pin_config: Path,
         base_config_file: Path,
         override_config_file: Path,
-        mock_pdk_root: dict[str, Any],
+        mock_pdk_root: MockPdkRoot,
     ) -> None:
         """Test config merging follows correct precedence: custom > override > base."""
         flow: FABulousTileVerilogMacroFlow = FABulousTileVerilogMacroFlow(
@@ -107,7 +137,7 @@ class TestFABulousTileVerilogMacroFlowInit:
         self,
         mock_tile: MagicMock,
         io_pin_config: Path,
-        mock_pdk_root: dict[str, Any],
+        mock_pdk_root: MockPdkRoot,
     ) -> None:
         """Test that string FABULOUS_OPT_MODE is converted to OptMode enum."""
         flow: FABulousTileVerilogMacroFlow = FABulousTileVerilogMacroFlow(
@@ -127,7 +157,7 @@ class TestFABulousTileVerilogMacroFlowInit:
         mock_tile: MagicMock,
         io_pin_config: Path,
         tmp_path: Path,
-        mock_pdk_root: dict[str, Any],
+        mock_pdk_root: MockPdkRoot,
     ) -> None:
         """Test empty YAML config files are treated as empty mappings."""
         base_config = tmp_path / "base_empty.yaml"
@@ -151,7 +181,7 @@ class TestFABulousTileVerilogMacroFlowInit:
         self,
         mock_tile: MagicMock,
         io_pin_config: Path,
-        mock_pdk_root: dict[str, Any],
+        mock_pdk_root: MockPdkRoot,
     ) -> None:
         """Test DIE_AREA is set when FABULOUS_IGNORE_DEFAULT_DIE_AREA is True."""
         flow: FABulousTileVerilogMacroFlow = FABulousTileVerilogMacroFlow(
@@ -173,7 +203,7 @@ class TestFABulousTileVerilogMacroFlowInit:
         self,
         mock_tile: MagicMock,
         io_pin_config: Path,
-        mock_pdk_root: dict[str, Any],
+        mock_pdk_root: MockPdkRoot,
     ) -> None:
         """Test that FlowException is raised when DIE_AREA is too small."""
         with pytest.raises(FlowException, match="DIE_AREA.*is smaller than"):
@@ -190,7 +220,7 @@ class TestFABulousTileVerilogMacroFlowInit:
         self,
         mock_tile: MagicMock,
         io_pin_config: Path,
-        mock_pdk_root: dict[str, Any],
+        mock_pdk_root: MockPdkRoot,
     ) -> None:
         """Test that valid DIE_AREA is accepted."""
         flow: FABulousTileVerilogMacroFlow = FABulousTileVerilogMacroFlow(
@@ -211,7 +241,7 @@ class TestFABulousTileVerilogMacroFlowInit:
         self,
         mock_tile: MagicMock,
         io_pin_config: Path,
-        mock_pdk_root: dict[str, Any],
+        mock_pdk_root: MockPdkRoot,
     ) -> None:
         """Test that NO_OPT mode requires DIE_AREA to be set."""
         with pytest.raises(FlowException, match="Invalid DIE_AREA configuration"):
@@ -227,7 +257,7 @@ class TestFABulousTileVerilogMacroFlowInit:
         self,
         mock_tile: MagicMock,
         io_pin_config: Path,
-        mock_pdk_root: dict[str, Any],
+        mock_pdk_root: MockPdkRoot,
     ) -> None:
         """Test that NO_OPT mode works when DIE_AREA is provided."""
         flow: FABulousTileVerilogMacroFlow = FABulousTileVerilogMacroFlow(
@@ -248,7 +278,7 @@ class TestFABulousTileVerilogMacroFlowInit:
         self,
         mock_tile: MagicMock,
         io_pin_config: Path,
-        mock_pdk_root: dict[str, Any],
+        mock_pdk_root: MockPdkRoot,
     ) -> None:
         """Test that routing obstructions are generated when not provided."""
         flow: FABulousTileVerilogMacroFlow = FABulousTileVerilogMacroFlow(
@@ -267,7 +297,7 @@ class TestFABulousTileVerilogMacroFlowInit:
         self,
         mock_tile: MagicMock,
         io_pin_config: Path,
-        mock_pdk_root: dict[str, Any],
+        mock_pdk_root: MockPdkRoot,
     ) -> None:
         """Test that routing obstructions are not generated when explicitly False."""
         flow: FABulousTileVerilogMacroFlow = FABulousTileVerilogMacroFlow(
@@ -285,7 +315,7 @@ class TestFABulousTileVerilogMacroFlowInit:
         self,
         mock_tile: MagicMock,
         io_pin_config: Path,
-        mock_pdk_root: dict[str, Any],
+        mock_pdk_root: MockPdkRoot,
     ) -> None:
         """Test that custom routing obstructions value is preserved."""
         custom_obstructions: list[tuple[str, int, int, int, int]] = [
@@ -306,7 +336,7 @@ class TestFABulousTileVerilogMacroFlowInit:
         self,
         mock_tile: MagicMock,
         io_pin_config: Path,
-        mock_pdk_root: dict[str, Any],
+        mock_pdk_root: MockPdkRoot,
     ) -> None:
         """Test that design_dir defaults to tile macro directory."""
         _flow: FABulousTileVerilogMacroFlow = FABulousTileVerilogMacroFlow(
@@ -324,7 +354,7 @@ class TestFABulousTileVerilogMacroFlowInit:
         self,
         mock_tile: MagicMock,
         io_pin_config: Path,
-        mock_pdk_root: dict[str, Any],
+        mock_pdk_root: MockPdkRoot,
         tmp_path: Path,
     ) -> None:
         """Test that custom design_dir is used when provided."""
@@ -346,7 +376,7 @@ class TestFABulousTileVerilogMacroFlowInit:
         self,
         mock_tile: MagicMock,
         io_pin_config: Path,
-        mock_pdk_root: dict[str, Any],
+        mock_pdk_root: MockPdkRoot,
     ) -> None:
         """Test that VERILOG_FILES are collected from tile directory."""
         flow: FABulousTileVerilogMacroFlow = FABulousTileVerilogMacroFlow(
@@ -366,7 +396,7 @@ class TestFABulousTileVerilogMacroFlowInit:
         self,
         mock_tile: MagicMock,
         io_pin_config: Path,
-        mock_pdk_root: dict[str, Any],
+        mock_pdk_root: MockPdkRoot,
         tmp_path: Path,
     ) -> None:
         """Test that nonexistent config files don't cause errors."""

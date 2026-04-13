@@ -12,7 +12,7 @@ Tests focus on:
 
 from decimal import Decimal
 from pathlib import Path
-from typing import Any
+from typing import TypedDict
 from unittest.mock import MagicMock
 
 import pytest
@@ -26,6 +26,16 @@ from fabulous.fabric_generator.gds_generator.flows.fabric_macro_flow import (
     configs,
     subs,
 )
+from fabulous.fabric_generator.gds_generator.flows.fabulous_sequential_flow import (
+    FABulousSequentialFlow,
+)
+
+
+class MockPdkRoot(TypedDict):
+    pdk_root: Path
+    pdk: str
+    tracks_file: Path
+    config_vars: dict[str, str]
 
 
 @pytest.mark.usefixtures("mock_config_load")
@@ -36,7 +46,7 @@ class TestFlowInitConfigMerging:
         self,
         tmp_path: Path,
         mock_fabric: MagicMock,
-        mock_pdk_root: dict[str, Any],
+        mock_pdk_root: MockPdkRoot,
     ) -> None:
         """Test empty YAML files are treated as empty mappings."""
         fabric_verilog = tmp_path / "fabric.v"
@@ -81,7 +91,7 @@ class TestFlowInitConfigMerging:
         self,
         tmp_path: Path,
         mock_fabric: MagicMock,
-        mock_pdk_root: dict[str, Any],
+        mock_pdk_root: MockPdkRoot,
     ) -> None:
         """Test base and override mappings merge one level with precedence."""
         fabric_verilog = tmp_path / "fabric.v"
@@ -398,7 +408,7 @@ class TestValidateNoMacroOverlaps:
         macro: Macro = create_macro({"inst1": instance})
 
         macros: dict[str, Macro] = {"unknown_tile": macro}
-        tile_sizes: dict[str, Any] = {}  # Empty
+        tile_sizes: dict[str, tuple[Decimal, Decimal]] = {}  # Empty
 
         # Should not raise - just logs error
         result: bool = flow._validate_no_macro_overlaps(flow, macros, tile_sizes)
@@ -660,3 +670,16 @@ class TestFlowConfiguration:
         """Test that flow has config_vars attribute."""
         assert hasattr(FABulousFabricMacroFlow, "config_vars")
         assert isinstance(FABulousFabricMacroFlow.config_vars, list)
+
+    def test_flow_uses_fabulous_sequential_flow(self) -> None:
+        """Fabric flow routes substitutions through the recursive engine."""
+        assert issubclass(FABulousFabricMacroFlow, FABulousSequentialFlow)
+
+    def test_substitute_returns_fabulous_sequential_flow_subclass(self) -> None:
+        """Substitute preserves the recursive engine in the returned subclass."""
+        derived = FABulousFabricMacroFlow.Substitute(
+            {"Verilator.Lint": None},
+        )
+        assert issubclass(derived, FABulousSequentialFlow)
+        assert issubclass(derived, FABulousFabricMacroFlow)
+        assert "Verilator.Lint" not in [s.id for s in derived.Steps]

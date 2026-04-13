@@ -2,24 +2,24 @@
 
 from decimal import Decimal
 from pathlib import Path
-from typing import Any
 
 from librelane.config.variable import Variable
 from librelane.flows.classic import Classic
 from librelane.flows.flow import Flow, FlowException
-from librelane.flows.sequential import SequentialFlow
-from librelane.logging.logger import err, warn
-from librelane.state.state import State
+from librelane.logging.logger import err
 from librelane.steps import odb as Odb
 from librelane.steps import openroad as OpenROAD
-from librelane.steps.step import Step
+from librelane.steps import pyosys as pyYosys
+from librelane.steps import verilator as Verilator
 
 from fabulous.fabric_definition.supertile import SuperTile
 from fabulous.fabric_definition.tile import Tile
+from fabulous.fabric_generator.gds_generator.flows.fabulous_sequential_flow import (
+    FABulousSequentialFlow,
+)
 from fabulous.fabric_generator.gds_generator.flows.flow_define import (
     check_steps,
     classic_gating_config_vars,
-    physical_steps,
     prep_steps,
     write_out_steps,
 )
@@ -30,30 +30,12 @@ from fabulous.fabric_generator.gds_generator.helper import (
     merge_config_mappings,
     round_die_area,
 )
-from fabulous.fabric_generator.gds_generator.steps.add_buffer import AddBuffers
-from fabulous.fabric_generator.gds_generator.steps.custom_pdn import CustomGeneratePDN
-from fabulous.fabric_generator.gds_generator.steps.tile_IO_placement import (
-    FABulousTileIOPlacement,
-)
 from fabulous.fabric_generator.gds_generator.steps.tile_optimisation import (
     OptMode,
     TileOptimisation,
 )
+from fabulous.fabric_generator.gds_generator.substitution import Remove, Replace
 from fabulous.fabulous_settings import get_context
-
-subs = {
-    # Disable STA
-    "OpenROAD.STAPrePNR*": None,
-    "OpenROAD.STAMidPNR*": None,
-    "OpenROAD.STAPostPNR*": None,
-    # IO placement
-    "Odb.CustomIOPlacement": FABulousTileIOPlacement,
-    # Power
-    "OpenROAD.GeneratePDN": CustomGeneratePDN,
-    "OpenROAD.Resize*": None,
-    "OpenROAD.RepairDesign*": None,
-    "+OpenROAD.GlobalPlacement": AddBuffers,
-}
 
 configs = Classic.config_vars + [
     Variable(
@@ -67,8 +49,8 @@ configs = Classic.config_vars + [
 
 
 @Flow.factory.register()
-class FABulousTileVerilogMacroFlow(SequentialFlow):
-    """A tile optimisation flow for FABulous fabric generation from Verilog."""
+class FABulousTileMacroFlow(FABulousSequentialFlow):
+    """Base tile optimisation flow for FABulous fabric generation."""
 
     Steps = (
         prep_steps
@@ -86,6 +68,8 @@ class FABulousTileVerilogMacroFlow(SequentialFlow):
     config_vars = configs
 
     gating_config_vars = classic_gating_config_vars
+    source_config_key = "VERILOG_FILES"
+    source_globs = ("**/*.v",)
 
     def __init__(
         self,
@@ -99,15 +83,6 @@ class FABulousTileVerilogMacroFlow(SequentialFlow):
         design_dir: Path | None = None,
         **custom_config_overrides: dict,
     ) -> None:
-        # Build file list
-        file_list = [
-            str(f)
-            for f in tile_type.tileDir.parent.glob("**/*.v")
-            if "macro" not in f.parts
-        ]
-        if models_pack := get_context().models_pack:
-            file_list.append(str(models_pack.resolve()))
-
         # Determine logical dimensions
         if isinstance(tile_type, SuperTile):
             logical_width = tile_type.max_width
@@ -123,7 +98,7 @@ class FABulousTileVerilogMacroFlow(SequentialFlow):
         tile_config_dict = {
             "DESIGN_NAME": tile_type.name,
             "FABULOUS_IO_PIN_ORDER_CFG": str(io_pin_config),
-            "VERILOG_FILES": file_list,
+            self.source_config_key: self._collect_source_files(tile_type),
             "FABULOUS_OPT_MODE": opt_mode,
         }
 
@@ -201,30 +176,41 @@ class FABulousTileVerilogMacroFlow(SequentialFlow):
                 ROUTING_OBSTRUCTIONS=get_routing_obstructions(self.config)
             )
 
+    @classmethod
+    def _collect_source_files(cls, tile_type: Tile | SuperTile) -> list[str]:
+        """Collect tile RTL sources for this flow variant."""
+        source_files: list[str] = []
+        seen: set[Path] = set()
+        for pattern in cls.source_globs:
+            for source in tile_type.tileDir.parent.glob(pattern):
+                if "macro" in source.parts or source in seen:
+                    continue
+                source_files.append(str(source))
+                seen.add(source)
+        if models_pack := get_context().models_pack:
+            source_files.append(str(models_pack.resolve()))
+        return source_files
+
+
+FABulousTileFlow = FABulousTileMacroFlow
+FABulousTileFlowVerilog = FABulousTileFlow
+FABulousTileVerilogMacroFlow = FABulousTileFlowVerilog
+
 
 @Flow.factory.register()
-class FABulousTileVHDLMacroFlowClassic(SequentialFlow):
-    """Classic LibreLane flow for FABulous fabric generation from VHDL."""
+class FABulousTileFlowVHDL(FABulousTileMacroFlow):
+    """Tile optimisation flow for FABulous fabric generation from VHDL."""
 
-    Steps = prep_steps + physical_steps + write_out_steps + check_steps
-    Substitutions = subs
-    config_vars = configs
-    gating_config_vars = classic_gating_config_vars
+    Substitutions = [
+        Remove(match=Verilator.Lint),
+        Remove(match=r"Checker\.Lint.*"),
+        Remove(match=pyYosys.JsonHeader),
+        Replace(match=pyYosys.Synthesis, with_step=pyYosys.VHDLSynthesis),
+        Remove(match=Odb.SetPowerConnections),
+        Remove(match=Odb.WriteVerilogHeader),
+    ]
+    source_config_key = "VHDL_FILES"
+    source_globs = ("**/*.vhd", "**/*.vhdl")
 
-    def run(
-        self,
-        initial_state: State,
-        *args: Any,  # noqa: ANN401
-        **kwargs: dict,
-    ) -> tuple[State, list[Step]]:  # noqa: ANN401
-        """Run the FABulous tile VHDL flow."""
-        warn("Linting and equivalence checking for VHDL files is disabled")
-        round_die_area(self.config)
-        if (
-            "ROUTING_OBSTRUCTIONS" not in self.config
-            or self.config["ROUTING_OBSTRUCTIONS"] is None
-        ) and self.config["ROUTING_OBSTRUCTIONS"] is not False:
-            self.config = self.config.copy(
-                ROUTING_OBSTRUCTIONS=get_routing_obstructions(self.config)
-            )
-        return super().run(initial_state, *args, **kwargs)
+
+FABulousTileVHDLMacroFlowClassic = FABulousTileFlowVHDL

@@ -13,6 +13,9 @@ from librelane.state.state import State
 from librelane.steps.step import Step
 
 from fabulous.fabric_definition.fabric import Fabric
+from fabulous.fabric_generator.gds_generator.flows.fabulous_sequential_flow import (
+    FABulousSequentialFlow,
+)
 from fabulous.fabric_generator.gds_generator.flows.flow_define import (
     check_steps,
     physical_steps,
@@ -67,7 +70,7 @@ configs = Classic.config_vars + [
 
 
 @Flow.factory.register()
-class FABulousFabricMacroFlow(Classic):
+class FABulousFabricMacroFlow(FABulousSequentialFlow):
     """Flow for stitching together individual tile macros into a complete fabric.
 
     This flow handles the placement and interconnection of pre-generated tile macros to

@@ -108,6 +108,7 @@ exclude = [
   "oss-cad-suite",
   "scripts",
   ".claude",
+  "fabulous_nix",
 ]
 
 [dependency-groups]
@@ -137,6 +138,7 @@ omit = [
   "demo/*",
   "docs/*",
   "build_hooks.py",
+  "fabulous_nix",
 ]
 show_missing = true
 skip_covered = true

@@ -159,7 +159,7 @@ class FABulousFabricMacroFlow(Classic):
             name=self.fabric.name,
             design_dir=final_design_dir,
             pdk=pdk,
-            pdk_root=str(pdk_root.resolve()),
+            pdk_root=str(pdk_root),
         )
 
     def _compute_row_and_column_sizes(

@@ -93,6 +93,7 @@ class FABulousTileVerilogMacroFlow(SequentialFlow):
         opt_mode: OptMode,
         pdk: str,
         pdk_root: Path,
+        models_pack_path: Path | None = None,
         base_config_path: Path | None = None,
         override_config_path: Path | None = None,
         design_dir: Path | None = None,
@@ -104,8 +105,13 @@ class FABulousTileVerilogMacroFlow(SequentialFlow):
             for f in tile_type.tileDir.parent.glob("**/*.v")
             if "macro" not in f.parts
         ]
-        if models_pack := get_context().models_pack:
+        models_pack = models_pack_path or get_context().models_pack
+        if models_pack is not None:
             file_list.append(str(models_pack.resolve()))
+        else:
+            raise FlowException(
+                "models_pack is not set in the context, cannot proceed."
+            )
 
         # Determine logical dimensions
         if isinstance(tile_type, SuperTile):
@@ -154,7 +160,7 @@ class FABulousTileVerilogMacroFlow(SequentialFlow):
             name=tile_type.name,
             design_dir=final_dir,
             pdk=pdk,
-            pdk_root=str(pdk_root.resolve()),
+            pdk_root=str(pdk_root),
         )
         self.config = self.config.copy(
             FABULOUS_TILE_LOGICAL_WIDTH=logical_width,

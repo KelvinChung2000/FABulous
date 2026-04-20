@@ -20,7 +20,11 @@ from fabulous.fabric_generator.gds_generator.flows.flow_define import (
     prep_steps,
     write_out_steps,
 )
-from fabulous.fabric_generator.gds_generator.helper import get_pitch, round_up_decimal
+from fabulous.fabric_generator.gds_generator.helper import (
+    deep_merge,
+    get_pitch,
+    round_up_decimal,
+)
 from fabulous.fabric_generator.gds_generator.steps.fabric_IO_placement import (
     FABulousFabricIOPlacement,
 )
@@ -134,13 +138,15 @@ class FABulousFabricMacroFlow(Classic):
         final_config["VERILOG_FILES"] = [str(i) for i in fabric_verilog_paths]
         final_config["DESIGN_NAME"] = fabric.name
         if base_config_path is not None:
-            final_config.update(
-                yaml.safe_load(base_config_path.read_text(encoding="utf-8"))
+            deep_merge(
+                final_config,
+                yaml.safe_load(base_config_path.read_text(encoding="utf-8")),
             )
 
         if config_override_path is not None:
-            final_config.update(
-                yaml.safe_load(config_override_path.read_text(encoding="utf-8"))
+            deep_merge(
+                final_config,
+                yaml.safe_load(config_override_path.read_text(encoding="utf-8")),
             )
         final_config.update(**custom_config_overrides)
         if design_dir is not None:

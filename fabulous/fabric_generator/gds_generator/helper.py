@@ -11,6 +11,15 @@ from librelane.config.config import Config
 from librelane.logging.logger import info
 
 
+def deep_merge(dest: dict, src: dict) -> None:
+    """Recursive merge ``src`` into ``dest`` of nested dict."""
+    for key, value in src.items():
+        if key in dest and isinstance(dest[key], dict) and isinstance(value, dict):
+            deep_merge(dest[key], value)
+        else:
+            dest[key] = value
+
+
 def get_layer_info(config: Config) -> dict[str, dict[str, tuple[Decimal, Decimal]]]:
     """Read the FP_TRACKS_INFO file and return layer information.
 

@@ -57,3 +57,10 @@ pdk::ihp-sg13g2:
   # Routing
   RT_CLOCK_MAX_LAYER: TopMetal1
   RT_MAX_LAYER: TopMetal1
+
+pdk::gf180mcuD:
+  # Routing
+  RT_MAX_LAYER: Metal4
+
+  # PDN
+  PDN_VPITCH: 100

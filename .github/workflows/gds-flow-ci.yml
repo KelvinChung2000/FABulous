@@ -56,13 +56,32 @@ jobs:
           echo "=== tile hardening manufacturability report ==="
           tail -300 tile_report.txt
 
+          fail=0
           for check in "Antenna" "LVS" "DRC"; do
-            if ! grep -A1 "^\* ${check}" tile_report.txt | grep -q "Passed"; then
-              echo "FAIL: ${check} did not pass"
-              exit 1
+            # Extract the line immediately following each "* <check>" header
+            results=$(awk -v c="$check" '
+              prev == "* " c { print }
+              { prev = $0 }
+            ' tile_report.txt)
+
+            total=$(printf "%s\n" "$results" | grep -c .)
+            passed=$(printf "%s\n" "$results" | grep -c "^Passed")
+
+            if [ "$total" -eq 0 ]; then
+              echo "FAIL: no ${check} results found (did any tile reach manufacturability?)"
+              fail=1
+            elif [ "$total" -ne "$passed" ]; then
+              echo "FAIL: ${check} ${passed}/${total} tiles passed"
+              fail=1
+            else
+              echo "OK: ${check} ${passed}/${total} tiles passed"
             fi
           done
-          echo "All tile manufacturability checks passed"
+
+          if [ "$fail" -ne 0 ]; then
+            exit 1
+          fi
+          echo "All tiles passed manufacturability checks"
 
       - name: Upload tile project
         if: always()
@@ -169,13 +188,31 @@ jobs:
           echo "=== fabric stitching manufacturability report ==="
           tail -300 fabric_report.txt
 
+          fail=0
           for check in "Antenna" "LVS" "DRC"; do
-            if ! grep -A1 "^\* ${check}" fabric_report.txt | grep -q "Passed"; then
-              echo "FAIL: ${check} did not pass"
-              exit 1
+            results=$(awk -v c="$check" '
+              prev == "* " c { print }
+              { prev = $0 }
+            ' fabric_report.txt)
+
+            total=$(printf "%s\n" "$results" | grep -c .)
+            passed=$(printf "%s\n" "$results" | grep -c "^Passed")
+
+            if [ "$total" -eq 0 ]; then
+              echo "FAIL: no ${check} results found"
+              fail=1
+            elif [ "$total" -ne "$passed" ]; then
+              echo "FAIL: ${check} ${passed}/${total} passed"
+              fail=1
+            else
+              echo "OK: ${check} ${passed}/${total} passed"
             fi
           done
-          echo "All fabric manufacturability checks passed"
+
+          if [ "$fail" -ne 0 ]; then
+            exit 1
+          fi
+          echo "Fabric passed all manufacturability checks"
 
       - name: Upload fabric artifacts
         if: always()

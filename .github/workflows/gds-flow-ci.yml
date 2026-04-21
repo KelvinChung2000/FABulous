@@ -83,16 +83,21 @@ jobs:
           fi
           echo "All tiles passed manufacturability checks"
 
+      - name: Package tile project
+        if: always()
+        run: |
+          tar --zstd -cf tile-project.tar.zst \
+            test_project \
+            tile_hardening_output.txt \
+            tile_report.txt
+
       - name: Upload tile project
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: tile-project-${{ matrix.pdk }}
-          path: |
-            test_project/
-            tile_hardening_output.txt
-            tile_report.txt
-          if-no-files-found: warn
+          path: tile-project.tar.zst
+          if-no-files-found: error
           retention-days: 2
 
       - name: Prepare failure issue body
@@ -168,6 +173,9 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: tile-project-${{ matrix.pdk }}
+
+      - name: Unpack tile project
+        run: tar --zstd -xf tile-project.tar.zst
 
       - name: Run fabric stitching
         run: |

@@ -222,17 +222,24 @@ jobs:
           fi
           echo "Fabric passed all manufacturability checks"
 
+      - name: Package fabric output
+        if: always()
+        run: |
+          tar --zstd -cf fabric-output.tar.zst \
+            --ignore-failed-read \
+            test_project/Fabric \
+            test_project/.FABulous \
+            fabric_stitching_output.txt \
+            fabric_report.txt
+
       - name: Upload fabric artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: fabric-output-${{ matrix.pdk }}
-          path: |
-            test_project/Fabric/macro/*/final_views/
-            fabric_stitching_output.txt
-            fabric_report.txt
-          if-no-files-found: warn
-          retention-days: 2
+          path: fabric-output.tar.zst
+          if-no-files-found: error
+          retention-days: 7
 
       - name: Prepare failure issue body
         if: failure()

@@ -120,12 +120,12 @@ class FABulousTileVerilogMacroFlow(SequentialFlow):
             "DESIGN_NAME": tile_type.name,
             "FABULOUS_IO_PIN_ORDER_CFG": str(io_pin_config),
             "VERILOG_FILES": file_list,
-            "FABULOUS_OPT_MODE": opt_mode,
+            "FABULOUS_OPT_MODE": OptMode(opt_mode),
         }
 
-        if "FABULOUS_OPT_MODE" in tile_config_dict:
-            tile_config_dict["FABULOUS_OPT_MODE"] = OptMode(
-                tile_config_dict["FABULOUS_OPT_MODE"]
+        if "FABULOUS_OPT_MODE" in custom_config_overrides:
+            custom_config_overrides["FABULOUS_OPT_MODE"] = OptMode(
+                custom_config_overrides["FABULOUS_OPT_MODE"]
             )
 
         default_design_dir = tile_type.tileDir.parent / "macro" / opt_mode.value

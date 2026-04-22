@@ -4,7 +4,6 @@ from decimal import Decimal
 from pathlib import Path
 from typing import Any
 
-import yaml
 from librelane.config.variable import Variable
 from librelane.flows.classic import Classic
 from librelane.flows.flow import Flow, FlowException
@@ -25,7 +24,6 @@ from fabulous.fabric_generator.gds_generator.flows.flow_define import (
     write_out_steps,
 )
 from fabulous.fabric_generator.gds_generator.helper import (
-    deep_merge,
     get_offset,
     get_pitch,
     get_routing_obstructions,
@@ -125,20 +123,6 @@ class FABulousTileVerilogMacroFlow(SequentialFlow):
             "FABULOUS_OPT_MODE": opt_mode,
         }
 
-        # Load base config
-        if base_config_path is not None and base_config_path.exists():
-            deep_merge(
-                tile_config_dict,
-                yaml.safe_load(base_config_path.read_text(encoding="utf-8")),
-            )
-
-        if override_config_path is not None and override_config_path.exists():
-            deep_merge(
-                tile_config_dict,
-                yaml.safe_load(override_config_path.read_text(encoding="utf-8")),
-            )
-
-        tile_config_dict.update(**custom_config_overrides)
         if "FABULOUS_OPT_MODE" in tile_config_dict:
             tile_config_dict["FABULOUS_OPT_MODE"] = OptMode(
                 tile_config_dict["FABULOUS_OPT_MODE"]
@@ -152,7 +136,12 @@ class FABulousTileVerilogMacroFlow(SequentialFlow):
         else:
             final_dir = str(design_dir)
         super().__init__(
-            tile_config_dict,
+            [
+                tile_config_dict,
+                base_config_path,
+                override_config_path,
+                custom_config_overrides,
+            ],
             name=tile_type.name,
             design_dir=final_dir,
             pdk=pdk,

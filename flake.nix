@@ -95,7 +95,7 @@
         system:
         let
           pkgs = nixpkgs.legacyPackages.${system};
-          python = nixpkgs.legacyPackages.${system}.python312;
+          python = nixpkgs.legacyPackages.${system}.python3;
         in
         (pkgs.callPackage pyproject-nix.build.packages {
           inherit python;
@@ -155,8 +155,8 @@
           # want to include the full librelane-env in packages (would collide with virtualenv).
           # Instead, we'll add it to NIX_PYTHONPATH.
           librelane-python-path = "${librelane-pkg}/${pkgs.python3.sitePackages}";
-          tkinter-pkg = nixpkgs.legacyPackages.${system}.python312Packages.tkinter;
-          tkinter-python-path = "${tkinter-pkg}/${nixpkgs.legacyPackages.${system}.python312.sitePackages}";
+          tkinter-pkg = nixpkgs.legacyPackages.${system}.python3Packages.tkinter;
+          tkinter-python-path = "${tkinter-pkg}/${nixpkgs.legacyPackages.${system}.python3.sitePackages}";
 
           # Combine all packages: librelane tools (with patched OpenROAD) + our custom tools + uv2nix env
           # Note: We only include virtualenv for Python, not librelane-env, to avoid collisions

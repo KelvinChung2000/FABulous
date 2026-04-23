@@ -142,13 +142,19 @@ class FABulousFabricMacroFlow(Classic):
             macro_dir = self.fabric.fabric_dir.parent / "macro"
             macro_dir.mkdir(parents=True, exist_ok=True)
             final_design_dir = str(macro_dir)
-        super().__init__(
-            [
+
+        configs = [
+            i
+            for i in [
                 final_config,
                 base_config_path,
                 config_override_path,
                 custom_config_overrides,
-            ],
+            ]
+            if i is not None
+        ]
+        super().__init__(
+            configs,
             name=self.fabric.name,
             design_dir=final_design_dir,
             pdk=pdk,

@@ -135,13 +135,19 @@ class FABulousTileVerilogMacroFlow(SequentialFlow):
             final_dir = str(default_design_dir.resolve())
         else:
             final_dir = str(design_dir)
-        super().__init__(
-            [
+
+        configs = [
+            i
+            for i in [
                 tile_config_dict,
                 base_config_path,
                 override_config_path,
                 custom_config_overrides,
-            ],
+            ]
+            if i is not None
+        ]
+        super().__init__(
+            configs,
             name=tile_type.name,
             design_dir=final_dir,
             pdk=pdk,

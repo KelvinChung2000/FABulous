@@ -608,13 +608,18 @@ class FABulous_API:
         }
         if tile_opt_config is not None:
             config_args["TILE_OPT_INFO"] = str(tile_opt_config)
-        flow = FABulousFabricMacroFullFlow(
-            [
+        configs = [
+            i
+            for i in [
                 config_args,
                 base_config_path,
                 config_override_path,
                 config_overrides,
-            ],
+            ]
+            if i is not None
+        ]
+        flow = FABulousFabricMacroFullFlow(
+            configs,
             name=self.fabric.name,
             design_dir=str(out_folder.resolve()),
             pdk=pdk,

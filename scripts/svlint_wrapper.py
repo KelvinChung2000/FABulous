@@ -36,9 +36,9 @@ RELEASE_API_URL = (
 )
 
 PLATFORM_TOKENS = {
-    "Linux": ("linux",),
-    "Darwin": ("darwin", "macos", "apple"),
-    "Windows": ("windows", "win"),
+    "Linux": ("lnx",),
+    "Darwin": ("mac",),
+    "Windows": ("win",),
 }
 
 ARCH_TOKENS = {

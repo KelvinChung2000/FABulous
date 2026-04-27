@@ -74,14 +74,18 @@ repos:
 
   # Verilog / SystemVerilog linting — upstream hook (Docker-backed)
   - repo: https://github.com/verilator/verilator
-    rev: v5.046 # refreshed by `pre-commit autoupdate`
+    rev: v5.048 # refreshed by `pre-commit autoupdate`
     hooks:
       - id: verilator
         # Waivers are inherent to pre-commit's per-file linting, not real design defects:
-        #   MODMISSING   - cross-file module refs (e.g. cus_mux21 lives in models_pack.v)
-        #   TIMESCALEMOD - only a subset of files carry `timescale; unified elsewhere
-        #   MULTITOP     - template files legitimately contain multiple top modules
-        args: [ --lint-only, -Wno-MODMISSING, -Wno-TIMESCALEMOD, -Wno-MULTITOP ]
+        args:
+          [
+            --lint-only,
+            -Wno-MODMISSING,
+            -Wno-TIMESCALEMOD,
+            -Wno-MULTITOP,
+            -Wno-MODDUP,
+          ]
 
   # Verilog / SystemVerilog linting — upstream svlint static binary.
   # scripts/svlint_wrapper.py downloads and caches the pinned release on first

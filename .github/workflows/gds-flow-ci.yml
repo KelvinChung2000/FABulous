@@ -4,7 +4,6 @@ on:
   schedule:
     # Run every night at 2 AM UTC (offset from dependency test at midnight)
     - cron: "0 2 * * *"
-  pull_request:
   workflow_dispatch:
 
 permissions:

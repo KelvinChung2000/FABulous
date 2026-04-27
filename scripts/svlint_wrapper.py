@@ -199,6 +199,13 @@ def find_cached_binary(prefix: Path) -> Path | None:
     return matches[0] if matches else None
 
 
+def ensure_executable(binary: Path) -> Path:
+    """Restore execute permission on a cached binary before running it."""
+    if platform.system() != "Windows":
+        binary.chmod(binary.stat().st_mode | 0o111)
+    return binary
+
+
 def ensure_bin() -> Path:
     """Return the path to svlint, downloading and installing it if missing."""
     system = shutil.which("svlint")
@@ -207,7 +214,7 @@ def ensure_bin() -> Path:
     prefix = cache_dir() / "install"
     binary = find_cached_binary(prefix)
     if binary:
-        return binary
+        return ensure_executable(binary)
     with file_lock(cache_dir() / ".lock"):
         binary = find_cached_binary(prefix)
         if not binary:
@@ -215,7 +222,7 @@ def ensure_bin() -> Path:
             binary = find_cached_binary(prefix)
     if not binary:
         sys.exit(f"svlint_wrapper: svlint not found after install in {prefix}")
-    return binary
+    return ensure_executable(binary)
 
 
 def main() -> None:

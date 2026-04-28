@@ -20,7 +20,7 @@ class FABulousFabric(FABulousFabricMacroFlow):
     config_vars = FABulousFabricMacroFlow.config_vars + [
         Variable(
             "FABULOUS_FABRIC_CONFIG",
-            Path,
+            list[Path],
             "Path to the fabric CSV describing the tile map, parameters, and "
             "per-tile CSV locations.",
         ),
@@ -62,7 +62,10 @@ class FABulousFabric(FABulousFabricMacroFlow):
             **kwargs,
         )
 
-        fabric_csv = Path(self.config["FABULOUS_FABRIC_CONFIG"])
+        fabric_csv_entries = self.config["FABULOUS_FABRIC_CONFIG"]
+        if not fabric_csv_entries:
+            raise FlowException("FABULOUS_FABRIC_CONFIG is empty")
+        fabric_csv = Path(fabric_csv_entries[0])
         if not fabric_csv.is_file():
             raise FlowException(f"FABULOUS_FABRIC_CONFIG={fabric_csv} does not exist")
         self.fabric = parseFabricCSV(fabric_csv)

@@ -75,6 +75,33 @@ class TestFABulousFabricSchema:
         """Wrapper inherits ``run()`` / step substitutions from the real flow."""
         assert issubclass(FABulousFabric, FABulousFabricMacroFlow)
 
+    def test_fabulous_fabric_config_accepts_dir_resolver_list(
+        self, tmp_path: Path
+    ) -> None:
+        """``FABULOUS_FABRIC_CONFIG`` must validate when set to ``dir::...``.
+
+        LibreLane rewrites ``dir::file.csv`` to ``refg::$DESIGN_DIR/file.csv``
+        and the refg resolver always produces a ``list[str]`` (see
+        ``librelane/config/preprocessor.py``). If the Variable is typed as a
+        scalar ``Path`` the type validator crashes with
+        ``TypeError: argument should be ... not 'list'`` before ``run()`` ever
+        executes, making ``dir::`` unusable for this variable.
+        """
+        from librelane.common import GenericDict
+
+        var = next(
+            v for v in FABulousFabric.config_vars if v.name == "FABULOUS_FABRIC_CONFIG"
+        )
+        fabric_csv = tmp_path / "fabric.csv"
+        fabric_csv.write_text("", encoding="utf-8")
+        resolved_list: list[str] = [str(fabric_csv)]
+        mutable = GenericDict({"FABULOUS_FABRIC_CONFIG": resolved_list})
+        _, value = var.compile(mutable, warning_list_ref=[])
+
+        # Concrete fabric path must be recoverable from whatever type we accept.
+        fabric_path = Path(value[0]) if isinstance(value, list) else Path(value)
+        assert fabric_path == fabric_csv
+
 
 class TestBuildMacros:
     """``_build_macros`` turns a tile-name → macro-dir mapping into Macros."""
@@ -212,7 +239,7 @@ class TestFABulousFabricInitAdapter:
 
         flow = FABulousFabric(
             config={
-                "FABULOUS_FABRIC_CONFIG": str(fabric_csv),
+                "FABULOUS_FABRIC_CONFIG": [str(fabric_csv)],
                 "FABULOUS_TILE_LIBRARY": str(tmp_path),
                 "FABULOUS_TILE_MACROS": {"LUT4AB": str(macro_dir)},
                 "DESIGN_DIR": str(tmp_path),
@@ -247,7 +274,7 @@ class TestFABulousFabricInitAdapter:
         flow = FABulousFabric(
             config={
                 "DESIGN_NAME": "CustomName",
-                "FABULOUS_FABRIC_CONFIG": str(fabric_csv),
+                "FABULOUS_FABRIC_CONFIG": [str(fabric_csv)],
                 "FABULOUS_TILE_LIBRARY": str(tmp_path),
                 "FABULOUS_TILE_MACROS": {"LUT4AB": str(macro_dir)},
                 "DESIGN_DIR": str(tmp_path),
@@ -268,7 +295,7 @@ class TestFABulousFabricInitAdapter:
         with pytest.raises(FlowException, match="does not exist"):
             FABulousFabric(
                 config={
-                    "FABULOUS_FABRIC_CONFIG": str(tmp_path / "missing.csv"),
+                    "FABULOUS_FABRIC_CONFIG": [str(tmp_path / "missing.csv")],
                     "FABULOUS_TILE_LIBRARY": str(tmp_path),
                     "FABULOUS_TILE_MACROS": {"LUT4AB": str(macro_dir)},
                     "DESIGN_DIR": str(tmp_path),
@@ -293,7 +320,7 @@ class TestFABulousFabricInitAdapter:
         with pytest.raises(FlowException, match="FABULOUS_TILE_MACROS is empty"):
             FABulousFabric(
                 config={
-                    "FABULOUS_FABRIC_CONFIG": str(fabric_csv),
+                    "FABULOUS_FABRIC_CONFIG": [str(fabric_csv)],
                     "FABULOUS_TILE_LIBRARY": str(tmp_path),
                     "FABULOUS_TILE_MACROS": {},
                     "DESIGN_DIR": str(tmp_path),

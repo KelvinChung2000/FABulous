@@ -614,8 +614,10 @@ class FABulous_API:
         logger.info(f"Output folder: {out_folder.resolve()}")
         config_args = {
             "FABULOUS_PROJ_DIR": str(project_dir.resolve()),
-            "FABULOUS_FABRIC": self.fabric.name,
+            "FABULOUS_FABRIC": self.fabric,
             "DESIGN_NAME": self.fabric.name,
+            "FABULOUS_NLP_ONLY": nlp_only,
+            "FABULOUS_NLP_AREA_MARGIN": nlp_area_margin,
         }
         if tile_opt_config is not None:
             config_args["TILE_OPT_INFO"] = str(tile_opt_config)

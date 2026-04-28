@@ -195,17 +195,8 @@ class NLPTileProblem(ElementwiseProblem):
                     areas.append(w * h)
                     raw_samples.append((w, h))
 
-            raw_samples.sort(key=lambda wh: (wh[1], wh[0]))
-            frontier: list[tuple[float, float]] = []
-            min_w_so_far = float("inf")
-            for w, h in reversed(raw_samples):
-                if w < min_w_so_far:
-                    frontier.append((w, h))
-                    min_w_so_far = w
-            frontier.reverse()
-
             self.min_areas[name] = min(areas) if areas else float("inf")
-            self.tile_samples[name] = frontier
+            self.tile_samples[name] = self._pareto_frontier(raw_samples)
 
             stdcell_vals = [
                 a
@@ -485,6 +476,29 @@ class NLPTileProblem(ElementwiseProblem):
             if w is not None and h is not None:
                 return (w, h)
         return self._min_dimensions_from_metrics(name)
+
+    @staticmethod
+    def _pareto_frontier(
+        samples: list[tuple[float, float]],
+    ) -> list[tuple[float, float]]:
+        """Return the (w, h) Pareto frontier where smaller is better on both axes.
+
+        A sample is kept iff no other sample has both smaller-or-equal w AND smaller-or-
+        equal h with at least one strictly smaller. The result is sorted by h ascending
+        (and by construction, w descending).
+
+        This preserves wider+shorter samples alongside narrower+taller ones so the
+        supertile aspect-target selector and the piecewise envelope constraint see the
+        full feasible front rather than a single extreme.
+        """
+        sorted_samples = sorted(samples, key=lambda wh: (wh[1], wh[0]))
+        frontier: list[tuple[float, float]] = []
+        min_w_so_far = float("inf")
+        for w, h in sorted_samples:
+            if w < min_w_so_far:
+                frontier.append((w, h))
+                min_w_so_far = w
+        return frontier
 
     @staticmethod
     def _envelope_w_floor(h: float, samples: list[tuple[float, float]]) -> float:

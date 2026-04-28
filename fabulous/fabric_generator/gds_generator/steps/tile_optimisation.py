@@ -170,10 +170,6 @@ class TileOptimisation(WhileStep):
 
     raise_on_failure: bool = False
 
-    break_next_iteration: bool = False
-
-    to_change_width: bool = False
-
     iter_count: int = 0
 
     last_core_area: Decimal | None = None
@@ -248,11 +244,7 @@ class TileOptimisation(WhileStep):
                 self.clean_probes.append([float(v) for v in die_bbox.split()])
 
         if self._is_directional():
-            _, _, w, h = self.config["DIE_AREA"]
-            if self.config["FABULOUS_OPT_MODE"] == OptMode.FIND_MIN_WIDTH:
-                target = Decimal(w)
-            else:
-                target = Decimal(h)
+            target = self._directional_target(self.config["DIE_AREA"])
             if full_iter_completed:
                 # Smallest-so-far working target axis; keep the best working state.
                 if self.bracket_high is None or target < self.bracket_high:
@@ -266,7 +258,6 @@ class TileOptimisation(WhileStep):
             self.last_working_state = post_iteration.copy()
             return post_iteration
 
-        self.to_change_width = not self.to_change_width
         self.iter_count += 1
         return post_iteration
 
@@ -430,16 +421,17 @@ class TileOptimisation(WhileStep):
         current_target = width if target_is_width else height
         non_target = height if target_is_width else width
 
-        if self.config["FABULOUS_OPT_MODE"] == OptMode.FIND_MIN_WIDTH:
-            pin_floor = Decimal(self.config.get("FABULOUS_PIN_MIN_WIDTH", 0))
-        else:
-            pin_floor = Decimal(self.config.get("FABULOUS_PIN_MIN_HEIGHT", 0))
+        pin_floor = Decimal(
+            self.config.get(
+                "FABULOUS_PIN_MIN_WIDTH"
+                if target_is_width
+                else "FABULOUS_PIN_MIN_HEIGHT",
+                0,
+            )
+        )
 
         x_pitch, y_pitch = get_pitch(self.config)
-        if self.config["FABULOUS_OPT_MODE"] == OptMode.FIND_MIN_WIDTH:
-            pitch = x_pitch
-        else:
-            pitch = y_pitch
+        pitch = x_pitch if target_is_width else y_pitch
 
         if self.bracket_high is None:
             next_target = current_target * Decimal(2)

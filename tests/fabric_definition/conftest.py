@@ -4,9 +4,8 @@ from collections.abc import Callable
 from pathlib import Path
 
 import pytest
-from PIL.ImageCms import Direction
 
-from fabulous.fabric_definition.define import IO, Side
+from fabulous.fabric_definition.define import IO, Direction, Side
 from fabulous.fabric_definition.fabric import Fabric
 from fabulous.fabric_definition.port import Port
 from fabulous.fabric_definition.tile import Tile

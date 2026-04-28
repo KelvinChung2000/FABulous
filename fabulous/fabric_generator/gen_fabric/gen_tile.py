@@ -856,7 +856,7 @@ def generateSuperTile(
                 else:
                     portsPairs.append(("UserCLK", f"Tile_X{x}Y{y}_UserCLK"))
                 portsPairs.append(("UserCLKo", f"Tile_X{x}Y{y}_UserCLKo"))
-            if frame_bits_per_row == ConfigBitMode.FRAME_BASED:
+            if config_bit_mode == ConfigBitMode.FRAME_BASED:
                 # add connection for frameData, frameStrobe
                 if (
                     0 <= x - 1 < len(superTile.tileMap[0])

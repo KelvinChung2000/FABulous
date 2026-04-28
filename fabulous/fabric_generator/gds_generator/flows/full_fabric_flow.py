@@ -492,10 +492,10 @@ class FABulousFabricMacroFullFlow(Flow):
                     f"Tile {tile_name} has no GDS output after recompilation"
                 )
 
-            # Walk up from the GDS path to find the run directory that
-            # contains the final/ snapshot. This is robust to varying step
-            # nesting depth (e.g. write-out steps inside a WhileStep wrapper).
-            # Note: librelane's Path is a UserString, so we wrap with pathlib.
+            # Walk up from the GDS path to find the run directory containing the
+            # final/ snapshot. Robust to varying step nesting (e.g. write-out
+            # steps inside a WhileStep wrapper). librelane's Path is a
+            # UserString, so wrap with pathlib.
             final_dir: Path | None = next(
                 (
                     parent / "final"
@@ -518,10 +518,6 @@ class FABulousFabricMacroFullFlow(Flow):
 
         info(f"Created final_views symlinks for {len(tile_type_states)} tiles")
 
-        # Generate fabric-level IO pin configuration
-        fabric_io_config_path: Path = proj_dir / "Fabric" / "fabric_io_pin_order.yaml"
-        fabric_io_config_path.parent.mkdir(parents=True, exist_ok=True)
-
         # Step 5: Run fabric stitching
         self.progress_bar.start_stage("Fabric Stitching")
 
@@ -540,5 +536,5 @@ class FABulousFabricMacroFullFlow(Flow):
         final_state: State = stitching_flow.start()
         self.progress_bar.end_stage()
 
-        info("\n✓ Fabric flow completed successfully!")
+        info("\nFabric flow completed successfully!")
         return final_state, []

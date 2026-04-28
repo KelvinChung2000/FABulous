@@ -19,6 +19,7 @@ env:
   PDK: ihp-sg13g2
   TILE_NAME: LUT4x8_ha
   FABRIC_NAME: synthetic_lut4x8_ha_10x10
+  TILE_BASE_CONFIG: tests/assets/librelane_plugin/tiles/classic/common/config.yaml
   TILE_CONFIG: tests/assets/librelane_plugin/tiles/classic/LUT4x8_ha/config.yaml
   FABRIC_CONFIG: tests/assets/librelane_plugin/fabrics/synthetic_lut4x8_ha_10x10/config.yaml
 
@@ -77,6 +78,7 @@ jobs:
               --pdk ${PDK} \
               --run-tag ci \
               --save-views-to tile_final_views \
+              ${TILE_BASE_CONFIG} \
               ${TILE_CONFIG} \
               2>&1 | tee tile_run.log
           "

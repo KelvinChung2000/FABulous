@@ -17,6 +17,7 @@ from fabulous.fabric_definition.tile import Tile
 from fabulous.fabric_generator.code_generator.code_generator_Verilog import (
     VerilogCodeGenerator,
 )
+from fabulous.fabric_generator.gds_generator.define import OptMode
 from fabulous.fabric_generator.gds_generator.flows.tile_macro_flow import (
     FABulousTileVerilogMacroFlow,
 )
@@ -150,6 +151,7 @@ class FABulousTile(SequentialFlow):
             FABULOUS_IO_PIN_ORDER_CFG=str(pin_yaml),
             FABULOUS_TILE_LOGICAL_WIDTH=logical_width,
             FABULOUS_TILE_LOGICAL_HEIGHT=logical_height,
+            FABULOUS_OPT_MODE=OptMode.NO_OPT,
         )
 
         self.config = _apply_tile_die_area_config(self.config, tile)

@@ -8,7 +8,6 @@ FABULOUS_TILE_DIR: dir::.
 DESIGN_NAME: LUT4x8_ha
 VERILOG_FILES:
   - dir::../../../models_pack.v
-  - dir::../../../custom.v
 
 # Disable timing driven placement
 # as it would resize the buffers

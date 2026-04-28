@@ -48,7 +48,7 @@ def make_empty_tile(name: str, ports: list[Port] | None = None) -> Tile:
     )
 
 
-def make_side_port(side: str, name: str = "P") -> Port:
+def make_side_port(side: Side, name: str = "P") -> Port:
     """Construct a Port physically located on the given side."""
     return Port(
         Direction.JUMP,
@@ -59,5 +59,5 @@ def make_side_port(side: str, name: str = "P") -> Port:
         1,
         name,
         IO.INPUT,
-        Side[side],
+        side,
     )

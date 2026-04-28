@@ -62,7 +62,6 @@ jobs:
     name: Harden LUT4x8_ha via FABulousTile
     runs-on: ubuntu-latest
     needs: plugin-smoke
-    timeout-minutes: 360
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
@@ -127,7 +126,6 @@ jobs:
     name: Stitch synthetic_lut4x8_ha_10x10 via FABulousFabric
     runs-on: ubuntu-latest
     needs: tile-hardening
-    timeout-minutes: 720
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:

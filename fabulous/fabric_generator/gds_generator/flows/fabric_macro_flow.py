@@ -10,6 +10,7 @@ from librelane.flows.classic import Classic
 from librelane.flows.flow import Flow, FlowException
 from librelane.logging.logger import err, info
 from librelane.state.state import State
+from librelane.steps.common_variables import io_layer_variables
 from librelane.steps.step import Step
 
 from fabulous.fabric_definition.fabric import Fabric
@@ -31,6 +32,8 @@ from fabulous.fabric_generator.gds_generator.steps.odb_connect_pdn import (
 )
 
 subs = {
+    "OpenROAD.CutRows": None,
+    "OpenROAD.TapEndcapInsertion": None,
     # Disable STA
     "OpenROAD.STAPrePNR*": None,
     "OpenROAD.STAMidPNR*": None,
@@ -39,30 +42,49 @@ subs = {
     "Odb.CustomIOPlacement": FABulousFabricIOPlacement,
     # Power
     "OpenROAD.GeneratePDN": FABulousPDN,
+    # Skip cell placement (macro-only fabric has no std cells, and macros
+    # fill the die so CutRows produces zero rows; GP/DP would error on that).
+    "Odb.ApplyDEFTemplate": None,
+    "OpenROAD.GlobalPlacement": None,
+    "Odb.ManualGlobalPlacement": None,
+    "OpenROAD.DetailedPlacement": None,
+    "OpenROAD.RepairAntennas*": None,
+    "OpenROAD.Repair*": None,
+    "OpenROAD.Resizer*": None,
+    "OpenROAD.DetailedRouting": None,
+    # It seems when we have no wires,
+    # OpenRCX won't write a spef file
+    "OpenROAD.RCX": None,
+    # No IR drop without a spef
+    "OpenROAD.IRDropReport": None,
 }
 
-configs = Classic.config_vars + [
-    Variable(
-        "FABULOUS_TILE_SPACING",
-        tuple[Decimal, Decimal],
-        "The spacing between tiles. (x_spacing, y_spacing)",
-        units="µm",
-        default=(0, 0),
-    ),
-    Variable(
-        "FABULOUS_HALO_SPACING",
-        tuple[Decimal, Decimal, Decimal, Decimal],
-        "The spacing around the fabric. [left, bottom, right, top]",
-        units="µm",
-        default=(0, 0, 0, 0),
-    ),
-    Variable(
-        "FABULOUS_SPEF_CORNERS",
-        list[str],
-        "The SPEF corners to use for the tile macros.",
-        default=["nom"],
-    ),
-]
+configs = (
+    Classic.config_vars
+    + [
+        Variable(
+            "FABULOUS_TILE_SPACING",
+            tuple[Decimal, Decimal],
+            "The spacing between tiles. (x_spacing, y_spacing)",
+            units="µm",
+            default=(0, 0),
+        ),
+        Variable(
+            "FABULOUS_HALO_SPACING",
+            tuple[Decimal, Decimal, Decimal, Decimal],
+            "The spacing around the fabric. [left, bottom, right, top]",
+            units="µm",
+            default=(0, 0, 0, 0),
+        ),
+        Variable(
+            "FABULOUS_SPEF_CORNERS",
+            list[str],
+            "The SPEF corners to use for the tile macros.",
+            default=["nom"],
+        ),
+    ]
+    + io_layer_variables
+)
 
 
 @Flow.factory.register()

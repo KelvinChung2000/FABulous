@@ -51,6 +51,9 @@ class VHDLCodeGenerator(CodeGenerator):
             The indentation level
         """
         #   library template
+        self._add(f"package attr_pack_{name} is")
+        self._add(" attribute keep : string;")
+        self._add("end package;")
         self._add("library IEEE;", indentLevel)
         self._add("use IEEE.STD_LOGIC_1164.ALL;", indentLevel)
         self._add("use IEEE.NUMERIC_STD.ALL;", indentLevel)
@@ -429,6 +432,7 @@ end process;
         portsPairs: list[tuple[str, str]],
         paramPairs: list[tuple[str, str]] | None = None,
         emulateParamPairs: list[tuple[str, str]] | None = None,
+        _add_keep: bool = False,
         indentLevel: int = 0,
     ) -> None:
         """Add a component instantiation.
@@ -445,6 +449,8 @@ end process;
             List of (parameter, value) pairs for generic mapping
         emulateParamPairs : list[tuple[str, str]] | None
             Additional parameters (unused)
+        _add_keep : bool
+            Whether to add a FABulous "keep" attribute to the instance
         indentLevel : int
             The indentation level
         """

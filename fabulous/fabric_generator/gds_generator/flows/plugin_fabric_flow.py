@@ -5,11 +5,15 @@ from pathlib import Path
 from librelane.config.variable import Variable
 from librelane.flows.flow import Flow, FlowException
 
+from fabulous.fabric_generator.code_generator.code_generator_Verilog import (
+    VerilogCodeGenerator,
+)
 from fabulous.fabric_generator.gds_generator.flows.fabric_macro_flow import (
     FABulousFabricMacroFlow,
     _build_macros,
     _collect_fabric_verilog,
 )
+from fabulous.fabric_generator.gen_fabric.gen_fabric import generateFabric
 from fabulous.fabric_generator.parser.parse_csv import parseFabricCSV
 
 
@@ -26,10 +30,8 @@ class FABulousFabric(FABulousFabricMacroFlow):
         ),
         Variable(
             "FABULOUS_TILE_LIBRARY",
-            Path | list[Path],
-            "Path (or list of paths) to the tile library roots. Currently "
-            "advisory: the fabric CSV is the authoritative source for tile "
-            "locations. Accepted for standalone-plugin compatibility.",
+            list[Path],
+            "List of paths to the tile library roots.",
         ),
         Variable(
             "FABULOUS_TILE_MACROS",
@@ -69,6 +71,13 @@ class FABulousFabric(FABulousFabricMacroFlow):
         if not fabric_csv.is_file():
             raise FlowException(f"FABULOUS_FABRIC_CONFIG={fabric_csv} does not exist")
         self.fabric = parseFabricCSV(fabric_csv)
+        design_name = self.config.get("DESIGN_NAME")
+        if design_name is not None:
+            self.fabric.name = design_name
+
+        writer = VerilogCodeGenerator()
+        writer.outFileName = fabric_csv.parent / "fabric.v"
+        generateFabric(writer, self.fabric)
 
         tile_macro_dirs: dict[str, Path] = {
             name: Path(path)

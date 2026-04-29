@@ -139,14 +139,44 @@ def io_place(
         if bterm.getSigType() not in ["POWER", "GROUND"]
     ]
 
+    inst_iterms = [
+        it
+        for inst in reader.block.getInsts()
+        for it in inst.getITerms()
+        if it.getSigType() not in ["POWER", "GROUND"]
+    ]
+    orphan_idx = 0
+
     for bterm in bterms:
         net = bterm.getNet()
         iterms = net.getITerms()
         if not iterms:
+            # Orphan top-level port (no instance pin consumes this net, e.g.
+            # a FrameData/FrameStrobe slice routed to an all-NULL row/column).
+            # GRT requires every signal bterm to have at least one bpin shape
+            # on a valid routing layer; round-robin onto a real macro pin's
+            # geometry so the placeholder lives on a known routing layer and
+            # different orphans don't pile up at one coordinate.
             warn(
                 f"Net {net.getName()} has no ITerms for BTerm "
-                f"{bterm.getName()}; skipping"
+                f"{bterm.getName()}; placing placeholder pin"
             )
+            pin_bpin = odb.dbBPin_create(bterm)
+            pin_bpin.setPlacementStatus("FIRM")
+            if inst_iterms:
+                anchor = inst_iterms[orphan_idx % len(inst_iterms)]
+                orphan_idx += 1
+                inst_loc = anchor.getInst().getLocation()
+                for mpin in anchor.getMTerm().getMPins():
+                    for db in mpin.getGeometry():
+                        odb.dbBox_create(
+                            pin_bpin,
+                            db.getTechLayer(),
+                            inst_loc[0] + db.xMin(),
+                            inst_loc[1] + db.yMin(),
+                            inst_loc[0] + db.xMax(),
+                            inst_loc[1] + db.yMax(),
+                        )
             continue
 
         iterm = iterms[0]
@@ -187,7 +217,7 @@ def io_place(
             # Compute edge Y position
             y = ury - int(v_length) if side == "NORTH" else lly - int(v_extension)
             # Clamp X inside die for the body width
-            x = int(max(llx, min(cx - v_width // 2, urx - v_width)))
+            x = int(max(llx, min(cx // 2, urx)))
             rect.moveTo(x, int(y))
             odb.dbBox_create(pin_bpin, v_layer, *rect.ll(), *rect.ur())
         else:
@@ -196,7 +226,7 @@ def io_place(
             # Compute edge X position
             x = urx - int(h_length) if side == "EAST" else llx - int(h_extension)
             # Clamp Y inside die for the body width
-            y = int(max(lly, min(cy - h_width // 2, ury - h_width)))
+            y = int(max(lly, min(cy // 2, ury)))
             rect.moveTo(int(x), y)
             odb.dbBox_create(pin_bpin, h_layer, *rect.ll(), *rect.ur())
 

@@ -95,6 +95,7 @@ def generateFabric(writer: CodeGenerator, fabric: Fabric) -> None:
                     f"{Path(writer.outFileName).parent.parent}/Tile/{t}/{t}.vhdl"
                 )
                 added.add(t)
+
             else:
                 writer.addComponentDeclarationForFile(
                     f"{Path(writer.outFileName).parent.parent}/Tile/{name}/{name}.vhdl"
@@ -250,7 +251,7 @@ def generateFabric(writer: CodeGenerator, fabric: Fabric) -> None:
                     ]
                     portsPairs += list(zip(northPorts, northInput, strict=False))
                 else:
-                    portsPairs += [(p, "1'b0") for p in northPorts]
+                    portsPairs += [(p, "") for p in northPorts]
 
                 # input connection from east side of the west tile
                 if fabric.tile[y + j][x + i].partOfSuperTile:
@@ -273,7 +274,7 @@ def generateFabric(writer: CodeGenerator, fabric: Fabric) -> None:
                     ]
                     portsPairs += list(zip(eastPorts, eastInput, strict=False))
                 else:
-                    portsPairs += [(p, "1'b0") for p in eastPorts]
+                    portsPairs += [(p, "") for p in eastPorts]
 
                 # input connection from south side of the north tile
                 if fabric.tile[y + j][x + i].partOfSuperTile:
@@ -297,7 +298,7 @@ def generateFabric(writer: CodeGenerator, fabric: Fabric) -> None:
                     ]
                     portsPairs += list(zip(southPorts, southInput, strict=False))
                 else:
-                    portsPairs += [(p, "1'b0") for p in southPorts]
+                    portsPairs += [(p, "") for p in southPorts]
 
                 # input connection from west side of the east tile
                 if fabric.tile[y + j][x + i].partOfSuperTile:
@@ -320,7 +321,7 @@ def generateFabric(writer: CodeGenerator, fabric: Fabric) -> None:
                     ]
                     portsPairs += list(zip(westPorts, westInput, strict=False))
                 else:
-                    portsPairs += [(p, "1'b0") for p in westPorts]
+                    portsPairs += [(p, "") for p in westPorts]
 
             # output signal name is same as the output port name
             if superTile:
@@ -536,12 +537,12 @@ def generateFabric(writer: CodeGenerator, fabric: Fabric) -> None:
                     emulateParamPairs.append(
                         ("Emulate_Bitstream", f"`Tile_X{x}Y{y}_Emulate_Bitstream")
                     )
-
             writer.addInstantiation(
                 compName=name,
                 compInsName=f"Tile_X{x}Y{y}_{name}",
                 portsPairs=portsPairs,
                 emulateParamPairs=emulateParamPairs,
+                add_keep=True,
             )
     writer.addDesignDescriptionEnd()
     writer.writeToFile()

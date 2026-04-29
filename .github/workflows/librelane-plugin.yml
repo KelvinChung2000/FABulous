@@ -156,11 +156,13 @@ jobs:
 
       - name: Run librelane on FABulousFabric
         run: |
+          FABRIC_DIR="$(dirname ${FABRIC_CONFIG})"
           nix develop --command bash -c "
             set -euo pipefail
             librelane \
               --pdk ${PDK} \
               --run-tag ci \
+              --design-dir ${FABRIC_DIR} \
               --save-views-to fabric_final_views \
               ${FABRIC_CONFIG} \
               tile_macros_overlay.yaml \

@@ -229,96 +229,98 @@ def generateFabric(writer: CodeGenerator, fabric: Fabric) -> None:
             # if is a normal tile then the offset is (0, 0)
             for i, j in tileLocationOffset:
                 # input connection from north side of the south tile
+                if fabric.tile[y + j][x + i].partOfSuperTile:
+                    northPorts = [
+                        f"Tile_X{i}Y{j}_{p.name}"
+                        for p in fabric.tile[y + j][x + i].getNorthPorts(IO.INPUT)
+                    ]
+                else:
+                    northPorts = [
+                        i.name
+                        for i in fabric.tile[y + j][x + i].getNorthPorts(IO.INPUT)
+                    ]
                 if (
                     0 <= y + 1 < len(fabric.tile)
                     and fabric.tile[y + j + 1][x + i] is not None
                     and (x + i, y + j + 1) not in superTileLoc
                 ):
-                    if fabric.tile[y + j][x + i].partOfSuperTile:
-                        northPorts = [
-                            f"Tile_X{i}Y{j}_{p.name}"
-                            for p in fabric.tile[y + j][x + i].getNorthPorts(IO.INPUT)
-                        ]
-                    else:
-                        northPorts = [
-                            i.name
-                            for i in fabric.tile[y + j][x + i].getNorthPorts(IO.INPUT)
-                        ]
-
                     northInput = [
                         f"Tile_X{x + i}Y{y + j + 1}_{p.name}"
                         for p in fabric.tile[y + j + 1][x + i].getNorthPorts(IO.OUTPUT)
                     ]
                     portsPairs += list(zip(northPorts, northInput, strict=False))
+                else:
+                    portsPairs += [(p, "1'b0") for p in northPorts]
 
                 # input connection from east side of the west tile
+                if fabric.tile[y + j][x + i].partOfSuperTile:
+                    eastPorts = [
+                        f"Tile_X{i}Y{j}_{p.name}"
+                        for p in fabric.tile[y + j][x + i].getEastPorts(IO.INPUT)
+                    ]
+                else:
+                    eastPorts = [
+                        i.name for i in fabric.tile[y + j][x + i].getEastPorts(IO.INPUT)
+                    ]
                 if (
                     0 <= x - 1 < len(fabric.tile[0])
                     and fabric.tile[y + j][x + i - 1] is not None
                     and (x + i - 1, y + j) not in superTileLoc
                 ):
-                    if fabric.tile[y + j][x + i].partOfSuperTile:
-                        eastPorts = [
-                            f"Tile_X{i}Y{j}_{p.name}"
-                            for p in fabric.tile[y + j][x + i].getEastPorts(IO.INPUT)
-                        ]
-                    else:
-                        eastPorts = [
-                            i.name
-                            for i in fabric.tile[y + j][x + i].getEastPorts(IO.INPUT)
-                        ]
-
                     eastInput = [
                         f"Tile_X{x + i - 1}Y{y + j}_{p.name}"
                         for p in fabric.tile[y + j][x + i - 1].getEastPorts(IO.OUTPUT)
                     ]
                     portsPairs += list(zip(eastPorts, eastInput, strict=False))
+                else:
+                    portsPairs += [(p, "1'b0") for p in eastPorts]
 
                 # input connection from south side of the north tile
+                if fabric.tile[y + j][x + i].partOfSuperTile:
+                    southPorts = [
+                        f"Tile_X{i}Y{j}_{p.name}"
+                        for p in fabric.tile[y + j][x + i].getSouthPorts(IO.INPUT)
+                    ]
+                else:
+                    southPorts = [
+                        i.name
+                        for i in fabric.tile[y + j][x + i].getSouthPorts(IO.INPUT)
+                    ]
                 if (
                     0 <= y - 1 < len(fabric.tile)
                     and fabric.tile[y + j - 1][x + i] is not None
                     and (x + i, y + j - 1) not in superTileLoc
                 ):
-                    if fabric.tile[y + j][x + i].partOfSuperTile:
-                        southPorts = [
-                            f"Tile_X{i}Y{j}_{p.name}"
-                            for p in fabric.tile[y + j][x + i].getSouthPorts(IO.INPUT)
-                        ]
-                    else:
-                        southPorts = [
-                            i.name
-                            for i in fabric.tile[y + j][x + i].getSouthPorts(IO.INPUT)
-                        ]
-
                     southInput = [
                         f"Tile_X{x + i}Y{y + j - 1}_{p.name}"
                         for p in fabric.tile[y + j - 1][x + i].getSouthPorts(IO.OUTPUT)
                     ]
                     portsPairs += list(zip(southPorts, southInput, strict=False))
+                else:
+                    portsPairs += [(p, "1'b0") for p in southPorts]
 
                 # input connection from west side of the east tile
+                if fabric.tile[y + j][x + i].partOfSuperTile:
+                    westPorts = [
+                        f"Tile_X{i}Y{j}_{p.name}"
+                        for p in fabric.tile[y + j][x + i].getWestPorts(IO.INPUT)
+                    ]
+                else:
+                    westPorts = [
+                        i.name for i in fabric.tile[y + j][x + i].getWestPorts(IO.INPUT)
+                    ]
                 if (
                     0 <= x + 1 < len(fabric.tile[0])
                     and fabric.tile[y + j][x + i + 1] is not None
                     and (x + i + 1, y + j) not in superTileLoc
                 ):
-                    if fabric.tile[y + j][x + i].partOfSuperTile:
-                        westPorts = [
-                            f"Tile_X{i}Y{j}_{p.name}"
-                            for p in fabric.tile[y + j][x + i].getWestPorts(IO.INPUT)
-                        ]
-                    else:
-                        westPorts = [
-                            i.name
-                            for i in fabric.tile[y + j][x + i].getWestPorts(IO.INPUT)
-                        ]
-
                     westInput = [
                         f"Tile_X{x + i + 1}Y{y + j}_{p.name}"
                         for p in fabric.tile[y + j][x + i + 1].getWestPorts(IO.OUTPUT)
                     ]
                     portsPairs += list(zip(westPorts, westInput, strict=False))
+                else:
+                    portsPairs += [(p, "1'b0") for p in westPorts]
 
             # output signal name is same as the output port name
             if superTile:

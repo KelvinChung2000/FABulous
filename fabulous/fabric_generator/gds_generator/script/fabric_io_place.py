@@ -1,7 +1,5 @@
 """Place fabric-level signal BPins by stamping connected ITerm mTerm geometry."""
 
-import logging
-
 import click
 import odb  # type: ignore[import]
 from librelane.logging.logger import info, warn
@@ -17,11 +15,8 @@ from fabulous.fabric_generator.gds_generator.script.odb_protocol import OdbReade
     help="Enable verbose (DEBUG) logging output.",
 )
 @click_odb
-def io_place(reader: OdbReaderLike, verbose: bool) -> None:
+def io_place(reader: OdbReaderLike) -> None:
     """Stamp signal BTerm's BPin with the geometry of its driving/sinking ITerms."""
-    if verbose:
-        logging.getLogger().setLevel(logging.DEBUG)
-
     stamped = 0
     deleted = 0
     for bterm in list(reader.block.getBTerms()):

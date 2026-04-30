@@ -157,6 +157,10 @@ class TileOptimisation(WhileStep):
         """Pre iteration callback."""
         if self.config["FABULOUS_OPT_MODE"] == OptMode.NO_OPT:
             self.config = self.config.copy(DRT_OPT_ITERS=64)
+            self.config = self.config.copy(ROUTING_OBSTRUCTIONS=None)
+            self.config = self.config.copy(
+                ROUTING_OBSTRUCTIONS=get_routing_obstructions(self.config)
+            )
             return pre_iteration
         die_area_raw: tuple[Decimal, Decimal, Decimal, Decimal] = self.config.get(
             "DIE_AREA", None

@@ -1,7 +1,10 @@
 """Config-driven LibreLane plugin adapter for the FABulous fabric flow."""
 
+import os
+import tempfile
 from pathlib import Path
 
+import yaml
 from librelane.config.variable import Variable
 from librelane.flows.flow import Flow, FlowException
 
@@ -15,6 +18,53 @@ from fabulous.fabric_generator.gds_generator.flows.fabric_macro_flow import (
 )
 from fabulous.fabric_generator.gen_fabric.gen_fabric import generateFabric
 from fabulous.fabric_generator.parser.parse_csv import parseFabricCSV
+
+
+def _coerce_legacy_spacing(config: object) -> object:
+    """Pre-process config files to coerce scalar spacing values to lists.
+
+    Older fabric configs (e.g. tt-fabulous-ihp-26a) write
+    ``FABULOUS_TILE_SPACING: 0`` as a scalar. Our flow's variable type is
+    ``tuple[Decimal, Decimal]``, which librelane rejects scalars for. Rewrite
+    the offending YAML files to a temp copy with the scalars expanded.
+    """
+    if not isinstance(config, list | tuple):
+        return config
+    paths: list[str] = []
+    rewrites_dir: str | None = None
+    for entry in config:
+        if not isinstance(entry, str | Path) or not str(entry).endswith(
+            (".yaml", ".yml")
+        ):
+            paths.append(entry)
+            continue
+        text = Path(entry).read_text()
+        try:
+            doc = yaml.safe_load(text)
+        except Exception:
+            paths.append(entry)
+            continue
+        if not isinstance(doc, dict):
+            paths.append(entry)
+            continue
+        changed = False
+        ts = doc.get("FABULOUS_TILE_SPACING")
+        if ts is not None and not isinstance(ts, list | tuple):
+            doc["FABULOUS_TILE_SPACING"] = [ts, ts]
+            changed = True
+        hs = doc.get("FABULOUS_HALO_SPACING")
+        if hs is not None and not isinstance(hs, list | tuple):
+            doc["FABULOUS_HALO_SPACING"] = [hs, hs, hs, hs]
+            changed = True
+        if not changed:
+            paths.append(entry)
+            continue
+        if rewrites_dir is None:
+            rewrites_dir = tempfile.mkdtemp(prefix="fabulous_cfg_")
+        new_path = os.path.join(rewrites_dir, os.path.basename(str(entry)))
+        Path(new_path).write_text(yaml.safe_dump(doc, sort_keys=False))
+        paths.append(new_path)
+    return paths
 
 
 @Flow.factory.register()
@@ -55,6 +105,7 @@ class FABulousFabric(FABulousFabricMacroFlow):
     ) -> None:
         # Skip FABulousFabricMacroFlow.__init__: plugin invocations receive a
         # plain LibreLane config and prepare fabric/macros here.
+        config = _coerce_legacy_spacing(config)
         super(FABulousFabricMacroFlow, self).__init__(
             config,
             name=name,

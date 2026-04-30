@@ -1,204 +1,125 @@
-"""Place I/O pins on the die edge based on mTerm positions."""
+"""Place fabric-level signal BPins, halo-aware.
 
-import logging
-import math
-from decimal import Decimal
+Each fabric-level BTerm connects to one or more tile-macro pins (ITerms) sitting
+flush against the fabric boundary. The placement of the BPin is decided per
+BTerm from geometry alone:
+
+- The facing side is the master edge the tile pin is flush with (N/S/E/W).
+- The gap between that pin edge and the die edge on that side equals the halo
+  reserved on that side.
+- No halo (gap 0): the pin already touches the die edge, so its geometry is
+  stamped in place and needs no routing.
+- Halo present (gap > 0): the pin is snapped onto the die edge, leaving the
+  router to connect it across the halo. This is how a multi-fanout net such as
+  the clock gets a routing channel -- a single edge access box is placed and the
+  router fans it out to every sink.
+- A multi-fanout net on an abutted (gap 0) side has nowhere to route, so
+  placement fails loudly instead of emitting an unroutable design.
+"""
 
 import click
 import odb  # type: ignore[import]
-from librelane.logging.logger import warn
+from librelane.logging.logger import info, warn
 from librelane.scripts.odbpy.reader import click_odb
 
-from fabulous.fabric_generator.gds_generator.script.odb_protocol import (
-    OdbReaderLike,
-    odbRectLike,
-)
+from fabulous.fabric_generator.gds_generator.script.odb_protocol import OdbReaderLike
+
+
+def _facing_side(mterm: object) -> str:
+    """Return the master edge (N/S/E/W) the mterm's pins are flush against."""
+    bbox = mterm.getBBox()
+    master = mterm.getMaster()
+    sides = []
+    if bbox.xMin() == 0:
+        sides.append("WEST")
+    if bbox.xMax() == master.getWidth():
+        sides.append("EAST")
+    if bbox.yMin() == 0:
+        sides.append("SOUTH")
+    if bbox.yMax() == master.getHeight():
+        sides.append("NORTH")
+    if len(sides) != 1:
+        raise ValueError(
+            f"Pin {mterm.getName()} is flush with {sides or 'no'} master edge(s); "
+            "a fabric-level pin must sit on exactly one tile edge."
+        )
+    return sides[0]
+
+
+def _snap_delta(side: str, iterm: object, die: object) -> tuple[int, int]:
+    """Return the (dx, dy) that moves the pin's facing edge onto the die edge."""
+    inst_x, inst_y = iterm.getInst().getLocation()
+    bbox = iterm.getMTerm().getBBox()
+    if side == "SOUTH":
+        return 0, die.yMin() - (inst_y + bbox.yMin())
+    if side == "NORTH":
+        return 0, die.yMax() - (inst_y + bbox.yMax())
+    if side == "WEST":
+        return die.xMin() - (inst_x + bbox.xMin()), 0
+    return die.xMax() - (inst_x + bbox.xMax()), 0
 
 
 @click.command()
-@click.option(
-    "-v",
-    "--ver-length",
-    default=None,
-    type=float,
-    help="Length for pins with N/S orientations in microns.",
-)
-@click.option(
-    "-h",
-    "--hor-length",
-    default=None,
-    type=float,
-    help="Length for pins with E/S orientations in microns.",
-)
-@click.option(
-    "-V",
-    "--ver-layer",
-    required=True,
-    help="Name of metal layer to place vertical pins on.",
-)
-@click.option(
-    "-H",
-    "--hor-layer",
-    required=True,
-    help="Name of metal layer to place horizontal pins on.",
-)
-@click.option(
-    "--hor-extension",
-    default=0,
-    type=float,
-    help="Extension for horizontal pins in microns.",
-)
-@click.option(
-    "--ver-extension",
-    default=0,
-    type=float,
-    help="Extension for vertical pins in microns.",
-)
-@click.option(
-    "--ver-width-mult", default=2, type=float, help="Multiplier for vertical pins."
-)
-@click.option(
-    "--hor-width-mult", default=2, type=float, help="Multiplier for horizontal pins."
-)
-@click.option(
-    "--verbose/--no-verbose",
-    default=False,
-    help="Enable verbose (DEBUG) logging output.",
-)
 @click_odb
-def io_place(
-    reader: OdbReaderLike,
-    ver_layer: str,
-    hor_layer: str,
-    ver_width_mult: float,
-    hor_width_mult: float,
-    hor_length: float | None,
-    ver_length: float | None,
-    hor_extension: float,
-    ver_extension: float,
-    verbose: bool,
-) -> None:
-    """Place each BTerm's BPin on the die edge corresponding to the mTerm's position.
-
-    Determines the side by checking where the mTerm is positioned relative to the master
-    tile center. If the mTerm is on the north side of the master, place the BPin on the
-    north edge of the die, and so on. Falls back to distance-based placement if mTerm
-    information is unavailable.
-    """
-    if verbose:
-        logging.getLogger().setLevel(logging.DEBUG)
-
-    micron_in_units = reader.dbunits
-
-    h_extension = int(micron_in_units * hor_extension)
-    v_extension = int(micron_in_units * ver_extension)
-
-    if h_extension < 0:
-        h_extension = 0
-
-    if v_extension < 0:
-        v_extension = 0
-
-    h_layer = reader.tech.findLayer(hor_layer)
-    v_layer = reader.tech.findLayer(ver_layer)
-
-    h_width = int(Decimal(hor_width_mult) * h_layer.getWidth())
-    v_width = int(Decimal(ver_width_mult) * v_layer.getWidth())
-
-    if hor_length is not None:
-        h_length = int(micron_in_units * hor_length)
-    else:
-        h_length = max(
-            int(
-                math.ceil(
-                    h_layer.getArea() * micron_in_units * micron_in_units / h_width
-                )
-            ),
-            h_width,
-        )
-
-    if ver_length is not None:
-        v_length = int(micron_in_units * ver_length)
-    else:
-        v_length = max(
-            int(
-                math.ceil(
-                    v_layer.getArea() * micron_in_units * micron_in_units / v_width
-                )
-            ),
-            v_width,
-        )
-
-    # Die area
+def io_place(reader: OdbReaderLike) -> None:
+    """Stamp signal BTerm BPins, snapping to the die edge where a halo exists."""
+    stamped = 0
+    deleted = 0
     die = reader.block.getDieArea()
-    llx, lly, urx, ury = die.xMin(), die.yMin(), die.xMax(), die.yMax()
-
-    bterms = [
-        bterm
-        for bterm in reader.block.getBTerms()
-        if bterm.getSigType() not in ["POWER", "GROUND"]
-    ]
-
-    for bterm in bterms:
-        net = bterm.getNet()
-        iterms = net.getITerms()
-        if not iterms:
-            warn(
-                f"Net {net.getName()} has no ITerms for BTerm "
-                f"{bterm.getName()}; skipping"
-            )
+    for bterm in list(reader.block.getBTerms()):
+        if bterm.getSigType() in ("POWER", "GROUND"):
             continue
 
-        iterm = iterms[0]
-        ibox: odbRectLike = iterm.getBBox()
-        cx = ibox.xCenter()
-        cy = ibox.yCenter()
+        net = bterm.getNet()
+        if net is None:
+            continue
 
-        # Get mTerm bbox to determine which side of the master tile it's on
-        mterm = iterm.getMTerm()
-        master = mterm.getMaster()
-        # Use mTerm bbox position relative to master to determine side
-        side = None
-        # Get the first mPin's geometry bbox
-        mterm_bbox: odbRectLike = mterm.getBBox()
+        if bterm.getBPins():
+            warn(f"BTerm {bterm.getName()} already has BPin(s); leaving them in place.")
+            continue
 
-        if mterm_bbox.xMin() == 0:
-            side = "WEST"
-        if mterm_bbox.xMax() == master.getWidth():
-            side = "EAST"
-        if mterm_bbox.yMin() == 0:
-            side = "SOUTH"
-        if mterm_bbox.yMax() == master.getHeight():
-            side = "NORTH"
+        iterms = list(net.getITerms())
+        if not iterms:
+            odb.dbBTerm.destroy(bterm)
+            if not net.getITerms() and not net.getBTerms():
+                odb.dbNet.destroy(net)
+            deleted += 1
+            continue
 
-        # Prepare or reuse BPin
-        pins = bterm.getBPins()
-        if len(pins) > 0:
-            warn(f"{bterm.getName()} already has shapes. Modifying existing shape.")
-            assert len(pins) == 1
-            pin_bpin = pins[0]
-        else:
-            pin_bpin = odb.dbBPin_create(bterm)
-        pin_bpin.setPlacementStatus("PLACED")
+        sides = {_facing_side(iterm.getMTerm()) for iterm in iterms}
+        if len(sides) != 1:
+            raise ValueError(
+                f"BTerm {bterm.getName()} drives sinks on multiple sides {sides}; "
+                "cannot place a single boundary pin for it."
+            )
+        side = next(iter(sides))
 
-        if side in ("NORTH", "SOUTH"):
-            # Vertical pin on top/bottom, align X to ITerm center
-            rect = odb.Rect(0, 0, int(v_width), int(v_length + v_extension))
-            # Compute edge Y position
-            y = ury - int(v_length) if side == "NORTH" else lly - int(v_extension)
-            # Clamp X inside die for the body width
-            x = int(max(llx, min(cx - v_width // 2, urx - v_width)))
-            rect.moveTo(x, int(y))
-            odb.dbBox_create(pin_bpin, v_layer, *rect.ll(), *rect.ur())
-        else:
-            # Horizontal pin on left/right, align Y to ITerm center
-            rect = odb.Rect(0, 0, int(h_length + h_extension), int(h_width))
-            # Compute edge X position
-            x = urx - int(h_length) if side == "EAST" else llx - int(h_extension)
-            # Clamp Y inside die for the body width
-            y = int(max(lly, min(cy - h_width // 2, ury - h_width)))
-            rect.moveTo(int(x), y)
-            odb.dbBox_create(pin_bpin, h_layer, *rect.ll(), *rect.ur())
+        anchor = iterms[0]
+        dx, dy = _snap_delta(side, anchor, die)
+
+        if dx == 0 and dy == 0 and len(iterms) > 1:
+            raise ValueError(
+                f"BTerm {bterm.getName()} drives {len(iterms)} sinks on the abutted "
+                f"{side} side with no halo, so the net has nowhere to route. Set "
+                "FABULOUS_HALO_SPACING on that side to open a routing channel."
+            )
+
+        bpin = odb.dbBPin_create(bterm)
+        inst_x, inst_y = anchor.getInst().getLocation()
+        for mpin in anchor.getMTerm().getMPins():
+            for geom in mpin.getGeometry():
+                odb.dbBox_create(
+                    bpin,
+                    geom.getTechLayer(),
+                    inst_x + geom.xMin() + dx,
+                    inst_y + geom.yMin() + dy,
+                    inst_x + geom.xMax() + dx,
+                    inst_y + geom.yMax() + dy,
+                )
+        bpin.setPlacementStatus("FIRM")
+        stamped += 1
+
+    info(f"Stamped {stamped} signal BPins; deleted {deleted} orphan BTerms.")
 
 
 if __name__ == "__main__":

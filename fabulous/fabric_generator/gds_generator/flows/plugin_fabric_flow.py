@@ -1,10 +1,7 @@
 """Config-driven LibreLane plugin adapter for the FABulous fabric flow."""
 
-import os
-import tempfile
 from pathlib import Path
 
-import yaml
 from librelane.config.variable import Variable
 from librelane.flows.flow import Flow, FlowException
 
@@ -20,51 +17,28 @@ from fabulous.fabric_generator.gen_fabric.gen_fabric import generateFabric
 from fabulous.fabric_generator.parser.parse_csv import parseFabricCSV
 
 
-def _coerce_legacy_spacing(config: object) -> object:
-    """Pre-process config files to coerce scalar spacing values to lists.
+def _discover_tile_macros(
+    tile_names: list[str], tile_library_paths: list[Path]
+) -> dict[str, Path]:
+    """Locate each tile's most recent ``RUN_*/final`` directory.
 
-    Older fabric configs (e.g. tt-fabulous-ihp-26a) write
-    ``FABULOUS_TILE_SPACING: 0`` as a scalar. Our flow's variable type is
-    ``tuple[Decimal, Decimal]``, which librelane rejects scalars for. Rewrite
-    the offending YAML files to a temp copy with the scalars expanded.
+    Walks each ``FABULOUS_TILE_LIBRARY`` root, looks for ``<root>/<tile>/runs/``,
+    and picks the most recently modified ``RUN_*/final`` directory. Tiles that
+    cannot be resolved are omitted; the caller is responsible for surfacing
+    the error.
     """
-    if not isinstance(config, list | tuple):
-        return config
-    paths: list[str] = []
-    rewrites_dir: str | None = None
-    for entry in config:
-        if not isinstance(entry, str | Path) or not str(entry).endswith(
-            (".yaml", ".yml")
-        ):
-            paths.append(entry)
+    discovered: dict[str, Path] = {}
+    for tile in tile_names:
+        candidates: list[Path] = []
+        for lib in tile_library_paths:
+            runs = Path(lib) / tile / "runs"
+            if not runs.is_dir():
+                continue
+            candidates.extend(p for p in runs.glob("RUN_*/final") if p.is_dir())
+        if not candidates:
             continue
-        text = Path(entry).read_text()
-        try:
-            doc = yaml.safe_load(text)
-        except Exception:
-            paths.append(entry)
-            continue
-        if not isinstance(doc, dict):
-            paths.append(entry)
-            continue
-        changed = False
-        ts = doc.get("FABULOUS_TILE_SPACING")
-        if ts is not None and not isinstance(ts, list | tuple):
-            doc["FABULOUS_TILE_SPACING"] = [ts, ts]
-            changed = True
-        hs = doc.get("FABULOUS_HALO_SPACING")
-        if hs is not None and not isinstance(hs, list | tuple):
-            doc["FABULOUS_HALO_SPACING"] = [hs, hs, hs, hs]
-            changed = True
-        if not changed:
-            paths.append(entry)
-            continue
-        if rewrites_dir is None:
-            rewrites_dir = tempfile.mkdtemp(prefix="fabulous_cfg_")
-        new_path = os.path.join(rewrites_dir, os.path.basename(str(entry)))
-        Path(new_path).write_text(yaml.safe_dump(doc, sort_keys=False))
-        paths.append(new_path)
-    return paths
+        discovered[tile] = max(candidates, key=lambda p: p.stat().st_mtime)
+    return discovered
 
 
 @Flow.factory.register()
@@ -85,11 +59,14 @@ class FABulousFabric(FABulousFabricMacroFlow):
         ),
         Variable(
             "FABULOUS_TILE_MACROS",
-            dict[str, Path],
+            dict[str, Path] | None,
             "Mapping of tile name to a previously-hardened macro output "
             "directory (containing ``metrics.json``, ``gds/``, ``lef/``, "
-            "``vh/``, ``nl/``, ``pnl/``, ``spef/``). Each entry is turned into "
-            "a LibreLane ``Macro`` and referenced by the stitching flow.",
+            "``vh/``, ``nl/``, ``pnl/``, ``spef/``). When omitted, each tile "
+            "name in the fabric CSV is auto-resolved by scanning the "
+            "``FABULOUS_TILE_LIBRARY`` paths for a ``<tile>/runs/RUN_*/final`` "
+            "directory and picking the most recently-modified one.",
+            default=None,
         ),
     ]
 
@@ -105,7 +82,6 @@ class FABulousFabric(FABulousFabricMacroFlow):
     ) -> None:
         # Skip FABulousFabricMacroFlow.__init__: plugin invocations receive a
         # plain LibreLane config and prepare fabric/macros here.
-        config = _coerce_legacy_spacing(config)
         super(FABulousFabricMacroFlow, self).__init__(
             config,
             name=name,
@@ -130,14 +106,24 @@ class FABulousFabric(FABulousFabricMacroFlow):
         writer.outFileName = fabric_csv.parent / "fabric.v"
         generateFabric(writer, self.fabric)
 
+        # todo: use yaml instead of csv
+        tile_macros_cfg = self.config.get("FABULOUS_TILE_MACROS") or {}
         tile_macro_dirs: dict[str, Path] = {
-            name: Path(path)
-            for name, path in dict(self.config["FABULOUS_TILE_MACROS"]).items()
+            name: Path(path) for name, path in dict(tile_macros_cfg).items()
         }
         if not tile_macro_dirs:
+            tile_lib_paths = [
+                Path(p) for p in self.config.get("FABULOUS_TILE_LIBRARY") or []
+            ]
+            tile_names = [
+                t.name for t in self.fabric.tileDic.values() if not t.partOfSuperTile
+            ]
+            tile_macro_dirs = _discover_tile_macros(tile_names, tile_lib_paths)
+        if not tile_macro_dirs:
             raise FlowException(
-                "FABULOUS_TILE_MACROS is empty. Provide a mapping of each "
-                "fabric tile name to its pre-hardened macro directory."
+                "FABULOUS_TILE_MACROS is empty and no RUN_*/final directories "
+                "were found under FABULOUS_TILE_LIBRARY. Either harden the "
+                "tile macros first or supply FABULOUS_TILE_MACROS explicitly."
             )
 
         self.macros, self.tile_sizes = _build_macros(tile_macro_dirs)

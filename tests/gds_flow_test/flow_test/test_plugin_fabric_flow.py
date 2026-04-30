@@ -236,6 +236,7 @@ class TestFABulousFabricInitAdapter:
         mocker.patch.object(
             plugin_fabric_flow, "parseFabricCSV", return_value=mock_fabric
         )
+        mocker.patch.object(plugin_fabric_flow, "generateFabric")
 
         flow = FABulousFabric(
             config={
@@ -270,6 +271,7 @@ class TestFABulousFabricInitAdapter:
         mocker.patch.object(
             plugin_fabric_flow, "parseFabricCSV", return_value=mock_fabric
         )
+        mocker.patch.object(plugin_fabric_flow, "generateFabric")
 
         flow = FABulousFabric(
             config={
@@ -316,6 +318,7 @@ class TestFABulousFabricInitAdapter:
         mocker.patch.object(
             plugin_fabric_flow, "parseFabricCSV", return_value=mock_fabric
         )
+        mocker.patch.object(plugin_fabric_flow, "generateFabric")
 
         with pytest.raises(FlowException, match="FABULOUS_TILE_MACROS is empty"):
             FABulousFabric(

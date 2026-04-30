@@ -9,11 +9,6 @@ from fabulous.fabric_generator.gds_generator.script.odb_protocol import OdbReade
 
 
 @click.command()
-@click.option(
-    "--verbose/--no-verbose",
-    default=False,
-    help="Enable verbose (DEBUG) logging output.",
-)
 @click_odb
 def io_place(reader: OdbReaderLike) -> None:
     """Stamp signal BTerm's BPin with the geometry of its driving/sinking ITerms."""

@@ -3,7 +3,7 @@
 import json
 from decimal import Decimal
 from pathlib import Path
-from typing import cast
+from typing import Union, cast
 
 from librelane.config.variable import Instance, Macro, Orientation, Variable
 from librelane.flows.classic import Classic
@@ -64,15 +64,17 @@ configs = (
     + [
         Variable(
             "FABULOUS_TILE_SPACING",
-            tuple[Decimal, Decimal],
-            "The spacing between tiles. (x_spacing, y_spacing)",
+            Union[Decimal, tuple[Decimal, Decimal]],  # noqa: UP007
+            "The spacing between tiles. Either a scalar (applied to both axes) "
+            "or (x_spacing, y_spacing).",
             units="µm",
             default=(0, 0),
         ),
         Variable(
             "FABULOUS_HALO_SPACING",
-            tuple[Decimal, Decimal, Decimal, Decimal],
-            "The spacing around the fabric. [left, bottom, right, top]",
+            Union[Decimal, tuple[Decimal, Decimal, Decimal, Decimal]],  # noqa: UP007
+            "The spacing around the fabric. Either a scalar (applied to all "
+            "four sides) or [left, bottom, right, top].",
             units="µm",
             default=(0, 0, 0, 0),
         ),
@@ -474,10 +476,14 @@ class FABulousFabricMacroFlow(Classic):
         tuple[State, list[Step]]
             Tuple of final state and list of executed steps.
         """
-        tile_spacing: tuple[Decimal, Decimal] = self.config["FABULOUS_TILE_SPACING"]
-        halo_spacing: tuple[Decimal, Decimal, Decimal, Decimal] = self.config[
-            "FABULOUS_HALO_SPACING"
-        ]
+        ts_raw = self.config["FABULOUS_TILE_SPACING"]
+        tile_spacing: tuple[Decimal, Decimal] = (
+            (ts_raw, ts_raw) if isinstance(ts_raw, Decimal) else ts_raw
+        )
+        hs_raw = self.config["FABULOUS_HALO_SPACING"]
+        halo_spacing: tuple[Decimal, Decimal, Decimal, Decimal] = (
+            (hs_raw, hs_raw, hs_raw, hs_raw) if isinstance(hs_raw, Decimal) else hs_raw
+        )
 
         # Get min_pitch_x/min_pitch_y from FP_TRACKS_INFO via helper.get_min_pitch
         pitch_x, pitch_y = get_pitch(self.config)

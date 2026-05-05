@@ -405,7 +405,7 @@ def parseTilesCSV(fileName: Path) -> tuple[list[Tile], list[tuple[str, str]]]:
                 if muxSize >= 2:
                     configBit += (muxSize - 1).bit_length()
 
-        # sorting to en
+        # sorting to ensure the ports section is always in the same order independent
         ports.sort(key=lambda p: p.wireDirection)
 
         new_tiles.append(

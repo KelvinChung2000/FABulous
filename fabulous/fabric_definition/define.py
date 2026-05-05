@@ -48,7 +48,7 @@ class Direction(Enum):
     JUMP = "JUMP"
 
     def __lt__(self, other: "Direction") -> bool:
-        """Order by canonical definition order (NORTH < EAST < SOUTH < WEST < JUMP)."""
+        """Return `True` if `self` precedes `other` in definition order."""
         if not isinstance(other, Direction):
             return NotImplemented
         members = list(type(self))

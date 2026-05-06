@@ -17,7 +17,7 @@ library IEEE;
   use IEEE.NUMERIC_STD.all;
   use work.attr_pack_RAM_IO_OutPass4_frame_config_mux.all;
 
--- InPass and OutPass are the same except for changing which side 
+-- InPass and OutPass are the same except for changing which side
 -- I0,I1,I2,I3 or O0,O1,O2,O3 gets connected to the top entity
 -- (* FABulous, BelMap, O0_reg=0, O1_reg=1, O2_reg=2, O3_reg=3 *)
 

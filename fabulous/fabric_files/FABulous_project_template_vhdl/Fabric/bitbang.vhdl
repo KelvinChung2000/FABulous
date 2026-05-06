@@ -27,9 +27,9 @@ end entity bitbang;
 
 architecture from_verilog of bitbang is
 
-  signal active_reg       : std_logic;
-  signal data_reg         : std_logic_vector(31 downto 0);
-  signal strobe_reg       : std_logic;
+  signal active_Reg       : std_logic;
+  signal data_Reg         : std_logic_vector(31 downto 0);
+  signal strobe_Reg       : std_logic;
   signal local_strobe     : std_logic;                     -- Declared at bitbang.v:18
   signal old_local_strobe : std_logic;                     -- Declared at bitbang.v:19
   signal s_clk_sample     : std_logic_vector(3 downto 0);  -- Declared at bitbang.v:13
@@ -39,9 +39,9 @@ architecture from_verilog of bitbang is
 
 begin
 
-  active <= active_reg;
-  data   <= data_reg;
-  strobe <= strobe_reg;
+  active <= active_Reg;
+  data   <= data_Reg;
+  strobe <= strobe_Reg;
 
   -- Generated from always process in bitbang (bitbang.v:21)
   p_input_sync : process (resetn, clk) is
@@ -86,17 +86,17 @@ begin
     if (falling_edge(resetn) or rising_edge(clk)) then
       if ((not resetn) = '1') then
         local_strobe     <= '0';
-        data_reg         <= x"00000000";
+        data_Reg         <= x"00000000";
         old_local_strobe <= '0';
-        strobe_reg       <= '0';
+        strobe_Reg       <= '0';
       else
         local_strobe <= '0';
         if (serial_control = x"FAB1") then
-          data_reg     <= serial_data;
+          data_Reg     <= serial_data;
           local_strobe <= '1';
         end if;
         old_local_strobe <= local_strobe;
-        strobe_reg       <= local_strobe and (not old_local_strobe);
+        strobe_Reg       <= local_strobe and (not old_local_strobe);
       end if;
     end if;
 
@@ -108,13 +108,13 @@ begin
 
     if (falling_edge(resetn) or rising_edge(clk)) then
       if ((not resetn) = '1') then
-        active_reg <= '0';
+        active_Reg <= '0';
       else
         if (serial_control = x"FAB1") then
-          active_reg <= '1';
+          active_Reg <= '1';
         end if;
         if (serial_control = x"FAB0") then
-          active_reg <= '0';
+          active_Reg <= '0';
         end if;
       end if;
     end if;

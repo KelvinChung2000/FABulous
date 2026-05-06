@@ -10,43 +10,43 @@ library ieee;
 --   Row = 1
 --   RowSelectWidth = 5
 
-entity frame_data_reg is
+entity Frame_Data_Reg is
   generic (
-    rowselectwidth  : integer := 5;
-    framebitsperrow : integer := 32;
-    row             : integer := 1
+    RowSelectWidth  : integer := 5;
+    FrameBitsPerRow : integer := 32;
+    Row             : integer := 1
   );
   port (
-    clk         : in    std_logic;
-    framedata_i : in    std_logic_vector(framebitsperrow - 1 downto 0);
-    framedata_o : out   std_logic_vector(framebitsperrow - 1 downto 0);
-    rowselect   : in    std_logic_vector(rowselectwidth - 1 downto 0)
+    CLK         : in    std_logic;
+    FrameData_I : in    std_logic_vector(FrameBitsPerRow - 1 downto 0);
+    FrameData_O : out   std_logic_vector(FrameBitsPerRow - 1 downto 0);
+    RowSelect   : in    std_logic_vector(RowSelectWidth - 1 downto 0)
   );
-end entity frame_data_reg;
+end entity Frame_Data_Reg;
 
 -- Generated from Verilog module Frame_Data_Reg (Frame_Data_Reg.v:1)
 --   FrameBitsPerRow = 32
 --   Row = 1
 --   RowSelectWidth = 5
 
-architecture from_verilog of frame_data_reg is
+architecture from_verilog of Frame_Data_Reg is
 
-  signal framedata_o_reg : std_logic_vector(31 downto 0);
+  signal FrameData_O_Reg : std_logic_vector(31 downto 0);
 
 begin
 
-  framedata_o <= framedata_o_reg;
+  FrameData_O <= FrameData_O_Reg;
 
   -- Generated from always process in Frame_Data_Reg (Frame_Data_Reg.v:10)
-  process_001 : process (clk) is
+  process (CLK) is
   begin
 
-    if rising_edge(clk) then
-      if (to_integer(unsigned(rowselect)) = row) then
-        framedata_o_reg <= framedata_i;
+    if rising_edge(CLK) then
+      if (to_integer(unsigned(RowSelect)) = Row) then
+        FrameData_O_Reg <= FrameData_I;
       end if;
     end if;
 
-  end process process_001;
+  end process;
 
 end architecture from_verilog;

@@ -1,4 +1,4 @@
-package attr_pack_w_io_io_1_bidirectional_frame_config_pass is
+package attr_pack_W_IO_IO_1_bidirectional_frame_config_pass is
 
   attribute FABulous    : string;
   attribute BelMap      : string;
@@ -6,18 +6,18 @@ package attr_pack_w_io_io_1_bidirectional_frame_config_pass is
   attribute SHARED_PORT : string;
   attribute GLOBAL      : string;
 
-end package attr_pack_w_io_io_1_bidirectional_frame_config_pass;
+end package attr_pack_W_IO_IO_1_bidirectional_frame_config_pass;
 
-library ieee;
-  use ieee.std_logic_1164.all;
-  use ieee.numeric_std.all;
-  use work.attr_pack_w_io_io_1_bidirectional_frame_config_pass.all;
+library IEEE;
+  use IEEE.STD_LOGIC_1164.all;
+  use IEEE.NUMERIC_STD.all;
+  use work.attr_pack_W_IO_IO_1_bidirectional_frame_config_pass.all;
 -- Library UNISIM;
 -- use UNISIM.vcomponents.all;
 
-entity io_1_bidirectional_frame_config_pass is
+entity IO_1_bidirectional_frame_config_pass is
   -- Generic ( NoConfigBits : integer := 0 );
-  -- NoConfigBits has to be adjusted manually.
+  -- has to be adjusted manually (we don't use an arithmetic parser for the value)
   port (
     -- Pin0
     I     : in    std_logic; -- from fabric to external pin
@@ -29,18 +29,20 @@ entity io_1_bidirectional_frame_config_pass is
     O_top : in    std_logic; -- (* FABulous, EXTERNAL *) has to ge to top-level entity not the switch matrix
     -- Tile IO ports from BELs
     UserCLK : in    std_logic -- (* FABulous, EXTERNAL, SHARED_PORT *)
-  -- EXTERNAL sends this signal all the way to top.
-  -- SHARED allows multiple BELs to use the same port.
-  -- GLOBAL pins connected to the switch matrix must precede the GLOBAL label.
+  -- ## the EXTERNAL keyword will send this signal all the way to top and the
+  -- SHARED Allows multiple BELs using the same port (e.g. for exporting a clock to the top)
+  -- GLOBAL all primitive pins that are connected to the switch matrix have to go before the GLOBAL label
   -- ConfigBits : in   STD_LOGIC_VECTOR( NoConfigBits -1 downto 0 )
   );
   attribute FABulous of IO_1_bidirectional_frame_config_pass : entity is "TRUE";
   attribute BelMap of IO_1_bidirectional_frame_config_pass   : entity is "TRUE";
-  attribute EXTERNAL of UserCLK                              : signal is "TRUE"; -- EXTERNAL has to ge
+  attribute EXTERNAL of UserCLK                              : signal is "TRUE";
+  -- SHARED_PORT allows multiple BELs using the same port
+  -- (e.g. for exporting a clock to the top)
   attribute SHARED_PORT of UserCLK                           : signal is "TRUE";
-end entity io_1_bidirectional_frame_config_pass;
+end entity IO_1_bidirectional_frame_config_pass;
 
-architecture behavioral of io_1_bidirectional_frame_config_pass is
+architecture Behavioral of IO_1_bidirectional_frame_config_pass is
 
 --                        _____
 --    I-----T_DRIVER----->|PAD|--+-------> O
@@ -48,22 +50,24 @@ architecture behavioral of io_1_bidirectional_frame_config_pass is
 --    T---------+                +-->FF--> Q
 
 -- I am instantiating an IOBUF primitive.
--- Corresponding pins can connect all the way to top by adding
--- an "-- EXTERNAL" comment (see PAD in the entity).
+-- However, it is possible to connect corresponding pins all the way to top,
+-- just by adding an "-- EXTERNAL" comment (see PAD in the entity)
+
+-- signal fromPad : std_logic;
 
 begin
 
   -- Slice outputs
   O <= O_top;
 
-  process_001 : process (UserCLK) is
+  process (UserCLK) is
   begin
 
     if (UserCLK'event and UserCLK = '1') then
       Q <= O_top;
     end if;
 
-  end process process_001;
+  end process;
 
   I_top <= I;
   T_top <= not T;
@@ -76,4 +80,4 @@ begin
 -- T => T -- 1-bit input: 3-state enable input
 -- );
 
-end architecture behavioral;
+end architecture Behavioral;

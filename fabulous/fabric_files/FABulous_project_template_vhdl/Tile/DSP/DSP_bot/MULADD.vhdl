@@ -1,4 +1,4 @@
-package attr_pack_dsp_muladd is
+package attr_pack_DSP_MULADD is
 
   attribute FABulous      : string;
   attribute BelMap        : string;
@@ -12,15 +12,15 @@ package attr_pack_dsp_muladd is
   attribute SHARED_PORT   : string;
   attribute GLOBAL        : string;
 
-end package attr_pack_dsp_muladd;
+end package attr_pack_DSP_MULADD;
 
-library ieee;
-  use ieee.std_logic_1164.all;
-  use ieee.numeric_std.all;
-  use work.attr_pack_dsp_muladd.all;
+library IEEE;
+  use IEEE.STD_LOGIC_1164.all;
+  use IEEE.NUMERIC_STD.all;
+  use work.attr_pack_DSP_MULADD.all;
 -- (* FABulous, BelMap, A_reg=0, B_reg=1, C_reg=2, ACC=3, signExtension=4, ACCout=5 *)
 
-entity muladd is
+entity MULADD is
   generic (
     NoConfigBits : integer := 6
   );
@@ -44,9 +44,9 @@ entity muladd is
   attribute EXTERNAL of UserCLK     : signal is "TRUE";
   attribute SHARED_PORT of UserCLK  : signal is "TRUE";
   attribute GLOBAL of ConfigBits    : signal is "TRUE";
-end entity muladd;
+end entity MULADD;
 
-architecture behavioral of muladd is
+architecture Behavioral of MULADD is
 
   signal A_reg : std_logic_vector(7 downto 0);  -- port A read data register
   signal B_reg : std_logic_vector(7 downto 0);  -- port B read data register
@@ -79,16 +79,14 @@ begin
 
   -- The sign extension was not tested
   product_extended <= "0000" & product when (ConfigBits(4) = '0') else
-                      product(product'high) & product(product'high) &
-                      product(product'high) & product(product'high) &
-                      product;
+                      product(product'high) & product(product'high) & product(product'high) & product(product'high) & product;
 
   sum <= product_extended + unsigned(sum_in);
 
   Q <= std_logic_vector(sum) when (ConfigBits(5) = '0') else
        ACC;
 
-  process_001 : process (UserCLK) is
+  process (UserCLK) is
   begin
 
     if (UserCLK'event and UserCLK = '1') then
@@ -102,6 +100,6 @@ begin
       end if;
     end if;
 
-  end process process_001;
+  end process;
 
-end architecture behavioral;
+end architecture Behavioral;

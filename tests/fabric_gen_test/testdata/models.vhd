@@ -6,10 +6,10 @@ package my_package is
 
   component config_latch is
     port (
-      d  : in    std_logic;
-      e  : in    std_logic;
-      q  : out   std_logic;
-      qn : out   std_logic
+      D  : in    std_logic;
+      E  : in    std_logic;
+      Q  : out   std_logic;
+      QN : out   std_logic
     );
   end component config_latch;
 
@@ -21,10 +21,10 @@ library ieee;
 
 entity config_latch is
   port (
-    d  : in    std_logic;
-    e  : in    std_logic;
-    q  : out   std_logic;
-    qn : out   std_logic
+    D  : in    std_logic;
+    E  : in    std_logic;
+    Q  : out   std_logic;
+    QN : out   std_logic
   );
 end entity config_latch;
 
@@ -32,14 +32,14 @@ architecture from_verilog of config_latch is
 
 begin
 
-  process_001 : process (e, d) is
+  process (E, D) is
   begin
 
-    if (e = '1') then
-      q  <= d;
-      qn <= not d;
+    if (E = '1') then
+      Q  <= D;
+      QN <= not D;
     end if;
 
-  end process process_001;
+  end process;
 
 end architecture from_verilog;

@@ -1,23 +1,23 @@
-package attr_pack_w_io_config_access is
+package attr_pack_W_IO_Config_access is
 
   attribute FABulous    : string;
   attribute BelMap      : string;
-  attribute c_bit0      : integer;
-  attribute c_bit1      : integer;
-  attribute c_bit2      : integer;
-  attribute c_bit3      : integer;
+  attribute C_bit0      : integer;
+  attribute C_bit1      : integer;
+  attribute C_bit2      : integer;
+  attribute C_bit3      : integer;
   attribute EXTERNAL    : string;
   attribute GLOBAL      : string;
 
-end package attr_pack_w_io_config_access;
+end package attr_pack_W_IO_Config_access;
 
-library ieee;
-  use ieee.std_logic_1164.all;
-  use work.attr_pack_w_io_config_access.all;
+library IEEE;
+  use IEEE.STD_LOGIC_1164.all;
+  use work.attr_pack_W_IO_Config_access.all;
 
 -- (* FABulous, BelMap, C_bit0=0, C_bit1=1, C_bit2=2, C_bit3=3 *)
 
-entity config_access is
+entity Config_access is
   generic (
     NoConfigBits : integer := 4 -- has to be adjusted manually (we don't use an arithmetic parser for the value)
   );
@@ -29,15 +29,15 @@ entity config_access is
   );
   attribute FABulous of Config_access : entity is "TRUE";
   attribute BelMap of Config_access   : entity is "TRUE";
-  attribute c_bit0 of Config_access   : entity is 0;
-  attribute c_bit1 of Config_access   : entity is 1;
-  attribute c_bit2 of Config_access   : entity is 2;
-  attribute c_bit3 of Config_access   : entity is 3;
+  attribute C_bit0 of Config_access   : entity is 0;
+  attribute C_bit1 of Config_access   : entity is 1;
+  attribute C_bit2 of Config_access   : entity is 2;
+  attribute C_bit3 of Config_access   : entity is 3;
   attribute EXTERNAL of C             : signal is "TRUE";
   attribute GLOBAL of ConfigBits      : signal is "TRUE";
-end entity config_access;
+end entity Config_access;
 
-architecture behavioral of config_access is
+architecture Behavioral of Config_access is
 
 begin
 
@@ -47,4 +47,4 @@ begin
   C(2) <= ConfigBits(2);
   C(3) <= ConfigBits(3);
 
-end architecture behavioral;
+end architecture Behavioral;

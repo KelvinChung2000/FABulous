@@ -10,40 +10,40 @@ library ieee;
 --   WRITE_ADDRESS_MSB_FROM_DATALSB = 16
 --   WRITE_ENABLE_FROM_DATA = 20
 
-entity blockram_1kb is
+entity BlockRAM_1KB is
   generic (
-    read_address_msb_from_datalsb  : integer := 24;
-    write_address_msb_from_datalsb : integer := 16;
-    write_enable_from_data         : integer := 20
+    READ_ADDRESS_MSB_FROM_DATALSB  : integer := 24;
+    WRITE_ADDRESS_MSB_FROM_DATALSB : integer := 16;
+    WRITE_ENABLE_FROM_DATA         : integer := 20
   );
   port (
-    c0      : in    std_logic;
-    c1      : in    std_logic;
-    c2      : in    std_logic;
-    c3      : in    std_logic;
-    c4      : in    std_logic;
-    c5      : in    std_logic;
+    C0      : in    std_logic;
+    C1      : in    std_logic;
+    C2      : in    std_logic;
+    C3      : in    std_logic;
+    C4      : in    std_logic;
+    C5      : in    std_logic;
     clk     : in    std_logic;
     rd_addr : in    std_logic_vector(7 downto 0);
     rd_data : out   std_logic_vector(31 downto 0);
     wr_addr : in    std_logic_vector(7 downto 0);
     wr_data : in    std_logic_vector(31 downto 0)
   );
-end entity blockram_1kb;
+end entity BlockRAM_1KB;
 
 -- Generated from Verilog module BlockRAM_1KB (BlockRAM_1KB.v:1)
 --   READ_ADDRESS_MSB_FROM_DATALSB = 24
 --   WRITE_ADDRESS_MSB_FROM_DATALSB = 16
 --   WRITE_ENABLE_FROM_DATA = 20
 
-architecture from_verilog of blockram_1kb is
+architecture from_verilog of BlockRAM_1KB is
 
-  signal alwayswriteenable                       : std_logic;                     -- Declared at BlockRAM_1KB.v:25
+  signal alwaysWriteEnable                       : std_logic;                     -- Declared at BlockRAM_1KB.v:25
   signal final_dout                              : std_logic_vector(31 downto 0); -- Declared at BlockRAM_1KB.v:119
-  signal memwriteenable                          : std_logic;                     -- Declared at BlockRAM_1KB.v:31
+  signal memWriteEnable                          : std_logic;                     -- Declared at BlockRAM_1KB.v:31
   signal mem_dout                                : std_logic_vector(31 downto 0); -- Declared at BlockRAM_1KB.v:73
   signal mem_wr_mask                             : std_logic_vector(3 downto 0);  -- Declared at BlockRAM_1KB.v:39
-  signal muxeddatain                             : std_logic_vector(31 downto 0); -- Declared at BlockRAM_1KB.v:40
+  signal muxedDataIn                             : std_logic_vector(31 downto 0); -- Declared at BlockRAM_1KB.v:40
   signal optional_register_enabled_configuration : std_logic;                     -- Declared at BlockRAM_1KB.v:24
   signal rd_dout_additional_register             : std_logic_vector(31 downto 0); -- Declared at BlockRAM_1KB.v:115
   signal rd_dout_muxed                           : std_logic_vector(31 downto 0); -- Declared at BlockRAM_1KB.v:92
@@ -51,9 +51,6 @@ architecture from_verilog of blockram_1kb is
   signal rd_port_configuration                   : std_logic_vector(1 downto 0);  -- Declared at BlockRAM_1KB.v:22
   signal wr_addr_topbits                         : std_logic_vector(1 downto 0);  -- Declared at BlockRAM_1KB.v:42
   signal wr_port_configuration                   : std_logic_vector(1 downto 0);  -- Declared at BlockRAM_1KB.v:23
-
-  constant write_address_top_lsb : integer := read_address_msb_from_datalsb;
-  constant write_address_top_msb : integer := read_address_msb_from_datalsb + 1;
 
   component sram_1rw1r_32_256_8_sky130 is
     port (
@@ -73,12 +70,13 @@ architecture from_verilog of blockram_1kb is
 
 begin
 
-  alwayswriteenable                       <= c4;
-  optional_register_enabled_configuration <= c5;
+  alwaysWriteEnable                       <= C4;
+  optional_register_enabled_configuration <= C5;
   rd_data                                 <= final_dout;
-  wr_port_configuration                   <= c0 & c1;
-  rd_port_configuration                   <= c2 & c3;
-  wr_addr_topbits                         <= wr_data(write_address_top_msb downto write_address_top_lsb);
+  wr_port_configuration                   <= C0 & C1;
+  rd_port_configuration                   <= C2 & C3;
+  wr_addr_topbits                         <= wr_data(READ_ADDRESS_MSB_FROM_DATALSB + 1 downto
+                                                     READ_ADDRESS_MSB_FROM_DATALSB);
 
   -- Generated from instantiation at BlockRAM_1KB.v:75
   memory_cell : component sram_1rw1r_32_256_8_sky130
@@ -87,60 +85,60 @@ begin
       addr1  => rd_addr,
       clk0   => clk,
       clk1   => clk,
-      csb0   => memwriteenable,
+      csb0   => memWriteEnable,
       csb1   => '0',
-      din0   => muxeddatain,
+      din0   => muxedDataIn,
       dout1  => mem_dout,
-      web0   => memwriteenable,
+      web0   => memWriteEnable,
       wmask0 => mem_wr_mask
     );
 
   -- Generated from always process in BlockRAM_1KB (BlockRAM_1KB.v:32)
-  process_001 : process (alwayswriteenable, wr_data) is
+  process (alwaysWriteEnable, wr_data) is
   begin
 
-    if (alwayswriteenable = '1') then
-      memwriteenable <= '0';
+    if (alwaysWriteEnable = '1') then
+      memWriteEnable <= '0';
     else
-      memwriteenable <= not wr_data(write_enable_from_data);
+      memWriteEnable <= not wr_data(WRITE_ENABLE_FROM_DATA);
     end if;
 
-  end process process_001;
+  end process;
 
   -- Generated from always process in BlockRAM_1KB (BlockRAM_1KB.v:44)
-  process_002 : process (wr_port_configuration, wr_data, wr_addr_topbits) is
+  process (wr_port_configuration, wr_data, wr_addr_topbits) is
   begin
 
-    muxeddatain <= "UUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUU";
+    muxedDataIn <= "UUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUU";
 
     if (wr_port_configuration = "00") then
       mem_wr_mask <= x"F";
-      muxeddatain <= wr_data;
+      muxedDataIn <= wr_data;
     else
       if (wr_port_configuration = "01") then
         if (wr_addr_topbits = "00") then
           mem_wr_mask                  <= x"3";
-          muxeddatain(0 + 15 downto 0) <= wr_data(0 + 15 downto 0);
+          muxedDataIn(0 + 15 downto 0) <= wr_data(0 + 15 downto 0);
         else
           mem_wr_mask                    <= x"C";
-          muxeddatain(16 + 15 downto 16) <= wr_data(0 + 15 downto 0);
+          muxedDataIn(16 + 15 downto 16) <= wr_data(0 + 15 downto 0);
         end if;
       else
         if (wr_port_configuration = "10") then
           if (wr_addr_topbits = "00") then
             mem_wr_mask                 <= x"1";
-            muxeddatain(0 + 7 downto 0) <= wr_data(0 + 7 downto 0);
+            muxedDataIn(0 + 7 downto 0) <= wr_data(0 + 7 downto 0);
           else
             if (wr_addr_topbits = "01") then
               mem_wr_mask                 <= x"2";
-              muxeddatain(8 + 7 downto 8) <= wr_data(0 + 7 downto 0);
+              muxedDataIn(8 + 7 downto 8) <= wr_data(0 + 7 downto 0);
             else
               if (wr_addr_topbits = "10") then
                 mem_wr_mask                   <= x"4";
-                muxeddatain(16 + 7 downto 16) <= wr_data(0 + 7 downto 0);
+                muxedDataIn(16 + 7 downto 16) <= wr_data(0 + 7 downto 0);
               else
                 mem_wr_mask                   <= x"8";
-                muxeddatain(24 + 7 downto 24) <= wr_data(0 + 7 downto 0);
+                muxedDataIn(24 + 7 downto 24) <= wr_data(0 + 7 downto 0);
               end if;
             end if;
           end if;
@@ -148,20 +146,20 @@ begin
       end if;
     end if;
 
-  end process process_002;
+  end process;
 
   -- Generated from always process in BlockRAM_1KB (BlockRAM_1KB.v:89)
-  process_003 : process (clk) is
+  process (clk) is
   begin
 
     if rising_edge(clk) then
       rd_dout_sel <= wr_data(24 + 1 downto 24);
     end if;
 
-  end process process_003;
+  end process;
 
   -- Generated from always process in BlockRAM_1KB (BlockRAM_1KB.v:93)
-  process_004 : process (mem_dout, rd_port_configuration, rd_dout_sel) is
+  process (mem_dout, rd_port_configuration, rd_dout_sel) is
   begin
 
     rd_dout_muxed <= mem_dout;
@@ -194,20 +192,20 @@ begin
       end if;
     end if;
 
-  end process process_004;
+  end process;
 
   -- Generated from always process in BlockRAM_1KB (BlockRAM_1KB.v:116)
-  process_005 : process (clk) is
+  process (clk) is
   begin
 
     if rising_edge(clk) then
       rd_dout_additional_register <= rd_dout_muxed;
     end if;
 
-  end process process_005;
+  end process;
 
   -- Generated from always process in BlockRAM_1KB (BlockRAM_1KB.v:121)
-  process_006 : process (optional_register_enabled_configuration, rd_dout_additional_register, rd_dout_muxed) is
+  process (optional_register_enabled_configuration, rd_dout_additional_register, rd_dout_muxed) is
   begin
 
     if (optional_register_enabled_configuration = '1') then
@@ -216,7 +214,7 @@ begin
       final_dout <= rd_dout_muxed;
     end if;
 
-  end process process_006;
+  end process;
 
 end architecture from_verilog;
 

@@ -1,23 +1,23 @@
-package attr_pack_lut4ab_mux8lut_frame_config_mux is
+package attr_pack_LUT4AB_MUX8LUT_frame_config_mux is
 
   attribute FABulous    : string;
   attribute BelMap      : string;
-  attribute c0          : integer;
-  attribute c1          : integer;
+  attribute C0          : integer;
+  attribute C1          : integer;
   attribute EXTERNAL    : string;
   attribute SHARED_PORT : string;
   attribute GLOBAL      : string;
 
-end package attr_pack_lut4ab_mux8lut_frame_config_mux;
+end package attr_pack_LUT4AB_MUX8LUT_frame_config_mux;
 
-library ieee;
-  use ieee.std_logic_1164.all;
-  use ieee.numeric_std.all;
-  use work.attr_pack_lut4ab_mux8lut_frame_config_mux.all;
+library IEEE;
+  use IEEE.STD_LOGIC_1164.all;
+  use IEEE.NUMERIC_STD.all;
+  use work.attr_pack_LUT4AB_MUX8LUT_frame_config_mux.all;
 
 -- (* FABulous, BelMap, c0=0, c1=1 *)
 
-entity mux8lut_frame_config_mux is
+entity MUX8LUT_frame_config_mux is
   generic (
     NoConfigBits : integer := 2 -- has to be adjusted manually (we don't use an arithmetic parser for the value)
   );
@@ -43,31 +43,31 @@ entity mux8lut_frame_config_mux is
   attribute c0 of MUX8LUT_frame_config_mux       : entity is 0;
   attribute c1 of MUX8LUT_frame_config_mux       : entity is 1;
   attribute GLOBAL of ConfigBits                 : signal is "TRUE";
-end entity mux8lut_frame_config_mux;
+end entity MUX8LUT_frame_config_mux;
 
-architecture behavioral of mux8lut_frame_config_mux is
+architecture Behavioral of MUX8LUT_frame_config_mux is
 
-  signal ab    : std_logic;
-  signal cd    : std_logic;
-  signal ef    : std_logic;
-  signal gh    : std_logic;
-  signal scd   : std_logic;
-  signal sef   : std_logic;
-  signal sgh   : std_logic;
-  signal seh   : std_logic;
+  signal AB    : std_logic;
+  signal CD    : std_logic;
+  signal EF    : std_logic;
+  signal GH    : std_logic;
+  signal sCD   : std_logic;
+  signal sEF   : std_logic;
+  signal sGH   : std_logic;
+  signal sEH   : std_logic;
   signal AD    : std_logic;
-  signal eh    : std_logic;
-  signal ah    : std_logic;
-  signal eh_gh : std_logic;
+  signal EH    : std_logic;
+  signal AH    : std_logic;
+  signal EH_GH : std_logic;
 
   signal c0, c1 : std_logic; -- configuration bits
 
   component cus_mux21 is
     port (
-      a0 : in    std_logic;
-      a1 : in    std_logic;
+      A0 : in    std_logic;
+      A1 : in    std_logic;
       S  : in    std_logic;
-      x  : out   std_logic
+      X  : out   std_logic
     );
   end component cus_mux21;
 
@@ -81,122 +81,122 @@ begin
   -- AB <= A when (S(0) = '0') else B;
   cus_mux21_ab : component cus_mux21
     port map (
-      a0 => A,
-      a1 => B,
+      A0 => A,
+      A1 => B,
       S  => S(0),
-      x  => ab
+      X  => AB
     );
 
   -- CD <= C when (sCD = '0') else D;
   cus_mux21_cd : component cus_mux21
     port map (
-      a0 => C,
-      a1 => D,
-      S  => scd,
-      x  => cd
+      A0 => C,
+      A1 => D,
+      S  => sCD,
+      X  => CD
     );
 
   -- EF <= E when (sEF = '0') else F;
   cus_mux21_ef : component cus_mux21
     port map (
-      a0 => E,
-      a1 => F,
-      S  => sef,
-      x  => ef
+      A0 => E,
+      A1 => F,
+      S  => sEF,
+      X  => EF
     );
 
   -- GH <= G when (sGH = '0') else H;
   cus_mux21_gh : component cus_mux21
     port map (
-      a0 => G,
-      a1 => H,
-      S  => sgh,
-      x  => gh
+      A0 => G,
+      A1 => H,
+      S  => sGH,
+      X  => GH
     );
 
   -- sCD <= S(1) when (c0 = '0') else S(0);
   cus_mux21_scd : component cus_mux21
     port map (
-      a0 => S(1),
-      a1 => S(0),
+      A0 => S(1),
+      A1 => S(0),
       S  => c0,
-      x  => scd
+      X  => sCD
     );
 
   -- sEF <= S(2) when (c1 = '0') else S(0);
   cus_mux21_sef : component cus_mux21
     port map (
-      a0 => S(2),
-      a1 => S(0),
+      A0 => S(2),
+      A1 => S(0),
       S  => c1,
-      x  => sef
+      X  => sEF
     );
 
   -- sGH <= sEH when (c0 = '0') else sEF;
   cus_mux21_sgh : component cus_mux21
     port map (
-      a0 => seh,
-      a1 => sef,
+      A0 => sEH,
+      A1 => sEF,
       S  => c0,
-      x  => sgh
+      X  => sGH
     );
 
   -- sEH <= S(3) when (c1 = '0') else S(1);
   cus_mux21_seh : component cus_mux21
     port map (
-      a0 => S(3),
-      a1 => S(1),
+      A0 => S(3),
+      A1 => S(1),
       S  => c1,
-      x  => seh
+      X  => sEH
     );
 
   -- AD <= AB when (S(1) = '0') else CD;
   cus_mux21_ad : component cus_mux21
     port map (
-      a0 => ab,
-      a1 => cd,
+      A0 => AB,
+      A1 => CD,
       S  => S(1),
-      x  => AD
+      X  => AD
     );
 
   -- EH <= EF when (sEH = '0') else GH;
   cus_mux21_eh : component cus_mux21
     port map (
-      a0 => ef,
-      a1 => gh,
-      S  => seh,
-      x  => eh
+      A0 => EF,
+      A1 => GH,
+      S  => sEH,
+      X  => EH
     );
 
   -- AH <= AD when (S(3) = '0') else EH;
   cus_mux21_ah : component cus_mux21
     port map (
-      a0 => AD,
-      a1 => eh,
+      A0 => AD,
+      A1 => EH,
       S  => S(3),
-      x  => ah
+      X  => AH
     );
 
-  M_AB <= ab;
+  M_AB <= AB;
 
   -- M_AD <= CD when (c0 = '0') else AD;
   cus_mux21_m_ad : component cus_mux21
     port map (
-      a0 => cd,
-      a1 => AD,
+      A0 => CD,
+      A1 => AD,
       S  => c0,
-      x  => M_AD
+      X  => M_AD
     );
 
   -- M_AH <= EH_GH when (c1 = '0') else AH;
   cus_mux21_m_ah : component cus_mux21
     port map (
-      a0 => eh_gh,
-      a1 => ah,
+      A0 => EH_GH,
+      A1 => AH,
       S  => c1,
-      x  => M_AH
+      X  => M_AH
     );
 
-  M_EF <= ef;
+  M_EF <= EF;
 
-end architecture behavioral;
+end architecture Behavioral;

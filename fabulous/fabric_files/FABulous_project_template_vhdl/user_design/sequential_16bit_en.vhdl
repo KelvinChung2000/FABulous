@@ -11,7 +11,7 @@ entity sequential_16bit_en is
   );
 end entity sequential_16bit_en;
 
-architecture behavioral of sequential_16bit_en is
+architecture Behavioral of sequential_16bit_en is
 
   signal rst : std_logic;
   signal en  : std_logic;
@@ -22,7 +22,7 @@ begin
   rst <= io_in(0);
   en  <= io_in(1);
 
-  process_001 : process (clk) is
+  process (clk) is
   begin
 
     if rising_edge(clk) then
@@ -37,9 +37,9 @@ begin
       end if;
     end if;
 
-  end process process_001;
+  end process;
 
   io_out(27 downto 0) <= std_logic_vector(b"0000_0000_0000" & ctr(15 downto 0));
   io_oeb(27 downto 0) <= (others => '1');
 
-end architecture behavioral;
+end architecture Behavioral;

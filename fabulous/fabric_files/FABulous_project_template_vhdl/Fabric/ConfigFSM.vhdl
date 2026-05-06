@@ -11,24 +11,24 @@ library ieee;
 --   RowSelectWidth = 5
 --   desync_flag = 20
 
-entity configfsm is
+entity ConfigFSM is
   generic (
-    framebitsperrow : integer := 32;
-    numberofrows    : integer := 16;
-    rowselectwidth  : integer := 5;
+    FrameBitsPerRow : integer := 32;
+    NumberOfRows    : integer := 16;
+    RowSelectWidth  : integer := 5;
     desync_flag     : integer := 20
   );
   port (
-    clk                  : in    std_logic;
-    fsm_reset            : in    std_logic;
-    frameaddressregister : out   std_logic_vector(31 downto 0);
-    longframestrobe      : out   std_logic;
-    rowselect            : out   std_logic_vector(4 downto 0);
-    writedata            : in    std_logic_vector(31 downto 0);
-    writestrobe          : in    std_logic;
+    CLK                  : in    std_logic;
+    FSM_Reset            : in    std_logic;
+    FrameAddressRegister : out   std_logic_vector(31 downto 0);
+    LongFrameStrobe      : out   std_logic;
+    RowSelect            : out   std_logic_vector(4 downto 0);
+    WriteData            : in    std_logic_vector(31 downto 0);
+    WriteStrobe          : in    std_logic;
     resetn               : in    std_logic
   );
-end entity configfsm;
+end entity ConfigFSM;
 
 -- Generated from Verilog module ConfigFSM (ConfigFSM.v:1)
 --   FrameBitsPerRow = 32
@@ -36,83 +36,83 @@ end entity configfsm;
 --   RowSelectWidth = 5
 --   desync_flag = 20
 
-architecture from_verilog of configfsm is
+architecture from_verilog of ConfigFSM is
 
-  signal frameaddressregister_reg : std_logic_vector(31 downto 0);
-  signal longframestrobe_reg      : std_logic;
-  signal rowselect_reg            : std_logic_vector(4 downto 0);
-  signal frameshiftstate          : unsigned(4 downto 0);         -- Declared at ConfigFSM.v:20
-  signal framestrobe              : std_logic;                    -- Declared at ConfigFSM.v:18
-  signal oldframestrobe           : std_logic;                    -- Declared at ConfigFSM.v:83
+  signal FrameAddressRegister_Reg : std_logic_vector(31 downto 0);
+  signal LongFrameStrobe_Reg      : std_logic;
+  signal RowSelect_Reg            : std_logic_vector(4 downto 0);
+  signal FrameShiftState          : unsigned(4 downto 0);         -- Declared at ConfigFSM.v:20
+  signal FrameStrobe              : std_logic;                    -- Declared at ConfigFSM.v:18
+  signal oldFrameStrobe           : std_logic;                    -- Declared at ConfigFSM.v:83
   signal old_reset                : std_logic;                    -- Declared at ConfigFSM.v:24
   signal state                    : std_logic_vector(1 downto 0); -- Declared at ConfigFSM.v:23
 
-  function boolean_to_logic (
-    b : boolean
+  function Boolean_To_Logic (
+    B : Boolean
   ) return std_logic is
   begin
 
-    if (b) then
+    if (B) then
       return '1';
     else
       return '0';
     end if;
 
-  end function boolean_to_logic;
+  end function Boolean_To_Logic;
 
 begin
 
-  frameaddressregister <= frameaddressregister_reg;
-  longframestrobe      <= longframestrobe_reg;
-  rowselect            <= rowselect_reg;
+  FrameAddressRegister <= FrameAddressRegister_Reg;
+  LongFrameStrobe      <= LongFrameStrobe_Reg;
+  RowSelect            <= RowSelect_Reg;
 
   -- Generated from always process in ConfigFSM (ConfigFSM.v:25)
-  p_fsm : process (resetn, clk) is
+  p_fsm : process (resetn, CLK) is
   begin
 
-    if (falling_edge(resetn) or rising_edge(clk)) then
+    if (falling_edge(resetn) or rising_edge(CLK)) then
       if ((not resetn) = '1') then
         old_reset                <= '0';
         state                    <= "00";
-        frameshiftstate          <= "00000";
-        frameaddressregister_reg <= x"00000000";
-        framestrobe              <= '0';
+        FrameShiftState          <= "00000";
+        FrameAddressRegister_Reg <= x"00000000";
+        FrameStrobe              <= '0';
       else
-        old_reset   <= fsm_reset;
-        framestrobe <= '0';
-        if ((old_reset = '0') and (fsm_reset = '1')) then
+        old_reset   <= FSM_Reset;
+        FrameStrobe <= '0';
+        if ((old_reset = '0') and (FSM_Reset = '1')) then
           state           <= "00";
-          frameshiftstate <= "00000";
+          FrameShiftState <= "00000";
         else
 
           case state is
 
             when "00" =>
 
-              if (writestrobe = '1') then
-                if (writedata = x"FAB0FAB1") then
+              if (WriteStrobe = '1') then
+                if (WriteData = x"FAB0FAB1") then
                   state <= "01";
                 end if;
               end if;
 
             when "01" =>
 
-              if (writestrobe = '1') then
-                if (writedata(desync_flag) = '1') then
+              if (WriteStrobe = '1') then
+                if (WriteData(desync_flag) = '1') then
                   state <= "00";
                 else
-                  frameaddressregister_reg <= writedata;
-                  frameshiftstate          <= to_unsigned(numberofrows, frameshiftstate'length);
+                  FrameAddressRegister_Reg <= WriteData;
+                  FrameShiftState          <= to_unsigned(NumberOfRows, FrameShiftState'length);
                   state                    <= "10";
                 end if;
               end if;
 
             when "10" =>
 
-              if (writestrobe = '1') then
-                frameshiftstate <= frameshiftstate - "00001";
-                if (Resize(frameshiftstate, 32) = x"00000001") then
-                  framestrobe <= '1';
+              if (WriteStrobe = '1') then
+                FrameShiftState <= FrameShiftState - "00001";
+                if (Resize(FrameShiftState, 32) = x"00000001") then
+                  FrameStrobe <= '1';
                   state       <= "01";
                 end if;
               end if;
@@ -130,28 +130,28 @@ begin
   end process p_fsm;
 
   -- Generated from always process in ConfigFSM (ConfigFSM.v:75)
-  process_001 : process (writestrobe, frameshiftstate) is
+  process (WriteStrobe, FrameShiftState) is
   begin
 
-    if (writestrobe = '1') then
-      rowselect_reg <= std_logic_vector(frameshiftstate);
+    if (WriteStrobe = '1') then
+      RowSelect_Reg <= std_logic_vector(FrameShiftState);
     else
-      rowselect_reg <= "11111";
+      RowSelect_Reg <= "11111";
     end if;
 
-  end process process_001;
+  end process;
 
   -- Generated from always process in ConfigFSM (ConfigFSM.v:84)
-  p_strobereg : process (resetn, clk) is
+  p_strobereg : process (resetn, CLK) is
   begin
 
-    if (falling_edge(resetn) or rising_edge(clk)) then
+    if (falling_edge(resetn) or rising_edge(CLK)) then
       if ((not resetn) = '1') then
-        oldframestrobe      <= '0';
-        longframestrobe_reg <= '0';
+        oldFrameStrobe      <= '0';
+        LongFrameStrobe_Reg <= '0';
       else
-        oldframestrobe      <= framestrobe;
-        longframestrobe_reg <= boolean_to_logic((framestrobe = '1') or (oldframestrobe = '1'));
+        oldFrameStrobe      <= FrameStrobe;
+        LongFrameStrobe_Reg <= Boolean_To_Logic((FrameStrobe = '1') or (oldFrameStrobe = '1'));
       end if;
     end if;
 

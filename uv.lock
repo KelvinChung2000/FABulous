@@ -2057,8 +2057,8 @@ wheels = [
 
 [[package]]
 name = "sdf-timing"
-version = "0.0.post135"
-source = { git = "https://github.com/FPGA-Research/f4pga-sdf-timing.git#91b44abb48090b5f969abba59f69f5d2c389de1d" }
+version = "0.0.post136"
+source = { git = "https://github.com/FPGA-Research/f4pga-sdf-timing.git#5df8fd077daeb42682842f93f9c2860f9eaa0350" }
 dependencies = [
     { name = "ply" },
     { name = "pyjson" },

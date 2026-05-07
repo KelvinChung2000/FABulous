@@ -22,13 +22,6 @@ let
     else
       pkgs.callPackage (./tools + "/${toolName}.nix") baseArgs;
 
-in
-{
-  # Custom builds only for these tools
-  yosys = buildTool "yosys";
-  nextpnr = buildTool "nextpnr";
-  fabulator = buildTool "fabulator";
-
   # GHDL: pre-built binaries for both platforms
   ghdl =
     let
@@ -43,4 +36,18 @@ in
     pkgs.callPackage ./tools/ghdl-bin.nix {
       prefetchedTarball = tarball;
     };
+in
+{
+  inherit ghdl;
+
+  # fab-yosys: bundles the ghdl-yosys-plugin (built in yosys.nix's postInstall)
+  # so `fab-yosys -m ghdl` works with no wrapper.
+  yosys = pkgs.callPackage ./tools/yosys.nix {
+    prefetchedSrc = srcs.yosys;
+    ghdl-bin = ghdl;
+    ghdlYosysPluginSrc = srcs.ghdl-yosys-plugin;
+  };
+
+  nextpnr = buildTool "nextpnr";
+  fabulator = buildTool "fabulator";
 }

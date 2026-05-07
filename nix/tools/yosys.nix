@@ -1,4 +1,5 @@
-# Yosys - RTL synthesis tool (custom build as fab-yosys)
+# Yosys - RTL synthesis tool (custom build as fab-yosys), bundled with the
+# ghdl-yosys-plugin so `fab-yosys -m ghdl` works out of the box.
 {
   lib,
   stdenv,
@@ -11,6 +12,8 @@
   zlib,
   python3,
   prefetchedSrc,
+  ghdl-bin,
+  ghdlYosysPluginSrc,
 }:
 
 let
@@ -35,6 +38,7 @@ stdenv.mkDerivation {
     tcl
     zlib
     python3
+    ghdl-bin
   ];
 
   postPatch = ''
@@ -69,6 +73,23 @@ stdenv.mkDerivation {
   ];
 
   enableParallelBuilding = true;
+
+  # Build the ghdl-yosys-plugin against the just-installed fab-yosys and drop
+  # it into yosys's plugin directory so `-m ghdl` finds it without wrappers
+  # or YOSYS_PLUGIN_PATH gymnastics. libghdl still needs GHDL_PREFIX at
+  # runtime (set in the devshell) since dlopen'd libghdl can't derive its own
+  # install prefix.
+  postInstall = ''
+    cp -r ${ghdlYosysPluginSrc} ./ghdl-plugin
+    chmod -R u+w ./ghdl-plugin
+    ( cd ./ghdl-plugin
+      make -j$NIX_BUILD_CORES ghdl.so \
+        GHDL=${ghdl-bin}/bin/ghdl \
+        YOSYS_CONFIG=$out/bin/fab-yosys-config \
+        VER_HASH=${builtins.substring 0 9 ghdlYosysPluginSrc.rev}
+      install -Dm644 ghdl.so $out/share/fab-yosys/plugins/ghdl.so
+    )
+  '';
 
   meta = with lib; {
     description = "Yosys Open SYnthesis Suite (FABulous build)";

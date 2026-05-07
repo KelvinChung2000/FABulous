@@ -40,6 +40,14 @@
       url = "git+https://github.com/YosysHQ/yosys?submodules=1";
       flake = false;
     };
+    # ghdl-yosys-plugin tracks ghdl master and has no GitHub releases, only a
+    # `ghdl-v<X>` tag that lines up with each ghdl release. Pin to the tag
+    # matching our ghdl-bin version; bumping ghdl-bin should bump this in
+    # lockstep.
+    ghdl-yosys-plugin-src = {
+      url = "github:ghdl/ghdl-yosys-plugin/ghdl-v6.0.0";
+      flake = false;
+    };
     nextpnr-src = {
       url = "github:YosysHQ/nextpnr";
       flake = false;
@@ -67,6 +75,7 @@
       ghdl-bin-x86_64-linux,
       ghdl-bin-aarch64-darwin,
       yosys-src,
+      ghdl-yosys-plugin-src,
       nextpnr-src,
       fabulator-src,
       pyproject-nix,
@@ -144,6 +153,7 @@
               ghdl-linux-bin = ghdl-bin-x86_64-linux;
               ghdl-darwin-bin = ghdl-bin-aarch64-darwin;
               yosys = yosys-src;
+              ghdl-yosys-plugin = ghdl-yosys-plugin-src;
               nextpnr = nextpnr-src;
               fabulator = fabulator-src;
             };
@@ -193,6 +203,13 @@
               {
                 name = "FAB_YOSYS_PATH";
                 value = "fab-yosys";
+              }
+              {
+                # libghdl loaded by the yosys ghdl plugin can't derive its own
+                # install prefix (only the ghdl binary can), so it can't find
+                # the IEEE libraries without GHDL_PREFIX.
+                name = "GHDL_PREFIX";
+                value = "${customPkgs.ghdl}/lib/ghdl";
               }
               {
                 name = "NIX_PYTHONPATH";
@@ -291,6 +308,11 @@
 
                 # FAB_YOSYS_PATH: tells FABulous the nix yosys binary is named fab-yosys
                 export FAB_YOSYS_PATH="fab-yosys"
+
+                # GHDL_PREFIX: libghdl loaded by the yosys ghdl plugin needs
+                # this to locate the IEEE libraries (the ghdl binary derives
+                # this itself, but a dlopen'd libghdl cannot).
+                export GHDL_PREFIX="${customPkgs.ghdl}/lib/ghdl"
 
                 export REPO_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || echo "")
                 . ${virtualenv}/bin/activate

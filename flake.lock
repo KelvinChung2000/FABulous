@@ -124,11 +124,11 @@
     "nextpnr-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1777911129,
-        "narHash": "sha256-9pm7Vm17HzP9ToMoSJQYqUcvk1ftHEu+azSX/fb5wE4=",
+        "lastModified": 1778063544,
+        "narHash": "sha256-i5c6eEoWI1JdDNNYq/pgWSig2ZpaQBUbkZJJoWkyknA=",
         "owner": "YosysHQ",
         "repo": "nextpnr",
-        "rev": "211cb5703ca4d93b80991e20247466f0105aa2d6",
+        "rev": "9cb5fc6428b81738d2636c63bd90c729c93fd918",
         "type": "github"
       },
       "original": {
@@ -266,11 +266,11 @@
     "yosys-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1777955639,
-        "narHash": "sha256-MIZ8dv69/VqO/ja3XJYCDtCJqnd3wjmKG7ofA8GTFOA=",
+        "lastModified": 1778074815,
+        "narHash": "sha256-egEva9iJRIp7y/qSsZJvaxbnoARz/jKk9vWc3Dikt/A=",
         "ref": "refs/heads/main",
-        "rev": "b864f70e52c401927b0fbcc46315637c9d6ddcdb",
-        "revCount": 17092,
+        "rev": "ab316c14d2c3f950eda7672e5c5507bb5219205a",
+        "revCount": 17104,
         "submodules": true,
         "type": "git",
         "url": "https://github.com/YosysHQ/yosys"

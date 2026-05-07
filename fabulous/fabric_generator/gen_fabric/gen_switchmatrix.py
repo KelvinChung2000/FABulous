@@ -43,7 +43,7 @@ def genTileSwitchMatrix(
     csv_output_dir: Path | None = None,
     config_bit_mode: ConfigBitMode = ConfigBitMode.FRAME_BASED,
     multiplexer_style: MultiplexerStyle = MultiplexerStyle.CUSTOM,
-    generate_delay_in_switch_matrix: int = 80,
+    default_pip_delay: int = 80,
 ) -> None:
     """Generate the RTL code for the tile switch matrix.
 
@@ -71,7 +71,7 @@ def genTileSwitchMatrix(
         The configuration-bit mode for the tile (frame-based or flip-flop chain).
     multiplexer_style : MultiplexerStyle
         The multiplexer style used to implement switch-matrix muxes.
-    generate_delay_in_switch_matrix : int
+    default_pip_delay : int
         Per-mux delay (ps) emitted on assign statements in the switch matrix.
 
     Raises
@@ -300,7 +300,7 @@ def genTileSwitchMatrix(
                 writer.addAssignScalar(
                     portName,
                     connections[portName][0],
-                    delay=generate_delay_in_switch_matrix,
+                    delay=default_pip_delay,
                 )
             writer.addNewLine()
         elif muxSize >= 2:
@@ -346,7 +346,7 @@ def genTileSwitchMatrix(
                 writer.addAssignScalar(
                     f"{portName}_input",
                     connections[portName][::-1],
-                    delay=generate_delay_in_switch_matrix,
+                    delay=default_pip_delay,
                 )
                 writer.addInstantiation(
                     compName=muxComponentName,

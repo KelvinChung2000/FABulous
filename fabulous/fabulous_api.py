@@ -232,7 +232,7 @@ class FABulous_API:
                 csv_output_dir=csv_output_dir,
                 config_bit_mode=self.fabric.configBitMode,
                 multiplexer_style=self.fabric.multiplexerStyle,
-                generate_delay_in_switch_matrix=self.fabric.generateDelayInSwitchMatrix,
+                default_pip_delay=self.fabric.generateDelayInSwitchMatrix,
             )
         else:
             raise ValueError(f"Tile {tileName} not found")

@@ -25,6 +25,7 @@ from fabulous.fabric_generator.gds_generator.flows.flow_define import (
     write_out_steps,
 )
 from fabulous.fabric_generator.gds_generator.helper import (
+    get_offset,
     get_pitch,
     get_routing_obstructions,
     round_die_area,
@@ -186,12 +187,10 @@ def _apply_tile_die_area_config(
     x_pitch, y_pitch = get_pitch(config)
     get_offset(config)
     min_x, min_y = tile_type.get_min_die_area(
-        x_pitch,
-        y_pitch,
-        config.get("IO_PIN_V_THINKNESS_MULT", Decimal(1)),
-        config.get("IO_PIN_H_THINKNESS_MULT", Decimal(1)),
-        x_pitch,
-        y_pitch,
+        x_pitch=x_pitch,
+        y_pitch=y_pitch,
+        x_pin_thickness_mult=config.get("IO_PIN_V_THICKNESS_MULT", Decimal(1)),
+        y_pin_thickness_mult=config.get("IO_PIN_H_THICKNESS_MULT", Decimal(1)),
     )
 
     if opt_mode == OptMode.NO_OPT:

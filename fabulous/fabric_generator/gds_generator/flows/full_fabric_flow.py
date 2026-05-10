@@ -272,7 +272,7 @@ class FABulousFabricMacroFullFlow(Flow):
                 opt_modes, fabric.get_all_unique_tiles()
             ):
                 io_config_path: Path = tile_type.tileDir.parent / "io_pin_order.yaml"
-                generate_IO_pin_order_config(fabric, tile_type, io_config_path)
+                generate_IO_pin_order_config(tile_type, io_config_path, fabric=fabric)
                 base_config_path: Path = (
                     proj_dir / "Tile" / "include" / "gds_config.yaml"
                 )
@@ -422,7 +422,7 @@ class FABulousFabricMacroFullFlow(Flow):
         for tile_type in fabric.get_all_unique_tiles():
             io_config_path: Path = tile_type.tileDir.parent / "io_pin_order.yaml"
             if not io_config_path.exists():
-                generate_IO_pin_order_config(fabric, tile_type, io_config_path)
+                generate_IO_pin_order_config(tile_type, io_config_path, fabric=fabric)
 
         # Compile tiles with optimal dimensions in parallel
         handlers: list[tuple[Future[WorkerResult], Tile | SuperTile]] = []

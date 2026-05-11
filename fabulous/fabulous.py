@@ -418,9 +418,11 @@ def nix_env_cmd(
     # Resolve flake directory
     if flake_dir is not None:
         resolved_flake_dir = flake_dir.resolve()
+        repo_root = None
     else:
         with as_file(files("fabulous_nix").joinpath("flake.nix")) as flake_file:
             resolved_flake_dir = flake_file.resolve().parent
+        repo_root = resolved_flake_dir.parent
 
     if not (resolved_flake_dir / "flake.nix").exists():
         logger.error(
@@ -445,6 +447,8 @@ def nix_env_cmd(
     env = os.environ.copy()
     env["FAB_NIX_SHELL"] = shell.value
     env["FAB_NIX_NO_CHECK"] = str(int(no_check or get_context().nix_no_check))
+    if repo_root is not None:
+        env["REPO_ROOT"] = str(repo_root)
 
     os.execvpe(
         "nix",

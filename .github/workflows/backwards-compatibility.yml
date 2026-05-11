@@ -10,31 +10,57 @@ on:
       - '.github/actions/**'
 
 jobs:
-  run_sim_makefile_on_base_project:
-    name: Run fabric generator flow and simulation with FABulous makefile against base branch
+  # NOTE: This workflow intentionally uses two separate jobs instead of two
+  # steps calling the same composite action in one job.
+  # Calling a composite action twice in the same job causes a GitHub Actions
+  # runner bug: Node.js actions inside it (setup-python, cache, setup-ghdl)
+  # register post-run handlers that break on duplicate step indices, producing
+  # "Index was out of range" errors in the post-run phase.
+  generate_old_project:
+    name: Generate old project (${{ matrix.name }})
     runs-on: ubuntu-latest
     strategy:
       matrix:
         include:
           - name: Verilog
-            type: verilog 
+            type: verilog
           - name: VHDL
             type: vhdl
-
     steps:
       - uses: actions/checkout@v5
         with:
-          ref: ${{ github.base_ref }} 
+          ref: ${{ github.base_ref }}
       - uses: ./.github/actions/prepare_FABulous_container
-      - name: generate old project
+      - name: Generate project with base branch FABulous
         run: |
           uv run FABulous -c /tmp/demo_${{ matrix.type }} -w ${{ matrix.type }}
+      - name: Upload generated project
+        uses: actions/upload-artifact@v4
+        with:
+          name: demo-${{ matrix.type }}-base
+          path: /tmp/demo_${{ matrix.type }}
+          include-hidden-files: true
 
+  run_simulation:
+    name: Run simulation with PR branch against base project (${{ matrix.name }})
+    needs: generate_old_project
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - name: Verilog
+            type: verilog
+          - name: VHDL
+            type: vhdl
+    steps:
       - uses: actions/checkout@v5
       - uses: ./.github/actions/prepare_FABulous_container
+      - name: Download base project
+        uses: actions/download-artifact@v4
+        with:
+          name: demo-${{ matrix.type }}-base
+          path: /tmp/demo_${{ matrix.type }}
       - name: Run fabric generator flow and simulation with FABulous makefile
-        id: run_simulation
-        continue-on-error: true
         run: |
           cd /tmp/demo_${{ matrix.type }}/Test
           make FAB_sim

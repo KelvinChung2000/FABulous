@@ -6,6 +6,7 @@ on:
       - 'fabulous/**'
       - 'tests/**'
       - 'pyproject.toml'
+      - 'uv.lock'
       - '.github/workflows/backwards-compatibility.yml'
       - '.github/actions/**'
 

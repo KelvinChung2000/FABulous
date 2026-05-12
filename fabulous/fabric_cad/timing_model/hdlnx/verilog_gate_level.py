@@ -528,16 +528,9 @@ class VerilogGateLevelTimingGraph(SDFTimingGraph):
 
         # Find instantiations:  cell_type inst_name ( ... );
         inst_pattern = re.compile(
-            r"""
-            (?P<cell>\w+)        # cell type
-            \s+
-            (?P<inst>\w+)        # instance name
-            \s*
-            \(
-                (?P<pins>[^;]*?) # pin connections until the semicolon
-            \)
-            \s*;
-            """,
+            r"""(?P<cell>\w+)        # cell type \s+ (?P<inst>\w+)        # instance
+            name \s* \( (?P<pins>[^;]*?) # pin connections until the semicolon \)
+            \s*;""",
             re.DOTALL | re.VERBOSE,
         )
 
@@ -649,16 +642,9 @@ class VerilogGateLevelTimingGraph(SDFTimingGraph):
         # Pattern for instances inside a module
         # Handles: cell_type [#(...)] inst_name ( ... );
         inst_pattern = re.compile(
-            r"""
-            (?P<cell>\w+)                 # cell/module type
-            \s+
-            (?P<inst>\w+)                 # instance name
-            \s*
-            \(
-                (?P<pins>[^;]*?)          # pin connections until ';'
-            \)
-            \s*;
-            """,
+            r"""(?P<cell>\w+)                 # cell/module type \s+ (?P<inst>\w+) #
+            instance name \s* \( (?P<pins>[^;]*?)          # pin connections until ';'
+            \) \s*;""",
             re.DOTALL | re.VERBOSE,
         )
 
@@ -897,16 +883,9 @@ class VerilogGateLevelTimingGraph(SDFTimingGraph):
         # Pattern for instances inside a module ---
         # Handles: cell_type [#(...)] inst_name ( ... );
         inst_pattern = re.compile(
-            r"""
-            (?P<cell>\w+)                 # cell/module type
-            \s+
-            (?P<inst>\w+)                 # instance name
-            \s*
-            \(
-                (?P<pins>[^;]*?)          # pin connections until ';'
-            \)
-            \s*;
-            """,
+            r"""(?P<cell>\w+)                 # cell/module type \s+ (?P<inst>\w+) #
+            instance name \s* \( (?P<pins>[^;]*?)          # pin connections until ';'
+            \) \s*;""",
             re.DOTALL | re.VERBOSE,
         )
 
@@ -1010,16 +989,9 @@ class VerilogGateLevelTimingGraph(SDFTimingGraph):
         # Matches:
         #   cell_type inst_name ( ... );
         inst_pattern = re.compile(
-            r"""
-            (?P<cell>\w+)                 # cell/module type
-            \s+
-            (?P<inst>\w+)                 # instance name
-            \s*
-            \(
-                (?P<pins>[^;]*?)          # pin connections up to ';'
-            \)
-            \s*;
-            """,
+            r"""(?P<cell>\w+)                 # cell/module type \s+ (?P<inst>\w+) #
+            instance name \s* \( (?P<pins>[^;]*?)          # pin connections up to ';'
+            \) \s*;""",
             re.DOTALL | re.VERBOSE,
         )
 

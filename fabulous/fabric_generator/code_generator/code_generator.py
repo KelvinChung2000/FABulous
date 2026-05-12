@@ -40,8 +40,8 @@ class CodeGenerator(abc.ABC):
     def writeToFile(self) -> None:
         """Write the content to the output file.
 
-        Writes all content strings to the specified output file,
-        filtering out `None` values. Clears content after writing.
+        Writes all content strings to the specified output file, filtering out `None`
+        values. Clears content after writing.
         """
         if self._outFileName == Path():
             logger.critical("OutFileName is not set")
@@ -133,21 +133,21 @@ class CodeGenerator(abc.ABC):
 
         Examples
         --------
-        ::
-
-            Verilog
-                module **name**
-            VHDL
-                library IEEE;
-                use IEEE.std_logic_1164.all;
-                use IEEE.NUMERIC_STD.ALL
-                **package**
-                entity **name** is
+        Verilog
+            module **name**
+        VHDL
+            library IEEE;
+            use IEEE.std_logic_1164.all;
+            use IEEE.NUMERIC_STD.ALL
+            **package**
+            entity **name** is
         """
 
     @abc.abstractmethod
     def addHeaderEnd(self, name: str, indentLevel: int = 0) -> None:
-        """Add end to header. Only useful with VHDL.
+        """Add end to header.
+
+        Only useful with VHDL.
 
         Parameters
         ----------
@@ -331,7 +331,9 @@ class CodeGenerator(abc.ABC):
 
     @abc.abstractmethod
     def addDesignDescriptionStart(self, name: str, indentLevel: int = 0) -> None:
-        """Add start of design description. Only useful with VHDL.
+        """Add start of design description.
+
+        Only useful with VHDL.
 
         Parameters
         ----------
@@ -443,7 +445,9 @@ class CodeGenerator(abc.ABC):
 
     @abc.abstractmethod
     def addLogicStart(self, indentLevel: int = 0) -> None:
-        """Add start of logic. Only useful with VHDL.
+        """Add start of logic.
+
+        Only useful with VHDL.
 
         Parameters
         ----------
@@ -460,7 +464,9 @@ class CodeGenerator(abc.ABC):
 
     @abc.abstractmethod
     def addLogicEnd(self, indentLevel: int = 0) -> None:
-        """Add end of logic. Only useful with VHDL.
+        """Add end of logic.
+
+        Only useful with VHDL.
 
         Examples
         --------

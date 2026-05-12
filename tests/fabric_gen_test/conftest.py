@@ -387,11 +387,15 @@ def code_generator_factory(tmp_path: Path) -> Callable[[str, str], CodeGenerator
 
 
 @pytest.fixture
-def cocotb_runner(tmp_path: Path) -> Callable:
+def cocotb_runner(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Callable:
     """Create cocotb runners for RTL simulation."""
 
     def _create_runner(
-        sources: list[Path], hdl_top_level: str, test_module_path: Path
+        sources: list[Path],
+        hdl_top_level: str,
+        test_module_path: Path,
+        plusargs: list[str] | None = None,
+        testcase: str | None = None,
     ) -> None:
         lang = set([i.suffix for i in sources])
 
@@ -399,20 +403,28 @@ def cocotb_runner(tmp_path: Path) -> Callable:
             raise ValueError("All source files must have the same HDL language suffix")
 
         hdl_toplevel_lang = lang.pop()  # Get the single language suffix
-        if hdl_toplevel_lang not in {".v", ".vhd"}:
-            raise ValueError(f"Unsupported HDL language: {hdl_toplevel_lang}")
-
         if hdl_toplevel_lang == ".v":
-            sim = "icarus"
-        elif hdl_toplevel_lang == ".vhd":
-            sim = "ghdl"
+            sim, test_lang = "icarus", "verilog"
+        elif hdl_toplevel_lang in {".vhd", ".vhdl"}:
+            test_lang = "vhdl"
+            # NVC is significantly faster than GHDL; prefer it when available
+            # and fall back to GHDL. Mirrors the upstream simulation Taskfile.
+            if shutil.which("nvc") is not None:
+                sim = "nvc"
+            elif shutil.which("ghdl") is not None:
+                sim = "ghdl"
+                # GHDL converts identifiers to lowercase for elaboration and
+                # execution; NVC > 1.16 preserves case (cocotb passes
+                # ``--preserve-case``) so leave the toplevel alone in that case.
+                hdl_top_level = hdl_top_level.lower()
+            else:
+                raise RuntimeError(
+                    "No VHDL simulator available: install nvc or ghdl."
+                )
         else:
             raise ValueError(f"Unsupported HDL language: {hdl_toplevel_lang}")
         runner = get_runner(sim)
 
-        sources.insert(
-            0, Path(__file__).parent / "testdata" / f"models{hdl_toplevel_lang}"
-        )
         # Copy test module and models to temp directory for cocotb
         test_dir = tmp_path / "tests"
         test_dir.mkdir(exist_ok=True)
@@ -420,36 +432,53 @@ def cocotb_runner(tmp_path: Path) -> Callable:
         # Copy this test file to the test directory so cocotb can find it
         shutil.copy(test_module_path, test_dir / test_module_path.name)
 
-        # Build directory
+        # cocotb_tools.runner exports the parent's ``sys.path`` to the
+        # simulator subprocess as PYTHONPATH; prepend ``test_dir`` so the
+        # copied test module imports as a top-level module by its stem.
+        monkeypatch.syspath_prepend(str(test_dir))
+
         build_dir = tmp_path / "cocotb_build"
+        build_kwargs: dict = {
+            "sources": sources,
+            "hdl_toplevel": hdl_top_level,
+            "always": True,
+            "build_dir": build_dir,
+        }
+        if test_lang == "verilog":
+            build_kwargs["timescale"] = ("1ps", "1ps")
+        elif sim == "nvc":
+            # NVC defaults to ~16 MiB heap which is exhausted while elaborating
+            # the FABulous fabric. The upstream simulation Taskfile uses the
+            # same -H/-M values; --std=2008 matches FABulous-emitted VHDL.
+            build_kwargs["build_args"] = [
+                "--std=2008",
+                "-H",
+                "2g",
+                "-M",
+                "1g",
+                "--ieee-warnings=off",
+            ]
+        runner.build(**build_kwargs)
 
-        # Configure sources based on HDL language
-        if hdl_toplevel_lang == ".v":
-            runner.build(
-                verilog_sources=sources,
-                hdl_toplevel=hdl_top_level,
-                always=True,
-                build_dir=build_dir,
-                timescale=("1ps", "1ps"),
-            )
-        elif hdl_toplevel_lang == ".vhd":
-            # GHDL converts identifiers to lowercase for elaboration and execution
-            hdl_top_level = hdl_top_level.lower()
-            runner.build(
-                vhdl_sources=sources,
-                hdl_toplevel=hdl_top_level,
-                always=True,
-                build_dir=build_dir,
-            )
-
-            # Copy all files from build_dir to test_dir
+        if sim == "ghdl":
+            # GHDL emits the elaborated executable into build_dir but cocotb
+            # runs the test process from build_dir too, so copying it next to
+            # the test module keeps the artefact reachable when test_dir is
+            # used as the run cwd.
             for file in build_dir.iterdir():
                 if file.is_file():
                     shutil.copy(file, test_dir / file.name)
 
+        # Pass hdl_toplevel_lang explicitly; cocotb_tools 2.x has a bug
+        # auto-detecting it from the runner's vhdl_sources attribute.
+        # Parameters reach the cocotb subprocess via simulator ``plusargs``
+        # so neither the pytest nor subprocess environment is mutated.
         runner.test(
             hdl_toplevel=hdl_top_level,
+            hdl_toplevel_lang=test_lang,
             test_module=test_module_path.stem,
+            plusargs=plusargs or [],
+            testcase=testcase,
         )
 
     return _create_runner

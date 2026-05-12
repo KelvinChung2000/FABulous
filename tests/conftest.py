@@ -1,7 +1,7 @@
 """Global pytest configuration and fixtures for all FABulous tests."""
 
 import os
-from collections.abc import Generator
+from collections.abc import Callable, Generator
 from pathlib import Path
 
 import pytest
@@ -10,6 +10,7 @@ from loguru import logger
 
 import fabulous.fabulous
 import fabulous.fabulous_settings
+from fabulous.fabric_definition.define import HDLType
 from fabulous.fabulous_cli.fabulous_cli import FABulous_CLI
 from fabulous.fabulous_cli.helper import create_project, setup_logger
 from fabulous.fabulous_settings import init_context, reset_context
@@ -149,14 +150,37 @@ def caplog(caplog: LogCaptureFixture) -> LogCaptureFixture:
         enqueue=False,  # Set to 'True' if your test is spawning child processes.
     )
     return caplog
-    # No need to remove specific handler - cleanup_logger removes all handlers
 
 
 @pytest.fixture
-def project(tmp_path: Path) -> Generator[Path]:
-    project_dir = tmp_path / "test_project"
-    create_project(project_dir)
-    yield project_dir
+def project_factory(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> Callable[..., Path]:
+    """Return a callable that creates a FABulous project in a temp directory.
 
-    # Cleanup
-    reset_context()  # Reset context after each test to avoid state leakage
+    The returned callable accepts `lang` to choose Verilog vs VHDL and an
+    optional `name` for the directory (default `test_project`). It also
+    chdirs into the temp directory and sets `FAB_PROJ_DIR` via monkeypatch
+    so context lookups resolve to the newly created project.
+    """
+
+    def _create(lang: HDLType = HDLType.VERILOG, name: str = "test_project") -> Path:
+        project_dir = tmp_path / name
+        monkeypatch.chdir(tmp_path)
+        monkeypatch.setenv("FAB_PROJ_DIR", str(project_dir))
+        create_project(project_dir, lang=lang)
+        return project_dir
+
+    return _create
+
+
+@pytest.fixture
+def project(project_factory: Callable[..., Path]) -> Path:
+    """Verilog FABulous project in a temp directory."""
+    return project_factory()
+
+
+@pytest.fixture
+def project_vhdl(project_factory: Callable[..., Path]) -> Path:
+    """VHDL FABulous project in a temp directory."""
+    return project_factory(lang=HDLType.VHDL)

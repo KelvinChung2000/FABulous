@@ -169,30 +169,9 @@ def do_compile_design(self: "FABulous_CLI", args: argparse.Namespace) -> None:
     fasm_file = json_file.with_suffix(".fasm")
     log_file = json_file.parent / (json_file.with_suffix("").name + "_npnr_log.txt")
 
-    # Build synth command (skip in pnr-only mode where it's unused)
-    synth_cmd = ""
-    if not args.pnr_only:
-        synth_parts = [
-            "synth_fabulous",
-            f"-top {args.top}",
-            f"-json {args.json}" if args.json else f"-json {json_file}",
-        ]
-
-        # Auto-include custom primitives library if present
-        custom_prims = self.projectDir / "user_design" / "custom_prims.v"
-        if custom_prims.exists():
-            synth_parts.append(f"-extra-plib {custom_prims}")
-            logger.info(f"Including custom primitives: {custom_prims}")
-
-        if args.synth_extra_args:
-            synth_parts.append(args.synth_extra_args)
-
-        synth_cmd = " ".join(synth_parts)
-
     # Check that compile Taskfile exists
     task_dir = self.projectDir / "Test"
-    tf_name = "compile.Taskfile.yml"
-    compile_taskfile = task_dir / tf_name
+    compile_taskfile = task_dir / "Taskfile.yml"
     if not compile_taskfile.exists():
         raise FileNotFoundError(
             f"Compile Taskfile not found at {compile_taskfile}. "
@@ -201,16 +180,20 @@ def do_compile_design(self: "FABulous_CLI", args: argparse.Namespace) -> None:
 
     # Build task variables
     ctx = get_context()
+    bin_file = fasm_file.with_suffix(".bin")
     task_vars: dict[str, str] = {
         "YOSYS_PATH": str(ctx.yosys_path),
         "NEXTPNR_PATH": str(ctx.nextpnr_path),
         "FAB_PROJ_ROOT": str(self.projectDir),
-        "SYNTH_CMD": synth_cmd,
+        "DESIGN": paths[0].stem,
+        "TOP_WRAPPER": args.top,
         "DESIGN_FILES": " ".join(str(p) for p in paths),
         "TOP_WRAPPER_FILE": str(self.projectDir / "user_design" / "top_wrapper.v"),
         "JSON_FILE": str(json_file),
         "FASM_FILE": str(fasm_file),
+        "BIN_FILE": str(bin_file),
         "LOG_FILE": str(log_file),
+        "SYNTH_EXTRA_ARGS": args.synth_extra_args,
         "YOSYS_EXTRA_ARGS": args.yosys_extra_args,
         "NEXTPNR_EXTRA_ARGS": args.nextpnr_extra_args,
         "NEXTPNR_VERBOSE": "--verbose" if (self.verbose or self.debug) else "",
@@ -218,12 +201,12 @@ def do_compile_design(self: "FABulous_CLI", args: argparse.Namespace) -> None:
 
     # Determine which task(s) to run
     if args.synth_only:
-        run_task("compile-yosys", task_dir, task_vars, taskfile=tf_name)
+        run_task("run-yosys", task_dir, task_vars)
     elif args.pnr_only:
-        run_task("compile-nextpnr", task_dir, task_vars, taskfile=tf_name)
+        run_task("run-nextpnr", task_dir, task_vars)
     elif args.bitgen_only:
-        run_task("compile-bitgen", task_dir, task_vars, taskfile=tf_name)
+        run_task("run-bitgen", task_dir, task_vars)
     else:
-        run_task("compile-design", task_dir, task_vars, taskfile=tf_name)
+        run_task("build-test-design", task_dir, task_vars)
 
     logger.info("Compile flow completed successfully.")

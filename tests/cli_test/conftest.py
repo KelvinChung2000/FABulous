@@ -8,22 +8,11 @@ from dotenv import set_key
 from pytest_mock import MockerFixture
 
 from fabulous.fabulous_cli.fabulous_cli import FABulous_CLI
-from fabulous.fabulous_cli.helper import create_project
 from tests.conftest import run_cmd
 
 TILE = "LUT4AB"
 
 MOCK_COMPLETED_PROCESS = subprocess.CompletedProcess(args=[], returncode=0)
-
-
-@pytest.fixture
-def project(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
-    """Create a temporary FABulous project directory."""
-    monkeypatch.chdir(tmp_path)
-    project_dir = tmp_path / "test_project"
-    monkeypatch.setenv("FAB_PROJ_DIR", str(project_dir))
-    create_project(project_dir)
-    return project_dir
 
 
 @pytest.fixture

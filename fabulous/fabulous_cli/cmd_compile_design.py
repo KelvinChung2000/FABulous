@@ -105,7 +105,7 @@ compile_design_parser.add_argument(
 )
 
 compile_design_parser.add_argument(
-    "-bit",
+    "-bin",
     type=Path,
     help="Set bit file output file path",
     completer=Cmd.path_complete,
@@ -197,6 +197,9 @@ def do_compile_design(self: "FABulous_CLI", args: argparse.Namespace) -> None:
     )
     if not log_file.is_absolute():
         log_file = (self.projectDir / log_file).resolve()
+    bin_file = args.bin or fasm_file.with_suffix(".bin")
+    if not bin_file.is_absolute():
+        bin_file = (self.projectDir / bin_file).resolve()
 
     # Check that compile Taskfile exists
     task_dir = self.projectDir / "Test"
@@ -209,7 +212,6 @@ def do_compile_design(self: "FABulous_CLI", args: argparse.Namespace) -> None:
 
     # Build task variables
     ctx = get_context()
-    bin_file = fasm_file.with_suffix(".bin")
     task_vars: dict[str, str] = {
         "YOSYS_PATH": str(ctx.yosys_path),
         "NEXTPNR_PATH": str(ctx.nextpnr_path),

@@ -1,3 +1,6 @@
+-- SPDX-FileCopyrightText: © 2026 FABulous Contributors
+-- SPDX-License-Identifier: Apache-2.0
+
 -- See all_ones.vhdl for the `\all\` extended-identifier rationale.
 
 library ieee;

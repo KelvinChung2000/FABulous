@@ -1,3 +1,6 @@
+-- SPDX-FileCopyrightText: © 2026 FABulous Contributors
+-- SPDX-License-Identifier: Apache-2.0
+
 -- `all` is a VHDL reserved word; the extended identifier `\all\` carries the
 -- same name into the synthesized netlist so the shared constraints.pcf
 -- entries `set_io all[N] …` still bind.

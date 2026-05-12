@@ -1,3 +1,6 @@
+-- SPDX-FileCopyrightText: © 2026 FABulous Contributors
+-- SPDX-License-Identifier: Apache-2.0
+
 -- See counter.vhdl for the Global_Clock blackbox idiom.
 
 library ieee;

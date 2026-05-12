@@ -1,3 +1,6 @@
+-- SPDX-FileCopyrightText: © 2026 FABulous Contributors
+-- SPDX-License-Identifier: Apache-2.0
+
 -- Global_Clock is declared as an unbound component so the GHDL Yosys plugin
 -- imports it as a blackbox and synth_fabulous tech-maps the instance to the
 -- dedicated clock bel.

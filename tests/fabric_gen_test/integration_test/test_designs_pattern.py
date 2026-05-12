@@ -2,22 +2,11 @@
 
 The parametrized ``test_design_pattern`` drives both flows:
 
-* ``sequential_16bit_en`` is the bundled demo design — built via
-  ``gen_user_design_wrapper`` against the auto-generated ``template.pcf`` and
-  used by the ``cocotb_test_demo_bitstream_smoke`` cocotb body.
-* the remaining names live under ``user_designs/`` — built with ``-iopad``
-  against the shared ``constraints.pcf`` and paired with their matching
-  ``cocotb_test_<name>`` body.
-
-VHDL is exercised separately by ``test_run_vhdl_simulation_makefile``
-(``tests/fabric_gen_test/integration_test/test_full_intergration.py``),
-which invokes the project's ``Test/Taskfile.yml`` directly — the layer that
-already knows about the GHDL plugin.
-
-The async ``cocotb_test_*`` functions are decorated with ``@cocotb.test``
-and only run inside the cocotb simulator subprocess. Pytest skips them
-during collection because their names don't match the default ``test_*``
-pattern.
+* designs under `user_designs/` — built with `-iopad` against the shared
+  `constraints.pcf` and paired with their matching `cocotb_test_<name>`
+  body. Verilog (`.v` / `.sv`) and VHDL (`.vhdl` / `.vhd`) sources sit
+  side-by-side; the `lang` parametrize axis picks one and the first
+  matching extension on disk wins.
 """
 
 # cspell:words cocotb noqa
@@ -27,7 +16,6 @@ import re
 import shutil
 from collections.abc import Callable
 from pathlib import Path
-from typing import TYPE_CHECKING
 
 import cocotb
 import pytest
@@ -35,6 +23,9 @@ from cocotb.clock import Clock
 from cocotb.triggers import ClockCycles, Timer
 from cocotb.types import Logic, LogicArray
 
+from fabulous.fabric_definition.define import HDLType
+from fabulous.fabulous_cli.fabulous_cli import FABulous_CLI
+from fabulous.fabulous_settings import init_context
 from tests.conftest import run_cmd
 from tests.fabric_gen_test.integration_test.conftest import (
     _USER_DESIGNS_DIR,
@@ -45,8 +36,15 @@ from tests.fabric_gen_test.integration_test.conftest import (
     setup_fabric,
 )
 
-if TYPE_CHECKING:
-    from fabulous.fabulous_cli.fabulous_cli import FABulous_CLI
+# User designs may ship in any of these extensions per language; the first
+# matching file on disk is used.
+_USER_DESIGN_SUFFIXES: dict[str, tuple[str, ...]] = {
+    "verilog": (".v", ".sv"),
+    "vhdl": (".vhdl", ".vhd"),
+}
+# FABulous always emits these suffixes for fabric/tile sources regardless of
+# the user-design extension.
+_FABRIC_SUFFIX: dict[str, str] = {"verilog": ".v", "vhdl": ".vhdl"}
 
 # FABulous W_IO bel exposes `_I_top` (fabric drives → pad), `_O_top`
 # (pad → fabric, an input to the fabric block), `_T_top` (tristate enable
@@ -258,48 +256,54 @@ async def cocotb_test_sys_reset(dut: FabricClockedDUT) -> None:
         pytest.param("sys_reset", "cocotb_test_sys_reset", id="sys_reset"),
     ],
 )
+@pytest.mark.parametrize("lang", ["verilog", "vhdl"])
 @pytest.mark.slow
 def test_design_pattern(
     design_name: str,
+    lang: str,
     testcase: str,
-    cli: "FABulous_CLI",
+    project_factory: Callable[..., Path],
     cocotb_runner: Callable[..., None],
 ) -> None:
-    """Compile ``design_name`` and dispatch its cocotb test.
+    """Compile `design_name` for `lang` and dispatch its cocotb test."""
+    project_dir = project_factory(lang=HDLType(lang))
+    init_context(project_dir)
+    cli = FABulous_CLI(lang, force=False, interactive=False, verbose=False, debug=True)
+    cli.debug = True
+    run_cmd(cli, "load_fabric")
 
-    The flow is selected by where the design source lives:
-
-    * a file under ``user_designs/`` → ``-iopad`` + shared ``constraints.pcf``
-      (no BEL annotations required).
-    * anything else → bundled-demo flow with ``gen_user_design_wrapper`` and
-      the auto-generated ``template.pcf``.
-    """
-    project_dir = cli.projectDir
-    source_file = _USER_DESIGNS_DIR / f"{design_name}.v"
-    user_design = project_dir / "user_design" / f"{design_name}.v"
+    candidates = [
+        _USER_DESIGNS_DIR / f"{design_name}{ext}" for ext in _USER_DESIGN_SUFFIXES[lang]
+    ]
+    source_file = next((p for p in candidates if p.exists()), None)
+    if source_file is None:
+        tried = ", ".join(c.name for c in candidates)
+        raise FileNotFoundError(
+            f"No {lang} source for design '{design_name}' (tried: {tried})"
+        )
+    user_design = project_dir / "user_design" / source_file.name
     top_wrapper = project_dir / "user_design" / "top_wrapper.v"
 
-    if source_file.exists():
-        pcf = project_dir / "user_design" / f"{design_name}.pcf"
-        shutil.copy(source_file, user_design)
-        shutil.copy(_USER_DESIGNS_PCF, pcf)
-        # compile_design's Taskfile reads TOP_WRAPPER_FILE positionally but its
-        # contents are irrelevant when we pass `-top <design>`.
-        top_wrapper.write_text("")
+    pcf = project_dir / "user_design" / f"{design_name}.pcf"
+    shutil.copy(source_file, user_design)
+    shutil.copy(_USER_DESIGNS_PCF, pcf)
+    # compile_design's Taskfile reads TOP_WRAPPER_FILE positionally; its
+    # contents are irrelevant when we pass `-top <design>`.
+    top_wrapper.write_text("")
 
-        run_cmd(cli, "run_FABulous_fabric")
-        run_cmd(
-            cli,
-            f"compile_design {user_design} -top {design_name} "
-            f'--synth-extra-args=-iopad --nextpnr-extra-args "-o pcf={pcf}"',
-        )
+    run_cmd(cli, "run_FABulous_fabric")
+    run_cmd(
+        cli,
+        f"compile_design {user_design} -top {design_name} "
+        f'--synth-extra-args=-iopad --nextpnr-extra-args "-o pcf={pcf}"',
+    )
 
     bitstream = user_design.with_suffix(".bin")
     if not bitstream.exists():
         raise FileNotFoundError(f"compile_design did not produce {bitstream}")
 
     cocotb_runner(
-        sources=_collect_fabric_sources(project_dir, suffix=".v"),
+        sources=_collect_fabric_sources(project_dir, suffix=_FABRIC_SUFFIX[lang]),
         hdl_top_level="eFPGA",
         test_module_path=_THIS_FILE,
         plusargs=[

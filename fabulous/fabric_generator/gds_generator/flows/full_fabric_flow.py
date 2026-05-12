@@ -272,7 +272,7 @@ class FABulousFabricMacroFullFlow(Flow):
         ]
 
         handlers: list[tuple[Future[WorkerResult], OptMode, Tile | SuperTile]] = []
-        with DillProcessPoolExecutor(max_workers=2) as executor:
+        with DillProcessPoolExecutor(max_workers=get_context().max_worker) as executor:
             for opt_mode, tile_type in product(
                 opt_modes, fabric.get_all_unique_tiles()
             ):
@@ -431,7 +431,7 @@ class FABulousFabricMacroFullFlow(Flow):
 
         # Compile tiles with optimal dimensions in parallel
         handlers: list[tuple[Future[WorkerResult], Tile | SuperTile]] = []
-        with DillProcessPoolExecutor(max_workers=None) as executor:
+        with DillProcessPoolExecutor(max_workers=get_context().max_worker) as executor:
             for tile_type in fabric.get_all_unique_tiles():
                 io_config_path = tile_type.tileDir.parent / "io_pin_order.yaml"
                 base_config_path: Path = (

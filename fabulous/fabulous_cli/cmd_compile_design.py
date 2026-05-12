@@ -50,8 +50,6 @@ compile_design_parser.add_argument(
     completer=Cmd.path_complete,
 )
 
-# Compile flow control — each --*-only flag runs exactly that step.
-# Without any flag the full flow (synth + PnR + bitgen) is executed.
 compile_design_parser.add_argument(
     "--synth-only",
     help="Only run synthesis.",
@@ -68,7 +66,6 @@ compile_design_parser.add_argument(
     action="store_true",
 )
 
-# Extra arguments passed directly to the tools
 compile_design_parser.add_argument(
     "--synth-extra-args",
     type=str,
@@ -89,7 +86,28 @@ compile_design_parser.add_argument(
     help="Extra arguments passed to the nextpnr CLI.",
 )
 
-# Tool help flags
+compile_design_parser.add_argument(
+    "-log",
+    type=Path,
+    help="Set log output file path",
+    completer=Cmd.path_complete,
+)
+
+compile_design_parser.add_argument(
+    "-fasm",
+    type=Path,
+    help="Set fasm output file path",
+    completer=Cmd.path_complete,
+)
+
+compile_design_parser.add_argument(
+    "-bin",
+    type=Path,
+    help="Set bit file output file path",
+    completer=Cmd.path_complete,
+)
+
+
 compile_design_parser.add_argument(
     "--yosys-synth-help",
     help="Print the full synth_fabulous help from Yosys and exit.",
@@ -136,7 +154,6 @@ def do_compile_design(self: "FABulous_CLI", args: argparse.Namespace) -> None:
     the appropriate task(s) depending on the selected mode (full compile, synth-only,
     pnr-only, or no-bitgen).
     """
-    # Handle help flags
     if args.yosys_synth_help:
         ctx = get_context()
         _print_tool_help(ctx.yosys_path, ["-p", "help synth_fabulous"], "Yosys")
@@ -148,7 +165,6 @@ def do_compile_design(self: "FABulous_CLI", args: argparse.Namespace) -> None:
 
     logger.info(f"Compiling design with files {[str(i) for i in args.files]}")
 
-    # Resolve file paths
     p: Path
     paths: list[Path] = []
     for p in args.files:
@@ -161,69 +177,59 @@ def do_compile_design(self: "FABulous_CLI", args: argparse.Namespace) -> None:
             logger.error(f"{resolvePath} does not exist")
             return
 
-    # Determine output file paths — must be absolute because the task
-    # runs with cwd=.FABulous/, so relative paths would resolve wrong.
+    # Output paths must be absolute: the task runs with cwd=.FABulous/.
     json_file = args.json or paths[0].with_suffix(".json")
     if not json_file.is_absolute():
         json_file = (self.projectDir / json_file).resolve()
-    fasm_file = json_file.with_suffix(".fasm")
-    log_file = json_file.parent / (json_file.with_suffix("").name + "_npnr_log.txt")
 
-    # Build synth command (skip in pnr-only mode where it's unused)
-    synth_cmd = ""
-    if not args.pnr_only:
-        synth_parts = [
-            "synth_fabulous",
-            f"-top {args.top}",
-            f"-json {args.json}" if args.json else f"-json {json_file}",
-        ]
+    fasm_file = args.fasm or json_file.with_suffix(".fasm")
+    if not fasm_file.is_absolute():
+        fasm_file = (self.projectDir / fasm_file).resolve()
 
-        # Auto-include custom primitives library if present
-        custom_prims = self.projectDir / "user_design" / "custom_prims.v"
-        if custom_prims.exists():
-            synth_parts.append(f"-extra-plib {custom_prims}")
-            logger.info(f"Including custom primitives: {custom_prims}")
+    log_file = args.log or json_file.parent / (
+        json_file.with_suffix("").name + "_npnr_log.txt"
+    )
+    if not log_file.is_absolute():
+        log_file = (self.projectDir / log_file).resolve()
 
-        if args.synth_extra_args:
-            synth_parts.append(args.synth_extra_args)
+    bin_file = args.bin or fasm_file.with_suffix(".bin")
+    if not bin_file.is_absolute():
+        bin_file = (self.projectDir / bin_file).resolve()
 
-        synth_cmd = " ".join(synth_parts)
-
-    # Check that compile Taskfile exists
     task_dir = self.projectDir / "Test"
-    tf_name = "compile.Taskfile.yml"
-    compile_taskfile = task_dir / tf_name
+    compile_taskfile = task_dir / "Taskfile.yml"
     if not compile_taskfile.exists():
         raise FileNotFoundError(
             f"Compile Taskfile not found at {compile_taskfile}. "
             "Please ensure the project is set up correctly."
         )
 
-    # Build task variables
     ctx = get_context()
     task_vars: dict[str, str] = {
         "YOSYS_PATH": str(ctx.yosys_path),
         "NEXTPNR_PATH": str(ctx.nextpnr_path),
         "FAB_PROJ_ROOT": str(self.projectDir),
-        "SYNTH_CMD": synth_cmd,
+        "DESIGN": paths[0].stem,
+        "TOP_WRAPPER": args.top,
         "DESIGN_FILES": " ".join(str(p) for p in paths),
         "TOP_WRAPPER_FILE": str(self.projectDir / "user_design" / "top_wrapper.v"),
         "JSON_FILE": str(json_file),
         "FASM_FILE": str(fasm_file),
+        "BIN_FILE": str(bin_file),
         "LOG_FILE": str(log_file),
+        "SYNTH_EXTRA_ARGS": args.synth_extra_args,
         "YOSYS_EXTRA_ARGS": args.yosys_extra_args,
         "NEXTPNR_EXTRA_ARGS": args.nextpnr_extra_args,
         "NEXTPNR_VERBOSE": "--verbose" if (self.verbose or self.debug) else "",
     }
 
-    # Determine which task(s) to run
     if args.synth_only:
-        run_task("compile-yosys", task_dir, task_vars, taskfile=tf_name)
+        run_task("run-yosys", task_dir, task_vars)
     elif args.pnr_only:
-        run_task("compile-nextpnr", task_dir, task_vars, taskfile=tf_name)
+        run_task("run-nextpnr", task_dir, task_vars)
     elif args.bitgen_only:
-        run_task("compile-bitgen", task_dir, task_vars, taskfile=tf_name)
+        run_task("run-bitgen", task_dir, task_vars)
     else:
-        run_task("compile-design", task_dir, task_vars, taskfile=tf_name)
+        run_task("build-test-design", task_dir, task_vars)
 
     logger.info("Compile flow completed successfully.")

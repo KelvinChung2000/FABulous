@@ -1,6 +1,7 @@
 """Tests for FABulous CLI compile_design command."""
 
 import argparse
+from pathlib import Path
 
 import pytest
 from pytest_mock import MockerFixture
@@ -15,6 +16,9 @@ def _make_default_args(**overrides) -> argparse.Namespace:  # noqa: ANN003
         files=[],
         top="top_wrapper",
         json=None,
+        fasm=None,
+        log=None,
+        bin=None,
         synth_only=False,
         pnr_only=False,
         bitgen_only=False,
@@ -35,19 +39,18 @@ def compile_cli(
 ) -> FABulous_CLI:
     """Extend the standard cli fixture with compile-specific project files.
 
-    Creates Test/compile.Taskfile.yml, .FABulous/pips.txt, bel.txt and a design file so
-    that do_compile_design can find everything it needs.
-
-    run_task and get_context are patched on the module under test.
+    Creates Test/Taskfile.yml and a design file so that do_compile_design can find
+    everything it needs. get_context is patched on the module under test.
     """
-    fab_dir = cli.projectDir / ".FABulous"
     test_dir = cli.projectDir / "Test"
     test_dir.mkdir(exist_ok=True)
-    (test_dir / "compile.Taskfile.yml").write_text(
-        "tasks:\n  compile-yosys: {}\n  compile-nextpnr: {}\n  compile-bitgen: {}\n"
+    (test_dir / "Taskfile.yml").write_text(
+        "tasks:\n"
+        "  build-test-design: {}\n"
+        "  run-yosys: {}\n"
+        "  run-nextpnr: {}\n"
+        "  run-bitgen: {}\n"
     )
-    (fab_dir / "pips.txt").write_text("")
-    (fab_dir / "bel.txt").write_text("")
 
     user_design = cli.projectDir / "user_design"
     user_design.mkdir(exist_ok=True)
@@ -73,10 +76,10 @@ def compile_cli(
 @pytest.mark.parametrize(
     ("cli_flags", "expected_tasks"),
     [
-        ("", ["compile-design"]),
-        ("--synth-only", ["compile-yosys"]),
-        ("--pnr-only", ["compile-nextpnr"]),
-        ("--bitgen-only", ["compile-bitgen"]),
+        ("", ["build-test-design"]),
+        ("--synth-only", ["run-yosys"]),
+        ("--pnr-only", ["run-nextpnr"]),
+        ("--bitgen-only", ["run-bitgen"]),
     ],
     ids=["full", "synth-only", "pnr-only", "bitgen-only"],
 )
@@ -94,8 +97,10 @@ def test_compile_design_task_dispatch(
     assert mock_run_task.call_count == len(expected_tasks)
     actual_tasks = [c.args[0] for c in mock_run_task.call_args_list]
     assert actual_tasks == expected_tasks
+    # The compile flow now relies on the default Taskfile.yml lookup, so no
+    # explicit taskfile= kwarg should be forwarded.
     for call in mock_run_task.call_args_list:
-        assert call.kwargs.get("taskfile") == "compile.Taskfile.yml"
+        assert "taskfile" not in call.kwargs
 
 
 # ---------------------------------------------------------------------------
@@ -114,16 +119,42 @@ def test_compile_design_task_vars(
 
     task_vars = mock_run_task.call_args.args[2]
 
-    assert "synth_fabulous" in task_vars["SYNTH_CMD"]
-    assert "-top top_wrapper" in task_vars["SYNTH_CMD"]
-    assert task_vars["JSON_FILE"].endswith(".json")
+    assert task_vars["DESIGN"] == "my_design"
+    assert task_vars["TOP_WRAPPER"] == "top_wrapper"
     assert str(design_file) in task_vars["DESIGN_FILES"]
+    assert task_vars["JSON_FILE"].endswith(".json")
     assert task_vars["FASM_FILE"].endswith(".fasm")
+    assert task_vars["BIN_FILE"].endswith(".bin")
     assert task_vars["LOG_FILE"].endswith("_npnr_log.txt")
     assert task_vars["YOSYS_PATH"] == "/usr/bin/yosys"
     assert task_vars["NEXTPNR_PATH"] == "/usr/bin/nextpnr-generic"
-    assert str(compile_cli.projectDir) in task_vars["FAB_PROJ_ROOT"]
+    assert task_vars["FAB_PROJ_ROOT"] == str(compile_cli.projectDir)
     assert "top_wrapper.v" in task_vars["TOP_WRAPPER_FILE"]
+    # Extra-arg slots default to empty strings.
+    assert task_vars["SYNTH_EXTRA_ARGS"] == ""
+    assert task_vars["YOSYS_EXTRA_ARGS"] == ""
+    assert task_vars["NEXTPNR_EXTRA_ARGS"] == ""
+
+
+def test_compile_design_default_paths_chain_from_json(
+    compile_cli: FABulous_CLI, mocker: MockerFixture
+) -> None:
+    """Verify FASM/BIN/LOG default paths are derived from JSON_FILE."""
+    design_file = compile_cli.projectDir / "user_design" / "my_design.v"
+    mock_run_task = mocker.patch("fabulous.fabulous_cli.cmd_compile_design.run_task")
+
+    run_cmd(compile_cli, f"compile_design {design_file}")
+
+    task_vars = mock_run_task.call_args.args[2]
+    json_path = Path(task_vars["JSON_FILE"])
+    assert Path(task_vars["FASM_FILE"]) == json_path.with_suffix(".fasm")
+    assert Path(task_vars["BIN_FILE"]) == json_path.with_suffix(".fasm").with_suffix(
+        ".bin"
+    )
+    assert (
+        Path(task_vars["LOG_FILE"])
+        == json_path.parent / f"{json_path.stem}_npnr_log.txt"
+    )
 
 
 def test_compile_design_task_dir(
@@ -139,42 +170,10 @@ def test_compile_design_task_dir(
     assert task_dir == compile_cli.projectDir / "Test"
 
 
-def test_compile_design_auto_includes_custom_prims(
-    compile_cli: FABulous_CLI, mocker: MockerFixture
-) -> None:
-    """Verify custom_prims.v is auto-included in SYNTH_CMD when present."""
-    design_file = compile_cli.projectDir / "user_design" / "my_design.v"
-    custom_prims = compile_cli.projectDir / "user_design" / "custom_prims.v"
-    custom_prims.write_text("")
-
-    mock_run_task = mocker.patch("fabulous.fabulous_cli.cmd_compile_design.run_task")
-
-    run_cmd(compile_cli, f"compile_design {design_file}")
-
-    task_vars = mock_run_task.call_args.args[2]
-    assert f"-extra-plib {custom_prims}" in task_vars["SYNTH_CMD"]
-
-
-def test_compile_design_no_custom_prims(
-    compile_cli: FABulous_CLI, mocker: MockerFixture
-) -> None:
-    """Verify SYNTH_CMD has no -extra-plib when custom_prims.v is absent."""
-    design_file = compile_cli.projectDir / "user_design" / "my_design.v"
-    custom_prims = compile_cli.projectDir / "user_design" / "custom_prims.v"
-    custom_prims.unlink(missing_ok=True)
-
-    mock_run_task = mocker.patch("fabulous.fabulous_cli.cmd_compile_design.run_task")
-
-    run_cmd(compile_cli, f"compile_design {design_file}")
-
-    task_vars = mock_run_task.call_args.args[2]
-    assert "-extra-plib" not in task_vars["SYNTH_CMD"]
-
-
 def test_compile_design_extra_args(
     compile_cli: FABulous_CLI, mocker: MockerFixture
 ) -> None:
-    """Verify all extra args are forwarded correctly to task variables."""
+    """Verify all extra args are forwarded verbatim to task variables."""
     design_file = compile_cli.projectDir / "user_design" / "my_design.v"
     mock_run_task = mocker.patch("fabulous.fabulous_cli.cmd_compile_design.run_task")
 
@@ -187,7 +186,7 @@ def test_compile_design_extra_args(
     )
 
     task_vars = mock_run_task.call_args.args[2]
-    assert "-nofsm -extra-plib prims.v" in task_vars["SYNTH_CMD"]
+    assert task_vars["SYNTH_EXTRA_ARGS"] == "-nofsm -extra-plib prims.v"
     assert task_vars["YOSYS_EXTRA_ARGS"] == "verbose_flag"
     assert task_vars["NEXTPNR_EXTRA_ARGS"] == "seed42"
 
@@ -219,6 +218,81 @@ def test_compile_design_nextpnr_verbose(
 
     task_vars = mock_run_task.call_args.args[2]
     assert task_vars["NEXTPNR_VERBOSE"] == expected
+
+
+def test_compile_design_top_override(
+    compile_cli: FABulous_CLI, mocker: MockerFixture
+) -> None:
+    """Verify -top propagates to the TOP_WRAPPER task var."""
+    design_file = compile_cli.projectDir / "user_design" / "my_design.v"
+    mock_run_task = mocker.patch("fabulous.fabulous_cli.cmd_compile_design.run_task")
+
+    run_cmd(compile_cli, f"compile_design {design_file} -top my_top")
+
+    task_vars = mock_run_task.call_args.args[2]
+    assert task_vars["TOP_WRAPPER"] == "my_top"
+
+
+# ---------------------------------------------------------------------------
+# Output path overrides (-json, -fasm, -bin, -log)
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.parametrize(
+    ("flag", "filename", "task_var"),
+    [
+        ("-json", "custom.json", "JSON_FILE"),
+        ("-fasm", "custom.fasm", "FASM_FILE"),
+        ("-bin", "custom.bin", "BIN_FILE"),
+        ("-log", "custom_log.txt", "LOG_FILE"),
+    ],
+    ids=["json", "fasm", "bin", "log"],
+)
+def test_compile_design_relative_output_override(
+    compile_cli: FABulous_CLI,
+    mocker: MockerFixture,
+    flag: str,
+    filename: str,
+    task_var: str,
+) -> None:
+    """Relative output paths resolve against projectDir."""
+    design_file = compile_cli.projectDir / "user_design" / "my_design.v"
+    mock_run_task = mocker.patch("fabulous.fabulous_cli.cmd_compile_design.run_task")
+
+    run_cmd(compile_cli, f"compile_design {design_file} {flag} {filename}")
+
+    task_vars = mock_run_task.call_args.args[2]
+    expected = (compile_cli.projectDir / filename).resolve()
+    assert task_vars[task_var] == str(expected)
+
+
+@pytest.mark.parametrize(
+    ("flag", "filename", "task_var"),
+    [
+        ("-json", "abs.json", "JSON_FILE"),
+        ("-fasm", "abs.fasm", "FASM_FILE"),
+        ("-bin", "abs.bin", "BIN_FILE"),
+        ("-log", "abs.log", "LOG_FILE"),
+    ],
+    ids=["json", "fasm", "bin", "log"],
+)
+def test_compile_design_absolute_output_override(
+    compile_cli: FABulous_CLI,
+    mocker: MockerFixture,
+    tmp_path: Path,
+    flag: str,
+    filename: str,
+    task_var: str,
+) -> None:
+    """Absolute output paths are preserved unchanged."""
+    design_file = compile_cli.projectDir / "user_design" / "my_design.v"
+    abs_path = tmp_path / filename
+    mock_run_task = mocker.patch("fabulous.fabulous_cli.cmd_compile_design.run_task")
+
+    run_cmd(compile_cli, f"compile_design {design_file} {flag} {abs_path}")
+
+    task_vars = mock_run_task.call_args.args[2]
+    assert task_vars[task_var] == str(abs_path)
 
 
 # ---------------------------------------------------------------------------
@@ -262,15 +336,15 @@ def test_compile_design_tool_help(
 def test_compile_design_no_taskfile(
     compile_cli: FABulous_CLI, mocker: MockerFixture
 ) -> None:
-    """Verify FileNotFoundError when compile.Taskfile.yml is absent."""
+    """Verify FileNotFoundError when Test/Taskfile.yml is absent."""
     design_file = compile_cli.projectDir / "user_design" / "my_design.v"
-    (compile_cli.projectDir / "Test" / "compile.Taskfile.yml").unlink()
+    (compile_cli.projectDir / "Test" / "Taskfile.yml").unlink()
     mocker.patch("fabulous.fabulous_cli.cmd_compile_design.run_task")
 
     from fabulous.fabulous_cli.cmd_compile_design import do_compile_design
 
     args = _make_default_args(files=[design_file])
-    with pytest.raises(FileNotFoundError, match="compile.Taskfile.yml"):
+    with pytest.raises(FileNotFoundError, match="Taskfile.yml"):
         do_compile_design.__wrapped__(compile_cli, args)
 
 

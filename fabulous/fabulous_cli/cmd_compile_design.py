@@ -189,14 +189,17 @@ def do_compile_design(self: "FABulous_CLI", args: argparse.Namespace) -> None:
     json_file = args.json or paths[0].with_suffix(".json")
     if not json_file.is_absolute():
         json_file = (self.projectDir / json_file).resolve()
+
     fasm_file = args.fasm or json_file.with_suffix(".fasm")
     if not fasm_file.is_absolute():
         fasm_file = (self.projectDir / fasm_file).resolve()
+
     log_file = args.log or json_file.parent / (
         json_file.with_suffix("").name + "_npnr_log.txt"
     )
     if not log_file.is_absolute():
         log_file = (self.projectDir / log_file).resolve()
+
     bin_file = args.bin or fasm_file.with_suffix(".bin")
     if not bin_file.is_absolute():
         bin_file = (self.projectDir / bin_file).resolve()

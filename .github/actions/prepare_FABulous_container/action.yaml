@@ -19,7 +19,8 @@ inputs:
     required: false
     default: ""
   install_ghdl_mcode:
-    description: "If false, ghdl mcode won't be installed and the oss-cad-suite llvm
+    description:
+      "If false, ghdl mcode won't be installed and the oss-cad-suite llvm
       version is used"
     required: false
     default: "true"
@@ -61,12 +62,12 @@ runs:
           # Fallback to a fixed version if API call fails
           if [ "$VERSION" = "unknown" ] || [ "$VERSION" = "null" ] || [ -z "$VERSION" ]; then
             echo "Warning: Failed to get OSS CAD Suite version from API, using fallback"
-            VERSION="2025-07-01"  # Use a recent stable version as fallback
+            VERSION="2026-05-12"  # Use a recent stable version as fallback
           fi
 
         else
           echo "Get latest known working OSS CAD Suite version."
-          VERSION="2025-07-01"  # Use a recent stable version as fallback
+          VERSION="2026-05-12"  # Use a recent stable version as fallback
         fi
 
         echo "Using OSS CAD Suite version: $VERSION"

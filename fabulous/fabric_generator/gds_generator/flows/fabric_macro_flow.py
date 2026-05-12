@@ -52,7 +52,6 @@ subs = {
     "OpenROAD.RepairAntennas*": None,
     "OpenROAD.Repair*": None,
     "OpenROAD.Resizer*": None,
-    # "OpenROAD.DetailedRouting": None,
     # It seems when we have no wires,
     # OpenRCX won't write a spef file
     "OpenROAD.RCX": None,

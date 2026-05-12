@@ -1,13 +1,4 @@
-"""Integration tests for FABulous user designs and the bitstream smoke flow.
-
-The parametrized ``test_design_pattern`` drives both flows:
-
-* designs under `user_designs/` — built with `-iopad` against the shared
-  `constraints.pcf` and paired with their matching `cocotb_test_<name>`
-  body. Verilog (`.v` / `.sv`) and VHDL (`.vhdl` / `.vhd`) sources sit
-  side-by-side; the `lang` parametrize axis picks one and the first
-  matching extension on disk wins.
-"""
+"""Integration tests for FABulous user designs and the bitstream smoke flow."""
 
 # cspell:words cocotb noqa
 
@@ -36,32 +27,19 @@ from tests.fabric_gen_test.integration_test.conftest import (
     setup_fabric,
 )
 
-# User designs may ship in any of these extensions per language; the first
-# matching file on disk is used.
 _USER_DESIGN_SUFFIXES: dict[str, tuple[str, ...]] = {
     "verilog": (".v", ".sv"),
     "vhdl": (".vhdl", ".vhd"),
 }
-# FABulous always emits these suffixes for fabric/tile sources regardless of
-# the user-design extension.
 _FABRIC_SUFFIX: dict[str, str] = {"verilog": ".v", "vhdl": ".vhdl"}
 
-# FABulous W_IO bel exposes `_I_top` (fabric drives → pad), `_O_top`
-# (pad → fabric, an input to the fabric block), `_T_top` (tristate enable
-# that the fabric drives). The fabric-driven outputs are the interesting
-# signals after a bitstream upload — they should resolve to a defined logic
-# level once the design is configured.
+# Fabric → pad outputs; after bitstream upload these should leave X/Z.
 _FABRIC_OUTPUT_RE = re.compile(
     r"^Tile_X(?P<tilex>\d+)Y(?P<tiley>\d+)_[A-Z]_I_top\d*$",
     re.IGNORECASE,
 )
 
 _THIS_FILE = Path(__file__).resolve()
-
-
-# --------------------------------------------------------------------------- #
-# Cocotb tests                                                                #
-# --------------------------------------------------------------------------- #
 
 
 @cocotb.test
@@ -94,8 +72,6 @@ async def cocotb_test_passthrough(dut: FabricConfigDUT) -> None:
 
     width = len(pcf.signals["a"])
 
-    # Walk one bit at a time so any unrouted bit fails with bit-precise
-    # information rather than as an opaque multi-bit pattern.
     for bit in range(width):
         for value in (0, 1):
             pcf.set("a", LogicArray.from_unsigned(0, width))
@@ -180,13 +156,7 @@ async def cocotb_test_all_zeros(dut: FabricConfigDUT) -> None:
 
 @cocotb.test
 async def cocotb_test_counter(dut: FabricClockedDUT) -> None:
-    """Reset, enable and count cycles, assert ``d == cycles - 1``.
-
-    The synchronous user design uses the demo fabric's ``Global_Clock`` bel
-    (placed at X0Y0/CLK) which drives the global clock wire — the same wire
-    fed by the eFPGA's top-level ``UserCLK`` input. The testbench therefore
-    toggles ``dut.UserCLK`` directly to advance the design.
-    """
+    """Reset, enable and count cycles, assert ``d == cycles - 1``."""
     dut.UserCLK.value = 0
     pcf = await setup_fabric(dut)
     pcf.set("rst", Logic(1), index=0)
@@ -211,11 +181,7 @@ async def cocotb_test_counter(dut: FabricClockedDUT) -> None:
 
 @cocotb.test
 async def cocotb_test_sys_reset(dut: FabricClockedDUT) -> None:
-    """Toggle rst, verify b latches the magic constant 0x7 then tracks a.
-
-    The design latches ``b <= 0x7`` while ``rst`` is high and ``b <= a``
-    otherwise.
-    """
+    """Toggle rst, verify b latches the magic constant 0x7 then tracks a."""
     dut.UserCLK.value = 0
     pcf = await setup_fabric(dut)
 
@@ -224,22 +190,15 @@ async def cocotb_test_sys_reset(dut: FabricClockedDUT) -> None:
 
     cocotb.start_soon(Clock(dut.UserCLK, 10, unit="ns").start())
 
-    # Hold reset for a few cycles, observe the latched magic constant.
     await ClockCycles(dut.UserCLK, 5)
     observed = pcf.get("b").to_unsigned()
     assert observed == 0x7, f"sys_reset latch mismatch: expected 0x7 got {observed:#x}"
 
-    # Release reset, drive a and observe b follows it.
     pcf.set("rst", Logic(0), index=0)
     pcf.set("a", LogicArray.from_unsigned(0x5, len(pcf.signals["a"])))
     await ClockCycles(dut.UserCLK, 3)
     observed = pcf.get("b").to_unsigned()
     assert observed == 0x5, f"sys_reset follow mismatch: expected 0x5 got {observed:#x}"
-
-
-# --------------------------------------------------------------------------- #
-# Pytest entries                                                              #
-# --------------------------------------------------------------------------- #
 
 
 @pytest.mark.parametrize(
@@ -287,8 +246,6 @@ def test_design_pattern(
     pcf = project_dir / "user_design" / f"{design_name}.pcf"
     shutil.copy(source_file, user_design)
     shutil.copy(_USER_DESIGNS_PCF, pcf)
-    # compile_design's Taskfile reads TOP_WRAPPER_FILE positionally; its
-    # contents are irrelevant when we pass `-top <design>`.
     top_wrapper.write_text("")
 
     run_cmd(cli, "run_FABulous_fabric")
@@ -309,7 +266,6 @@ def test_design_pattern(
         plusargs=[
             f"+FAB_BIT={bitstream}",
             f"+FAB_PCF={pcf}",
-            # bit_gen omits the top/bottom NULL termination rows.
             f"+FAB_NUM_DATA_ROWS={cli.fabulousAPI.fabric.numberOfRows - 2}",
         ],
         testcase=testcase,

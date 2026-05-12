@@ -1,4 +1,3 @@
--- VHDL mirror of all_zeros.v.
 -- See all_ones.vhdl for the `\all\` extended-identifier rationale.
 
 library ieee;

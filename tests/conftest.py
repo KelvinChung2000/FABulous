@@ -32,7 +32,6 @@ def pytest_addoption(parser: pytest.Parser) -> None:  # type: ignore[name-define
 
 
 def pytest_configure(config: pytest.Config) -> None:  # type: ignore[name-defined]
-    # If --runslow is given, remove the '-m not slow' filter so slow tests run.
     if (
         config.getoption("runslow")
         and getattr(config.option, "markexpr", None) == "not slow"
@@ -76,19 +75,14 @@ def fabulous_test_environment(
 
     fake_user_config_dir = tmp_path / ".fabulous"
 
-    # Set test environment using monkeypatch for automatic cleanup
     monkeypatch.setenv("FAB_ROOT", fabulous_root)
     monkeypatch.setenv("FABULOUS_TESTING", "TRUE")
     monkeypatch.chdir(tmp_path)
     monkeypatch.setattr(Path, "home", lambda _: tmp_path)
-    # FAB_USER_CONFIG_DIR is computed at module import time, so Path.home()
-    # patching above is too late. Patch the constant directly in both modules.
     monkeypatch.setattr(
         fabulous.fabulous_settings, "FAB_USER_CONFIG_DIR", fake_user_config_dir
     )
     monkeypatch.setattr(fabulous.fabulous, "FAB_USER_CONFIG_DIR", fake_user_config_dir)
-    # Avoid network-dependent PDK download attempts in tests when settings
-    # validation triggers ciel activation.
     monkeypatch.setattr(
         fabulous.fabulous_settings.ciel.manage,
         "enable",
@@ -134,8 +128,6 @@ def cleanup_logger() -> Generator[None]:
     quickly.
     """
     yield
-    # Remove all logger handlers to prevent logging to closed files
-    # This handles cleanup for both regular logging and caplog fixtures
     logger.remove()
 
 

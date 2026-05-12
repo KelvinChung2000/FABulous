@@ -1,4 +1,3 @@
--- VHDL mirror of all_ones.v.
 -- `all` is a VHDL reserved word; the extended identifier `\all\` carries the
 -- same name into the synthesized netlist so the shared constraints.pcf
 -- entries `set_io all[N] …` still bind.

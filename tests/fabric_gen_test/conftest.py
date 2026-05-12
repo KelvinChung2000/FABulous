@@ -52,22 +52,18 @@ def default_tile(mocker: MockerFixture) -> Tile:
 
 @pytest.fixture(
     params=[
-        # Standard configurations
         FabricConfig(
             frame_bits_per_row=32, max_frames_per_col=20, name="StandardFabric"
         ),
         FabricConfig(frame_bits_per_row=8, max_frames_per_col=5, name="SmallFabric"),
-        # Boundary conditions
         FabricConfig(frame_bits_per_row=1, max_frames_per_col=1, name="MinimalFabric"),
         FabricConfig(frame_bits_per_row=1, max_frames_per_col=64, name="ThinFabric"),
         FabricConfig(frame_bits_per_row=64, max_frames_per_col=1, name="WideFabric"),
-        # Non-power-of-2 configurations
         FabricConfig(frame_bits_per_row=5, max_frames_per_col=7, name="IrregularSmall"),
         FabricConfig(
             frame_bits_per_row=33, max_frames_per_col=21, name="IrregularLarge"
         ),
         FabricConfig(frame_bits_per_row=7, max_frames_per_col=13, name="PrimeFabric"),
-        # Large-scale configurations
         FabricConfig(
             frame_bits_per_row=256, max_frames_per_col=100, name="VeryLargeFabric"
         ),
@@ -86,12 +82,10 @@ def fabric_config(request: pytest.FixtureRequest, mocker: MockerFixture) -> Fabr
 
 @pytest.fixture(
     params=[
-        # Boundary conditions
         TileConfig("StandardTile", 16),
         TileConfig("EmptyTile", 0),
         TileConfig("MinimalTile", 1),
         TileConfig("MaxTile", 256),
-        # Non-power-of-2 configurations
         TileConfig("Irregular7Tile", 7),
         TileConfig("Irregular33Tile", 33),
     ],
@@ -165,11 +159,6 @@ class ConfigMemConfig(NamedTuple):
 
     name: str
     scenario: str
-
-
-# ---------------------------------------------------------------------------
-# Switch Matrix Testing Utilities
-# ---------------------------------------------------------------------------
 
 
 def create_switchmatrix_list(
@@ -272,7 +261,6 @@ def configmem_list(
 
         random.seed(request.param)
 
-        # Generate all possible (frame_index, bits_used) combinations
         poss = list(
             itertools.product(
                 range(fabric.maxFramesPerCol), range(fabric.frameBitsPerRow + 1)
@@ -281,7 +269,6 @@ def configmem_list(
         shuffle(poss)
         config_final = poss[: tile.globalConfigBits]
 
-        # Helper function to generate random bit mask
         def generate_mask(bits_used: int, total_bits: int) -> str:
             """Generate a random bit mask with specified number of '1's and '0's.
 
@@ -302,25 +289,20 @@ def configmem_list(
             if bits_used >= total_bits:
                 return "1" * total_bits
 
-            # Create a list with the right number of 1s and 0s
             mask_bits = ["1"] * bits_used + ["0"] * (total_bits - bits_used)
-            # Randomly shuffle the bits to create a random pattern
             shuffle(mask_bits)
 
             return "".join(mask_bits)
 
-        # Generate ConfigMem objects based on config_final
         configmems = []
         total_bits_assigned = 0
 
-        # Group config_final by frame_index to consolidate bits per frame
         frame_groups = {}
         for frame_index, bits_in_frame in config_final:
             if frame_index not in frame_groups:
                 frame_groups[frame_index] = []
             frame_groups[frame_index].append(bits_in_frame)
 
-        # Create ConfigMem objects for each frame
         for frame_index in range(fabric.maxFramesPerCol):
             if frame_index not in frame_groups:
                 configmems.append(
@@ -336,7 +318,6 @@ def configmem_list(
             bits_list = frame_groups[frame_index]
             total_bits_in_frame = len(bits_list)
 
-            # Ensure we don't exceed frame capacity
             bits_used = min(total_bits_in_frame, fabric.frameBitsPerRow)
 
             if bits_used > 0:
@@ -402,20 +383,15 @@ def cocotb_runner(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Callable:
         if len(lang) > 1:
             raise ValueError("All source files must have the same HDL language suffix")
 
-        hdl_toplevel_lang = lang.pop()  # Get the single language suffix
+        hdl_toplevel_lang = lang.pop()
         if hdl_toplevel_lang == ".v":
             sim, test_lang = "icarus", "verilog"
         elif hdl_toplevel_lang in {".vhd", ".vhdl"}:
             test_lang = "vhdl"
-            # NVC is significantly faster than GHDL; prefer it when available
-            # and fall back to GHDL. Mirrors the upstream simulation Taskfile.
             if shutil.which("nvc") is not None:
                 sim = "nvc"
             elif shutil.which("ghdl") is not None:
                 sim = "ghdl"
-                # GHDL converts identifiers to lowercase for elaboration and
-                # execution; NVC > 1.16 preserves case (cocotb passes
-                # ``--preserve-case``) so leave the toplevel alone in that case.
                 hdl_top_level = hdl_top_level.lower()
             else:
                 raise RuntimeError("No VHDL simulator available: install nvc or ghdl.")
@@ -423,16 +399,14 @@ def cocotb_runner(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Callable:
             raise ValueError(f"Unsupported HDL language: {hdl_toplevel_lang}")
         runner = get_runner(sim)
 
-        # Copy test module and models to temp directory for cocotb
         test_dir = tmp_path / "tests"
         test_dir.mkdir(exist_ok=True)
 
-        # Copy this test file to the test directory so cocotb can find it
         shutil.copy(test_module_path, test_dir / test_module_path.name)
 
-        # cocotb_tools.runner exports the parent's ``sys.path`` to the
-        # simulator subprocess as PYTHONPATH; prepend ``test_dir`` so the
-        # copied test module imports as a top-level module by its stem.
+        # cocotb_tools.runner exports the parent's sys.path to the simulator
+        # subprocess as PYTHONPATH; prepend test_dir so the copied test module
+        # imports as a top-level module by its stem.
         monkeypatch.syspath_prepend(str(test_dir))
 
         build_dir = tmp_path / "cocotb_build"
@@ -445,9 +419,6 @@ def cocotb_runner(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Callable:
         if test_lang == "verilog":
             build_kwargs["timescale"] = ("1ps", "1ps")
         elif sim == "nvc":
-            # NVC defaults to ~16 MiB heap which is exhausted while elaborating
-            # the FABulous fabric. The upstream simulation Taskfile uses the
-            # same -H/-M values; --std=2008 matches FABulous-emitted VHDL.
             build_kwargs["build_args"] = [
                 "--std=2008",
                 "-H",
@@ -459,18 +430,10 @@ def cocotb_runner(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Callable:
         runner.build(**build_kwargs)
 
         if sim == "ghdl":
-            # GHDL emits the elaborated executable into build_dir but cocotb
-            # runs the test process from build_dir too, so copying it next to
-            # the test module keeps the artefact reachable when test_dir is
-            # used as the run cwd.
             for file in build_dir.iterdir():
                 if file.is_file():
                     shutil.copy(file, test_dir / file.name)
 
-        # Pass hdl_toplevel_lang explicitly; cocotb_tools 2.x has a bug
-        # auto-detecting it from the runner's vhdl_sources attribute.
-        # Parameters reach the cocotb subprocess via simulator ``plusargs``
-        # so neither the pytest nor subprocess environment is mutated.
         runner.test(
             hdl_toplevel=hdl_top_level,
             hdl_toplevel_lang=test_lang,

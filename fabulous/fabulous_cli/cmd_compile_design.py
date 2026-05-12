@@ -50,8 +50,6 @@ compile_design_parser.add_argument(
     completer=Cmd.path_complete,
 )
 
-# Compile flow control — each --*-only flag runs exactly that step.
-# Without any flag the full flow (synth + PnR + bitgen) is executed.
 compile_design_parser.add_argument(
     "--synth-only",
     help="Only run synthesis.",
@@ -68,7 +66,6 @@ compile_design_parser.add_argument(
     action="store_true",
 )
 
-# Extra arguments passed directly to the tools
 compile_design_parser.add_argument(
     "--synth-extra-args",
     type=str,
@@ -89,7 +86,6 @@ compile_design_parser.add_argument(
     help="Extra arguments passed to the nextpnr CLI.",
 )
 
-# Extra args for bit file and logs
 compile_design_parser.add_argument(
     "-log",
     type=Path,
@@ -112,7 +108,6 @@ compile_design_parser.add_argument(
 )
 
 
-# Tool help flags
 compile_design_parser.add_argument(
     "--yosys-synth-help",
     help="Print the full synth_fabulous help from Yosys and exit.",
@@ -159,7 +154,6 @@ def do_compile_design(self: "FABulous_CLI", args: argparse.Namespace) -> None:
     the appropriate task(s) depending on the selected mode (full compile, synth-only,
     pnr-only, or no-bitgen).
     """
-    # Handle help flags
     if args.yosys_synth_help:
         ctx = get_context()
         _print_tool_help(ctx.yosys_path, ["-p", "help synth_fabulous"], "Yosys")
@@ -171,7 +165,6 @@ def do_compile_design(self: "FABulous_CLI", args: argparse.Namespace) -> None:
 
     logger.info(f"Compiling design with files {[str(i) for i in args.files]}")
 
-    # Resolve file paths
     p: Path
     paths: list[Path] = []
     for p in args.files:
@@ -184,8 +177,7 @@ def do_compile_design(self: "FABulous_CLI", args: argparse.Namespace) -> None:
             logger.error(f"{resolvePath} does not exist")
             return
 
-    # Determine output file paths — must be absolute because the task
-    # runs with cwd=.FABulous/, so relative paths would resolve wrong.
+    # Output paths must be absolute: the task runs with cwd=.FABulous/.
     json_file = args.json or paths[0].with_suffix(".json")
     if not json_file.is_absolute():
         json_file = (self.projectDir / json_file).resolve()
@@ -204,7 +196,6 @@ def do_compile_design(self: "FABulous_CLI", args: argparse.Namespace) -> None:
     if not bin_file.is_absolute():
         bin_file = (self.projectDir / bin_file).resolve()
 
-    # Check that compile Taskfile exists
     task_dir = self.projectDir / "Test"
     compile_taskfile = task_dir / "Taskfile.yml"
     if not compile_taskfile.exists():
@@ -213,7 +204,6 @@ def do_compile_design(self: "FABulous_CLI", args: argparse.Namespace) -> None:
             "Please ensure the project is set up correctly."
         )
 
-    # Build task variables
     ctx = get_context()
     task_vars: dict[str, str] = {
         "YOSYS_PATH": str(ctx.yosys_path),
@@ -233,7 +223,6 @@ def do_compile_design(self: "FABulous_CLI", args: argparse.Namespace) -> None:
         "NEXTPNR_VERBOSE": "--verbose" if (self.verbose or self.debug) else "",
     }
 
-    # Determine which task(s) to run
     if args.synth_only:
         run_task("run-yosys", task_dir, task_vars)
     elif args.pnr_only:

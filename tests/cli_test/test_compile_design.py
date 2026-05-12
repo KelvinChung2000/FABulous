@@ -68,11 +68,6 @@ def compile_cli(
     return cli
 
 
-# ---------------------------------------------------------------------------
-# Task dispatch
-# ---------------------------------------------------------------------------
-
-
 @pytest.mark.parametrize(
     ("cli_flags", "expected_tasks"),
     [
@@ -97,15 +92,8 @@ def test_compile_design_task_dispatch(
     assert mock_run_task.call_count == len(expected_tasks)
     actual_tasks = [c.args[0] for c in mock_run_task.call_args_list]
     assert actual_tasks == expected_tasks
-    # The compile flow now relies on the default Taskfile.yml lookup, so no
-    # explicit taskfile= kwarg should be forwarded.
     for call in mock_run_task.call_args_list:
         assert "taskfile" not in call.kwargs
-
-
-# ---------------------------------------------------------------------------
-# Task variables
-# ---------------------------------------------------------------------------
 
 
 def test_compile_design_task_vars(
@@ -130,7 +118,6 @@ def test_compile_design_task_vars(
     assert task_vars["NEXTPNR_PATH"] == "/usr/bin/nextpnr-generic"
     assert task_vars["FAB_PROJ_ROOT"] == str(compile_cli.projectDir)
     assert "top_wrapper.v" in task_vars["TOP_WRAPPER_FILE"]
-    # Extra-arg slots default to empty strings.
     assert task_vars["SYNTH_EXTRA_ARGS"] == ""
     assert task_vars["YOSYS_EXTRA_ARGS"] == ""
     assert task_vars["NEXTPNR_EXTRA_ARGS"] == ""
@@ -233,11 +220,6 @@ def test_compile_design_top_override(
     assert task_vars["TOP_WRAPPER"] == "my_top"
 
 
-# ---------------------------------------------------------------------------
-# Output path overrides (-json, -fasm, -bin, -log)
-# ---------------------------------------------------------------------------
-
-
 @pytest.mark.parametrize(
     ("flag", "filename", "task_var"),
     [
@@ -295,11 +277,6 @@ def test_compile_design_absolute_output_override(
     assert task_vars[task_var] == str(abs_path)
 
 
-# ---------------------------------------------------------------------------
-# Tool help flags
-# ---------------------------------------------------------------------------
-
-
 @pytest.mark.parametrize(
     ("flag", "expected_in_args"),
     [
@@ -326,11 +303,6 @@ def test_compile_design_tool_help(
     mock_run_task.assert_not_called()
     mock_subprocess.assert_called_once()
     assert expected_in_args in mock_subprocess.call_args.args[0]
-
-
-# ---------------------------------------------------------------------------
-# Error paths
-# ---------------------------------------------------------------------------
 
 
 def test_compile_design_no_taskfile(

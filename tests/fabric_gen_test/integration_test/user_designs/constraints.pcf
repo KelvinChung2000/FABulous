@@ -1,42 +1,23 @@
-# Shared PCF for FABulous demo integration tests
-#
-# The FABulous demo fabric exposes external IO via the W_IO column (X=0)
-# at Y = 1..14, with two single-bit IO_1_bidirectional_frame_config_pass
-# bels per tile (A = top, B = bottom). Each test only references a subset of
-# the signals below; placements are reused across tests because nextpnr only
-# sees the signals present in the currently-loaded design.
-#
-# Conventions used by the testbench (see conftest.PCF):
-#   set_io <signal>[<bit>] X<x>Y<y>/<bel>
-#     IN  → DUT port Tile_X<x>Y<y>_<bel>_O_top  (pad → fabric)
-#     OUT → DUT port Tile_X<x>Y<y>_<bel>_I_top  (fabric → pad)
-#     EN  → DUT port Tile_X<x>Y<y>_<bel>_T_top  (tristate enable)
-
-# Clocks / control (shared by counter + sys_reset).
 set_io clk1 X0Y1/A
 set_io rst  X0Y1/B
 set_io ena  X0Y2/A
 
-# Operand a: passthrough, addition, sys_reset.
 set_io a[0] X0Y3/A
 set_io a[1] X0Y3/B
 set_io a[2] X0Y4/A
 set_io a[3] X0Y4/B
 
-# Operand b: passthrough, sys_reset (out); addition (in).
 set_io b[0] X0Y5/A
 set_io b[1] X0Y5/B
 set_io b[2] X0Y6/A
 set_io b[3] X0Y6/B
 
-# Addition output c (5 bits).
 set_io c[0] X0Y7/A
 set_io c[1] X0Y7/B
 set_io c[2] X0Y8/A
 set_io c[3] X0Y8/B
 set_io c[4] X0Y9/A
 
-# Counter output d (8 bits).
 set_io d[0] X0Y10/A
 set_io d[1] X0Y10/B
 set_io d[2] X0Y11/A
@@ -46,12 +27,8 @@ set_io d[5] X0Y12/B
 set_io d[6] X0Y13/A
 set_io d[7] X0Y13/B
 
-# Multiplication: mult_a, mult_b → product. Width is held to 3 bits per
-# operand (6-bit product) — at 4 bits the LUT-based multiplier triggers a
-# SimFailure in icarus on the demo fabric (the bitstream upload causes the
-# vvp run to exit before completing). nextpnr will also map this onto LUTs
-# rather than the DSP because the demo's MULADD has different signal
-# names; see the spec follow-ups.
+# Multiplication width is held to 3 bits per operand — at 4 bits the
+# LUT-based multiplier triggers a SimFailure in icarus on the demo fabric.
 set_io mult_a[0] X0Y3/A
 set_io mult_a[1] X0Y3/B
 set_io mult_a[2] X0Y4/A
@@ -65,7 +42,6 @@ set_io product[3] X0Y8/B
 set_io product[4] X0Y9/A
 set_io product[5] X0Y9/B
 
-# Bitstream-only constant outputs (all_ones / all_zeros).
 set_io all[0] X0Y3/A
 set_io all[1] X0Y3/B
 set_io all[2] X0Y4/A

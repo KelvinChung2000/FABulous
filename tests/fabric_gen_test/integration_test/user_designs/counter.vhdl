@@ -1,10 +1,6 @@
--- VHDL mirror of counter.v.
--- The Global_Clock instance lands the clock on the demo fabric's global
--- clock network (the same wire fed by the eFPGA's top-level UserCLK). We
--- declare Global_Clock as a *component* with no backing entity body; the
--- GHDL Yosys plugin treats unbound component instantiations as blackboxes
--- and synth_fabulous then tech-maps the instance to the dedicated clock
--- bel. See ghdl-yosys-plugin/testsuite/examples/blackbox/blackbox1.vhdl.
+-- Global_Clock is declared as an unbound component so the GHDL Yosys plugin
+-- imports it as a blackbox and synth_fabulous tech-maps the instance to the
+-- dedicated clock bel.
 
 library ieee;
   use ieee.std_logic_1164.all;

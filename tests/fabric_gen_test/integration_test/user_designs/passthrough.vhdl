@@ -1,7 +1,3 @@
--- VHDL mirror of passthrough.v.
--- 4-bit width chosen to match the overlapping signal placements in the
--- shared constraints.pcf.
-
 library ieee;
   use ieee.std_logic_1164.all;
 

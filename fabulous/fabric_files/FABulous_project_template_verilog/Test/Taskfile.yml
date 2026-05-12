@@ -55,7 +55,7 @@ tasks:
     desc: Run FABulous to generate the default fabric
     cmds:
       - FABulous {{.FAB_PROJ_ROOT}} -fs {{.FAB_PROJ_ROOT}}/FABulous.tcl
-      # Re-create build dirs after FABulous (it removes them during simulation)
+      # FABulous removes build dirs during simulation; re-create afterwards.
       - mkdir -p {{.BUILD_DIR}} {{.FABRIC_FILES_DIR}}
       - mv -f {{.DESIGN}}.hex {{.BUILD_DIR}}/
       - mv -f {{.DESIGN}}.fst {{.BUILD_DIR}}/

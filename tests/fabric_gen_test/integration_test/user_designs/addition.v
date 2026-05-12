@@ -1,5 +1,3 @@
-// Adapted from mole99/tt-fabulous-ihp-26a for the FABulous demo fabric.
-
 `default_nettype none
 
 module addition (

@@ -1,8 +1,4 @@
--- VHDL mirror of sys_reset.v.
--- Latches the magic constant 0x7 while `rst` is asserted; otherwise tracks
--- `a` on each rising edge. Global_Clock is declared as an unbound
--- component so the GHDL Yosys plugin imports it as a blackbox and
--- synth_fabulous tech-maps it (see counter.vhdl for the same idiom).
+-- See counter.vhdl for the Global_Clock blackbox idiom.
 
 library ieee;
   use ieee.std_logic_1164.all;

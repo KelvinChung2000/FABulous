@@ -1,24 +1,4 @@
-"""Shared fixtures and cocotb-time helpers for FABulous integration tests.
-
-The module bundles two things that integration tests need:
-
-* the :class:`PCF` class and the :func:`upload_bitstream` / :func:`zero_bitstream`
-  coroutines that drive a generated fabric DUT inside a cocotb simulation, and
-* pytest fixtures that orchestrate the end-to-end flow (generate a demo
-  project, run FABulous, hand the resulting bitstream + sources off to the
-  ``cocotb_runner`` fixture defined one level up).
-
-The cocotb-time helpers are ported from
-``mole99/tt-fabulous-ihp-26a/tb/testcases/common.py`` (Apache-2.0,
-© 2026 FABulous Contributors / Leo Moser) and reworked to follow FABulous
-coding taste: ``loguru`` for logging, ``pathlib`` paths, explicit type hints,
-NumPy-style docstrings.
-
-Cocotb test modules under ``tests/fabric_gen_test/integration_test/`` import
-the helpers via ``from conftest import PCF, upload_bitstream, zero_bitstream``;
-when the orchestration fixture invokes ``cocotb_runner`` it copies this file
-next to the test module so the simulator-side ``import conftest`` resolves.
-"""
+"""Shared fixtures and cocotb-time helpers for FABulous integration tests."""
 
 # cspell:words tilex tiley netlist Gtkw gtkw cocotb noqa hdl pnr bitgen
 
@@ -53,13 +33,9 @@ def _disable_pdk_download(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> No
     monkeypatch.setattr(subprocess, "run", scrubbing_run)
 
 
-# --------------------------------------------------------------------------- #
-# Bitstream protocol constants                                                #
-# --------------------------------------------------------------------------- #
-
 FRAME_BITS_PER_ROW: int = 32
 MAX_FRAMES_PER_COL: int = 20
-FRAME_SELECT_WIDTH: int = 5  # hardcoded, derived from FABRIC_NUM_COLUMNS
+FRAME_SELECT_WIDTH: int = 5
 
 BITSTREAM_START: int = 0xFAB0FAB1
 DESYNC_FLAG: int = 20
@@ -78,10 +54,6 @@ class FabricClockedDUT(FabricConfigDUT, Protocol):
     UserCLK: LogicObject
 
 
-# --------------------------------------------------------------------------- #
-# PCF parsing and DUT signal resolution                                       #
-# --------------------------------------------------------------------------- #
-
 # set_io <signal>[<index>] X<tile_x>Y<tile_y>/<bel>
 _PCF_LINE_RE = re.compile(
     r"\s*set_io\s+(?P<signal>\w+)(\[(?P<index>\d+)?\])?\s+"
@@ -89,24 +61,14 @@ _PCF_LINE_RE = re.compile(
 )
 
 # Tile_X<tile_x>Y<tile_y>_<bel>_<port>_top[<bit_index>]
-#
-# FABulous's W_IO/IO_1_bidirectional_frame_config_pass bel exposes three top-level
-# ports per instance:
-#
-#   I_top  — fabric drives this OUT to the external pad   (testbench reads it)
-#   O_top  — external pad drives this IN to the fabric    (testbench writes it)
-#   T_top  — tristate enable, fabric drives
-#
-# Upstream mole99's naming is testbench-centric ("IN" means the testbench's
-# read direction, which is the fabric's output side). Map accordingly so a
-# PCF written for the upstream convention works against vanilla FABulous.
 _PORT_NAME_RE = re.compile(
     r"^Tile_X(?P<tilex>\d+)Y(?P<tiley>\d+)_(?P<bel>\w)_"
     r"(?P<port>I|O|T)_top(?P<bit>\d*)$",
     re.IGNORECASE,
 )
 
-# PCF semantic direction → FABulous bel top-port letter.
+# PCF semantic direction → FABulous bel top-port letter (I_top is fabric→pad,
+# so reads from the fabric map to OUT; O_top is pad→fabric, so IN drives it).
 _USE_TO_PORT: dict[str, str] = {"IN": "I", "OUT": "O", "EN": "T"}
 
 
@@ -127,11 +89,6 @@ class PCF:
     tile-relative ports, which keeps the test code portable across fabric
     layouts.
 
-    FABulous bit-indexes external ports as `..._top<bit_index>` (e.g.
-    `Tile_X1Y2_A_IN_top0`). The mole99 implementation expected a plain
-    `..._top` suffix; this port handles both forms so it works against
-    vanilla FABulous output and against the IHP-26A fabric variant.
-
     Parameters
     ----------
     dut : HierarchyObject
@@ -139,20 +96,10 @@ class PCF:
     file : Path
         Path to a FABulous `.pcf` constraint file produced by the design
         flow (typically `<design>.pcf` or `.FABulous/template.pcf`).
-
-    Attributes
-    ----------
-    top : str
-        Name of the DUT top-level module (used by `write_gtkw`).
-    signals : dict[str, dict[int, dict[str, LogicObject]]]
-        `{signal_name: {bit_index: {"IN": handle, "OUT": handle,
-        "EN": handle}}}`.
     """
 
     def __init__(self, dut: HierarchyObject, file: Path) -> None:
         file = Path(file)
-        # cocotb exposes `_name` as the canonical handle identifier;
-        # the leading underscore avoids clashes with HDL signal names.
         self.top: str = dut._name  # noqa: SLF001
         self.signals: dict[str, dict[int, dict[str, LogicObject]]] = {}
 
@@ -196,8 +143,6 @@ class PCF:
 
         entry = {"IN": dut_in, "OUT": dut_out, "EN": dut_en}
         self.signals.setdefault(signal, {})[index] = entry
-        # Keep deterministic ordering so iteration matches the bit order users
-        # expect when reading multi-bit signals.
         self.signals[signal] = dict(sorted(self.signals[signal].items()))
 
     def _find_signal(
@@ -271,11 +216,6 @@ class PCF:
         return self.signals[signal][index][use]
 
 
-# --------------------------------------------------------------------------- #
-# Cocotb-time helpers (bitstream upload)                                      #
-# --------------------------------------------------------------------------- #
-
-
 async def zero_bitstream(dut: FabricConfigDUT, delay_ns: int = 10) -> None:
     """Drive an all-zeros frame across every column to clear configuration.
 
@@ -337,7 +277,6 @@ async def upload_bitstream(
     )
 
     with bitstream_path.open("rb") as f:
-        # Skip header words until the sync marker is seen.
         synced = False
         while data := f.read(4):
             if int.from_bytes(data, "big") == BITSTREAM_START:
@@ -349,7 +288,6 @@ async def upload_bitstream(
                 f"Sync word 0x{BITSTREAM_START:08X} not found in {bitstream_path}"
             )
 
-        # Stream frame payload until a desync header arrives or the file ends.
         while True:
             data = f.read(4)
             if not data:
@@ -359,9 +297,9 @@ async def upload_bitstream(
                 break
 
             header = int.from_bytes(data, "big")
-            column_select = (header >> 27) & 0x1F  # bits [31:27]
-            sync_bit = (header >> DESYNC_FLAG) & 0x1  # bit 20
-            frame_strobe = header & 0xFFFFF  # bits [19:0]
+            column_select = (header >> 27) & 0x1F
+            sync_bit = (header >> DESYNC_FLAG) & 0x1
+            frame_strobe = header & 0xFFFFF
 
             if sync_bit:
                 logger.debug("Detected DESYNC flag, ending upload")
@@ -381,7 +319,6 @@ async def upload_bitstream(
 
         logger.info(f"Bitstream upload completed ({framestrobe_bits} strobe bits)")
 
-        # Park the config ports.
         dut.FrameData.value = 0
         dut.FrameStrobe.value = 0
         await Timer(delay_ns, unit="ns")
@@ -418,21 +355,14 @@ async def setup_fabric(dut: FabricConfigDUT, settle_ns: int = 10) -> PCF:
     return pcf
 
 
-# --------------------------------------------------------------------------- #
-# Pytest orchestration: shared constants and source collection                #
-# --------------------------------------------------------------------------- #
-
-
 def _collect_fabric_sources(project_dir: Path, suffix: str) -> list[Path]:
     """Return every HDL source emitted under ``Fabric/`` and ``Tile/``.
 
     FABulous emits the same module (e.g. ``Config_access.v``) under multiple
-    tile directories with identical content. The reference iverilog flow
-    deduplicates by basename via ``cp -n`` (no-clobber); this function does
-    the same so the simulator sees one definition per module name.
+    tile directories with identical content; deduplicate by basename so the
+    simulator sees one definition per module name.
     """
-    # NVC analyzes files in command-line order and rejects forward references,
-    # so the FABulous-wide `models_pack` package must come first.
+    # NVC rejects forward references, so the models_pack package must come first.
     fabric_paths = sorted((project_dir / "Fabric").glob(f"*{suffix}"))
     package_paths = [p for p in fabric_paths if p.stem == "models_pack"]
     other_fabric_paths = [p for p in fabric_paths if p.stem != "models_pack"]

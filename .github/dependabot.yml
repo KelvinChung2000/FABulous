@@ -1,14 +1,15 @@
 version: 2
 updates:
   - package-ecosystem: "uv"
-    directory: "/"
+    directories:
+      - "/"
+      - "/docs"
     schedule:
       interval: "weekly"
       day: "monday"
-    open-pull-requests-limit: 10
+    open-pull-requests-limit: 2
     labels:
       - "dependencies"
-      - "python"
     groups:
       minor-and-patch:
         update-types:
@@ -18,29 +19,7 @@ updates:
         update-types:
           - "major"
     commit-message:
-      prefix: "chore(deps)"
-      include: "scope"
-
-  - package-ecosystem: "uv"
-    directory: "/docs"
-    schedule:
-      interval: "weekly"
-      day: "monday"
-    open-pull-requests-limit: 5
-    labels:
-      - "dependencies"
-      - "python"
-      - "documentation"
-    groups:
-      minor-and-patch:
-        update-types:
-          - "minor"
-          - "patch"
-      major:
-        update-types:
-          - "major"
-    commit-message:
-      prefix: "chore(deps)"
+      prefix: "chore"
       include: "scope"
 
   - package-ecosystem: "nix"
@@ -48,10 +27,9 @@ updates:
     schedule:
       interval: "weekly"
       day: "monday"
-    open-pull-requests-limit: 5
+    open-pull-requests-limit: 2
     labels:
       - "dependencies"
-      - "nix"
     groups:
       minor-and-patch:
         update-types:
@@ -61,43 +39,19 @@ updates:
         update-types:
           - "major"
     commit-message:
-      prefix: "chore(deps)"
-      include: "scope"
-
-  - package-ecosystem: "nix"
-    directory: "/fabulous_nix"
-    schedule:
-      interval: "weekly"
-      day: "monday"
-    open-pull-requests-limit: 5
-    labels:
-      - "dependencies"
-      - "nix"
-    groups:
-      minor-and-patch:
-        update-types:
-          - "minor"
-          - "patch"
-      major:
-        update-types:
-          - "major"
-    commit-message:
-      prefix: "chore(deps)"
+      prefix: "chore"
       include: "scope"
 
   - package-ecosystem: "github-actions"
     directories:
       - "/"
-      - "/.github/actions/prepare_nix_environment"
-      - "/.github/actions/prepare_FABulous_container"
-      - "/.github/actions/create_failure_issue"
+      - "/.github/**/*"
     schedule:
       interval: "weekly"
       day: "monday"
-    open-pull-requests-limit: 5
+    open-pull-requests-limit: 2
     labels:
       - "dependencies"
-      - "github-actions"
     groups:
       minor-and-patch:
         update-types:
@@ -107,5 +61,5 @@ updates:
         update-types:
           - "major"
     commit-message:
-      prefix: "chore(deps)"
+      prefix: "chore"
       include: "scope"

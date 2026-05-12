@@ -138,13 +138,13 @@ class FABulousTileVerilogMacroFlow(SequentialFlow):
                 custom_config_overrides["FABULOUS_OPT_MODE"]
             )
 
-        default_design_dir = tile_type.tileDir.parent / "macro" / opt_mode.value
-        default_design_dir.mkdir(parents=True, exist_ok=True)
-        final_dir: str
-        if design_dir is None:
-            final_dir = str(default_design_dir.resolve())
-        else:
-            final_dir = str(design_dir)
+        final_dir_path = (
+            Path(str(design_dir))
+            if design_dir is not None
+            else tile_type.tileDir.parent / "macro" / opt_mode.value
+        )
+        final_dir_path.mkdir(parents=True, exist_ok=True)
+        final_dir = str(final_dir_path.resolve())
 
         configs = [
             i

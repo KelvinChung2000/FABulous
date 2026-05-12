@@ -17,15 +17,15 @@ repos:
       - id: check-toml
       - id: no-commit-to-branch
 
-  # - repo: https://github.com/PyCQA/docformatter.git
-  #   rev: "v1.7.8"
-  #   hooks:
-  #     - id: docformatter
-  #       name: docformatter
-  #       description: "Formats docstrings to follow PEP 257."
-  #       args: [--in-place, --non-strict]
-  #       language: python
-  #       types: [python]
+  - repo: https://github.com/PyCQA/docformatter.git
+    rev: "v1.7.8"
+    hooks:
+      - id: docformatter
+        name: docformatter
+        description: "Formats docstrings to follow PEP 257."
+        args: [--in-place, --wrap-descriptions=88, --wrap-summaries=88]
+        language: python
+        types: [python]
 
   - repo: local
     hooks:

@@ -270,16 +270,6 @@ class YosysJson:
         # VHDL files are converted to Verilog by GHDL, so use .v suffix for yosys
         # Verilog/SystemVerilog files use their original suffix
         if self.srcPath.suffix in {".vhd", ".vhdl"}:
-            entity_match = re.search(
-                r"^\s*entity\s+(\w+)\s+is\b",
-                self.srcPath.read_text(),
-                flags=re.IGNORECASE | re.MULTILINE,
-            )
-            if entity_match is None:
-                raise RuntimeError(
-                    f"No VHDL entity declaration found in {self.srcPath}"
-                )
-            entity_name = entity_match.group(1)
             runCmd = [
                 f"{ghdl!s}",
                 "--synth",
@@ -289,7 +279,7 @@ class YosysJson:
                 f"{get_context().models_pack!s}",
                 f"{self.srcPath}",
                 "-e",
-                entity_name,
+                f"{self.srcPath.stem}",
             ]
             try:
                 r = subprocess.run(runCmd, check=True, capture_output=True)

@@ -209,8 +209,9 @@ def test_configmem_rtl_with_generated_configmem_simulation(
     with config_info_file.open("w") as f:
         json.dump(bit_mapping, f, indent=2)
 
+    models_source = Path(__file__).parent.parent / "testdata" / f"models{hdl_lang}"
     cocotb_runner(
-        sources=[writer.outFileName],
+        sources=[models_source, writer.outFileName],
         hdl_top_level=f"{tile_config.name}_ConfigMem",
         test_module_path=Path(__file__),
     )
@@ -295,8 +296,9 @@ def test_configmem_rtl_with_custom_configmem_simulation(
         json.dump(bit_mapping, f, indent=2)
 
     # Set up cocotb simulation and run using the factory fixture
+    models_source = Path(__file__).parent.parent / "testdata" / f"models{hdl_lang}"
     cocotb_runner(
-        sources=[writer.outFileName],
+        sources=[models_source, writer.outFileName],
         hdl_top_level=f"{default_tile.name}_ConfigMem",
         test_module_path=Path(__file__),
     )

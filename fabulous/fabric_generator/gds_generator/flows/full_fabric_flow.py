@@ -95,6 +95,7 @@ def _run_tile_flow_worker(
     pdk: str,
     pdk_root: Path,
     models_pack: Path | None,
+    design_dir: Path | None = None,
     **custom_config_overrides: dict,
 ) -> WorkerResult:
     """Worker function to run a tile flow in a separate process.
@@ -120,6 +121,9 @@ def _run_tile_flow_worker(
         The root directory of the PDK.
     models_pack : Path | None
         Optional path to the models pack file required for compilation.
+    design_dir : Path | None
+        Override the flow's design directory. When ``None``, the default
+        ``<tile>/macro/<opt_mode>`` location is used.
     **custom_config_overrides : dict
         Any software overrides for the flow configuration.
 
@@ -140,6 +144,7 @@ def _run_tile_flow_worker(
             models_pack_path=models_pack,
             base_config_path=base_config_path,
             override_config_path=override_config_path,
+            design_dir=design_dir,
             **custom_config_overrides,
         )
         state: State = flow.start()
@@ -439,6 +444,9 @@ class FABulousFabricMacroFullFlow(Flow):
                 die_area: tuple[int, int, Decimal, Decimal] = nlp_state.metrics[
                     "nlp__tile__area"
                 ][tile_type.name]
+                optimised_design_dir: Path = (
+                    tile_type.tileDir.parent / "macro" / "fabric_optmised"
+                )
                 # Submit tile compilation with optimal dimensions
                 result: Future[WorkerResult] = executor.submit(
                     _run_tile_flow_worker,
@@ -450,6 +458,7 @@ class FABulousFabricMacroFullFlow(Flow):
                     get_context().pdk,
                     get_context().pdk_root,
                     get_context().models_pack,
+                    design_dir=optimised_design_dir,
                     DIE_AREA=die_area,
                 )
                 handlers.append((result, tile_type))

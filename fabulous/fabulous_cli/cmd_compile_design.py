@@ -89,6 +89,29 @@ compile_design_parser.add_argument(
     help="Extra arguments passed to the nextpnr CLI.",
 )
 
+# Extra args for bit file and logs
+compile_design_parser.add_argument(
+    "-log",
+    type=Path,
+    help="Set log output file path",
+    completer=Cmd.path_complete,
+)
+
+compile_design_parser.add_argument(
+    "-fasm",
+    type=Path,
+    help="Set fasm output file path",
+    completer=Cmd.path_complete,
+)
+
+compile_design_parser.add_argument(
+    "-bit",
+    type=Path,
+    help="Set bit file output file path",
+    completer=Cmd.path_complete,
+)
+
+
 # Tool help flags
 compile_design_parser.add_argument(
     "--yosys-synth-help",
@@ -166,8 +189,14 @@ def do_compile_design(self: "FABulous_CLI", args: argparse.Namespace) -> None:
     json_file = args.json or paths[0].with_suffix(".json")
     if not json_file.is_absolute():
         json_file = (self.projectDir / json_file).resolve()
-    fasm_file = json_file.with_suffix(".fasm")
-    log_file = json_file.parent / (json_file.with_suffix("").name + "_npnr_log.txt")
+    fasm_file = args.fasm or json_file.with_suffix(".fasm")
+    if not fasm_file.is_absolute():
+        fasm_file = (self.projectDir / fasm_file).resolve()
+    log_file = args.log or json_file.parent / (
+        json_file.with_suffix("").name + "_npnr_log.txt"
+    )
+    if not log_file.is_absolute():
+        log_file = (self.projectDir / log_file).resolve()
 
     # Check that compile Taskfile exists
     task_dir = self.projectDir / "Test"

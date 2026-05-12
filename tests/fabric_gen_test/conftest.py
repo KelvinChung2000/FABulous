@@ -418,9 +418,7 @@ def cocotb_runner(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Callable:
                 # ``--preserve-case``) so leave the toplevel alone in that case.
                 hdl_top_level = hdl_top_level.lower()
             else:
-                raise RuntimeError(
-                    "No VHDL simulator available: install nvc or ghdl."
-                )
+                raise RuntimeError("No VHDL simulator available: install nvc or ghdl.")
         else:
             raise ValueError(f"Unsupported HDL language: {hdl_toplevel_lang}")
         runner = get_runner(sim)

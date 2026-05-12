@@ -4,15 +4,18 @@
 -- entries `set_io all[N] …` still bind.
 
 library ieee;
-use ieee.std_logic_1164.all;
+  use ieee.std_logic_1164.all;
 
 entity all_ones is
   port (
-    \all\ : out std_logic_vector(3 downto 0)
+    \all\ : out   std_logic_vector(3 downto 0)
   );
-end entity;
+end entity all_ones;
 
 architecture rtl of all_ones is
+
 begin
+
   \all\ <= (others => '1');
-end architecture;
+
+end architecture rtl;

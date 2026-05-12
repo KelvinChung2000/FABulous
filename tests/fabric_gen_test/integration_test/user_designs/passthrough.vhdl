@@ -3,16 +3,19 @@
 -- shared constraints.pcf.
 
 library ieee;
-use ieee.std_logic_1164.all;
+  use ieee.std_logic_1164.all;
 
 entity passthrough is
   port (
-    a : in  std_logic_vector(3 downto 0);
-    b : out std_logic_vector(3 downto 0)
+    a : in    std_logic_vector(3 downto 0);
+    b : out   std_logic_vector(3 downto 0)
   );
-end entity;
+end entity passthrough;
 
 architecture rtl of passthrough is
+
 begin
+
   b <= a;
-end architecture;
+
+end architecture rtl;

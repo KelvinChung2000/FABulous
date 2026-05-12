@@ -6,6 +6,7 @@ on:
       - 'fabulous/**'
       - 'tests/**'
       - 'pyproject.toml'
+      - 'uv.lock'
       - '.github/workflows/pytest_testing.yml'
       - '.github/actions/**'
   pull_request:
@@ -13,6 +14,7 @@ on:
       - 'fabulous/**'
       - 'tests/**'
       - 'pyproject.toml'
+      - 'uv.lock'
       - '.github/workflows/pytest_testing.yml'
       - '.github/actions/**'
 

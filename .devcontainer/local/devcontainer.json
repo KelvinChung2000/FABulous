@@ -1,6 +1,6 @@
 {
     "name": "Local",
-    "image": "ghcr.io/fpga-research/fabulous:dev",
+    "image": "ghcr.io/fpga-research/fabulous:latest",
     "features": {
         "ghcr.io/devcontainers/features/desktop-lite:1": {
             "password": "fabulous",

@@ -15,7 +15,6 @@ import shutil
 import subprocess
 import sys
 import tarfile
-import tempfile
 from collections.abc import Callable, Sequence
 from concurrent import futures
 from importlib import resources
@@ -182,22 +181,13 @@ def create_project(project_dir: Path, lang: HDLType = HDLType.VERILOG) -> None:
     project_dir.mkdir(parents=True, exist_ok=True)
     (project_dir / ".FABulous").mkdir(parents=True, exist_ok=True)
 
-    # Copy templates from package resources using shutil.copytree
-    # Use a robust approach that works in all environments
     def _copy_template_safely(template_ref: Traversable, target_dir: Path) -> None:
-        """Copy template files safely, handling different installation environments."""
-        try:
-            # Try direct copy first (works in development/editable installs)
-            with resources.as_file(template_ref) as template_src:
-                shutil.copytree(template_src, target_dir, dirs_exist_ok=True)
-        except (OSError, PermissionError, shutil.Error) as e:
-            # Fallback: extract to temp directory first (works with wheels, frozen apps)
-            logger.debug(f"Direct copy failed ({e}), using temp directory fallback")
-            with tempfile.TemporaryDirectory() as temp_dir:
-                temp_template = Path(temp_dir) / "template"
-                with resources.as_file(template_ref) as template_src:
-                    shutil.copytree(template_src, temp_template)
-                shutil.copytree(temp_template, target_dir, dirs_exist_ok=True)
+        """Copy a packaged template into `target_dir` with writable permissions."""
+        with resources.as_file(template_ref) as template_src:
+            shutil.copytree(template_src, target_dir, dirs_exist_ok=True)
+        target_dir.chmod(0o755)
+        for path in target_dir.rglob("*"):
+            path.chmod(0o755 if path.is_dir() else 0o644)
 
     # Copy common template first
     _copy_template_safely(common_template_ref, project_dir)

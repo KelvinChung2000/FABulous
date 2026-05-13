@@ -239,7 +239,7 @@
             ];
             devshell.startup.fabulous-setup = {
               text = ''
-                export REPO_ROOT=$(git rev-parse --show-toplevel)
+                [ -n "''${REPO_ROOT:-}" ] || export REPO_ROOT="${toString ./.}"
                 ORIGINAL_PS1="$PS1"
 
                 . ${virtualenv}/bin/activate

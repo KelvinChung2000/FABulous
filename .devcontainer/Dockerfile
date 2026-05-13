@@ -25,7 +25,7 @@ RUN su - nixuser -c 'curl -L https://nixos.org/nix/install | sh -s -- --no-daemo
 WORKDIR /build
 COPY --chown=nixuser:nixuser flake.nix flake.lock ./
 COPY --chown=nixuser:nixuser nix/ ./nix/
-COPY --chown=nixuser:nixuser pyproject.toml uv.lock ./
+COPY --chown=nixuser:nixuser pyproject.toml uv.lock build_hooks.py ./
 COPY --chown=nixuser:nixuser fabulous/ ./fabulous/
 
 # Build dev shell profile as nixuser and clean up to reduce image size

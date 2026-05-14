@@ -90,7 +90,12 @@ class FABulousSettings(BaseSettings):
     # GDS variables
     pdk_root: Path | None = Field(
         default=None,
-        description="Root directory of the PDK installation",
+        description=(
+            "Path to the PDK family directory . "
+            "When unset for a ciel-managed PDK it is auto-resolved to "
+            "`<ciel_home>/<family>`; the install dir for the active "
+            "variant is then at ``pdk_root/<pdk>``."
+        ),
     )
     pdk: str | None = Field(
         default=None,

@@ -4,13 +4,15 @@ This module contains tests for various CLI commands including fabric generation,
 generation, bitstream creation, simulation execution, and GUI commands.
 """
 
+import os
 from pathlib import Path
 
 import pytest
 from pytest_mock import MockerFixture
 
 from fabulous.fabulous_cli.fabulous_cli import FABulous_CLI
-from fabulous.fabulous_settings import init_context
+from fabulous.fabulous_cli.helper import create_project, setup_logger
+from fabulous.fabulous_settings import init_context, reset_context
 from tests.cli_test.conftest import MOCK_COMPLETED_PROCESS, TILE, find_task_calls
 from tests.conftest import (
     normalize_and_check_for_errors,
@@ -331,3 +333,82 @@ def test_exit_code_reset_after_error(cli: FABulous_CLI) -> None:
     run_cmd(cli, "load_fabric")
 
     assert cli.exit_code == 0, "Exit code should be reset after successful command"
+
+
+# ---------------------------------------------------------------------------
+# start_klayout_gui — regression coverage for issue #764
+#
+# ``pdk_root`` is the PDK family directory; the install dir for the active
+# variant lives at ``pdk_root/<pdk>``. The command must point klayout at
+# ``pdk_root/<pdk>/libs.tech/klayout/tech/<lyp>``, and the IHP filename must
+# be ``sg13g2.lyp`` — not the ``sg12g2.lyp`` typo that was there before.
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.parametrize(
+    ("pdk", "family", "lyp", "auto_resolve_pdk_root"),
+    [
+        pytest.param(
+            "ihp-sg13g2",
+            "ihp-sg13g2",
+            "sg13g2.lyp",
+            True,
+            id="ihp_sg13g2_fresh_ciel_install",
+        ),
+        pytest.param(
+            "sky130A",
+            "sky130",
+            "sky130A.lyp",
+            False,
+            id="sky130A_explicit_pdk_root",
+        ),
+    ],
+)
+def test_start_klayout_gui_layer_file(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    mocker: MockerFixture,
+    pdk: str,
+    family: str,
+    lyp: str,
+    auto_resolve_pdk_root: bool,
+) -> None:
+    """The layer file resolves to ``pdk_root/<pdk>/libs.tech/klayout/tech/<lyp>``.
+
+    Covers both branches: ciel auto-resolution of ``pdk_root`` (fresh
+    install) and an explicit ``FAB_PDK_ROOT``. The IHP case also pins
+    the ``sg13g2.lyp`` filename so the ``sg12g2.lyp`` typo can't return.
+    """
+    reset_context()
+    for key in list(os.environ.keys()):
+        if key.startswith("FAB_"):
+            monkeypatch.delenv(key, raising=False)
+
+    # tests/conftest.py patches get_ciel_home() to ``tmp_path/.ciel``.
+    pdk_root = tmp_path / ".ciel" / family
+    expected_layer_file = (
+        pdk_root / pdk / "libs.tech" / "klayout" / "tech" / lyp
+    )
+    expected_layer_file.parent.mkdir(parents=True, exist_ok=True)
+    expected_layer_file.touch()
+
+    monkeypatch.setenv("FAB_PDK", pdk)
+    if not auto_resolve_pdk_root:
+        monkeypatch.setenv("FAB_PDK_ROOT", str(pdk_root))
+
+    gds_file = tmp_path / "fabric.gds"
+    gds_file.touch()
+    run_mock = mocker.patch("subprocess.run", return_value=MOCK_COMPLETED_PROCESS)
+
+    project_dir = tmp_path / "proj"
+    create_project(project_dir)
+    init_context(project_dir)
+    setup_logger(0, False)
+    cli = FABulous_CLI(
+        "verilog", force=False, interactive=False, verbose=False, debug=True
+    )
+    run_cmd(cli, f"start_klayout_gui {gds_file}")
+
+    cmd: list[str] = run_mock.call_args.args[0]
+    assert "-l" in cmd, f"klayout invocation missing -l: {cmd}"
+    assert Path(cmd[cmd.index("-l") + 1]) == expected_layer_file

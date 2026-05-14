@@ -20,6 +20,9 @@ from fabulous.fabric_generator.gds_generator.steps.diodes_on_ports import (
 from fabulous.fabric_generator.gds_generator.steps.extract_pdk_info import (
     ExtractPDKInfo,
 )
+from fabulous.fabric_generator.gds_generator.steps.magic_streamout import (
+    FABulousMagicStreamOut,
+)
 
 prep_steps: list[type[Step]] = [
     Verilator.Lint,
@@ -86,7 +89,7 @@ physical_steps: list[type[Step]] = [
 ]
 
 write_out_steps: list[type[Step]] = [
-    Magic.StreamOut,
+    FABulousMagicStreamOut,
     KLayout.StreamOut,
     Magic.WriteLEF,
 ]
@@ -125,7 +128,7 @@ classic_gating_config_vars: dict[str, list[str]] = {
     "OpenROAD.FillInsertion": ["RUN_FILL_INSERTION"],
     "OpenROAD.STAPostPNR": ["RUN_MCSTA"],
     "OpenROAD.IRDropReport": ["RUN_IRDROP_REPORT"],
-    "Magic.StreamOut": ["RUN_MAGIC_STREAMOUT"],
+    "Magic.FABulousStreamOut": ["RUN_MAGIC_STREAMOUT"],
     "KLayout.StreamOut": ["RUN_KLAYOUT_STREAMOUT"],
     "Magic.WriteLEF": ["RUN_MAGIC_WRITE_LEF"],
     "Magic.DRC": ["RUN_MAGIC_DRC"],

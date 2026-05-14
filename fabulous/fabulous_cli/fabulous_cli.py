@@ -89,6 +89,18 @@ CMD_SCRIPT = "Script"
 CMD_TOOLS = "Tools"
 CMD_TIMING_MODEL = "Timing Characterization"
 
+# klayout layer property file naming differs by PDK:
+# - ihp-sg13g2 ships sg13g2.lyp under its single-variant install dir.
+# - gf180mcu ships a single gf180mcu.lyp shared by every variant (A/B/C/D).
+# - Other PDKs (e.g. sky130A/B) follow the variant-name convention.
+KLAYOUT_LAYER_FILE_NAMES: dict[str, str] = {
+    "ihp-sg13g2": "sg13g2.lyp",
+    "gf180mcuA": "gf180mcu.lyp",
+    "gf180mcuB": "gf180mcu.lyp",
+    "gf180mcuC": "gf180mcu.lyp",
+    "gf180mcuD": "gf180mcu.lyp",
+}
+
 
 INTO_STRING = rf"""
      ______      ____        __
@@ -1566,9 +1578,7 @@ class FABulous_CLI(Cmd):
             gds_file = args.file
         pdk_name = cast("str", get_context().pdk)
         pdk_root = cast("Path", get_context().pdk_root)
-        layer_file_name = (
-            "sg13g2.lyp" if pdk_name == "ihp-sg13g2" else f"{pdk_name}.lyp"
-        )
+        layer_file_name = KLAYOUT_LAYER_FILE_NAMES.get(pdk_name, f"{pdk_name}.lyp")
         layer_file = (
             pdk_root / pdk_name / "libs.tech" / "klayout" / "tech" / layer_file_name
         )

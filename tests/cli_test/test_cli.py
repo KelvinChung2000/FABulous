@@ -335,16 +335,6 @@ def test_exit_code_reset_after_error(cli: FABulous_CLI) -> None:
     assert cli.exit_code == 0, "Exit code should be reset after successful command"
 
 
-# ---------------------------------------------------------------------------
-# start_klayout_gui — regression coverage for issue #764
-#
-# ``pdk_root`` is the PDK family directory; the install dir for the active
-# variant lives at ``pdk_root/<pdk>``. The command must point klayout at
-# ``pdk_root/<pdk>/libs.tech/klayout/tech/<lyp>``, and the IHP filename must
-# be ``sg13g2.lyp`` — not the ``sg12g2.lyp`` typo that was there before.
-# ---------------------------------------------------------------------------
-
-
 @pytest.mark.parametrize(
     ("pdk", "family", "lyp", "auto_resolve_pdk_root"),
     [
@@ -362,6 +352,20 @@ def test_exit_code_reset_after_error(cli: FABulous_CLI) -> None:
             False,
             id="sky130A_explicit_pdk_root",
         ),
+        pytest.param(
+            "gf180mcuD",
+            "gf180mcu",
+            "gf180mcu.lyp",
+            True,
+            id="gf180mcuD_fresh_ciel_install",
+        ),
+        pytest.param(
+            "gf180mcuD",
+            "gf180mcu",
+            "gf180mcu.lyp",
+            False,
+            id="gf180mcuD_explicit_pdk_root",
+        ),
     ],
 )
 def test_start_klayout_gui_layer_file(
@@ -375,9 +379,8 @@ def test_start_klayout_gui_layer_file(
 ) -> None:
     """The layer file resolves to ``pdk_root/<pdk>/libs.tech/klayout/tech/<lyp>``.
 
-    Covers both branches: ciel auto-resolution of ``pdk_root`` (fresh
-    install) and an explicit ``FAB_PDK_ROOT``. The IHP case also pins
-    the ``sg13g2.lyp`` filename so the ``sg12g2.lyp`` typo can't return.
+    Covers both branches: ciel auto-resolution of `pdk_root` (fresh install)
+    and an explicit `FAB_PDK_ROOT`
     """
     reset_context()
     for key in list(os.environ.keys()):
@@ -386,9 +389,7 @@ def test_start_klayout_gui_layer_file(
 
     # tests/conftest.py patches get_ciel_home() to ``tmp_path/.ciel``.
     pdk_root = tmp_path / ".ciel" / family
-    expected_layer_file = (
-        pdk_root / pdk / "libs.tech" / "klayout" / "tech" / lyp
-    )
+    expected_layer_file = pdk_root / pdk / "libs.tech" / "klayout" / "tech" / lyp
     expected_layer_file.parent.mkdir(parents=True, exist_ok=True)
     expected_layer_file.touch()
 

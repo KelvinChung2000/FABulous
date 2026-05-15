@@ -494,7 +494,7 @@ class FABulousSettings(BaseSettings):
         if self.pdk == ciel_family.name and self.pdk not in ciel_family.variants:
             logger.warning(
                 "FAB_PDK is set to a supported family name, but it should be set to "
-                "the variant name."
+                "the variant name. "
                 "Auto resolving to the default variant for the family."
             )
             self.pdk = ciel_family.default_variant

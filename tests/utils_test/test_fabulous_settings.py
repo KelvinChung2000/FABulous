@@ -180,6 +180,40 @@ class TestFABulousSettings:
         settings = init_context(project)
         assert settings.pdk_hash == "abc123def456"
 
+    @pytest.mark.parametrize(
+        ("configured_pdk", "expected_pdk"),
+        [
+            ("sky130", "sky130A"),
+            ("sky130B", "sky130B"),
+            ("sky130A", "sky130A"),
+            ("ihp-sg13g2", "ihp-sg13g2"),
+        ],
+    )
+    def test_pdk_variant_resolution(
+        self,
+        project: Path,
+        monkeypatch: pytest.MonkeyPatch,
+        mocker: MockerFixture,
+        tmp_path: Path,
+        configured_pdk: str,
+        expected_pdk: str,
+    ) -> None:
+        """FAB_PDK family names auto-resolve to default variant; variants stay."""
+        pdk_root = tmp_path / "pdk_root"
+        pdk_root.mkdir()
+        monkeypatch.setenv("FAB_PDK", configured_pdk)
+        monkeypatch.setenv("FAB_PDK_ROOT", str(pdk_root))
+        monkeypatch.setenv("FAB_PDK_HASH", "deadbeef" * 5)
+
+        mocker.patch("fabulous.fabulous_settings.which", return_value=None)
+        mocker.patch(
+            "fabulous.fabulous_settings.get_pdk_hash", return_value="deadbeef" * 5
+        )
+        mocker.patch("ciel.manage.enable")
+
+        settings = init_context(project)
+        assert settings.pdk == expected_pdk
+
 
 class TestFieldValidators:
     """Test cases for field validators in FABulousSettings."""

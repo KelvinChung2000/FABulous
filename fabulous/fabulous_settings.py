@@ -490,8 +490,18 @@ class FABulousSettings(BaseSettings):
                 "https://fossi-foundation.github.io/ciel-releases"
             ),
         )
+
+        if self.pdk == ciel_family.name:
+            logger.warning(
+                "FAB_PDK is set to a supported family name, but it should be set to "
+                "the variant name."
+                "Auto resolving to the default variant for the family."
+            )
+            self.pdk = ciel_family.default_variant
+
         logger.info(
-            f"Auto-resolved PDK hash: {self.pdk_hash[:12]} for family '{ciel_family}'"
+            f"Auto-resolved PDK hash: {self.pdk_hash[:12]} for family "
+            f"'{ciel_family.name}' with variant '{self.pdk}'. "
         )
 
         pdk_path = self.pdk_root.resolve()

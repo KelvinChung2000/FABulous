@@ -1318,6 +1318,9 @@ class FABulous_CLI(Cmd):
         help="Override config with a custom YAML config file",
         type=Path,
     )
+    gds_parser.add_argument(
+        "--io-pin-config", help="Path to a custom IO pin config YAML file", type=Path
+    )
 
     io_pin_config_parser: Cmd2ArgumentParser = Cmd2ArgumentParser()
     io_pin_config_parser.add_argument(
@@ -1389,14 +1392,17 @@ class FABulous_CLI(Cmd):
             logger.error(f"Tile directory {tile_dir} does not exist")
             return
 
-        if tile := self.fabulousAPI.getTile(args.tile):
-            self.fabulousAPI.gen_io_pin_order_config(tile, pin_order_file)
+        if not args.io_pin_config:
+            if tile := self.fabulousAPI.getTile(args.tile):
+                self.fabulousAPI.gen_io_pin_order_config(tile, pin_order_file)
+            else:
+                super_tile = self.fabulousAPI.getSuperTile(args.tile)
+                if super_tile is None:
+                    logger.error(f"Tile {args.tile} not found in fabric definition")
+                    return
+                self.fabulousAPI.gen_io_pin_order_config(super_tile, pin_order_file)
         else:
-            super_tile = self.fabulousAPI.getSuperTile(args.tile)
-            if super_tile is None:
-                logger.error(f"Tile {args.tile} not found in fabric definition")
-                return
-            self.fabulousAPI.gen_io_pin_order_config(super_tile, pin_order_file)
+            pin_order_file = args.io_pin_config.resolve()
 
         self.fabulousAPI.genTileMacro(
             tile_dir,

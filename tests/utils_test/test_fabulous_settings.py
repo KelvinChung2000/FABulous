@@ -187,6 +187,7 @@ class TestFABulousSettings:
             ("sky130B", "sky130B"),
             ("sky130A", "sky130A"),
             ("ihp-sg13g2", "ihp-sg13g2"),
+            ("gf180mcu", "gf180mcuD"),
         ],
     )
     def test_pdk_variant_resolution(

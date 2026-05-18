@@ -126,6 +126,44 @@ def test_gen_io_pin_config(cli: FABulous_CLI, caplog: pytest.LogCaptureFixture) 
     assert output_file.exists()
 
 
+def test_gen_tile_macro_with_io_pin_config_skips_generation(
+    cli: FABulous_CLI, mocker: MockerFixture, tmp_path: Path
+) -> None:
+    """`gen_tile_macro --io-pin-config <file>` uses the user-provided pin config."""
+    mocker.patch(
+        "fabulous.fabulous_cli.fabulous_cli.is_pdk_config_set", return_value=True
+    )
+    gen_pin_order_spy = mocker.spy(cli.fabulousAPI, "gen_io_pin_order_config")
+    gen_tile_macro_mock = mocker.patch.object(cli.fabulousAPI, "genTileMacro")
+
+    user_pin_config = tmp_path / "custom_pin_config.yaml"
+    user_pin_config.touch()
+
+    run_cmd(cli, f"gen_tile_macro {TILE} --io-pin-config {user_pin_config}")
+
+    gen_pin_order_spy.assert_not_called()
+    gen_tile_macro_mock.assert_called_once()
+    assert gen_tile_macro_mock.call_args.args[1] == user_pin_config.resolve()
+
+
+def test_gen_tile_macro_without_io_pin_config_generates_for_tile(
+    cli: FABulous_CLI, mocker: MockerFixture
+) -> None:
+    """Without ``--io-pin-config``, the CLI auto-generates the pin order for a tile."""
+    mocker.patch(
+        "fabulous.fabulous_cli.fabulous_cli.is_pdk_config_set", return_value=True
+    )
+    gen_pin_order_mock = mocker.patch.object(cli.fabulousAPI, "gen_io_pin_order_config")
+    gen_tile_macro_mock = mocker.patch.object(cli.fabulousAPI, "genTileMacro")
+
+    run_cmd(cli, f"gen_tile_macro {TILE}")
+
+    expected_pin_order = cli.projectDir / "Tile" / TILE / f"{TILE}_io_pin_order.yaml"
+    gen_pin_order_mock.assert_called_once()
+    assert gen_pin_order_mock.call_args.args[1] == expected_pin_order
+    assert gen_tile_macro_mock.call_args.args[1] == expected_pin_order
+
+
 def test_run_FABulous_bitstream_deprecated(
     cli: FABulous_CLI, caplog: pytest.LogCaptureFixture, mocker: MockerFixture
 ) -> None:

@@ -55,14 +55,14 @@ def generate_cli_docs(app: Sphinx, conf: Config) -> None:  # noqa: ARG001
         lookup = jinja2.FileSystemLoader(searchpath=all_templates_path)
         env = jinja2.Environment(loader=lookup)
 
+        #TODO: Workout an architecture that don't need this type of fixing. 
         # Extract command metadata using AST parsing (no imports needed)
         repo_root = doc_root_dir.parent.parent
         cli_dir = repo_root / "fabulous" / "fabulous_cli"
         cli_file = cli_dir / "fabulous_cli.py"
         commands_by_category = extract_cli_commands_ast(cli_file)
 
-        # Also extract commands from cmd_synthesis.py
-        synthesis_file = cli_dir / "cmd_synthesis.py"
+        synthesis_file = cli_dir / "cmd_compile_design.py"
         if synthesis_file.exists():
             synthesis_commands = extract_standalone_commands_ast(synthesis_file)
             for category, cmds in synthesis_commands.items():

@@ -143,7 +143,7 @@ jobs:
           } >> "$GITHUB_OUTPUT"
 
       - name: Create issue on failure
-        if: false
+        if: failure()
         uses: ./.github/actions/create_failure_issue
         with:
           title: ${{ steps.failure_body.outputs.title }}
@@ -286,7 +286,7 @@ jobs:
           } >> "$GITHUB_OUTPUT"
 
       - name: Create issue on failure
-        if: false
+        if: failure()
         uses: ./.github/actions/create_failure_issue
         with:
           title: ${{ steps.failure_body.outputs.title }}

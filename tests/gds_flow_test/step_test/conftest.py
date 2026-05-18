@@ -41,6 +41,8 @@ def mock_config() -> Config:  # type: ignore[name-defined]
             "RT_MAX_LAYER": "met2",
             "VDD_NETS": ["VDD"],
             "GND_NETS": ["VSS"],
+            "VDD_PIN": "VDD",
+            "GND_PIN": "VSS",
         }
     )
 

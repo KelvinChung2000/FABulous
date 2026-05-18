@@ -59,15 +59,20 @@ def test_get_command_includes_config_nets(
 def test_get_command_reverts_to_default_nets(
     mock_config: Config, mock_state: State, mocker: MockerFixture
 ) -> None:
-    """Test that get_command() includes default values for power nets if absent (None)
-    from the configuration."""
+    """Test that get_command() falls back to the PDK VDD_PIN/GND_PIN when
+    VDD_NETS/GND_NETS are unset (None), rather than hardcoded VPWR/VGND.
+
+    The tile macros expose exactly the PDK power/ground pins, so on PDKs where
+    those are VDD/VSS (gf180mcuD, ihp-sg13g2) a hardcoded VPWR/VGND fallback
+    leaves the fabric power pins disconnected.
+    """
     # Mock the parent class get_command to return a base command
     mocker.patch(
         "librelane.steps.odb.OdbpyStep.get_command",
         return_value=["python", "script.py", "--input", "test.odb"],
     )
 
-    # Add required config values for IO placement
+    # VDD_PIN/GND_PIN come from mock_config (VDD/VSS)
     config = mock_config.copy(VDD_NETS=None, GND_NETS=None)
 
     step = FABulousPDN(config, mock_state)
@@ -76,11 +81,11 @@ def test_get_command_reverts_to_default_nets(
 
     assert "--power-names" in command
     power_idx = command.index("--power-names")
-    assert command[power_idx + 1] == "VPWR"
+    assert command[power_idx + 1] == "VDD"
 
-    assert "--power-names" in command
+    assert "--ground-names" in command
     ground_idx = command.index("--ground-names")
-    assert command[ground_idx + 1] == "VGND"
+    assert command[ground_idx + 1] == "VSS"
 
 
 def test_get_command_supports_multple_power_nets(

@@ -2,10 +2,12 @@
 
 from importlib import resources
 
-from librelane.config.flow import option_variables
+from librelane.config.flow import option_variables, pdk_variables
 from librelane.steps.common_variables import pdn_variables
 from librelane.steps.odb import OdbpyStep
 from librelane.steps.step import Step
+
+_power_pin_variables = [v for v in pdk_variables if v.name in ("VDD_PIN", "GND_PIN")]
 
 
 @Step.factory.register()
@@ -15,7 +17,7 @@ class FABulousPDN(OdbpyStep):
     id = "Odb.FABulousPDN"
     name = "FABulous PDN connections for the tiles"
 
-    config_vars = pdn_variables + option_variables
+    config_vars = pdn_variables + option_variables + _power_pin_variables
 
     def get_script_path(self) -> str:
         """Get the path to the power connection script."""
@@ -26,22 +28,17 @@ class FABulousPDN(OdbpyStep):
 
     def get_command(self) -> list[str]:
         """Get the command to run the power connection script."""
+        vdd_nets = self.config["VDD_NETS"] or [self.config["VDD_PIN"]]
+        gnd_nets = self.config["GND_NETS"] or [self.config["GND_PIN"]]
+
         vdd_pins = []
-        if self.config["VDD_NETS"] is None:
+        for power_net in vdd_nets:
             vdd_pins.append("--power-names")
-            vdd_pins.append("VPWR")
-        else:
-            for power_net in self.config["VDD_NETS"]:
-                vdd_pins.append("--power-names")
-                vdd_pins.append(power_net)
+            vdd_pins.append(power_net)
 
         gnd_pins = []
-        if self.config["GND_NETS"] is None:
+        for ground_net in gnd_nets:
             gnd_pins.append("--ground-names")
-            gnd_pins.append("VGND")
-        else:
-            for power_net in self.config["GND_NETS"]:
-                gnd_pins.append("--ground-names")
-                gnd_pins.append(power_net)
+            gnd_pins.append(ground_net)
 
         return super().get_command() + vdd_pins + gnd_pins

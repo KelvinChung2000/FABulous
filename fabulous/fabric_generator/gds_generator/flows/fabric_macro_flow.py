@@ -622,15 +622,7 @@ class FABulousFabricMacroFlow(Classic):
 
         info(f"Setting MACROS to {self.config['MACROS']}")
 
-        (final_state, steps) = super().run(initial_state, **kwargs)
-
-        final_views_path = (Path() / "macro" / self.config["PDK"]).resolve()
-        info(f"Saving final views for FABulous to {final_views_path}")
-        final_state.save_snapshot(final_views_path)
-
-        info("Copying FABulous related files.")
-
-        return (final_state, steps)
+        return super().run(initial_state, **kwargs)
 
 
 def _build_macros(

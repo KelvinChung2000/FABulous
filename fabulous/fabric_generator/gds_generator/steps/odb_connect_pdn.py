@@ -7,6 +7,8 @@ from librelane.steps.common_variables import pdn_variables
 from librelane.steps.odb import OdbpyStep
 from librelane.steps.step import Step
 
+_power_pin_variables = [v for v in pdk_variables if v.name in ("VDD_PIN", "GND_PIN")]
+
 
 @Step.factory.register()
 class FABulousPDN(OdbpyStep):
@@ -15,10 +17,7 @@ class FABulousPDN(OdbpyStep):
     id = "Odb.FABulousPDN"
     name = "FABulous PDN connections for the tiles"
 
-    # pdk_variables provides VDD_PIN/GND_PIN, used as the power/ground pin
-    # fallback when VDD_NETS/GND_NETS are unset (e.g. VPWR/VGND on sky130A,
-    # VDD/VSS on gf180mcuD and ihp-sg13g2).
-    config_vars = pdn_variables + option_variables + pdk_variables
+    config_vars = pdn_variables + option_variables + _power_pin_variables
 
     def get_script_path(self) -> str:
         """Get the path to the power connection script."""
@@ -29,9 +28,6 @@ class FABulousPDN(OdbpyStep):
 
     def get_command(self) -> list[str]:
         """Get the command to run the power connection script."""
-        # Fall back to the PDK power/ground pin names when VDD_NETS/GND_NETS are
-        # unset. The tile macros expose exactly these pins, so hardcoding
-        # VPWR/VGND silently leaves them disconnected on PDKs that use VDD/VSS.
         vdd_nets = self.config["VDD_NETS"] or [self.config["VDD_PIN"]]
         gnd_nets = self.config["GND_NETS"] or [self.config["GND_PIN"]]
 

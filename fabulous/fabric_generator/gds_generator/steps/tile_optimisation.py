@@ -115,6 +115,12 @@ var = [
         "FABULOUS_TILE_LOGICAL_WIDTH for aspect locking.",
         default=1,
     ),
+    Variable(
+        "FABULOUS_BASE_OPTIMISATION_ITERATION_START",
+        int,
+        "The base iteration number to start from for optimisations.",
+        default=15,
+    ),
 ]
 
 
@@ -342,7 +348,8 @@ class TileOptimisation(WhileStep):
             round_up_decimal(new_height, y_pitch),
         )
         self.config = self.config.copy(
-            DRT_OPT_ITERS=5 + self.iter_count,
+            DRT_OPT_ITERS=self.config["FABULOUS_BASE_OPTIMISATION_ITERATION_START"]
+            + self.iter_count,
             DIE_AREA=die_area,
         )
         self._refresh_routing_obstructions()

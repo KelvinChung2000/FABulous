@@ -1,4 +1,4 @@
-"""Fixtures for gds_generator_test tests."""
+"""Fixtures fceor gds_generator_test tests."""
 
 from decimal import Decimal
 
@@ -41,6 +41,7 @@ def mock_config() -> Config:  # type: ignore[name-defined]
             "RT_MAX_LAYER": "met2",
             "VDD_NETS": ["VDD"],
             "GND_NETS": ["VSS"],
+            "FABULOUS_BASE_OPTIMISATION_ITERATION_START": 15,
         }
     )
 

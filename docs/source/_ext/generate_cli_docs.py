@@ -55,7 +55,7 @@ def generate_cli_docs(app: Sphinx, conf: Config) -> None:  # noqa: ARG001
         lookup = jinja2.FileSystemLoader(searchpath=all_templates_path)
         env = jinja2.Environment(loader=lookup)
 
-        #TODO: Workout an architecture that don't need this type of fixing. 
+        #TODO: Workout an architecture that don't need this type of fixing.
         # Extract command metadata using AST parsing (no imports needed)
         repo_root = doc_root_dir.parent.parent
         cli_dir = repo_root / "fabulous" / "fabulous_cli"

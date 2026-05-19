@@ -134,13 +134,6 @@ class FABulousTileVerilogMacroFlow(SequentialFlow):
             "FABULOUS_OPT_MODE": OptMode(opt_mode),
         }
 
-        if opt_mode != OptMode.NO_OPT:
-            logger.info(
-                "Tile optimisation is enabled. "
-                "Setting FABULOUS_IGNORE_DEFAULT_DIE_AREA to True."
-            )
-            tile_config_dict["FABULOUS_IGNORE_DEFAULT_DIE_AREA"] = True
-
         if "FABULOUS_OPT_MODE" in custom_config_overrides:
             custom_config_overrides["FABULOUS_OPT_MODE"] = OptMode(
                 custom_config_overrides["FABULOUS_OPT_MODE"]
@@ -175,7 +168,17 @@ class FABulousTileVerilogMacroFlow(SequentialFlow):
             FABULOUS_TILE_LOGICAL_WIDTH=logical_width,
             FABULOUS_TILE_LOGICAL_HEIGHT=logical_height,
         )
-        self.config = _apply_tile_die_area_config(self.config, tile_type, opt_mode)
+        final_opt_mode = self.config.get("FABULOUS_OPT_MODE", None)
+        if final_opt_mode and final_opt_mode != OptMode.NO_OPT:
+            logger.info(
+                f"FABulous optimisation is set to {final_opt_mode}, "
+                "default die area is ignored."
+            )
+            self.config = self.config.copy(FABULOUS_IGNORE_DEFAULT_DIE_AREA=True)
+
+        self.config = _apply_tile_die_area_config(
+            self.config, tile_type, final_opt_mode
+        )
         self.config = round_die_area(self.config)
         if (
             "ROUTING_OBSTRUCTIONS" not in self.config

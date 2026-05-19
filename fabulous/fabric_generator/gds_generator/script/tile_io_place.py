@@ -12,6 +12,7 @@ from pathlib import Path
 
 import click
 import odb  # type: ignore[import]
+import utl  # type: ignore[import]
 import yaml
 from librelane.logging.logger import debug, err, info, warn
 from librelane.scripts.odbpy.reader import click_odb
@@ -902,6 +903,17 @@ def io_place(
         for bterm in reader.block.getBTerms()
         if bterm.getSigType() not in ["POWER", "GROUND"]
     ]
+
+    # Expose I/O bit counts so downstream steps (e.g. TileOptimisation) can
+    # size the die to absorb DiodesOnPorts cells without parsing the netlist.
+    utl.metric_integer(
+        "design__io__count__input",
+        sum(1 for b in bterms if b.getIoType() == "INPUT"),
+    )
+    utl.metric_integer(
+        "design__io__count__output",
+        sum(1 for b in bterms if b.getIoType() == "OUTPUT"),
+    )
 
     # generate slots
     DIE_AREA = reader.block.getDieArea()

@@ -182,6 +182,12 @@ class TileOptimisation(WhileStep):
 
     last_core_area: Decimal | None = None
 
+    # (input_bits, output_bits) captured from the design__io__count__*
+    # metrics that FABulousTileIOPlacement emits. Cached on the instance
+    # because WhileStep resets state between iterations, so the metric
+    # produced by the previous iteration's IO placement is otherwise lost.
+    diode_port_bits: tuple[int, int] | None = None
+
     # Binary-search state for directional modes.
     bracket_low: Decimal | None = None
 
@@ -190,6 +196,34 @@ class TileOptimisation(WhileStep):
     bracket_cap: Decimal | None = None
 
     bracket_exhausted: bool = False
+
+    def _diode_port_area(self, site_width: Decimal, site_height: Decimal) -> Decimal:
+        """Estimate the flat instance-area contribution of port diodes.
+
+        ``DiodesOnPorts`` inserts one diode per protected port bit. Each
+        diode cell is approximated as one placement-site footprint. The
+        result is added to the design's instance area so downstream sizing
+        absorbs the diodes in one shot rather than growing iteratively.
+
+        Returns zero until the first iteration's ``FABulousTileIOPlacement``
+        has populated ``diode_port_bits`` via ``post_iteration_callback``.
+        """
+        mode = self.config.get("DIODE_ON_PORTS", "none")
+        if mode == "none" or self.diode_port_bits is None:
+            return Decimal(0)
+
+        input_bits, output_bits = self.diode_port_bits
+        match mode:
+            case "in":
+                bits = input_bits
+            case "out":
+                bits = output_bits
+            case "both":
+                bits = input_bits + output_bits
+            case _:
+                return Decimal(0)
+
+        return Decimal(bits) * site_width * site_height
 
     def _is_directional(self) -> bool:
         """Return True when the current mode is FIND_MIN_WIDTH or FIND_MIN_HEIGHT."""
@@ -244,6 +278,11 @@ class TileOptimisation(WhileStep):
         # on the instance to carry it across resets.
         if (ca := post_iteration.metrics.get("design__core__area")) is not None:
             self.last_core_area = Decimal(ca)
+
+        io_in = post_iteration.metrics.get("design__io__count__input")
+        io_out = post_iteration.metrics.get("design__io__count__output")
+        if io_in is not None and io_out is not None:
+            self.diode_port_bits = (int(io_in), int(io_out))
 
         # DRC and antenna clean design as sample for the later optimisation.
         if full_iter_completed:
@@ -305,18 +344,9 @@ class TileOptimisation(WhileStep):
             site_height * self.config["FABULOUS_OPTIMISATION_HEIGHT_STEP_COUNT"]
         )
 
-        # Diode insertion on ports adds cells that need extra area.
-        # Scale both step sizes so the optimiser grows the tile faster
-        # to accommodate the additional diode cells.
-        diode_on_ports: str = self.config.get("DIODE_ON_PORTS", "none")
-        if diode_on_ports == "both":
-            width_step += site_width * 8
-            height_step += site_height * 8
-        elif diode_on_ports in ("in", "out"):
-            width_step += site_width * 4
-            height_step += site_height * 4
-
-        instance_area = Decimal(pre_iteration.metrics.get("design__instance__area", 0))
+        instance_area = Decimal(
+            pre_iteration.metrics.get("design__instance__area", 0)
+        ) + self._diode_port_area(site_width, site_height)
         if self.last_core_area is not None:
             core_area = self.last_core_area
         else:
@@ -535,7 +565,11 @@ class TileOptimisation(WhileStep):
         opt_mode = self.config["FABULOUS_OPT_MODE"]
         pin_w = Decimal(self.config.get("FABULOUS_PIN_MIN_WIDTH", 0))
         pin_h = Decimal(self.config.get("FABULOUS_PIN_MIN_HEIGHT", 0))
-        instance_area = Decimal(state_in.metrics.get("design__instance__area", 0))
+        site_width = Decimal(state_in.metrics.get("pdk__site_width", Decimal(1)))
+        site_height = Decimal(state_in.metrics.get("pdk__site_height", Decimal(1)))
+        instance_area = Decimal(
+            state_in.metrics.get("design__instance__area", 0)
+        ) + self._diode_port_area(site_width, site_height)
 
         # Short-circuit directional modes whose pin floor already comfortably
         # covers the instance area - iterating would only produce a tall/narrow

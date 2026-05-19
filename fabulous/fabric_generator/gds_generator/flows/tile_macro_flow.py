@@ -4,6 +4,7 @@ from decimal import Decimal
 from pathlib import Path
 from typing import Any
 
+from dill.logger import logger
 from librelane.common import GenericDict
 from librelane.config.variable import Variable
 from librelane.flows.classic import Classic
@@ -132,6 +133,13 @@ class FABulousTileVerilogMacroFlow(SequentialFlow):
             "VERILOG_FILES": file_list,
             "FABULOUS_OPT_MODE": OptMode(opt_mode),
         }
+
+        if opt_mode != OptMode.NO_OPT:
+            logger.info(
+                "Tile optimisation is enabled. "
+                "Setting FABULOUS_IGNORE_DEFAULT_DIE_AREA to True."
+            )
+            tile_config_dict["FABULOUS_IGNORE_DEFAULT_DIE_AREA"] = True
 
         if "FABULOUS_OPT_MODE" in custom_config_overrides:
             custom_config_overrides["FABULOUS_OPT_MODE"] = OptMode(

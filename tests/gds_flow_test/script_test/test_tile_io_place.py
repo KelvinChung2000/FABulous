@@ -27,6 +27,7 @@ if TYPE_CHECKING:
 def mock_modules(mocker: MockerFixture) -> None:
     sys.modules["odb"] = mocker.MagicMock()
     sys.modules["openroad"] = mocker.MagicMock()
+    sys.modules["utl"] = mocker.MagicMock()
 
 
 class TestGridToTracks:

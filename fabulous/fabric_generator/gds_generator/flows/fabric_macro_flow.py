@@ -30,7 +30,6 @@ from fabulous.fabric_generator.gds_generator.steps.fabric_IO_placement import (
 from fabulous.fabric_generator.gds_generator.steps.odb_connect_pdn import (
     FABulousPDN,
 )
-from fabulous.fabulous_settings import get_context
 
 subs = {
     "OpenROAD.CutRows": None,

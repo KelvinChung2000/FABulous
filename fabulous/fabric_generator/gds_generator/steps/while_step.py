@@ -28,6 +28,8 @@ class WhileStep(Step):
 
     break_on_failure: bool = True
 
+    propagate_exceptions: tuple[type[BaseException], ...] = ()
+
     _current_iter_dir: Path | None = None
 
     def __init_subclass__(Self):  # noqa: ANN204, D105
@@ -130,6 +132,10 @@ class WhileStep(Step):
                     if self.mid_iteration_break(current_state, step):
                         break
                 except Exception as e:
+                    if self.propagate_exceptions and isinstance(
+                        e, self.propagate_exceptions
+                    ):
+                        raise
                     if self.raise_on_failure:
                         raise e from None
                     if self.break_on_failure:

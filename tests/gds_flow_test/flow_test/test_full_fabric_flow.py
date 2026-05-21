@@ -435,3 +435,58 @@ class TestRunNlpOnlyEarlyReturn:
         # No recompilation pool, no stitching flow.
         pool.assert_not_called()
         stitching.assert_not_called()
+
+
+class TestFinaliseFabric:
+    """Tests for the post-stitching completeness check and summary."""
+
+    @staticmethod
+    def _fabric(mocker: MockerFixture) -> MagicMock:
+        fabric: MagicMock = mocker.MagicMock()
+        fabric.name = "myfab"
+        fabric.get_all_unique_tiles.return_value = [object(), object()]
+        return fabric
+
+    @staticmethod
+    def _tile_state(mocker: MockerFixture, bbox: str) -> MagicMock:
+        state: MagicMock = mocker.MagicMock()
+        state.metrics = {"design__die__bbox": bbox}
+        return state
+
+    def test_raises_when_no_gds(self, mocker: MockerFixture) -> None:
+        """An incomplete stitch (no GDS) raises rather than reporting success."""
+        final_state: MagicMock = mocker.MagicMock()
+        final_state.get.return_value = None  # no GDS produced
+        final_state.metrics = {}
+
+        with pytest.raises(RuntimeError, match="no GDS"):
+            FABulousFabricMacroFullFlow._finalise(self._fabric(mocker), final_state, {})
+
+    def test_logs_summary_with_per_tile_macro_sizes(
+        self, mocker: MockerFixture
+    ) -> None:
+        """A complete stitch logs the die area and each tile macro's size."""
+        final_state: MagicMock = mocker.MagicMock()
+        final_state.get.return_value = "/runs/final/gds/myfab.gds"
+        final_state.metrics = {"design__die__bbox": "0 0 100 200"}
+        tile_states = {
+            "LUT": self._tile_state(mocker, "0 0 30 40"),
+            "DSP": self._tile_state(mocker, "0 0 50 60"),
+        }
+        info_mock = mocker.patch(
+            "fabulous.fabric_generator.gds_generator.flows.full_fabric_flow.info"
+        )
+
+        FABulousFabricMacroFullFlow._finalise(
+            self._fabric(mocker), final_state, tile_states
+        )
+
+        # Collapse the column-alignment padding so the assertions aren't brittle.
+        logged = " ".join(
+            " ".join(str(call.args[0]).split()) for call in info_mock.call_args_list
+        )
+        assert "myfab" in logged
+        assert "100.00 x 200.00" in logged  # overall die area w x h
+        assert "LUT 30.00 x 40.00" in logged  # per-macro tile size
+        assert "DSP 50.00 x 60.00" in logged
+        assert "myfab.gds" in logged

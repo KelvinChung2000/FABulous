@@ -186,6 +186,52 @@ class FABulousFabricMacroFullFlow(Flow):
         info("-" * len(hdr))
         info(f"{'Total fabric area':<20} {'':>10} {'':>10} {total_area:>12} {'':>8}")
 
+    @staticmethod
+    def _finalise(
+        fabric: Fabric,
+        final_state: State,
+        tile_states: dict[str, State],
+    ) -> None:
+        """Verify the stitched fabric is complete and log a compact summary.
+
+        Parameters
+        ----------
+        fabric : Fabric
+            The fabric that was stitched.
+        final_state : State
+            The state returned by the stitching flow.
+        tile_states : dict[str, State]
+            The recompiled per-tile macro states, keyed by tile name, used to
+            report each macro's final size.
+
+        Raises
+        ------
+        RuntimeError
+            If the stitching flow returned without producing a final GDS, i.e.
+            the fabric is incomplete despite the flow finishing.
+        """
+        gds = final_state.get(DesignFormat.GDS)
+        if not gds:
+            raise RuntimeError(
+                "Fabric stitching finished but produced no GDS; the final "
+                "fabric is incomplete."
+            )
+
+        info("\n=== Fabric summary ===")
+        info(f"  Fabric            : {fabric.name}")
+        info(f"  Unique tile types : {len(fabric.get_all_unique_tiles())}")
+        die_bbox = final_state.metrics.get("design__die__bbox")
+        if die_bbox is not None:
+            x0, y0, x1, y1 = (float(c) for c in str(die_bbox).split())
+            info(f"  Die area          : {x1 - x0:.2f} x {y1 - y0:.2f} um")
+        info("  Tile macro sizes:")
+        for name in sorted(tile_states):
+            tile_bbox = tile_states[name].metrics.get("design__die__bbox")
+            if tile_bbox is None:
+                continue
+            x0, y0, x1, y1 = (float(c) for c in str(tile_bbox).split())
+            info(f"    {name:<18} {x1 - x0:>9.2f} x {y1 - y0:>9.2f} um")
+
     def _validate_project_dir(self, proj_dir: Path, fabric: Fabric) -> None:
         """Validate the project directory structure for required tile directories."""
         info("Validating project directory structure...")
@@ -494,7 +540,7 @@ class FABulousFabricMacroFullFlow(Flow):
                 )
 
             # Walk up from the GDS path to find the run directory containing the
-            # final/ snapshot. Robust to varying step nesting (e.g. write-out
+            # `final/`` snapshot. Robust to varying step nesting (e.g. write-out
             # steps inside a WhileStep wrapper). librelane's Path is a
             # UserString, so wrap with pathlib.
             final_dir: Path | None = next(
@@ -537,5 +583,7 @@ class FABulousFabricMacroFullFlow(Flow):
         final_state: State = stitching_flow.start()
         self.progress_bar.end_stage()
 
+        # Confirm the stitch actually produced a fabric before declaring success.
+        self._finalise(fabric, final_state, tile_type_states)
         info("\nFabric flow completed successfully!")
         return final_state, []

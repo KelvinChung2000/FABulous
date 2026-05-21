@@ -164,6 +164,87 @@ class TestTileOptimisation:
         assert result is True
 
 
+class TestRunUserFixedSmartInit:
+    """``run`` smart-init for directional modes with a user-locked axis.
+
+    When ``FABULOUS_IGNORE_DEFAULT_DIE_AREA`` is False the user has supplied a
+    DIE_AREA whose non-minimised axis must be held constant, while the minimised
+    axis is seeded from the synthesised instance area so the bracket search
+    starts somewhere feasible.
+    """
+
+    def _prepare(
+        self,
+        mocker: MockerFixture,
+        config: Config,
+        die_area: tuple[Decimal, Decimal, Decimal, Decimal],
+    ) -> TileOptimisation:
+        mocker.patch(
+            "fabulous.fabric_generator.gds_generator.steps.tile_optimisation.get_pitch",
+            return_value=(Decimal("0.5"), Decimal("0.5")),
+        )
+        mocker.patch(
+            "fabulous.fabric_generator.gds_generator.steps.tile_optimisation.WhileStep.run",
+            return_value=({}, {}),
+        )
+        cfg = config.copy(FABULOUS_IGNORE_DEFAULT_DIE_AREA=False, DIE_AREA=die_area)
+        step = TileOptimisation(cfg)
+        step.config = cfg
+        return step
+
+    def test_find_min_width_locks_height_and_seeds_width(
+        self, mocker: MockerFixture, mock_config: Config, mock_state: State
+    ) -> None:
+        # Tiny start width, fixed height 100; instance area 5000 needs ~50 width.
+        step = self._prepare(
+            mocker,
+            mock_config.copy(FABULOUS_OPT_MODE=OptMode.FIND_MIN_WIDTH),
+            (Decimal(0), Decimal(0), Decimal(1), Decimal(100)),
+        )
+        mock_state.metrics["design__instance__area"] = 5000
+
+        step.run(mock_state)
+
+        die = step.config["DIE_AREA"]
+        assert die[3] == Decimal(100)  # height locked to the user value
+        assert die[2] >= Decimal(50)  # width seeded to hold the cells
+
+    def test_find_min_height_locks_width_and_seeds_height(
+        self, mocker: MockerFixture, mock_config: Config, mock_state: State
+    ) -> None:
+        step = self._prepare(
+            mocker,
+            mock_config.copy(FABULOUS_OPT_MODE=OptMode.FIND_MIN_HEIGHT),
+            (Decimal(0), Decimal(0), Decimal(100), Decimal(1)),
+        )
+        mock_state.metrics["design__instance__area"] = 5000
+
+        step.run(mock_state)
+
+        die = step.config["DIE_AREA"]
+        assert die[2] == Decimal(100)  # width locked to the user value
+        assert die[3] >= Decimal(50)  # height seeded to hold the cells
+
+    def test_user_fixed_height_not_grown_by_pin_floor(
+        self, mocker: MockerFixture, mock_config: Config, mock_state: State
+    ) -> None:
+        # A larger pin floor must not override the user-locked fixed axis.
+        step = self._prepare(
+            mocker,
+            mock_config.copy(
+                FABULOUS_OPT_MODE=OptMode.FIND_MIN_WIDTH,
+                FABULOUS_PIN_MIN_WIDTH=Decimal(1),
+                FABULOUS_PIN_MIN_HEIGHT=Decimal(500),
+            ),
+            (Decimal(0), Decimal(0), Decimal(10), Decimal(100)),
+        )
+        mock_state.metrics["design__instance__area"] = 5000
+
+        step.run(mock_state)
+
+        assert step.config["DIE_AREA"][3] == Decimal(100)
+
+
 class TestOptModeMissing:
     """``OptMode._missing_`` is the entry point for tolerant string lookups.
 

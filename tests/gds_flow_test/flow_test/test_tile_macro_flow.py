@@ -24,6 +24,7 @@ from librelane.flows.flow import FlowException
 from fabulous.fabric_generator.gds_generator.flows.tile_macro_flow import (
     FABulousTileVerilogMacroFlow,
 )
+from fabulous.fabric_generator.gds_generator.helper import round_up_decimal
 from fabulous.fabric_generator.gds_generator.steps.tile_optimisation import OptMode
 
 
@@ -196,8 +197,12 @@ class TestFABulousTileVerilogMacroFlowInit:
         io_pin_config: Path,
         mock_pdk_root: dict[str, Any],
     ) -> None:
-        """Test that FlowException is raised when DIE_AREA is too small."""
-        with pytest.raises(FlowException, match="DIE_AREA.*is smaller than"):
+        """Test that FlowException is raised when DIE_AREA is too small.
+
+        Default opt mode is ``find_min_width``, so the fixed axis is the height;
+        a height below the physical minimum must be rejected.
+        """
+        with pytest.raises(FlowException, match="smaller than the minimum"):
             self._create_flow(
                 tile_type=mock_tile,
                 io_pin_config=io_pin_config,
@@ -223,6 +228,124 @@ class TestFABulousTileVerilogMacroFlowInit:
         # 150.0 / 0.28 = 535.71... -> 536 * 0.28 = 150.08
         # 150.0 / 0.56 = 267.85... -> 268 * 0.56 = 150.08
         assert flow.config["DIE_AREA"] == (0, 0, Decimal("150.08"), Decimal("150.08"))
+
+    def test_find_min_width_honors_user_fixed_height(
+        self,
+        mock_tile: MagicMock,
+        io_pin_config: Path,
+        mock_pdk_root: dict[str, Any],
+    ) -> None:
+        """find_min_width keeps the user height (fixed axis) and tolerates a
+        below-minimum width, since width is the axis being minimised."""
+        # Physical minimum: width >= 200, height >= 100.
+        mock_tile.get_min_die_area.return_value = (Decimal("200.0"), Decimal("100.0"))
+
+        flow: FABulousTileVerilogMacroFlow = self._create_flow(
+            tile_type=mock_tile,
+            io_pin_config=io_pin_config,
+            mock_pdk_root=mock_pdk_root,
+            opt_mode=OptMode.FIND_MIN_WIDTH,
+            DIE_AREA=(0, 0, Decimal("50.0"), Decimal("150.0")),
+        )
+
+        # User die area is honoured (not replaced by the computed minimum).
+        assert flow.config["FABULOUS_IGNORE_DEFAULT_DIE_AREA"] is False
+        assert flow.config["DIE_AREA"] == (
+            0,
+            0,
+            round_up_decimal(Decimal("50.0"), Decimal("0.28")),
+            round_up_decimal(Decimal("150.0"), Decimal("0.56")),
+        )
+
+    def test_find_min_width_rejects_height_below_physical_min(
+        self,
+        mock_tile: MagicMock,
+        io_pin_config: Path,
+        mock_pdk_root: dict[str, Any],
+    ) -> None:
+        """find_min_width must reject a fixed height below the physical minimum,
+        even when the (minimised) width is comfortably above its minimum."""
+        mock_tile.get_min_die_area.return_value = (Decimal("200.0"), Decimal("100.0"))
+
+        with pytest.raises(FlowException, match="smaller than the minimum"):
+            self._create_flow(
+                tile_type=mock_tile,
+                io_pin_config=io_pin_config,
+                mock_pdk_root=mock_pdk_root,
+                opt_mode=OptMode.FIND_MIN_WIDTH,
+                DIE_AREA=(0, 0, Decimal("500.0"), Decimal("50.0")),
+            )
+
+    def test_find_min_height_honors_user_fixed_width(
+        self,
+        mock_tile: MagicMock,
+        io_pin_config: Path,
+        mock_pdk_root: dict[str, Any],
+    ) -> None:
+        """find_min_height keeps the user width (fixed axis) and tolerates a
+        below-minimum height, since height is the axis being minimised."""
+        # Physical minimum: width >= 100, height >= 200.
+        mock_tile.get_min_die_area.return_value = (Decimal("100.0"), Decimal("200.0"))
+
+        flow: FABulousTileVerilogMacroFlow = self._create_flow(
+            tile_type=mock_tile,
+            io_pin_config=io_pin_config,
+            mock_pdk_root=mock_pdk_root,
+            opt_mode=OptMode.FIND_MIN_HEIGHT,
+            DIE_AREA=(0, 0, Decimal("150.0"), Decimal("50.0")),
+        )
+
+        assert flow.config["FABULOUS_IGNORE_DEFAULT_DIE_AREA"] is False
+        assert flow.config["DIE_AREA"] == (
+            0,
+            0,
+            round_up_decimal(Decimal("150.0"), Decimal("0.28")),
+            round_up_decimal(Decimal("50.0"), Decimal("0.56")),
+        )
+
+    def test_find_min_height_rejects_width_below_physical_min(
+        self,
+        mock_tile: MagicMock,
+        io_pin_config: Path,
+        mock_pdk_root: dict[str, Any],
+    ) -> None:
+        """find_min_height must reject a fixed width below the physical minimum."""
+        mock_tile.get_min_die_area.return_value = (Decimal("100.0"), Decimal("200.0"))
+
+        with pytest.raises(FlowException, match="smaller than the minimum"):
+            self._create_flow(
+                tile_type=mock_tile,
+                io_pin_config=io_pin_config,
+                mock_pdk_root=mock_pdk_root,
+                opt_mode=OptMode.FIND_MIN_HEIGHT,
+                DIE_AREA=(0, 0, Decimal("50.0"), Decimal("500.0")),
+            )
+
+    def test_balance_ignores_user_die_area(
+        self,
+        mock_tile: MagicMock,
+        io_pin_config: Path,
+        mock_pdk_root: dict[str, Any],
+    ) -> None:
+        """balance has no fixed axis, so a user DIE_AREA is ignored in favour of
+        the computed minimum (full-auto sizing)."""
+        mock_tile.get_min_die_area.return_value = (Decimal("100.0"), Decimal("100.0"))
+
+        flow: FABulousTileVerilogMacroFlow = self._create_flow(
+            tile_type=mock_tile,
+            io_pin_config=io_pin_config,
+            mock_pdk_root=mock_pdk_root,
+            opt_mode=OptMode.BALANCE,
+            DIE_AREA=(0, 0, Decimal("300.0"), Decimal("300.0")),
+        )
+
+        assert flow.config["FABULOUS_IGNORE_DEFAULT_DIE_AREA"] is True
+        assert flow.config["DIE_AREA"] == (
+            0,
+            0,
+            round_up_decimal(Decimal("100.0"), Decimal("0.28")),
+            round_up_decimal(Decimal("100.0"), Decimal("0.56")),
+        )
 
     def test_no_opt_mode_requires_die_area(
         self,

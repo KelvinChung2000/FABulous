@@ -12,8 +12,11 @@ correct algorithm so that regression cannot reappear unnoticed.
 import json
 from pathlib import Path
 
+import numpy as np
 import pytest
 
+from fabulous.fabric_definition.fabric import Fabric
+from fabulous.fabric_definition.tile import Tile
 from fabulous.fabric_generator.gds_generator.steps.global_tile_opitmisation import (
     GlobalTileSizeOptimization,
     NLPTileProblem,
@@ -342,3 +345,111 @@ class TestLoadTileMetricsFromJson:
         valid, all_ = GlobalTileSizeOptimization._load_tile_metrics_from_json(path)
         assert valid[OptMode.BALANCE] == {}
         assert all_[OptMode.BALANCE] == {}
+
+
+def _make_tile(name: str) -> Tile:
+    """Build a minimal real Tile (no BELs, ports, or supertile membership)."""
+    return Tile(
+        name=name,
+        ports=[],
+        bels=[],
+        tileDir=Path(),
+        matrixDir=Path(),
+        gen_ios=[],
+        userCLK=False,
+    )
+
+
+def _make_fabric(grid: list[list[Tile | None]]) -> Fabric:
+    """Build a real Fabric from a row-major grid of Tile/None positions.
+
+    `numberOfRows`/`numberOfColumns` are derived from the grid shape, and
+    `tileDic`` is populated with one entry per distinct tile name so that
+    `get_all_unique_tiles` and the row/column index helpers behave exactly as
+    they do for a CSV-parsed fabric.
+    """
+    tile_dic: dict[str, Tile] = {}
+    for row in grid:
+        for tile in row:
+            if tile is not None:
+                tile_dic.setdefault(tile.name, tile)
+    return Fabric(
+        fabric_dir=Path("/tmp"),
+        tile=grid,
+        numberOfRows=len(grid),
+        numberOfColumns=len(grid[0]),
+        tileDic=tile_dic,
+    )
+
+
+def _metric(width: float, height: float) -> dict:
+    """A successful single-mode metric entry with the given die bbox."""
+    return {
+        "design__die__bbox": [0.0, 0.0, float(width), float(height)],
+        "design__instance__area__stdcell": 100.0,
+    }
+
+
+class TestNLPTileProblemInit:
+    """Constructor coverage for the NLP problem setup.
+
+    These exercise the equivalence-class -> variable mapping, the xl/xu bound
+    derivation, and the fail-fast that rejects a fabric whose tile never
+    compiled. They build real `Fabric`/`Tile` objects rather than mocks so
+    the iteration, `tileDic`, and `get_all_unique_tiles` paths are real.
+    """
+
+    def test_missing_tile_raises_runtimeerror(self) -> None:
+        # Tile "C" sits in the fabric grid but appears in no mode's metrics, so
+        # the NLP cannot bound its dimensions and must fail fast.
+        a = _make_tile("A")
+        c = _make_tile("C")
+        fabric = _make_fabric([[a], [c]])
+        tile_metrics = {OptMode.BALANCE: {"A": _metric(100.0, 200.0)}}
+
+        with pytest.raises(RuntimeError, match="failed all exploration modes") as exc:
+            NLPTileProblem(fabric, tile_metrics)
+        assert "C" in str(exc.value)
+
+    def test_happy_path_variable_count_and_bounds(self) -> None:
+        # A in column 0, B in column 1; both span rows {0, 1}. Sharing both rows
+        # collapses the rows into a single height group, while the two columns
+        # stay distinct: 1 row var + 2 column vars = 3 variables.
+        a = _make_tile("A")
+        b = _make_tile("B")
+        fabric = _make_fabric([[a, b], [a, b]])
+        tile_metrics = {
+            OptMode.BALANCE: {"A": _metric(100.0, 200.0), "B": _metric(120.0, 200.0)}
+        }
+
+        problem = NLPTileProblem(fabric, tile_metrics)
+
+        n_row_groups = len(set(problem.row_groups.values()))
+        n_col_groups = len(set(problem.col_groups.values()))
+        assert n_row_groups == 1
+        assert n_col_groups == 2
+        assert problem.n_var == n_row_groups + n_col_groups
+
+        # Every dimension has a strictly positive floor and a non-collapsing
+        # upper bound.
+        assert np.all(problem.xl > 0)
+        assert np.all(problem.xu >= problem.xl)
+
+    def test_disjoint_rows_get_distinct_row_groups(self) -> None:
+        # A occupies only row 0 and B only row 1 (single shared column). Because
+        # no tile type spans both rows, the two rows must land in different
+        # height groups.
+        a = _make_tile("A")
+        b = _make_tile("B")
+        fabric = _make_fabric([[a], [b]])
+        tile_metrics = {
+            OptMode.BALANCE: {"A": _metric(100.0, 200.0), "B": _metric(100.0, 250.0)}
+        }
+
+        problem = NLPTileProblem(fabric, tile_metrics)
+
+        (row_a,) = problem.tile_row_set["A"]
+        (row_b,) = problem.tile_row_set["B"]
+        assert problem.row_groups[row_a] != problem.row_groups[row_b]
+        # The shared single column keeps both column indices in one group.
+        assert len(set(problem.col_groups.values())) == 1

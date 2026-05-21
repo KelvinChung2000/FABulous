@@ -559,3 +559,58 @@ class TestGenTileMacroFlags:
             gen_macro.call_args.kwargs["custom_config_overrides"]["DIODE_ON_PORTS"]
             == "both"
         )
+
+
+class TestRunEFPGAMacroForwarding:
+    """End-to-end CLI wiring: flags forwarded to the API entrypoint."""
+
+    def _patch(self, cli: FABulous_CLI, mocker: MockerFixture) -> MockerFixture:
+        mocker.patch(
+            "fabulous.fabulous_cli.fabulous_cli.is_pdk_config_set", return_value=True
+        )
+        return mocker.patch.object(cli.fabulousAPI, "full_fabric_automation")
+
+    def test_forwards_nlp_flags(self, cli: FABulous_CLI, mocker: MockerFixture) -> None:
+        full_auto = self._patch(cli, mocker)
+
+        run_cmd(cli, "run_FABulous_eFPGA_macro --nlp-only --nlp-area-margin 0.1")
+
+        full_auto.assert_called_once()
+        kwargs = full_auto.call_args.kwargs
+        assert kwargs["nlp_only"] is True
+        assert kwargs["nlp_area_margin"] == pytest.approx(0.1)
+        assert kwargs["tile_opt_config"] is None
+
+    def test_forwards_defaults(self, cli: FABulous_CLI, mocker: MockerFixture) -> None:
+        full_auto = self._patch(cli, mocker)
+
+        run_cmd(cli, "run_FABulous_eFPGA_macro")
+
+        kwargs = full_auto.call_args.kwargs
+        assert kwargs["nlp_only"] is False
+        assert kwargs["nlp_area_margin"] == pytest.approx(0.05)
+        assert kwargs["tile_opt_config"] is None
+
+    def test_forwards_tile_opt_info_as_path(
+        self, cli: FABulous_CLI, mocker: MockerFixture, tmp_path: Path
+    ) -> None:
+        full_auto = self._patch(cli, mocker)
+        summary = tmp_path / "tile_optimisation_summary.json"
+        summary.touch()
+
+        run_cmd(cli, f"run_FABulous_eFPGA_macro --tile-opt-info {summary}")
+
+        tile_opt_config = full_auto.call_args.kwargs["tile_opt_config"]
+        assert tile_opt_config == Path(summary)
+
+    def test_skips_when_pdk_not_set(
+        self, cli: FABulous_CLI, mocker: MockerFixture
+    ) -> None:
+        mocker.patch(
+            "fabulous.fabulous_cli.fabulous_cli.is_pdk_config_set", return_value=False
+        )
+        full_auto = mocker.patch.object(cli.fabulousAPI, "full_fabric_automation")
+
+        run_cmd(cli, "run_FABulous_eFPGA_macro")
+
+        full_auto.assert_not_called()

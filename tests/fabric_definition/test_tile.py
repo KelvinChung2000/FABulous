@@ -1,6 +1,7 @@
 """Tests for Tile methods — notably pin-count and min-die-area computation."""
 
 from decimal import Decimal
+from pathlib import Path
 
 from fabulous.fabric_definition.define import IO, Direction, Side
 from fabulous.fabric_definition.port import Port
@@ -13,8 +14,8 @@ def _mk_tile(ports: list[Port]) -> Tile:
         name="T",
         ports=ports,
         bels=[],
-        tileDir=None,
-        matrixDir=None,
+        tileDir=Path(),
+        matrixDir=Path(),
         gen_ios=[],
         userCLK=False,
     )

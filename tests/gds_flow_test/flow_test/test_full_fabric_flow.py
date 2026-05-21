@@ -164,18 +164,64 @@ class TestValidateProjectDir:
 class TestRunTileFlowWorker:
     """Tests for _run_tile_flow_worker function."""
 
-    def test_worker_catches_exceptions(
+    def test_worker_propagates_unexpected_exceptions(
         self, mocker: MockerFixture, tmp_path: Path
     ) -> None:
-        """Test that worker catches exceptions and returns error trace."""
-        # Make flow raise an exception
+        """Unexpected (non-flow) exceptions propagate instead of being masked.
+
+        Only librelane `FlowError` (which includes deferred errors raised after
+        the GDS is written) triggers the disk-recovery path. A genuine bug must
+        surface with its stack trace.
+        """
         mocker.patch(
             "fabulous.fabric_generator.gds_generator.flows.full_fabric_flow.FABulousTileVerilogMacroFlow",
             side_effect=ValueError("Test error"),
         )
 
         tile: MagicMock = mocker.MagicMock()
-        result: WorkerResult = _run_tile_flow_worker(
+        with pytest.raises(ValueError, match="Test error"):
+            _run_tile_flow_worker(
+                tile,
+                tmp_path / "io.yaml",
+                OptMode.BALANCE,
+                tmp_path / "base.yaml",
+                tmp_path / "override.yaml",
+                "test_pdk",
+                tmp_path,
+                tmp_path / "models_pack.v",
+            )
+
+    def test_worker_recovers_state_on_deferred_flow_error(
+        self, mocker: MockerFixture, tmp_path: Path
+    ) -> None:
+        """A `FlowError` after the state was saved recovers the on-disk state."""
+        from librelane.flows.flow import FlowError
+
+        recovered_state: MagicMock = mocker.MagicMock()
+        mock_flow: MagicMock = mocker.MagicMock()
+        mock_flow.start.side_effect = FlowError("deferred errors were encountered")
+        mock_flow.run_dir = str(tmp_path)
+        mock_flow.config = {
+            "FABULOUS_PIN_MIN_WIDTH": Decimal("10.0"),
+            "FABULOUS_PIN_MIN_HEIGHT": Decimal("10.0"),
+        }
+        mocker.patch(
+            "fabulous.fabric_generator.gds_generator.flows.full_fabric_flow.FABulousTileVerilogMacroFlow",
+            return_value=mock_flow,
+        )
+        state_file: Path = tmp_path / "state_out.json"
+        state_file.write_text("{}", encoding="utf-8")
+        mocker.patch(
+            "fabulous.fabric_generator.gds_generator.flows.full_fabric_flow.get_latest_file",
+            return_value=state_file,
+        )
+        mocker.patch(
+            "fabulous.fabric_generator.gds_generator.flows.full_fabric_flow.State.loads",
+            return_value=recovered_state,
+        )
+
+        tile: MagicMock = mocker.MagicMock()
+        state, error_trace, pin_min = _run_tile_flow_worker(
             tile,
             tmp_path / "io.yaml",
             OptMode.BALANCE,
@@ -186,11 +232,10 @@ class TestRunTileFlowWorker:
             tmp_path / "models_pack.v",
         )
 
-        state, error_trace, pin_min = result
-        assert state is None
+        assert state is recovered_state
         assert error_trace is not None
-        assert "Test error" in error_trace
-        assert pin_min is None
+        assert "deferred errors" in error_trace
+        assert pin_min is not None
 
     def test_worker_returns_state_on_success(
         self, mocker: MockerFixture, tmp_path: Path
@@ -263,3 +308,130 @@ class TestWorkerCustomOverrides:
         assert "CUSTOM_KEY" in call_kwargs.kwargs or (
             len(call_kwargs.args) > 0 and hasattr(call_kwargs, "kwargs")
         )
+
+
+class TestLogNlpSummary:
+    """Tests for the _log_nlp_summary static method."""
+
+    def test_logs_table_with_tile_rows_and_utilisation(
+        self, mocker: MockerFixture
+    ) -> None:
+        """Each tile produces a row containing its name and a utilisation %."""
+        info_mock = mocker.patch(
+            "fabulous.fabric_generator.gds_generator.flows.full_fabric_flow.info"
+        )
+
+        nlp_state: MagicMock = mocker.MagicMock()
+        # nlp__tile__area maps name -> (x0, y0, width, height); util uses w*h.
+        nlp_state.metrics = {
+            "nlp__tile__area": {
+                "tile1": (0, 0, 10.0, 20.0),  # alloc area 200
+                "tile2": (0, 0, 5.0, 4.0),  # alloc area 20
+            },
+            "nlp__tile__stdcell_area": {
+                "tile1": 100.0,  # 50% util
+                "tile2": 5.0,  # 25% util
+            },
+            "nlp__total__area": 220.0,
+        }
+
+        FABulousFabricMacroFullFlow._log_nlp_summary(nlp_state)
+
+        logged = "\n".join(str(call.args[0]) for call in info_mock.call_args_list)
+        assert "tile1" in logged
+        assert "tile2" in logged
+        # tile1: 100/200 -> 50.0%, tile2: 5/20 -> 25.0%
+        assert "50.0%" in logged
+        assert "25.0%" in logged
+        # The width/height columns are derived from dims[2]/dims[3].
+        assert "10.00" in logged
+        assert "20.00" in logged
+
+    def test_handles_zero_allocated_area(self, mocker: MockerFixture) -> None:
+        """A zero-area tile reports 0% utilisation instead of dividing by zero."""
+        info_mock = mocker.patch(
+            "fabulous.fabric_generator.gds_generator.flows.full_fabric_flow.info"
+        )
+
+        nlp_state: MagicMock = mocker.MagicMock()
+        nlp_state.metrics = {
+            "nlp__tile__area": {"empty": (0, 0, 0.0, 0.0)},
+            "nlp__tile__stdcell_area": {"empty": 0.0},
+            "nlp__total__area": 0,
+        }
+
+        FABulousFabricMacroFullFlow._log_nlp_summary(nlp_state)
+
+        logged = "\n".join(str(call.args[0]) for call in info_mock.call_args_list)
+        assert "empty" in logged
+        assert "0.0%" in logged
+
+
+class TestRunNlpOnlyEarlyReturn:
+    """Tests for the FABULOUS_NLP_ONLY early-return path in run()."""
+
+    def test_returns_after_nlp_without_stitching(
+        self, mocker: MockerFixture, tmp_path: Path
+    ) -> None:
+        """With FABULOUS_NLP_ONLY set, run() returns the NLP state and stops.
+
+        The heavy recompilation/stitching collaborators must not be invoked:
+        no process pool, no stitching flow.
+        """
+        flow: MagicMock = mocker.MagicMock(spec=FABulousFabricMacroFullFlow)
+
+        fabric: MagicMock = mocker.MagicMock()
+
+        # Drive config lookups from a real dict so behaviour is explicit.
+        # TILE_OPT_INFO present -> initial compilation is skipped.
+        config_data: dict[str, object] = {
+            "FABULOUS_FABRIC": fabric,
+            "FABULOUS_PROJ_DIR": str(tmp_path),
+            "TILE_OPT_INFO": str(tmp_path / "summary.json"),
+            "FABULOUS_NLP_ONLY": True,
+        }
+        config: MagicMock = mocker.MagicMock()
+        config.__getitem__.side_effect = config_data.__getitem__
+        config.get.side_effect = config_data.get
+        config.copy.return_value = config
+        flow.config = config
+
+        # progress_bar is an instance attribute on Flow, not a class attribute,
+        # so the spec'd mock won't auto-create it.
+        flow.progress_bar = mocker.MagicMock()
+
+        nlp_state: MagicMock = mocker.MagicMock()
+        flow.start_step.return_value = nlp_state
+        flow._validate_project_dir = mocker.MagicMock()
+        flow._init_compile = mocker.MagicMock()
+        flow._log_nlp_summary = mocker.MagicMock()
+
+        # Patch the collaborators constructed inside run().
+        mocker.patch(
+            "fabulous.fabric_generator.gds_generator.flows."
+            "full_fabric_flow.GlobalTileSizeOptimization"
+        )
+        stitching = mocker.patch(
+            "fabulous.fabric_generator.gds_generator.flows."
+            "full_fabric_flow.FABulousFabricMacroFlow"
+        )
+        pool = mocker.patch(
+            "fabulous.fabric_generator.gds_generator.flows."
+            "full_fabric_flow.DillProcessPoolExecutor"
+        )
+
+        initial_state: MagicMock = mocker.MagicMock()
+        result_state, result_steps = FABulousFabricMacroFullFlow.run(
+            flow, initial_state
+        )
+
+        # NLP-only contract: returns the NLP state with no executed steps.
+        assert result_state is nlp_state
+        assert result_steps == []
+        # NLP summary is logged on the early-return path.
+        flow._log_nlp_summary.assert_called_once_with(nlp_state)
+        # Step 1 skipped because TILE_OPT_INFO was provided.
+        flow._init_compile.assert_not_called()
+        # No recompilation pool, no stitching flow.
+        pool.assert_not_called()
+        stitching.assert_not_called()

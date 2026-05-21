@@ -8,6 +8,7 @@ from pathlib import Path
 
 import pytest
 from librelane.config.config import Config
+from librelane.flows.flow import FlowException
 from librelane.state.state import State
 from pytest_mock import MockerFixture
 
@@ -243,6 +244,21 @@ class TestRunUserFixedSmartInit:
         step.run(mock_state)
 
         assert step.config["DIE_AREA"][3] == Decimal(100)
+
+    def test_zero_locked_axis_raises_clear_error(
+        self, mocker: MockerFixture, mock_config: Config, mock_state: State
+    ) -> None:
+        # A user DIE_AREA whose locked axis is zero must raise a clear error
+        # instead of a decimal.DivisionByZero from the smart-init seeding.
+        step = self._prepare(
+            mocker,
+            mock_config.copy(FABULOUS_OPT_MODE=OptMode.FIND_MIN_WIDTH),
+            (Decimal(0), Decimal(0), Decimal(10), Decimal(0)),
+        )
+        mock_state.metrics["design__instance__area"] = 5000
+
+        with pytest.raises(FlowException):
+            step.run(mock_state)
 
 
 class TestOptModeMissing:

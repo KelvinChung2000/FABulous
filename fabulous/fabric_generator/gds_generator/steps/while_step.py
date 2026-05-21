@@ -68,7 +68,7 @@ class WhileStep(Step):
         """Return true if the condition is met and keep the loop going."""
         return True
 
-    def mid_iteration_break(self, _state: State, _step: type[Step]) -> bool:
+    def mid_iteration_break(self, _state: State, _step: Step) -> bool:
         """Return True to break the current iteration and start the next iteration.
 
         If True, breaks the current iteration and starts the next iteration. Breaking

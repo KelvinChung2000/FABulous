@@ -33,8 +33,9 @@ class DillProcessPoolExecutor(ProcessPoolExecutor):
     ) -> None:
         ForkingPickler.dumps = dill.dumps
         ForkingPickler.loads = dill.loads
+        workers = max_workers if max_workers is not None else get_context().max_worker
         super().__init__(
-            max_workers=max_workers or get_context().max_worker,
+            max_workers=workers or None,
             mp_context=multiprocessing.get_context("spawn"),
             initializer=_init_worker,
             initargs=initargs,

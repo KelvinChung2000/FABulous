@@ -67,8 +67,7 @@ class FABulousDetailedRoutingTimed(OpenROAD.DetailedRouting):
         """Run detailed routing, killing the OpenROAD process tree on timeout."""
         timeout_s = int(self.config["FABULOUS_DRT_TIMEOUT"])
         timed_out = threading.Event()
-        # Keep a ref to the timer so the finally-clause can cancel it.
-        _timer_ref: dict[str, threading.Timer] = {}
+        timers: list[threading.Timer] = []
 
         def _spawn(
             *args: Any,  # noqa: ANN401
@@ -92,7 +91,7 @@ class FABulousDetailedRoutingTimed(OpenROAD.DetailedRouting):
             timer = threading.Timer(timeout_s, _kill)
             timer.daemon = True
             timer.start()
-            _timer_ref["t"] = timer
+            timers.append(timer)
             return proc
 
         kwargs["_popen_callable"] = _spawn
@@ -105,6 +104,5 @@ class FABulousDetailedRoutingTimed(OpenROAD.DetailedRouting):
                 ) from exc
             raise
         finally:
-            timer = _timer_ref.get("t")
-            if timer is not None:
+            for timer in timers:
                 timer.cancel()

@@ -81,8 +81,10 @@ class FABulousSettings(BaseSettings):
     )
     max_worker: int | None = Field(
         default=2,
-        description="Maximum number of worker processes for parallel tasks "
-        "(Multiple workers are only used for the full fabric flow for now)",
+        ge=0,
+        description="Maximum number of worker processes for parallel tasks. "
+        "0 or None means use the system default. (Multiple workers are only "
+        "used for the full fabric flow for now)",
     )
 
     # CLI variable

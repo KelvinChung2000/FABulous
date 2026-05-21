@@ -4,13 +4,12 @@ from decimal import Decimal
 from pathlib import Path
 from typing import Any
 
-from dill.logger import logger
 from librelane.common import GenericDict
 from librelane.config.variable import Variable
 from librelane.flows.classic import Classic
 from librelane.flows.flow import Flow, FlowException
 from librelane.flows.sequential import SequentialFlow
-from librelane.logging.logger import err, warn
+from librelane.logging.logger import err, info, warn
 from librelane.state.state import State
 from librelane.steps import odb as Odb
 from librelane.steps import openroad as OpenROAD
@@ -184,13 +183,13 @@ class FABulousTileVerilogMacroFlow(SequentialFlow):
                 and not self.config["FABULOUS_IGNORE_DEFAULT_DIE_AREA"]
             )
             if honour_user_die_area:
-                logger.info(
+                info(
                     f"FABulous optimisation is set to {final_opt_mode}, honouring "
                     "the user DIE_AREA: the fixed axis is locked and the other "
                     "axis is minimised."
                 )
             else:
-                logger.info(
+                info(
                     f"FABulous optimisation is set to {final_opt_mode}, "
                     "default die area is ignored."
                 )

@@ -20,7 +20,7 @@ from librelane.common.misc import get_latest_file
 from librelane.config.flow import flow_common_variables
 from librelane.config.variable import Variable
 from librelane.flows.classic import Classic
-from librelane.flows.flow import Flow, FlowException
+from librelane.flows.flow import Flow, FlowError, FlowException
 from librelane.logging.logger import err, info
 from librelane.state.design_format import DesignFormat
 from librelane.state.state import State
@@ -65,12 +65,6 @@ configs = (
             bool,
             description="Stop after NLP optimisation, skip recompilation and stitching",
             default=False,
-        ),
-        Variable(
-            "FABULOUS_NLP_AREA_MARGIN",
-            float,
-            description="Area margin for NLP constraint (0.05 = 5% slack)",
-            default=0.0,
         ),
     ]
 )
@@ -148,9 +142,7 @@ def _run_tile_flow_worker(
             **custom_config_overrides,
         )
         state: State = flow.start()
-    except Exception:  # noqa: BLE001
-        # Try to recover the state from disk - deferred errors (e.g. XOR
-        # differences) raise after the state has already been saved.
+    except FlowError:
         if flow is not None and flow.run_dir is not None:
             latest_state = get_latest_file(flow.run_dir, "state_out.json")
             if latest_state is not None:
@@ -445,7 +437,7 @@ class FABulousFabricMacroFullFlow(Flow):
                     "nlp__tile__area"
                 ][tile_type.name]
                 optimised_design_dir: Path = (
-                    tile_type.tileDir.parent / "macro" / "fabric_optmised"
+                    tile_type.tileDir.parent / "macro" / "fabric_optimised"
                 )
                 # Submit tile compilation with optimal dimensions
                 result: Future[WorkerResult] = executor.submit(

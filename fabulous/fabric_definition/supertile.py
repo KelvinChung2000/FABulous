@@ -134,8 +134,9 @@ class SuperTile:
     ) -> tuple[Decimal, Decimal]:
         """Calculate minimum SuperTile dimensions based on IO pin track requirements.
 
-        Aggregates IO pins from all constituent tiles on the outer edges
-        and calculates the minimum physical width and height required.
+        Takes the maximum per-side IO pin count across all constituent subtiles
+        as a conservative upper bound, then derives the minimum physical width
+        and height required.
 
         See ``Tile.get_min_die_area`` for the track-based derivation.
 

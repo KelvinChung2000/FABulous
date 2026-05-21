@@ -351,7 +351,7 @@ class NLPTileProblem(ElementwiseProblem):
             (
                 self.col_group_to_var[self.col_groups[col]],
                 self.row_group_to_var[self.row_groups[row]],
-                self.min_areas.get(name, float("inf")) * margin,
+                self.min_areas[name] * margin,
             )
             for name, col, row in tile_constraints
         ]
@@ -359,7 +359,7 @@ class NLPTileProblem(ElementwiseProblem):
             (
                 [self.col_group_to_var[self.col_groups[c]] for c in st_cols],
                 [self.row_group_to_var[self.row_groups[r]] for r in st_rows],
-                self.min_areas.get(name, float("inf")) * margin,
+                self.min_areas[name] * margin,
             )
             for name, st_cols, st_rows in supertile_constraints
         ]
@@ -598,6 +598,12 @@ class GlobalTileSizeOptimization(Step):
             Path,
             description="Path to the FABulous project directory",
         ),
+        Variable(
+            "FABULOUS_NLP_AREA_MARGIN",
+            float,
+            description="Area margin for NLP constraint (0.05 = 5% slack)",
+            default=0.05,
+        ),
     ]
 
     inputs = []
@@ -621,8 +627,8 @@ class GlobalTileSizeOptimization(Step):
             Raw metric fields for a tile from the JSON file, including required
             bbox fields and optional pin minimums.
 
-        Return
-        ------
+        Returns
+        -------
         dict[str, Any]
              Parsed fields including:
              - "design__die__bbox": [x0, y0, x1, y1]
@@ -725,7 +731,7 @@ class GlobalTileSizeOptimization(Step):
             valid_metrics = self.config["TILE_OPT_INFO"]
             all_metrics = valid_metrics
 
-        area_margin = self.config.get("FABULOUS_NLP_AREA_MARGIN", 0.0)
+        area_margin = self.config["FABULOUS_NLP_AREA_MARGIN"]
         info(f"Using area margin: {area_margin:.1%}")
         problem = NLPTileProblem(
             fabric, valid_metrics, all_metrics, area_margin=area_margin

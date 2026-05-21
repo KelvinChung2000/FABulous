@@ -1701,8 +1701,8 @@ class FABulous_CLI(Cmd):
         help="Area margin for NLP constraint (default: 0.05 = 5%%)",
     )
 
-    @with_argparser(eFPGA_macro_parser)
     @with_category(CMD_FABRIC_FLOW)
+    @with_argparser(eFPGA_macro_parser)
     def do_run_FABulous_eFPGA_macro(self, args: argparse.Namespace) -> None:
         """Run the full FABulous eFPGA macro generation flow."""
         if not is_pdk_config_set():

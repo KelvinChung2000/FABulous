@@ -4,7 +4,9 @@ from decimal import Decimal
 from enum import StrEnum
 from typing import cast
 
+from librelane.common import GenericImmutableDict
 from librelane.config.variable import Variable
+from librelane.flows.flow import FlowException
 from librelane.logging.logger import info
 from librelane.state.design_format import DesignFormat
 from librelane.state.state import State
@@ -512,8 +514,6 @@ class TileOptimisation(WhileStep):
 
         # State.metrics is an immutable dict; rebuild the state with an added
         # clean_probes entry rather than mutating in place.
-        from librelane.common import GenericImmutableDict
-
         last = self.last_working_state
         result = State(
             last,
@@ -541,7 +541,7 @@ class TileOptimisation(WhileStep):
 
         return result
 
-    def mid_iteration_break(self, state: State, step: type[Step]) -> bool:
+    def mid_iteration_break(self, state: State, step: Step) -> bool:
         """Mid iteration callback."""
         if not isinstance(step, Checker.TrDRC):
             return False
@@ -620,9 +620,19 @@ class TileOptimisation(WhileStep):
             match opt_mode:
                 case OptMode.FIND_MIN_WIDTH:
                     init_h = current_h if user_fixed else pin_h
+                    if init_h <= 0:
+                        raise FlowException(
+                            "FIND_MIN_WIDTH needs a positive locked height: set a "
+                            "non-zero DIE_AREA height or FABULOUS_PIN_MIN_HEIGHT."
+                        )
                     init_w = max(pin_w, instance_area / init_h)
                 case OptMode.FIND_MIN_HEIGHT:
                     init_w = current_w if user_fixed else pin_w
+                    if init_w <= 0:
+                        raise FlowException(
+                            "FIND_MIN_HEIGHT needs a positive locked width: set a "
+                            "non-zero DIE_AREA width or FABULOUS_PIN_MIN_WIDTH."
+                        )
                     init_h = max(pin_h, instance_area / init_w)
                 case _:  # BALANCE, LARGE — target square cells, aspect = W:H.
                     cell_side = (instance_area / (logical_w * logical_h)).sqrt()

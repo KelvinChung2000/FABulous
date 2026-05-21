@@ -597,18 +597,32 @@ class TileOptimisation(WhileStep):
         # Size the first iteration's die so it can hold the synth-reported
         # stdcell area at 100% utilisation. Buffer/CTS/routing slack is earned
         # by subsequent while-loop iterations. Per mode:
-        #   FIND_MIN_WIDTH:  keep h = pin_min_h, widen to fit the cells.
-        #   FIND_MIN_HEIGHT: keep w = pin_min_w, grow h to fit the cells.
+        #   FIND_MIN_WIDTH:  keep h fixed (user DIE_AREA, else pin_min_h), widen.
+        #   FIND_MIN_HEIGHT: keep w fixed (user DIE_AREA, else pin_min_w), grow h.
         #   BALANCE / LARGE: square bbox sized to hold the cells.
-        if instance_area > 0 and pin_w > 0 and pin_h > 0:
+        die_area = self.config.get("DIE_AREA")
+        current_w = Decimal(die_area[2]) if die_area else Decimal(0)
+        current_h = Decimal(die_area[3]) if die_area else Decimal(0)
+
+        # In directional modes the user locks the non-minimised axis via DIE_AREA
+        # (FABULOUS_IGNORE_DEFAULT_DIE_AREA stays False). When they do, hold that
+        # axis at the user value and seed only the minimised axis from the
+        # instance area, even if no pin floor is configured.
+        user_fixed = (
+            die_area is not None
+            and self._is_directional()
+            and not self.config.get("FABULOUS_IGNORE_DEFAULT_DIE_AREA", False)
+        )
+
+        if instance_area > 0 and (pin_w > 0 and pin_h > 0 or user_fixed):
             logical_w = Decimal(self.config.get("FABULOUS_TILE_LOGICAL_WIDTH", 1))
             logical_h = Decimal(self.config.get("FABULOUS_TILE_LOGICAL_HEIGHT", 1))
             match opt_mode:
                 case OptMode.FIND_MIN_WIDTH:
-                    init_h = pin_h
+                    init_h = current_h if user_fixed else pin_h
                     init_w = max(pin_w, instance_area / init_h)
                 case OptMode.FIND_MIN_HEIGHT:
-                    init_w = pin_w
+                    init_w = current_w if user_fixed else pin_w
                     init_h = max(pin_h, instance_area / init_w)
                 case _:  # BALANCE, LARGE — target square cells, aspect = W:H.
                     cell_side = (instance_area / (logical_w * logical_h)).sqrt()
@@ -627,12 +641,7 @@ class TileOptimisation(WhileStep):
             init_w = round_up_decimal(init_w, x_pitch)
             init_h = round_up_decimal(init_h, y_pitch)
 
-            die_area = self.config.get("DIE_AREA")
-            current_w = Decimal(die_area[2]) if die_area else Decimal(0)
-            current_h = Decimal(die_area[3]) if die_area else Decimal(0)
-
-            # Grow per-axis only so a user-supplied DIE_AREA override on the
-            # non-target axis is preserved.
+            # Grow per-axis only so a user-locked axis is preserved.
             new_w = max(current_w, init_w)
             new_h = max(current_h, init_h)
             if new_w > current_w or new_h > current_h:

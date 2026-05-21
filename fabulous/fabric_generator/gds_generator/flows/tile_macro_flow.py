@@ -170,11 +170,31 @@ class FABulousTileVerilogMacroFlow(SequentialFlow):
         )
         final_opt_mode = self.config.get("FABULOUS_OPT_MODE", None)
         if final_opt_mode and final_opt_mode != OptMode.NO_OPT:
-            logger.info(
-                f"FABulous optimisation is set to {final_opt_mode}, "
-                "default die area is ignored."
+            directional = final_opt_mode in (
+                OptMode.FIND_MIN_WIDTH,
+                OptMode.FIND_MIN_HEIGHT,
             )
-            self.config = self.config.copy(FABULOUS_IGNORE_DEFAULT_DIE_AREA=True)
+            # Directional modes minimise one axis. When the user supplies a
+            # DIE_AREA they are fixing the other axis, so keep that value instead
+            # of forcing the computed minimum. BALANCE/LARGE have no fixed axis,
+            # so they always fall back to full-auto sizing.
+            honour_user_die_area = (
+                directional
+                and self.config.get("DIE_AREA") is not None
+                and not self.config["FABULOUS_IGNORE_DEFAULT_DIE_AREA"]
+            )
+            if honour_user_die_area:
+                logger.info(
+                    f"FABulous optimisation is set to {final_opt_mode}, honouring "
+                    "the user DIE_AREA: the fixed axis is locked and the other "
+                    "axis is minimised."
+                )
+            else:
+                logger.info(
+                    f"FABulous optimisation is set to {final_opt_mode}, "
+                    "default die area is ignored."
+                )
+                self.config = self.config.copy(FABULOUS_IGNORE_DEFAULT_DIE_AREA=True)
 
         self.config = _apply_tile_die_area_config(
             self.config, tile_type, final_opt_mode
@@ -219,6 +239,14 @@ def _apply_tile_die_area_config(
     _, _, width, height = die_area
     width = Decimal(width)
     height = Decimal(height)
+
+    if opt_mode == OptMode.FIND_MIN_WIDTH:
+        _validate_fixed_axis("height", height, min_y, tile_type.name)
+        return config
+    if opt_mode == OptMode.FIND_MIN_HEIGHT:
+        _validate_fixed_axis("width", width, min_x, tile_type.name)
+        return config
+
     if width < min_x or height < min_y:
         raise FlowException(
             f"DIE_AREA ({width}, {height}) is smaller than the "
@@ -226,6 +254,18 @@ def _apply_tile_die_area_config(
             f"tile {tile_type.name}. Please update the DIE_AREA "
         )
     return config
+
+
+def _validate_fixed_axis(
+    axis: str, value: Decimal, minimum: Decimal, tile_name: str
+) -> None:
+    """Reject a user-fixed directional axis below its physical IO-pin minimum."""
+    if value < minimum:
+        raise FlowException(
+            f"Fixed {axis} ({value}) is smaller than the minimum required "
+            f"{axis} ({minimum}) to fit the IO pins of tile {tile_name}. "
+            f"Increase the DIE_AREA {axis} or pick a different optimisation mode."
+        )
 
 
 @Flow.factory.register()

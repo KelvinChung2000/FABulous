@@ -154,7 +154,7 @@ def _run_tile_flow_worker(
 
 
 @Flow.factory.register()
-class FABulousFabricMacroFullFlow(Flow):
+class FABulousFabricOptimisationFlow(Flow):
     """Full automatic fabric flow with LP-optimized tile dimensions.
 
     This flow automatically:

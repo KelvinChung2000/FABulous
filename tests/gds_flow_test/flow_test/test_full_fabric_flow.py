@@ -16,8 +16,8 @@ from unittest.mock import MagicMock
 import pytest
 from pytest_mock import MockerFixture
 
-from fabulous.fabric_generator.gds_generator.flows.full_fabric_flow import (
-    FABulousFabricMacroFullFlow,
+from fabulous.fabric_generator.gds_generator.flows.fabric_optimisation_flow import (
+    FABulousFabricOptimisationFlow,
     WorkerResult,
     _run_tile_flow_worker,
 )
@@ -28,8 +28,8 @@ from fabulous.fabric_generator.gds_generator.steps.tile_optimisation import OptM
 @pytest.fixture
 def mock_flow_with_validate_project_dir(mocker: MockerFixture) -> MagicMock:
     """Create a mock flow with _validate_project_dir method bound."""
-    flow: MagicMock = mocker.MagicMock(spec=FABulousFabricMacroFullFlow)
-    flow._validate_project_dir = FABulousFabricMacroFullFlow._validate_project_dir
+    flow: MagicMock = mocker.MagicMock(spec=FABulousFabricOptimisationFlow)
+    flow._validate_project_dir = FABulousFabricOptimisationFlow._validate_project_dir
     return flow
 
 
@@ -335,7 +335,7 @@ class TestLogNlpSummary:
             "nlp__total__area": 220.0,
         }
 
-        FABulousFabricMacroFullFlow._log_nlp_summary(nlp_state)
+        FABulousFabricOptimisationFlow._log_nlp_summary(nlp_state)
 
         logged = "\n".join(str(call.args[0]) for call in info_mock.call_args_list)
         assert "tile1" in logged
@@ -360,7 +360,7 @@ class TestLogNlpSummary:
             "nlp__total__area": 0,
         }
 
-        FABulousFabricMacroFullFlow._log_nlp_summary(nlp_state)
+        FABulousFabricOptimisationFlow._log_nlp_summary(nlp_state)
 
         logged = "\n".join(str(call.args[0]) for call in info_mock.call_args_list)
         assert "empty" in logged
@@ -378,7 +378,7 @@ class TestRunNlpOnlyEarlyReturn:
         The heavy recompilation/stitching collaborators must not be invoked:
         no process pool, no stitching flow.
         """
-        flow: MagicMock = mocker.MagicMock(spec=FABulousFabricMacroFullFlow)
+        flow: MagicMock = mocker.MagicMock(spec=FABulousFabricOptimisationFlow)
 
         fabric: MagicMock = mocker.MagicMock()
 
@@ -421,7 +421,7 @@ class TestRunNlpOnlyEarlyReturn:
         )
 
         initial_state: MagicMock = mocker.MagicMock()
-        result_state, result_steps = FABulousFabricMacroFullFlow.run(
+        result_state, result_steps = FABulousFabricOptimisationFlow.run(
             flow, initial_state
         )
 
@@ -460,7 +460,9 @@ class TestFinaliseFabric:
         final_state.metrics = {}
 
         with pytest.raises(RuntimeError, match="no GDS"):
-            FABulousFabricMacroFullFlow._finalise(self._fabric(mocker), final_state, {})
+            FABulousFabricOptimisationFlow._finalise(
+                self._fabric(mocker), final_state, {}
+            )
 
     def test_logs_summary_with_per_tile_macro_sizes(
         self, mocker: MockerFixture
@@ -477,7 +479,7 @@ class TestFinaliseFabric:
             "fabulous.fabric_generator.gds_generator.flows.full_fabric_flow.info"
         )
 
-        FABulousFabricMacroFullFlow._finalise(
+        FABulousFabricOptimisationFlow._finalise(
             self._fabric(mocker), final_state, tile_states
         )
 

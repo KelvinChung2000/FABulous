@@ -37,8 +37,8 @@ from fabulous.fabric_generator.code_generator.code_generator_VHDL import (
 from fabulous.fabric_generator.gds_generator.flows.fabric_macro_flow import (
     FABulousFabricMacroFlow,
 )
-from fabulous.fabric_generator.gds_generator.flows.full_fabric_flow import (
-    FABulousFabricMacroFullFlow,
+from fabulous.fabric_generator.gds_generator.flows.fabric_optimisation_flow import (
+    FABulousFabricOptimisationFlow,
 )
 from fabulous.fabric_generator.gds_generator.flows.tile_macro_flow import (
     FABulousTileVerilogMacroFlow,
@@ -711,7 +711,7 @@ class FABulous_API:
             ]
             if i is not None
         ]
-        flow = FABulousFabricMacroFullFlow(
+        flow = FABulousFabricOptimisationFlow(
             configs,
             name=self.fabric.name,
             design_dir=str(out_folder.resolve()),

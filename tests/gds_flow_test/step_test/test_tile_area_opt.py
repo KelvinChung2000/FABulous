@@ -1,4 +1,4 @@
-"""Tests for TileOptimisation step."""
+"""Tests for TileAreaOptimisation step."""
 
 # for testing private methods
 # ruff: noqa: SLF001
@@ -68,12 +68,12 @@ class TestTileOptimisation:
         """Test pre_iteration_callback in find_min_width mode."""
         # Mock get_pitch to return reasonable pitch values
         mocker.patch(
-            "fabulous.fabric_generator.gds_generator.steps.tile_optimisation.get_pitch",
+            "fabulous.fabric_generator.gds_generator.steps.tile_area_opt.get_pitch",
             return_value=(Decimal("0.46"), Decimal("2.72")),
         )
         # Mock get_routing_obstructions to avoid config key errors
         mocker.patch(
-            "fabulous.fabric_generator.gds_generator.steps.tile_optimisation.get_routing_obstructions",
+            "fabulous.fabric_generator.gds_generator.steps.tile_area_opt.get_routing_obstructions",
             return_value=[],
         )
 
@@ -137,7 +137,7 @@ class TestTileOptimisation:
         step = TileAreaOptimisation(mock_config)
         step.config = mock_config
         _mock_run = mocker.patch(
-            "fabulous.fabric_generator.gds_generator.steps.tile_optimisation.WhileStep.run",
+            "fabulous.fabric_generator.gds_generator.steps.tile_area_opt.WhileStep.run",
             return_value=({}, {}),
         )
 
@@ -150,7 +150,7 @@ class TestTileOptimisation:
         self, mock_config: Config, mock_state: State
     ) -> None:
         """Test mid_iteration_break returns True on DRC errors."""
-        from fabulous.fabric_generator.gds_generator.steps.tile_optimisation import (
+        from fabulous.fabric_generator.gds_generator.steps.tile_area_opt import (
             Checker,
         )
 
@@ -181,11 +181,11 @@ class TestRunUserFixedSmartInit:
         die_area: tuple[Decimal, Decimal, Decimal, Decimal],
     ) -> TileAreaOptimisation:
         mocker.patch(
-            "fabulous.fabric_generator.gds_generator.steps.tile_optimisation.get_pitch",
+            "fabulous.fabric_generator.gds_generator.steps.tile_area_opt.get_pitch",
             return_value=(Decimal("0.5"), Decimal("0.5")),
         )
         mocker.patch(
-            "fabulous.fabric_generator.gds_generator.steps.tile_optimisation.WhileStep.run",
+            "fabulous.fabric_generator.gds_generator.steps.tile_area_opt.WhileStep.run",
             return_value=({}, {}),
         )
         cfg = config.copy(FABULOUS_IGNORE_DEFAULT_DIE_AREA=False, DIE_AREA=die_area)
@@ -448,7 +448,7 @@ class TestComputeBinarySearchDimensions:
     ) -> TileAreaOptimisation:
         # get_pitch is read inside the helper to compute pitch on the target axis.
         mocker.patch(
-            "fabulous.fabric_generator.gds_generator.steps.tile_optimisation.get_pitch",
+            "fabulous.fabric_generator.gds_generator.steps.tile_area_opt.get_pitch",
             return_value=(Decimal("0.5"), Decimal("0.5")),
         )
         cfg = mock_config.copy(FABULOUS_OPT_MODE=mode)

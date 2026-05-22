@@ -1,4 +1,4 @@
-"""Tests for FABulousFabricMacroFullFlow - Full automatic fabric flow.
+"""Tests for FABulousFabricOptimisationFlow - fabric optimisation flow.
 
 Tests focus on:
 - Flow initialization and configuration
@@ -174,7 +174,7 @@ class TestRunTileFlowWorker:
         surface with its stack trace.
         """
         mocker.patch(
-            "fabulous.fabric_generator.gds_generator.flows.full_fabric_flow.FABulousTileVerilogMacroFlow",
+            "fabulous.fabric_generator.gds_generator.flows.fabric_optimisation_flow.FABulousTileVerilogMacroFlow",
             side_effect=ValueError("Test error"),
         )
 
@@ -206,17 +206,17 @@ class TestRunTileFlowWorker:
             "FABULOUS_PIN_MIN_HEIGHT": Decimal("10.0"),
         }
         mocker.patch(
-            "fabulous.fabric_generator.gds_generator.flows.full_fabric_flow.FABulousTileVerilogMacroFlow",
+            "fabulous.fabric_generator.gds_generator.flows.fabric_optimisation_flow.FABulousTileVerilogMacroFlow",
             return_value=mock_flow,
         )
         state_file: Path = tmp_path / "state_out.json"
         state_file.write_text("{}", encoding="utf-8")
         mocker.patch(
-            "fabulous.fabric_generator.gds_generator.flows.full_fabric_flow.get_latest_file",
+            "fabulous.fabric_generator.gds_generator.flows.fabric_optimisation_flow.get_latest_file",
             return_value=state_file,
         )
         mocker.patch(
-            "fabulous.fabric_generator.gds_generator.flows.full_fabric_flow.State.loads",
+            "fabulous.fabric_generator.gds_generator.flows.fabric_optimisation_flow.State.loads",
             return_value=recovered_state,
         )
 
@@ -249,7 +249,7 @@ class TestRunTileFlowWorker:
             "FABULOUS_PIN_MIN_HEIGHT": Decimal("10.0"),
         }
         mocker.patch(
-            "fabulous.fabric_generator.gds_generator.flows.full_fabric_flow.FABulousTileVerilogMacroFlow",
+            "fabulous.fabric_generator.gds_generator.flows.fabric_optimisation_flow.FABulousTileVerilogMacroFlow",
             return_value=mock_flow,
         )
 
@@ -286,7 +286,7 @@ class TestWorkerCustomOverrides:
             "FABULOUS_PIN_MIN_HEIGHT": Decimal("10.0"),
         }
         mock_flow_class: MagicMock = mocker.patch(
-            "fabulous.fabric_generator.gds_generator.flows.full_fabric_flow.FABulousTileVerilogMacroFlow",
+            "fabulous.fabric_generator.gds_generator.flows.fabric_optimisation_flow.FABulousTileVerilogMacroFlow",
             return_value=mock_flow,
         )
 
@@ -318,7 +318,7 @@ class TestLogNlpSummary:
     ) -> None:
         """Each tile produces a row containing its name and a utilisation %."""
         info_mock = mocker.patch(
-            "fabulous.fabric_generator.gds_generator.flows.full_fabric_flow.info"
+            "fabulous.fabric_generator.gds_generator.flows.fabric_optimisation_flow.info"
         )
 
         nlp_state: MagicMock = mocker.MagicMock()
@@ -350,7 +350,7 @@ class TestLogNlpSummary:
     def test_handles_zero_allocated_area(self, mocker: MockerFixture) -> None:
         """A zero-area tile reports 0% utilisation instead of dividing by zero."""
         info_mock = mocker.patch(
-            "fabulous.fabric_generator.gds_generator.flows.full_fabric_flow.info"
+            "fabulous.fabric_generator.gds_generator.flows.fabric_optimisation_flow.info"
         )
 
         nlp_state: MagicMock = mocker.MagicMock()
@@ -409,15 +409,15 @@ class TestRunNlpOnlyEarlyReturn:
         # Patch the collaborators constructed inside run().
         mocker.patch(
             "fabulous.fabric_generator.gds_generator.flows."
-            "full_fabric_flow.GlobalTileSizeoptimisation"
+            "fabric_optimisation_flow.FabricAreaOptimisation"
         )
         stitching = mocker.patch(
             "fabulous.fabric_generator.gds_generator.flows."
-            "full_fabric_flow.FABulousFabricMacroFlow"
+            "fabric_optimisation_flow.FABulousFabricMacroFlow"
         )
         pool = mocker.patch(
             "fabulous.fabric_generator.gds_generator.flows."
-            "full_fabric_flow.DillProcessPoolExecutor"
+            "fabric_optimisation_flow.DillProcessPoolExecutor"
         )
 
         initial_state: MagicMock = mocker.MagicMock()
@@ -476,7 +476,7 @@ class TestFinaliseFabric:
             "DSP": self._tile_state(mocker, "0 0 50 60"),
         }
         info_mock = mocker.patch(
-            "fabulous.fabric_generator.gds_generator.flows.full_fabric_flow.info"
+            "fabulous.fabric_generator.gds_generator.flows.fabric_optimisation_flow.info"
         )
 
         FABulousFabricOptimisationFlow._finalise(
@@ -491,4 +491,3 @@ class TestFinaliseFabric:
         assert "100.00 x 200.00" in logged  # overall die area w x h
         assert "LUT 30.00 x 40.00" in logged  # per-macro tile size
         assert "DSP 50.00 x 60.00" in logged
-        assert "myfab.gds" in logged

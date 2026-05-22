@@ -1,4 +1,4 @@
-"""Tests for GlobalTileSizeoptimisation NLP problem helpers.
+"""Tests for FabricAreaOptimisation NLP problem helpers.
 
 The Pareto frontier helper is the most failure-prone part of the NLP setup: a
 flipped iteration direction silently locks the body row to the worst-aspect

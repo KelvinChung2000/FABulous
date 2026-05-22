@@ -1675,7 +1675,9 @@ class FABulous_CLI(Cmd):
         (self.projectDir / "Fabric" / "macro").mkdir(exist_ok=True)
         self.fabulousAPI.fabric_stitching(
             tile_macro_paths,
-            self.projectDir / "Fabric" / f"{self.fabulousAPI.fabric.name}.v",
+            self.projectDir
+            / "Fabric"
+            / f"{self.fabulousAPI.fabric.name}.{self.extension}",
             self.projectDir / "Fabric" / "macro",
             cast("str", get_context().pdk),
             cast("Path", get_context().pdk_root),

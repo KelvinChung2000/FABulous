@@ -78,8 +78,8 @@ class VerilogGateLevelTimingGraph(SDFTimingGraph):
 
         Limitations
         -----------
-        - Expects gate-level, structural Verilog: module/endmodule + simple instances
-            of the form: CellType inst_name ( .PIN(net), ... );
+        - Expects gate-level, structural Verilog: module/endmodule + simple
+          instances of the form `CellType inst_name ( .PIN(net), ... );`
         - Ignores assign statements, generate blocks, functions, etc.
         - Assumes module port names are used as net names inside the module.
 

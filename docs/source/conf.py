@@ -25,8 +25,8 @@ project_tagline = "An easy-to-use, silicon-proven (e)FPGA generator with an inte
 
 # -- General configuration
 
-# Ensure the repository root is importable so `import FABulous.*` works as a
-# proper package (and doesn't get shadowed by FABulous.py).
+# Ensure the repository root is importable so the `fabulous` package and the
+# docs helper modules (`docs.source.*`) resolve as proper packages.
 _repo_root = Path(__file__).resolve().parents[2].as_posix()
 if _repo_root not in sys.path:
     sys.path.insert(0, _repo_root)
@@ -46,7 +46,6 @@ format_annotation_for_rst = import_module(
 extensions = [
     # Core Sphinx extensions (scikit-learn style)
     "sphinx.ext.autodoc",
-    "sphinx.ext.autosummary",
     "sphinx.ext.duration",
     "sphinx.ext.doctest",
     "sphinx.ext.intersphinx",
@@ -65,7 +64,7 @@ extensions = [
     # Utility extensions
     "sphinxcontrib.bibtex",
     "sphinx_llm.txt",
-    'sphinxcontrib.mermaid',
+    "sphinxcontrib.mermaid",
     # Custom FABulous extensions
     "generate_cli_docs",
     "generate_configvar_docs",
@@ -136,26 +135,9 @@ napoleon_custom_sections = [
     ("VHDL", "Other"),
 ]
 
-# -- Mock imports for documentation build
-autodoc_mock_imports = [
-    # External dependencies that aren't available in docs environment
-    "numpy",
-    "pandas",
-    "matplotlib",
-    "networkx",
-    "lxml",
-    "typing_extensions",
-    "loguru",
-    "cmd2",
-    "dotenv",
-    "bitarray",
-    "requests",
-    "pydantic",
-    "pydantic_settings",
-    "rich",
-    "textx",
-    "arpeggio",
-]
+# No autodoc_mock_imports: the docs environment installs `fabulous-fpga` with its
+# full dependency set, and AutoAPI parses sources statically, so nothing needs
+# mocking. (Add a name here only if a real import genuinely fails in the build.)
 
 # Configure autodoc to avoid dataclass field duplication
 autodoc_default_options = {
@@ -169,11 +151,11 @@ autodoc_default_options = {
 # Prevent autodoc from automatically documenting modules
 autodoc_member_order = "alphabetical"
 
-# Prevent duplicate object warnings from autosummary
+# Render type hints in the parameter descriptions, not the signature: keeps
+# AutoAPI signatures readable and avoids unresolved fully-qualified type refs.
 autodoc_typehints = "description"
 autodoc_typehints_description_target = "documented"
 autodoc_preserve_defaults = True
-autodoc_member_order = "alphabetical"
 autodoc_class_signature = "mixed"
 autodoc_inherit_docstrings = True
 
@@ -185,14 +167,6 @@ typehints_use_signature_return = True  # Show return types in signature
 typehints_use_rtype = False  # Do not add return types to docstring bodies
 always_document_param_types = True  # Always show parameter types
 typehints_formatter = format_annotation_for_rst
-
-# Enhanced intersphinx mapping for better cross-references
-intersphinx_mapping.update(
-    {
-        "numpy": ("https://numpy.org/doc/stable/", None),
-        "pandas": ("https://pandas.pydata.org/docs/", None),
-    }
-)
 
 # Modern Sphinx configuration
 html_title = f"{project} v{version}"
@@ -311,22 +285,17 @@ def setup(app):
     return {"version": "0.1", "parallel_read_safe": True}
 
 
-# Only suppress warnings that are definitely safe to ignore
 suppress_warnings = [
-    # These are genuinely noisy and don't indicate real issues
-    "app.add_node",  # Extension internal warnings
-    "ref.class",  # Missing type references that can't be resolved
-    "ref.exc",  # Missing exception references
-    "ref.obj",  # Missing exception references
-    # TODO(doc): Temporary suppression for docutils-origin warnings coming from
-    # generated .rst/docstrings. Remove after cleaning docstrings and
-    # improving templates. Patterns below cover common docutils emitters.
+    "app.add_node",  # Sphinx extension internal node-registration noise
+    # Pre-existing docstring-markup debt in the AutoAPI-generated API reference:
+    # a number of source docstrings embed code/examples or inherited (cmd2)
+    # docstrings that docutils misparses (block quotes, field/definition lists).
+    # These are NOT config issues; clearing them is a dedicated docstring sweep
+    # (note: AutoAPI's nested-parse mis-attributes the warning line numbers, so
+    # the whole generated rst for a module must be read to find the real source).
+    # Remove this once the source docstrings are cleaned up.
     "docutils",
-    "ref.doc",
 ]
-# Note: ~10 "duplicate object description" warnings are expected from AutoAPI's handling
-# of dataclass attributes (like hide_name, bits, etc. that appear in multiple classes).
-# These are cosmetic only - the documentation content is complete and correct.
 
 
 # Exclude patterns to prevent conflicts
@@ -381,22 +350,6 @@ html_theme_options = {
 html_static_path = ["_static"]
 html_css_files = ["custom.css"]
 html_js_files = ["toc_sidebar.js"]
-
-# -- removing left side bar on pages that don't benefit
-html_sidebars = {
-    "Usage": [],
-    "Building fabric": [],
-    "fabric_definition": [],
-    "fabric_automation": [],
-    "FPGA_CAD-tools/index": [],
-    "gallary/index": [],
-    "FPGA-to-bitstream/index": [],
-    "definitions": [],
-    "contact": [],
-    "publications": [],
-    "simulation/index": [],
-    "development": [],
-}
 
 # -- Options for EPUB output
 epub_show_urls = "footnote"

@@ -42,7 +42,7 @@ from fabulous.fabric_generator.gds_generator.gen_io_pin_config_yaml import (
 from fabulous.fabric_generator.gds_generator.steps.extract_pdk_info import (
     ExtractPDKInfo,
 )
-from fabulous.fabric_generator.gds_generator.steps.global_tile_opitmisation import (
+from fabulous.fabric_generator.gds_generator.steps.global_tile_optimisation import (
     GlobalTileSizeOptimization,
 )
 from fabulous.fabric_generator.gds_generator.steps.tile_optimisation import OptMode

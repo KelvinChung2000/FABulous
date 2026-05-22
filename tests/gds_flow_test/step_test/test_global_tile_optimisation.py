@@ -17,7 +17,7 @@ import pytest
 
 from fabulous.fabric_definition.fabric import Fabric
 from fabulous.fabric_definition.tile import Tile
-from fabulous.fabric_generator.gds_generator.steps.global_tile_opitmisation import (
+from fabulous.fabric_generator.gds_generator.steps.global_tile_optimisation import (
     GlobalTileSizeOptimization,
     NLPTileProblem,
 )

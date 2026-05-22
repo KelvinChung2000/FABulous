@@ -11,7 +11,7 @@ from pathlib import Path
 import pytest
 from pytest_mock import MockerFixture
 
-from fabulous.fabric_generator.gds_generator.steps.tile_optimisation import OptMode
+from fabulous.fabric_generator.gds_generator.steps.tile_area_opt import OptMode
 from fabulous.fabulous_cli.fabulous_cli import FABulous_CLI, _resolve_directional_fix
 from fabulous.fabulous_cli.helper import create_project, setup_logger
 from fabulous.fabulous_settings import init_context, reset_context

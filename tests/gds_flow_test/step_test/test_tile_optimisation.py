@@ -12,9 +12,9 @@ from librelane.flows.flow import FlowException
 from librelane.state.state import State
 from pytest_mock import MockerFixture
 
-from fabulous.fabric_generator.gds_generator.steps.tile_optimisation import (
+from fabulous.fabric_generator.gds_generator.steps.tile_area_opt import (
     OptMode,
-    TileOptimisation,
+    TileAreaOptimisation,
 )
 
 
@@ -27,7 +27,7 @@ class TestTileOptimisation:
         """Test condition returns True when DRC errors exist."""
         mock_state.metrics["route__drc_errors"] = 5
 
-        step = TileOptimisation(mock_config)
+        step = TileAreaOptimisation(mock_config)
         step.config = mock_config
         assert step.condition(mock_state) is True
 
@@ -38,7 +38,7 @@ class TestTileOptimisation:
         mock_state.metrics["route__drc_errors"] = 0
         mock_state.metrics["antenna__violating__nets"] = 2
 
-        step = TileOptimisation(mock_config)
+        step = TileAreaOptimisation(mock_config)
         step.config = mock_config
         assert step.condition(mock_state) is True
 
@@ -54,7 +54,7 @@ class TestTileOptimisation:
         # bracket-based termination and ignore DRC when no bracket is set, so
         # pin the mode here.
         mock_config = mock_config.copy(FABULOUS_OPT_MODE=OptMode.BALANCE)
-        step = TileOptimisation(mock_config)
+        step = TileAreaOptimisation(mock_config)
         step.config = mock_config
         assert step.condition(mock_state) is False
 
@@ -86,7 +86,7 @@ class TestTileOptimisation:
         mock_config = mock_config.copy(BOTTOM_MARGIN_MULT=Decimal(0))
         mock_config = mock_config.copy(TOP_MARGIN_MULT=Decimal(0))
 
-        step = TileOptimisation(mock_config)
+        step = TileAreaOptimisation(mock_config)
         step.step_dir = str(tmp_path)
         step.config = mock_config
         step.iter_count = 0
@@ -107,7 +107,7 @@ class TestTileOptimisation:
         against ``mock_state`` no longer holds, but the original metrics must still be
         visible on the returned state.
         """
-        step = TileOptimisation(mock_config)
+        step = TileAreaOptimisation(mock_config)
         step.config = mock_config
         step.last_working_state = State(metrics=mock_state.metrics)
         step.clean_probes = []
@@ -121,7 +121,7 @@ class TestTileOptimisation:
         self, mock_config: Config, mock_state: State
     ) -> None:
         """Test post_loop_callback raises error if no working state found."""
-        step = TileOptimisation(mock_config)
+        step = TileAreaOptimisation(mock_config)
         step.config = mock_config
         step.last_working_state = None
 
@@ -134,7 +134,7 @@ class TestTileOptimisation:
         """Test run method with IGNORE_ANTENNA_VIOLATIONS enabled."""
         mock_config = mock_config.copy(IGNORE_ANTENNA_VIOLATIONS=True)
 
-        step = TileOptimisation(mock_config)
+        step = TileAreaOptimisation(mock_config)
         step.config = mock_config
         _mock_run = mocker.patch(
             "fabulous.fabric_generator.gds_generator.steps.tile_optimisation.WhileStep.run",
@@ -157,7 +157,7 @@ class TestTileOptimisation:
         mock_state.metrics["route__drc_errors"] = 5
         mock_config = mock_config.copy(IGNORE_ANTENNA_VIOLATIONS=True)
 
-        step = TileOptimisation(mock_config)
+        step = TileAreaOptimisation(mock_config)
         step.config = mock_config
 
         result = step.mid_iteration_break(mock_state, Checker.TrDRC())
@@ -179,7 +179,7 @@ class TestRunUserFixedSmartInit:
         mocker: MockerFixture,
         config: Config,
         die_area: tuple[Decimal, Decimal, Decimal, Decimal],
-    ) -> TileOptimisation:
+    ) -> TileAreaOptimisation:
         mocker.patch(
             "fabulous.fabric_generator.gds_generator.steps.tile_optimisation.get_pitch",
             return_value=(Decimal("0.5"), Decimal("0.5")),
@@ -189,7 +189,7 @@ class TestRunUserFixedSmartInit:
             return_value=({}, {}),
         )
         cfg = config.copy(FABULOUS_IGNORE_DEFAULT_DIE_AREA=False, DIE_AREA=die_area)
-        step = TileOptimisation(cfg)
+        step = TileAreaOptimisation(cfg)
         step.config = cfg
         return step
 
@@ -291,7 +291,7 @@ class TestDirectionalHelpers:
     ) -> None:
         for mode in (OptMode.FIND_MIN_WIDTH, OptMode.FIND_MIN_HEIGHT):
             cfg = mock_config.copy(FABULOUS_OPT_MODE=mode)
-            step = TileOptimisation(cfg)
+            step = TileAreaOptimisation(cfg)
             step.config = cfg
             assert step._is_directional() is True
 
@@ -300,7 +300,7 @@ class TestDirectionalHelpers:
     ) -> None:
         for mode in (OptMode.BALANCE, OptMode.LARGE, OptMode.NO_OPT):
             cfg = mock_config.copy(FABULOUS_OPT_MODE=mode)
-            step = TileOptimisation(cfg)
+            step = TileAreaOptimisation(cfg)
             step.config = cfg
             assert step._is_directional() is False
 
@@ -308,7 +308,7 @@ class TestDirectionalHelpers:
         self, mock_config: Config
     ) -> None:
         cfg = mock_config.copy(FABULOUS_OPT_MODE=OptMode.FIND_MIN_WIDTH)
-        step = TileOptimisation(cfg)
+        step = TileAreaOptimisation(cfg)
         step.config = cfg
         # die_area is (x0, y0, w, h); FIND_MIN_WIDTH targets w.
         assert step._directional_target(
@@ -319,7 +319,7 @@ class TestDirectionalHelpers:
         self, mock_config: Config
     ) -> None:
         cfg = mock_config.copy(FABULOUS_OPT_MODE=OptMode.FIND_MIN_HEIGHT)
-        step = TileOptimisation(cfg)
+        step = TileAreaOptimisation(cfg)
         step.config = cfg
         assert step._directional_target(
             (Decimal(0), Decimal(0), Decimal("12.5"), Decimal("99.9"))
@@ -333,7 +333,7 @@ class TestComputeNewDimensions:
         # BALANCE on a non-supertile (logical=1x1) grows the smaller axis only.
         cfg = mock_config.copy(FABULOUS_OPT_MODE=OptMode.BALANCE)
         cfg = cfg.copy(FABULOUS_TILE_LOGICAL_WIDTH=1, FABULOUS_TILE_LOGICAL_HEIGHT=1)
-        step = TileOptimisation(cfg)
+        step = TileAreaOptimisation(cfg)
         step.config = cfg
 
         # width (5) <= height (10) -> width grows by width_step.
@@ -362,7 +362,7 @@ class TestComputeNewDimensions:
 
     def test_large_grows_both_axes(self, mock_config: Config) -> None:
         cfg = mock_config.copy(FABULOUS_OPT_MODE=OptMode.LARGE)
-        step = TileOptimisation(cfg)
+        step = TileAreaOptimisation(cfg)
         step.config = cfg
 
         new_w, new_h = step._compute_new_dimensions(
@@ -380,7 +380,7 @@ class TestComputeNewDimensions:
         # When instance area > core area, both axes scale by sqrt(ratio)
         # *before* the per-axis step is applied.
         cfg = mock_config.copy(FABULOUS_OPT_MODE=OptMode.LARGE)
-        step = TileOptimisation(cfg)
+        step = TileAreaOptimisation(cfg)
         step.config = cfg
 
         # ratio = 400/100 = 4 -> scale = 2.
@@ -402,7 +402,7 @@ class TestComputeNewDimensions:
         # 2x1 supertile: logical aspect 2:1 must be preserved when growing.
         cfg = mock_config.copy(FABULOUS_OPT_MODE=OptMode.BALANCE)
         cfg = cfg.copy(FABULOUS_TILE_LOGICAL_WIDTH=2, FABULOUS_TILE_LOGICAL_HEIGHT=1)
-        step = TileOptimisation(cfg)
+        step = TileAreaOptimisation(cfg)
         step.config = cfg
 
         # cell_step = max(width_step/2, height_step/1) = max(2, 3) = 3
@@ -421,7 +421,7 @@ class TestComputeNewDimensions:
 
     def test_unknown_mode_raises(self, mock_config: Config) -> None:
         cfg = mock_config.copy(FABULOUS_OPT_MODE=OptMode.NO_OPT)
-        step = TileOptimisation(cfg)
+        step = TileAreaOptimisation(cfg)
         step.config = cfg
         with pytest.raises(ValueError, match="Unknown FABULOUS_OPT_MODE"):
             step._compute_new_dimensions(
@@ -445,7 +445,7 @@ class TestComputeBinarySearchDimensions:
 
     def _setup(
         self, mocker: MockerFixture, mock_config: Config, mode: OptMode
-    ) -> TileOptimisation:
+    ) -> TileAreaOptimisation:
         # get_pitch is read inside the helper to compute pitch on the target axis.
         mocker.patch(
             "fabulous.fabric_generator.gds_generator.steps.tile_optimisation.get_pitch",
@@ -454,7 +454,7 @@ class TestComputeBinarySearchDimensions:
         cfg = mock_config.copy(FABULOUS_OPT_MODE=mode)
         cfg = cfg.copy(FABULOUS_PIN_MIN_WIDTH=Decimal(1))
         cfg = cfg.copy(FABULOUS_PIN_MIN_HEIGHT=Decimal(1))
-        step = TileOptimisation(cfg)
+        step = TileAreaOptimisation(cfg)
         step.config = cfg
         return step
 

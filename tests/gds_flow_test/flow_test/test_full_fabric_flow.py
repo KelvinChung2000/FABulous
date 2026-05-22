@@ -21,7 +21,7 @@ from fabulous.fabric_generator.gds_generator.flows.fabric_optimisation_flow impo
     WorkerResult,
     _run_tile_flow_worker,
 )
-from fabulous.fabric_generator.gds_generator.steps.tile_optimisation import OptMode
+from fabulous.fabric_generator.gds_generator.steps.tile_area_opt import OptMode
 
 
 # Shared fixtures
@@ -409,7 +409,7 @@ class TestRunNlpOnlyEarlyReturn:
         # Patch the collaborators constructed inside run().
         mocker.patch(
             "fabulous.fabric_generator.gds_generator.flows."
-            "full_fabric_flow.GlobalTileSizeOptimization"
+            "full_fabric_flow.GlobalTileSizeoptimisation"
         )
         stitching = mocker.patch(
             "fabulous.fabric_generator.gds_generator.flows."

@@ -23,6 +23,9 @@ from fabulous.fabric_generator.gds_generator.steps.extract_pdk_info import (
 from fabulous.fabric_generator.gds_generator.steps.magic_streamout import (
     FABulousMagicStreamOut,
 )
+from fabulous.fabric_generator.gds_generator.steps.tile_area_opt import (
+    TileAreaOptimisation,
+)
 
 prep_steps: list[type[Step]] = [
     Verilator.Lint,
@@ -85,6 +88,14 @@ physical_steps: list[type[Step]] = [
     Odb.CellFrequencyTables,
     OpenROAD.RCX,
     OpenROAD.STAPostPNR,
+    OpenROAD.IRDropReport,
+]
+
+tile_optimisation_physical_steps: list[type[Step]] = [
+    TileAreaOptimisation,
+    OpenROAD.FillInsertion,
+    Odb.CellFrequencyTables,
+    OpenROAD.RCX,
     OpenROAD.IRDropReport,
 ]
 

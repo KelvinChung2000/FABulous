@@ -1,4 +1,4 @@
-"""FABulous GDS Generator - NLP Optimization Step using pymoo."""
+"""FABulous GDS Generator - NLP optimisation Step using pymoo."""
 
 import json
 from collections import defaultdict
@@ -21,11 +21,11 @@ from pymoo.termination.max_gen import MaximumGenerationTermination
 
 from fabulous.fabric_definition.fabric import Fabric
 from fabulous.fabric_generator.gds_generator.helper import round_up_decimal
-from fabulous.fabric_generator.gds_generator.steps.tile_optimisation import OptMode
+from fabulous.fabric_generator.gds_generator.steps.tile_area_opt import OptMode
 
 
 class NLPTileProblem(ElementwiseProblem):
-    """NLP problem for tile size optimization using row/column variables.
+    """NLP problem for tile size optimisation using row/column variables.
 
     Variables are row heights h[r] and column widths w[c], so that uniformity within
     each row and column is inherent in the formulation rather than enforced through soft
@@ -570,22 +570,22 @@ class NLPTileProblem(ElementwiseProblem):
 
 
 @Step.factory.register()
-class GlobalTileSizeOptimization(Step):
-    """LibreLane step for NLP optimization of tile dimensions.
+class FabricAreaOptimisation(Step):
+    """LibreLane step for NLP optimisation of tile dimensions.
 
     Formulates and solves a Non-Linear Program using pymoo to minimize total fabric
     area. Variables are row heights and column widths, ensuring uniformity within each
     row/column by construction.
     """
 
-    id = "FABulous.GlobalTileSizeOptimization"
-    name = "FABulous Global Tile Size Optimization"
+    id = "FABulous.FabricAreaOptimisation"
+    name = "FABulous Fabric Area optimisation"
 
     config_vars = [
         Variable(
             "TILE_OPT_INFO",
             Optional[Path],  # noqa: UP045 librelane issue
-            description="Tile optimization information dictionary or path to JSON file",
+            description="Tile optimisation information dictionary or path to JSON file",
             default=None,
         ),
         Variable(
@@ -756,7 +756,7 @@ class GlobalTileSizeOptimization(Step):
         algorithm = ISRES(repair=RoundRepair())
 
         n_gen = 500
-        info(f"Running optimization for {n_gen} generations")
+        info(f"Running optimisation for {n_gen} generations")
         termination = MaximumGenerationTermination(n_gen)
 
         res = minimize(problem, algorithm, termination, verbose=True)
@@ -778,7 +778,7 @@ class GlobalTileSizeOptimization(Step):
                 res.F = best_ind.F
                 res.CV = best_ind.CV if hasattr(best_ind, "CV") else None
             else:
-                raise RuntimeError("NLP optimization failed to find any solution")
+                raise RuntimeError("NLP optimisation failed to find any solution")
 
         if hasattr(res, "CV") and res.CV is not None:
             if res.CV[0] > 1e-6:
@@ -788,7 +788,7 @@ class GlobalTileSizeOptimization(Step):
         else:
             info("Found solution (constraint violation not available)")
 
-        info(f"Optimization terminated with objective={res.F[0]}")
+        info(f"optimisation terminated with objective={res.F[0]}")
 
         quant = Decimal(".01")
         zero = Decimal(0)

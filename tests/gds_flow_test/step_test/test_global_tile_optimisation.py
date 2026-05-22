@@ -1,4 +1,4 @@
-"""Tests for GlobalTileSizeOptimization NLP problem helpers.
+"""Tests for GlobalTileSizeoptimisation NLP problem helpers.
 
 The Pareto frontier helper is the most failure-prone part of the NLP setup: a
 flipped iteration direction silently locks the body row to the worst-aspect
@@ -17,11 +17,11 @@ import pytest
 
 from fabulous.fabric_definition.fabric import Fabric
 from fabulous.fabric_definition.tile import Tile
-from fabulous.fabric_generator.gds_generator.steps.global_tile_optimisation import (
-    GlobalTileSizeOptimization,
+from fabulous.fabric_generator.gds_generator.steps.fabric_area_opt import (
+    FabricAreaOptimisation,
     NLPTileProblem,
 )
-from fabulous.fabric_generator.gds_generator.steps.tile_optimisation import OptMode
+from fabulous.fabric_generator.gds_generator.steps.tile_area_opt import OptMode
 
 
 class TestParetoFrontier:
@@ -229,7 +229,7 @@ class TestParseTileFields:
     def test_parses_required_bbox_strings_to_floats(self) -> None:
         # Bbox fields arrive as space-separated strings and must come out as
         # 4-tuples of floats.
-        out = GlobalTileSizeOptimization._parse_tile_fields(
+        out = FabricAreaOptimisation._parse_tile_fields(
             {
                 "design__die__bbox": "0 0 100 200",
                 "design__core__bbox": "1 2 99 198",
@@ -239,7 +239,7 @@ class TestParseTileFields:
         assert out["design__core__bbox"] == [1.0, 2.0, 99.0, 198.0]
 
     def test_optional_scalar_fields_passed_through_as_floats(self) -> None:
-        out = GlobalTileSizeOptimization._parse_tile_fields(
+        out = FabricAreaOptimisation._parse_tile_fields(
             {
                 "design__die__bbox": "0 0 100 100",
                 "design__core__bbox": "0 0 100 100",
@@ -254,7 +254,7 @@ class TestParseTileFields:
 
     def test_optional_fields_omitted_when_none(self) -> None:
         # Explicitly None scalars must not appear in the output.
-        out = GlobalTileSizeOptimization._parse_tile_fields(
+        out = FabricAreaOptimisation._parse_tile_fields(
             {
                 "design__die__bbox": "0 0 100 100",
                 "design__core__bbox": "0 0 100 100",
@@ -265,7 +265,7 @@ class TestParseTileFields:
 
     def test_clean_probes_parsed_into_nested_floats(self) -> None:
         # Each probe is a list of stringly-typed numerics; output is float-of-float.
-        out = GlobalTileSizeOptimization._parse_tile_fields(
+        out = FabricAreaOptimisation._parse_tile_fields(
             {
                 "design__die__bbox": "0 0 100 100",
                 "design__core__bbox": "0 0 100 100",
@@ -279,14 +279,12 @@ class TestParseTileFields:
 
     def test_missing_bbox_raises_typeerror(self) -> None:
         with pytest.raises(TypeError, match="design__die__bbox"):
-            GlobalTileSizeOptimization._parse_tile_fields(
-                {"design__core__bbox": "0 0 1 1"}
-            )
+            FabricAreaOptimisation._parse_tile_fields({"design__core__bbox": "0 0 1 1"})
 
     def test_non_string_bbox_raises_typeerror(self) -> None:
         # Lists / numbers are not accepted — bbox must be a string.
         with pytest.raises(TypeError, match="design__die__bbox"):
-            GlobalTileSizeOptimization._parse_tile_fields(
+            FabricAreaOptimisation._parse_tile_fields(
                 {
                     "design__die__bbox": [0, 0, 1, 1],
                     "design__core__bbox": "0 0 1 1",
@@ -324,7 +322,7 @@ class TestLoadTileMetricsFromJson:
         path = tmp_path / "metrics.json"
         path.write_text(json.dumps(payload))
 
-        valid, all_ = GlobalTileSizeOptimization._load_tile_metrics_from_json(path)
+        valid, all_ = FabricAreaOptimisation._load_tile_metrics_from_json(path)
 
         assert OptMode.BALANCE in valid
         assert "good" in valid[OptMode.BALANCE]
@@ -342,7 +340,7 @@ class TestLoadTileMetricsFromJson:
         path = tmp_path / "metrics.json"
         path.write_text(json.dumps(payload))
 
-        valid, all_ = GlobalTileSizeOptimization._load_tile_metrics_from_json(path)
+        valid, all_ = FabricAreaOptimisation._load_tile_metrics_from_json(path)
         assert valid[OptMode.BALANCE] == {}
         assert all_[OptMode.BALANCE] == {}
 

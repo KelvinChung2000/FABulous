@@ -131,11 +131,11 @@ var = [
 
 
 @Step.factory.register()
-class TileOptimisation(WhileStep):
+class TileAreaOptimisation(WhileStep):
     """Tile size optimisation step."""
 
-    id = "FABulous.TileOptimisation"
-    name = "Tile Optimisation"
+    id = "FABulous.TileAreaOptimisation"
+    name = "Tile Area Optimisation"
 
     inputs = [DesignFormat.NETLIST]
 

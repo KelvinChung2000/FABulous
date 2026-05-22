@@ -1,4 +1,4 @@
-"""Full automatic fabric flow with LP-based tile optimization.
+"""Full automatic fabric flow with LP-based tile optimisation.
 
 This flow uses non-Linear Programming (NLP) to optimize tile dimensions:
 1. Compiles all tiles with 3 modes (balance, min-width, min-height) in parallel
@@ -42,10 +42,10 @@ from fabulous.fabric_generator.gds_generator.gen_io_pin_config_yaml import (
 from fabulous.fabric_generator.gds_generator.steps.extract_pdk_info import (
     ExtractPDKInfo,
 )
-from fabulous.fabric_generator.gds_generator.steps.global_tile_optimisation import (
-    GlobalTileSizeOptimization,
+from fabulous.fabric_generator.gds_generator.steps.fabric_area_opt import (
+    FabricAreaOptimisation,
 )
-from fabulous.fabric_generator.gds_generator.steps.tile_optimisation import OptMode
+from fabulous.fabric_generator.gds_generator.steps.tile_area_opt import OptMode
 from fabulous.fabulous_settings import get_context
 from fabulous.processpool import DillProcessPoolExecutor
 
@@ -58,7 +58,7 @@ configs = (
     Classic.config_vars
     + Floorplan.config_vars
     + flow_common_variables
-    + GlobalTileSizeOptimization.config_vars
+    + FabricAreaOptimisation.config_vars
     + [
         Variable(
             "FABULOUS_NLP_ONLY",
@@ -104,7 +104,7 @@ def _run_tile_flow_worker(
     io_pin_config : Path
         Path to the IO pin configuration YAML file.
     optimisation : OptMode
-        The optimization mode for tile compilation.
+        The optimisation mode for tile compilation.
     base_config_path : Path
         Base configuration file path for the flow.
     override_config_path : Path
@@ -158,13 +158,13 @@ class FABulousFabricOptimisationFlow(Flow):
     """Full automatic fabric flow with LP-optimized tile dimensions.
 
     This flow automatically:
-    1. Compiles all tiles with 3 optimization modes to explore dimension space
+    1. Compiles all tiles with 3 optimisation modes to explore dimension space
     2. Solves LP problem to find optimal dimensions minimizing fabric perimeter
     3. Recompiles tiles with optimal dimensions from LP solution
     4. Stitches all tiles into final fabric with minimal area
     """
 
-    Steps = [ExtractPDKInfo, GlobalTileSizeOptimization]
+    Steps = [ExtractPDKInfo, FabricAreaOptimisation]
 
     config_vars = configs
 
@@ -302,7 +302,7 @@ class FABulousFabricOptimisationFlow(Flow):
 
     def _init_compile(self, fabric: Fabric, proj_dir: Path) -> None:
         """Compile all tiles for design space exploration."""
-        # Optimization modes to try for each tile
+        # optimisation modes to try for each tile
         opt_modes: list[OptMode] = [
             OptMode.BALANCE,
             OptMode.FIND_MIN_HEIGHT,
@@ -394,7 +394,7 @@ class FABulousFabricOptimisationFlow(Flow):
         """Execute the NLP-based fabric flow.
 
         Flow steps:
-        1. Compile all tiles with optimization mode in parallel
+        1. Compile all tiles with optimisation mode in parallel
         2. Formulate Non-linear Programming (NLP) problem to minimize total fabric area
         3. Recompile tiles with optimal dimensions in parallel
         4. Stitch all tiles into final fabric
@@ -414,9 +414,9 @@ class FABulousFabricOptimisationFlow(Flow):
         Raises
         ------
         RuntimeError
-            If tile compilation or NLP optimization fails.
+            If tile compilation or NLP optimisation fails.
         FlowException
-            When NLP optimization step fails.
+            When NLP optimisation step fails.
         """
         fabric: Fabric = self.config["FABULOUS_FABRIC"]
         proj_dir: Path = Path(self.config["FABULOUS_PROJ_DIR"])
@@ -431,23 +431,23 @@ class FABulousFabricOptimisationFlow(Flow):
             self._init_compile(fabric, proj_dir)
         else:
             info(
-                "Tile optimization info already present, skipping initial compilation."
+                "Tile optimisation info already present, skipping initial compilation."
             )
 
-        self.progress_bar.start_stage("NLP Optimization")
-        info("\n=== Step 2: Solving NLP optimization ===")
-        # Create and run NLP optimization step
+        self.progress_bar.start_stage("NLP optimisation")
+        info("\n=== Step 2: Solving NLP optimisation ===")
+        # Create and run NLP optimisation step
         nlp_config: Config = self.config.copy(FABULOUS_PROJ_DIR=proj_dir)
 
-        nlp_step: GlobalTileSizeOptimization = GlobalTileSizeOptimization(
-            nlp_config, id="SolveNLPOptimization", state_in=initial_state
+        nlp_step: FabricAreaOptimisation = FabricAreaOptimisation(
+            nlp_config, id="SolveNLPoptimisation", state_in=initial_state
         )
         try:
             nlp_state: State = self.start_step(nlp_step)
         except Exception as e:
-            err(f"NLP optimization step failed to start/execute: {e}")
+            err(f"NLP optimisation step failed to start/execute: {e}")
             err(traceback.format_exc())
-            raise FlowException("NLP optimization step failed") from e
+            raise FlowException("NLP optimisation step failed") from e
 
         self.progress_bar.end_stage()
 

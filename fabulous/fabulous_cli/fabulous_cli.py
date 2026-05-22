@@ -61,7 +61,7 @@ from fabulous.fabric_generator.code_generator.code_generator_Verilog import (
 from fabulous.fabric_generator.code_generator.code_generator_VHDL import (
     VHDLCodeGenerator,
 )
-from fabulous.fabric_generator.gds_generator.steps.tile_optimisation import OptMode
+from fabulous.fabric_generator.gds_generator.steps.tile_area_opt import OptMode
 from fabulous.fabric_generator.gen_fabric.fabric_automation import (
     generateCustomTileConfig,
 )

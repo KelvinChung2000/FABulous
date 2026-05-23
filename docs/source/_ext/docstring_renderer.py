@@ -76,6 +76,9 @@ def _convert_fenced_code_blocks(lines: Iterable[str]) -> list[str]:
                 in_fence = False
                 fence_indent = ""
                 code_indent = ""
+                # reST requires a blank line after a literal block; markdown does
+                # not, so terminate the block even when the source omitted it.
+                converted.append("")
             continue
 
         if in_fence:

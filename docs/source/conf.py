@@ -86,6 +86,10 @@ intersphinx_mapping = {
     # Additional scikit-learn style mappings
     "scipy": ("https://docs.scipy.org/doc/scipy/", None),
     "matplotlib": ("https://matplotlib.org/stable/", None),
+    # GDS-flow dependencies whose types appear in the gds_generator docstrings.
+    "librelane": ("https://librelane.readthedocs.io/en/latest/", None),
+    "packaging": ("https://packaging.pypa.io/en/stable/", None),
+    "networkx": ("https://networkx.org/documentation/stable/", None),
 }
 
 # Enable cross-references within the project
@@ -248,7 +252,11 @@ autoapi_prepare_jinja_env = prepare_autoapi_jinja_env
 
 # Custom AutoAPI configuration
 autoapi_python_class_content = (
-    "both"  # Include both class and __init__ docs (scikit-learn style)
+    # Only the class docstring (where this codebase documents fields/attributes).
+    # "both" would also splice in the inherited Pydantic/object __init__ boilerplate
+    # ("Create a new model by parsing...", "Initialize self.  See help..."), which
+    # napoleon then mis-parses as cross-reference targets.
+    "class"
 )
 autoapi_member_order = "alphabetical"
 autoapi_own_page_level = (
@@ -277,24 +285,69 @@ def strip_redundant_rtype_fields(app, domain, objtype, contentnode) -> None:  # 
                 field_list.remove(field)
 
 
+# Type names that appear bare (or mis-qualified) in NumPy-style docstring type
+# fields, rewritten to a target an intersphinx inventory can resolve so the
+# cross-reference renders as a real link instead of failing under nitpicky mode.
+_XREF_REWRITE = {
+    "Path": "pathlib.Path",
+    "Decimal": "decimal.Decimal",
+    "nx.DiGraph": "networkx.DiGraph",
+    "Cmd2ArgumentParser": "cmd2.argparse_utils.Cmd2ArgumentParser",
+    "State": "librelane.state.State",
+    "Config": "librelane.config.config.Config",
+    "FlowException": "librelane.flows.flow.FlowException",
+    # Re-exported by librelane.steps.magic but only documented under common.drc.
+    "librelane.steps.magic.DRC": "librelane.common.drc.DRC",
+}
+
+# References with no documentation target to link to: the NumPy ``optional``
+# modifier (not a type), an import-aliased stdlib callable, and library-internal
+# type aliases / classes their published API docs do not expose. Rendered as
+# plain text rather than warning. Anything *not* listed here still warns under
+# nitpicky mode, so newly broken references are not masked.
+_XREF_AS_TEXT = {
+    "optional",
+    "csvWriter",
+    "ValidationInfo",
+    "ValidationError",
+    "librelane.steps.step.ViewsUpdate",
+    "librelane.steps.step.MetricsUpdate",
+    "librelane.steps.step.CompositeStep",
+    "librelane.steps.openroad.Floorplan",
+    "librelane.flows.classic.Classic",
+    "pymoo.core.problem.ElementwiseProblem",
+}
+
+
+def resolve_known_type_refs(app, env, node, contnode):  # noqa: ARG001
+    """Resolve a docstring type reference the domains cannot resolve alone.
+
+    Rewrites a known bare/mis-qualified target so intersphinx links it, or
+    returns its display text for references with no documentation target.
+    Returns ``None`` for unknown targets so nitpicky mode still reports them.
+    """
+    target = node.get("reftarget")
+    if target in _XREF_REWRITE:
+        node["reftarget"] = _XREF_REWRITE[target]
+        return None
+    if target in _XREF_AS_TEXT:
+        return contnode
+    return None
+
+
 def setup(app):
     """Custom Sphinx setup to ensure proper AutoAPI execution order."""
     # Connect AutoAPI skip member hook to avoid duplicates
     app.connect("autoapi-skip-member", autoapi_skip_member)
     app.connect("object-description-transform", strip_redundant_rtype_fields)
+    # Priority below intersphinx's default (500) so a rewritten target is handed
+    # to intersphinx for resolution within the same event dispatch.
+    app.connect("missing-reference", resolve_known_type_refs, priority=400)
     return {"version": "0.1", "parallel_read_safe": True}
 
 
 suppress_warnings = [
     "app.add_node",  # Sphinx extension internal node-registration noise
-    # Pre-existing docstring-markup debt in the AutoAPI-generated API reference:
-    # a number of source docstrings embed code/examples or inherited (cmd2)
-    # docstrings that docutils misparses (block quotes, field/definition lists).
-    # These are NOT config issues; clearing them is a dedicated docstring sweep
-    # (note: AutoAPI's nested-parse mis-attributes the warning line numbers, so
-    # the whole generated rst for a module must be read to find the real source).
-    # Remove this once the source docstrings are cleaned up.
-    "docutils",
 ]
 
 

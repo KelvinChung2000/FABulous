@@ -1,11 +1,14 @@
 # Configuration file for the Sphinx documentation builder.
 
-import re
 import sys
 from importlib import import_module
 from pathlib import Path
 
-from docs.source.conf_helper import get_display_version, get_version
+_source_root = Path(__file__).resolve().parent
+if _source_root.as_posix() not in sys.path:
+    sys.path.insert(0, _source_root.as_posix())
+
+from conf_helper import get_display_version, get_version
 
 # -- Project information
 
@@ -332,7 +335,10 @@ exclude_patterns = [
     "Thumbs.db",
     ".DS_Store",
     "generated_doc/fabulous_variable.md",
-]
+    "generated_doc/FABulous",
+    "generated_doc/FABulous/**",
+] # since we alias the fabulous package with FABulous, we have to exclude the FABulous
+# package from the generated_doc to avoid confusion and duplication in the documentation.
 
 # -- Options for HTML output
 

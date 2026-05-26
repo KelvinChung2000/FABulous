@@ -3,20 +3,20 @@ name: Testing with pytest and cocotb
 on:
   push:
     paths:
-      - 'fabulous/**'
-      - 'tests/**'
-      - 'pyproject.toml'
-      - 'uv.lock'
-      - '.github/workflows/pytest_testing.yml'
-      - '.github/actions/**'
+      - "fabulous/**"
+      - "tests/**"
+      - "pyproject.toml"
+      - "uv.lock"
+      - ".github/workflows/pytest_testing.yml"
+      - ".github/actions/**"
   pull_request:
     paths:
-      - 'fabulous/**'
-      - 'tests/**'
-      - 'pyproject.toml'
-      - 'uv.lock'
-      - '.github/workflows/pytest_testing.yml'
-      - '.github/actions/**'
+      - "fabulous/**"
+      - "tests/**"
+      - "pyproject.toml"
+      - "uv.lock"
+      - ".github/workflows/pytest_testing.yml"
+      - ".github/actions/**"
 
 # copy and modified based on https://github.com/jerry-git/pytest-split/issues/20#issuecomment-2576031836
 
@@ -36,7 +36,7 @@ jobs:
             tests-durations-${{ github.sha }}
             tests-durations-
           fail-on-cache-miss: false
-          
+
       # Then we upload the restored test durations as an artifact. This way, each matrix job will download
       # it when it starts. When a matrix job will be manually retried, it will also reuse the artifact (to
       # retry the exact same tests, even if the cache has been updated in the meantime).
@@ -62,12 +62,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        job-index: [ 1, 2, 3, 4, 5, 6, 7, 8 ]
+        job-index: [1, 2, 3, 4, 5, 6, 7, 8]
     steps:
-      # These two steps will be executed only when there IS a cache hit (exact match or not). 
+      # These two steps will be executed only when there IS a cache hit (exact match or not).
       # When a matrix job is retried, it will reuse the same artifact, to execute the exact same split.
       - uses: actions/checkout@v6
-        with: 
+        with:
           token: ${{ secrets.GITHUB_TOKEN }}
       - name: Download test durations
         if: needs.restore_test_durations.outputs.restored == 'true'
@@ -77,13 +77,13 @@ jobs:
       - name: Use cached test durations
         if: needs.restore_test_durations.outputs.restored == 'true'
         run: mv .test_durations_cached .test_durations
-        
+
       # This step will be executed only when there is NO cache hit.
       # You need to commit file `.test_durations_fallback`.
       # You can also refresh it manually from time to time to keep an up-to-date fallback
       # (see step "Upload final test durations" below).
       - name: Use fallback test durations
-        if: needs.restore_test_durations.outputs.restored == 'false' 
+        if: needs.restore_test_durations.outputs.restored == 'false'
         run: |
           if [ -f .test_durations_fallback ]; then
             mv .test_durations_fallback .test_durations
@@ -98,7 +98,7 @@ jobs:
       # When running pytest, we write the new test durations using options
       # `--store-durations --clean-durations`.
       # Option `--clean-durations` is undocumented
-      # Removes the test duration info for tests which are not present 
+      # Removes the test duration info for tests which are not present
       # while running the suite with '--store-durations'.
       - name: Run pytest
         env:
@@ -160,7 +160,7 @@ jobs:
         uses: actions/download-artifact@v8
         with:
           pattern: test-durations-after-partial-*
-          
+
       # This step regroups the 8 partial files and sorts keys alphabetically:
       - name: Merge all partial test durations
         run: |
@@ -195,8 +195,9 @@ jobs:
       contents: read
       pull-requests: write
       issues: write
+      code-quality: write
     env:
-      COVERAGE_FAIL_UNDER: '70'
+      COVERAGE_FAIL_UNDER: "70"
     steps:
       - uses: actions/checkout@v6
       - name: Download all partial coverage artifacts
@@ -208,7 +209,7 @@ jobs:
       - name: Set up Python for coverage
         uses: actions/setup-python@v6
         with:
-          python-version: '3.12'
+          python-version: "3.12"
 
       - name: Install coverage tool
         run: |
@@ -255,10 +256,20 @@ jobs:
         run: |
           echo "Coverage Summary" >> "$GITHUB_STEP_SUMMARY"
           cat code-coverage-results.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload code coverage
+        uses: actions/upload-code-coverage@v1
+        if: ${{ hashFiles('coverage.xml') != '' }}
+        with:
+          file: coverage.xml
+          language: Python
+          label: code-coverage/pytest
+          # Public preview - don't fail on transient upload errors.
+          fail-on-error: false
+
       - name: Enforce coverage threshold
         if: ${{ hashFiles('coverage.xml') != '' }}
         shell: bash
         run: |
           echo "Enforcing coverage threshold: ${COVERAGE_FAIL_UNDER}%"
           coverage report --fail-under=${COVERAGE_FAIL_UNDER}
-

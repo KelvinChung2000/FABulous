@@ -294,18 +294,19 @@ class TestParseTileFields:
 
 class TestLoadTileMetricsFromJson:
     """End-to-end deserialisation of the per-mode metric file produced by the
-    exploration phase. The function partitions tiles into:
-
-    - ``valid_data``: tiles whose exploration found a working state
-      (used for feasibility constraints).
-    - ``all_data``: every tile that has a bbox, including those that never
-      compiled (used for lower-bound estimates only).
+    exploration phase. Any entry with an ``error`` field is excluded from both
+    returned dicts — a partial recovered bbox from a failed run does not
+    represent a buildable geometry, so it must not enter either the NLP
+    feasibility samples or the lower-bound floor.
     """
 
-    def test_partitions_valid_and_all_metrics(self, tmp_path: Path) -> None:
-        # "good" tile compiled cleanly; "broken" tile has a bbox but
-        # exploration eventually gave up with "No working state found".
-        # The latter is included in all_data but excluded from valid_data.
+    def test_excludes_failed_entries_from_both_dicts(self, tmp_path: Path) -> None:
+        # "good" compiled cleanly. "broken" gave up with "No working state
+        # found" and carries no bbox. "recovered_failure" timed out in
+        # detailed routing but left an intermediate bbox + error -- this
+        # is the case that motivated tightening the filter, since the bbox
+        # was previously slipping into all_metrics and shrinking the NLP
+        # lower bound below the only proven-buildable width.
         payload = {
             OptMode.BALANCE.value: {
                 "good": {
@@ -313,9 +314,16 @@ class TestLoadTileMetricsFromJson:
                     "design__core__bbox": "0 0 100 100",
                 },
                 "broken": {
-                    "design__die__bbox": "0 0 50 50",
-                    "design__core__bbox": "0 0 50 50",
+                    "error": "No working state found",
                     "error_traceback": "RuntimeError: No working state found",
+                },
+                "recovered_failure": {
+                    "design__die__bbox": "0 0 50 200",
+                    "design__core__bbox": "0 0 50 200",
+                    "error": "Worker execution failed",
+                    "error_traceback": (
+                        "FlowError: Detailed Routing exceeded 600s timeout"
+                    ),
                 },
             }
         }
@@ -324,17 +332,14 @@ class TestLoadTileMetricsFromJson:
 
         valid, all_ = FabricAreaOptimisation._load_tile_metrics_from_json(path)
 
-        assert OptMode.BALANCE in valid
-        assert "good" in valid[OptMode.BALANCE]
-        assert "broken" not in valid[OptMode.BALANCE]
-        assert "good" in all_[OptMode.BALANCE]
-        assert "broken" in all_[OptMode.BALANCE]
+        assert valid[OptMode.BALANCE].keys() == {"good"}
+        assert all_[OptMode.BALANCE].keys() == {"good"}
 
     def test_skips_entries_without_bbox(self, tmp_path: Path) -> None:
-        # No bbox -> nothing to constrain; the entry is dropped from both dicts.
+        # No bbox, no error -> nothing to constrain; entry is dropped.
         payload = {
             OptMode.BALANCE.value: {
-                "no_bbox": {"error": "compilation failed"},
+                "no_bbox": {},
             }
         }
         path = tmp_path / "metrics.json"

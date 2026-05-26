@@ -29,7 +29,6 @@ from fabulous.fabric_generator.gds_generator.steps.tile_IO_placement import (
     FABulousTileIOPlacement,
 )
 from fabulous.fabric_generator.gds_generator.steps.timed_detailed_routing import (
-    DRTTimedOutError,
     FABulousDetailedRoutingTimed,
 )
 from fabulous.fabric_generator.gds_generator.steps.while_step import WhileStep
@@ -183,11 +182,6 @@ class TileAreaOptimisation(WhileStep):
     clean_probes: list[list[float]] = []
 
     raise_on_failure: bool = False
-
-    # A DRT timeout means TritonRoute couldn't route this die size within the
-    # budget; another iteration would only grow the die and waste another
-    # budget on the same problem. Let the timeout abort the whole loop.
-    propagate_exceptions: tuple[type[BaseException], ...] = (DRTTimedOutError,)
 
     iter_count: int = 0
 

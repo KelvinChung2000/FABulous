@@ -41,8 +41,9 @@ class NLPTileProblem(ElementwiseProblem):
     tile_metrics : dict[OptMode, dict]
         Per-mode compilation metrics for tiles that compiled successfully.
     all_tile_metrics : dict[OptMode, dict] | None, optional
-        Metrics including failed explorations, used for lower-bound
-        estimates. Falls back to *tile_metrics* when ``None``.
+        Retained for backwards compatibility; should contain the same
+        successful-compilation entries as *tile_metrics*. Falls back to
+        *tile_metrics* when ``None``.
     area_margin : float, optional
         Fractional margin added to standard-cell area constraints,
         by default 0.05 (5 %).
@@ -65,7 +66,6 @@ class NLPTileProblem(ElementwiseProblem):
         self.fabric = fabric
         self.tile_metrics = tile_metrics
         self.area_margin = area_margin
-        # all_tile_metrics includes failed explorations for lower bounds
         self._all_tile_metrics = all_tile_metrics or tile_metrics
 
         self.tile_row_set: dict[str, set[int]] = defaultdict(set)
@@ -676,10 +676,15 @@ class FabricAreaOptimisation(Step):
     ) -> tuple[dict[OptMode, dict], dict[OptMode, dict]]:
         """Load tile metrics from a JSON file.
 
-        Returns two dicts: (valid_metrics, all_metrics).
-        valid_metrics excludes tiles whose exploration never found a
-        working state (used for feasibility constraints).
-        all_metrics includes everything with a bbox (used for lower bounds).
+        Returns two dicts: ``(valid_metrics, all_metrics)``. Both contain only
+        entries that compiled successfully — any entry with an ``error`` field
+        is dropped. A failed run may have left behind a recovered intermediate
+        bbox (for example, when detailed routing timed out at an attempted die
+        size), but that bbox does not represent a buildable geometry and would
+        mislead both the NLP lower bounds and the feasibility envelope.
+
+        The two dicts are returned identical for now; the second slot remains
+        for backwards compatibility with ``NLPTileProblem.all_tile_metrics``.
         """
         tile_data_raw = json.loads(path.resolve().read_text())
         valid_data: dict[OptMode, dict] = {}
@@ -690,24 +695,19 @@ class FabricAreaOptimisation(Step):
             all_dict: dict[str, dict[str, Any]] = {}
 
             for tile_name, data in tile_info.items():
+                if "error" in data:
+                    warn(
+                        f"Tile {tile_name} in mode {mode} failed "
+                        f"({data['error']!r}), excluding from constraints"
+                    )
+                    continue
+
                 if not data.get("design__die__bbox"):
-                    if "error" in data:
-                        warn(
-                            f"Tile {tile_name} in mode {mode} has error "
-                            f"and no bbox: {data['error']}"
-                        )
                     continue
 
                 parsed = cls._parse_tile_fields(data)
+                valid_dict[tile_name] = parsed
                 all_dict[tile_name] = parsed
-
-                if "No working state found" in data.get("error_traceback", ""):
-                    warn(
-                        f"Tile {tile_name} in mode {mode} never compiled "
-                        f"successfully, excluding from constraints"
-                    )
-                else:
-                    valid_dict[tile_name] = parsed
 
             valid_data[OptMode(mode)] = valid_dict
             all_data[OptMode(mode)] = all_dict

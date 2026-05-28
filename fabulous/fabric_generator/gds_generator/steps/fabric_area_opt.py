@@ -212,6 +212,9 @@ class NLPTileProblem(ElementwiseProblem):
             if not samples:
                 continue
 
+            if len(samples) >= 2:
+                continue
+
             is_supertile = tile.name in self.fabric.superTileDic
             if is_supertile:
                 supertile = self.fabric.superTileDic[tile.name]
@@ -225,8 +228,6 @@ class NLPTileProblem(ElementwiseProblem):
                 if n_cols == 0 or n_rows == 0:
                     continue
             else:
-                if len(samples) != 1:
-                    continue
                 n_cols, n_rows = 1, 1
 
             target_aspect = n_cols / n_rows  # w/h for square cells

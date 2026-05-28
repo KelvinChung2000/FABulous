@@ -202,6 +202,10 @@ class TileAreaOptimisation(WhileStep):
 
     bracket_exhausted: bool = False
 
+    pending_locked_axis_bump: Decimal = Decimal(0)
+
+    LOW_UTIL_THRESH: Decimal = Decimal("0.25")
+
     def _diode_port_area(self, site_width: Decimal, site_height: Decimal) -> Decimal:
         """Estimate the flat instance-area contribution of port diodes.
 
@@ -304,6 +308,12 @@ class TileAreaOptimisation(WhileStep):
                     self.last_working_state = post_iteration.copy()
             elif self.bracket_low is None or target > self.bracket_low:
                 self.bracket_low = target
+
+            # Adaptive widen: when the seed picked by IGNORE_DEFAULT_DIE_AREA
+            # mode left the locked axis too narrow (cells sparse against
+            # walls), nudge the locked axis up by one step so the next iter
+            # has more room. Only fires when we control the seed.
+            self._maybe_request_locked_axis_widen(post_iteration)
             return post_iteration
 
         if full_iter_completed:
@@ -312,6 +322,33 @@ class TileAreaOptimisation(WhileStep):
 
         self.iter_count += 1
         return post_iteration
+
+    def _maybe_request_locked_axis_widen(self, state: State) -> None:
+        """Queue a locked-axis bump when the iter ran with utilisation < threshold.
+
+        Only meaningful when FABULOUS_IGNORE_DEFAULT_DIE_AREA is on (we control
+        the seed): a sparse placement means the locked axis is over-sized
+        relative to the cells, but in directional modes we can only fix that
+        on the *locked* axis (the target axis is being optimised on its own).
+        The bump is consumed on the next call to
+        _compute_binary_search_dimensions.
+        """
+        if not self.config.get("FABULOUS_IGNORE_DEFAULT_DIE_AREA", False):
+            return
+        util_raw = state.metrics.get("design__instance__utilization")
+        if util_raw is None:
+            return
+        if Decimal(util_raw) >= self.LOW_UTIL_THRESH:
+            return
+
+        target_is_width = self.config["FABULOUS_OPT_MODE"] == OptMode.FIND_MIN_WIDTH
+        site_w = Decimal(state.metrics.get("pdk__site_width", Decimal(1)))
+        site_h = Decimal(state.metrics.get("pdk__site_height", Decimal(1)))
+        if target_is_width:
+            step = site_h * self.config["FABULOUS_OPTIMISATION_HEIGHT_STEP_COUNT"]
+        else:
+            step = site_w * self.config["FABULOUS_OPTIMISATION_WIDTH_STEP_COUNT"]
+        self.pending_locked_axis_bump = step
 
     def _refresh_routing_obstructions(self) -> None:
         """Clear and recompute routing obstructions from current config.
@@ -492,6 +529,15 @@ class TileAreaOptimisation(WhileStep):
                 self.bracket_low = pin_floor
         else:
             next_target = (self.bracket_low + self.bracket_high) / Decimal(2)
+
+        # Consume any pending locked-axis bump requested by the previous
+        # iter's util check. Widening the locked axis makes the tile
+        # strictly easier, so prior failing targets may now succeed —
+        # drop bracket_low so the bisection re-explores below it.
+        if self.pending_locked_axis_bump > 0:
+            non_target = non_target + self.pending_locked_axis_bump
+            self.pending_locked_axis_bump = Decimal(0)
+            self.bracket_low = None
 
         if target_is_width:
             return next_target, non_target

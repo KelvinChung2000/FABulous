@@ -576,6 +576,7 @@ class FABulousFabricOptimisationFlow(Flow):
                 for k in fabric.get_all_unique_tiles()
             },
             base_config_path=proj_dir / "Fabric" / "gds_config.yaml",
+            design_dir=proj_dir / "Fabric" / "macro",
             pdk=get_context().pdk,
             pdk_root=get_context().pdk_root,
         )

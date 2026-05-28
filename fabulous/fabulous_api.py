@@ -5,6 +5,7 @@ parsing fabric definitions, generating HDL code, creating geometries, and handli
 various fabric-related operations.
 """
 
+import shutil
 from collections.abc import Iterable
 from pathlib import Path
 
@@ -719,8 +720,15 @@ class FABulous_API:
             pdk_root=str(pdk_root.resolve()),
         )
         result = flow.start()
-        logger.info(f"Saving final views for FABulous to {out_folder / 'final_views'}")
-        result.save_snapshot(out_folder / "final_views")
+        final_views = out_folder / "final_views"
+        logger.info(f"Saving final views for FABulous to {final_views}")
+        result.save_snapshot(final_views)
+        tile_opt_summary = flow.config.get("TILE_OPT_INFO")
+        if tile_opt_summary is not None:
+            summary_src = Path(tile_opt_summary)
+            summary_dst = final_views / summary_src.name
+            logger.info(f"Copying tile optimisation summary to {summary_dst}")
+            shutil.copyfile(summary_src, summary_dst)
         logger.info("Stitching flow completed.")
 
     def timing_model_interface(

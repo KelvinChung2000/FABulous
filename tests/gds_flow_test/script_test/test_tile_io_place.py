@@ -1431,14 +1431,10 @@ class TestNormalTileSupertilePinAlignment:
             },
         }
         pin_names = [f"{letter}{i}" for letter in "abc" for i in range(5)]
-        plan = PinPlacementPlan(
-            config, self._make_bterms(mocker, pin_names), "none"
-        )
+        plan = PinPlacementPlan(config, self._make_bterms(mocker, pin_names), "none")
 
         track_count = int((tile_width - origin) / step) + 1
-        plan.allocate_tracks(
-            {Side.SOUTH: (track_count, step, origin, tile_width)}
-        )
+        plan.allocate_tracks({Side.SOUTH: (track_count, step, origin, tile_width)})
         plan.ensure_min_distances({Side.SOUTH: min_distance})
 
         assert len(plan.segments_by_side[Side.SOUTH]) == 3

@@ -130,51 +130,43 @@ class TestParetoFrontier:
 
 
 class TestEnvelopeWFloor:
-    """Hyperbolic (constant-area) lower bound on width given a row height.
+    """Piecewise-linear lower bound on width given a row height.
 
-    The envelope assumes density-limited feasibility: any (w, h) with
-    w * h >= min(observed die area) should compile. Floor clamped from below
-    by the narrowest observed width so we never extrapolate past the sampled
-    w range.
+    The Pareto frontier delivered by ``_pareto_frontier`` is sorted by ``h``
+    ascending and ``w`` descending — that monotone shape is the precondition
+    of the linear interpolation used here.
     """
 
     def test_no_samples_returns_zero(self) -> None:
         # No exploration data -> no constraint, the floor is 0.
         assert NLPTileProblem._envelope_w_floor(100.0, []) == 0.0
 
-    def test_below_sample_range_grows_hyperbolic(self) -> None:
-        # Both samples have die area 10,000; at h=10 hyperbolic says w>=1000.
+    def test_below_sample_range_clamps_to_first(self) -> None:
+        # The frontier is sorted by h ascending; below the smallest h we clamp
+        # to the widest sample. This is the correct convex lower bound.
         samples = [(200.0, 50.0), (100.0, 100.0)]
-        assert NLPTileProblem._envelope_w_floor(10.0, samples) == 1000.0
-        # At smallest sampled h: hyperbolic recovers the sample width.
+        assert NLPTileProblem._envelope_w_floor(10.0, samples) == 200.0
+        # And exactly at the smallest h.
         assert NLPTileProblem._envelope_w_floor(50.0, samples) == 200.0
 
-    def test_above_sample_range_clamps_to_narrowest(self) -> None:
-        # Both samples have area 10,000. At h=999 hyperbolic w would be ~10,
-        # but narrowest observed w is 100; the floor never drops below it.
+    def test_above_sample_range_clamps_to_last(self) -> None:
         samples = [(200.0, 50.0), (100.0, 100.0)]
         assert NLPTileProblem._envelope_w_floor(999.0, samples) == 100.0
         # And exactly at the largest h.
         assert NLPTileProblem._envelope_w_floor(100.0, samples) == 100.0
 
-    def test_inside_range_uses_hyperbolic(self) -> None:
-        # min die area is 10,000; at h=75 -> w_floor = 10000/75 = 133.33.
+    def test_inside_range_linearly_interpolates(self) -> None:
+        # Between (200, 50) and (100, 100): at h=75 (midpoint) -> w=150.
         samples = [(200.0, 50.0), (100.0, 100.0)]
-        assert NLPTileProblem._envelope_w_floor(75.0, samples) == pytest.approx(
-            10000.0 / 75.0
-        )
+        assert NLPTileProblem._envelope_w_floor(75.0, samples) == 150.0
 
-    def test_uses_tightest_observed_area(self) -> None:
-        # Three points; tightest die area is 100*40 = 4000 (NOT 300*10 = 3000
-        # is actually tighter — let's be explicit). Use a clear case:
-        # (300, 10) -> area 3000; (200, 20) -> 4000; (100, 40) -> 4000.
-        # min_die_area = 3000. At h=15: w_floor = 3000/15 = 200.
+    def test_three_segment_envelope_picks_correct_segment(self) -> None:
+        # Three Pareto points -> two interpolation segments.
         samples = [(300.0, 10.0), (200.0, 20.0), (100.0, 40.0)]
-        assert NLPTileProblem._envelope_w_floor(15.0, samples) == pytest.approx(
-            3000.0 / 15.0
-        )
-        # At h=30: hyperbolic gives 3000/30 = 100, which equals narrowest w.
-        assert NLPTileProblem._envelope_w_floor(30.0, samples) == 100.0
+        # h=15 is in [10, 20]: w = 300 + (200-300)*(15-10)/(20-10) = 250.
+        assert NLPTileProblem._envelope_w_floor(15.0, samples) == 250.0
+        # h=30 is in [20, 40]: w = 200 + (100-200)*(30-20)/(40-20) = 150.
+        assert NLPTileProblem._envelope_w_floor(30.0, samples) == 150.0
 
 
 class TestComputeEquivalenceClasses:

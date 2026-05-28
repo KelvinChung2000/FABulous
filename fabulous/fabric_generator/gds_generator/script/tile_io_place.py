@@ -76,6 +76,11 @@ def filter_pin_tracks_by_stride_and_distance(
         One entry per segment that did not have enough filtered tracks to
         hold its pins, with ``side``, ``shortage``, ``step`` and
         ``min_distance`` keys.
+
+    Raises
+    ------
+    AssertionError
+        If any segment is missing a ``min_distance`` value, which should have
     """
     pin_tracks: dict[Side, list[list[float]]] = {side: [] for side in Side}
     track_errors: list[dict] = []

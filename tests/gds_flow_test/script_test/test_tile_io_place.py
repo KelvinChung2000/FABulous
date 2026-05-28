@@ -16,6 +16,7 @@ from fabulous.fabric_generator.gds_generator.script.tile_io_place import (
     PinPlacementPlan,
     SegmentInfo,
     equally_spaced_sequence,
+    filter_pin_tracks_by_stride_and_distance,
     grid_to_tracks,
 )
 
@@ -1286,24 +1287,34 @@ class TestNormalTileSupertilePinAlignment:
         stride: int,
         label: str,
     ) -> None:
-        """Stride filtering must not shift pins between divisions.
+        """Stride filtering must not shift pins between super-tile divisions.
 
         When the division boundary falls on an odd global track index and stride=2, a
         global-index-based filter would skip the first track in upper divisions,
-        shifting all pins by 1 track.  The stride must be relative to each division's
-        start instead.
+        shifting all pins by 1 track.  The cadence must reset at every ``tile_index``
+        boundary so each super-tile division reproduces the standalone tile layout.
         """
         import math as m
 
         origin_f = float(origin)
         step_f = float(step)
         tile_h = float(tile_height)
+        min_distance = stride * step_f
+        micron_in_units = 1.0
         normal_count = m.floor((tile_h - origin_f) / step_f) + 1
         super_count = m.floor((2 * tile_h - origin_f) / step_f) + 1
 
         # Normal tile
         normal_config = {
-            "X0Y0": {"EAST": [{"pins": ["n0", "n1"], "sort_mode": "bus_major"}]},
+            "X0Y0": {
+                "EAST": [
+                    {
+                        "pins": ["n0", "n1"],
+                        "sort_mode": "bus_major",
+                        "min_distance": min_distance,
+                    }
+                ]
+            },
         }
         plan_normal = PinPlacementPlan(
             normal_config,
@@ -1313,12 +1324,28 @@ class TestNormalTileSupertilePinAlignment:
         plan_normal.allocate_tracks(
             {Side.EAST: (normal_count, step_f, origin_f, tile_h)}
         )
-        normal_raw = plan_normal.track_coordinates[Side.EAST][0]
+        plan_normal.ensure_min_distances({Side.EAST: min_distance})
 
         # Super tile
         super_config = {
-            "X0Y0": {"WEST": [{"pins": ["s0", "s1"], "sort_mode": "bus_major"}]},
-            "X0Y1": {"WEST": [{"pins": ["s2", "s3"], "sort_mode": "bus_major"}]},
+            "X0Y0": {
+                "WEST": [
+                    {
+                        "pins": ["s0", "s1"],
+                        "sort_mode": "bus_major",
+                        "min_distance": min_distance,
+                    }
+                ]
+            },
+            "X0Y1": {
+                "WEST": [
+                    {
+                        "pins": ["s2", "s3"],
+                        "sort_mode": "bus_major",
+                        "min_distance": min_distance,
+                    }
+                ]
+            },
         }
         plan_super = PinPlacementPlan(
             super_config,
@@ -1328,24 +1355,24 @@ class TestNormalTileSupertilePinAlignment:
         plan_super.allocate_tracks(
             {Side.WEST: (super_count, step_f, origin_f, 2 * tile_h)}
         )
-        super_raw_top = plan_super.track_coordinates[Side.WEST][0]  # Y0 = top
-        super_raw_bot = plan_super.track_coordinates[Side.WEST][1]  # Y1 = bottom
+        plan_super.ensure_min_distances({Side.WEST: min_distance})
 
-        # Apply stride filter (same logic as io_place)
-        def stride_filter(tracks: list[float]) -> list[float]:
-            result = []
-            ref_idx = None
-            for t in tracks:
-                idx = round((t - origin_f) / step_f)
-                if ref_idx is None:
-                    ref_idx = idx
-                if (idx - ref_idx) % stride == 0:
-                    result.append(t)
-            return result
+        step_by_side = {side: step_f for side in Side}
+        origin_by_side = {side: origin_f for side in Side}
 
-        normal_filtered = stride_filter(normal_raw)
-        super_top_filtered = stride_filter(super_raw_top)
-        super_bot_filtered = stride_filter(super_raw_bot)
+        normal_pin_tracks, normal_errors = filter_pin_tracks_by_stride_and_distance(
+            plan_normal, step_by_side, origin_by_side, micron_in_units
+        )
+        super_pin_tracks, super_errors = filter_pin_tracks_by_stride_and_distance(
+            plan_super, step_by_side, origin_by_side, micron_in_units
+        )
+
+        assert normal_errors == [], f"[{label}] normal filter errors: {normal_errors}"
+        assert super_errors == [], f"[{label}] super filter errors: {super_errors}"
+
+        normal_filtered = normal_pin_tracks[Side.EAST][0]
+        super_top_filtered = super_pin_tracks[Side.WEST][0]  # Y0 = top
+        super_bot_filtered = super_pin_tracks[Side.WEST][1]  # Y1 = bottom
 
         # Bottom division must match normal tile exactly
         assert normal_filtered == super_bot_filtered, (
@@ -1356,6 +1383,110 @@ class TestNormalTileSupertilePinAlignment:
             f"[{label}] Top division has {len(super_top_filtered)} tracks after "
             f"stride filter, normal has {len(normal_filtered)}"
         )
+
+    def test_stride_filter_respects_distance_across_segments_in_tile(
+        self, mocker: MockerFixture
+    ) -> None:
+        """Stride filter must hold ``stride * step`` across segment boundaries.
+
+        Real tiles split one side across multiple YAML segments (e.g.
+        ``N_term_single`` SOUTH allocates pins to ``N1END``, ``N2MID``,
+        ``N2END``).  The stride filter that enforces ``min_distance`` should
+        treat the whole side of a physical tile as one stride cadence.
+        When the cadence restarts at every segment boundary the last
+        filtered pin of segment A and the first filtered pin of segment B
+        can land at ``step`` apart instead of ``stride * step``, which
+        TritonRoute then reports as Metal Spacing DRCs on the routed nets.
+
+        Reproduction observed on ``N_term_single`` SOUTH at W=120.96 um.
+        """
+        # SG13G2 Metal2 routing parameters: origin on-grid, step is the
+        # native pitch, min_distance = 2 pitches → stride = 2.
+        origin, step, tile_width = 0.0, 0.48, 60.0
+        min_distance = 2 * step
+        expected_spacing = min_distance
+        micron_in_units = 1.0
+
+        # Three segments on SOUTH with odd-sized pin sets so the buggy
+        # per-segment cadence reset puts the boundaries off-parity.
+        config = {
+            "X0Y0": {
+                "SOUTH": [
+                    {
+                        "pins": ["a0", "a1", "a2", "a3", "a4"],
+                        "sort_mode": "bus_major",
+                        "min_distance": min_distance,
+                    },
+                    {
+                        "pins": ["b0", "b1", "b2", "b3", "b4"],
+                        "sort_mode": "bus_major",
+                        "min_distance": min_distance,
+                    },
+                    {
+                        "pins": ["c0", "c1", "c2", "c3", "c4"],
+                        "sort_mode": "bus_major",
+                        "min_distance": min_distance,
+                    },
+                ],
+            },
+        }
+        pin_names = [f"{letter}{i}" for letter in "abc" for i in range(5)]
+        plan = PinPlacementPlan(
+            config, self._make_bterms(mocker, pin_names), "none"
+        )
+
+        track_count = int((tile_width - origin) / step) + 1
+        plan.allocate_tracks(
+            {Side.SOUTH: (track_count, step, origin, tile_width)}
+        )
+        plan.ensure_min_distances({Side.SOUTH: min_distance})
+
+        assert len(plan.segments_by_side[Side.SOUTH]) == 3
+        assert len(plan.track_coordinates[Side.SOUTH]) == 3
+
+        pin_tracks, track_errors = filter_pin_tracks_by_stride_and_distance(
+            plan,
+            step_by_side={
+                Side.NORTH: step,
+                Side.SOUTH: step,
+                Side.EAST: step,
+                Side.WEST: step,
+            },
+            origin_by_side={
+                Side.NORTH: origin,
+                Side.SOUTH: origin,
+                Side.EAST: origin,
+                Side.WEST: origin,
+            },
+            micron_in_units=micron_in_units,
+        )
+
+        assert track_errors == [], (
+            f"filter reported track shortfalls instead of producing tracks: "
+            f"{track_errors}"
+        )
+
+        south_segments = pin_tracks[Side.SOUTH]
+        assert len(south_segments) == 3
+
+        # Each segment in isolation must satisfy its own stride spacing.
+        for seg_idx, filtered in enumerate(south_segments):
+            for i in range(len(filtered) - 1):
+                delta = filtered[i + 1] - filtered[i]
+                assert delta == pytest.approx(expected_spacing), (
+                    f"segment {seg_idx} internal spacing {delta} "
+                    f"!= expected {expected_spacing}"
+                )
+
+        # Spacing must also hold across segment boundaries on the same side.
+        side_tracks = [t for seg in south_segments for t in seg]
+        for i in range(len(side_tracks) - 1):
+            delta = side_tracks[i + 1] - side_tracks[i]
+            assert delta == pytest.approx(expected_spacing), (
+                f"cross-segment spacing violation between filtered "
+                f"track {i}={side_tracks[i]} and {i + 1}={side_tracks[i + 1]}: "
+                f"Δ={delta} != expected {expected_spacing}"
+            )
 
     @pytest.mark.parametrize("num_divisions", [2, 3, 4])
     def test_division_index_symmetry_east_west(self, num_divisions: int) -> None:

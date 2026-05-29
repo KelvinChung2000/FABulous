@@ -14,6 +14,17 @@ To take advantage of fabric stitching, there are two limitations to the tile phy
 1. The interfaces of adjacent tiles need to line up in the exact order, and they need to align physically with the same spacing.
 2. Adjacent tiles in the same row must have the same height and tiles in the same column must be the same width in order to have perfect stitching. For the tile interface alignment, this is something that our framework will handle, however the tile sizing is something that needs special handling, which we will describe in the following for each stage.
 
+:::{tip} TL;DR
+Once the [prerequisites](#prerequisites) are met (Nix environment and a PDK), the quickest way to get a plain GDS is to harden every tile with no size optimisation and stitch them together:
+
+```bash
+fabulous> gen_all_tile_macros
+fabulous> gen_fabric_macro
+```
+
+This uses the default `no_opt` mode, so each tile takes the `DIE_AREA` from its `gds_config.yaml` as-is. For automatically optimised tile sizes, use the [Full Automated Flow](#full-automated-flow) instead.
+:::
+
 ## Prerequisites
 
 ### Install tools
@@ -88,7 +99,13 @@ fabulous> gen_all_tile_macros --optimise      # With optimisation (balance mode)
 
 You can change and customise any setting you want via modifying the `gds_config.yaml` file. There are two layers of configuration. There is a `gds_config.yaml` located at `<project>/Tile/include` and in each of the tiles, they have their respective `gds_config.yaml`. The one in the `include` is the base configuration which applies to all tiles, you can put all the settings that are common to all tiles in that file. For per tile specific configuration, you can set them using the `gds_config.yaml` at the tile.
 
+If a per-tile setting does not seem to take effect, check that the base `include/gds_config.yaml` is not setting a *different, deprecated* key for the same option. When both a current and a deprecated variable name are present, LibreLane can pick up the deprecated one and override your per-tile value. Update the base config to use the current variable name so the per-tile override applies. The valid names are listed in the [flow variable table](#gds-variables).
+
 The per tile `gds_config.yaml` is particularly useful and important as you can set per tile `die_area`. In order for the tiles to perfectly stitch together, as mentioned before, all tiles in the same row must have the same height, and tiles in the same column must have the same width, and you can control the tile sizing by using it. To see what variables can be configured, please check the [flow variable table](#gds-variables).
+
+:::{note}
+Some tiles, such as the `N_term_single` / `S_term_single` routing terminals, synthesize down to little more than wires, but they still occupy a grid position and must stitch with their neighbours, so they are hardened and sized like any other tile. They are routing terminals that cascade and bounce long wires back into the routing channels, not dead logic, so the one-to-one connections you see in their netlist are intended rather than over-optimised away.
+:::
 
 ### Pin Config
 
@@ -197,6 +214,38 @@ This command performs the following steps automatically:
 
 4. **Fabric Stitching**: Assembles all tiles into the final fabric layout.
 
+(automated-flow-non-determinism)=
+
+:::{note}
+**The automated flow is non-deterministic.** The NLP optimisation is solved with [pymoo](https://pymoo.org/)'s ISRES (Improved Stochastic Ranking Evolution Strategy), a stochastic evolutionary algorithm currently run without a fixed random seed. Two runs on the same fabric can therefore converge to slightly different tile dimensions. Every solution is valid (it satisfies the minimum-area and grid constraints), but the solutions are not identical and the reported total area can vary slightly between runs.
+
+Seed control to make the optimisation reproducible is planned but not yet available. `FABULOUS_NLP_FTOL_TOLERANCE` only controls the convergence tolerance, not the randomness.
+:::
+
+### When to use the automated flow
+
+The automated flow is designed for **fast bring-up of a custom fabric with custom tiles to a good result**. It takes you from RTL to a stitched GDS with a globally area-optimised set of tile sizes without hand-tuning each tile, by exploring the design space and letting the NLP solver trade off all tiles at once. The result is a strong starting point rather than a hard ceiling. You can usually push PPA further by tuning the [flow variables](#gds-variables) for your PDK and tiles.
+
+If you instead need **fine control**, for example you are iterating on a single tile, or some tiles are already hardened, the manual per-tile flow gives more predictable, repeatable results. A good greedy recipe that gets close to the automated result is:
+
+1. Harden the **majority tile** (the most repeated tile, usually the LUT/CLB tile) with `gen_tile_macro <tile> --optimise balance`.
+2. For the **other tiles in the same row**, fix their height to the majority tile's height and optimise width only (`find_min_width`).
+3. For **tiles at the edge** of a row or column, fix the width and optimise height only (`find_min_height`).
+
+Because the majority tile dominates the total area, optimising it first and matching the rest around it gives a good, though not guaranteed globally optimal, result. The automated flow is what closes that last gap by optimising every tile jointly.
+
+### Working with pre-hardened macros
+
+A common case is adding a column of pre-hardened macros, such as an SRAM macro generated by a memory compiler. This is possible, but the tile that contains the macro needs extra settings in its per-tile `gds_config.yaml` so the flow knows about the macro (for example pointing the flow at the macro views, fixing its placement, and pinning the tile's `DIE_AREA` to a size that fits the macro). The automated flow is intended to pick up that tile configuration and harden the rest of the fabric around the provided macro tile.
+
+:::{warning}
+This pre-hardened-macro path through the automated flow has not been tested yet. If in doubt, it is always safe to fall back to the manual flow.
+:::
+
+In the manual flow, harden the macro tile with fixed dimensions (`FABULOUS_OPT_MODE: no_opt` and an explicit `DIE_AREA`), then size the remaining tiles around it. Because tiles in a row must share a height (and tiles in a column a width) for seamless stitching, match the macro height to the majority tile height. As there are usually more logic tiles than macro tiles, matching the macro to the logic tile (rather than the reverse) wastes the least area. If a single tile height cannot fit the macro, model it as a [supertile](#stitching-the-tiles) spanning two tile heights and adjust the width accordingly.  For the general mechanism of integrating macros into a LibreLane run, see the [LibreLane macro guide](https://librelane.readthedocs.io/en/latest/usage/using_macros.html).
+
+The `io_pin_order.yaml` for each tile is generated during `gen_tile_macro` (see [Pin Config](#pin-config)), using the fabric structure to align with adjacent tiles, so pin placement is handled in the manual per-tile flow as well as the automated flow.
+
 (tile-size-optimisation)=
 
 ## Tile Size Optimisation
@@ -282,6 +331,8 @@ fabulous> start_klayout_gui --tile <tile_name>
 fabulous> start_klayout_gui --fabric
 ```
 
+Resuming the LibreLane flow from a failed step is not supported yet. When a tile or fabric run fails, use `start_openroad_gui --last-run --tile <tile_name>` (or `--fabric`) to open the last `.odb` of that run and inspect where it went wrong.
+
 ## Troubleshooting
 
-If you encounter issues during the GDS flow, please ask for help in the [GitHub Discussions](https://github.com/FPGA-Research-Manchester/FABulous/discussions).
+If you encounter issues during the GDS flow, please ask for help in the [GitHub Discussions](https://github.com/FPGA-Research/FABulous/discussions).

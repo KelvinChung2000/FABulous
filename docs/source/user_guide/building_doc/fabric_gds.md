@@ -25,6 +25,8 @@ fabulous> gen_fabric_macro
 This uses the default `no_opt` mode, so each tile takes the `DIE_AREA` from its `gds_config.yaml` as-is. For automatically optimised tile sizes, use the [Full Automated Flow](#full-automated-flow) instead.
 :::
 
+(prerequisites)=
+
 ## Prerequisites
 
 ### Install tools
@@ -107,6 +109,8 @@ The per tile `gds_config.yaml` is particularly useful and important as you can s
 Some tiles, such as the `N_term_single` / `S_term_single` routing terminals, synthesize down to little more than wires, but they still occupy a grid position and must stitch with their neighbours, so they are hardened and sized like any other tile. They are routing terminals that cascade and bounce long wires back into the routing channels, not dead logic, so the one-to-one connections you see in their netlist are intended rather than over-optimised away.
 :::
 
+(pin-config)=
+
 ### Pin Config
 
 During the generation process there will be an extra file generated under the `macro` folder, which is the `io_pin_order.yaml`. This file controls the placement of the IO pins along the tile. This is auto-populated to make sure all the pins of a tile align with the adjacent tiles. But one can modify it for whatever means, such as optimisation. The following is an example of the IO config file:
@@ -167,6 +171,8 @@ addr_bus[1]  # Index 1 first
 data_bus[1]  # Index 1 second (different bus)
 ```
 
+(stitching-the-tiles)=
+
 ## Stitching the tiles
 
 Once all the tiles are compiled to GDS format with correct sizing, we then can stitch them together. This can be done by using the following command:
@@ -187,6 +193,8 @@ External input clock routing into clock leaders through a 2x2 tile fabric. Red b
 ```
 
 Same as tile implementation, there is a `gds_config.yaml` file under the `Fabric` folder where you can set additional variables. Check the [flow variable table](#gds-variables) for available options.
+
+(full-automated-flow)=
 
 ## Full Automated Flow
 

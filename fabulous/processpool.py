@@ -7,6 +7,8 @@ from typing import Any
 
 import dill
 
+from fabulous.fabulous_settings import get_context
+
 
 def _init_worker() -> None:
     """Initialize worker process to use dill for pickling."""
@@ -31,8 +33,9 @@ class DillProcessPoolExecutor(ProcessPoolExecutor):
     ) -> None:
         ForkingPickler.dumps = dill.dumps
         ForkingPickler.loads = dill.loads
+        workers = max_workers if max_workers is not None else get_context().max_worker
         super().__init__(
-            max_workers=max_workers,
+            max_workers=workers or None,
             mp_context=multiprocessing.get_context("spawn"),
             initializer=_init_worker,
             initargs=initargs,

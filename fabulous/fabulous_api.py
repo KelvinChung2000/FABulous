@@ -5,6 +5,7 @@ parsing fabric definitions, generating HDL code, creating geometries, and handli
 various fabric-related operations.
 """
 
+import shutil
 from collections.abc import Iterable
 from pathlib import Path
 
@@ -37,8 +38,8 @@ from fabulous.fabric_generator.code_generator.code_generator_VHDL import (
 from fabulous.fabric_generator.gds_generator.flows.fabric_macro_flow import (
     FABulousFabricMacroFlow,
 )
-from fabulous.fabric_generator.gds_generator.flows.full_fabric_flow import (
-    FABulousFabricMacroFullFlow,
+from fabulous.fabric_generator.gds_generator.flows.fabric_optimisation_flow import (
+    FABulousFabricOptimisationFlow,
 )
 from fabulous.fabric_generator.gds_generator.flows.tile_macro_flow import (
     FABulousTileVerilogMacroFlow,
@@ -46,7 +47,7 @@ from fabulous.fabric_generator.gds_generator.flows.tile_macro_flow import (
 from fabulous.fabric_generator.gds_generator.gen_io_pin_config_yaml import (
     generate_IO_pin_order_config,
 )
-from fabulous.fabric_generator.gds_generator.steps.tile_optimisation import OptMode
+from fabulous.fabric_generator.gds_generator.steps.tile_area_opt import OptMode
 from fabulous.fabric_generator.gen_fabric.fabric_automation import genIOBel
 from fabulous.fabric_generator.gen_fabric.gen_configmem import generateConfigMem
 from fabulous.fabric_generator.gen_fabric.gen_fabric import generateFabric
@@ -684,6 +685,8 @@ class FABulous_API:
         base_config_path: Path | None = None,
         config_override_path: Path | None = None,
         tile_opt_config: Path | None = None,
+        nlp_only: bool = False,
+        nlp_area_margin: float = 0.05,
         **config_overrides: dict,
     ) -> None:
         """Run the stitching flow to assemble tile macros into a fabric-level GDS."""
@@ -692,8 +695,10 @@ class FABulous_API:
         logger.info(f"Output folder: {out_folder.resolve()}")
         config_args = {
             "FABULOUS_PROJ_DIR": str(project_dir.resolve()),
-            "FABULOUS_FABRIC": self.fabric.name,
+            "FABULOUS_FABRIC": self.fabric,
             "DESIGN_NAME": self.fabric.name,
+            "FABULOUS_NLP_ONLY": nlp_only,
+            "FABULOUS_NLP_AREA_MARGIN": nlp_area_margin,
         }
         if tile_opt_config is not None:
             config_args["TILE_OPT_INFO"] = str(tile_opt_config)
@@ -707,7 +712,7 @@ class FABulous_API:
             ]
             if i is not None
         ]
-        flow = FABulousFabricMacroFullFlow(
+        flow = FABulousFabricOptimisationFlow(
             configs,
             name=self.fabric.name,
             design_dir=str(out_folder.resolve()),
@@ -715,8 +720,15 @@ class FABulous_API:
             pdk_root=str(pdk_root.resolve()),
         )
         result = flow.start()
-        logger.info(f"Saving final views for FABulous to {out_folder / 'final_views'}")
-        result.save_snapshot(out_folder / "final_views")
+        final_views = out_folder / "final_views"
+        logger.info(f"Saving final views for FABulous to {final_views}")
+        result.save_snapshot(final_views)
+        tile_opt_summary = flow.config.get("TILE_OPT_INFO")
+        if tile_opt_summary is not None:
+            summary_src = Path(tile_opt_summary)
+            summary_dst = final_views / summary_src.name
+            logger.info(f"Copying tile optimisation summary to {summary_dst}")
+            shutil.copyfile(summary_src, summary_dst)
         logger.info("Stitching flow completed.")
 
     def timing_model_interface(

@@ -5,12 +5,14 @@ generation, bitstream creation, simulation execution, and GUI commands.
 """
 
 import os
+from decimal import Decimal
 from pathlib import Path
 
 import pytest
 from pytest_mock import MockerFixture
 
-from fabulous.fabulous_cli.fabulous_cli import FABulous_CLI
+from fabulous.fabric_generator.gds_generator.steps.tile_area_opt import OptMode
+from fabulous.fabulous_cli.fabulous_cli import FABulous_CLI, _resolve_directional_fix
 from fabulous.fabulous_cli.helper import create_project, setup_logger
 from fabulous.fabulous_settings import init_context, reset_context
 from tests.cli_test.conftest import MOCK_COMPLETED_PROCESS, TILE, find_task_calls
@@ -451,3 +453,164 @@ def test_start_klayout_gui_layer_file(
     cmd: list[str] = run_mock.call_args.args[0]
     assert "-l" in cmd, f"klayout invocation missing -l: {cmd}"
     assert Path(cmd[cmd.index("-l") + 1]) == expected_layer_file
+
+
+class TestResolveDirectionalFix:
+    """``_resolve_directional_fix`` maps a fix flag onto a directional mode."""
+
+    def test_fix_height_implies_find_min_width(self) -> None:
+        mode, die_area = _resolve_directional_fix(OptMode.NO_OPT, None, Decimal(245))
+        assert mode == OptMode.FIND_MIN_WIDTH
+        assert die_area == [0, 0, Decimal(245), Decimal(245)]
+
+    def test_fix_width_implies_find_min_height(self) -> None:
+        mode, die_area = _resolve_directional_fix(OptMode.NO_OPT, Decimal(246), None)
+        assert mode == OptMode.FIND_MIN_HEIGHT
+        assert die_area == [0, 0, Decimal(246), Decimal(246)]
+
+    def test_fix_height_consistent_with_explicit_mode(self) -> None:
+        mode, _ = _resolve_directional_fix(OptMode.FIND_MIN_WIDTH, None, Decimal(245))
+        assert mode == OptMode.FIND_MIN_WIDTH
+
+    def test_fix_height_conflicts_with_find_min_height(self) -> None:
+        with pytest.raises(
+            ValueError, match="only valid with --optimise find_min_width"
+        ):
+            _resolve_directional_fix(OptMode.FIND_MIN_HEIGHT, None, Decimal(245))
+
+    def test_fix_width_conflicts_with_balance(self) -> None:
+        with pytest.raises(
+            ValueError, match="only valid with --optimise find_min_height"
+        ):
+            _resolve_directional_fix(OptMode.BALANCE, Decimal(246), None)
+
+    def test_both_fix_flags_raise(self) -> None:
+        with pytest.raises(ValueError, match="only one of"):
+            _resolve_directional_fix(OptMode.NO_OPT, Decimal(246), Decimal(245))
+
+    def test_no_fix_flags_passthrough(self) -> None:
+        mode, die_area = _resolve_directional_fix(OptMode.BALANCE, None, None)
+        assert mode == OptMode.BALANCE
+        assert die_area is None
+
+
+class TestGenTileMacroFlags:
+    """End-to-end CLI wiring for the explicit size flags."""
+
+    def _patch(self, cli: FABulous_CLI, mocker: MockerFixture) -> MockerFixture:
+        mocker.patch(
+            "fabulous.fabulous_cli.fabulous_cli.is_pdk_config_set", return_value=True
+        )
+        mocker.patch.object(cli.fabulousAPI, "gen_io_pin_order_config")
+        return mocker.patch.object(cli.fabulousAPI, "genTileMacro")
+
+    def test_fix_height_sets_mode_and_die_area(
+        self, cli: FABulous_CLI, mocker: MockerFixture
+    ) -> None:
+        gen_macro = self._patch(cli, mocker)
+
+        run_cmd(cli, f"gen_tile_macro {TILE} --fix-height 245")
+
+        kwargs = gen_macro.call_args.kwargs
+        assert kwargs["optimisation"] == OptMode.FIND_MIN_WIDTH
+        overrides = kwargs["custom_config_overrides"]
+        assert overrides["DIE_AREA"] == [0, 0, Decimal(245), Decimal(245)]
+        assert overrides["FABULOUS_OPT_MODE"] == OptMode.FIND_MIN_WIDTH
+
+    def test_fix_width_sets_mode_and_die_area(
+        self, cli: FABulous_CLI, mocker: MockerFixture
+    ) -> None:
+        gen_macro = self._patch(cli, mocker)
+
+        run_cmd(cli, f"gen_tile_macro {TILE} --fix-width 246")
+
+        kwargs = gen_macro.call_args.kwargs
+        assert kwargs["optimisation"] == OptMode.FIND_MIN_HEIGHT
+        assert kwargs["custom_config_overrides"]["DIE_AREA"] == [
+            0,
+            0,
+            Decimal(246),
+            Decimal(246),
+        ]
+
+    def test_fix_height_conflicting_mode_aborts(
+        self, cli: FABulous_CLI, mocker: MockerFixture, caplog: pytest.LogCaptureFixture
+    ) -> None:
+        gen_macro = self._patch(cli, mocker)
+
+        run_cmd(
+            cli,
+            f"gen_tile_macro {TILE} --optimise find_min_height --fix-height 245",
+        )
+
+        gen_macro.assert_not_called()
+        assert "only valid with --optimise find_min_width" in caplog.text
+
+    def test_override_merges_custom_yaml(
+        self, cli: FABulous_CLI, mocker: MockerFixture, tmp_path: Path
+    ) -> None:
+        gen_macro = self._patch(cli, mocker)
+        override = tmp_path / "ov.yaml"
+        override.write_text("DIODE_ON_PORTS: both\n")
+
+        run_cmd(cli, f"gen_tile_macro {TILE} --override {override}")
+
+        assert (
+            gen_macro.call_args.kwargs["custom_config_overrides"]["DIODE_ON_PORTS"]
+            == "both"
+        )
+
+
+class TestRunEFPGAMacroForwarding:
+    """End-to-end CLI wiring: flags forwarded to the API entrypoint."""
+
+    def _patch(self, cli: FABulous_CLI, mocker: MockerFixture) -> MockerFixture:
+        mocker.patch(
+            "fabulous.fabulous_cli.fabulous_cli.is_pdk_config_set", return_value=True
+        )
+        return mocker.patch.object(cli.fabulousAPI, "full_fabric_automation")
+
+    def test_forwards_nlp_flags(self, cli: FABulous_CLI, mocker: MockerFixture) -> None:
+        full_auto = self._patch(cli, mocker)
+
+        run_cmd(cli, "run_FABulous_eFPGA_macro --nlp-only --nlp-area-margin 0.1")
+
+        full_auto.assert_called_once()
+        kwargs = full_auto.call_args.kwargs
+        assert kwargs["nlp_only"] is True
+        assert kwargs["nlp_area_margin"] == pytest.approx(0.1)
+        assert kwargs["tile_opt_config"] is None
+
+    def test_forwards_defaults(self, cli: FABulous_CLI, mocker: MockerFixture) -> None:
+        full_auto = self._patch(cli, mocker)
+
+        run_cmd(cli, "run_FABulous_eFPGA_macro")
+
+        kwargs = full_auto.call_args.kwargs
+        assert kwargs["nlp_only"] is False
+        assert kwargs["nlp_area_margin"] == pytest.approx(0.05)
+        assert kwargs["tile_opt_config"] is None
+
+    def test_forwards_tile_opt_info_as_path(
+        self, cli: FABulous_CLI, mocker: MockerFixture, tmp_path: Path
+    ) -> None:
+        full_auto = self._patch(cli, mocker)
+        summary = tmp_path / "tile_optimisation_summary.json"
+        summary.touch()
+
+        run_cmd(cli, f"run_FABulous_eFPGA_macro --tile-opt-info {summary}")
+
+        tile_opt_config = full_auto.call_args.kwargs["tile_opt_config"]
+        assert tile_opt_config == Path(summary)
+
+    def test_skips_when_pdk_not_set(
+        self, cli: FABulous_CLI, mocker: MockerFixture
+    ) -> None:
+        mocker.patch(
+            "fabulous.fabulous_cli.fabulous_cli.is_pdk_config_set", return_value=False
+        )
+        full_auto = mocker.patch.object(cli.fabulousAPI, "full_fabric_automation")
+
+        run_cmd(cli, "run_FABulous_eFPGA_macro")
+
+        full_auto.assert_not_called()

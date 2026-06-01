@@ -33,9 +33,11 @@ import tempfile
 import tkinter as tk
 import traceback
 from collections.abc import Callable
+from decimal import Decimal
 from pathlib import Path
 from typing import cast
 
+import yaml
 from cmd2 import (
     Cmd,
     Cmd2ArgumentParser,
@@ -59,7 +61,7 @@ from fabulous.fabric_generator.code_generator.code_generator_Verilog import (
 from fabulous.fabric_generator.code_generator.code_generator_VHDL import (
     VHDLCodeGenerator,
 )
-from fabulous.fabric_generator.gds_generator.steps.tile_optimisation import OptMode
+from fabulous.fabric_generator.gds_generator.steps.tile_area_opt import OptMode
 from fabulous.fabric_generator.gen_fabric.fabric_automation import (
     generateCustomTileConfig,
 )
@@ -104,6 +106,84 @@ KLAYOUT_LAYER_FILE_NAMES: dict[str, str] = {
     "gf180mcuC": "gf180mcu.lyp",
     "gf180mcuD": "gf180mcu.lyp",
 }
+
+
+def _require_directional_mode(
+    opt_mode: OptMode, implied: OptMode, flag: str
+) -> OptMode:
+    """Return the directional mode a ``--fix-*`` flag implies, or raise on conflict.
+
+    Parameters
+    ----------
+    opt_mode : OptMode
+        The mode requested via ``--optimise`` (``NO_OPT`` when unset).
+    implied : OptMode
+        The directional mode the fix flag requires.
+    flag : str
+        The flag name, used for the error message.
+
+    Returns
+    -------
+    OptMode
+        ``implied`` when compatible with ``opt_mode``.
+
+    Raises
+    ------
+    ValueError
+        If ``opt_mode`` is an explicit mode other than ``implied``.
+    """
+    if opt_mode in (OptMode.NO_OPT, implied):
+        return implied
+    raise ValueError(
+        f"{flag} is only valid with --optimise {implied.value}, not {opt_mode.value}."
+    )
+
+
+def _resolve_directional_fix(
+    opt_mode: OptMode,
+    fix_width: Decimal | None,
+    fix_height: Decimal | None,
+) -> tuple[OptMode, list[int | Decimal] | None]:
+    """Resolve ``--optimise`` plus ``--fix-*`` into a mode and DIE_AREA override.
+
+    A fixed axis pins one side and minimises the other: ``--fix-width`` pairs with
+    ``find_min_height`` and ``--fix-height`` with ``find_min_width``. The minimised
+    axis starts square; ``TileOptimisation`` re-seeds it from the synthesised cell
+    area, so only the fixed value needs to be supplied.
+
+    Parameters
+    ----------
+    opt_mode : OptMode
+        The mode requested via ``--optimise``.
+    fix_width : Decimal | None
+        Locked tile width, if ``--fix-width`` was given.
+    fix_height : Decimal | None
+        Locked tile height, if ``--fix-height`` was given.
+
+    Returns
+    -------
+    tuple[OptMode, list[int | Decimal] | None]
+        The resolved optimisation mode and the DIE_AREA override, or ``None`` when
+        neither fix flag is set.
+
+    Raises
+    ------
+    ValueError
+        If both fix flags are given, or a fix flag contradicts ``--optimise``.
+    """
+    if fix_width is not None and fix_height is not None:
+        raise ValueError("Specify only one of --fix-width / --fix-height.")
+    if fix_width is not None:
+        mode = _require_directional_mode(
+            opt_mode, OptMode.FIND_MIN_HEIGHT, "--fix-width"
+        )
+        return mode, [0, 0, fix_width, fix_width]
+    if fix_height is not None:
+        mode = _require_directional_mode(
+            opt_mode, OptMode.FIND_MIN_WIDTH, "--fix-height"
+        )
+        return mode, [0, 0, fix_height, fix_height]
+    return opt_mode, None
 
 
 INTO_STRING = rf"""
@@ -217,6 +297,8 @@ class FABulous_CLI(Cmd):
         Argument parser for the gen_io_pin_config command
     gen_all_tile_parser : Cmd2ArgumentParser
         Argument parser for the gen_all_tile command
+    eFPGA_macro_parser: Cmd2ArgumentParser
+        Argument parser for the gen_eFPGA_macro command
     gui_parser : Cmd2ArgumentParser
         Argument parser for the open_gui command
     timing_model_parser : Cmd2ArgumentParser
@@ -1399,6 +1481,22 @@ class FABulous_CLI(Cmd):
         type=Path,
     )
     gds_parser.add_argument(
+        "--fix-width",
+        type=Decimal,
+        default=None,
+        metavar="WIDTH",
+        help="Lock the tile width to WIDTH and minimise the height "
+        "(implies --optimise find_min_height).",
+    )
+    gds_parser.add_argument(
+        "--fix-height",
+        type=Decimal,
+        default=None,
+        metavar="HEIGHT",
+        help="Lock the tile height to HEIGHT and minimise the width "
+        "(implies --optimise find_min_width).",
+    )
+    gds_parser.add_argument(
         "--io-pin-config", help="Path to a custom IO pin config YAML file", type=Path
     )
 
@@ -1465,6 +1563,21 @@ class FABulous_CLI(Cmd):
             )
             return
 
+        try:
+            opt_mode, die_area_override = _resolve_directional_fix(
+                args.optimise, args.fix_width, args.fix_height
+            )
+        except ValueError as exc:
+            logger.error(str(exc))
+            return
+
+        custom_overrides: dict = {}
+        if args.override:
+            custom_overrides.update(yaml.safe_load(args.override.read_text()) or {})
+        if die_area_override is not None:
+            custom_overrides["FABULOUS_OPT_MODE"] = opt_mode
+            custom_overrides["DIE_AREA"] = die_area_override
+
         tile_dir = self.projectDir / "Tile" / args.tile
         pin_order_file = tile_dir / f"{args.tile}_io_pin_order.yaml"
 
@@ -1490,9 +1603,10 @@ class FABulous_CLI(Cmd):
             tile_dir / "macro",
             cast("str", get_context().pdk),
             cast("Path", get_context().pdk_root),
-            optimisation=args.optimise,
+            optimisation=opt_mode,
             base_config_path=self.projectDir / "Tile" / "include" / "gds_config.yaml",
             config_override_path=tile_dir / "gds_config.yaml",
+            custom_config_overrides=custom_overrides or None,
         )
 
     gen_all_tile_parser: Cmd2ArgumentParser = Cmd2ArgumentParser()
@@ -1568,8 +1682,28 @@ class FABulous_CLI(Cmd):
             base_config_path=self.projectDir / "Fabric" / "gds_config.yaml",
         )
 
+    eFPGA_macro_parser: Cmd2ArgumentParser = Cmd2ArgumentParser()
+    eFPGA_macro_parser.add_argument(
+        "--tile-opt-info",
+        type=str,
+        default=None,
+        help="Path to tile optimisation summary JSON to skip Step 1",
+    )
+    eFPGA_macro_parser.add_argument(
+        "--nlp-only",
+        action="store_true",
+        help="Run exploration and NLP only, skip recompilation",
+    )
+    eFPGA_macro_parser.add_argument(
+        "--nlp-area-margin",
+        type=float,
+        default=0.05,
+        help="Area margin for NLP constraint (default: 0.05 = 5%%)",
+    )
+
     @with_category(CMD_FABRIC_FLOW)
-    def do_run_FABulous_eFPGA_macro(self, *_arg: str) -> None:
+    @with_argparser(eFPGA_macro_parser)
+    def do_run_FABulous_eFPGA_macro(self, args: argparse.Namespace) -> None:
         """Run the full FABulous eFPGA macro generation flow."""
         if not is_pdk_config_set():
             logger.error(
@@ -1579,12 +1713,16 @@ class FABulous_CLI(Cmd):
             return
 
         (self.projectDir / "Fabric" / "macro").mkdir(exist_ok=True)
+        tile_opt_config = Path(args.tile_opt_info) if args.tile_opt_info else None
         self.fabulousAPI.full_fabric_automation(
             self.projectDir,
             self.projectDir / "Fabric" / "macro",
             cast("str", get_context().pdk),
             cast("Path", get_context().pdk_root),
             base_config_path=self.projectDir / "Fabric" / "gds_config.yaml",
+            tile_opt_config=tile_opt_config,
+            nlp_only=args.nlp_only,
+            nlp_area_margin=args.nlp_area_margin,
         )
 
     gui_parser: Cmd2ArgumentParser = Cmd2ArgumentParser()

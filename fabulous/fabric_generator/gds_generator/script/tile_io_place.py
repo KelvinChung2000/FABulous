@@ -12,6 +12,7 @@ from pathlib import Path
 
 import click
 import odb  # type: ignore[import]
+import utl  # type: ignore[import]
 import yaml
 from librelane.logging.logger import debug, err, info, warn
 from librelane.scripts.odbpy.reader import click_odb
@@ -37,6 +38,131 @@ def grid_to_tracks(origin: float, count: int, step: float) -> list[float]:
     tracks.sort()
 
     return tracks
+
+
+def filter_pin_tracks_by_stride_and_distance(
+    plan: "PinPlacementPlan",
+    step_by_side: dict[Side, float],
+    origin_by_side: dict[Side, float],
+    micron_in_units: float,
+) -> tuple[dict[Side, list[list[float]]], list[dict]]:
+    """Filter the per-segment raw tracks to satisfy min/max distance.
+
+    For each side and each segment in ``plan``, keep every ``stride``-th raw
+    track to enforce the segment's ``min_distance``, then insert extra
+    tracks where consecutive filtered tracks fall further apart than the
+    segment's ``max_distance``.  Segments whose filtered track count is
+    smaller than ``actual_pin_count`` are flagged in the returned
+    ``track_errors`` list for the caller to surface.
+
+    Parameters
+    ----------
+    plan : PinPlacementPlan
+        Plan whose ``track_coordinates`` and ``segments_by_side`` have been
+        populated by ``allocate_tracks`` and ``ensure_min_distances``.
+    step_by_side : dict[Side, float]
+        Track pitch for each side, in DBU.
+    origin_by_side : dict[Side, float]
+        Track origin for each side, in DBU.
+    micron_in_units : float
+        DBU per micron, used to convert segment distances to DBU.
+
+    Returns
+    -------
+    pin_tracks : dict[Side, list[list[float]]]
+        Filtered track coordinates per side, in the same order as
+        ``plan.segments_by_side[side]``.
+    track_errors : list[dict]
+        One entry per segment that did not have enough filtered tracks to
+        hold its pins, with ``side``, ``shortage``, ``step`` and
+        ``min_distance`` keys.
+
+    Raises
+    ------
+    AssertionError
+        If any segment is missing a ``min_distance`` value, which should have
+    """
+    pin_tracks: dict[Side, list[list[float]]] = {side: [] for side in Side}
+    track_errors: list[dict] = []
+
+    for side, segments in plan.segments_by_side.items():
+        if not segments or side not in origin_by_side:
+            continue
+        global_origin = origin_by_side[side]
+        step = step_by_side[side]
+
+        # Stride cadence is carried across segments that share a physical
+        # tile; it resets when ``tile_index`` changes so each super-tile
+        # division still produces the same pin layout as a standalone tile.
+        side_last_filtered_idx: int | None = None
+        side_current_tile_index: int | None = None
+        first_segment_seen = False
+
+        for segment_index, segment in enumerate(segments):
+            if segment.min_distance is None:
+                raise AssertionError("min_distance must be defined before placement")
+            min_distance = segment.min_distance * micron_in_units
+            max_distance = segment.max_distance
+            if max_distance is not None:
+                max_distance = max_distance * micron_in_units
+
+            raw_tracks = plan.track_coordinates[side][segment_index]
+
+            stride = max(1, math.ceil(min_distance / step))
+
+            # Reset the cadence when entering a new physical tile so each
+            # super-tile division produces the same pin positions as a
+            # standalone build.  The first segment on the side always
+            # anchors a fresh cadence on its own first raw track.
+            if not first_segment_seen or segment.tile_index != side_current_tile_index:
+                side_last_filtered_idx = None
+                side_current_tile_index = segment.tile_index
+                first_segment_seen = True
+
+            filtered: list[float] = []
+            for track_coord in raw_tracks:
+                track_idx = round((track_coord - global_origin) / step)
+                if (
+                    side_last_filtered_idx is None
+                    or (track_idx - side_last_filtered_idx) >= stride
+                ):
+                    filtered.append(track_coord)
+                    side_last_filtered_idx = track_idx
+
+            if max_distance is not None:
+                max_stride = max(1, math.floor(max_distance / step))
+                enforced: list[float] = []
+                last_global_idx: int | None = None
+                for track_coord in filtered:
+                    global_track_idx = round((track_coord - global_origin) / step)
+                    if last_global_idx is None:
+                        enforced.append(track_coord)
+                        last_global_idx = global_track_idx
+                    else:
+                        if global_track_idx - last_global_idx > max_stride:
+                            interim_idx = last_global_idx + max_stride
+                            while interim_idx < global_track_idx:
+                                interim_coord = global_origin + interim_idx * step
+                                enforced.append(interim_coord)
+                                interim_idx += max_stride
+                        enforced.append(track_coord)
+                        last_global_idx = global_track_idx
+                filtered = enforced
+
+            needed = segment.actual_pin_count
+            if needed > len(filtered):
+                track_errors.append(
+                    {
+                        "side": side,
+                        "shortage": needed - len(filtered),
+                        "step": step,
+                        "min_distance": min_distance,
+                    }
+                )
+
+            pin_tracks[side].append(filtered)
+
+    return pin_tracks, track_errors
 
 
 def equally_spaced_sequence(
@@ -903,6 +1029,17 @@ def io_place(
         if bterm.getSigType() not in ["POWER", "GROUND"]
     ]
 
+    # Expose I/O bit counts so downstream steps (e.g. TileOptimisation) can
+    # size the die to absorb DiodesOnPorts cells without parsing the netlist.
+    utl.metric_integer(
+        "design__io__count__input",
+        sum(1 for b in bterms if b.getIoType() == "INPUT"),
+    )
+    utl.metric_integer(
+        "design__io__count__output",
+        sum(1 for b in bterms if b.getIoType() == "OUTPUT"),
+    )
+
     # generate slots
     DIE_AREA = reader.block.getDieArea()
     BLOCK_LL_X = DIE_AREA.xMin()
@@ -952,74 +1089,15 @@ def io_place(
         Side.SOUTH: v_step,
     }
 
-    pin_tracks: dict[Side, list[list[float]]] = {side: [] for side in Side}
-    track_errors: list[dict] = []
-
-    for side in Side:
-        # Get origin for this side to calculate global alignment
-        global_origin = origin_v if side in {Side.NORTH, Side.SOUTH} else origin_h
-
-        for segment_index, segment in enumerate(plan.segments_by_side[side]):
-            if segment.min_distance is None:
-                raise AssertionError("min_distance must be defined before placement")
-            min_distance = segment.min_distance * micron_in_units
-            max_distance = segment.max_distance
-            if max_distance is not None:
-                max_distance = max_distance * micron_in_units
-
-            raw_tracks = plan.track_coordinates[side][segment_index]
-            step = step_by_side[side]
-
-            stride = max(1, math.ceil(min_distance / step))
-
-            # Filter tracks by stride.  Use the first raw track as the
-            # reference so the stride pattern restarts at each division
-            # boundary.  This ensures that super-tile divisions produce
-            # the same pin positions as a standalone tile, regardless of
-            # whether the division boundary falls on an even or odd
-            # global track index.
-            filtered = []
-            ref_idx: int | None = None
-            for track_coord in raw_tracks:
-                track_idx = round((track_coord - global_origin) / step)
-                if ref_idx is None:
-                    ref_idx = track_idx
-                if (track_idx - ref_idx) % stride == 0:
-                    filtered.append(track_coord)
-
-            if max_distance is not None:
-                max_stride = max(1, math.floor(max_distance / step))
-                enforced = []
-                last_global_idx = None
-                for track_coord in filtered:
-                    global_track_idx = round((track_coord - global_origin) / step)
-                    if last_global_idx is None:
-                        enforced.append(track_coord)
-                        last_global_idx = global_track_idx
-                    else:
-                        if global_track_idx - last_global_idx > max_stride:
-                            # Need to add intermediate tracks
-                            interim_idx = last_global_idx + max_stride
-                            while interim_idx < global_track_idx:
-                                interim_coord = global_origin + interim_idx * step
-                                enforced.append(interim_coord)
-                                interim_idx += max_stride
-                        enforced.append(track_coord)
-                        last_global_idx = global_track_idx
-                filtered = enforced
-
-            needed = segment.actual_pin_count
-            if needed > len(filtered):
-                track_errors.append(
-                    {
-                        "side": side,
-                        "shortage": needed - len(filtered),
-                        "step": step,
-                        "min_distance": min_distance,
-                    }
-                )
-
-            pin_tracks[side].append(filtered)
+    origin_by_side = {
+        Side.NORTH: origin_v,
+        Side.SOUTH: origin_v,
+        Side.EAST: origin_h,
+        Side.WEST: origin_h,
+    }
+    pin_tracks, track_errors = filter_pin_tracks_by_stride_and_distance(
+        plan, step_by_side, origin_by_side, micron_in_units
+    )
 
     if track_errors:
         err("Insufficient tracks for pin allocation. Minimum die size increase needed:")

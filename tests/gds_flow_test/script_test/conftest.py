@@ -9,6 +9,7 @@ import pytest
 # Mock external dependencies BEFORE any test imports
 sys.modules["odb"] = MagicMock()
 sys.modules["openroad"] = MagicMock()
+sys.modules["utl"] = MagicMock()
 
 
 # ============================================================================

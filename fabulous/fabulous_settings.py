@@ -79,6 +79,13 @@ class FABulousSettings(BaseSettings):
         deprecated=True,
         description="Deprecated, use proj_version instead",
     )
+    max_worker: int | None = Field(
+        default=2,
+        ge=0,
+        description="Maximum number of worker processes for parallel tasks. "
+        "0 or None means use the system default. (Multiple workers are only "
+        "used for the full fabric flow for now)",
+    )
 
     # CLI variable
     editor: str | None = None

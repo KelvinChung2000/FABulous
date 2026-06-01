@@ -28,6 +28,8 @@ class WhileStep(Step):
 
     break_on_failure: bool = True
 
+    propagate_exceptions: tuple[type[BaseException], ...] = ()
+
     _current_iter_dir: Path | None = None
 
     def __init_subclass__(Self):  # noqa: ANN204, D105
@@ -66,7 +68,7 @@ class WhileStep(Step):
         """Return true if the condition is met and keep the loop going."""
         return True
 
-    def mid_iteration_break(self, _state: State, _step: type[Step]) -> bool:
+    def mid_iteration_break(self, _state: State, _step: Step) -> bool:
         """Return True to break the current iteration and start the next iteration.
 
         If True, breaks the current iteration and starts the next iteration. Breaking
@@ -130,6 +132,10 @@ class WhileStep(Step):
                     if self.mid_iteration_break(current_state, step):
                         break
                 except Exception as e:
+                    if self.propagate_exceptions and isinstance(
+                        e, self.propagate_exceptions
+                    ):
+                        raise
                     if self.raise_on_failure:
                         raise e from None
                     if self.break_on_failure:
@@ -148,6 +154,10 @@ class WhileStep(Step):
             )
             progress_bar.end_stage()
         current_state = self.post_loop_callback(current_state)
+
+        # Persist final config — post_loop_callback may have updated it
+        (Path(self.step_dir) / "config.json").write_text(self.config.dumps())
+
         for key in current_state:
             if (
                 state_in.get(key) != current_state.get(key)

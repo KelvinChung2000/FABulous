@@ -68,20 +68,20 @@ This will generate the tile GDS for you under the tile macro folder (`<project>/
 
 ### Command Options
 
-The `gen_tile_macro` command supports an optimization flag:
+The `gen_tile_macro` command supports an optimisation flag:
 
 ```bash
 fabulous> gen_tile_macro <tile_name> --optimise [mode]
 ```
 
-Where `[mode]` is one of the optimization modes described in the [Tile Size Optimization](#tile-size-optimization) section. If `--optimise` is provided without a mode, `balance` is used by default.
+Where `[mode]` is one of the optimisation modes described in the [Tile Size optimisation](#tile-size-optimisation) section. If `--optimise` is provided without a mode, `balance` is used by default.
 
 To generate all tiles at once:
 
 ```bash
 fabulous> gen_all_tile_macros
 fabulous> gen_all_tile_macros --parallel      # Run in parallel for faster compilation
-fabulous> gen_all_tile_macros --optimise      # With optimization (balance mode)
+fabulous> gen_all_tile_macros --optimise      # With optimisation (balance mode)
 ```
 
 ### Tile Config
@@ -92,7 +92,7 @@ The per tile `gds_config.yaml` is particularly useful and important as you can s
 
 ### Pin Config
 
-During the generation process there will be an extra file generated under the `macro` folder, which is the `io_pin_order.yaml`. This file controls the placement of the IO pins along the tile. This is auto-populated to make sure all the pins of a tile align with the adjacent tiles. But one can modify it for whatever means, such as optimization. The following is an example of the IO config file:
+During the generation process there will be an extra file generated under the `macro` folder, which is the `io_pin_order.yaml`. This file controls the placement of the IO pins along the tile. This is auto-populated to make sure all the pins of a tile align with the adjacent tiles. But one can modify it for whatever means, such as optimisation. The following is an example of the IO config file:
 
 ```yaml
 X0Y0:
@@ -173,21 +173,21 @@ Same as tile implementation, there is a `gds_config.yaml` file under the `Fabric
 
 ## Full Automated Flow
 
-For a fully automated flow that handles tile size optimization and fabric stitching, use:
+For a fully automated flow that handles tile size optimisation and fabric stitching, use:
 
 ```bash
 fabulous> run_FABulous_eFPGA_macro
 ```
 
 :::{note}
-The fully automated flow can take significantly longer than manual tile compilation, as it performs design space exploration by compiling all tiles with multiple optimization modes in parallel before running NLP optimization. For large fabrics with many unique tiles, expect longer runtimes.
+The fully automated flow can take significantly longer than manual tile compilation, as it performs design space exploration by compiling all tiles with multiple optimisation modes in parallel before running NLP optimisation. For large fabrics with many unique tiles, expect longer runtimes.
 :::
 
 This command performs the following steps automatically:
 
-1. **Design Space Exploration**: Compiles all tiles with three optimization modes (`balance`, `find_min_width`, `find_min_height`) in parallel to explore possible tile dimensions.
+1. **Design Space Exploration**: Compiles all tiles with three optimisation modes (`balance`, `find_min_width`, `find_min_height`) in parallel to explore possible tile dimensions.
 
-2. **NLP Optimization**: Uses Non-Linear Programming (via pymoo) to find optimal tile dimensions that minimize total fabric area while satisfying:
+2. **NLP optimisation**: Uses Non-Linear Programming (via pymoo) to find optimal tile dimensions that minimize total fabric area while satisfying:
    - Minimum area constraints for each tile
    - Row height consistency (all tiles in a row must have the same height)
    - Column width consistency (all tiles in a column must have the same width)
@@ -197,13 +197,13 @@ This command performs the following steps automatically:
 
 4. **Fabric Stitching**: Assembles all tiles into the final fabric layout.
 
-(tile-size-optimization)=
+(tile-size-optimisation)=
 
-## Tile Size Optimization
+## Tile Size Optimisation
 
-The GDS flow includes an iterative optimization process to find the minimum viable tile dimensions. This is controlled by the `FABULOUS_OPT_MODE` variable.
+The GDS flow includes an iterative optimisation process to find the minimum viable tile dimensions. This is controlled by the `FABULOUS_OPT_MODE` variable.
 
-### Optimization Modes
+### Optimisation Modes
 
 | Mode | Description | Use Case |
 |------|-------------|----------|
@@ -211,9 +211,9 @@ The GDS flow includes an iterative optimization process to find the minimum viab
 | `find_min_width` | Increases width iteratively while keeping height fixed | When height is constrained |
 | `find_min_height` | Increases height iteratively while keeping width fixed | When width is constrained |
 | `large` | Increases both dimensions together | Quick compilation, larger area |
-| `no_opt` | No optimization, uses provided `DIE_AREA` directly | Manual control, requires `DIE_AREA` to be set |
+| `no_opt` | No optimisation, uses provided `DIE_AREA` directly | Manual control, requires `DIE_AREA` to be set |
 
-### How Optimization Works
+### How Optimisation Works
 
 1. The flow starts with an initial die area (either provided or calculated from instance area)
 2. It runs through placement and routing
@@ -239,9 +239,9 @@ After successful compilation, the output is organized as follows:
 ├── Tile/
 │   └── <tile_name>/
 │       └── macro/
-│           ├── balance/          # Output from balance optimization
-│           ├── find_min_width/   # Output from width optimization
-│           ├── find_min_height/  # Output from height optimization
+│           ├── balance/          # Output from balance optimisation
+│           ├── find_min_width/   # Output from width optimisation
+│           ├── find_min_height/  # Output from height optimisation
 │           └── final_views/      # Final compiled output
 │               ├── gds/          # GDSII files
 │               ├── lef/          # LEF macro files

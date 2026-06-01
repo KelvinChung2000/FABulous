@@ -9,10 +9,8 @@ from librelane.config.variable import Variable
 from librelane.flows.classic import Classic
 from librelane.flows.flow import Flow, FlowException
 from librelane.flows.sequential import SequentialFlow
-from librelane.logging.logger import err, warn
+from librelane.logging.logger import err, info, warn
 from librelane.state.state import State
-from librelane.steps import odb as Odb
-from librelane.steps import openroad as OpenROAD
 from librelane.steps.step import Step
 
 from fabulous.fabric_definition.supertile import SuperTile
@@ -22,6 +20,7 @@ from fabulous.fabric_generator.gds_generator.flows.flow_define import (
     classic_gating_config_vars,
     physical_steps,
     prep_steps,
+    tile_optimisation_physical_steps,
     write_out_steps,
 )
 from fabulous.fabric_generator.gds_generator.helper import (
@@ -32,12 +31,11 @@ from fabulous.fabric_generator.gds_generator.helper import (
 )
 from fabulous.fabric_generator.gds_generator.steps.add_buffer import AddBuffers
 from fabulous.fabric_generator.gds_generator.steps.custom_pdn import CustomGeneratePDN
+from fabulous.fabric_generator.gds_generator.steps.tile_area_opt import (
+    OptMode,
+)
 from fabulous.fabric_generator.gds_generator.steps.tile_IO_placement import (
     FABulousTileIOPlacement,
-)
-from fabulous.fabric_generator.gds_generator.steps.tile_optimisation import (
-    OptMode,
-    TileOptimisation,
 )
 from fabulous.fabulous_settings import get_context
 
@@ -71,16 +69,7 @@ class FABulousTileVerilogMacroFlow(SequentialFlow):
     """A tile optimisation flow for FABulous fabric generation from Verilog."""
 
     Steps = (
-        prep_steps
-        + [
-            TileOptimisation,
-            OpenROAD.FillInsertion,
-            Odb.CellFrequencyTables,
-            OpenROAD.RCX,
-            OpenROAD.IRDropReport,
-        ]
-        + write_out_steps
-        + check_steps
+        prep_steps + tile_optimisation_physical_steps + write_out_steps + check_steps
     )
 
     config_vars = configs
@@ -94,6 +83,7 @@ class FABulousTileVerilogMacroFlow(SequentialFlow):
         opt_mode: OptMode,
         pdk: str,
         pdk_root: Path,
+        models_pack_path: Path | None = None,
         base_config_path: Path | None = None,
         override_config_path: Path | None = None,
         design_dir: Path | None = None,
@@ -105,8 +95,13 @@ class FABulousTileVerilogMacroFlow(SequentialFlow):
             for f in tile_type.tileDir.parent.glob("**/*.v")
             if "macro" not in f.parts
         ]
-        if models_pack := get_context().models_pack:
+        models_pack = models_pack_path or get_context().models_pack
+        if models_pack is not None:
             file_list.append(str(models_pack.resolve()))
+        else:
+            raise FlowException(
+                "models_pack is not set in the context, cannot proceed."
+            )
 
         # Determine logical dimensions
         if isinstance(tile_type, SuperTile):
@@ -132,13 +127,13 @@ class FABulousTileVerilogMacroFlow(SequentialFlow):
                 custom_config_overrides["FABULOUS_OPT_MODE"]
             )
 
-        default_design_dir = tile_type.tileDir.parent / "macro" / opt_mode.value
-        default_design_dir.mkdir(parents=True, exist_ok=True)
-        final_dir: str
-        if design_dir is None:
-            final_dir = str(default_design_dir.resolve())
-        else:
-            final_dir = str(design_dir)
+        final_dir_path = (
+            Path(str(design_dir))
+            if design_dir is not None
+            else tile_type.tileDir.parent / "macro" / opt_mode.value
+        )
+        final_dir_path.mkdir(parents=True, exist_ok=True)
+        final_dir = str(final_dir_path.resolve())
 
         configs = [
             i
@@ -155,13 +150,43 @@ class FABulousTileVerilogMacroFlow(SequentialFlow):
             name=tile_type.name,
             design_dir=final_dir,
             pdk=pdk,
-            pdk_root=str(pdk_root.resolve()),
+            pdk_root=str(pdk_root),
         )
         self.config = self.config.copy(
             FABULOUS_TILE_LOGICAL_WIDTH=logical_width,
             FABULOUS_TILE_LOGICAL_HEIGHT=logical_height,
         )
-        self.config = _apply_tile_die_area_config(self.config, tile_type, opt_mode)
+        final_opt_mode = self.config.get("FABULOUS_OPT_MODE", None)
+        if final_opt_mode and final_opt_mode != OptMode.NO_OPT:
+            directional = final_opt_mode in (
+                OptMode.FIND_MIN_WIDTH,
+                OptMode.FIND_MIN_HEIGHT,
+            )
+            # Directional modes minimise one axis. When the user supplies a
+            # DIE_AREA they are fixing the other axis, so keep that value instead
+            # of forcing the computed minimum. BALANCE/LARGE have no fixed axis,
+            # so they always fall back to full-auto sizing.
+            honour_user_die_area = (
+                directional
+                and self.config.get("DIE_AREA") is not None
+                and not self.config["FABULOUS_IGNORE_DEFAULT_DIE_AREA"]
+            )
+            if honour_user_die_area:
+                info(
+                    f"FABulous optimisation is set to {final_opt_mode}, honouring "
+                    "the user DIE_AREA: the fixed axis is locked and the other "
+                    "axis is minimised."
+                )
+            else:
+                info(
+                    f"FABulous optimisation is set to {final_opt_mode}, "
+                    "default die area is ignored."
+                )
+                self.config = self.config.copy(FABULOUS_IGNORE_DEFAULT_DIE_AREA=True)
+
+        self.config = _apply_tile_die_area_config(
+            self.config, tile_type, final_opt_mode
+        )
         self.config = round_die_area(self.config)
         if (
             "ROUTING_OBSTRUCTIONS" not in self.config
@@ -181,12 +206,10 @@ def _apply_tile_die_area_config(
     x_pitch, y_pitch = get_pitch(config)
     get_offset(config)
     min_x, min_y = tile_type.get_min_die_area(
-        x_pitch,
-        y_pitch,
-        config.get("IO_PIN_V_THINKNESS_MULT", Decimal(1)),
-        config.get("IO_PIN_H_THINKNESS_MULT", Decimal(1)),
-        x_pitch,
-        y_pitch,
+        x_pitch=x_pitch,
+        y_pitch=y_pitch,
+        x_pin_thickness_mult=config.get("IO_PIN_V_THICKNESS_MULT", Decimal(1)),
+        y_pin_thickness_mult=config.get("IO_PIN_H_THICKNESS_MULT", Decimal(1)),
     )
 
     if opt_mode == OptMode.NO_OPT:
@@ -204,6 +227,14 @@ def _apply_tile_die_area_config(
     _, _, width, height = die_area
     width = Decimal(width)
     height = Decimal(height)
+
+    if opt_mode == OptMode.FIND_MIN_WIDTH:
+        _validate_fixed_axis("height", height, min_y, tile_type.name)
+        return config
+    if opt_mode == OptMode.FIND_MIN_HEIGHT:
+        _validate_fixed_axis("width", width, min_x, tile_type.name)
+        return config
+
     if width < min_x or height < min_y:
         raise FlowException(
             f"DIE_AREA ({width}, {height}) is smaller than the "
@@ -211,6 +242,18 @@ def _apply_tile_die_area_config(
             f"tile {tile_type.name}. Please update the DIE_AREA "
         )
     return config
+
+
+def _validate_fixed_axis(
+    axis: str, value: Decimal, minimum: Decimal, tile_name: str
+) -> None:
+    """Reject a user-fixed directional axis below its physical IO-pin minimum."""
+    if value < minimum:
+        raise FlowException(
+            f"Fixed {axis} ({value}) is smaller than the minimum required "
+            f"{axis} ({minimum}) to fit the IO pins of tile {tile_name}. "
+            f"Increase the DIE_AREA {axis} or pick a different optimisation mode."
+        )
 
 
 @Flow.factory.register()

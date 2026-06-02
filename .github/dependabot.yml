@@ -95,3 +95,7 @@ updates:
     commit-message:
       prefix: "chore"
       include: "scope"
+    # Pin the Ubuntu base image to an LTS release manually. Dependabot cannot
+    # distinguish LTS (even-year .04) from interim releases, and break the build.
+    ignore:
+      - dependency-name: "ubuntu"

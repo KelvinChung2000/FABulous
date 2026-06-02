@@ -75,7 +75,6 @@ class FABulousTileMacroFlow(SequentialFlow):
         design_dir: Path | None = None,
         **custom_config_overrides: dict,
     ) -> None:
-        """Configure the tile macro flow for `tile_type` and its die area."""
         # Build the HDL source list. `models_pack` lives under Fabric/ (outside the
         # tile glob); for VHDL it must be analysed before the tile sources, so it is
         # prepended rather than appended.

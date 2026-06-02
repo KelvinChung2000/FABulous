@@ -248,7 +248,7 @@ def test_design_pattern(
     shutil.copy(_USER_DESIGNS_PCF, pcf)
     top_wrapper.write_text("")
 
-    run_cmd(cli, "run_FABulous_fabric")
+    run_cmd(cli, "run_fab")
     run_cmd(
         cli,
         f"compile_design {user_design} -top {design_name} "

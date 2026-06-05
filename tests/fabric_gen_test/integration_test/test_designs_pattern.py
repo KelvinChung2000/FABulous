@@ -16,6 +16,7 @@ from cocotb.types import Logic, LogicArray
 from fabulous.fabric_definition.define import HDLType
 from fabulous.fabulous_cli.fabulous_cli import FABulous_CLI
 from fabulous.fabulous_settings import init_context
+from fabulous.plugins.manager import FABulousPluginManager
 from tests.conftest import run_cmd
 from tests.fabric_gen_test.integration_test.conftest import (
     FabricClockedDUT,
@@ -229,7 +230,14 @@ def test_design_pattern(
     # Bootstrap a lang-specific CLI inline. The global `cli` fixture is
     # verilog-only, so we can't reuse it across this test's lang parametrize.
     init_context(project_dir)
-    cli = FABulous_CLI(lang, force=False, interactive=False, verbose=False, debug=True)
+    cli = FABulous_CLI(
+        lang,
+        plugin_manager=FABulousPluginManager.core_only(),
+        force=False,
+        interactive=False,
+        verbose=False,
+        debug=True,
+    )
     cli.debug = True
     run_cmd(cli, "load_fabric")
 

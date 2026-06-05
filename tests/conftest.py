@@ -17,6 +17,7 @@ from fabulous.fabric_definition.tile import Tile
 from fabulous.fabulous_cli.fabulous_cli import FABulous_CLI
 from fabulous.fabulous_cli.helper import create_project, setup_logger
 from fabulous.fabulous_settings import init_context, reset_context
+from fabulous.plugins.manager import FABulousPluginManager
 
 
 def sjump_port(
@@ -233,6 +234,7 @@ def cli(fabulous_project: Path) -> FABulous_CLI:
     init_context(fabulous_project)
     cli = FABulous_CLI(
         "verilog",
+        plugin_manager=FABulousPluginManager.core_only(),
         force=False,
         interactive=False,
         verbose=False,

@@ -396,7 +396,10 @@ def test_force_flag(
             ["FABulous", "{project}", "--install_oss_cad_suite"], 2, 0, id="legacy"
         ),
         pytest.param(
-            ["FABulous", "install", "oss-cad-suite", "{project}"], 2, 0, id="typer-project"
+            ["FABulous", "install", "oss-cad-suite", "{project}"],
+            2,
+            0,
+            id="typer-project",
         ),
         pytest.param(["FABulous", "install", "oss-cad-suite"], 2, 0, id="default-dir"),
         pytest.param(

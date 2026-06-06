@@ -65,7 +65,7 @@ def plugins_list_cmd() -> None:
     """List discovered plugins."""
     from fabulous.plugins.management import format_plugin_list
 
-    manager = FABulousPluginManager.core_only()
+    manager = FABulousPluginManager.for_management()
     typer.echo(format_plugin_list(manager))
 
 
@@ -74,44 +74,26 @@ def plugins_info_cmd(name: str) -> None:
     """Show detail for a single plugin."""
     from fabulous.plugins.management import format_plugin_info
 
-    manager = FABulousPluginManager.core_only()
+    manager = FABulousPluginManager.for_management()
     typer.echo(format_plugin_info(manager, name))
-
-
-@plugins_app.command("enable")
-def plugins_enable_cmd(name: str) -> None:
-    """Enable a plugin (restart to apply)."""
-    from fabulous.plugins.management import set_plugin_enabled
-
-    set_plugin_enabled(FABulousPluginManager.core_only(), name, enabled=True)
-    typer.echo(f"Enabled '{name}'. Restart to apply.")
-
-
-@plugins_app.command("disable")
-def plugins_disable_cmd(name: str) -> None:
-    """Disable a plugin (restart to apply)."""
-    from fabulous.plugins.management import set_plugin_enabled
-
-    set_plugin_enabled(FABulousPluginManager.core_only(), name, enabled=False)
-    typer.echo(f"Disabled '{name}'. Restart to apply.")
 
 
 @plugins_app.command("install")
 def plugins_install_cmd(spec: str) -> None:
     """Install a plugin package via uv."""
-    from fabulous.plugins.management import install_plugin
+    from fabulous.plugins.management import format_install_result
 
-    install_plugin(spec)
-    typer.echo("Installed. Restart FABulous to load the plugin.")
+    added = FABulousPluginManager.install(spec)
+    typer.echo(format_install_result(added))
 
 
 @plugins_app.command("uninstall")
 def plugins_uninstall_cmd(name: str) -> None:
     """Uninstall a plugin package via uv."""
-    from fabulous.plugins.management import uninstall_plugin
+    from fabulous.plugins.management import format_uninstall_result
 
-    uninstall_plugin(name)
-    typer.echo("Uninstalled. Restart FABulous to apply.")
+    removed = FABulousPluginManager.uninstall(name)
+    typer.echo(format_uninstall_result(removed))
 
 
 def version_callback(value: bool) -> None:
@@ -345,7 +327,7 @@ def common_options(
     subcommand = ctx.invoked_subcommand
     if subcommand and (
         subcommand.startswith("install")
-        or subcommand in {"create-project", "c", "nix-env"}
+        or subcommand in {"create-project", "c", "nix-env", "plugins"}
     ):
         return
 

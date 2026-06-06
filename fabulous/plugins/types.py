@@ -14,11 +14,11 @@ if TYPE_CHECKING:
 
 @dataclass(frozen=True)
 class CodeGeneratorProvider:
-    """A code generator contributed by a plugin, keyed by ``hdlType``.
+    """A code generator contributed by a plugin, keyed by ``hdl_type``.
 
     Attributes
     ----------
-    hdlType : HDLType
+    hdl_type : HDLType
         The HDL language this generator produces.
     factory : Callable[[], CodeGenerator]
         Zero-argument factory returning a fresh generator (generators hold
@@ -27,7 +27,7 @@ class CodeGeneratorProvider:
         Human-readable provider name, used in diagnostics.
     """
 
-    hdlType: HDLType
+    hdl_type: HDLType
     factory: "Callable[[], CodeGenerator]"
     name: str
 
@@ -52,22 +52,19 @@ class ParserProvider:
 
 
 @dataclass(frozen=True)
-class PluginSettingsSpec:
-    """A pydantic settings model contributed by a plugin.
+class PluginStatus:
+    """The discovery state of one registered plugin.
 
     Attributes
     ----------
     name : str
-        Settings group name (used to look the instance up later).
-    model : type
-        A pydantic ``BaseModel`` subclass.
-    envPrefix : str
-        Environment-variable prefix, recorded for display.
+        The plugin's registration name.
+    tier : str
+        ``"core"`` for an essential built-in, otherwise ``"plugin"``.
     """
 
     name: str
-    model: type
-    envPrefix: str
+    tier: str
 
 
 class PluginError(RuntimeError):

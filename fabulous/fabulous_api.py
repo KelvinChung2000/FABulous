@@ -145,10 +145,10 @@ class FABulous_API:
         fabric_dir : Path
             Path to the fabric file.
         """
-        parse = self.pluginManager.get_parser(fabric_dir.suffix)
+        parse = self.pluginManager.make_parser(fabric_dir)
         self.fabric = parse(fabric_dir)
         self.geometryGenerator = GeometryGenerator(self.fabric)
-        self.pluginManager.pm.hook.fabulous_after_fabric_loaded(api=self)
+        self.pluginManager.notify_fabric_loaded(self)
 
     def bootstrapSwitchMatrix(self, tileName: str, outputDir: Path) -> None:
         """Bootstrap the switch matrix for the specified tile.
@@ -583,7 +583,7 @@ class FABulous_API:
             logger.error(f"Tile {tile_name} not found in fabric.")
             raise ValueError
 
-        suffix = self.writer.fileExtension.lstrip(".")
+        suffix = self.writer.fileExtension.removeprefix(".")
 
         gios = [gio for gio in tile.gen_ios if not gio.configAccess]
         gio_config_access = [gio for gio in tile.gen_ios if gio.configAccess]

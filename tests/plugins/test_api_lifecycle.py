@@ -52,7 +52,7 @@ def test_loadfabric_fires_after_fabric_loaded(
 
     api = FABulous_API(VerilogCodeGenerator(), plugin_manager=manager)
     fabric_file = tmp_path / "fabric.csv"
-    mocker.patch.object(manager, "get_parser", return_value=lambda _path: "FABRIC")
+    mocker.patch.object(manager, "make_parser", return_value=lambda _path: "FABRIC")
     mocker.patch("fabulous.fabulous_api.GeometryGenerator", return_value=object())
     api.loadFabric(fabric_file)
     assert seen == [api]

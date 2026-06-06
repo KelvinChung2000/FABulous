@@ -29,11 +29,48 @@ def fabulous_register_commands():
 - `fabulous_register_code_generators()` returns `CodeGeneratorProvider`s.
 - `fabulous_register_parsers()` returns `ParserProvider`s.
 - `fabulous_after_fabric_loaded(api)` runs after a fabric is loaded.
-- `fabulous_register_settings()` returns a `PluginSettingsSpec`.
+- `fabulous_register_settings()` returns your `PluginSettings` subclass.
 - `fabulous_startup(manager)` runs once after discovery.
 
 A hookimpl only declares the arguments it needs, so the `hello` example above
 omits `cli`.
+
+## Typed settings
+
+Subclass `PluginSettings` (a `pydantic-settings` model) to declare your plugin's
+own configuration. Set `group` (its key on the settings singleton) and an env
+prefix, then return the class from `fabulous_register_settings`:
+
+```python
+from pydantic_settings import SettingsConfigDict
+
+from fabulous.fabulous_settings import PluginSettings
+from fabulous.plugins import hookimpl
+
+
+class MySettings(PluginSettings):
+    group = "my_plugin"
+    model_config = SettingsConfigDict(env_prefix="FAB_MY_PLUGIN__")
+    jobs: int = 4
+
+
+@hookimpl
+def fabulous_register_settings() -> type[PluginSettings]:
+    return MySettings
+```
+
+After discovery the manager instantiates your model (reading `FAB_MY_PLUGIN__*`
+from the environment) and stores it on the settings singleton. Read it back
+anywhere with full typing through `from_context`, which uses `get_context()`
+under the hood:
+
+```python
+MySettings.from_context().jobs  # -> int, the configured value
+```
+
+This is the recommended way to reach configuration from a plugin: it keeps the
+single `get_context()` source of truth while giving you a precisely typed handle
+instead of dictionary lookups.
 
 ## Distributing
 

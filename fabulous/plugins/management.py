@@ -1,29 +1,19 @@
-"""Built-in management plugin: the ``plugins`` command surface and operations.
+"""The ``plugins`` command surface shared by the shell and the Typer entry.
 
-The operation functions are surface-agnostic so the cmd2 ``CommandSet`` and the
-top-level Typer passthrough share one implementation.
+This is *not* a plugin. The manager owns every operation; these helpers only
+format the manager's state, and the ``PluginCommands`` set is a thin cmd2 bridge
+that the CLI registers directly. The shell subcommands (``plugins list``,
+``plugins info``, …) are wired through cmd2's ``as_subcommand_to`` so each is a
+self-contained handler rather than a branch in a manual dispatcher.
 """
 
 import argparse
-import json
-import shutil
-import subprocess
-import sys
 
 import cmd2
 from cmd2 import CommandSet, with_default_category
 
-from fabulous.fabulous_settings import add_var_to_project_env, get_context
-from fabulous.plugins import hookimpl
 from fabulous.plugins.manager import FABulousPluginManager
 from fabulous.plugins.types import PluginError
-
-
-def _tier_of(manager: FABulousPluginManager, name: str) -> str:
-    """Return a best-effort tier label for a registered plugin name."""
-    if manager.isEssential(name):
-        return "core"
-    return "plugin"
 
 
 def format_plugin_list(manager: FABulousPluginManager) -> str:
@@ -39,13 +29,8 @@ def format_plugin_list(manager: FABulousPluginManager) -> str:
     str
         The formatted listing.
     """
-    disabled = set(get_context().plugins.disabled)
-    rows = []
-    for name, _ in sorted(manager.pm.list_name_plugin(), key=lambda kv: kv[0]):
-        tier = _tier_of(manager, name)
-        state = "disabled" if name in disabled else "enabled"
-        rows.append(f"  {name:50s} {tier:8s} {state}")
-    header = f"  {'name':50s} {'tier':8s} state"
+    header = f"  {'name':50s} tier"
+    rows = [f"  {s.name:50s} {s.tier}" for s in manager.status()]
     return "Plugins:\n" + header + "\n" + "\n".join(rows)
 
 
@@ -69,136 +54,121 @@ def format_plugin_info(manager: FABulousPluginManager, name: str) -> str:
     PluginError
         If no plugin named ``name`` is registered.
     """
-    if manager.pm.get_plugin(name) is None:
+    if not manager.is_registered(name):
         raise PluginError(f"No plugin named '{name}'")
-    lines = [f"Plugin: {name}", f"  tier: {_tier_of(manager, name)}"]
-    spec = manager.get_setting_spec(name)
-    if spec is not None:
-        lines.append(f"  settings: {spec.name} (env prefix {spec.envPrefix})")
+    lines = [f"Plugin: {name}", f"  tier: {manager.tier_of(name)}"]
+    summary = manager.settings_summary(name)
+    if summary is not None:
+        lines.append(f"  settings: {summary}")
     return "\n".join(lines)
 
 
-def set_plugin_enabled(
-    manager: FABulousPluginManager, name: str, enabled: bool
-) -> None:
-    """Enable or disable a plugin by rewriting the project ``disabled`` list.
+def format_install_result(added: list[str]) -> str:
+    """Return a human-readable summary of an ``install`` outcome.
 
     Parameters
     ----------
-    manager : FABulousPluginManager
-        The manager (used to check essential built-ins).
-    name : str
-        The plugin name.
-    enabled : bool
-        ``True`` to enable, ``False`` to disable.
+    added : list[str]
+        The plugin entry points the install added.
 
-    Raises
-    ------
-    PluginError
-        If an essential built-in is being disabled.
+    Returns
+    -------
+    str
+        A success line naming the new plugin(s), or a warning that the package
+        registered no FABulous plugin.
     """
-    if not enabled and manager.isEssential(name):
-        raise PluginError(f"'{name}' is an essential built-in and cannot be disabled.")
-    disabled = list(get_context().plugins.disabled)
-    if enabled:
-        disabled = [d for d in disabled if d != name]
-    elif name not in disabled:
-        disabled.append(name)
-    add_var_to_project_env("FAB_PLUGINS__DISABLED", json.dumps(disabled))
+    if added:
+        return (
+            f"Installed. Registered plugin(s): {', '.join(added)}. "
+            "Restart FABulous to load them."
+        )
+    return (
+        "Installed, but the package exposes no 'fabulous.plugins' entry point, "
+        "so it adds no FABulous plugin."
+    )
 
 
-def install_plugin(spec: str) -> None:
-    """Install a plugin package into the running environment via uv.
+def format_uninstall_result(removed: list[str]) -> str:
+    """Return a human-readable summary of an ``uninstall`` outcome.
 
     Parameters
     ----------
-    spec : str
-        A uv/pip install specifier (package name, git URL, or local path).
+    removed : list[str]
+        The plugin entry points the uninstall removed.
 
-    Raises
-    ------
-    PluginError
-        If uv is not available.
+    Returns
+    -------
+    str
+        A line naming the removed plugin(s), or a plain confirmation.
     """
-    uv = shutil.which("uv")
-    if uv is None:
-        raise PluginError("uv not found; uv is required to install plugins.")
-    subprocess.run([uv, "pip", "install", "--python", sys.executable, spec], check=True)
+    if removed:
+        return f"Uninstalled. Removed plugin(s): {', '.join(removed)}."
+    return "Uninstalled."
 
 
-def uninstall_plugin(name: str) -> None:
-    """Uninstall a plugin package via uv.
-
-    Parameters
-    ----------
-    name : str
-        The package name to uninstall.
-
-    Raises
-    ------
-    PluginError
-        If uv is not available.
-    """
-    uv = shutil.which("uv")
-    if uv is None:
-        raise PluginError("uv not found; uv is required to uninstall plugins.")
-    subprocess.run([uv, "pip", "uninstall", name], check=True)
-
-
-def _build_parser() -> cmd2.Cmd2ArgumentParser:
+def _name_argument(metavar: str, help_text: str) -> cmd2.Cmd2ArgumentParser:
+    """Build a subcommand parser taking a single positional argument."""
     parser = cmd2.Cmd2ArgumentParser()
-    sub = parser.add_subparsers(dest="action", required=True)
-    sub.add_parser("list", help="List discovered plugins")
-    info_p = sub.add_parser("info", help="Show plugin detail")
-    info_p.add_argument("name")
-    en_p = sub.add_parser("enable", help="Enable a plugin (restart to apply)")
-    en_p.add_argument("name")
-    dis_p = sub.add_parser("disable", help="Disable a plugin (restart to apply)")
-    dis_p.add_argument("name")
-    inst_p = sub.add_parser("install", help="Install a plugin package via uv")
-    inst_p.add_argument("spec")
-    uninst_p = sub.add_parser("uninstall", help="Uninstall a plugin package via uv")
-    uninst_p.add_argument("name")
+    parser.add_argument(metavar, help=help_text)
     return parser
+
+
+_plugins_parser = cmd2.Cmd2ArgumentParser()
+_plugins_parser.add_subparsers(dest="action")
 
 
 @with_default_category("Plugins")
 class PluginCommands(CommandSet):
-    """The shell ``plugins ...`` command surface."""
+    """The shell ``plugins ...`` surface (a thin bridge to the manager)."""
 
-    @cmd2.with_argparser(_build_parser())
+    @property
+    def _manager(self) -> FABulousPluginManager:
+        return self._cmd.pluginManager
+
+    @cmd2.with_argparser(_plugins_parser)
     def do_plugins(self, args: argparse.Namespace) -> None:
         """Manage FABulous plugins."""
-        manager = self._cmd.pluginManager
-        action = args.action
-        if action == "list":
-            self._cmd.poutput(format_plugin_list(manager))
-        elif action == "info":
-            self._cmd.poutput(format_plugin_info(manager, args.name))
-        elif action == "enable":
-            set_plugin_enabled(manager, args.name, enabled=True)
-            self._cmd.poutput(f"Enabled '{args.name}'. Restart to apply.")
-        elif action == "disable":
-            set_plugin_enabled(manager, args.name, enabled=False)
-            self._cmd.poutput(f"Disabled '{args.name}'. Restart to apply.")
-        elif action == "install":
-            install_plugin(args.spec)
-            self._cmd.poutput("Installed. Restart FABulous to load the plugin.")
-        elif action == "uninstall":
-            uninstall_plugin(args.name)
-            self._cmd.poutput("Uninstalled. Restart FABulous to apply.")
+        handler = args.cmd2_handler.get()
+        if handler is not None:
+            handler(args)
+        else:
+            self._cmd.do_help("plugins")
 
+    @cmd2.as_subcommand_to(
+        "plugins", "list", cmd2.Cmd2ArgumentParser(), help="List discovered plugins"
+    )
+    def _list(self, _args: argparse.Namespace) -> None:
+        """List discovered plugins."""
+        self._cmd.poutput(format_plugin_list(self._manager))
 
-@hookimpl
-def fabulous_register_commands() -> CommandSet:
-    """Contribute the management command set to the shell.
+    @cmd2.as_subcommand_to(
+        "plugins",
+        "info",
+        _name_argument("name", "Plugin name"),
+        help="Show plugin detail",
+    )
+    def _info(self, args: argparse.Namespace) -> None:
+        """Show detail for a single plugin."""
+        self._cmd.poutput(format_plugin_info(self._manager, args.name))
 
-    The command set reaches the shell and manager via ``self._cmd``, so the
-    ``cli`` hook argument is not needed here (pluggy passes only declared args).
+    @cmd2.as_subcommand_to(
+        "plugins",
+        "install",
+        _name_argument("spec", "Package name, git URL, or local path"),
+        help="Install a plugin package via uv",
+    )
+    def _install(self, args: argparse.Namespace) -> None:
+        """Install a plugin package via uv."""
+        added = self._manager.install(args.spec)
+        self._cmd.poutput(format_install_result(added))
 
-    Returns
-    -------
-    CommandSet
-        The management command set.
-    """
-    return PluginCommands()
+    @cmd2.as_subcommand_to(
+        "plugins",
+        "uninstall",
+        _name_argument("name", "Package name"),
+        help="Uninstall a plugin package via uv",
+    )
+    def _uninstall(self, args: argparse.Namespace) -> None:
+        """Uninstall a plugin package via uv."""
+        removed = self._manager.uninstall(args.name)
+        self._cmd.poutput(format_uninstall_result(removed))

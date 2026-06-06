@@ -9,7 +9,7 @@ import re
 from importlib.metadata import version as meta_version
 from pathlib import Path
 from shutil import which
-from typing import Self
+from typing import ClassVar, Self, cast
 
 import ciel
 import typer
@@ -47,7 +47,7 @@ MODELS_PACK_REQUIRED_MODULES: list[str] = [
 ]
 
 
-class PluginSettings(BaseModel):
+class PluginSystemSettings(BaseModel):
     """Settings controlling plugin discovery and loading.
 
     Attributes
@@ -55,15 +55,62 @@ class PluginSettings(BaseModel):
     dir : Path
         Directory scanned for tier-2 sub-plugins (relative paths resolve against
         the project directory).
-    disabled : list[str]
-        Plugin names blocked from registering.
     skip_broken : bool
         Downgrade broken optional plugins to warnings instead of aborting.
     """
 
     dir: Path = Path("plugins")
-    disabled: list[str] = []
     skip_broken: bool = False
+
+
+class PluginSettings(BaseSettings):
+    """Base class a plugin subclasses to declare its own settings.
+
+    A subclass sets ``group`` (its key on the settings singleton) and its own
+    ``model_config`` env prefix. After discovery the plugin manager instantiates
+    each subclass and stores it on the singleton, so ``from_context`` hands back
+    the populated, fully typed instance anywhere in the codebase, e.g.::
+
+        class SynthSettings(PluginSettings):
+            group = "synthesis"
+            model_config = SettingsConfigDict(env_prefix="FAB_SYNTHESIS__")
+            jobs: int = 4
+
+
+        SynthSettings.from_context().jobs  # typed, reads the singleton
+
+    Attributes
+    ----------
+    group : ClassVar[str]
+        Unique key identifying this plugin's settings on the singleton.
+    """
+
+    group: ClassVar[str]
+
+    @classmethod
+    def from_context(cls) -> Self:
+        """Return this plugin's settings instance from the settings singleton.
+
+        Returns
+        -------
+        Self
+            The instance stored under ``cls.group``.
+
+        Raises
+        ------
+        PluginError
+            If no settings for ``cls.group`` were registered (the plugin is
+            not installed, or it never registered settings).
+        """
+        from fabulous.plugins.types import PluginError
+
+        store = get_context().plugin_settings
+        if cls.group not in store:
+            raise PluginError(
+                f"No settings registered for group '{cls.group}'. "
+                "Ensure the plugin is installed and registers its settings."
+            )
+        return cast("Self", store[cls.group])
 
 
 class FABulousSettings(BaseSettings):
@@ -92,7 +139,8 @@ class FABulousSettings(BaseSettings):
 
     proj_dir: Path = Field(default_factory=Path.cwd)
     proj_lang: HDLType = HDLType.VERILOG
-    plugins: PluginSettings = PluginSettings()
+    plugins: PluginSystemSettings = PluginSystemSettings()
+    plugin_settings: dict[str, PluginSettings] = {}
     models_pack: Path | None = None
     switch_matrix_debug_signal: bool = False
     proj_version_created: Version = Version("0.0.1")

@@ -9,5 +9,5 @@ def test_builtin_codegen_registers_verilog_and_vhdl() -> None:
     manager = FABulousPluginManager()
     manager.pm.register(plugin, name="builtin_codegen")
     manager.build_registries()
-    assert manager.get_code_generator(HDLType.VERILOG).fileExtension == ".v"
-    assert manager.get_code_generator(HDLType.VHDL).fileExtension == ".vhdl"
+    assert manager.make_writer(HDLType.VERILOG).fileExtension == ".v"
+    assert manager.make_writer(HDLType.VHDL).fileExtension == ".vhdl"

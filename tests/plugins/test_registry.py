@@ -1,6 +1,7 @@
-"""Registry folding and resolution semantics."""
+"""Registry folding and factory-method resolution semantics."""
 
 import types
+from pathlib import Path
 
 import pytest
 
@@ -16,7 +17,7 @@ def test_resolves_registered_code_generator(
     manager = FABulousPluginManager()
     manager.pm.register(fake_codegen_module, name="fake_codegen")
     manager.build_registries()
-    writer = manager.get_code_generator(HDLType.SYSTEM_VERILOG)
+    writer = manager.make_writer(HDLType.SYSTEM_VERILOG)
     assert writer.fileExtension == ".fake"
 
 
@@ -24,7 +25,7 @@ def test_resolves_registered_parser(fake_parser_module: types.ModuleType) -> Non
     manager = FABulousPluginManager()
     manager.pm.register(fake_parser_module, name="fake_parser")
     manager.build_registries()
-    parse = manager.get_parser(".fake")
+    parse = manager.make_parser(Path("fabric.fake"))
     assert parse("path") == "path"
 
 
@@ -59,7 +60,7 @@ def test_missing_code_generator_lists_available(
     manager.pm.register(fake_codegen_module, name="fake_codegen")
     manager.build_registries()
     with pytest.raises(PluginError) as exc:
-        manager.get_code_generator(HDLType.VHDL)
+        manager.make_writer(HDLType.VHDL)
     assert "system_verilog" in str(exc.value)
 
 
@@ -68,4 +69,4 @@ def test_missing_parser_raises(fake_parser_module: types.ModuleType) -> None:
     manager.pm.register(fake_parser_module, name="fake_parser")
     manager.build_registries()
     with pytest.raises(PluginError):
-        manager.get_parser(".csv")
+        manager.make_parser(Path("fabric.csv"))

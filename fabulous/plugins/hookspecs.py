@@ -1,8 +1,10 @@
 """Hook specifications for the FABulous plugin system.
 
 All hooks use the ``fabulous_`` prefix and are collect-from-all (no
-``firstresult``). Heavy argument types are referenced as string forward-refs so
-this module stays free of import cycles; pluggy never evaluates the annotations.
+``firstresult``). Heavy argument types are imported only under ``TYPE_CHECKING``
+and referenced as string forward-refs, so this module stays free of import
+cycles; pluggy matches hooks by parameter name and never evaluates the
+annotations.
 """
 
 from typing import TYPE_CHECKING
@@ -14,15 +16,22 @@ if TYPE_CHECKING:
 
     from fabulous.fabulous_api import FABulous_API
     from fabulous.fabulous_cli import FABulous_CLI
+    from fabulous.fabulous_settings import PluginSettings
     from fabulous.plugins.manager import FABulousPluginManager
-    from fabulous.plugins.types import (
-        CodeGeneratorProvider,
-        ParserProvider,
-        PluginSettingsSpec,
-    )
+    from fabulous.plugins.types import CodeGeneratorProvider, ParserProvider
 
 hookspec = pluggy.HookspecMarker("fabulous")
 hookimpl = pluggy.HookimplMarker("fabulous")
+
+PLUGIN_API_VERSION = 1
+"""Version of the plugin-hook contract.
+
+Bump this on any backwards-incompatible change to the hook specifications below.
+Externally discovered plugins (the directory, entry-point, and session tiers)
+must declare the version they target through a module-level
+``FABULOUS_PLUGIN_API`` attribute; discovery rejects any plugin whose declared
+version does not match this one.
+"""
 
 
 @hookspec
@@ -88,11 +97,11 @@ def fabulous_after_fabric_loaded(api: "FABulous_API") -> None:
 
 
 @hookspec
-def fabulous_register_settings() -> "PluginSettingsSpec | None":
-    """Return a ``PluginSettingsSpec`` describing plugin-owned settings.
+def fabulous_register_settings() -> "type[PluginSettings] | None":
+    """Return a ``PluginSettings`` subclass describing plugin-owned settings.
 
     Returns
     -------
-    PluginSettingsSpec | None
-        The settings spec, or ``None`` if the plugin has no settings.
+    type[PluginSettings] | None
+        The settings model class, or ``None`` if the plugin has no settings.
     """

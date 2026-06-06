@@ -9,7 +9,7 @@ from fabulous.plugins.types import (
     CodeGeneratorProvider,
     ParserProvider,
     PluginError,
-    PluginSettingsSpec,
+    PluginStatus,
 )
 
 
@@ -26,9 +26,9 @@ def test_parser_provider_holds_suffix_and_callable() -> None:
     assert provider.parse("x") == "x"
 
 
-def test_plugin_settings_spec_fields() -> None:
-    spec = PluginSettingsSpec("demo", dict, "FAB_DEMO_")
-    assert (spec.name, spec.model, spec.envPrefix) == ("demo", dict, "FAB_DEMO_")
+def test_plugin_status_fields() -> None:
+    status = PluginStatus("demo", "plugin")
+    assert (status.name, status.tier) == ("demo", "plugin")
 
 
 def test_plugin_error_is_runtime_error() -> None:

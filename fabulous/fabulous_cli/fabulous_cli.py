@@ -370,7 +370,7 @@ class FABulous_CLI(Cmd):
             self.max_job = max_job
 
         self.pluginManager = plugin_manager
-        writer = plugin_manager.get_code_generator(HDLType(writerType))
+        writer = plugin_manager.make_writer(HDLType(writerType))
         self.fabulousAPI = FABulous_API(writer, plugin_manager=plugin_manager)
 
         self.projectDir = get_context().proj_dir
@@ -399,7 +399,7 @@ class FABulous_CLI(Cmd):
             logger.info("Setting to use editor from .FABulous/.env file")
             self.editor = e
 
-        self.extension = self.fabulousAPI.writer.fileExtension.lstrip(".")
+        self.extension = self.fabulousAPI.writer.fileExtension.removeprefix(".")
 
         categorize(self.do_alias, CMD_OTHER)
         categorize(self.do_edit, CMD_OTHER)
@@ -436,6 +436,11 @@ class FABulous_CLI(Cmd):
             CMD_HELPER, "Helper commands are disabled until fabric is loaded"
         )
 
+        # The plugins command is owned by the manager, not a plugin, so the CLI
+        # registers it directly rather than through fabulous_register_commands.
+        from fabulous.plugins.management import PluginCommands
+
+        self.register_command_set(PluginCommands())
         for result in self.pluginManager.pm.hook.fabulous_register_commands(cli=self):
             for command_set in _as_command_sets(result):
                 self.register_command_set(command_set)

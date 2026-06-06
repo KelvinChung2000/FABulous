@@ -48,6 +48,11 @@ dependencies = [
   "go-task-bin>=3.40.0",
 ]
 
+[project.optional-dependencies]
+# uv drives `FABulous plugins install/uninstall`. It is optional so the base
+# install stays lean; when absent at runtime the manager provisions it.
+plugins = ["uv>=0.5.0"]
+
 [project.urls]
 Repository = "https://github.com/FPGA-Research/FABulous"
 Documentation = "https://fabulous.readthedocs.io"

@@ -917,18 +917,21 @@ def test_short_dotenv_flags(
 @pytest.mark.parametrize(
     ("subcmd", "expected_code"),
     [
-        pytest.param("script", 0, id="script"),
-        pytest.param("run", 0, id="run"),
-        pytest.param("start", 0, id="start"),
-        pytest.param("create-project", 0, id="create-project"),
-        pytest.param("install", 0, id="install"),
-        pytest.param("update-project-version", 0, id="update-project-version"),
+        pytest.param(["script"], 0, id="script"),
+        pytest.param(["run"], 0, id="run"),
+        pytest.param(["start"], 0, id="start"),
+        pytest.param(["create-project"], 0, id="create-project"),
+        pytest.param(["install"], 0, id="install"),
+        pytest.param(["install", "oss-cad-suite"], 0, id="install-oss-cad-suite"),
+        pytest.param(["install", "fabulator"], 0, id="install-fabulator"),
+        pytest.param(["install", "nix"], 0, id="install-nix"),
+        pytest.param(["update-project-version"], 0, id="update-project-version"),
     ],
 )
 def test_subcommand_help(
-    monkeypatch: pytest.MonkeyPatch, subcmd: str, expected_code: int
+    monkeypatch: pytest.MonkeyPatch, subcmd: list[str], expected_code: int
 ) -> None:
-    argv = ["FABulous", subcmd, "--help"]
+    argv = ["FABulous", *subcmd, "--help"]
     monkeypatch.setattr(sys, "argv", argv)
     with pytest.raises(SystemExit) as exc_info:
         main()

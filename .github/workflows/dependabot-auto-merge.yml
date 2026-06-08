@@ -5,17 +5,32 @@ on: pull_request
 permissions:
   contents: write
   pull-requests: write
+  checks: read
 
 jobs:
   auto-merge:
+    name: auto-merge
     if: github.actor == 'dependabot[bot]'
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     steps:
       - name: Fetch Dependabot metadata
         id: meta
         uses: dependabot/fetch-metadata@v3
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Wait for all other checks to pass
+        if: |
+          steps.meta.outputs.dependency-group != 'major' &&
+          steps.meta.outputs.update-type != 'version-update:semver-major'
+        uses: lewagon/wait-on-check-action@v1.7.0
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          running-workflow-name: auto-merge
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          wait-interval: 30
+          allowed-conclusions: success,skipped,neutral
 
       - name: Approve a PR
         if: |

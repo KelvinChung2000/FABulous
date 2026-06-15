@@ -342,17 +342,18 @@ def genTileSwitchMatrix(
 
             portsPairs.append(("X", f"{portName}"))
 
+            # Drive the mux input vector for both mux styles. The connections are
+            # reversed so the left-most adjacency-matrix entry sits at the high
+            # index of the concatenated vector; this makes the select value line
+            # up left-to-right with the mux input index, matching how the
+            # bitstream encodes the selection regardless of mux style.
+            writer.addAssignScalar(
+                f"{portName}_input",
+                connections[portName][::-1],
+                delay=default_pip_delay,
+            )
+
             if multiplexer_style == MultiplexerStyle.CUSTOM:
-                # we add the input signal in reversed order
-                # Changed it such that the left-most entry is located at the end of the
-                # concatenated vector for the multiplexing
-                # This was done such that the index from left-to-right in the adjacency
-                # matrix corresponds with the multiplexer select input (index)
-                writer.addAssignScalar(
-                    f"{portName}_input",
-                    connections[portName][::-1],
-                    delay=default_pip_delay,
-                )
                 writer.addInstantiation(
                     compName=muxComponentName,
                     compInsName=f"inst_{muxComponentName}_{portName}",
@@ -364,18 +365,16 @@ def genTileSwitchMatrix(
                         f"MUX-{muxSize} in switch matrix for tile {tile.name}"
                     )
             else:
-                # generic multiplexer
+                # generic multiplexer: select the input behaviorally so it
+                # synthesises to standard cells. The writer emits the indexing
+                # in language-correct syntax for Verilog and VHDL.
                 select_width = paddedMuxSize.bit_length() - 1
-                if select_width == 1:
-                    select_index = f"ConfigBits[{configBitstreamPosition}]"
-                else:
-                    select_index = (
-                        f"ConfigBits[{configBitstreamPosition + select_width - 1}:"
-                        f"{configBitstreamPosition}]"
-                    )
-                writer.addAssignScalar(
+                writer.addMuxAssign(
                     portName,
-                    f"{portName}_input[{select_index}]",
+                    f"{portName}_input",
+                    "ConfigBits",
+                    configBitstreamPosition,
+                    select_width,
                 )
 
             # update the configuration bitstream position

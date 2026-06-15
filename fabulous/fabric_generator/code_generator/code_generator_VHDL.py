@@ -425,6 +425,42 @@ end process;
         inv = "not " if inverted else ""
         self._add(f"{left} <= {inv}{right}( {widthL} downto {widthR} );", indentLevel)
 
+    def addMuxAssign(
+        self,
+        output: str,
+        inputVector: str,
+        selectVector: str,
+        selectLow: int,
+        selectWidth: int,
+        delay: int = 0,
+        indentLevel: int = 0,
+    ) -> None:
+        """Assign a behavioral mux output, converting the select slice to integer.
+
+        VHDL array indices must be integers, so the ``std_logic_vector`` select
+        slice is converted with ``to_integer(unsigned(...))``.
+
+        Parameters
+        ----------
+        output : str
+            Signal driven with the selected input.
+        inputVector : str
+            Concatenated mux inputs being indexed.
+        selectVector : str
+            Vector holding the select bits.
+        selectLow : int
+            Index of the lowest select bit.
+        selectWidth : int
+            Number of select bits.
+        delay : int
+            Delay in picoseconds.
+        indentLevel : int
+            The indentation level.
+        """
+        selectHigh = selectLow + selectWidth - 1
+        index = f"to_integer(unsigned({selectVector}({selectHigh} downto {selectLow})))"
+        self._add(f"{output} <= {inputVector}({index}) after {delay} ps;", indentLevel)
+
     def addInstantiation(
         self,
         compName: str,

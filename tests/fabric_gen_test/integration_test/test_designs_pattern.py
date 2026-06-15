@@ -22,6 +22,7 @@ from tests.fabric_gen_test.integration_test.conftest import (
     FabricConfigDUT,
     _collect_fabric_sources,
     compile_user_design,
+    set_multiplexer_style,
     setup_fabric,
     stage_user_design,
 )
@@ -211,17 +212,20 @@ async def cocotb_test_sys_reset(dut: FabricClockedDUT) -> None:
     ],
 )
 @pytest.mark.parametrize("lang", ["verilog", "vhdl"])
+@pytest.mark.parametrize("mux_style", ["custom", "generic"])
 @pytest.mark.slow
 def test_design_pattern(
     design_name: str,
     lang: str,
+    mux_style: str,
     testcase: str,
     project_factory: Callable[..., Path],
     cocotb_runner: Callable[..., None],
 ) -> None:
-    """Compile `design_name` for `lang` and dispatch its cocotb test."""
+    """Compile `design_name` for `lang` + `mux_style` and dispatch its cocotb test."""
     hdl_lang = HDLType(lang)
     project_dir = project_factory(lang=hdl_lang)
+    set_multiplexer_style(project_dir, mux_style)
     # Bootstrap a lang-specific CLI inline. The global `cli` fixture is
     # verilog-only, so we can't reuse it across this test's lang parametrize.
     init_context(project_dir)

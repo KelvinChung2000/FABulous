@@ -419,6 +419,39 @@ def _collect_fabric_sources(project_dir: Path, suffix: str) -> list[Path]:
     return sources
 
 
+def set_multiplexer_style(project_dir: Path, style: str) -> None:
+    """Rewrite the ``MultiplexerStyle`` value in a project's ``fabric.csv``.
+
+    Flips the switch-matrix mux style the generated fabric will use (``custom``
+    or ``generic``) by editing only the value column of the
+    ``MultiplexerStyle`` row, leaving the trailing comment columns intact. The
+    edit happens before ``load_fabric`` so the real ``parse_csv`` path consumes
+    it rather than the in-memory model being mutated.
+
+    Parameters
+    ----------
+    project_dir : Path
+        FABulous project directory containing ``fabric.csv``.
+    style : str
+        New multiplexer style, e.g. ``"custom"`` or ``"generic"``.
+
+    Raises
+    ------
+    ValueError
+        If ``fabric.csv`` has no ``MultiplexerStyle`` row.
+    """
+    fabric_csv = project_dir / "fabric.csv"
+    lines = fabric_csv.read_text().splitlines()
+    for i, line in enumerate(lines):
+        fields = line.split(",")
+        if fields[0].strip() == "MultiplexerStyle":
+            fields[1] = style
+            lines[i] = ",".join(fields)
+            fabric_csv.write_text("\n".join(lines) + "\n")
+            return
+    raise ValueError(f"No MultiplexerStyle row found in {fabric_csv}")
+
+
 _USER_DESIGNS_DIR = Path(__file__).resolve().parent / "user_designs"
 _USER_DESIGNS_PCF = _USER_DESIGNS_DIR / "constraints.pcf"
 

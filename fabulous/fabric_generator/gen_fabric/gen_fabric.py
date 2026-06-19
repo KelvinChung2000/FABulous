@@ -591,6 +591,7 @@ def generateFabric(writer: CodeGenerator, fabric: Fabric) -> None:
                 compInsName=f"Tile_X{x}Y{y}_{name}",
                 portsPairs=portsPairs,
                 emulateParamPairs=emulateParamPairs,
+                add_keep=True,
             )
     writer.addDesignDescriptionEnd()
     writer.writeToFile()

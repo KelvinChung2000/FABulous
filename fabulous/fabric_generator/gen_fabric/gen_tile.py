@@ -651,7 +651,9 @@ def generateSuperTile(
     # add config port
     if config_bit_mode == ConfigBitMode.FRAME_BASED:
         for y, row in enumerate(superTile.tileMap):
-            for x, _tile in enumerate(row):
+            for x, tile in enumerate(row):
+                if tile is None:
+                    continue
                 if y - 1 < 0 or superTile.tileMap[y - 1][x] is None:
                     writer.addPortVector(
                         f"Tile_X{x}Y{y}_FrameStrobe_O",
@@ -692,7 +694,9 @@ def generateSuperTile(
                     writer.addComment("CONFIG_PORT", onNewLine=False)
     if not disable_user_clk:
         for y, row in enumerate(superTile.tileMap):
-            for x, _tile in enumerate(row):
+            for x, tile in enumerate(row):
+                if tile is None:
+                    continue
                 if y - 1 < 0 or superTile.tileMap[y - 1][x] is None:
                     writer.addPortScalar(
                         f"Tile_X{x}Y{y}_UserCLKo", IO.OUTPUT, indentLevel=2
@@ -735,7 +739,9 @@ def generateSuperTile(
 
     # declare internal connections for frameData, frameStrobe, and UserCLK
     for y, row in enumerate(superTile.tileMap):
-        for x, _tile in enumerate(row):
+        for x, tile in enumerate(row):
+            if tile is None:
+                continue
             if (
                 0 <= y - 1 < len(superTile.tileMap)
                 and superTile.tileMap[y - 1][x] is not None
@@ -748,8 +754,8 @@ def generateSuperTile(
                 if not disable_user_clk:
                     writer.addConnectionScalar(f"Tile_X{x}Y{y}_UserCLKo", indentLevel=1)
             if (
-                0 <= x - 1 < len(superTile.tileMap[y])
-                and superTile.tileMap[y][x - 1] is not None
+                0 <= x + 1 < len(superTile.tileMap[y])
+                and superTile.tileMap[y][x + 1] is not None
             ):
                 writer.addConnectionVector(
                     f"Tile_X{x}Y{y}_FrameData_O", "FrameBitsPerRow-1", indentLevel=1

@@ -1,6 +1,7 @@
 """Conftest file providing fixtures for fabric generator tests."""
 
 import csv
+import re
 import shutil
 from collections.abc import Callable
 from pathlib import Path
@@ -13,7 +14,9 @@ from pytest_mock import MockerFixture
 from fabulous.fabric_definition.configmem import ConfigMem
 from fabulous.fabric_definition.fabric import Fabric
 from fabulous.fabric_definition.tile import Tile
+from fabulous.fabric_definition.yosys_obj import YosysJson
 from fabulous.fabric_generator.code_generator.code_generator import CodeGenerator
+from fabulous.fabulous_settings import get_context
 
 
 class FabricConfig(NamedTuple):
@@ -43,8 +46,8 @@ def mk_tile(tmp_path: Path) -> Callable[[str], Tile]:
     Returns
     -------
     Callable[[str], Tile]
-        A factory that accepts a tile name and returns a ``Tile`` with no
-        ports, no BELs, and files rooted under ``tmp_path``.
+        A factory that accepts a tile name and returns a `Tile` with no
+        ports, no BELs, and files rooted under `tmp_path`.
     """
 
     def _create(name: str) -> Tile:
@@ -465,3 +468,145 @@ def cocotb_runner(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Callable:
         )
 
     return _create_runner
+
+
+class Netlist:
+    """Connectivity view over a Yosys-elaborated design.
+
+    Wraps a `YosysJson` so `gen_*` tests can assert that generated RTL
+    is _wired_ correctly, not merely that the right identifiers appear in the
+    text. Two terminals are electrically connected iff they share Yosys net IDs,
+    so a signal bound to the wrong net (undeclared or truncated) fails.
+
+    Terminals are addressed by name: top-level ports by port name, sub-instance
+    pins by `(instance_name, port_name)`. Net IDs come back as plain `int`
+    lists (one per bit); equal lists mean the same physical net.
+    """
+
+    def __init__(self, yj: YosysJson) -> None:
+        self.yj = yj
+        self.top_name, self.top = yj.getTopModule()
+
+    def port_net(self, name: str) -> list[int]:
+        """Net IDs bound to top-level port `name`."""
+        return list(self.top.ports[name].bits)
+
+    def cell_net(self, instance: str, port: str) -> list[int]:
+        """Net IDs on `port` of sub-instance `instance`."""
+        return list(self.top.cells[instance].connections[port])
+
+    def port_names(self) -> set[str]:
+        """Names of every top-level port."""
+        return set(self.top.ports)
+
+    def cell_names(self) -> set[str]:
+        """Names of every sub-instance."""
+        return set(self.top.cells)
+
+    def driver(self, bit: int) -> tuple[str, str]:
+        """The `(instance, port)` driving net `bit` (`("", "z")` if undriven)."""
+        return self.yj.getNetPortSrcSinks(bit)[0]
+
+    def sinks(self, bit: int) -> list[tuple[str, str]]:
+        """The `(instance, port)` terminals driven by net `bit`."""
+        return self.yj.getNetPortSrcSinks(bit)[1]
+
+
+class GridConnectivity:
+    """Coordinate-addressed connectivity view over a 2D grid of HDL instances.
+
+    Many FABulous generators emit a 2D array of sub-instances (supertile,
+    fabric, ...). This wraps a `Netlist` so tests can address a cell by its
+    `(x, y)` grid coordinate instead of by raw instance name. Cell occupancy and
+    the coordinate-to-instance naming are supplied by the caller; net queries
+    delegate to the wrapped `Netlist`.
+
+    Parameters
+    ----------
+    netlist : Netlist
+        The elaborated design to view.
+    occupied : set[tuple[int, int]]
+        Grid coordinates that hold an instance.
+    instance_name : Callable[[int, int], str]
+        Maps an occupied `(x, y)` coordinate to its instance name in `netlist`.
+    coord_pattern : str
+        Regex with two capture groups (x, y) used by `referenced_cells` to read
+        coordinates back out of instance and port names. Default
+        `X(\\d+)Y(\\d+)` matches the FABulous `X#Y#` naming convention.
+    """
+
+    def __init__(
+        self,
+        netlist: Netlist,
+        occupied: set[tuple[int, int]],
+        instance_name: Callable[[int, int], str],
+        coord_pattern: str = r"X(\d+)Y(\d+)",
+    ) -> None:
+        self.netlist = netlist
+        self._occupied = occupied
+        self._instance_name = instance_name
+        self._coord_re = re.compile(coord_pattern)
+
+    @property
+    def occupied(self) -> set[tuple[int, int]]:
+        """Grid coordinates that hold an instance."""
+        return self._occupied
+
+    def exists(self, x: int, y: int) -> bool:
+        """Whether grid cell `(x, y)` holds an instance."""
+        return (x, y) in self._occupied
+
+    def cell_net(self, x: int, y: int, port: str) -> list[int]:
+        """Net IDs on `port` of the instance at grid cell `(x, y)`."""
+        return self.netlist.cell_net(self._instance_name(x, y), port)
+
+    def top_port_net(self, name: str) -> list[int]:
+        """Net IDs bound to the top-level boundary port `name`."""
+        return self.netlist.port_net(name)
+
+    def top_port_names(self) -> set[str]:
+        """Names of every top-level boundary port."""
+        return self.netlist.port_names()
+
+    def driver(self, bit: int) -> tuple[str, str]:
+        """The `(instance, port)` driving net `bit`."""
+        return self.netlist.driver(bit)
+
+    def sinks(self, bit: int) -> list[tuple[str, str]]:
+        """The `(instance, port)` terminals driven by net `bit`."""
+        return self.netlist.sinks(bit)
+
+    def referenced_cells(self) -> set[tuple[int, int]]:
+        """Grid coordinates named by any instance or top-level port.
+
+        A correctly built grid never names an empty cell, so a hole leaking
+        into the interface surfaces here as a coordinate outside `occupied`.
+        """
+        coords: set[tuple[int, int]] = set()
+        for name in self.netlist.cell_names() | self.netlist.port_names():
+            if m := self._coord_re.search(name):
+                coords.add((int(m.group(1)), int(m.group(2))))
+        return coords
+
+
+@pytest.fixture
+def elaborate(tmp_path: Path) -> Callable[..., Netlist]:
+    """Elaborate generated HDL with Yosys and return a `Netlist`.
+
+    Pass either raw Verilog text (written to a temp `.v`) or a `Path` to an
+    existing source file. Skips when Yosys is unavailable, so suites still run
+    outside the Nix toolchain; under the Nix shell it gives real netlist-level
+    connectivity checks reusable across `gen_*` tests.
+    """
+    if shutil.which(str(get_context().yosys_path)) is None:
+        pytest.skip("yosys not on PATH; connectivity checks need the Nix toolchain")
+
+    def _elaborate(source: str | Path, name: str = "dut") -> Netlist:
+        if isinstance(source, Path):
+            path = source
+        else:
+            path = tmp_path / f"{name}.v"
+            path.write_text(source)
+        return Netlist(YosysJson(path))
+
+    return _elaborate

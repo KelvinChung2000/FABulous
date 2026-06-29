@@ -92,6 +92,8 @@ class SuperTile:
         internalConnections = []
         for y, row in enumerate(self.tileMap):
             for x, tile in enumerate(row):
+                if tile is None:
+                    continue
                 if (
                     0 <= y - 1 < len(self.tileMap)
                     and self.tileMap[y - 1][x] is not None
@@ -138,7 +140,7 @@ class SuperTile:
         as a conservative upper bound, then derives the minimum physical width
         and height required.
 
-        See ``Tile.get_min_die_area`` for the track-based derivation.
+        See `Tile.get_min_die_area` for the track-based derivation.
 
         Parameters
         ----------

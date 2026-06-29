@@ -95,6 +95,15 @@ class FABulousTileMacroFlow(SequentialFlow):
         if not self._models_pack_first:
             file_list.append(str(models_pack.resolve()))
 
+        # Collect out of tree Bels
+        bels = list(tile_type.bels)
+        if isinstance(tile_type, SuperTile):
+            for sub_tile in tile_type.tiles:
+                bels.extend(sub_tile.bels)
+        for bel in bels:
+            if (bel_path := str(bel.src)) not in file_list:
+                file_list.append(bel_path)
+
         # Determine logical dimensions
         if isinstance(tile_type, SuperTile):
             logical_width = tile_type.max_width

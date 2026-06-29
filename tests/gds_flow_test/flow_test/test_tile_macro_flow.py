@@ -489,6 +489,63 @@ class TestFABulousTileVerilogMacroFlowInit:
         assert len(verilog_files) > 0
         assert all(f.endswith(".v") for f in verilog_files)
 
+    def test_verilog_files_include_out_of_tree_bel_source(
+        self,
+        mock_tile: MagicMock,
+        io_pin_config: Path,
+        mock_pdk_root: dict[str, Any],
+        tmp_path: Path,
+    ) -> None:
+        """BEL sources outside the tile directory are added to VERILOG_FILES.
+
+        A BEL referenced by a relative path in the tile CSV (e.g. a shared
+        primitive under ``primitives/``) lives outside the tile glob, so it
+        must be picked up from the tile's BEL list instead.
+        """
+        bel_src: Path = tmp_path / "primitives" / "SRAM" / "fabulous" / "SRAM.v"
+        bel_src.parent.mkdir(parents=True)
+        bel_src.write_text("module SRAM(); endmodule")
+        mock_tile.bels = [MagicMock(src=bel_src)]
+
+        flow: FABulousTileVerilogMacroFlow = self._create_flow(
+            tile_type=mock_tile,
+            io_pin_config=io_pin_config,
+            mock_pdk_root=mock_pdk_root,
+            models_pack_path=Path("/fake/models/pack.v"),
+        )
+
+        verilog_files: list[str] = flow.config["VERILOG_FILES"]
+        assert str(bel_src) in verilog_files
+
+    def test_verilog_files_include_subtile_bel_source(
+        self,
+        mock_supertile: MagicMock,
+        io_pin_config: Path,
+        mock_pdk_root: dict[str, Any],
+        tmp_path: Path,
+    ) -> None:
+        """SuperTile sub-tile BEL sources are added to VERILOG_FILES.
+
+        SuperTile BELs live on the constituent sub-tiles rather than the
+        wrapper, so collection must descend into ``SuperTile.tiles``.
+        """
+        bel_src: Path = tmp_path / "primitives" / "SRAM" / "fabulous" / "SRAM.v"
+        bel_src.parent.mkdir(parents=True)
+        bel_src.write_text("module SRAM(); endmodule")
+        sub_tile: MagicMock = MagicMock()
+        sub_tile.bels = [MagicMock(src=bel_src)]
+        mock_supertile.tiles = [sub_tile]
+
+        flow: FABulousTileVerilogMacroFlow = self._create_flow(
+            tile_type=mock_supertile,
+            io_pin_config=io_pin_config,
+            mock_pdk_root=mock_pdk_root,
+            models_pack_path=Path("/fake/models/pack.v"),
+        )
+
+        verilog_files: list[str] = flow.config["VERILOG_FILES"]
+        assert str(bel_src) in verilog_files
+
     def test_nonexistent_config_files_ignored(
         self,
         mock_tile: MagicMock,

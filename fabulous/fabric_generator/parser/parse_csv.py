@@ -498,6 +498,14 @@ def parseSupertilesCSV(fileName: Path, tileDic: dict[str, Tile]) -> list[SuperTi
                     )
             tileMap.append(row)
 
+        # Pad every row to a common width with None so the tileMap is always
+        # rectangular. Trailing empty CSV cells are stripped above, leaving
+        # ragged rows; downstream generation indexes neighbours assuming a
+        # rectangular grid, so holes (trailing or interior) must all be None.
+        width = max((len(row) for row in tileMap), default=0)
+        for row in tileMap:
+            row.extend([None] * (width - len(row)))
+
         withUserCLK = any(bel.withUserCLK for bel in bels)
         new_supertiles.append(
             SuperTile(name, fileName.absolute(), tiles, tileMap, bels, withUserCLK)

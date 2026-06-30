@@ -10,6 +10,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from fabulous.fabric_definition.define import IO, HDLType
+from fabulous.fabric_definition.yosys_obj import YosysJson
 
 
 @dataclass
@@ -54,6 +55,9 @@ class Bel:
         Carry chains by name.
     localShared : dict[str, tuple[str, IO]]
         Local shared ports of the BEL.
+    yosys_json : YosysJson | None
+        Parsed Yosys netlist of the BEL, used for combinational-arc analysis.
+        Default is None.
 
     Attributes
     ----------
@@ -99,6 +103,8 @@ class Bel:
         {RESET/ENABLE,(portname, IO)}
         Local shared ports of the BEL.
         Are only shared in the Tile, not in the fabric.
+    yosys_json : YosysJson | None
+        Parsed Yosys netlist of the BEL, used for combinational-arc analysis.
 
     Raises
     ------
@@ -124,6 +130,7 @@ class Bel:
     ports_vectors: dict[str, dict[str, tuple[IO, int]]] = field(default_factory=dict)
     carry: dict[str, dict[IO, str]] = field(default_factory=dict)
     localShared: dict[str, tuple[str, IO]] = field(default_factory=dict)
+    yosys_json: YosysJson | None = None
 
     def __init__(
         self,
@@ -140,6 +147,7 @@ class Bel:
         ports_vectors: dict[str, dict[str, tuple[IO, int]]],
         carry: dict[str, dict[IO, str]],
         localShared: dict[str, tuple[str, IO]],
+        yosys_json: YosysJson | None = None,
     ) -> None:
         self.src = src
         self.prefix = prefix
@@ -165,3 +173,4 @@ class Bel:
             raise ValueError(f"Unknown file type {self.src.suffix} for BEL {self.src}")
         self.carry = carry
         self.localShared = localShared
+        self.yosys_json = yosys_json

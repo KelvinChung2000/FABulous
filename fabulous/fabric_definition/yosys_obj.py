@@ -219,6 +219,10 @@ class YosysJson:
     ----------
     path : Path
         Path to a HDL file.
+    run_hierarchy : bool
+        Whether to run `hierarchy -auto-top`, which prunes modules unreachable
+        from the chosen top. Set to `False` to keep every module of a
+        multi-module library (e.g. a primitive pack). Default is `True`.
 
     Attributes
     ----------
@@ -248,7 +252,7 @@ class YosysJson:
     modules: dict[str, YosysModule]
     models: dict
 
-    def __init__(self, path: Path) -> None:
+    def __init__(self, path: Path, run_hierarchy: bool = True) -> None:
         if not path.exists():
             raise FileNotFoundError(f"File {path} does not exist")
         if path.suffix not in {".vhd", ".vhdl", ".v", ".sv"}:
@@ -297,13 +301,15 @@ class YosysJson:
             yosys_src = self.srcPath.with_suffix(".v")
         else:
             yosys_src = self.srcPath
+
+        hierarchy_step = "hierarchy -auto-top; " if run_hierarchy else ""
         runCmd = [
             f"{yosys!s}",
             "-q",
             (
                 "-p "
                 f"read_verilog -sv {yosys_src}; "
-                "hierarchy -auto-top; "
+                f"{hierarchy_step}"
                 "proc -noopt; "
                 f"write_json -compat-int {json_file}"
             ),

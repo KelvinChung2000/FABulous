@@ -374,8 +374,7 @@ def _gen_switch_matrix_body(
 
             portsPairs.append(("X", f"{portName}"))
 
-            # we add the input signal in reversed order
-            # Both multiplexer styles index this vector, so it is driven for both.
+            # Drive the mux input vector for both mux styles.
             writer.addAssignScalar(
                 f"{portName}_input",
                 connections[portName][::-1],
@@ -394,10 +393,16 @@ def _gen_switch_matrix_body(
                         f"MUX-{muxSize} in switch matrix for {name}"
                     )
             else:
-                writer.addAssignScalar(
+                # generic multiplexer: select the input behaviorally so it
+                # synthesises to standard cells. The writer emits the indexing
+                # in language-correct syntax for Verilog and VHDL.
+                select_width = paddedMuxSize.bit_length() - 1
+                writer.addMuxAssign(
                     portName,
-                    f"{portName}_input[ConfigBits[{configBitstreamPosition - 1}:"
-                    f"{configBitstreamPosition}]]",
+                    f"{portName}_input",
+                    "ConfigBits",
+                    configBitstreamPosition,
+                    select_width,
                 )
 
             configBitstreamPosition += paddedMuxSize.bit_length() - 1

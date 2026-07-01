@@ -98,8 +98,9 @@ def _simplify_annotation(annotation: object) -> str:
     str
         A simplified type label (e.g. ``Path``, ``str``, ``tuple``).
     """
-    text = str(annotation)
-    text = text.replace(" | None", "").removeprefix("Optional[").rstrip("]")
+    text = str(annotation).replace(" | None", "")
+    if text.startswith("Optional["):
+        text = text.removeprefix("Optional[").removesuffix("]")
     for known in ("Path", "Version", "HDLType"):
         if known in text:
             return known
@@ -107,7 +108,7 @@ def _simplify_annotation(annotation: object) -> str:
         return "tuple"
     # Use __name__ only when the annotation is a plain class (not a generic
     # alias such as Union whose str() already gives the simplified text).
-    if type(annotation).__name__ == "type" and hasattr(annotation, "__name__"):
+    if isinstance(annotation, type):
         return annotation.__name__
     return text
 

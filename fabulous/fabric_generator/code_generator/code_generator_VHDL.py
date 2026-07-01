@@ -459,7 +459,8 @@ end process;
         """
         selectHigh = selectLow + selectWidth - 1
         index = f"to_integer(unsigned({selectVector}({selectHigh} downto {selectLow})))"
-        self._add(f"{output} <= {inputVector}({index}) after {delay} ps;", indentLevel)
+        delayStr = f" after {delay} ps" if delay else ""
+        self._add(f"{output} <= {inputVector}({index}){delayStr};", indentLevel)
 
     def addInstantiation(
         self,

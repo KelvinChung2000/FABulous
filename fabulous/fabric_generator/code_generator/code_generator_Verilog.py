@@ -485,7 +485,8 @@ end
             index = f"{selectVector}[{selectLow}]"
         else:
             index = f"{selectVector}[{selectLow + selectWidth - 1}:{selectLow}]"
-        self._add(f"assign {output} = #{delay} {inputVector}[{index}];", indentLevel)
+        delayStr = f"#{delay} " if delay else ""
+        self._add(f"assign {delayStr}{output} = {inputVector}[{index}];", indentLevel)
 
     def addPreprocIfDef(self, macro: str, indentLevel: int = 0) -> None:
         """Add an `ifdef` preprocessor directive.

@@ -403,6 +403,7 @@ def _gen_switch_matrix_body(
                     "ConfigBits",
                     configBitstreamPosition,
                     select_width,
+                    delay=default_pip_delay,
                 )
 
             configBitstreamPosition += paddedMuxSize.bit_length() - 1

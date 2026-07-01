@@ -26,6 +26,12 @@ dependencies = [
   "sphinxcontrib-mermaid>=2.0.0",
 ]
 
+# cmd2 4.0 (pulled in transitively via the editable FABulous package) requires
+# rich>=15, which ciel's conservative rich<15 cap conflicts with. uv overrides are
+# project-local, so the docs project repeats the override the root project applies.
+[tool.uv]
+override-dependencies = ["rich>=15.0.0"]
+
 # Editable installation of FABulous package
 [tool.uv.sources]
 fabulous-fpga = { path = "..", editable = true }

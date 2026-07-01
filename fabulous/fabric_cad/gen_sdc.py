@@ -1,16 +1,16 @@
 """Generate SDC constraints that break combinational loops in switch matrices.
 
-The loop graph combines switch-matrix routing (from a tile's `.list` file,
-see `build_graph_from_list_file`) with the tile's BEL combinational arcs (read
-from the BEL's parsed netlist `Bel.yosys_json`, see `add_bel_comb_arcs`). A
-combinational loop alternates routing and logic, so the BEL arcs are required
-for any loop that closes through
-a cell (e.g. a LUT feeding its own input). Loops are broken at node granularity
-by selecting a small feedback-vertex set (see `select_break_nodes`) and disabling
-the driver pin of each chosen net. BEL pins are excluded from that set so a cut
-never disables a cell's own combinational arc; loops break on the switch-matrix
-and jump-wire feedback instead, which leaves every BEL forward delay analyzable.
-The chosen net names are emitted as portable `set_disable_timing` constraints.
+The loop graph is built by `Tile.as_graph`, which combines switch-matrix routing
+(from a tile's `.list` file) with the tile's BEL combinational arcs (read from
+each BEL's parsed netlist via `Bel.get_comb_arcs`) and its intra-tile jump wires.
+A combinational loop alternates routing and logic, so the BEL arcs are required
+for any loop that closes through a cell (e.g. a LUT feeding its own input). Loops
+are broken at node granularity by selecting a small feedback-vertex set (see
+`select_break_nodes`) and disabling the driver pin of each chosen net. BEL pins
+are excluded from that set so a cut never disables a cell's own combinational
+arc; loops break on the switch-matrix and jump-wire feedback instead, which
+leaves every BEL forward delay analyzable. The chosen net names are emitted as
+portable `set_disable_timing` constraints.
 """
 
 from pathlib import Path
@@ -20,36 +20,7 @@ from jinja2 import Environment, PackageLoader
 from loguru import logger
 
 from fabulous.custom_exception import InvalidState
-from fabulous.fabric_definition.bel import Bel
 from fabulous.fabric_definition.tile import Tile
-from fabulous.fabric_definition.yosys_obj import YosysJson, YosysModule
-from fabulous.fabric_generator.parser.parse_switchmatrix import parseList
-from fabulous.fabulous_settings import get_context
-
-# Yosys cell types whose internal input->output path is sequential (broken by a
-# register or memory) and therefore is NOT a combinational timing arc.
-_REGISTER_CELL_PREFIXES = (
-    "$dff",
-    "$adff",
-    "$sdff",
-    "$dffsr",
-    "$dlatch",
-    "$adlatch",
-    "$sr",
-    "$mem",
-    "$_DFF",
-    "$_SDFF",
-    "$_DLATCH",
-    "$_SR",
-)
-
-# Combinational input->output arcs per BEL module, keyed by module name. A BEL
-# type is resolved once; its arcs are reused across every instance.
-_bel_comb_arc_cache: dict[str, set[tuple[str, str]]] = {}
-
-# models_pack primitive port directions and sequential flag, keyed by module
-# name. Resolved once per process from the project's models_pack.
-_models_pack_prim_cache: dict[str, tuple[dict[str, str], bool]] | None = None
 
 _SDC_ENV = Environment(
     loader=PackageLoader("fabulous.fabric_cad", "templates"),
@@ -62,13 +33,19 @@ _SDC_TEMPLATE = _SDC_ENV.get_template("loop_break.sdc.j2")
 
 # Strongly connected components up to this size are reduced one vertex per round,
 # which is near-minimum and exact on the per-tile switch matrices. Larger
-# components remove the top `_FVS_BATCH_FRACTION` of vertices per round so the
+# components remove the top `FVS_BATCH_FRACTION` of vertices per round so the
 # whole-fabric graph (one large inter-tile component) stays fast.
-_FVS_SINGLE_MAX = 300
-_FVS_BATCH_FRACTION = 0.02
+FVS_SINGLE_MAX = 300
+FVS_BATCH_FRACTION = 0.02
 
 
-def select_break_nodes(graph: nx.DiGraph, protected: set[str]) -> list[str]:
+def select_break_nodes(
+    graph: nx.DiGraph,
+    protected: set[str],
+    *,
+    single_max: int = FVS_SINGLE_MAX,
+    batch_fraction: float = FVS_BATCH_FRACTION,
+) -> list[str]:
     """Select a feedback-vertex set whose removal makes `graph` acyclic.
 
     Nodes in `protected` stay in the graph but are never chosen as a cut, so a
@@ -81,6 +58,12 @@ def select_break_nodes(graph: nx.DiGraph, protected: set[str]) -> list[str]:
     protected : set[str]
         Net names that must never be chosen as a cut (typically BEL pins). They
         remain in the graph and may still lie on a cycle that is broken elsewhere.
+    single_max : int, optional
+        Strongly connected components up to this size are reduced one vertex per
+        round, which is near-minimum and exact on the per-tile switch matrices.
+    batch_fraction : float, optional
+        Larger components remove this fraction of their vertices per round so the
+        whole-fabric graph (one large inter-tile component) stays fast.
 
     Returns
     -------
@@ -123,10 +106,10 @@ def select_break_nodes(graph: nx.DiGraph, protected: set[str]) -> list[str]:
             key=lambda node: (scc.in_degree(node) * scc.out_degree(node), node),
             reverse=True,
         )
-        if scc.number_of_nodes() <= _FVS_SINGLE_MAX:
+        if scc.number_of_nodes() <= single_max:
             count = 1
         else:
-            count = max(1, int(scc.number_of_nodes() * _FVS_BATCH_FRACTION))
+            count = max(1, int(scc.number_of_nodes() * batch_fraction))
         victims = ranked[:count]
         chosen.update(victims)
         scc.remove_nodes_from(victims)
@@ -167,192 +150,13 @@ def render_sdc(break_nodes: list[str], scope: str, *, resolved: bool) -> str:
     )
 
 
-def build_graph_from_list_file(matrix_path: Path) -> nx.DiGraph:
-    """Build a connectivity graph from a switch-matrix `.list` file.
-
-    Parameters
-    ----------
-    matrix_path : Path
-        Path to the `.list` switch-matrix file.
-
-    Returns
-    -------
-    nx.DiGraph
-        Directed graph whose nodes are port names and whose edges run from
-        driver to sink.
-    """
-    graph = nx.DiGraph()
-    for sink, source in parseList(matrix_path, collect="pair"):
-        graph.add_edge(source, sink)
-    return graph
-
-
-def _models_pack_primitives() -> dict[str, tuple[dict[str, str], bool]]:
-    """Return the project's models_pack primitives, keyed by module name.
-
-    Returns
-    -------
-    dict[str, tuple[dict[str, str], bool]]
-        `module_name -> ({port: direction}, is_sequential)`.
-
-    Raises
-    ------
-    InvalidState
-        `models_pack` is not configured.
-    """
-    global _models_pack_prim_cache
-    if _models_pack_prim_cache is not None:
-        return _models_pack_prim_cache
-
-    models_pack = get_context().models_pack
-    if models_pack is None:
-        raise InvalidState(
-            "models_pack is not configured; load a fabric project before "
-            "exporting loop-break SDC."
-        )
-    # models_pack is a flat primitive library with no single top, so keep every
-    # module instead of letting `hierarchy -auto-top` prune it.
-    yosys_json = YosysJson(models_pack, run_hierarchy=False)
-
-    primitives: dict[str, tuple[dict[str, str], bool]] = {}
-    for name, module in yosys_json.modules.items():
-        directions = {port: detail.direction for port, detail in module.ports.items()}
-        sequential = any(
-            cell.type.startswith(_REGISTER_CELL_PREFIXES)
-            for cell in module.cells.values()
-        )
-        primitives[name] = (directions, sequential)
-    _models_pack_prim_cache = primitives
-    return primitives
-
-
-def _comb_arcs_from_module(
-    module: YosysModule, primitives: dict[str, tuple[dict[str, str], bool]]
-) -> set[tuple[str, str]]:
-    """Extract combinational input->output port arcs from a parsed module.
-
-    Parameters
-    ----------
-    module : YosysModule
-        The parsed netlist module to analyze.
-    primitives : dict[str, tuple[dict[str, str], bool]]
-        models_pack primitives, `module_name -> ({port: direction}, sequential)`.
-
-    Returns
-    -------
-    set[tuple[str, str]]
-        Combinational `(input_port, output_port)` arcs in module-local names.
-    """
-    graph = nx.DiGraph()
-    for cell in module.cells.values():
-        if cell.type in primitives:
-            directions, sequential = primitives[cell.type]
-            if sequential:
-                continue
-        else:
-            directions = cell.port_directions
-            if not directions or cell.type.startswith(_REGISTER_CELL_PREFIXES):
-                continue
-        input_bits = [
-            bit
-            for port, bits in cell.connections.items()
-            if directions.get(port) == "input"
-            for bit in bits
-            if isinstance(bit, int)
-        ]
-        output_bits = [
-            bit
-            for port, bits in cell.connections.items()
-            if directions.get(port) == "output"
-            for bit in bits
-            if isinstance(bit, int)
-        ]
-        for source_bit in input_bits:
-            for sink_bit in output_bits:
-                graph.add_edge(source_bit, sink_bit)
-
-    input_name: dict[int, str] = {}
-    output_name: dict[int, str] = {}
-    for port, detail in module.ports.items():
-        multibit = len(detail.bits) > 1
-        for index, bit in enumerate(detail.bits):
-            if not isinstance(bit, int):
-                continue
-            name = f"{port}{index}" if multibit else port
-            if detail.direction == "input":
-                input_name[bit] = name
-            elif detail.direction == "output":
-                output_name[bit] = name
-
-    arcs: set[tuple[str, str]] = set()
-    for in_bit, in_port in input_name.items():
-        reachable = nx.descendants(graph, in_bit) if in_bit in graph else set()
-        for out_bit, out_port in output_name.items():
-            if out_bit in reachable:
-                arcs.add((in_port, out_port))
-    return arcs
-
-
-def _bel_comb_arcs(bel: Bel) -> set[tuple[str, str]]:
-    """Return a BEL type's combinational input->output arcs in BEL-local names.
-
-    Parameters
-    ----------
-    bel : Bel
-        The BEL whose combinational arcs are extracted.
-
-    Returns
-    -------
-    set[tuple[str, str]]
-        Combinational `(input_port, output_port)` arcs in BEL-local names.
-
-    Raises
-    ------
-    InvalidState
-        The BEL has no parsed netlist, or its module is missing from it.
-    """
-    cached = _bel_comb_arc_cache.get(bel.module_name)
-    if cached is not None:
-        return cached
-
-    if bel.yosys_json is None:
-        raise InvalidState(
-            f"BEL {bel.name} has no parsed netlist (yosys_json); cannot extract "
-            f"combinational arcs."
-        )
-    module = bel.yosys_json.modules.get(bel.module_name)
-    if module is None:
-        raise InvalidState(
-            f"Module {bel.module_name} not found in the parsed netlist of BEL "
-            f"{bel.name}."
-        )
-
-    arcs = _comb_arcs_from_module(module, _models_pack_primitives())
-    _bel_comb_arc_cache[bel.module_name] = arcs
-    return arcs
-
-
-def add_bel_comb_arcs(graph: nx.DiGraph, tile: Tile) -> None:
-    """Add a tile's BEL combinational arcs to `graph` in place.
-
-    Parameters
-    ----------
-    graph : nx.DiGraph
-        Graph to add the arcs to.
-    tile : Tile
-        Tile whose BELs are analyzed.
-    """
-    for bel in tile.bels:
-        valid_inputs = set(bel.inputs)
-        valid_outputs = set(bel.outputs)
-        for in_port, out_port in _bel_comb_arcs(bel):
-            source = f"{bel.prefix}{in_port}"
-            sink = f"{bel.prefix}{out_port}"
-            if source in valid_inputs and sink in valid_outputs:
-                graph.add_edge(source, sink)
-
-
-def export_tile_sdc(tile: Tile, out_path: Path) -> Path:
+def export_tile_sdc(
+    tile: Tile,
+    out_path: Path,
+    *,
+    single_max: int = FVS_SINGLE_MAX,
+    batch_fraction: float = FVS_BATCH_FRACTION,
+) -> Path:
     """Write a loop-break SDC for a single tile.
 
     The tile graph is the switch-matrix routing graph plus the tile's BEL
@@ -366,20 +170,22 @@ def export_tile_sdc(tile: Tile, out_path: Path) -> Path:
         Placed tile to analyze.
     out_path : Path
         Destination SDC file path. Parent directories are created.
+    single_max : int, optional
+        Feedback-vertex-set tuning knob forwarded to `select_break_nodes`.
+    batch_fraction : float, optional
+        Feedback-vertex-set tuning knob forwarded to `select_break_nodes`.
 
     Returns
     -------
     Path
         `out_path`.
     """
-    graph = build_graph_from_list_file(tile.matrixDir)
-    add_bel_comb_arcs(graph, tile)
-    for wire in tile.wireList:
-        if wire.xOffset == 0 and wire.yOffset == 0:
-            graph.add_edge(wire.source, wire.destination)
+    graph = tile.as_graph()
     # Protect BEL pins so a cut never disables a cell's own combinational arc.
     protected = {pin for bel in tile.bels for pin in (*bel.inputs, *bel.outputs)}
-    break_nodes = select_break_nodes(graph, protected)
+    break_nodes = select_break_nodes(
+        graph, protected, single_max=single_max, batch_fraction=batch_fraction
+    )
     text = render_sdc(break_nodes, scope=f"tile {tile.name}", resolved=False)
     out_path.parent.mkdir(parents=True, exist_ok=True)
     out_path.write_text(text)

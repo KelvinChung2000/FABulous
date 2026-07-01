@@ -1,5 +1,5 @@
 import shutil
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -9,14 +9,15 @@ from pytest_mock import MockerFixture
 
 from fabulous.custom_exception import InvalidState
 from fabulous.fabric_cad.gen_sdc import (
-    _bel_comb_arcs,
-    _comb_arcs_from_module,
-    add_bel_comb_arcs,
-    build_graph_from_list_file,
     export_tile_sdc,
     render_sdc,
     select_break_nodes,
 )
+from fabulous.fabric_definition.bel import (
+    Bel,
+    _comb_arcs_from_module,
+)
+from fabulous.fabric_definition.tile import Tile
 from fabulous.fabric_definition.yosys_obj import YosysJson
 
 
@@ -135,21 +136,6 @@ def _write_list(tmp_path: Path, body: str) -> Path:
     return p
 
 
-def test_build_graph_edge_direction_is_driver_to_sink(tmp_path: Path) -> None:
-    # parseList pair is (field0=sink, field1=source); edge must be source->sink.
-    path = _write_list(tmp_path, "SINK0,SRC0\n")
-    g = build_graph_from_list_file(path)
-    assert g.has_edge("SRC0", "SINK0")
-    assert not g.has_edge("SINK0", "SRC0")
-
-
-def test_build_graph_detects_loop(tmp_path: Path) -> None:
-    # SRC drives SINK, SINK drives back to SRC -> a 2-cycle.
-    path = _write_list(tmp_path, "SINK0,SRC0\nSRC0,SINK0\n")
-    g = build_graph_from_list_file(path)
-    assert not nx.is_directed_acyclic_graph(g)
-
-
 @dataclass
 class _FakeWire:
     source: str
@@ -163,13 +149,22 @@ class _FakeBel:
     prefix: str
     inputs: list[str]
     outputs: list[str]
+    comb_arcs: set[tuple[str, str]] = field(default_factory=set)
     module_name: str = "FAKE"
     name: str = "fake"
     src: Path = Path("fake.v")
     yosys_json: object = None
 
+    def get_comb_arcs(self) -> set[tuple[str, str]]:
+        return self.comb_arcs
 
-class _FakeTile:
+
+class _FakeTile(Tile):
+    """A Tile that skips the heavy real `__init__` but keeps the real `as_graph`.
+
+    Only the attributes `as_graph`/`export_tile_sdc` read are populated.
+    """
+
     def __init__(
         self,
         matrix_path: Path,
@@ -181,6 +176,20 @@ class _FakeTile:
         self.wireList = wires
         self.bels = bels or []
         self.name = name
+
+
+def test_as_graph_edge_direction_is_driver_to_sink(tmp_path: Path) -> None:
+    # parseList pair is (field0=sink, field1=source); edge must be source->sink.
+    tile = _FakeTile(_write_list(tmp_path, "SINK0,SRC0\n"), [])
+    g = tile.as_graph()
+    assert g.has_edge("SRC0", "SINK0")
+    assert not g.has_edge("SINK0", "SRC0")
+
+
+def test_as_graph_detects_loop(tmp_path: Path) -> None:
+    # SRC drives SINK, SINK drives back to SRC -> a 2-cycle.
+    tile = _FakeTile(_write_list(tmp_path, "SINK0,SRC0\nSRC0,SINK0\n"), [])
+    assert not nx.is_directed_acyclic_graph(tile.as_graph())
 
 
 def test_export_tile_sdc_writes_file_with_constraints(tmp_path: Path) -> None:
@@ -249,15 +258,14 @@ def test_comb_arcs_from_module_breaks_registers() -> None:
 
 
 def test_comb_arcs_from_module_resolves_sequential_primitive() -> None:
-    # A models_pack primitive `config_latch` (sequential) feeds a combinational
-    # `cus_mux21` whose select comes from input S. The latch breaks the data path
-    # from D, so only S -> X is a combinational arc; D -> X must be dropped.
-    primitives = {
-        "config_latch": ({"D": "input", "Q": "output"}, True),
-        "cus_mux21": (
-            {"A0": "input", "A1": "input", "S": "input", "X": "output"},
-            False,
-        ),
+    # A custom primitive `config_latch` is sequential (its own definition holds a
+    # latch) and feeds a combinational `cus_mux21` whose select comes from input
+    # S. The latch breaks the data path from D, so only S -> X is a combinational
+    # arc; D -> X must be dropped. Direction/sequential info is read from the
+    # cells' own port_directions and the sibling submodule definitions.
+    submodules = {
+        "config_latch": SimpleNamespace(cells={"l": _cell("$dlatch", {}, {})}),
+        "cus_mux21": SimpleNamespace(cells={"m": _cell("$mux", {}, {})}),
     }
     module = SimpleNamespace(
         ports={
@@ -266,30 +274,30 @@ def test_comb_arcs_from_module_resolves_sequential_primitive() -> None:
             "X": _port("output", [5]),
         },
         cells={
-            "latch": _cell("config_latch", {}, {"D": [2], "Q": [4]}),
-            "mux": _cell("cus_mux21", {}, {"A0": [4], "A1": [4], "S": [3], "X": [5]}),
+            "latch": _cell(
+                "config_latch", {"D": "input", "Q": "output"}, {"D": [2], "Q": [4]}
+            ),
+            "mux": _cell(
+                "cus_mux21",
+                {"A0": "input", "A1": "input", "S": "input", "X": "output"},
+                {"A0": [4], "A1": [4], "S": [3], "X": [5]},
+            ),
         },
     )
-    arcs = _comb_arcs_from_module(module, primitives)
+    arcs = _comb_arcs_from_module(module, submodules)
     assert arcs == {("S", "X")}
 
 
-def test_add_bel_comb_arcs_maps_pins_and_filters_non_data_ports(
-    mocker: MockerFixture,
-) -> None:
+def test_as_graph_maps_bel_pins_and_filters_non_data_ports(tmp_path: Path) -> None:
+    # netlist arcs include a config pin (ConfigBits0) that is not a data port.
     bel = _FakeBel(
         prefix="LA_",
         inputs=["LA_I0", "LA_Ci"],
         outputs=["LA_O", "LA_Co"],
+        comb_arcs={("I0", "O"), ("Ci", "Co"), ("ConfigBits0", "O")},
     )
-    tile = _FakeTile(Path("unused.list"), [], bels=[bel])
-    # netlist arcs include a config pin (ConfigBits0) that is not a data port.
-    mocker.patch(
-        "fabulous.fabric_cad.gen_sdc._bel_comb_arcs",
-        return_value={("I0", "O"), ("Ci", "Co"), ("ConfigBits0", "O")},
-    )
-    g = nx.DiGraph()
-    add_bel_comb_arcs(g, tile)
+    tile = _FakeTile(_write_list(tmp_path, ""), [], bels=[bel])
+    g = tile.as_graph()
 
     assert g.has_edge("LA_I0", "LA_O")
     assert g.has_edge("LA_Ci", "LA_Co")
@@ -297,21 +305,17 @@ def test_add_bel_comb_arcs_maps_pins_and_filters_non_data_ports(
     assert "LA_ConfigBits0" not in g
 
 
-def test_export_tile_sdc_finds_bel_feedback_loop(
-    tmp_path: Path, mocker: MockerFixture
-) -> None:
+def test_export_tile_sdc_finds_bel_feedback_loop(tmp_path: Path) -> None:
     # Routing: END0 -> LA_I0 (mux input) and LA_O -> BEG0 (mux output).
     # BEL arc LA_I0 -> LA_O plus an intra-tile jump wire BEG0 -> END0 close the
     # loop LA_I0 -> LA_O -> BEG0 -> END0 -> LA_I0.
     m = tmp_path / "t.list"
     m.write_text("LA_I0,END0\nBEG0,LA_O\n")
-    bel = _FakeBel(prefix="LA_", inputs=["LA_I0"], outputs=["LA_O"])
+    bel = _FakeBel(
+        prefix="LA_", inputs=["LA_I0"], outputs=["LA_O"], comb_arcs={("I0", "O")}
+    )
     wire = _FakeWire(source="BEG0", destination="END0", xOffset=0, yOffset=0)
     tile = _FakeTile(m, [wire], bels=[bel], name="LUT4AB")
-    mocker.patch(
-        "fabulous.fabric_cad.gen_sdc._bel_comb_arcs",
-        return_value={("I0", "O")},
-    )
     out = tmp_path / "LUT4AB_loop_break.sdc"
 
     export_tile_sdc(tile, out)
@@ -325,17 +329,14 @@ def test_export_tile_sdc_finds_bel_feedback_loop(
     assert "get_nets LA_I0" not in text
 
 
-def test_export_tile_sdc_no_loop_without_bel_arc(
-    tmp_path: Path, mocker: MockerFixture
-) -> None:
+def test_export_tile_sdc_no_loop_without_bel_arc(tmp_path: Path) -> None:
     # Same routing and jump wire, but no BEL arc: the LUT input never reaches its
     # output, so no combinational loop exists and no constraint is emitted.
     m = tmp_path / "t.list"
     m.write_text("LA_I0,END0\nBEG0,LA_O\n")
-    bel = _FakeBel(prefix="LA_", inputs=["LA_I0"], outputs=["LA_O"])
+    bel = _FakeBel(prefix="LA_", inputs=["LA_I0"], outputs=["LA_O"], comb_arcs=set())
     wire = _FakeWire(source="BEG0", destination="END0", xOffset=0, yOffset=0)
     tile = _FakeTile(m, [wire], bels=[bel], name="LUT4AB")
-    mocker.patch("fabulous.fabric_cad.gen_sdc._bel_comb_arcs", return_value=set())
     out = tmp_path / "LUT4AB_loop_break.sdc"
 
     export_tile_sdc(tile, out)
@@ -344,7 +345,7 @@ def test_export_tile_sdc_no_loop_without_bel_arc(
 
 
 @pytest.mark.slow
-def test_bel_comb_arcs_extracts_lut_arcs_from_demo_netlist(
+def test_get_comb_arcs_extracts_lut_arcs_from_demo_netlist(
     tmp_path: Path, mocker: MockerFixture
 ) -> None:
     # Real extraction from the demo LUT4c BEL netlist: the LUT inputs and carry
@@ -362,22 +363,29 @@ def test_bel_comb_arcs_extracts_lut_arcs_from_demo_netlist(
     context = SimpleNamespace(
         models_pack=Path(models_pack), yosys_path="yosys", ghdl_path="ghdl"
     )
-    mocker.patch("fabulous.fabric_cad.gen_sdc.get_context", return_value=context)
+    # The BEL netlist now resolves its primitives against models_pack at read
+    # time (see YosysJson), so only yosys_obj needs the patched context.
     mocker.patch(
         "fabulous.fabric_definition.yosys_obj.get_context", return_value=context
     )
-    mocker.patch.dict("fabulous.fabric_cad.gen_sdc._bel_comb_arc_cache", {}, clear=True)
-    mocker.patch("fabulous.fabric_cad.gen_sdc._models_pack_prim_cache", None)
 
-    bel = _FakeBel(
-        prefix="LA_",
-        inputs=[],
-        outputs=[],
-        module_name="LUT4c_frame_config_dffesr",
+    bel = Bel(
         src=Path(bel_src),
+        prefix="LA_",
+        module_name="LUT4c_frame_config_dffesr",
+        internal=[],
+        external=[],
+        configPort=[],
+        sharedPort=[],
+        configBit=0,
+        belMap={},
+        userCLK=False,
+        ports_vectors={},
+        carry={},
+        localShared={},
         yosys_json=YosysJson(Path(bel_src)),
     )
-    arcs = _bel_comb_arcs(bel)
+    arcs = bel.get_comb_arcs()
 
     assert ("I0", "O") in arcs
     assert ("Ci", "Co") in arcs

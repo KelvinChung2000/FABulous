@@ -2,6 +2,9 @@
 
 from pathlib import Path
 
+from pytest_mock import MockerFixture
+
+from fabulous.fabric_cad.gen_sdc import FVS_BATCH_FRACTION, FVS_SINGLE_MAX
 from fabulous.fabulous_cli.fabulous_cli import FABulous_CLI
 from tests.conftest import run_cmd
 
@@ -53,3 +56,25 @@ def test_export_sdc_supertile_output_dir(cli: FABulous_CLI, tmp_path: Path) -> N
     run_cmd(cli, f"export_sdc {super_name} -o {tmp_path}")
     for sub in super_tile.tiles:
         assert (tmp_path / f"{sub.name}_loop_break.sdc").exists()
+
+
+def test_export_sdc_fvs_knobs_default(cli: FABulous_CLI, mocker: MockerFixture) -> None:
+    """Without flags, the FVS tuning knobs default to the module constants."""
+    spy = mocker.patch("fabulous.fabulous_cli.cmd_export_sdc.export_tile_sdc")
+    tile_name = next(iter(cli.fabulousAPI.fabric.tileDic))
+    run_cmd(cli, f"export_sdc {tile_name}")
+    _, kwargs = spy.call_args
+    assert kwargs["single_max"] == FVS_SINGLE_MAX
+    assert kwargs["batch_fraction"] == FVS_BATCH_FRACTION
+
+
+def test_export_sdc_fvs_knobs_override(
+    cli: FABulous_CLI, mocker: MockerFixture
+) -> None:
+    """The --fvs-single-max/--fvs-batch-fraction flags reach export_tile_sdc."""
+    spy = mocker.patch("fabulous.fabulous_cli.cmd_export_sdc.export_tile_sdc")
+    tile_name = next(iter(cli.fabulousAPI.fabric.tileDic))
+    run_cmd(cli, f"export_sdc {tile_name} --fvs-single-max 50 --fvs-batch-fraction 0.1")
+    _, kwargs = spy.call_args
+    assert kwargs["single_max"] == 50
+    assert kwargs["batch_fraction"] == 0.1

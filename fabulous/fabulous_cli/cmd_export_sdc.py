@@ -13,7 +13,11 @@ from cmd2 import Cmd, Cmd2ArgumentParser, with_argparser, with_category
 from loguru import logger
 
 from fabulous.custom_exception import CommandError
-from fabulous.fabric_cad.gen_sdc import export_tile_sdc
+from fabulous.fabric_cad.gen_sdc import (
+    FVS_BATCH_FRACTION,
+    FVS_SINGLE_MAX,
+    export_tile_sdc,
+)
 from fabulous.fabric_definition.supertile import SuperTile
 
 if TYPE_CHECKING:
@@ -36,6 +40,24 @@ export_sdc_parser.add_argument(
     default=None,
     help="Override the output SDC file path",
     completer=Cmd.path_complete,
+)
+export_sdc_parser.add_argument(
+    "--fvs-single-max",
+    type=int,
+    default=FVS_SINGLE_MAX,
+    help=(
+        "Strongly connected components up to this size are reduced one vertex "
+        f"per round (default: {FVS_SINGLE_MAX})"
+    ),
+)
+export_sdc_parser.add_argument(
+    "--fvs-batch-fraction",
+    type=float,
+    default=FVS_BATCH_FRACTION,
+    help=(
+        "Fraction of vertices removed per round from larger components "
+        f"(default: {FVS_BATCH_FRACTION})"
+    ),
 )
 
 
@@ -88,5 +110,10 @@ def do_export_sdc(self: "FABulous_CLI", args: argparse.Namespace) -> None:
             out = args.output / f"{name}_loop_break.sdc"
         else:
             out = args.output
-        export_tile_sdc(tile, out)
+        export_tile_sdc(
+            tile,
+            out,
+            single_max=args.fvs_single_max,
+            batch_fraction=args.fvs_batch_fraction,
+        )
         logger.info(f"Exported loop-break SDC to {out}")

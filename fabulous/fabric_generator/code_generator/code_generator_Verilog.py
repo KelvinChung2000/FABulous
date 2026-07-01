@@ -460,6 +460,34 @@ end
         inv = "~" if inverted else ""
         self._add(f"assign {left} = {inv}{right}[{widthL}:{widthR}];", indentLevel)
 
+    def addMuxAssign(
+        self,
+        output: str,
+        inputVector: str,
+        selectVector: str,
+        selectLow: int,
+        selectWidth: int,
+        delay: int = 0,
+        indentLevel: int = 0,
+    ) -> None:
+        """Assign a behavioral mux output using a Verilog vector index.
+
+        Args:
+            output: Signal driven with the selected input
+            inputVector: Concatenated mux inputs being indexed
+            selectVector: Vector holding the select bits
+            selectLow: Index of the lowest select bit
+            selectWidth: Number of select bits
+            delay: Assignment delay
+            indentLevel: The indentation level
+        """
+        if selectWidth == 1:
+            index = f"{selectVector}[{selectLow}]"
+        else:
+            index = f"{selectVector}[{selectLow + selectWidth - 1}:{selectLow}]"
+        delayStr = f"#{delay} " if delay else ""
+        self._add(f"assign {delayStr}{output} = {inputVector}[{index}];", indentLevel)
+
     def addPreprocIfDef(self, macro: str, indentLevel: int = 0) -> None:
         """Add an `ifdef` preprocessor directive.
 

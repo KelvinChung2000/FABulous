@@ -1,3 +1,4 @@
+(simulation-setup)=
 # Simulation setup
 
 FABulous provides a simulation environment to validate that the generated

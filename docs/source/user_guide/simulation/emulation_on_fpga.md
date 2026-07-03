@@ -44,8 +44,8 @@ host bitstream (Vivado)          user-design bitstream (FABulous)
   loaded once, over JTAG           streamed at runtime, over UART
          │                                   │
          ▼                                   ▼
-  ┌──────────────────────── Nexys Video (host FPGA) ───────────────────────┐
-  │   top.v  (clock wizard, reset, UART Rx, switch/LED wiring)             │
+  ┌──────────────────────── Nexys Video (host FPGA) ──────────────────────┐
+  │   top.v  (clock wizard, reset, UART Rx, switch/LED wiring)            │
   │     └── eFPGA_top  (the FABulous fabric)                              │
   │           ├── eFPGA_Config  (config_UART -> ConfigFSM -> frames)      │
   │           └── tile array     (LUT4AB, RegFile, BRAM, IO, ...)         │
@@ -111,12 +111,12 @@ port through `eFPGA_Config`, and the fabric's `ReceiveLED` is brought out to a
 board LED so you can see configuration traffic. The relevant configuration ports
 exposed by `eFPGA_Config` are:
 
-| Port          | Direction | Role                                                        |
-|---------------|-----------|-------------------------------------------------------------|
-| `Rx`          | in        | UART serial input — this is what `board.py` drives          |
-| `s_clk`/`s_data` | in     | Bit-bang serial config (unused in the UART flow)            |
-| `ReceiveLED`  | out       | Toggles while configuration data is being received          |
-| `ComActive`   | out       | High while a configuration transfer is in progress          |
+| Port             | Direction | Role                                                        |
+|------------------|-----------|-------------------------------------------------------------|
+| `Rx`             | in        | UART serial input — this is what `board.py` drives          |
+| `s_clk`/`s_data` | in        | Bit-bang serial config (unused in the UART flow)            |
+| `ReceiveLED`     | out       | Toggles while configuration data is being received          |
+| `ComActive`      | out       | High while a configuration transfer is in progress          |
 
 The fabric prioritizes configuration sources as **UART > bit-bang > parallel**,
 so wiring only `Rx` is sufficient for this flow.
@@ -170,11 +170,11 @@ pip install -r requirements.txt
 
 Useful options:
 
-| Flag              | Default | Meaning                                        |
-|-------------------|---------|------------------------------------------------|
-| `-i DEVICE_ID`    | —       | Select a specific board by serial/device id    |
-| `-v`              | off     | Verbose progress output                        |
-| (VID/PID/baud)    | `0403` / `6014` / `57600` | FTDI USB-UART identity and bit rate |
+| Flag              | Default                   | Meaning                                        |
+|-------------------|---------------------------|------------------------------------------------|
+| `-i DEVICE_ID`    | —                         | Select a specific board by serial/device id    |
+| `-v`              | off                       | Verbose progress output                        |
+| (VID/PID/baud)    | `0403` / `6014` / `57600` | FTDI USB-UART identity and bit rate            |
 
 The configuration-receive LED (`led[1]` in the demo) toggles while the bitstream
 is being received. When the upload finishes, the fabric holds the mapped design.

@@ -35,6 +35,9 @@ from fabulous.fabric_definition.fabric import Fabric
 from fabulous.fabric_definition.supertile import SuperTile
 from fabulous.fabric_definition.tile import Tile
 from fabulous.fabric_generator.code_generator import CodeGenerator
+from fabulous.fabric_generator.code_generator.code_generator_VHDL import (
+    VHDLCodeGenerator,
+)
 from fabulous.fabric_generator.gds_generator.flows.fabric_macro_flow import (
     FABulousFabricMacroFlow,
     FABulousFabricVHDLMacroFlow,

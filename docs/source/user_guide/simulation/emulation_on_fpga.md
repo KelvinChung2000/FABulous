@@ -107,9 +107,12 @@ the clocking wizard reports `locked`, so the fabric is not clocked before its
 PLL is stable.
 
 **Configuration link.** The board's UART receive line drives the fabric's `Rx`
-port through `eFPGA_Config`, and the fabric's `ReceiveLED` is brought out to a
-board LED so you can see configuration traffic. The relevant configuration ports
-exposed by `eFPGA_Config` are:
+port through `eFPGA_Config`, and the fabric's `ReceiveLED` is brought out to a board LED.
+If it will be solid on during the bitstream transmission and blink when there is no transmission,
+so you can see if the config logic receives a bitstream. This is useful for debugging something
+like a baud rate mismatch.
+
+The relevant configuration ports exposed by `eFPGA_Config` are:
 
 | Port             | Direction | Role                                                        |
 |------------------|-----------|-------------------------------------------------------------|

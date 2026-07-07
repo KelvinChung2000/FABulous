@@ -1,4 +1,11 @@
+(emulation-setup)=
 # Emulation setup
+
+:::{note}
+This page describes *hardwired-bitstream* emulation. For running the fabric on a
+board with its configuration port intact and reprogramming it over UART at
+runtime, see [Emulating a fabric on a commercial FPGA](#emulation-on-fpga).
+:::
 
 :::{note}
 The emulation functionality is implemented but needs more testing.

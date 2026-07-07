@@ -24,6 +24,10 @@ on:
       - ".github/workflows/pytest_testing.yml"
       - ".github/actions/**"
   merge_group:
+  # The full Nix-devshell suite only runs on this nightly schedule; push/PR
+  # runs stay container-only.
+  schedule:
+    - cron: "0 2 * * *"
 
 # copy and modified based on https://github.com/jerry-git/pytest-split/issues/20#issuecomment-2576031836
 
@@ -69,9 +73,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # Run the same split in both the apt/oss-cad-suite container env and the
-        # Nix devshell so behavioural drift between them is caught per-PR.
-        environment: [container, nix]
+        # Push/PR runs use only the fast apt/oss-cad-suite container env. The
+        # slower Nix devshell is added on the nightly schedule.
+        environment: ${{ github.event_name == 'schedule' && fromJSON('["container", "nix"]') || fromJSON('["container"]') }}
         job-index: [1, 2, 3, 4, 5, 6, 7, 8]
     steps:
       # These two steps will be executed only when there IS a cache hit (exact match or not).
@@ -290,3 +294,52 @@ jobs:
         run: |
           echo "Enforcing coverage threshold: ${COVERAGE_FAIL_UNDER}%"
           coverage report --fail-under=${COVERAGE_FAIL_UNDER}
+
+  notify_nightly_failure:
+    name: Report nightly failure
+    needs: pytest_testing
+    # Only the nightly schedule needs an out-of-band report; push/PR failures
+    # are already visible as checks on the triggering commit.
+    if: failure() && github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Prepare failure issue body
+        id: failure_body
+        shell: bash
+        run: |
+          DATE=$(date -u +%Y-%m-%d)
+          RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+
+          echo "title=Nightly pytest suite failed - ${DATE}" >> "$GITHUB_OUTPUT"
+
+          {
+            echo 'body<<ISSUE_BODY_EOF'
+            cat <<EOF
+          ## Nightly pytest suite failed
+
+          The scheduled full test run (container + Nix devshell) failed.
+
+          **Workflow Run:** ${RUN_URL}
+
+          ### Action Items
+          - [ ] Check which matrix leg failed (\`container\` vs \`nix\`) in the run above
+          - [ ] If only \`nix\` failed, look for devshell / flake drift against the container env
+
+          ---
+          *Automatically created by the nightly pytest workflow*
+          EOF
+            echo 'ISSUE_BODY_EOF'
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Create issue on failure
+        uses: ./.github/actions/create_failure_issue
+        with:
+          title: ${{ steps.failure_body.outputs.title }}
+          body: ${{ steps.failure_body.outputs.body }}
+          labels: nightly-failure,ci
+          github_token: ${{ secrets.GITHUB_TOKEN }}

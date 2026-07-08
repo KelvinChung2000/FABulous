@@ -170,9 +170,6 @@ DEP002 = ["go-task-bin", "FABulous-bit-gen"]
 [tool.deptry.package_module_name_map]
 FABulous-bit-gen = "FABulous_bit_gen"
 
-[tool.uv]
-override-dependencies = ["rich>=15.0.0"]
-
 [tool.uv.sources]
 sdf-timing = { git = "https://github.com/FPGA-Research/f4pga-sdf-timing.git" }
 

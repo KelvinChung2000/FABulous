@@ -19,6 +19,30 @@ if TYPE_CHECKING:
     from fabulous.fabric_definition.configmem import ConfigMem
 
 
+def border_rows_have_config_bits(fabric: Fabric) -> bool:
+    """Check whether the top or bottom fabric row holds any config bits.
+
+    Parameters
+    ----------
+    fabric : Fabric
+        The fabric object whose border rows are inspected.
+
+    Returns
+    -------
+    bool
+        True if any tile in the top or bottom row has configuration bits.
+    """
+    if not fabric.tile:
+        return False
+
+    border_rows = (fabric.tile[0], fabric.tile[-1])
+    return any(
+        tile is not None and tile.globalConfigBits > 0
+        for row in border_rows
+        for tile in row
+    )
+
+
 def generateBitstreamSpec(fabric: Fabric) -> dict[str, dict]:
     """Generate the fabric's bitstream specification.
 
@@ -48,7 +72,7 @@ def generateBitstreamSpec(fabric: Fabric) -> dict[str, dict]:
             "FrameSelectWidth": fabric.frameSelectWidth,
             "DesyncBit": fabric.desync_flag,
             "SyncHeaderHex": fabric.syncHeaderHex,
-            "IncludeBorderRows": False,  # Currently not supported in FABulous
+            "IncludeBorderRows": border_rows_have_config_bits(fabric),
             "FABulousVersion": version("FABulous-FPGA"),
         },
     }

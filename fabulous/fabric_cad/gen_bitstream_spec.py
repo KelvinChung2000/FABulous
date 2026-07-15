@@ -13,7 +13,6 @@ from loguru import logger
 
 from fabulous.fabric_definition.fabric import Fabric
 from fabulous.fabric_generator.parser.parse_configmem import parseConfigMem
-from fabulous.fabric_generator.parser.parse_switchmatrix import parseList, parseMatrix
 from fabulous.fabulous_settings import get_context
 
 if TYPE_CHECKING:
@@ -69,13 +68,11 @@ def generateBitstreamSpec(fabric: Fabric) -> dict[str, dict]:
             if tile is None:
                 continue
             if "fabric.csv" in str(tile.tileDir):
-                # backward compatibility for old project structure
-                # We need to take the matrixDir from the tile, since there
-                # is the actual path to the tile defined in the fabric.csv
-                if tile.matrixDir.is_file():
-                    configMemPath = tile.matrixDir.parent / f"{tile.name}_ConfigMem.csv"
-                elif tile.matrixDir.is_dir():
-                    configMemPath = tile.matrixDir / f"{tile.name}_ConfigMem.csv"
+                # Backward compat: in the old fabric.csv-embedded layout the
+                # tile's real location comes from its switch-matrix file path.
+                matrix_file = tile.switch_matrix.matrix_file
+                if matrix_file.is_file():
+                    configMemPath = matrix_file.parent / f"{tile.name}_ConfigMem.csv"
                 else:
                     configMemPath = (
                         get_context().proj_dir
@@ -149,13 +146,7 @@ def generateBitstreamSpec(fabric: Fabric) -> dict[str, dict]:
                                 ] = {encodeDict[curBitOffset + v]: keyDict[entry][v]}
                             curBitOffset += len(keyDict[entry])
 
-            # All the generation will be working on the tile level with the tileDic
-            # This is added to propagate the updated switch matrix to each of the tile
-            # in the fabric
-            if tile.matrixDir.suffix == ".list":
-                tile.matrixDir = tile.matrixDir.with_suffix(".csv")
-
-            result = parseMatrix(tile.matrixDir, tile.name)
+            result = tile.switch_matrix.connections
             for source, sinkList in result.items():
                 controlWidth = 0
                 for i, sink in enumerate(reversed(sinkList)):
@@ -193,17 +184,17 @@ def generateBitstreamSpec(fabric: Fabric) -> dict[str, dict]:
     # slicing. The BEL and switch-matrix features are added to the master tile's
     # TileSpecs entry alongside the master tile's own features.
     st_bel_count: dict[tuple[int, int], int] = {}
-    for superTile in fabric.superTileDic.values():
-        if not superTile.bels and superTile.supertile_matrix_dir is None:
+    for super_tile in fabric.superTileDic.values():
+        if not super_tile.bels and super_tile.supertile_matrix_dir is None:
             continue
 
-        st_config_bits = superTile.total_config_bits
+        st_config_bits = super_tile.total_config_bits
 
         st_encode_dict = [-1] * (fabric.maxFramesPerCol * fabric.frameBitsPerRow)
         st_mask_dic: dict[int, str] = {}
         if st_config_bits > 0:
             st_config_mem_list = parseConfigMem(
-                superTile.tileDir.parent / f"{superTile.name}_ConfigMem.csv",
+                super_tile.tileDir.parent / f"{super_tile.name}_ConfigMem.csv",
                 fabric.maxFramesPerCol,
                 fabric.frameBitsPerRow,
                 st_config_bits,
@@ -217,17 +208,12 @@ def generateBitstreamSpec(fabric: Fabric) -> dict[str, dict]:
                         ) + fabric.frameBitsPerRow * cfm.frameIndex
 
         sm_connections: dict[str, list[str]] = {}
-        if superTile.supertile_matrix_dir is not None:
-            mat_path = superTile.supertile_matrix_dir
-            if mat_path.suffix == ".list":
-                for dest, src in parseList(mat_path):
-                    sm_connections.setdefault(dest, []).append(src)
-            else:
-                sm_connections = parseMatrix(mat_path, superTile.name)
+        if super_tile.switch_matrix is not None:
+            sm_connections = super_tile.switch_matrix.connections
 
-        tx_local, ty_local = superTile.get_master_tile_coords()
+        tx_local, ty_local = super_tile.get_master_tile_coords()
 
-        for base_fx, base_fy, _ in fabric.iter_super_tile_placements(superTile):
+        for base_fx, base_fy, _ in fabric.iter_super_tile_placements(super_tile):
             ftx = base_fx + tx_local
             fty = base_fy + ty_local
             master_tile = fabric.tile[fty][ftx]
@@ -269,7 +255,7 @@ def generateBitstreamSpec(fabric: Fabric) -> dict[str, dict]:
 
             bel_coord = (ftx, fty)
             bel_offset = len(master_tile.bels) + st_bel_count.get(bel_coord, 0)
-            for i, bel in enumerate(superTile.bels):
+            for i, bel in enumerate(super_tile.bels):
                 letter = string.ascii_uppercase[bel_offset + i]
                 for featureKey, keyDict in bel.belFeatureMap.items():
                     for entry in keyDict:
@@ -281,6 +267,6 @@ def generateBitstreamSpec(fabric: Fabric) -> dict[str, dict]:
                                     st_encode_dict[curBitOffset + v]: keyDict[entry][v]
                                 }
                         curBitOffset += len(keyDict[entry])
-            st_bel_count[bel_coord] = bel_offset + len(superTile.bels)
+            st_bel_count[bel_coord] = bel_offset + len(super_tile.bels)
 
     return specData

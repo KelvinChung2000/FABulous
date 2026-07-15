@@ -16,6 +16,7 @@ import numpy as np
 import pytest
 
 from fabulous.fabric_definition.fabric import Fabric
+from fabulous.fabric_definition.switch_matrix import SwitchMatrix
 from fabulous.fabric_definition.tile import Tile
 from fabulous.fabric_generator.gds_generator.steps.fabric_area_opt import (
     FabricAreaOptimisation,
@@ -357,7 +358,7 @@ def _make_tile(name: str) -> Tile:
         ports=[],
         bels=[],
         tileDir=Path(),
-        matrixDir=Path(),
+        switch_matrix=SwitchMatrix(matrix_file=Path(), connections={}),
         gen_ios=[],
         userCLK=False,
     )

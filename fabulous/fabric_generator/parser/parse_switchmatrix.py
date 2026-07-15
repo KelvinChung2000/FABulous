@@ -10,32 +10,40 @@ from collections import defaultdict
 from pathlib import Path
 from typing import Literal, overload
 
+from loguru import logger
+
 from fabulous.custom_exception import (
     InvalidListFileDefinition,
     InvalidSwitchMatrixDefinition,
 )
 
 
-def parseMatrix(fileName: Path, tileName: str) -> dict[str, list[str]]:
+def parseMatrix(
+    fileName: Path, preserve_list_order: bool = False
+) -> dict[str, list[str]]:
     """Parse the matrix CSV into a dictionary from destination to source.
 
-    Any non-zero integer denotes a configurable connection; the integer
-    encodes the mux input position (higher = earlier, i.e. rightmost
-    `.list` entry → `A0`, MSB-first). Sort by (-value, column) so all-`1`
-    rows fall back to CSV-column order via the column-index secondary key.
+    A non-zero cell denotes a configurable connection. When
+    `preserve_list_order` is set, the cell's integer encodes the mux input
+    position (higher = earlier, MSB-first) and that order is kept; when unset,
+    every connection is treated as a plain `1` so the inputs fall back to
+    CSV-column order (legacy behaviour). Both sort by `(-value, column)`.
+
+    The top-left header cell is a label only (conventionally the tile name)
+    and is not validated: the mux-input columns are `header[1:]`.
 
     Parameters
     ----------
     fileName : Path
         Directory of the matrix CSV file.
-    tileName : str
-        Name of the tile needed to be parsed.
+    preserve_list_order : bool, optional
+        Keep the cell-encoded mux-input order when True; otherwise treat every
+        connection as `1` and use CSV-column order. Defaults to False.
 
     Raises
     ------
     InvalidSwitchMatrixDefinition
-        Non matching matrix file content and tile name, or a non-integer
-        cell value in a row.
+        A non-integer cell value in a row.
 
     Returns
     -------
@@ -47,12 +55,6 @@ def parseMatrix(fileName: Path, tileName: str) -> dict[str, list[str]]:
         lines = re.sub(r"#.*", "", f.read()).split("\n")
 
     header = lines[0].split(",")
-    if header[0] != tileName:
-        raise InvalidSwitchMatrixDefinition(
-            f"{path} {header} {tileName}\n"
-            "Tile name (top left element) in csv file does not match tile name "
-            "in tile object"
-        )
     dest_list = header[1:]
 
     connections: dict[str, list[str]] = {}
@@ -74,7 +76,8 @@ def parseMatrix(fileName: Path, tileName: str) -> dict[str, list[str]]:
                     f"cell value {stripped!r}"
                 ) from exc
             if value != 0 and k < len(dest_list):
-                items.append((value, k, dest_list[k]))
+                sort_value = value if preserve_list_order else 1
+                items.append((sort_value, k, dest_list[k]))
         items.sort(key=lambda x: (-x[0], x[1]))
         connections[port_name] = [d for _, _, d in items]
     return connections
@@ -200,6 +203,11 @@ def parseList(
         pairs.extend(zip(expanded_sources, expanded_sinks, strict=True))
 
     unique_pairs = list(dict.fromkeys(pairs))
+    if len(unique_pairs) != len(pairs):
+        logger.warning(
+            f"{path.name}: ignoring {len(pairs) - len(unique_pairs)} duplicate "
+            "connection(s)"
+        )
 
     if collect == "source":
         grouped: defaultdict[str, list[str]] = defaultdict(list)

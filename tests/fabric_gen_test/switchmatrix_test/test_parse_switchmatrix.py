@@ -66,60 +66,46 @@ def test_expand_list_ports(
 
 
 @pytest.mark.parametrize(
-    ("content", "tile_name", "expected_result", "expected_error"),
+    ("content", "expected_result", "expected_error"),
     [
         pytest.param(
             "MyTile,DEST0,DEST1\nSRC0,1,0\nSRC1,0,1\n",
-            "MyTile",
             {"SRC0": ["DEST0"], "SRC1": ["DEST1"]},
             None,
             id="basic_connections",
         ),
         pytest.param(
             "T,D0,D1,D2\nSRC,1,0,1\n",
-            "T",
             {"SRC": ["D0", "D2"]},
             None,
             id="multiple_destinations_per_source",
         ),
         pytest.param(
             "T,D0,D1\nSRC,0,0\n",
-            "T",
             {"SRC": []},
             None,
             id="no_connections",
         ),
         pytest.param(
             "T,D0 # header comment\nSRC,1 # row comment\n",
-            "T",
             None,
             None,
             id="comments_stripped",
         ),
         pytest.param(
             "T,D0\n\nSRC,1\n\n",
-            "T",
             None,
             None,
             id="blank_lines_skipped",
         ),
         pytest.param(
-            "WrongTile,D0\nSRC,1\n",
-            "MyTile",
-            None,
-            InvalidSwitchMatrixDefinition,
-            id="tile_name_mismatch",
-        ),
-        pytest.param(
             "T,D0,D1,D2,D3\nSRC,1,2,3,4\n",
-            "T",
             {"SRC": ["D3", "D2", "D1", "D0"]},
             None,
             id="preserve_order_msb_first",
         ),
         pytest.param(
             "T,D0,D1,D2\nSRC,0,foo,1\n",
-            "T",
             None,
             InvalidSwitchMatrixDefinition,
             id="non_integer_cell_value",
@@ -129,23 +115,39 @@ def test_expand_list_ports(
 def test_parse_matrix(
     tmp_path: Path,
     content: str,
-    tile_name: str,
     expected_result: dict | None,
     expected_error: type | None,
 ) -> None:
-    """Test parseMatrix for valid connection parsing and error conditions."""
+    """Test parseMatrix with preserve_list_order, honouring the cell encoding.
+
+    The parametrized cases encode mux-input positions, so they are read with
+    `preserve_list_order=True`; the legacy (treat-as-1, column-order) read is
+    covered separately in `test_parse_matrix_legacy_column_order`.
+    """
     f = tmp_path / "tile_matrix.csv"
     f.write_text(content)
 
     if expected_error:
         with pytest.raises(expected_error):
-            parseMatrix(f, tile_name)
+            parseMatrix(f, preserve_list_order=True)
     else:
-        result = parseMatrix(f, tile_name)
+        result = parseMatrix(f, preserve_list_order=True)
         if expected_result is not None:
             assert result == expected_result
         else:
             assert isinstance(result, dict)
+
+
+def test_parse_matrix_legacy_column_order(tmp_path: Path) -> None:
+    """Without preserve_list_order, every entry is treated as 1 (column order)."""
+    f = tmp_path / "m.csv"
+    # Cell magnitudes would put SRC in D3..D0 order, but the legacy read ignores
+    # them and returns the mux inputs in CSV-column order instead.
+    f.write_text("T,D0,D1,D2,D3\nSRC,1,2,3,4\n")
+    assert parseMatrix(f, preserve_list_order=False) == {
+        "SRC": ["D0", "D1", "D2", "D3"]
+    }
+    assert parseMatrix(f, preserve_list_order=True) == {"SRC": ["D3", "D2", "D1", "D0"]}
 
 
 @pytest.mark.parametrize(
@@ -248,6 +250,16 @@ def test_parse_list(
             parseList(main_file, collect)
     else:
         assert parseList(main_file, collect) == expected_result
+
+
+def test_parse_list_warns_on_duplicates(
+    tmp_path: Path, caplog: pytest.LogCaptureFixture
+) -> None:
+    """Duplicate connections are de-duplicated but reported."""
+    f = tmp_path / "dup.list"
+    f.write_text("A,B\nA,C\nA,B\n")
+    assert parseList(f, "pair") == [("A", "B"), ("A", "C")]
+    assert "ignoring 1 duplicate" in caplog.text
 
 
 class TestParseSJumpPortLine:

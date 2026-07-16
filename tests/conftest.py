@@ -12,6 +12,7 @@ import fabulous.fabulous
 import fabulous.fabulous_settings
 from fabulous.fabric_definition.bel import Bel
 from fabulous.fabric_definition.define import IO, Direction, HDLType, Side
+from fabulous.fabric_definition.fabric import Fabric
 from fabulous.fabric_definition.port import Port
 from fabulous.fabric_definition.switch_matrix import SwitchMatrix
 from fabulous.fabric_definition.tile import Tile
@@ -53,18 +54,23 @@ def make_empty_tile(
     tileDir: Path = Path(),
     matrixDir: Path = Path(),
     pinOrderConfig: dict | None = None,
+    config_bits: int = 0,
 ) -> Tile:
     """Build a minimal Tile usable inside a SuperTile.tileMap.
 
     Passing `pinOrderConfig={}` skips the GDS pin-order import; the `None`
     default preserves the original behaviour for callers that don't care.
+    `config_bits` sets the switch matrix's declared config-bit count so the
+    tile reports it via `globalConfigBits`.
     """
     return Tile(
         name=name,
         ports=ports or [],
         bels=[],
         tileDir=tileDir,
-        switch_matrix=SwitchMatrix(matrix_file=matrixDir, connections={}),
+        switch_matrix=SwitchMatrix(
+            matrix_file=matrixDir, connections={}, hdl_config_bits=config_bits or None
+        ),
         gen_ios=[],
         userCLK=False,
         pinOrderConfig=pinOrderConfig,
@@ -159,6 +165,37 @@ def normalize_and_check_for_errors(caplog_text: str) -> list[str]:
     log = normalize(caplog_text)
     assert not any("ERROR" in line for line in log), "Error found in log messages"
     return log
+
+
+def make_fabric_from_grid(grid: list[list[Tile | None]]) -> Fabric:
+    """Build a real Fabric from a row-major grid of Tile/None positions.
+
+    `numberOfRows`/`numberOfColumns` are derived from the grid shape and
+    `tileDic`` gets one entry per distinct tile name, so the fabric behaves
+    like a CSV-parsed one without going through the parser.
+
+    Parameters
+    ----------
+    grid : list[list[Tile | None]]
+        Row-major tile placement; `None` marks an empty (NULL) cell.
+
+    Returns
+    -------
+    Fabric
+        A real Fabric populated from the grid.
+    """
+    tile_dic: dict[str, Tile] = {}
+    for row in grid:
+        for tile in row:
+            if tile is not None:
+                tile_dic.setdefault(tile.name, tile)
+    return Fabric(
+        fabric_dir=Path("/tmp"),
+        tile=grid,
+        numberOfRows=len(grid),
+        numberOfColumns=len(grid[0]) if grid else 0,
+        tileDic=tile_dic,
+    )
 
 
 @pytest.fixture(autouse=True)

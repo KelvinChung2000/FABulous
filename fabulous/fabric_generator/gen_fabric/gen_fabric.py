@@ -14,7 +14,6 @@ Key features:
 """
 
 from collections.abc import Generator
-from pathlib import Path
 
 from fabulous.fabric_definition.define import IO, ConfigBitMode, Direction
 from fabulous.fabric_definition.fabric import Fabric
@@ -139,21 +138,24 @@ def generateFabric(writer: CodeGenerator, fabric: Fabric) -> None:
     writer.addNewLine()
 
     if isinstance(writer, VHDLCodeGenerator):
-        added = set()
-        for t in fabric.tileDic:
-            name = t.split("_")[0]
-            if name in added:
+        # Declare a component per entity the fabric body instantiates: regular
+        # tiles by their own name, supertiles by the wrapper name. Subtiles are
+        # instantiated inside the wrapper, not the fabric, so they are skipped.
+        # Every tile HDL lives at Tile/<name>/<name>.vhdl under the project root
+        # (fabric_dir is the fabric.csv, so its parent is that root). This is
+        # correct for both per-tile CSVs and the legacy inline fabric.csv, where
+        # every tileDir is the fabric.csv itself rather than a per-tile directory.
+        tileRoot = fabric.fabric_dir.parent / "Tile"
+        for tile in fabric.tileDic.values():
+            if tile.partOfSuperTile:
                 continue
-            if name not in fabric.superTileDic:
-                writer.addComponentDeclarationForFile(
-                    f"{Path(writer.outFileName).parent.parent}/Tile/{t}/{t}.vhdl"
-                )
-                added.add(t)
-            else:
-                writer.addComponentDeclarationForFile(
-                    f"{Path(writer.outFileName).parent.parent}/Tile/{name}/{name}.vhdl"
-                )
-                added.add(name)
+            writer.addComponentDeclarationForFile(
+                str(tileRoot / tile.name / f"{tile.name}.vhdl")
+            )
+        for superTile in fabric.superTileDic.values():
+            writer.addComponentDeclarationForFile(
+                str(tileRoot / superTile.name / f"{superTile.name}.vhdl")
+            )
 
     # VHDL signal declarations
     writer.addComment("signal declarations", onNewLine=True, end="\n")

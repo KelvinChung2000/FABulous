@@ -282,6 +282,8 @@ MATRIX,   LUT4AB_switch_matrix.list
 EndTILE
 ```
 
+A tile description is built from the `INCLUDE`, `NORTH`/`EAST`/`SOUTH`/`WEST`/`JUMP`, `BEL`, `GEN_IO`, `MATRIX` and `CONFIGMEM` keywords. Only `MATRIX` is mandatory; `CONFIGMEM` is described in [configuration memory](#configuration-memory) and the rest in the subsections below.
+
 The `INCLUDE` keyword specifies a path to another tile configuration, and the configuration in that file will be added. The
 entry within the target path will be appended to the file. For example if `../include/Base.csv` contains:
 
@@ -631,6 +633,68 @@ To simplify the definition of fabrics, the provided FABulous reference fabrics h
 The provided switch matrices can be easily reused in new custom tiles (it is standard to have mostly identical switch matrices throughout an FPGA fabric, even if resources (LUTs, BRAMs, DSPs) differ).
 Moreover, downstripping the routing fabric is easily possible by removing wires and connections.
 :::
+
+(configuration-memory)=
+
+### Configuration memory
+
+Every tile with configuration bits gets a `<tile_descriptor>_ConfigMem` module that holds
+those bits and presents them to the switch matrix and the {ref}`primitives`. Two artefacts
+describe it:
+
+- the _mapping CSV_ `<tile_descriptor>_ConfigMem.csv`, which says which configuration bit
+  lands in which frame and bit position (see [bitstream remapping](#bitstream-remapping)), and
+- the _RTL_ itself, which FABulous generates from that mapping.
+
+By default neither needs to be mentioned in the tile CSV: FABulous looks for the mapping
+CSV next to the tile CSV, generates a default enumerated mapping if it is absent, and
+generates the RTL from it.
+
+The optional `CONFIGMEM` keyword overrides that. Like `MATRIX`, the file suffix selects
+the mode, and the path is resolved relative to the tile CSV:
+
+```{code-block} text
+:emphasize-lines: 4
+
+TILE, LUT4AB
+BEL,        LUT4c_frame_config_OQ.vhdl,  LA_
+MATRIX,     LUT4AB_switch_matrix.list
+CONFIGMEM,  LUT4AB_ConfigMem.csv
+EndTILE
+```
+
+| Entry | Meaning |
+| --- | --- |
+| _no `CONFIGMEM` line_ | The mapping CSV is taken from its conventional location beside the tile CSV. This is the default and no existing fabric needs changing. |
+| `<path>.csv` | Use this file as the mapping CSV. It need not exist yet; FABulous writes a default enumerated mapping if it is missing. |
+| `<path>.v`, `.sv`, `.vhd`, `.vhdl` | The tile's `<tile_descriptor>_ConfigMem` module is supplied by this file. FABulous generates **no** configuration-memory RTL for the tile. |
+| `NULL` | The tile has no configuration memory. Only valid for a tile with zero configuration bits. |
+
+#### Supplying your own configuration memory
+
+Naming an HDL file is how user hardware is placed in the configuration-memory path — for
+example a checksum over the configuration bits, an ECC scrubber, or a write lock. FABulous
+steps out of the way and the file becomes the tile's configuration memory, so a few things
+become your responsibility:
+
+- The module must be named `<tile_descriptor>_ConfigMem`. The tile instantiates that name
+  either way, so nothing else in the generated fabric changes.
+- Its port list must match what the tile expects: `FrameData`, `FrameStrobe`, `ConfigBits`
+  and `ConfigBits_N`, with the widths the fabric's `FrameBitsPerRow`, `MaxFramesPerCol`
+  and the tile's configuration-bit count imply.
+- **The mapping CSV still drives the bitstream.** `gen_bitStream_spec` reads it whether or
+  not FABulous generated the RTL, so the two must agree. If your module stores a bit
+  somewhere other than where the mapping CSV says, the fabric is misprogrammed and nothing
+  will report it.
+- Keep the file in step with the tile. If the tile's configuration-bit count later changes,
+  FABulous cannot update a file it does not generate.
+
+The same caveats apply as for a hand-written switch matrix, and FABulous emits a warning at
+parse time naming the file so the substitution is visible in the log.
+
+An HDL file must exist when the tile CSV is parsed — unlike the mapping CSV, nothing
+generates it on demand, so a mistyped path is reported as an error rather than silently
+leaving the tile without a configuration memory.
 
 (primitives)=
 
@@ -1038,6 +1102,8 @@ The prefix removal is case-insensitive (`fab_attr_FF`, `FAB_ATTR_ff`, and
 
 (bitstream)=
 
+(bitstream-remapping)=
+
 ### Bitstream remapping
 
 FABulous will take care when implementing the configuration logic and bitstream encoding and the mapping of this into configuration bitstreams. This can be done automatically.
@@ -1111,7 +1177,7 @@ frame18,     18,          0,         0000_0000_0000_0000_0000_0000_0000_0000,
 frame19,     19,          0,         0000_0000_0000_0000_0000_0000_0000_0000,
 ```
 
-FABulous will generate a default \<tile_descriptor>\_ConfigMem.csv, and users are not required to modify the \<tile_descriptor>\_ConfigMem.csv file. However, if FABulous finds a file called \<tile_descriptor>\_ConfigMem.csv before generating it, it will use the bitstream mapping provided instead. The following example shows the basic idea that was used to provide a human-readable bitstream encoding. It is not intended to understand the example in detail. The basic idea is to align configuration LUT function tables, settings and the switch matrix multiplexer encoding to be nibble aligned such that they are easy to find in a hex editor. For instance, in the example below, the first 8 frames are mostly encoding the LUTs where the 16 MSBs are the LUT tables and the next two nibbles are encoding a flop and carry-chain mode:
+FABulous will generate a default \<tile_descriptor>\_ConfigMem.csv, and users are not required to modify the \<tile_descriptor>\_ConfigMem.csv file. However, if FABulous finds a file called \<tile_descriptor>\_ConfigMem.csv before generating it, it will use the bitstream mapping provided instead. A tile can also point at a mapping file elsewhere with a `CONFIGMEM` line, described in [configuration memory](#configuration-memory). The following example shows the basic idea that was used to provide a human-readable bitstream encoding. It is not intended to understand the example in detail. The basic idea is to align configuration LUT function tables, settings and the switch matrix multiplexer encoding to be nibble aligned such that they are easy to find in a hex editor. For instance, in the example below, the first 8 frames are mostly encoding the LUTs where the 16 MSBs are the LUT tables and the next two nibbles are encoding a flop and carry-chain mode:
 
 ```python
 frame_name, frame_index, bits_used_in_frame, used_bits_mask, ConfigBits_ranges

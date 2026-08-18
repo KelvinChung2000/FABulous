@@ -216,14 +216,18 @@ def generateTile(
             )
 
         if tile.globalConfigBits > 0:
-            if (basePath / f"{tile.name}_ConfigMem.vhdl").exists():
-                writer.addComponentDeclarationForFile(
-                    f"{basePath}/{tile.name}_ConfigMem.vhdl"
-                )
+            # A hand-written ConfigMem is never generated into basePath, so the
+            # component has to be read from the file the tile CSV named.
+            config_mem_vhdl = tile.config_mem.hdl_file or (
+                basePath / f"{tile.name}_ConfigMem.vhdl"
+            )
+            if config_mem_vhdl.exists():
+                writer.addComponentDeclarationForFile(str(config_mem_vhdl))
             else:
                 raise FileNotFoundError(
-                    f"Could not find {tile.name}_ConfigMem.vhdl in {basePath} "
-                    "config_mem generation first"
+                    f"Could not find {config_mem_vhdl.name} in "
+                    f"{config_mem_vhdl.parent} Need to run config_mem "
+                    "generation first"
                 )
 
     # signal declarations

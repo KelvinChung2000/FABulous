@@ -166,6 +166,10 @@ class FABulousTile(SequentialFlow):
             )
             for bel in concrete_tile.bels:
                 file_list.append(str(bel.src))
+            # Nothing was generated for a hand-written ConfigMem, so the user's
+            # file is the only source of that module.
+            if concrete_tile.config_mem.hdl_file is not None:
+                file_list.append(str(concrete_tile.config_mem.hdl_file))
 
         file_list.extend(str(f) for f in generated_files if f.exists())
         file_list = list(dict.fromkeys(file_list))
@@ -260,7 +264,8 @@ def _emit_regular_tile_verilog(
         writer,
         tile.name,
         tile.globalConfigBits,
-        tile_dir / f"{tile.name}_ConfigMem.csv",
+        tile.config_mem.mapping_csv,
+        hdl_file=tile.config_mem.hdl_file,
     )
     writer.outFileName = tile_dir / f"{tile.name}.v"
     generateTile(

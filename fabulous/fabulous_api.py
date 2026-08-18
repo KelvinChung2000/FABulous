@@ -182,32 +182,38 @@ class FABulous_API:
             matrix, matrix.stem, preserve_list_order=preserve_list_order
         ).to_list_file(listFile)
 
-    def genConfigMem(self, tileName: str, configMem: Path) -> None:
+    def gen_config_mem(self, tile_name: str, config_mem: Path | None = None) -> None:
         """Generate configuration memory for specified tile.
+
+        A tile that declares `CONFIGMEM,NULL` has no configuration memory, so
+        nothing is generated for it. A tile that declares HDL supplies its own
+        `<tile>_ConfigMem` module, so only its mapping CSV is written.
 
         Parameters
         ----------
-        tileName : str
+        tile_name : str
             Name of the tile for which configuration memory will be generated.
-        configMem : Path
-            File path where the configuration memory will be saved.
+        config_mem : Path | None, optional
+            Frame-to-bit mapping CSV to read. Defaults to the tile's own
+            `config_mem.mapping_csv`, which is the authoritative location.
 
         Raises
         ------
         ValueError
             If tile is not found in fabric.
         """
-        if tile := self.fabric.getTileByName(tileName):
+        if tile := self.fabric.getTileByName(tile_name):
             generateConfigMem(
                 self.writer,
                 tile.name,
                 tile.globalConfigBits,
-                configMem,
+                tile.config_mem.mapping_csv if config_mem is None else config_mem,
                 frame_bits_per_row=self.fabric.frameBitsPerRow,
                 max_frame_per_col=self.fabric.maxFramesPerCol,
+                hdl_file=tile.config_mem.hdl_file,
             )
         else:
-            raise ValueError(f"Tile {tileName} not found")
+            raise ValueError(f"Tile {tile_name} not found")
 
     def genSwitchMatrix(self, tileName: str) -> None:
         """Generate switch matrix RTL for the specified tile.
@@ -380,13 +386,10 @@ class FABulous_API:
         if tile := self.fabric.getSuperTileByName(tileName):
             mx, my = tile.get_master_tile_coords()
             master_tile = tile.tileMap[my][mx]
-            master_config_mem_csv = (
-                master_tile.tileDir.parent / f"{master_tile.name}_ConfigMem.csv"
-            )
             generate_super_tile_config_mem(
                 self.writer,
                 tile,
-                master_config_mem_csv,
+                master_tile.config_mem.mapping_csv,
                 frame_bits_per_row=self.fabric.frameBitsPerRow,
                 max_frame_per_col=self.fabric.maxFramesPerCol,
             )

@@ -2,6 +2,7 @@
 
 import re
 from copy import deepcopy
+from dataclasses import replace
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -15,6 +16,10 @@ from fabulous.custom_exception import (
     InvalidSupertileDefinition,
     InvalidSwitchMatrixDefinition,
     InvalidTileDefinition,
+)
+from fabulous.fabric_definition.config_mem_spec import (
+    ConfigMemSpec,
+    resolve_config_mem_spec,
 )
 from fabulous.fabric_definition.define import (
     IO,
@@ -223,6 +228,92 @@ def parse_port_line(line: str) -> tuple[list[TilePort], tuple[str, str] | None]:
     return (ports, common_wire_pair)
 
 
+CONFIG_MEM_NULL_TOKEN = "NULL"
+CONFIG_MEM_MAPPING_SUFFIX = ".csv"
+CONFIG_MEM_WRAPPER_SUFFIXES = (".v", ".sv", ".vhd", ".vhdl")
+
+
+def parse_config_mem_line(
+    entry: str, tile_name: str, tile_csv_dir: Path
+) -> ConfigMemSpec:
+    """Parse the payload of a `CONFIGMEM` line from a tile CSV.
+
+    The suffix decides the mode, the same rule `MATRIX` already follows. A
+    `.csv` entry names the frame-to-bit mapping file; the file need not exist,
+    because `generateConfigMem` writes a default enumerated mapping when it is
+    missing. An HDL entry names a file that provides `<tile>_ConfigMem`, so
+    FABulous generates no ConfigMem RTL for the tile; that file must exist,
+    since nothing writes it on demand. `NULL` states that the tile has no
+    configuration memory.
+
+    An HDL entry leaves `mapping_csv` unset: the mapping stays where convention
+    puts it, and `parseTilesCSV` fills it in once the tile's real directory is
+    known.
+
+    Parameters
+    ----------
+    entry : str
+        The field after `CONFIGMEM`: a path relative to the tile CSV's
+        directory, or `NULL`.
+    tile_name : str
+        Name of the tile being parsed, used in error messages.
+    tile_csv_dir : Path
+        Directory holding the tile CSV, which relative paths resolve against.
+
+    Raises
+    ------
+    InvalidTileDefinition
+        If the entry is empty, names an HDL file that does not exist, or has
+        any other unrecognised suffix.
+
+    Returns
+    -------
+    ConfigMemSpec
+        Spec pointing at the named mapping CSV, at the named HDL file, or with
+        `mapping_csv` set to None for `NULL`.
+    """
+    if not entry:
+        raise InvalidTileDefinition(
+            f"CONFIGMEM line in tile {tile_name} has no value. Give a path to a "
+            f"{CONFIG_MEM_MAPPING_SUFFIX} mapping file, or "
+            f"{CONFIG_MEM_NULL_TOKEN} for a tile without configuration memory."
+        )
+
+    if entry == CONFIG_MEM_NULL_TOKEN:
+        return ConfigMemSpec(mapping_csv=None)
+
+    path = tile_csv_dir.joinpath(entry)
+
+    if path.suffix == CONFIG_MEM_MAPPING_SUFFIX:
+        return ConfigMemSpec(mapping_csv=path)
+
+    if path.suffix in CONFIG_MEM_WRAPPER_SUFFIXES:
+        # Nothing writes this file on demand the way generateConfigMem writes a
+        # missing mapping CSV, so a typo here would silently leave the tile
+        # without a ConfigMem module at all.
+        if not path.is_file():
+            raise InvalidTileDefinition(
+                f"CONFIGMEM entry {entry!r} in tile {tile_name} names the HDL "
+                f"file {path}, which does not exist. FABulous does not generate "
+                "it; the file must be supplied."
+            )
+        logger.warning(
+            f"Configuration memory for tile {tile_name!r} is read from HDL "
+            f"{path.name}: FABulous generates NO {tile_name}_ConfigMem module "
+            "for this tile. The tile still instantiates that module name and "
+            "the mapping CSV still drives the bitstream, so you are "
+            "responsible for ensuring the HDL matches the tile's "
+            f"configuration-bit count and {tile_name}_ConfigMem.csv."
+        )
+        return ConfigMemSpec(mapping_csv=None, hdl_file=path)
+
+    raise InvalidTileDefinition(
+        f"CONFIGMEM entry {entry!r} in tile {tile_name} has unsupported suffix "
+        f"{path.suffix!r}. Give a {CONFIG_MEM_MAPPING_SUFFIX} mapping file "
+        f"or {CONFIG_MEM_NULL_TOKEN}."
+    )
+
+
 def parseTilesCSV(
     fileName: Path, preserve_list_order: bool = False
 ) -> tuple[list[Tile], list[tuple[str, str]]]:
@@ -262,35 +353,36 @@ def parseTilesCSV(
     if not fileName.exists():
         raise FileExistsError(f"File {fileName} does not exist.")
 
-    filePathParent = fileName.parent
+    file_path_parent = fileName.parent
 
     with fileName.open() as f:
         file = f.read()
         file = re.sub(r"#.*", "", file)
 
-    tilesData = re.findall(r"TILE(.*?)EndTILE", file, re.MULTILINE | re.DOTALL)
+    tiles_data = re.findall(r"TILE(.*?)EndTILE", file, re.MULTILINE | re.DOTALL)
 
     new_tiles = []
     common_wire_pairs = []
     proj_dir = get_context().proj_dir
 
     # Parse each tile config
-    for t in tilesData:
+    for t in tiles_data:
         t = t.split("\n")
-        tileName = t[0].split(",")[1].strip()
-        if filePathParent.name != tileName:
+        tile_name = t[0].split(",")[1].strip()
+        if file_path_parent.name != tile_name:
             logger.warning(
-                f"Tile name '{tileName}' does not match folder name "
-                f"'{filePathParent.name}' in {fileName}."
+                f"Tile name '{tile_name}' does not match folder name "
+                f"'{file_path_parent.name}' in {fileName}."
             )
         ports: list[TilePort] = []
         bels: list[Bel] = []
-        matrixDir: Path | None = None
+        matrix_dir: Path | None = None
+        config_mem: ConfigMemSpec | None = None
         gen_ios: list[Gen_IO] = []
-        withUserCLK = False
-        genMatrixList = False
-        tileCarry: dict[str, dict[IO, str]] = {}
-        localSharedPorts: dict[str, list[TilePort]] = {}
+        with_user_clk = False
+        gen_matrix_list = False
+        tile_carry: dict[str, dict[IO, str]] = {}
+        local_shared_ports: dict[str, list[TilePort]] = {}
 
         for item in t:
             temp: list[str] = item.split(",")
@@ -301,8 +393,8 @@ def parseTilesCSV(
                 port, common_wire_pair = parse_port_line(item)
                 if "CARRY" in temp[6]:
                     # For prefix after carry
-                    carryPrefix = re.search(r'CARRY="([^"]+)"', temp[6])
-                    if not carryPrefix:
+                    carry_prefix = re.search(r'CARRY="([^"]+)"', temp[6])
+                    if not carry_prefix:
                         if "=" in temp[6] and '"' not in temp[6]:
                             # Crude check if its defined as string string notation
                             logger.error(
@@ -314,37 +406,37 @@ def parseTilesCSV(
                             "CARRY port without prefix,"
                             "using default prefix FABulous_default"
                         )
-                        carryPrefix = "FABulous_default"
+                        carry_prefix = "FABulous_default"
                     else:
-                        carryPrefix = carryPrefix.group(1)
+                        carry_prefix = carry_prefix.group(1)
 
-                    if carryPrefix not in tileCarry:
-                        tileCarry[carryPrefix] = {}
-                        tileCarry[carryPrefix][IO.OUTPUT] = f"{temp[1]}0"
-                        tileCarry[carryPrefix][IO.INPUT] = f"{temp[4]}0"
+                    if carry_prefix not in tile_carry:
+                        tile_carry[carry_prefix] = {}
+                        tile_carry[carry_prefix][IO.OUTPUT] = f"{temp[1]}0"
+                        tile_carry[carry_prefix][IO.INPUT] = f"{temp[4]}0"
                     else:
                         raise InvalidPortType(
                             "There is already a carrychain "
-                            f"with the prefix {carryPrefix}"
+                            f"with the prefix {carry_prefix}"
                         )
                 if "SHARED_" in temp[6]:
                     if "JUMP" not in temp[0]:
                         raise InvalidTileDefinition(
                             "LOCAL SHARED_ Ports can only be used with JUMP ports."
                         )
-                    localShared = temp[6].split("_")[1]
-                    if localShared is None or localShared == "":
+                    local_shared = temp[6].split("_")[1]
+                    if local_shared is None or local_shared == "":
                         raise InvalidTileDefinition("SHARED_ cannot be empty.")
-                    if localShared not in ["RESET", "ENABLE"]:
+                    if local_shared not in ["RESET", "ENABLE"]:
                         raise InvalidTileDefinition(
-                            f"LOCAL SHARED_ port {localShared} is not supported. "
+                            f"LOCAL SHARED_ port {local_shared} is not supported. "
                             "Only SHARED_RESET and SHARED_ENABLE are supported."
                         )
-                    if localShared not in localSharedPorts:
-                        localSharedPorts[localShared] = port
+                    if local_shared not in local_shared_ports:
+                        local_shared_ports[local_shared] = port
                     else:
                         raise InvalidTileDefinition(
-                            f"LOCAL SHARED_ port {localShared} already exists."
+                            f"LOCAL SHARED_ port {local_shared} already exists."
                         )
 
                 ports.extend(port)
@@ -352,32 +444,32 @@ def parseTilesCSV(
                     common_wire_pairs.append(common_wire_pair)
 
             elif temp[0] == "BEL":
-                belFilePath = filePathParent.joinpath(temp[1])
+                bel_file_path = file_path_parent.joinpath(temp[1])
                 bel_prefix = temp[2] if len(temp) > 2 else ""
                 if (
                     temp[1].endswith(".vhdl")
                     or temp[1].endswith(".v")
                     or temp[1].endswith(".sv")
                 ):
-                    bels.append(parseBelFile(belFilePath, bel_prefix))
+                    bels.append(parseBelFile(bel_file_path, bel_prefix))
                 else:
                     raise InvalidFileType(
-                        f"File {belFilePath} is not a .vhdl, .v, or .sv file. "
+                        f"File {bel_file_path} is not a .vhdl, .v, or .sv file. "
                         "Please check the BEL file."
                     )
 
                 if "ADD_AS_CUSTOM_PRIM" in temp[3:]:
-                    primsFile = proj_dir.joinpath("user_design/custom_prims.v")
-                    logger.info(f"Adding bels to custom prims file: {primsFile}")
-                    addBelsToPrim(primsFile, [bels[-1]])
+                    prims_file = proj_dir.joinpath("user_design/custom_prims.v")
+                    logger.info(f"Adding bels to custom prims file: {prims_file}")
+                    addBelsToPrim(prims_file, [bels[-1]])
 
             elif temp[0] == "GEN_IO":
-                configBit = 0
-                configAccess = False
+                config_bit = 0
+                config_access = False
                 inverted = False
                 clocked = False
-                clockedComb = False
-                clockedMux = False
+                clocked_comb = False
+                clocked_mux = False
                 pins = int(temp[1])
                 if pins <= 0:
                     raise InvalidTileDefinition(
@@ -393,22 +485,22 @@ def parseTilesCSV(
                                 "CONFIGACCESS GEN_IO can only be used with OUTPUT, "
                                 f"but is {temp[2]}"
                             )
-                        if not configAccess and temp[2] != "OUTPUT":
+                        if not config_access and temp[2] != "OUTPUT":
                             raise InvalidTileDefinition(
                                 "CONFIGACCESS GEN_IO can only be used with OUTPUT, "
                                 f"but is {temp[2]}"
                             )
-                        configAccess = True
-                        configBit = int(temp[1])
+                        config_access = True
+                        config_bit = int(temp[1])
                     elif param == "INVERTED":
                         inverted = True
                     elif param == "CLOCKED":
                         clocked = True
                     elif param == "CLOCKED_COMB":
-                        clockedComb = True
+                        clocked_comb = True
                     elif param == "CLOCKED_MUX":
-                        clockedMux = True
-                        configBit = int(temp[1])
+                        clocked_mux = True
+                        config_bit = int(temp[1])
                     elif param is None or param == "":
                         continue
                     else:
@@ -418,11 +510,11 @@ def parseTilesCSV(
                             "CLOCKED_COMB, CLOCKED_MUX."
                         )
 
-                    if configAccess and (clocked or clockedComb or clockedMux):
+                    if config_access and (clocked or clocked_comb or clocked_mux):
                         raise InvalidTileDefinition(
                             "CONFIGACCESS GEN_IO can not be clocked"
                         )
-                    if sum([clocked, clockedComb, clockedMux]) > 1:
+                    if sum([clocked, clocked_comb, clocked_mux]) > 1:
                         raise InvalidTileDefinition(
                             "CLOCKED, CLOCKED_COMB or CLOCKED_MUX can not be combined "
                             "for one GEN_IO"
@@ -434,65 +526,75 @@ def parseTilesCSV(
                             temp[3],
                             int(temp[1]),
                             IO[temp[2]],
-                            configBit,
-                            configAccess,
+                            config_bit,
+                            config_access,
                             inverted,
                             clocked,
-                            clockedComb,
-                            clockedMux,
+                            clocked_comb,
+                            clocked_mux,
                         )
                     )
                 else:
                     raise InvalidTileDefinition(
                         f"GEN_IO with prefix {temp[3]} already exists in tile "
-                        f"{tileName}."
+                        f"{tile_name}."
                     )
             elif temp[0] == "MATRIX":
                 if "GENERATE" in temp:
-                    logger.info(f"Generating switch matrix list for tile {tileName}")
-                    genMatrixList = True
+                    logger.info(f"Generating switch matrix list for tile {tile_name}")
+                    gen_matrix_list = True
                     if len(temp) <= 2:
                         # only MATRIX, GENERATE in csv
-                        matrixDir = fileName.parent
+                        matrix_dir = fileName.parent
                     else:
-                        matrixDir = fileName.parent.joinpath(temp[2])
-                    if matrixDir.is_file() and matrixDir.suffix == ".list":
+                        matrix_dir = fileName.parent.joinpath(temp[2])
+                    if matrix_dir.is_file() and matrix_dir.suffix == ".list":
                         logger.warning(
-                            f"Matrix file {matrixDir} already exists and will be "
+                            f"Matrix file {matrix_dir} already exists and will be "
                             "overwritten."
                         )
-                    elif matrixDir.parent == proj_dir.joinpath("Tile"):
-                        matrixDir = matrixDir.joinpath(
-                            f"{tileName}_generated_switch_matrix.list"
+                    elif matrix_dir.parent == proj_dir.joinpath("Tile"):
+                        matrix_dir = matrix_dir.joinpath(
+                            f"{tile_name}_generated_switch_matrix.list"
                         )
-                        logger.info(f"Generating matrix file {matrixDir}")
+                        logger.info(f"Generating matrix file {matrix_dir}")
                     else:
-                        matrixDir = proj_dir.joinpath(
-                            f"./Tile/{tileName}/{tileName}_generated_switch_matrix.list"
+                        matrix_dir = proj_dir.joinpath(
+                            f"./Tile/{tile_name}/{tile_name}_generated_switch_matrix.list"
                         )
                         logger.warning(
                             "No destination directory for matrix file sepicified, "
-                            f"using default path {matrixDir}."
+                            f"using default path {matrix_dir}."
                         )
-                        if not matrixDir.parent.exists():
-                            matrixDir.parent.mkdir(parents=True)
-                            logger.warning(f"Creating directory {matrixDir.parent}.")
+                        if not matrix_dir.parent.exists():
+                            matrix_dir.parent.mkdir(parents=True)
+                            logger.warning(f"Creating directory {matrix_dir.parent}.")
 
                 else:
-                    matrixDir = fileName.parent.joinpath(temp[1]).absolute()
+                    matrix_dir = fileName.parent.joinpath(temp[1]).absolute()
+
+            elif temp[0] == "CONFIGMEM":
+                if config_mem is not None:
+                    raise InvalidTileDefinition(
+                        f"Tile {tile_name} has more than one CONFIGMEM line. "
+                        "A tile has exactly one configuration memory."
+                    )
+                config_mem = parse_config_mem_line(
+                    temp[1] if len(temp) > 1 else "", tile_name, file_path_parent
+                )
 
             elif temp[0] == "INCLUDE":
                 p = fileName.parent.joinpath(temp[1])
                 if not p.exists():
                     raise InvalidTileDefinition(
-                        f"Cannot find {str(p)} in tile {tileName}"
+                        f"Cannot find {str(p)} in tile {tile_name}"
                     )
                 with p.open() as f:
-                    iFile = f.read()
-                    iFile = re.sub(r"#.*", "", iFile)
-                for line in iFile.split("\n"):
-                    lineItem = line.split(",")
-                    if not lineItem[0]:
+                    include_file = f.read()
+                    include_file = re.sub(r"#.*", "", include_file)
+                for line in include_file.split("\n"):
+                    line_item = line.split(",")
+                    if not line_item[0]:
                         continue
 
                     port, common_wire_pair = parse_port_line(line)
@@ -502,41 +604,68 @@ def parseTilesCSV(
 
             else:
                 raise InvalidTileDefinition(
-                    f"Unknown tile description {temp[0]} in tile {tileName}. "
+                    f"Unknown tile description {temp[0]} in tile {tile_name}. "
                     f"Valid descriptions are {', '.join(d.value for d in Direction)}, "
-                    "BEL, GEN_IO, MATRIX, and INCLUDE."
+                    "BEL, GEN_IO, MATRIX, CONFIGMEM, and INCLUDE."
                 )
 
-        withUserCLK = any(bel.withUserCLK for bel in bels)
+        with_user_clk = any(bel.withUserCLK for bel in bels)
 
-        if matrixDir is None:
+        if matrix_dir is None:
             raise InvalidTileDefinition(
-                f"Tile {tileName!r} has no MATRIX line; a switch matrix "
+                f"Tile {tile_name!r} has no MATRIX line; a switch matrix "
                 "(.csv/.list) or hand-written HDL file is required."
             )
 
-        if genMatrixList:
+        if gen_matrix_list:
             generateSwitchmatrixList(
-                tileName, bels, matrixDir, tileCarry, localSharedPorts
+                tile_name, bels, matrix_dir, tile_carry, local_shared_ports
             )
 
-        new_tiles.append(
-            Tile(
-                name=tileName,
+        if config_mem is None or config_mem.hdl_file is not None:
+            # An HDL entry names the RTL only. The mapping CSV keeps its
+            # conventional location, because the bitstream spec reads it whether
+            # or not FABulous generated the module - and that location depends on
+            # the switch matrix file, which is only known now.
+            resolved = resolve_config_mem_spec(
+                tile_name, fileName, proj_dir, switch_matrix_file=matrix_dir
+            )
+            config_mem = (
+                resolved
+                if config_mem is None
+                else replace(config_mem, mapping_csv=resolved.mapping_csv)
+            )
+
+        tile = Tile(
+            name=tile_name,
+            ports=ports,
+            bels=bels,
+            tileDir=fileName,
+            switch_matrix=SwitchMatrix.from_file(
+                matrix_dir,
+                tile_name,
                 ports=ports,
                 bels=bels,
-                tileDir=fileName,
-                switch_matrix=SwitchMatrix.from_file(
-                    matrixDir,
-                    tileName,
-                    ports=ports,
-                    bels=bels,
-                    preserve_list_order=preserve_list_order,
-                ),
-                gen_ios=gen_ios,
-                userCLK=withUserCLK,
-            )
+                preserve_list_order=preserve_list_order,
+            ),
+            gen_ios=gen_ios,
+            userCLK=with_user_clk,
+            config_mem=config_mem,
         )
+
+        # globalConfigBits is only known once the switch matrix and BELs are
+        # assembled, so CONFIGMEM,NULL can only be contradicted here.
+        if tile.config_mem.mapping_csv is None and tile.globalConfigBits > 0:
+            raise InvalidTileDefinition(
+                f"Tile {tile_name} declares CONFIGMEM,{CONFIG_MEM_NULL_TOKEN} but "
+                f"has {tile.globalConfigBits} configuration bits "
+                f"({tile.switch_matrix.no_config_bits} from the switch matrix, "
+                f"{sum(b.configBit for b in bels)} from BELs). Give a "
+                f"{CONFIG_MEM_MAPPING_SUFFIX} mapping file, or remove the "
+                "CONFIGMEM line to use the conventional location."
+            )
+
+        new_tiles.append(tile)
 
     return (new_tiles, common_wire_pairs)
 

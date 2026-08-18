@@ -129,12 +129,16 @@ class TestEmitTileVerilog:
     def test_regular_tile_emits_switch_matrix_config_mem_and_tile(
         self, mock_writer: MagicMock, mocker: MockerFixture, tmp_path: Path
     ) -> None:
+        from fabulous.fabric_definition.config_mem_spec import ConfigMemSpec
         from fabulous.fabric_definition.tile import Tile
 
         tile_dir: Path = tmp_path / "LUT4AB"
         tile_dir.mkdir()
         mock_tile: MagicMock = mocker.MagicMock(spec=Tile)
         mock_tile.name = "LUT4AB"
+        mock_tile.config_mem = ConfigMemSpec(
+            mapping_csv=tile_dir / "LUT4AB_ConfigMem.csv"
+        )
 
         actual_paths: list[Path] = []
         gen_sm = mocker.patch.object(plugin_tile_flow, "genTileSwitchMatrix")
@@ -179,6 +183,7 @@ class TestEmitTileVerilog:
             mock_tile.name,
             mock_tile.globalConfigBits,
             tile_dir / "LUT4AB_ConfigMem.csv",
+            hdl_file=None,
         )
         gen_tile.assert_called_once()
 
@@ -423,28 +428,48 @@ class TestFABulousTileRunAdapter:
 SYNTHETIC_TILE_NAME = "PLUGIN_TEST_TILE"
 
 
-def _build_synthetic_tile(parent: Path) -> Path:
+def _build_synthetic_tile(
+    parent: Path,
+    *,
+    extra_rows: tuple[str, ...] = (),
+    matrix: str = "S1BEG[0|1|2|3],N1END[3|2|1|0]\n",
+) -> Path:
     """Build a minimal valid plugin-tile workspace under `parent`.
 
     Produces `<parent>/<name>/<name>.csv` and the matching
     `<name>_switch_matrix.list`. The trailing comma on each line keeps the
     `temp[6]` lookup in :func:`parseTilesCSV` safe.
+
+    Parameters
+    ----------
+    parent : Path
+        Directory the tile workspace is created under.
+    extra_rows : tuple[str, ...], optional
+        Extra tile-CSV rows (without the trailing comma) placed after MATRIX.
+    matrix : str, optional
+        Contents of the `.list` switch matrix. The default wires each output to
+        exactly one input, so the tile has no configuration bits.
+
+    Returns
+    -------
+    Path
+        The tile workspace directory.
     """
     name = SYNTHETIC_TILE_NAME
     tile_dir = parent / name
     tile_dir.mkdir()
+    rows = [
+        f"TILE,{name}",
+        "NORTH,NULL,0,-1,N1END,4",
+        "SOUTH,S1BEG,0,1,NULL,4",
+        f"MATRIX,./{name}_switch_matrix.list",
+        *extra_rows,
+        "EndTILE",
+    ]
     (tile_dir / f"{name}.csv").write_text(
-        f"TILE,{name},\n"
-        "NORTH,NULL,0,-1,N1END,4,\n"
-        "SOUTH,S1BEG,0,1,NULL,4,\n"
-        f"MATRIX,./{name}_switch_matrix.list,\n"
-        "EndTILE,\n",
-        encoding="utf-8",
+        "".join(f"{row},\n" for row in rows), encoding="utf-8"
     )
-    (tile_dir / f"{name}_switch_matrix.list").write_text(
-        "S1BEG[0|1|2|3],N1END[3|2|1|0]\n",
-        encoding="utf-8",
-    )
+    (tile_dir / f"{name}_switch_matrix.list").write_text(matrix, encoding="utf-8")
     return tile_dir
 
 
@@ -466,19 +491,9 @@ class TestFABulousTileEndToEnd:
     def tile_workspace(self, tmp_path: Path) -> Path:
         return _build_synthetic_tile(tmp_path)
 
-    def test_run_emits_real_rtl_and_pin_yaml(
-        self,
-        tile_workspace: Path,
-        tmp_path: Path,
-        mocker: MockerFixture,
-    ) -> None:
-        """Run the plugin against a synthetic tile and verify on-disk artifacts.
-
-        Only PDK-touching helpers are stubbed; the generators, parser, and
-        pin-YAML producer all execute. This is the test that would have
-        caught the `FABulous_API.fabric` AttributeError surfaced by the
-        librelane CLI smoke run.
-        """
+    @pytest.fixture
+    def stubbed_pdk_and_flow(self, mocker: MockerFixture) -> None:
+        """Stub only the PDK readers and the inherited `SequentialFlow.run`."""
         # Stub PDK readers; plugin computes a fake DIE_AREA from these.
         mocker.patch.object(
             plugin_tile_flow, "get_pitch", return_value=(Decimal(1), Decimal(1))
@@ -493,6 +508,20 @@ class TestFABulousTileEndToEnd:
             return_value=(mocker.MagicMock(), []),
         )
 
+    @pytest.mark.usefixtures("stubbed_pdk_and_flow")
+    def test_run_emits_real_rtl_and_pin_yaml(
+        self,
+        tile_workspace: Path,
+        tmp_path: Path,
+        mocker: MockerFixture,
+    ) -> None:
+        """Run the plugin against a synthetic tile and verify on-disk artifacts.
+
+        Only PDK-touching helpers are stubbed; the generators, parser, and
+        pin-YAML producer all execute. This is the test that would have
+        caught the `FABulous_API.fabric` AttributeError surfaced by the
+        librelane CLI smoke run.
+        """
         name = SYNTHETIC_TILE_NAME
         flow = FABulousTile(
             config={
@@ -527,3 +556,47 @@ class TestFABulousTileEndToEnd:
         verilog_files = [str(p) for p in flow.config["VERILOG_FILES"]]
         assert any(f"{name}.v" in p for p in verilog_files)
         assert any(f"{name}_switch_matrix.v" in p for p in verilog_files)
+
+    @pytest.mark.usefixtures("stubbed_pdk_and_flow")
+    def test_run_uses_a_hand_written_config_mem_instead_of_generating_one(
+        self,
+        tmp_path: Path,
+        mocker: MockerFixture,
+    ) -> None:
+        """`CONFIGMEM,<file>.v` leaves the module to the user's file.
+
+        The mapping CSV is still written, because the bitstream reads it
+        whoever owns the RTL.
+        """
+        name = SYNTHETIC_TILE_NAME
+        hand_written = tmp_path / name / f"{name}_ConfigMem_hand.v"
+        tile_workspace = _build_synthetic_tile(
+            tmp_path,
+            extra_rows=(f"CONFIGMEM,./{hand_written.name}",),
+            # Four 4-input muxes, so the tile really has configuration bits.
+            matrix="".join(
+                f"S1BEG{out},N1END{src}\n" for out in range(4) for src in range(4)
+            ),
+        )
+        hand_written.write_text("", encoding="utf-8")
+
+        flow = FABulousTile(
+            config={
+                "DESIGN_NAME": name,
+                "FABULOUS_TILE_DIR": [str(tile_workspace)],
+                "VERILOG_FILES": [],
+                "DESIGN_DIR": str(tile_workspace),
+            },
+            design_dir=str(tile_workspace),
+            pdk="sky130A",
+            pdk_root=str(tmp_path / "pdk"),
+        )
+        flow.run_dir = str(tmp_path / "run")
+        Path(flow.run_dir).mkdir()
+
+        flow.run(initial_state=mocker.MagicMock())
+
+        assert not (tile_workspace / f"{name}_ConfigMem.v").exists()
+        assert (tile_workspace / f"{name}_ConfigMem.csv").is_file()
+        verilog_files = [str(p) for p in flow.config["VERILOG_FILES"]]
+        assert str(hand_written) in verilog_files

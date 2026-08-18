@@ -1,10 +1,15 @@
 """Tests for parsing tile port lines from CSV fabric definitions."""
 
+from pathlib import Path
+
 import pytest
 
-from fabulous.custom_exception import InvalidPortType
+from fabulous.custom_exception import InvalidPortType, InvalidTileDefinition
 from fabulous.fabric_definition.define import IO, Direction, Side
-from fabulous.fabric_generator.parser.parse_csv import parse_port_line
+from fabulous.fabric_definition.fabric import Fabric
+from fabulous.fabric_definition.tile import Tile
+from fabulous.fabric_generator.parser.parse_csv import parse_port_line, parseTilesCSV
+from fabulous.fabulous_settings import init_context
 
 # (kind, physical side of the OUTPUT/start port, physical side of the INPUT/end port)
 DIRECTIONAL_CASES = [
@@ -126,3 +131,310 @@ class TestPortNameTrailingDigit:
     def test_valid_names_do_not_raise(self, line: str) -> None:
         ports, _ = parse_port_line(line)
         assert ports
+
+
+class TestConfigMemSpecWiring:
+    """`parseTilesCSV` is the sole producer of a tile's `ConfigMemSpec`.
+
+    The mapping CSV path used to be rebuilt by convention in every consumer.
+    These tests pin the parser as the one place that decides it, for both the
+    modern per-tile-directory layout and the legacy `fabric.csv`-embedded one
+    that `tests/reference_test` covers end to end.
+    """
+
+    def test_modern_layout_resolves_next_to_the_tile_csv(
+        self, parsed_default_fabric: Fabric
+    ) -> None:
+        for tile in parsed_default_fabric.tileDic.values():
+            assert (
+                tile.config_mem.mapping_csv
+                == tile.tileDir.parent / f"{tile.name}_ConfigMem.csv"
+            )
+
+    def test_supertile_resolves_its_own_not_the_master_tiles(
+        self, parsed_default_fabric: Fabric
+    ) -> None:
+        assert parsed_default_fabric.superTileDic, "fixture must contain a supertile"
+        for super_tile in parsed_default_fabric.superTileDic.values():
+            assert (
+                super_tile.config_mem.mapping_csv
+                == super_tile.tileDir.parent / f"{super_tile.name}_ConfigMem.csv"
+            )
+            for sub_tile in super_tile.tiles:
+                assert (
+                    sub_tile.config_mem.mapping_csv != super_tile.config_mem.mapping_csv
+                )
+
+    def test_legacy_inline_layout_follows_the_switch_matrix_file(
+        self, tmp_path: Path
+    ) -> None:
+        """A tile declared inline in fabric.csv is located via its matrix file.
+
+        `tileDir` is then fabric.csv itself and says nothing about where the
+        tile lives, so the switch-matrix path is the only usable anchor. The
+        matrix deliberately sits outside `Tile/LUT4AB/` so that following it is
+        distinguishable from the `<proj>/Tile/<name>/` fallback.
+        """
+        matrix_dir = tmp_path / "legacy_tiles"
+        matrix_dir.mkdir()
+        (matrix_dir / "LUT4AB_switch_matrix.list").write_text("")
+
+        fabric_csv = tmp_path / "fabric.csv"
+        # Rows need a trailing comma run: parseTilesCSV indexes temp[6].
+        fabric_csv.write_text(
+            "TILE,LUT4AB,,,,,,\n"
+            "NORTH,N1BEG,0,-1,N1END,4,,\n"
+            "MATRIX,./legacy_tiles/LUT4AB_switch_matrix.list,,,,,,\n"
+            "EndTILE,,,,,,,\n"
+        )
+
+        init_context(tmp_path)
+        tiles, _ = parseTilesCSV(fabric_csv)
+
+        assert len(tiles) == 1
+        assert tiles[0].tileDir == fabric_csv
+        assert tiles[0].config_mem.mapping_csv == matrix_dir / "LUT4AB_ConfigMem.csv"
+
+
+TILE_NAME = "LUT4AB"
+
+# One mux with three inputs: (3 - 1).bit_length() == 2 select bits.
+MATRIX_WITH_TWO_CONFIG_BITS = "N1BEG0,N1END0\nN1BEG0,N1END1\nN1BEG0,N1END2\n"
+
+
+def write_tile_csv(proj_dir: Path, *extra_rows: str, matrix: str = "") -> Path:
+    """Write a minimal `Tile/LUT4AB/LUT4AB.csv` plus its switch matrix file.
+
+    Rows carry a trailing comma run because `parseTilesCSV` indexes `temp[6]`.
+
+    Parameters
+    ----------
+    proj_dir : Path
+        Project root the tile directory is created under.
+    *extra_rows : str
+        Extra CSV rows (without the trailing comma run) placed after MATRIX.
+    matrix : str, optional
+        Contents of the tile's `.list` switch matrix. Empty (the default) gives
+        a tile with zero configuration bits; a mux with two or more inputs makes
+        the tile report config bits.
+
+    Returns
+    -------
+    Path
+        The tile CSV that was written.
+    """
+    tile_dir = proj_dir / "Tile" / TILE_NAME
+    tile_dir.mkdir(parents=True, exist_ok=True)
+    (tile_dir / f"{TILE_NAME}_switch_matrix.list").write_text(matrix)
+
+    rows = [
+        f"TILE,{TILE_NAME}",
+        "NORTH,N1BEG,0,-1,N1END,4",
+        f"MATRIX,./{TILE_NAME}_switch_matrix.list",
+        *extra_rows,
+        "EndTILE",
+    ]
+    tile_csv = tile_dir / f"{TILE_NAME}.csv"
+    tile_csv.write_text("".join(f"{row},,,,,,,\n" for row in rows))
+    return tile_csv
+
+
+def write_config_mem_hdl(proj_dir: Path, suffix: str) -> Path:
+    """Write an empty hand-written ConfigMem HDL file into the tile directory.
+
+    The parser only checks that the file exists, so its contents are irrelevant.
+
+    Parameters
+    ----------
+    proj_dir : Path
+        Project root the tile directory is created under.
+    suffix : str
+        HDL suffix, one of `.v`, `.sv`, `.vhd`, `.vhdl`.
+
+    Returns
+    -------
+    Path
+        The HDL file that was written.
+    """
+    hdl = proj_dir / "Tile" / TILE_NAME / f"{TILE_NAME}_ConfigMem{suffix}"
+    hdl.parent.mkdir(parents=True, exist_ok=True)
+    hdl.write_text("")
+    return hdl
+
+
+def parse_single_tile(proj_dir: Path, *extra_rows: str, matrix: str = "") -> Tile:
+    """Parse a synthetic one-tile CSV and return the tile.
+
+    Parameters
+    ----------
+    proj_dir : Path
+        Project root; also becomes the settings context.
+    *extra_rows : str
+        Extra CSV rows passed through to `write_tile_csv`.
+    matrix : str, optional
+        Switch matrix `.list` contents passed through to `write_tile_csv`.
+
+    Returns
+    -------
+    Tile
+        The single parsed tile.
+    """
+    tile_csv = write_tile_csv(proj_dir, *extra_rows, matrix=matrix)
+    init_context(proj_dir)
+    tiles, _ = parseTilesCSV(tile_csv)
+    assert len(tiles) == 1
+    return tiles[0]
+
+
+class TestConfigMemKeyword:
+    """The optional `CONFIGMEM` tile-CSV line says where config memory comes from.
+
+    A `.csv` entry overrides the mapping-file path. An HDL entry hands the
+    `<tile>_ConfigMem` module to the user, exactly as a hand-written `MATRIX`
+    file does for the switch matrix, and leaves the mapping CSV where
+    convention puts it — the bitstream reads it either way.
+    """
+
+    def test_absent_line_keeps_the_convention_default(self, tmp_path: Path) -> None:
+        """No `CONFIGMEM` line must behave exactly as before the keyword existed."""
+        tile = parse_single_tile(tmp_path)
+
+        assert (
+            tile.config_mem.mapping_csv
+            == tmp_path / "Tile" / TILE_NAME / f"{TILE_NAME}_ConfigMem.csv"
+        )
+
+    @pytest.mark.parametrize(
+        ("entry", "expected_parts"),
+        [
+            ("custom_ConfigMem.csv", ("Tile", TILE_NAME, "custom_ConfigMem.csv")),
+            ("./custom_ConfigMem.csv", ("Tile", TILE_NAME, "custom_ConfigMem.csv")),
+            ("./mapping/custom.csv", ("Tile", TILE_NAME, "mapping", "custom.csv")),
+            ("../shared_ConfigMem.csv", ("Tile", "shared_ConfigMem.csv")),
+        ],
+    )
+    def test_csv_entry_resolves_against_the_tile_csv_directory(
+        self, tmp_path: Path, entry: str, expected_parts: tuple[str, ...]
+    ) -> None:
+        tile = parse_single_tile(tmp_path, f"CONFIGMEM,{entry}")
+
+        assert (
+            tile.config_mem.mapping_csv.resolve()
+            == tmp_path.joinpath(*expected_parts).resolve()
+        )
+
+    def test_csv_entry_need_not_exist(self, tmp_path: Path) -> None:
+        """`generateConfigMem` writes the mapping on demand, so absence is fine."""
+        tile = parse_single_tile(tmp_path, "CONFIGMEM,./not_written_yet.csv")
+
+        assert not tile.config_mem.mapping_csv.exists()
+        assert tile.config_mem.mapping_csv.name == "not_written_yet.csv"
+
+    def test_null_means_no_configuration_memory(self, tmp_path: Path) -> None:
+        tile = parse_single_tile(tmp_path, "CONFIGMEM,NULL")
+
+        assert tile.config_mem is not None
+        assert tile.config_mem.mapping_csv is None
+        assert tile.globalConfigBits == 0
+
+    def test_null_on_a_tile_with_config_bits_is_rejected(self, tmp_path: Path) -> None:
+        """A tile that needs config bits cannot also say it has no config memory.
+
+        `globalConfigBits` is only known once the switch matrix is read, so this
+        contradiction has to be caught after the `Tile` is built rather than on
+        the `CONFIGMEM` line itself.
+        """
+        with pytest.raises(InvalidTileDefinition) as excinfo:
+            parse_single_tile(
+                tmp_path,
+                "CONFIGMEM,NULL",
+                matrix=MATRIX_WITH_TWO_CONFIG_BITS,
+            )
+
+        message = str(excinfo.value)
+        assert TILE_NAME in message
+        assert "2 configuration bits" in message
+        assert "CONFIGMEM,NULL" in message
+
+    def test_config_bits_are_fine_without_the_null_token(self, tmp_path: Path) -> None:
+        """The rejection is about `NULL` specifically, not about having bits."""
+        tile = parse_single_tile(tmp_path, matrix=MATRIX_WITH_TWO_CONFIG_BITS)
+
+        assert tile.globalConfigBits == 2
+        assert tile.config_mem.mapping_csv is not None
+
+    @pytest.mark.parametrize("suffix", [".v", ".sv", ".vhd", ".vhdl"])
+    def test_hdl_entry_is_recorded_for_every_suffix(
+        self, tmp_path: Path, suffix: str
+    ) -> None:
+        hdl = write_config_mem_hdl(tmp_path, suffix)
+
+        tile = parse_single_tile(tmp_path, f"CONFIGMEM,./{hdl.name}")
+
+        assert tile.config_mem.hdl_file == hdl
+
+    @pytest.mark.parametrize("suffix", [".v", ".sv", ".vhd", ".vhdl"])
+    def test_hdl_entry_keeps_the_conventional_mapping_csv(
+        self, tmp_path: Path, suffix: str
+    ) -> None:
+        """Owning the RTL does not move the bitstream's mapping file."""
+        hdl = write_config_mem_hdl(tmp_path, suffix)
+
+        tile = parse_single_tile(tmp_path, f"CONFIGMEM,./{hdl.name}")
+
+        assert (
+            tile.config_mem.mapping_csv
+            == tmp_path / "Tile" / TILE_NAME / f"{TILE_NAME}_ConfigMem.csv"
+        )
+
+    def test_hdl_entry_survives_a_tile_with_config_bits(self, tmp_path: Path) -> None:
+        """An HDL tile is not a `CONFIGMEM,NULL` tile, so bits are fine."""
+        hdl = write_config_mem_hdl(tmp_path, ".v")
+
+        tile = parse_single_tile(
+            tmp_path,
+            f"CONFIGMEM,./{hdl.name}",
+            matrix=MATRIX_WITH_TWO_CONFIG_BITS,
+        )
+
+        assert tile.globalConfigBits == 2
+        assert tile.config_mem.hdl_file == hdl
+        assert tile.config_mem.mapping_csv is not None
+
+    def test_missing_hdl_file_is_rejected(self, tmp_path: Path) -> None:
+        """Nothing writes the HDL on demand, so a missing file is an error."""
+        with pytest.raises(InvalidTileDefinition, match="does not exist"):
+            parse_single_tile(tmp_path, f"CONFIGMEM,./{TILE_NAME}_ConfigMem.v")
+
+    def test_hdl_entry_warns_what_is_not_generated(
+        self, tmp_path: Path, caplog: pytest.LogCaptureFixture
+    ) -> None:
+        """The user has to be told the module is now theirs to keep in step."""
+        hdl = write_config_mem_hdl(tmp_path, ".v")
+
+        parse_single_tile(tmp_path, f"CONFIGMEM,./{hdl.name}")
+
+        assert hdl.name in caplog.text
+        assert f"generates NO {TILE_NAME}_ConfigMem module" in caplog.text
+        assert f"{TILE_NAME}_ConfigMem.csv" in caplog.text
+
+    @pytest.mark.parametrize(
+        "entry", ["./mapping.txt", "./mapping.list", "./mapping.yaml", "./mapping"]
+    )
+    def test_unknown_suffix_is_rejected(self, tmp_path: Path, entry: str) -> None:
+        with pytest.raises(InvalidTileDefinition, match="unsupported suffix"):
+            parse_single_tile(tmp_path, f"CONFIGMEM,{entry}")
+
+    def test_empty_entry_is_rejected(self, tmp_path: Path) -> None:
+        with pytest.raises(InvalidTileDefinition, match="has no value"):
+            parse_single_tile(tmp_path, "CONFIGMEM")
+
+    def test_duplicate_line_is_rejected(self, tmp_path: Path) -> None:
+        with pytest.raises(InvalidTileDefinition, match="more than one CONFIGMEM"):
+            parse_single_tile(
+                tmp_path, "CONFIGMEM,./first.csv", "CONFIGMEM,./second.csv"
+            )
+
+    def test_unknown_keyword_error_advertises_configmem(self, tmp_path: Path) -> None:
+        with pytest.raises(InvalidTileDefinition, match="MATRIX, CONFIGMEM, and"):
+            parse_single_tile(tmp_path, "CONFIGMEMORY,./mapping.csv")

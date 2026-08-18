@@ -123,7 +123,7 @@ def test_gen_tile_aborts_on_sub_command_failure(
     mocker.patch.object(
         cli.fabulousAPI, "genSwitchMatrix", side_effect=RuntimeError("boom")
     )
-    gen_config_mem = mocker.patch.object(cli.fabulousAPI, "genConfigMem")
+    gen_config_mem = mocker.patch.object(cli.fabulousAPI, "gen_config_mem")
 
     run_cmd(cli, f"gen_tile {TILE}")
 

@@ -49,7 +49,7 @@ class FabricGenCommandSet(ReplCommandSet):
     ) -> None:
         """Generate configuration memory of the given tile.
 
-        Parsing input arguments and calling `genConfigMem`.
+        Parsing input arguments and calling `gen_config_mem`.
 
         Logs generation processes for each specified tile.
         """
@@ -60,9 +60,7 @@ class FabricGenCommandSet(ReplCommandSet):
             repl.fabulousAPI.setWriterOutputFile(
                 repl.projectDir / f"Tile/{i}/{i}_ConfigMem.{repl.extension}"
             )
-            repl.fabulousAPI.genConfigMem(
-                i, repl.projectDir / f"Tile/{i}/{i}_ConfigMem.csv"
-            )
+            repl.fabulousAPI.gen_config_mem(i)
         logger.info("ConfigMem generation complete")
 
     @with_annotated
@@ -110,7 +108,7 @@ class FabricGenCommandSet(ReplCommandSet):
         """Generate given tile with switch matrix and configuration memory.
 
         Parsing input arguments, call functions such as `genSwitchMatrix` and
-        `genConfigMem`. Handle both regular tiles and super tiles with sub-tiles.
+        `gen_config_mem`. Handle both regular tiles and super tiles with sub-tiles.
 
         Also logs generation process for each specified tile and sub-tile.
         """
@@ -142,9 +140,7 @@ class FabricGenCommandSet(ReplCommandSet):
                     repl.fabulousAPI.setWriterOutputFile(
                         f"{repl.projectDir}/Tile/{t}/{st}/{st}_ConfigMem.{repl.extension}"
                     )
-                    repl.fabulousAPI.genConfigMem(
-                        st, repl.projectDir / f"Tile/{t}/{st}/{st}_ConfigMem.csv"
-                    )
+                    repl.fabulousAPI.gen_config_mem(st)
                     logger.info(f"Generated configMem for {st}")
 
                     # Gen tile

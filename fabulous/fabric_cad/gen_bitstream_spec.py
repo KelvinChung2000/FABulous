@@ -13,7 +13,6 @@ from loguru import logger
 
 from fabulous.fabric_definition.fabric import Fabric
 from fabulous.fabric_generator.parser.parse_configmem import parseConfigMem
-from fabulous.fabulous_settings import get_context
 
 if TYPE_CHECKING:
     from fabulous.fabric_definition.configmem import ConfigMem
@@ -92,32 +91,15 @@ def generateBitstreamSpec(fabric: Fabric) -> dict[str, dict]:
         for x, tile in enumerate(row):
             if tile is None:
                 continue
-            if "fabric.csv" in str(tile.tileDir):
-                # Backward compat: in the old fabric.csv-embedded layout the
-                # tile's real location comes from its switch-matrix file path.
-                matrix_file = tile.switch_matrix.matrix_file
-                if matrix_file.is_file():
-                    configMemPath = matrix_file.parent / f"{tile.name}_ConfigMem.csv"
-                else:
-                    configMemPath = (
-                        get_context().proj_dir
-                        / "Tile"
-                        / tile.name
-                        / f"{tile.name}_ConfigMem.csv"
-                    )
-                    logger.warning(
-                        f"MatrixDir for {tile.name} is not a valid file or directory. "
-                        f"Assuming default path: {configMemPath}"
-                    )
-            else:
-                configMemPath = tile.tileDir.parent.joinpath(
-                    f"{tile.name}_ConfigMem.csv"
-                )
-            logger.info(f"ConfigMemPath: {configMemPath}")
+            config_mem_path = tile.config_mem.mapping_csv
+            logger.info(f"ConfigMemPath: {config_mem_path}")
 
-            if configMemPath.exists() and configMemPath.is_file():
+            # A CONFIGMEM,NULL tile has no mapping file, which is the same
+            # situation as a mapping file that has not been generated: the
+            # branches below already say what that means for the bitstream spec.
+            if config_mem_path is not None and config_mem_path.is_file():
                 configMemList = parseConfigMem(
-                    configMemPath,
+                    config_mem_path,
                     fabric.maxFramesPerCol,
                     fabric.frameBitsPerRow,
                     tile.globalConfigBits,
@@ -218,7 +200,7 @@ def generateBitstreamSpec(fabric: Fabric) -> dict[str, dict]:
         st_mask_dic: dict[int, str] = {}
         if st_config_bits > 0:
             st_config_mem_list = parseConfigMem(
-                super_tile.tileDir.parent / f"{super_tile.name}_ConfigMem.csv",
+                super_tile.config_mem.mapping_csv,
                 fabric.maxFramesPerCol,
                 fabric.frameBitsPerRow,
                 st_config_bits,

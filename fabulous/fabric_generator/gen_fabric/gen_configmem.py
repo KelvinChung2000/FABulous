@@ -106,14 +106,21 @@ def generateConfigMem(
     writer: CodeGenerator,
     name: str,
     config_bits_count: int,
-    configMemCsv: Path,
+    config_mem_csv: Path | None,
     frame_bits_per_row: int = 32,
     max_frame_per_col: int = 20,
+    hdl_file: Path | None = None,
 ) -> None:
     """Generate the RTL code for configuration memory.
 
-    If the given configMemCsv file does not exist, it will be created using
-    `generateConfigMemInit`.
+    If the given config_mem_csv file does not exist, it will be created using
+    `generateConfigMemInit`. A `None` path means the tile declared
+    `CONFIGMEM,NULL`, so there is no configuration memory to generate.
+
+    When `hdl_file` is given the tile supplies its own `<name>_ConfigMem`
+    module, so no RTL is written. The mapping CSV is still created if missing
+    and still checked against `config_bits_count`, because the bitstream reads
+    it regardless of who wrote the RTL.
 
     We use a file to describe the exact configuration bits to frame mapping
     the following command generates an init file with a
@@ -129,17 +136,22 @@ def generateConfigMem(
         Name of the tile or module (used for module naming and log messages).
     config_bits_count : int
         Total number of configuration bits.
-    configMemCsv : Path
-        The directory of the config memory CSV file.
+    config_mem_csv : Path | None
+        The config memory CSV file, or None when the tile declares no
+        configuration memory.
     frame_bits_per_row : int
         The number of configuration bits per frame row.
     max_frame_per_col : int
         The number of frames stored per tile column.
+    hdl_file : Path | None
+        Hand-written HDL supplying the `<name>_ConfigMem` module. When set, the
+        module is not generated.
 
     Raises
     ------
     ValueError
         - If the config bits exceed the fabric capacity.
+        - If there is no config memory CSV but the tile has config bits.
         - If the total config bits in the config memory CSV file does not match
           config_bits_count.
     """
@@ -151,8 +163,18 @@ def generateConfigMem(
             "Please adjust the configuration."
         )
 
+    if config_mem_csv is None:
+        if config_bits_count > 0:
+            raise ValueError(
+                f"{name} declares no configuration memory (CONFIGMEM,NULL) but "
+                f"has {config_bits_count} configuration bits. Give it a "
+                "ConfigMem mapping CSV."
+            )
+        logger.info(f"{name} declares no configuration memory, nothing to generate")
+        return
+
     configMemList: list[ConfigMem] = []
-    if configMemCsv.exists():
+    if config_mem_csv.exists():
         if config_bits_count <= 0:
             logger.warning(
                 f"Found bitstream mapping file {name}_configMem.csv for {name}, "
@@ -162,7 +184,7 @@ def generateConfigMem(
             logger.info(f"Found bitstream mapping file {name}_configMem.csv for {name}")
         logger.info(f"Parsing {name}_configMem.csv")
         configMemList = parseConfigMem(
-            configMemCsv,
+            config_mem_csv,
             max_frame_per_col,
             frame_bits_per_row,
             config_bits_count,
@@ -171,14 +193,14 @@ def generateConfigMem(
         logger.info(f"{name}_configMem.csv does not exist")
         logger.info(f"Generating a default configMem for {name}")
         generateConfigMemInit(
-            configMemCsv,
+            config_mem_csv,
             config_bits_count,
             frame_bits_per_row=frame_bits_per_row,
             max_frame_per_col=max_frame_per_col,
         )
         logger.info(f"Parsing {name}_configMem.csv")
         configMemList = parseConfigMem(
-            configMemCsv,
+            config_mem_csv,
             max_frame_per_col,
             frame_bits_per_row,
             config_bits_count,
@@ -201,6 +223,13 @@ def generateConfigMem(
             f"Total config bits in {name}_configMem.csv ({totalConfigBits}) "
             f"does not match global config bits ({config_bits_count})"
         )
+
+    if hdl_file is not None:
+        logger.info(
+            f"{name} provides a hand-written ConfigMem HDL ({hdl_file.name}); "
+            "skipping ConfigMem generation."
+        )
+        return
 
     # start writing the file
     logger.info(f"Generating {writer.outFileName} for {name}")
@@ -487,7 +516,7 @@ def build_super_tile_config_mem_csv(
 def generate_super_tile_config_mem(
     writer: CodeGenerator,
     superTile: "SuperTile",
-    master_config_mem_csv: Path,
+    master_config_mem_csv: Path | None,
     frame_bits_per_row: int = 32,
     max_frame_per_col: int = 20,
 ) -> None:
@@ -503,18 +532,37 @@ def generate_super_tile_config_mem(
         Code generator instance for RTL output.
     superTile : SuperTile
         The supertile whose SM config bits need a ConfigMem.
-    master_config_mem_csv : Path
-        Path to the master tile's existing `*_ConfigMem.csv`.
+    master_config_mem_csv : Path | None
+        Path to the master tile's existing `*_ConfigMem.csv`, or None when the
+        master tile declares no configuration memory.
     frame_bits_per_row : int
         Number of bits per frame row.
     max_frame_per_col : int
         Number of frames per column.
+
+    Raises
+    ------
+    ValueError
+        If the supertile has config bits but its master tile declares no
+        configuration memory.
     """
     st_config_bits = superTile.total_config_bits
     if st_config_bits <= 0:
         return
 
-    output_csv = superTile.tileDir.parent / f"{superTile.name}_ConfigMem.csv"
+    # The supertile's bits live in the master tile's frame space, so a master
+    # tile with no ConfigMem has nowhere to put them. Reachable when the master
+    # tile has zero config bits of its own and says CONFIGMEM,NULL.
+    if master_config_mem_csv is None:
+        raise ValueError(
+            f"Supertile {superTile.name} has {st_config_bits} configuration "
+            "bits, but its master tile declares no configuration memory "
+            "(CONFIGMEM,NULL). The supertile's bits are placed in the master "
+            "tile's frame space, so the master tile needs a ConfigMem mapping "
+            "CSV."
+        )
+
+    output_csv = superTile.config_mem.mapping_csv
     build_super_tile_config_mem_csv(
         master_config_mem_csv,
         st_config_bits,

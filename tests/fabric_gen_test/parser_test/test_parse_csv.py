@@ -12,6 +12,7 @@ from fabulous.custom_exception import (
 from fabulous.fabric_definition.config_mem_wrapper import (
     ConfigMemPort,
     ConfigMemWrapper,
+    wrapper_module_name,
 )
 from fabulous.fabric_definition.define import IO, Direction, Side
 from fabulous.fabric_definition.fabric import Fabric
@@ -251,10 +252,25 @@ def write_tile_csv(proj_dir: Path, *extra_rows: str, matrix: str = "") -> Path:
     return tile_csv
 
 
-def write_config_mem_hdl(proj_dir: Path, suffix: str) -> Path:
-    """Write an empty hand-written ConfigMem HDL file into the tile directory.
+# Wrapper suffixes paired with a project language that accepts them. Verilog and
+# SystemVerilog projects take either Verilog suffix, matching the models pack.
+WRAPPER_LANGUAGE_CASES = [
+    (".v", "verilog"),
+    (".sv", "verilog"),
+    (".v", "system_verilog"),
+    (".sv", "system_verilog"),
+    (".vhd", "vhdl"),
+    (".vhdl", "vhdl"),
+]
 
-    The parser only checks that the file exists, so its contents are irrelevant.
+
+def write_config_mem_hdl(
+    proj_dir: Path, suffix: str, module: str | None = None
+) -> Path:
+    """Write a hand-written ConfigMem wrapper HDL into the tile directory.
+
+    Only the module declaration matters: the parser checks that the file
+    declares the wrapper module, and never looks at its body.
 
     Parameters
     ----------
@@ -262,15 +278,23 @@ def write_config_mem_hdl(proj_dir: Path, suffix: str) -> Path:
         Project root the tile directory is created under.
     suffix : str
         HDL suffix, one of `.v`, `.sv`, `.vhd`, `.vhdl`.
+    module : str | None, optional
+        Name to declare, defaulting to the wrapper module the tile expects.
 
     Returns
     -------
     Path
         The HDL file that was written.
     """
+    name = wrapper_module_name(TILE_NAME) if module is None else module
+    if suffix in (".v", ".sv"):
+        source = f"module {name};\nendmodule\n"
+    else:
+        source = f"entity {name} is\nend entity;\n"
+
     hdl = proj_dir / "Tile" / TILE_NAME / f"{TILE_NAME}_ConfigMem{suffix}"
     hdl.parent.mkdir(parents=True, exist_ok=True)
-    hdl.write_text("")
+    hdl.write_text(source)
     return hdl
 
 
@@ -375,10 +399,11 @@ class TestConfigMemKeyword:
         assert tile.globalConfigBits == 2
         assert tile.config_mem_csv is not None
 
-    @pytest.mark.parametrize("suffix", [".v", ".sv", ".vhd", ".vhdl"])
+    @pytest.mark.parametrize(("suffix", "lang"), WRAPPER_LANGUAGE_CASES)
     def test_hdl_entry_is_recorded_for_every_suffix(
-        self, tmp_path: Path, suffix: str
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch, suffix: str, lang: str
     ) -> None:
+        monkeypatch.setenv("FAB_PROJ_LANG", lang)
         hdl = write_config_mem_hdl(tmp_path, suffix)
 
         tile = parse_single_tile(tmp_path, f"CONFIGMEM,./{hdl.name}")
@@ -386,11 +411,12 @@ class TestConfigMemKeyword:
         assert tile.config_mem_wrapper is not None
         assert tile.config_mem_wrapper.hdl_file == hdl
 
-    @pytest.mark.parametrize("suffix", [".v", ".sv", ".vhd", ".vhdl"])
+    @pytest.mark.parametrize(("suffix", "lang"), WRAPPER_LANGUAGE_CASES)
     def test_hdl_entry_keeps_the_conventional_mapping_csv(
-        self, tmp_path: Path, suffix: str
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch, suffix: str, lang: str
     ) -> None:
         """Wrapping the module does not move the bitstream's mapping file."""
+        monkeypatch.setenv("FAB_PROJ_LANG", lang)
         hdl = write_config_mem_hdl(tmp_path, suffix)
 
         tile = parse_single_tile(tmp_path, f"CONFIGMEM,./{hdl.name}")
@@ -546,6 +572,99 @@ class TestConfigMemWrapper:
                 "CONFIGMEM_PORT,crc_error,OUTPUT,1",
                 "CONFIGMEM_PORT,crc_error,OUTPUT,1",
             )
+
+
+class TestConfigMemWrapperHdlIsChecked:
+    """The wrapper file must be in the project's language and declare the module.
+
+    FABulous never reads what the wrapper does, but two mistakes are cheap to
+    catch from the file itself: handing a VHDL project a Verilog wrapper, and
+    naming a file whose module is called something else. Left unchecked both
+    surface as a synthesis error a long way from the tile CSV that caused them.
+    """
+
+    @pytest.mark.parametrize(
+        ("suffix", "lang"),
+        [
+            (".vhd", "verilog"),
+            (".vhdl", "verilog"),
+            (".vhd", "system_verilog"),
+            (".v", "vhdl"),
+            (".sv", "vhdl"),
+        ],
+    )
+    def test_a_wrapper_in_another_language_is_rejected(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch, suffix: str, lang: str
+    ) -> None:
+        monkeypatch.setenv("FAB_PROJ_LANG", lang)
+        hdl = write_config_mem_hdl(tmp_path, suffix)
+
+        with pytest.raises(InvalidTileDefinition, match="project language"):
+            parse_single_tile(tmp_path, f"CONFIGMEM,./{hdl.name}")
+
+    @pytest.mark.parametrize(
+        ("suffix", "lang"),
+        [(".v", "verilog"), (".vhd", "vhdl")],
+        ids=["verilog", "vhdl"],
+    )
+    def test_a_file_missing_the_wrapper_module_is_rejected(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch, suffix: str, lang: str
+    ) -> None:
+        """The error names the module the tile is going to instantiate."""
+        monkeypatch.setenv("FAB_PROJ_LANG", lang)
+        hdl = write_config_mem_hdl(tmp_path, suffix, module="some_other_module")
+
+        with pytest.raises(InvalidTileDefinition, match=wrapper_module_name(TILE_NAME)):
+            parse_single_tile(tmp_path, f"CONFIGMEM,./{hdl.name}")
+
+    @pytest.mark.parametrize(
+        ("suffix", "lang", "source"),
+        [
+            (".v", "verilog", "// module {module};\n"),
+            (".v", "verilog", "/* module {module};\nendmodule */\n"),
+            (".vhd", "vhdl", "-- entity {module} is\n"),
+        ],
+        ids=["line-comment", "block-comment", "vhdl-comment"],
+    )
+    def test_a_commented_out_declaration_does_not_satisfy_the_check(
+        self,
+        tmp_path: Path,
+        monkeypatch: pytest.MonkeyPatch,
+        suffix: str,
+        lang: str,
+        source: str,
+    ) -> None:
+        monkeypatch.setenv("FAB_PROJ_LANG", lang)
+        hdl = write_config_mem_hdl(tmp_path, suffix)
+        hdl.write_text(source.format(module=wrapper_module_name(TILE_NAME)))
+
+        with pytest.raises(InvalidTileDefinition, match=wrapper_module_name(TILE_NAME)):
+            parse_single_tile(tmp_path, f"CONFIGMEM,./{hdl.name}")
+
+    def test_a_vhdl_entity_matches_regardless_of_case(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """VHDL identifiers are case-insensitive, so the check must be too."""
+        monkeypatch.setenv("FAB_PROJ_LANG", "vhdl")
+        hdl = write_config_mem_hdl(
+            tmp_path, ".vhd", module=wrapper_module_name(TILE_NAME).upper()
+        )
+
+        tile = parse_single_tile(tmp_path, f"CONFIGMEM,./{hdl.name}")
+
+        assert tile.config_mem_wrapper is not None
+
+    def test_a_verilog_module_does_not_match_on_case_alone(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Verilog identifiers are case-sensitive, so a near miss is a miss."""
+        monkeypatch.setenv("FAB_PROJ_LANG", "verilog")
+        hdl = write_config_mem_hdl(
+            tmp_path, ".v", module=wrapper_module_name(TILE_NAME).upper()
+        )
+
+        with pytest.raises(InvalidTileDefinition, match=wrapper_module_name(TILE_NAME)):
+            parse_single_tile(tmp_path, f"CONFIGMEM,./{hdl.name}")
 
 
 class TestConfigMemIsTileOnly:

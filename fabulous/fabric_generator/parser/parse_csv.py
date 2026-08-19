@@ -21,12 +21,14 @@ from fabulous.fabric_definition.config_mem_wrapper import (
     ConfigMemPort,
     ConfigMemWrapper,
     resolve_config_mem_csv,
+    wrapper_module_name,
 )
 from fabulous.fabric_definition.define import (
     IO,
     SWITCH_MATRIX_CONSTANTS,
     ConfigBitMode,
     Direction,
+    HDLType,
     MultiplexerStyle,
     Side,
 )
@@ -40,6 +42,11 @@ from fabulous.fabric_generator.gen_fabric.fabric_automation import (
     addBelsToPrim,
     generateCustomTileConfig,
     generateSwitchmatrixList,
+)
+from fabulous.fabric_generator.parser.hdl_scan import (
+    VHDL_SUFFIXES,
+    declared_modules,
+    hdl_suffixes,
 )
 from fabulous.fabric_generator.parser.parse_hdl import parseBelFile
 from fabulous.fabulous_settings import get_context
@@ -235,7 +242,7 @@ CONFIG_MEM_WRAPPER_SUFFIXES = (".v", ".sv", ".vhd", ".vhdl")
 
 
 def parse_config_mem_line(
-    entry: str, tile_name: str, tile_csv_dir: Path
+    entry: str, tile_name: str, tile_csv_dir: Path, *, proj_lang: HDLType
 ) -> tuple[ConfigMemMode, Path | None]:
     """Parse the payload of a `CONFIGMEM` line from a tile CSV.
 
@@ -257,11 +264,14 @@ def parse_config_mem_line(
         Name of the tile being parsed, used in error messages.
     tile_csv_dir : Path
         Directory holding the tile CSV, which relative paths resolve against.
+    proj_lang : HDLType
+        The project language, which a wrapper file has to be written in.
 
     Raises
     ------
     InvalidTileDefinition
-        If the entry is empty, names an HDL file that does not exist, or has
+        If the entry is empty, names an HDL file that does not exist, is not in
+        the project language, or does not declare the wrapper module, or has
         any other unrecognised suffix.
 
     Returns
@@ -294,6 +304,38 @@ def parse_config_mem_line(
                 f"file {path}, which does not exist. FABulous does not generate "
                 "it; the file must be supplied."
             )
+
+        accepted = hdl_suffixes(proj_lang)
+        if path.suffix not in accepted:
+            raise InvalidTileDefinition(
+                f"CONFIGMEM entry {entry!r} in tile {tile_name} is a "
+                f"{path.suffix} file, which the project language "
+                f"{proj_lang.value} does not accept. A wrapper is elaborated "
+                f"with the rest of the fabric, so give a "
+                f"{' or '.join(sorted(accepted))} file."
+            )
+
+        wanted = wrapper_module_name(tile_name)
+        declared = declared_modules(path)
+        # VHDL identifiers are case-insensitive and come back lowercased;
+        # Verilog names come back as written.
+        if path.suffix in VHDL_SUFFIXES:
+            found = wanted.lower() in declared
+        else:
+            found = wanted in declared
+        if not found:
+            declares = (
+                f" It declares {', '.join(sorted(declared))}."
+                if declared
+                else " It declares nothing."
+            )
+            raise InvalidTileDefinition(
+                f"CONFIGMEM entry {entry!r} in tile {tile_name} names {path}, "
+                f"which does not declare {wanted}.{declares} The tile "
+                "instantiates that module in place of its generated ConfigMem, "
+                "so the file has to supply it under that name."
+            )
+
         return (ConfigMemMode.WRAPPER, path)
 
     raise InvalidTileDefinition(
@@ -307,10 +349,10 @@ def parse_config_mem_line(
 def parse_config_mem_port_line(fields: list[str], tile_name: str) -> ConfigMemPort:
     """Parse a `CONFIGMEM_PORT` line into a typed wrapper port.
 
-    The line is `CONFIGMEM_PORT,<name>,<INPUT|OUTPUT>,<width>`. FABulous does
-    not read the wrapper's HDL, so this declaration is the only description of
-    the port it has; a declaration that disagrees with the HDL fails at
-    synthesis, not here.
+    The line is `CONFIGMEM_PORT,<name>,<INPUT|OUTPUT>,<width>`. FABulous checks
+    that the wrapper file declares the wrapper module, but never reads its port
+    list, so this declaration is the only description of the port it has; a
+    declaration that disagrees with the HDL fails at synthesis, not here.
 
     Parameters
     ----------
@@ -633,7 +675,10 @@ def parseTilesCSV(
                         "A tile has exactly one configuration memory."
                     )
                 config_mem_mode, path = parse_config_mem_line(
-                    temp[1] if len(temp) > 1 else "", tile_name, file_path_parent
+                    temp[1] if len(temp) > 1 else "",
+                    tile_name,
+                    file_path_parent,
+                    proj_lang=get_context().proj_lang,
                 )
                 if config_mem_mode is ConfigMemMode.WRAPPER:
                     config_mem_wrapper_hdl = path

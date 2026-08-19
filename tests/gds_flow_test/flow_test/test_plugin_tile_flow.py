@@ -576,7 +576,11 @@ class TestFABulousTileEndToEnd:
                 f"S1BEG{out},N1END{src}\n" for out in range(4) for src in range(4)
             ),
         )
-        wrapper.write_text("", encoding="utf-8")
+        # The parser checks that the file declares the module the tile
+        # instantiates; the body is the user's and is never read.
+        wrapper.write_text(
+            f"module {name}_ConfigMem_wrapper;\nendmodule\n", encoding="utf-8"
+        )
 
         flow = FABulousTile(
             config={

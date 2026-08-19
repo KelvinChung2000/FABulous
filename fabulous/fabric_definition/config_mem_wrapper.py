@@ -6,12 +6,15 @@ file with `CONFIGMEM,<file>.v`; that file supplies `<tile>_ConfigMem_wrapper`,
 which the tile instantiates in place of the generated module and which
 instantiates the generated module itself. Everything the wrapper does around
 that instance -- checking a frame before it is latched, scrubbing configuration
-bits after -- is the user's, and FABulous neither reads nor constrains it.
+bits after -- is the user's, and FABulous does not constrain it.
 
 The wrapper's extra ports are declared in the tile CSV with `CONFIGMEM_PORT`
-rows rather than read from the HDL, so parsing stays free of an HDL front end.
-That means the declaration and the HDL can disagree; the mismatch surfaces at
-synthesis, not at parse time.
+rows rather than read from the HDL. The file itself is scanned only far enough
+to confirm it is in the project language and declares the wrapper module; a
+wrapper instantiates the not-yet-generated `<tile>_ConfigMem`, so it cannot be
+elaborated while the fabric is still being parsed. The declaration and the
+port list of the HDL can therefore still disagree, and that mismatch surfaces
+at synthesis, not at parse time.
 """
 
 from __future__ import annotations

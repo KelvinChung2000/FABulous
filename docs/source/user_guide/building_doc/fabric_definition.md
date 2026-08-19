@@ -723,11 +723,22 @@ One name is special: a port called `UserCLK` is connected to the tile's own cloc
 of leaving the tile. It must be declared `INPUT` with width 1, and declaring it on a tile
 that has no user clock — because the fabric disables it — is an error.
 
-##### What FABulous does not check
+##### What FABulous checks, and what it does not
 
-FABulous never reads the wrapper's HDL; the `CONFIGMEM_PORT` lines are its only description
-of the module. That keeps fabric parsing free of an HDL front end, at a cost worth stating
-plainly:
+Three things about the wrapper file are checked while the tile CSV is parsed:
+
+- **It exists.** Unlike the mapping CSV, nothing generates it on demand, so a mistyped
+  path is an error rather than a tile instantiating a module nobody ever writes.
+- **It is in the project language.** A Verilog or SystemVerilog project takes a `.v` or
+  `.sv` wrapper, a VHDL project a `.vhd` or `.vhdl` one, matching the rule the models
+  pack already follows. The wrapper is elaborated with the rest of the fabric.
+- **It declares `<tile>_ConfigMem_wrapper`**, the module the tile is about to
+  instantiate. A declaration inside a comment does not count.
+
+What is *not* checked is the wrapper's logic, and the `CONFIGMEM_PORT` lines stay the
+only description FABulous has of its ports. A wrapper instantiates the generated
+`<tile>_ConfigMem`, which does not exist yet while the fabric is being parsed, so the
+file cannot be elaborated there. That leaves three costs worth stating plainly:
 
 - If the declared ports disagree with the wrapper's actual port list, the mismatch surfaces
   at synthesis, not when the fabric is parsed.
@@ -737,10 +748,6 @@ plainly:
 - Keep the file in step with the tile. If the tile's configuration-bit count changes, the
   wrapper's port widths change with it and FABulous cannot update a file it does not
   generate.
-
-A wrapper HDL file must exist when the tile CSV is parsed — unlike the mapping CSV, nothing
-generates it on demand, so a mistyped path is reported as an error rather than leaving the
-tile instantiating a module that does not exist.
 
 Wrappers are a tile-level feature. `CONFIGMEM` is a tile-CSV keyword, so a supertile
 cannot declare one; a tile that declares a wrapper also cannot be used inside a supertile,

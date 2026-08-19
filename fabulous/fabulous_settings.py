@@ -5,7 +5,6 @@ tool paths, project settings, and environment variable management.
 """
 
 import os
-import re
 from importlib.metadata import version as meta_version
 from pathlib import Path
 from shutil import which
@@ -31,6 +30,7 @@ from pydantic_settings import (
 )
 
 from fabulous.fabric_definition.define import HDLType
+from fabulous.fabric_generator.parser.hdl_scan import declared_modules, hdl_suffixes
 
 # User configuration directory for FABulous
 FAB_USER_CONFIG_DIR = Path(typer.get_app_dir("FABulous", force_posix=True))
@@ -247,48 +247,25 @@ class FABulousSettings(BaseSettings):
                 "Invalid project language while validating models_pack"
             ) from None
 
-        if proj_lang in {
-            HDLType.VERILOG,
-            HDLType.SYSTEM_VERILOG,
-        } and value.suffix not in {".v", ".sv"}:
+        accepted = hdl_suffixes(proj_lang)
+        if value.suffix not in accepted:
             raise ValueError(
-                "Models pack for Verilog/System Verilog must be a .v or .sv file"
+                f"Models pack for {proj_lang.value} must be a "
+                f"{' or '.join(sorted(accepted))} file"
             )
-        if proj_lang == HDLType.VHDL and value.suffix not in {".vhdl", ".vhd"}:
-            raise ValueError("Models pack for VHDL must be a .vhdl or .vhd file")
 
         # YosysJson cannot be used here (circular import + settings not yet
-        # fully initialised), so we do a lightweight regex scan instead.
-        if value.suffix in {".v", ".sv", ".vhd", ".vhdl"}:
-            content = value.read_text()
-
-            if value.suffix in {".v", ".sv"}:
-                # Strip comments before scanning so commented-out module
-                # declarations are not mistaken for real ones.
-                content = re.sub(r"/\*.*?\*/", "", content, flags=re.DOTALL)
-                content = re.sub(r"//[^\n]*", "", content)
-                found = set(re.findall(r"^\s*module\s+(\w+)", content, re.MULTILINE))
-            else:
-                # VHDL only has single-line comments ("--").
-                content = re.sub(r"--[^\n]*", "", content)
-                found = {
-                    match.lower()
-                    for match in re.findall(
-                        r"^\s*entity\s+(\w+)\s+is",
-                        content,
-                        re.MULTILINE | re.IGNORECASE,
-                    )
-                }
-
-            missing = [m for m in MODELS_PACK_REQUIRED_MODULES if m not in found]
-            if missing:
-                logger.warning(
-                    f"The models pack at '{value}' is missing the following "
-                    f"models-pack definitions: {missing}. "
-                    "The models pack may be outdated. Update it to a recent "
-                    "version from upstream FABulous, or use an older version "
-                    "of FABulous."
-                )
+        # fully initialised), so the file is scanned for its declarations.
+        found = declared_modules(value)
+        missing = [m for m in MODELS_PACK_REQUIRED_MODULES if m not in found]
+        if missing:
+            logger.warning(
+                f"The models pack at '{value}' is missing the following "
+                f"models-pack definitions: {missing}. "
+                "The models pack may be outdated. Update it to a recent "
+                "version from upstream FABulous, or use an older version "
+                "of FABulous."
+            )
 
         logger.info(f"Using models pack at: {value.absolute()}")
         return value.absolute()

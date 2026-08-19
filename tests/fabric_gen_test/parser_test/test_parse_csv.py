@@ -12,7 +12,6 @@ from fabulous.custom_exception import (
 from fabulous.fabric_definition.config_mem_wrapper import (
     ConfigMemPort,
     ConfigMemWrapper,
-    wrapper_module_name,
 )
 from fabulous.fabric_definition.define import IO, Direction, Side
 from fabulous.fabric_definition.fabric import Fabric
@@ -252,6 +251,10 @@ def write_tile_csv(proj_dir: Path, *extra_rows: str, matrix: str = "") -> Path:
     return tile_csv
 
 
+# Deliberately unrelated to TILE_NAME: the wrapper module is the user's to name,
+# so nothing may reconstruct it from the tile.
+WRAPPER_MODULE = "ecc_guard"
+
 # Wrapper suffixes paired with a project language that accepts them. Verilog and
 # SystemVerilog projects take either Verilog suffix, matching the models pack.
 WRAPPER_LANGUAGE_CASES = [
@@ -279,14 +282,14 @@ def write_config_mem_hdl(
     suffix : str
         HDL suffix, one of `.v`, `.sv`, `.vhd`, `.vhdl`.
     module : str | None, optional
-        Name to declare, defaulting to the wrapper module the tile expects.
+        Name to declare, defaulting to the module the tile CSV rows name.
 
     Returns
     -------
     Path
         The HDL file that was written.
     """
-    name = wrapper_module_name(TILE_NAME) if module is None else module
+    name = WRAPPER_MODULE if module is None else module
     if suffix in (".v", ".sv"):
         source = f"module {name};\nendmodule\n"
     else:
@@ -406,7 +409,7 @@ class TestConfigMemKeyword:
         monkeypatch.setenv("FAB_PROJ_LANG", lang)
         hdl = write_config_mem_hdl(tmp_path, suffix)
 
-        tile = parse_single_tile(tmp_path, f"CONFIGMEM,./{hdl.name}")
+        tile = parse_single_tile(tmp_path, f"CONFIGMEM,./{hdl.name},{WRAPPER_MODULE}")
 
         assert tile.config_mem_wrapper is not None
         assert tile.config_mem_wrapper.hdl_file == hdl
@@ -419,7 +422,7 @@ class TestConfigMemKeyword:
         monkeypatch.setenv("FAB_PROJ_LANG", lang)
         hdl = write_config_mem_hdl(tmp_path, suffix)
 
-        tile = parse_single_tile(tmp_path, f"CONFIGMEM,./{hdl.name}")
+        tile = parse_single_tile(tmp_path, f"CONFIGMEM,./{hdl.name},{WRAPPER_MODULE}")
 
         assert (
             tile.config_mem_csv
@@ -432,7 +435,7 @@ class TestConfigMemKeyword:
 
         tile = parse_single_tile(
             tmp_path,
-            f"CONFIGMEM,./{hdl.name}",
+            f"CONFIGMEM,./{hdl.name},{WRAPPER_MODULE}",
             matrix=MATRIX_WITH_TWO_CONFIG_BITS,
         )
 
@@ -444,7 +447,9 @@ class TestConfigMemKeyword:
     def test_missing_hdl_file_is_rejected(self, tmp_path: Path) -> None:
         """Nothing writes the HDL on demand, so a missing file is an error."""
         with pytest.raises(InvalidTileDefinition, match="does not exist"):
-            parse_single_tile(tmp_path, f"CONFIGMEM,./{TILE_NAME}_ConfigMem.v")
+            parse_single_tile(
+                tmp_path, f"CONFIGMEM,./{TILE_NAME}_ConfigMem.v,{WRAPPER_MODULE}"
+            )
 
     @pytest.mark.parametrize(
         "entry", ["./mapping.txt", "./mapping.list", "./mapping.yaml", "./mapping"]
@@ -483,7 +488,7 @@ class TestConfigMemWrapper:
         write_config_mem_hdl(tmp_path, ".v")
         tile = parse_single_tile(
             tmp_path,
-            f"CONFIGMEM,./{TILE_NAME}_ConfigMem.v",
+            f"CONFIGMEM,./{TILE_NAME}_ConfigMem.v,{WRAPPER_MODULE}",
             "CONFIGMEM_PORT,crc_error,OUTPUT,1",
             matrix=MATRIX_WITH_TWO_CONFIG_BITS,
         )
@@ -498,7 +503,7 @@ class TestConfigMemWrapper:
         write_config_mem_hdl(tmp_path, ".v")
         tile = parse_single_tile(
             tmp_path,
-            f"CONFIGMEM,./{TILE_NAME}_ConfigMem.v",
+            f"CONFIGMEM,./{TILE_NAME}_ConfigMem.v,{WRAPPER_MODULE}",
             "CONFIGMEM_PORT,scrub_en,INPUT,1",
             "CONFIGMEM_PORT,syndrome,OUTPUT,8",
             "CONFIGMEM_PORT,crc_error,OUTPUT,1",
@@ -515,7 +520,9 @@ class TestConfigMemWrapper:
     def test_a_tile_without_ports_has_an_empty_port_list(self, tmp_path: Path) -> None:
         """A bare wrapper is legal: it just wraps, adding no ports."""
         write_config_mem_hdl(tmp_path, ".v")
-        tile = parse_single_tile(tmp_path, f"CONFIGMEM,./{TILE_NAME}_ConfigMem.v")
+        tile = parse_single_tile(
+            tmp_path, f"CONFIGMEM,./{TILE_NAME}_ConfigMem.v,{WRAPPER_MODULE}"
+        )
 
         assert tile.config_mem_wrapper is not None
         assert tile.config_mem_wrapper.ports == ()
@@ -560,7 +567,9 @@ class TestConfigMemWrapper:
         write_config_mem_hdl(tmp_path, ".v")
 
         with pytest.raises(InvalidTileDefinition, match=match):
-            parse_single_tile(tmp_path, f"CONFIGMEM,./{TILE_NAME}_ConfigMem.v", row)
+            parse_single_tile(
+                tmp_path, f"CONFIGMEM,./{TILE_NAME}_ConfigMem.v,{WRAPPER_MODULE}", row
+            )
 
     def test_duplicate_port_names_are_rejected(self, tmp_path: Path) -> None:
         write_config_mem_hdl(tmp_path, ".v")
@@ -568,7 +577,7 @@ class TestConfigMemWrapper:
         with pytest.raises(InvalidTileDefinition, match="declared more than once"):
             parse_single_tile(
                 tmp_path,
-                f"CONFIGMEM,./{TILE_NAME}_ConfigMem.v",
+                f"CONFIGMEM,./{TILE_NAME}_ConfigMem.v,{WRAPPER_MODULE}",
                 "CONFIGMEM_PORT,crc_error,OUTPUT,1",
                 "CONFIGMEM_PORT,crc_error,OUTPUT,1",
             )
@@ -577,11 +586,60 @@ class TestConfigMemWrapper:
 class TestConfigMemWrapperHdlIsChecked:
     """The wrapper file must be in the project's language and declare the module.
 
-    FABulous never reads what the wrapper does, but two mistakes are cheap to
-    catch from the file itself: handing a VHDL project a Verilog wrapper, and
-    naming a file whose module is called something else. Left unchecked both
-    surface as a synthesis error a long way from the tile CSV that caused them.
+    The module is the user's to name, so `CONFIGMEM,<file>,<module>` writes it
+    out and nothing derives it from the tile. FABulous never reads what the
+    wrapper does, but the cheap mistakes are caught from the file itself:
+    handing a VHDL project a Verilog wrapper, and naming a module the file does
+    not declare. Left unchecked both surface as a synthesis error a long way
+    from the tile CSV that caused them.
     """
+
+    def test_the_module_is_not_derived_from_the_tile(self, tmp_path: Path) -> None:
+        """Any name will do, including one with no bearing on the tile."""
+        write_config_mem_hdl(tmp_path, ".v", module="whatever_i_like")
+        tile = parse_single_tile(
+            tmp_path, f"CONFIGMEM,./{TILE_NAME}_ConfigMem.v,whatever_i_like"
+        )
+
+        assert tile.config_mem_wrapper is not None
+        assert tile.config_mem_wrapper.module == "whatever_i_like"
+
+    def test_a_wrapper_without_a_module_is_rejected(self, tmp_path: Path) -> None:
+        """Nothing can be derived, so an omitted name is an error, not a default."""
+        hdl = write_config_mem_hdl(tmp_path, ".v")
+
+        with pytest.raises(InvalidTileDefinition, match="no module"):
+            parse_single_tile(tmp_path, f"CONFIGMEM,./{hdl.name}")
+
+    @pytest.mark.parametrize(
+        "module",
+        ["./ecc_guard.v", "ecc guard", "9lives", "ecc-guard"],
+        ids=["path", "space", "leading-digit", "dash"],
+    )
+    def test_a_module_name_that_is_not_an_identifier_is_rejected(
+        self, tmp_path: Path, module: str
+    ) -> None:
+        """Catches a mistyped field where it is written, not at synthesis."""
+        hdl = write_config_mem_hdl(tmp_path, ".v")
+
+        with pytest.raises(InvalidTileDefinition, match="not an HDL identifier"):
+            parse_single_tile(tmp_path, f"CONFIGMEM,./{hdl.name},{module}")
+
+    @pytest.mark.parametrize(
+        ("suffix", "lang"),
+        [(".v", "verilog"), (".vhd", "vhdl")],
+        ids=["verilog", "vhdl"],
+    )
+    def test_naming_the_generated_module_is_rejected(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch, suffix: str, lang: str
+    ) -> None:
+        """The wrapper instantiates `<tile>_ConfigMem`, so it cannot also be it."""
+        monkeypatch.setenv("FAB_PROJ_LANG", lang)
+        generated = f"{TILE_NAME}_ConfigMem"
+        hdl = write_config_mem_hdl(tmp_path, suffix, module=generated)
+
+        with pytest.raises(InvalidTileDefinition, match="name of its own"):
+            parse_single_tile(tmp_path, f"CONFIGMEM,./{hdl.name},{generated}")
 
     @pytest.mark.parametrize(
         ("suffix", "lang"),
@@ -600,7 +658,7 @@ class TestConfigMemWrapperHdlIsChecked:
         hdl = write_config_mem_hdl(tmp_path, suffix)
 
         with pytest.raises(InvalidTileDefinition, match="project language"):
-            parse_single_tile(tmp_path, f"CONFIGMEM,./{hdl.name}")
+            parse_single_tile(tmp_path, f"CONFIGMEM,./{hdl.name},{WRAPPER_MODULE}")
 
     @pytest.mark.parametrize(
         ("suffix", "lang"),
@@ -614,8 +672,8 @@ class TestConfigMemWrapperHdlIsChecked:
         monkeypatch.setenv("FAB_PROJ_LANG", lang)
         hdl = write_config_mem_hdl(tmp_path, suffix, module="some_other_module")
 
-        with pytest.raises(InvalidTileDefinition, match=wrapper_module_name(TILE_NAME)):
-            parse_single_tile(tmp_path, f"CONFIGMEM,./{hdl.name}")
+        with pytest.raises(InvalidTileDefinition, match=WRAPPER_MODULE):
+            parse_single_tile(tmp_path, f"CONFIGMEM,./{hdl.name},{WRAPPER_MODULE}")
 
     @pytest.mark.parametrize(
         ("suffix", "lang", "source"),
@@ -636,21 +694,19 @@ class TestConfigMemWrapperHdlIsChecked:
     ) -> None:
         monkeypatch.setenv("FAB_PROJ_LANG", lang)
         hdl = write_config_mem_hdl(tmp_path, suffix)
-        hdl.write_text(source.format(module=wrapper_module_name(TILE_NAME)))
+        hdl.write_text(source.format(module=WRAPPER_MODULE))
 
-        with pytest.raises(InvalidTileDefinition, match=wrapper_module_name(TILE_NAME)):
-            parse_single_tile(tmp_path, f"CONFIGMEM,./{hdl.name}")
+        with pytest.raises(InvalidTileDefinition, match=WRAPPER_MODULE):
+            parse_single_tile(tmp_path, f"CONFIGMEM,./{hdl.name},{WRAPPER_MODULE}")
 
     def test_a_vhdl_entity_matches_regardless_of_case(
         self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
     ) -> None:
         """VHDL identifiers are case-insensitive, so the check must be too."""
         monkeypatch.setenv("FAB_PROJ_LANG", "vhdl")
-        hdl = write_config_mem_hdl(
-            tmp_path, ".vhd", module=wrapper_module_name(TILE_NAME).upper()
-        )
+        hdl = write_config_mem_hdl(tmp_path, ".vhd", module=WRAPPER_MODULE.upper())
 
-        tile = parse_single_tile(tmp_path, f"CONFIGMEM,./{hdl.name}")
+        tile = parse_single_tile(tmp_path, f"CONFIGMEM,./{hdl.name},{WRAPPER_MODULE}")
 
         assert tile.config_mem_wrapper is not None
 
@@ -659,19 +715,17 @@ class TestConfigMemWrapperHdlIsChecked:
     ) -> None:
         """Verilog identifiers are case-sensitive, so a near miss is a miss."""
         monkeypatch.setenv("FAB_PROJ_LANG", "verilog")
-        hdl = write_config_mem_hdl(
-            tmp_path, ".v", module=wrapper_module_name(TILE_NAME).upper()
-        )
+        hdl = write_config_mem_hdl(tmp_path, ".v", module=WRAPPER_MODULE.upper())
 
-        with pytest.raises(InvalidTileDefinition, match=wrapper_module_name(TILE_NAME)):
-            parse_single_tile(tmp_path, f"CONFIGMEM,./{hdl.name}")
+        with pytest.raises(InvalidTileDefinition, match=WRAPPER_MODULE):
+            parse_single_tile(tmp_path, f"CONFIGMEM,./{hdl.name},{WRAPPER_MODULE}")
 
 
 class TestConfigMemIsTileOnly:
     """`CONFIGMEM` is a tile-CSV keyword; a supertile cannot declare one."""
 
     @pytest.mark.parametrize(
-        "row", ["CONFIGMEM,./wrapper.v", "CONFIGMEM_PORT,crc_error,OUTPUT,1"]
+        "row", ["CONFIGMEM,./wrapper.v,ecc_guard", "CONFIGMEM_PORT,crc_error,OUTPUT,1"]
     )
     def test_config_mem_in_a_supertile_names_itself_in_the_error(
         self, tmp_path: Path, row: str
@@ -694,7 +748,7 @@ class TestConfigMemIsTileOnly:
         hdl = tmp_path / "wrapper.v"
         hdl.write_text("")
         tile = make_empty_tile(TILE_NAME)
-        tile.config_mem_wrapper = ConfigMemWrapper(hdl_file=hdl)
+        tile.config_mem_wrapper = ConfigMemWrapper(hdl_file=hdl, module="ecc_guard")
         super_csv = tmp_path / "super.csv"
         super_csv.write_text(f"SuperTILE,DSP\n{TILE_NAME}\nEndSuperTILE\n")
 

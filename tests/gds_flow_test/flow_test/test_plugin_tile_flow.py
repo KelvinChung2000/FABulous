@@ -560,17 +560,17 @@ class TestFABulousTileEndToEnd:
         tmp_path: Path,
         mocker: MockerFixture,
     ) -> None:
-        """`CONFIGMEM,<file>.v` wraps the generated module, it does not replace it.
+        """`CONFIGMEM,<file>,<module>` wraps the generated module, not replaces it.
 
         The generated RTL, the mapping CSV and the user's wrapper all have to
         reach the synthesis file list, because the wrapper instantiates the
         module FABulous generated.
         """
         name = SYNTHETIC_TILE_NAME
-        wrapper = tmp_path / name / f"{name}_ConfigMem_wrapper.v"
+        wrapper = tmp_path / name / "ecc_guard.v"
         tile_workspace = _build_synthetic_tile(
             tmp_path,
-            extra_rows=(f"CONFIGMEM,./{wrapper.name}",),
+            extra_rows=(f"CONFIGMEM,./{wrapper.name},ecc_guard",),
             # Four 4-input muxes, so the tile really has configuration bits.
             matrix="".join(
                 f"S1BEG{out},N1END{src}\n" for out in range(4) for src in range(4)
@@ -578,9 +578,7 @@ class TestFABulousTileEndToEnd:
         )
         # The parser checks that the file declares the module the tile
         # instantiates; the body is the user's and is never read.
-        wrapper.write_text(
-            f"module {name}_ConfigMem_wrapper;\nendmodule\n", encoding="utf-8"
-        )
+        wrapper.write_text("module ecc_guard;\nendmodule\n", encoding="utf-8")
 
         flow = FABulousTile(
             config={

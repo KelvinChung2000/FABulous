@@ -208,7 +208,9 @@ class TestConfigMemWrapperPortsReachTheTop:
         hdl = tmp_path / "LUT4AB_ConfigMem_wrapper.v"
         hdl.write_text("")
         tile = make_empty_tile("LUT4AB", config_bits=4)
-        tile.config_mem_wrapper = ConfigMemWrapper(hdl_file=hdl, ports=(port,))
+        tile.config_mem_wrapper = ConfigMemWrapper(
+            hdl_file=hdl, module="ecc_guard", ports=(port,)
+        )
         return make_fabric_from_grid([[tile]])
 
     def test_the_port_is_declared_at_the_tile_coordinates(
@@ -241,7 +243,9 @@ class TestConfigMemWrapperPortsReachTheTop:
         def _fabric_text(ports: tuple[ConfigMemPort, ...]) -> str:
             writer = code_generator_factory(".v", f"fabric{len(ports)}")
             tile = make_empty_tile("LUT4AB", config_bits=4)
-            tile.config_mem_wrapper = ConfigMemWrapper(hdl_file=hdl, ports=ports)
+            tile.config_mem_wrapper = ConfigMemWrapper(
+                hdl_file=hdl, module="ecc_guard", ports=ports
+            )
             generateFabric(writer, make_fabric_from_grid([[tile]]))
             return writer.outFileName.read_text()
 

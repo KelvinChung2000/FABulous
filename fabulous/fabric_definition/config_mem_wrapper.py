@@ -2,15 +2,16 @@
 
 FABulous always generates `<tile>_ConfigMem`, the frame-latch array that turns
 frame data into configuration bits. A tile CSV may additionally name an HDL
-file with `CONFIGMEM,<file>.v`; that file supplies `<tile>_ConfigMem_wrapper`,
-which the tile instantiates in place of the generated module and which
-instantiates the generated module itself. Everything the wrapper does around
-that instance -- checking a frame before it is latched, scrubbing configuration
-bits after -- is the user's, and FABulous does not constrain it.
+file and a module inside it with `CONFIGMEM,<file>.v,<module>`; the tile
+instantiates that module in place of the generated one, and the module
+instantiates the generated one itself. Everything the wrapper does around that
+instance -- checking a frame before it is latched, scrubbing configuration bits
+after -- is the user's, and FABulous does not constrain it, down to what the
+module is called.
 
 The wrapper's extra ports are declared in the tile CSV with `CONFIGMEM_PORT`
 rows rather than read from the HDL. The file itself is scanned only far enough
-to confirm it is in the project language and declares the wrapper module; a
+to confirm it is in the project language and declares the named module; a
 wrapper instantiates the not-yet-generated `<tile>_ConfigMem`, so it cannot be
 elaborated while the fabric is still being parsed. The declaration and the
 port list of the HDL can therefore still disagree, and that mismatch surfaces
@@ -19,6 +20,7 @@ at synthesis, not at parse time.
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
 from enum import Enum, auto
 from typing import TYPE_CHECKING
@@ -30,7 +32,9 @@ from fabulous.fabric_definition.define import IO
 if TYPE_CHECKING:
     from pathlib import Path
 
-WRAPPER_MODULE_SUFFIX = "_ConfigMem_wrapper"
+# An HDL identifier: what a wrapper module may be called in both Verilog and
+# VHDL. Checked so a path or a stray CSV field is rejected where it is written.
+MODULE_NAME = re.compile(r"[A-Za-z_][A-Za-z0-9_]*\Z")
 
 # The ports every ConfigMem exposes. A wrapper stands in for the generated
 # module, so it must expose these too and may not redeclare them as extras.
@@ -41,22 +45,6 @@ CONFIG_MEM_STANDARD_PORTS = frozenset(
 # Connected to the tile's clock instead of becoming an external port, matching
 # how a BEL's UserCLK port is treated.
 USER_CLK_PORT = "UserCLK"
-
-
-def wrapper_module_name(tile_name: str) -> str:
-    """Return the wrapper module name a tile instantiates.
-
-    Parameters
-    ----------
-    tile_name : str
-        Name of the tile.
-
-    Returns
-    -------
-    str
-        `<tile_name>_ConfigMem_wrapper`.
-    """
-    return f"{tile_name}{WRAPPER_MODULE_SUFFIX}"
 
 
 @dataclass(frozen=True)
@@ -119,23 +107,35 @@ class ConfigMemWrapper:
     Attributes
     ----------
     hdl_file : Path
-        The file supplying `<tile>_ConfigMem_wrapper`. It must exist: nothing
-        generates it on demand.
+        The file supplying the wrapper. It must exist: nothing generates it on
+        demand.
+    module : str
+        The module the tile instantiates. Named by the user, so it carries no
+        convention FABulous can reconstruct.
     ports : tuple[ConfigMemPort, ...]
         Extra ports beyond the standard ConfigMem four, in declaration order.
     """
 
     hdl_file: Path
+    module: str
     ports: tuple[ConfigMemPort, ...] = ()
 
     def __post_init__(self) -> None:
-        """Reject a port list that cannot be wired.
+        """Reject a wrapper that cannot be instantiated or wired.
 
         Raises
         ------
         ValueError
-            If two ports share a name.
+            If the module name is not an HDL identifier, or two ports share a
+            name.
         """
+        if not MODULE_NAME.match(self.module):
+            raise ValueError(
+                f"CONFIGMEM module name {self.module!r} is not an HDL "
+                "identifier. Give the name of the module the tile is to "
+                "instantiate, as CONFIGMEM,<file>,<module>."
+            )
+
         seen: set[str] = set()
         for port in self.ports:
             if port.name in seen:

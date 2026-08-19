@@ -2,6 +2,7 @@
 
 import re
 from copy import deepcopy
+from dataclasses import replace
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -21,7 +22,6 @@ from fabulous.fabric_definition.config_mem_wrapper import (
     ConfigMemPort,
     ConfigMemWrapper,
     resolve_config_mem_csv,
-    wrapper_module_name,
 )
 from fabulous.fabric_definition.define import (
     IO,
@@ -242,24 +242,24 @@ CONFIG_MEM_WRAPPER_SUFFIXES = (".v", ".sv", ".vhd", ".vhdl")
 
 
 def parse_config_mem_line(
-    entry: str, tile_name: str, tile_csv_dir: Path, *, proj_lang: HDLType
-) -> tuple[ConfigMemMode, Path | None]:
-    """Parse the payload of a `CONFIGMEM` line from a tile CSV.
+    fields: list[str], tile_name: str, tile_csv_dir: Path, *, proj_lang: HDLType
+) -> tuple[ConfigMemMode, Path | None, ConfigMemWrapper | None]:
+    """Parse a `CONFIGMEM` line from a tile CSV.
 
     The suffix decides the mode, the same rule `MATRIX` already follows. A
     `.csv` entry names the frame-to-bit mapping file; the file need not exist,
     because `generateConfigMem` writes a default enumerated mapping when it is
-    missing. An HDL entry names a file supplying `<tile>_ConfigMem_wrapper`,
-    which the tile instantiates instead of the generated `<tile>_ConfigMem` and
-    which instantiates that generated module itself; the file must exist, since
-    nothing writes it on demand. `NULL` states that the tile has no
-    configuration memory.
+    missing. An HDL entry, written `CONFIGMEM,<file>,<module>`, names a file
+    and the module inside it that the tile instantiates instead of the
+    generated `<tile>_ConfigMem`, and which instantiates that generated module
+    itself; the file must exist, since nothing writes it on demand. The module
+    is the user's to name, so it has to be written out rather than derived.
+    `NULL` states that the tile has no configuration memory.
 
     Parameters
     ----------
-    entry : str
-        The field after `CONFIGMEM`: a path relative to the tile CSV's
-        directory, or `NULL`.
+    fields : list[str]
+        The comma-separated fields of the line, including the keyword itself.
     tile_name : str
         Name of the tile being parsed, used in error messages.
     tile_csv_dir : Path
@@ -271,14 +271,22 @@ def parse_config_mem_line(
     ------
     InvalidTileDefinition
         If the entry is empty, names an HDL file that does not exist, is not in
-        the project language, or does not declare the wrapper module, or has
-        any other unrecognised suffix.
+        the project language, names no module or one the file does not declare,
+        or has any other unrecognised suffix.
 
     Returns
     -------
-    tuple[ConfigMemMode, Path | None]
-        The declared mode and the path it names, which is None for `NULL`.
+    tuple[ConfigMemMode, Path | None, ConfigMemWrapper | None]
+        The declared mode, the path it names, and the wrapper it declares. The
+        path is None for `NULL`, and the wrapper is None unless the line
+        declares one. The wrapper carries no ports yet: `CONFIGMEM_PORT` rows
+        are read afterwards.
     """
+    # Tile CSV rows carry a trailing comma run, so a short line arrives padded
+    # with empty fields rather than missing them.
+    padded = [f.strip() for f in fields] + ["", ""]
+    entry, module = padded[1], padded[2]
+
     if not entry:
         raise InvalidTileDefinition(
             f"CONFIGMEM line in tile {tile_name} has no value. Give a path to a "
@@ -287,12 +295,12 @@ def parse_config_mem_line(
         )
 
     if entry == CONFIG_MEM_NULL_TOKEN:
-        return (ConfigMemMode.NULL, None)
+        return (ConfigMemMode.NULL, None, None)
 
     path = tile_csv_dir.joinpath(entry)
 
     if path.suffix == CONFIG_MEM_MAPPING_SUFFIX:
-        return (ConfigMemMode.MAPPING, path)
+        return (ConfigMemMode.MAPPING, path, None)
 
     if path.suffix in CONFIG_MEM_WRAPPER_SUFFIXES:
         # Nothing writes this file on demand the way generateConfigMem writes a
@@ -315,15 +323,34 @@ def parse_config_mem_line(
                 f"{' or '.join(sorted(accepted))} file."
             )
 
-        wanted = wrapper_module_name(tile_name)
+        if not module:
+            raise InvalidTileDefinition(
+                f"CONFIGMEM entry {entry!r} in tile {tile_name} names a wrapper "
+                "HDL file but no module in it. The module is yours to name, so "
+                "FABulous cannot guess which one the tile should instantiate: "
+                "write it as CONFIGMEM,<file>,<module>."
+            )
+
+        try:
+            wrapper = ConfigMemWrapper(hdl_file=path, module=module)
+        except ValueError as e:
+            raise InvalidTileDefinition(f"Tile {tile_name}: {e}") from e
+
+        generated = f"{tile_name}_ConfigMem"
+        vhdl = path.suffix in VHDL_SUFFIXES
+        # VHDL identifiers are case-insensitive, so names are compared
+        # lowercased there and as written for Verilog.
+        wanted = module.lower() if vhdl else module
+        if wanted == (generated.lower() if vhdl else generated):
+            raise InvalidTileDefinition(
+                f"CONFIGMEM entry in tile {tile_name} names its wrapper module "
+                f"{module!r}, which is the name FABulous generates for the "
+                "module the wrapper is meant to instantiate. Give the wrapper "
+                "a name of its own."
+            )
+
         declared = declared_modules(path)
-        # VHDL identifiers are case-insensitive and come back lowercased;
-        # Verilog names come back as written.
-        if path.suffix in VHDL_SUFFIXES:
-            found = wanted.lower() in declared
-        else:
-            found = wanted in declared
-        if not found:
+        if wanted not in declared:
             declares = (
                 f" It declares {', '.join(sorted(declared))}."
                 if declared
@@ -331,12 +358,12 @@ def parse_config_mem_line(
             )
             raise InvalidTileDefinition(
                 f"CONFIGMEM entry {entry!r} in tile {tile_name} names {path}, "
-                f"which does not declare {wanted}.{declares} The tile "
+                f"which does not declare {module}.{declares} The tile "
                 "instantiates that module in place of its generated ConfigMem, "
                 "so the file has to supply it under that name."
             )
 
-        return (ConfigMemMode.WRAPPER, path)
+        return (ConfigMemMode.WRAPPER, path, wrapper)
 
     raise InvalidTileDefinition(
         f"CONFIGMEM entry {entry!r} in tile {tile_name} has unsupported suffix "
@@ -471,7 +498,7 @@ def parseTilesCSV(
         matrix_dir: Path | None = None
         config_mem_mode: ConfigMemMode | None = None
         config_mem_csv_override: Path | None = None
-        config_mem_wrapper_hdl: Path | None = None
+        config_mem_wrapper: ConfigMemWrapper | None = None
         config_mem_ports: list[ConfigMemPort] = []
         gen_ios: list[Gen_IO] = []
         with_user_clk = False
@@ -674,14 +701,14 @@ def parseTilesCSV(
                         f"Tile {tile_name} has more than one CONFIGMEM line. "
                         "A tile has exactly one configuration memory."
                     )
-                config_mem_mode, path = parse_config_mem_line(
-                    temp[1] if len(temp) > 1 else "",
+                config_mem_mode, path, wrapper = parse_config_mem_line(
+                    temp,
                     tile_name,
                     file_path_parent,
                     proj_lang=get_context().proj_lang,
                 )
                 if config_mem_mode is ConfigMemMode.WRAPPER:
-                    config_mem_wrapper_hdl = path
+                    config_mem_wrapper = wrapper
                 elif config_mem_mode is ConfigMemMode.MAPPING:
                     config_mem_csv_override = path
 
@@ -727,19 +754,17 @@ def parseTilesCSV(
                 tile_name, bels, matrix_dir, tile_carry, local_shared_ports
             )
 
-        if config_mem_ports and config_mem_wrapper_hdl is None:
-            raise InvalidTileDefinition(
-                f"Tile {tile_name} declares CONFIGMEM_PORT lines but no wrapper "
-                "HDL. CONFIGMEM_PORT describes ports of the module named by "
-                "CONFIGMEM,<file>.v, so that line has to come first."
-            )
-
-        if config_mem_wrapper_hdl is None:
-            config_mem_wrapper = None
-        else:
+        if config_mem_ports:
+            if config_mem_wrapper is None:
+                raise InvalidTileDefinition(
+                    f"Tile {tile_name} declares CONFIGMEM_PORT lines but no "
+                    "wrapper. CONFIGMEM_PORT describes ports of the module "
+                    "named by CONFIGMEM,<file>,<module>, so that line has to "
+                    "come first."
+                )
             try:
-                config_mem_wrapper = ConfigMemWrapper(
-                    hdl_file=config_mem_wrapper_hdl, ports=tuple(config_mem_ports)
+                config_mem_wrapper = replace(
+                    config_mem_wrapper, ports=tuple(config_mem_ports)
                 )
             except ValueError as e:
                 raise InvalidTileDefinition(f"Tile {tile_name}: {e}") from e

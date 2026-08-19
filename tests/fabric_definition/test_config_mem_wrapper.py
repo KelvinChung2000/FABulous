@@ -24,7 +24,6 @@ from fabulous.fabric_definition.config_mem_wrapper import (
     ConfigMemWrapper,
     conventional_config_mem_csv,
     resolve_config_mem_csv,
-    wrapper_module_name,
 )
 from fabulous.fabric_definition.define import IO
 from fabulous.fabric_definition.supertile import SuperTile
@@ -137,9 +136,24 @@ def test_supertile_derives_the_conventional_location() -> None:
     assert super_tile.config_mem_csv == PROJ / "Tile/DSP/DSP_ConfigMem.csv"
 
 
-def test_wrapper_module_is_named_after_the_tile() -> None:
-    """The tile instantiates a wrapper whose name it can compute."""
-    assert wrapper_module_name("LUT4AB") == "LUT4AB_ConfigMem_wrapper"
+@pytest.mark.parametrize(
+    "module",
+    ["ecc_guard", "_private", "Guard2", "a"],
+    ids=["plain", "leading-underscore", "mixed-case", "single-letter"],
+)
+def test_any_hdl_identifier_may_name_the_wrapper(module: str) -> None:
+    """The module is the user's to name; nothing derives it from the tile."""
+    assert ConfigMemWrapper(hdl_file=Path("w.v"), module=module).module == module
+
+
+@pytest.mark.parametrize(
+    "module",
+    ["", "9lives", "ecc guard", "ecc-guard", "./ecc_guard.v"],
+    ids=["empty", "leading-digit", "space", "dash", "path"],
+)
+def test_a_module_name_that_is_not_an_identifier_is_rejected(module: str) -> None:
+    with pytest.raises(ValueError, match="not an HDL identifier"):
+        ConfigMemWrapper(hdl_file=Path("w.v"), module=module)
 
 
 class TestWrapperPortValidation:
@@ -173,12 +187,15 @@ class TestWrapperPortValidation:
     def test_duplicate_port_names_are_rejected(self, tmp_path: Path) -> None:
         port = ConfigMemPort(name="crc_error", io=IO.OUTPUT, width=1)
         with pytest.raises(ValueError, match="declared more than once"):
-            ConfigMemWrapper(hdl_file=tmp_path / "w.v", ports=(port, port))
+            ConfigMemWrapper(
+                hdl_file=tmp_path / "w.v", module="ecc_guard", ports=(port, port)
+            )
 
     def test_user_clk_is_not_an_external_port(self, tmp_path: Path) -> None:
         """`UserCLK` binds to the tile clock, so it never leaves the tile."""
         wrapper = ConfigMemWrapper(
             hdl_file=tmp_path / "w.v",
+            module="ecc_guard",
             ports=(
                 ConfigMemPort(name="UserCLK", io=IO.INPUT, width=1),
                 ConfigMemPort(name="crc_error", io=IO.OUTPUT, width=1),
@@ -189,7 +206,7 @@ class TestWrapperPortValidation:
         assert [p.name for p in wrapper.external_ports] == ["crc_error"]
 
     def test_a_wrapper_without_user_clk_says_so(self, tmp_path: Path) -> None:
-        wrapper = ConfigMemWrapper(hdl_file=tmp_path / "w.v")
+        wrapper = ConfigMemWrapper(hdl_file=tmp_path / "w.v", module="ecc_guard")
         assert not wrapper.wants_user_clk
         assert wrapper.external_ports == ()
 
@@ -305,7 +322,9 @@ class TestAWrapperNeverSuppressesGeneration:
         generateConfigMemInit(mapping, 8)
         tile = make_empty_tile("LUT4AB", config_bits=8)
         tile.config_mem_csv = mapping
-        tile.config_mem_wrapper = ConfigMemWrapper(hdl_file=tmp_path / "wrap.v")
+        tile.config_mem_wrapper = ConfigMemWrapper(
+            hdl_file=tmp_path / "wrap.v", module="ecc_guard"
+        )
 
         spec = generateBitstreamSpec(make_fabric_from_grid([[tile]]))
 

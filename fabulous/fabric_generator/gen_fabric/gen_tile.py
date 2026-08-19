@@ -16,10 +16,7 @@ Key features:
 from collections import defaultdict
 from pathlib import Path
 
-from fabulous.fabric_definition.config_mem_wrapper import (
-    USER_CLK_PORT,
-    wrapper_module_name,
-)
+from fabulous.fabric_definition.config_mem_wrapper import USER_CLK_PORT
 from fabulous.fabric_definition.define import IO, ConfigBitMode, Direction
 from fabulous.fabric_definition.supertile import SuperTile
 from fabulous.fabric_definition.tile import Tile
@@ -430,7 +427,7 @@ def generateTile(
         if tile.config_mem_wrapper is None:
             config_mem_module = f"{tile.name}_ConfigMem"
         else:
-            config_mem_module = wrapper_module_name(tile.name)
+            config_mem_module = tile.config_mem_wrapper.module
             if tile.config_mem_wrapper.wants_user_clk:
                 if disable_user_clk:
                     raise ValueError(

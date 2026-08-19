@@ -1,9 +1,9 @@
 """Tests for how `generateTile` treats a tile's configuration memory.
 
 FABulous always generates `<tile>_ConfigMem`. When the tile CSV names a wrapper
-the tile instantiates `<tile>_ConfigMem_wrapper` instead, and that wrapper is
-what instantiates the generated module, so user logic can sit before or after
-the configuration bits.
+the tile instantiates the module the user named instead, and that module is
+what instantiates the generated one, so user logic can sit before or after the
+configuration bits.
 """
 
 from collections.abc import Callable
@@ -21,6 +21,9 @@ from fabulous.fabric_generator.gen_fabric.gen_tile import generateTile
 from tests.conftest import make_empty_tile
 
 TILE_NAME = "LUT4AB"
+# Unrelated to TILE_NAME on purpose: the tile has to instantiate the name the
+# user gave, not one it could have reconstructed.
+WRAPPER_MODULE = "ecc_guard"
 
 
 def _stub_entity(path: Path, name: str) -> None:
@@ -52,9 +55,9 @@ def verilog_writer(
 
 def _wrapper(tmp_path: Path, *ports: ConfigMemPort) -> ConfigMemWrapper:
     """A wrapper whose HDL file exists, with the given extra ports."""
-    hdl = tmp_path / f"{TILE_NAME}_ConfigMem_wrapper.v"
+    hdl = tmp_path / f"{WRAPPER_MODULE}.v"
     hdl.write_text("")
-    return ConfigMemWrapper(hdl_file=hdl, ports=ports)
+    return ConfigMemWrapper(hdl_file=hdl, module=WRAPPER_MODULE, ports=ports)
 
 
 class TestInstantiation:
@@ -80,7 +83,7 @@ class TestInstantiation:
         generateTile(verilog_writer, tile)
 
         rtl = verilog_writer.outFileName.read_text()
-        assert f"\n{TILE_NAME}_ConfigMem_wrapper\n" in rtl
+        assert f"\n{WRAPPER_MODULE}\n" in rtl
         assert f"Inst_{TILE_NAME}_ConfigMem" in rtl
 
 
@@ -136,14 +139,16 @@ class TestVhdlComponentDeclarations:
         """The wrapper is instantiated by the tile, the module by the wrapper."""
         _stub_entity(tmp_path / f"{TILE_NAME}_ConfigMem.vhdl", f"{TILE_NAME}_ConfigMem")
         wrapper_hdl = tmp_path / "hand" / "my_wrapper.vhdl"
-        _stub_entity(wrapper_hdl, f"{TILE_NAME}_ConfigMem_wrapper")
+        _stub_entity(wrapper_hdl, WRAPPER_MODULE)
         tile = make_empty_tile(TILE_NAME, config_bits=4)
-        tile.config_mem_wrapper = ConfigMemWrapper(hdl_file=wrapper_hdl)
+        tile.config_mem_wrapper = ConfigMemWrapper(
+            hdl_file=wrapper_hdl, module=WRAPPER_MODULE
+        )
 
         generateTile(vhdl_writer, tile)
 
         rtl = vhdl_writer.outFileName.read_text()
-        assert f"component {TILE_NAME}_ConfigMem_wrapper is" in rtl
+        assert f"component {WRAPPER_MODULE} is" in rtl
         assert f"component {TILE_NAME}_ConfigMem is" in rtl
 
     def test_vhdl_reports_a_missing_config_mem_file(

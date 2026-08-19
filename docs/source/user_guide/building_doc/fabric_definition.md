@@ -667,7 +667,7 @@ EndTILE
 | --- | --- |
 | _no `CONFIGMEM` line_ | The mapping CSV is taken from its conventional location beside the tile CSV. This is the default and no existing fabric needs changing. |
 | `<path>.csv` | Use this file as the mapping CSV. It need not exist yet; FABulous writes a default enumerated mapping if it is missing. |
-| `<path>.v`, `.sv`, `.vhd`, `.vhdl` | This file supplies a _wrapper_ around the tile's generated configuration memory. See [wrapping the configuration memory](#wrapping-the-configuration-memory). |
+| `<path>.v`, `.sv`, `.vhd`, `.vhdl` followed by `,<module>` | This file supplies a _wrapper_ around the tile's generated configuration memory, and `<module>` is the module inside it that the tile instantiates. See [wrapping the configuration memory](#wrapping-the-configuration-memory). |
 | `NULL` | The tile has no configuration memory. Only valid for a tile with zero configuration bits. |
 
 (wrapping-the-configuration-memory)=
@@ -678,16 +678,19 @@ Naming an HDL file is how user hardware is placed in the configuration-memory pa
 example a checksum over the configuration bits, an ECC scrubber, or a write lock.
 
 FABulous keeps generating `<tile_descriptor>_ConfigMem` exactly as it would otherwise. Your
-file supplies a second module, `<tile_descriptor>_ConfigMem_wrapper`, which the tile
-instantiates in its place and which instantiates the generated module itself. Your logic
-sits between the two — before the frame data reaches the latches, after the configuration
-bits leave them, or both:
+file supplies a second module, which the tile instantiates in its place and which
+instantiates the generated module itself. Your logic sits between the two — before the
+frame data reaches the latches, after the configuration bits leave them, or both:
 
 ```{code-block} text
 
-<tile>            instantiates  ->  <tile>_ConfigMem_wrapper   (yours)
-<tile>_ConfigMem_wrapper          ->  <tile>_ConfigMem         (generated)
+<tile>            instantiates  ->  <module>            (yours)
+<module>                          ->  <tile>_ConfigMem  (generated)
 ```
+
+The module is yours to name, so the `CONFIGMEM` line names it after the file. Call it
+anything an HDL identifier allows — anything except `<tile_descriptor>_ConfigMem`, which
+is the generated module it is meant to instantiate.
 
 Because the generated module is still generated, the mapping CSV, the bitstream and the
 frame layout are unaffected by anything the wrapper does around it.
@@ -704,12 +707,12 @@ enable to start a scrub. Declare each one with a `CONFIGMEM_PORT` line after the
 `CONFIGMEM` line:
 
 ```{code-block} text
-:emphasize-lines: 5,6,7
+:emphasize-lines: 4,5,6,7
 
 TILE, LUT4AB
 BEL,            LUT4c_frame_config_OQ.vhdl,  LA_
 MATRIX,         LUT4AB_switch_matrix.list
-CONFIGMEM,      LUT4AB_ConfigMem_wrapper.v
+CONFIGMEM,      ecc_guard.v,  ecc_guard
 CONFIGMEM_PORT, crc_error,  OUTPUT,  1
 CONFIGMEM_PORT, scrub_en,   INPUT,   1
 CONFIGMEM_PORT, syndrome,   OUTPUT,  8
@@ -732,8 +735,9 @@ Three things about the wrapper file are checked while the tile CSV is parsed:
 - **It is in the project language.** A Verilog or SystemVerilog project takes a `.v` or
   `.sv` wrapper, a VHDL project a `.vhd` or `.vhdl` one, matching the rule the models
   pack already follows. The wrapper is elaborated with the rest of the fabric.
-- **It declares `<tile>_ConfigMem_wrapper`**, the module the tile is about to
-  instantiate. A declaration inside a comment does not count.
+- **It declares the module the `CONFIGMEM` line names**, the one the tile is about to
+  instantiate. A declaration inside a comment does not count, and omitting the name is an
+  error rather than a guess at a convention.
 
 What is *not* checked is the wrapper's logic, and the `CONFIGMEM_PORT` lines stay the
 only description FABulous has of its ports. A wrapper instantiates the generated

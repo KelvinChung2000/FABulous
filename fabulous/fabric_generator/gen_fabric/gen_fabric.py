@@ -102,6 +102,23 @@ def generateFabric(writer: CodeGenerator, fabric: Fabric) -> None:
                         )
                         writer.addComment("EXTERNAL", onNewLine=False)
 
+                # A ConfigMem wrapper's extra ports leave the fabric the same
+                # way a BEL's external ports do.
+                if tile.config_mem_wrapper is not None:
+                    for p in tile.config_mem_wrapper.external_ports:
+                        if p.width == 1:
+                            writer.addPortScalar(
+                                f"Tile_X{x}Y{y}_{p.name}", p.io, indentLevel=2
+                            )
+                        else:
+                            writer.addPortVector(
+                                f"Tile_X{x}Y{y}_{p.name}",
+                                p.io,
+                                f"{p.width}-1",
+                                indentLevel=2,
+                            )
+                        writer.addComment("EXTERNAL", onNewLine=False)
+
     # supertile-level BEL external ports (the BEL lives in the wrapper, not a
     # child tile); declare them at the wrapper's anchor coordinates.
     for ax, ay, superTile in iter_super_tile_anchors(fabric):
@@ -365,6 +382,11 @@ def generateFabric(writer: CodeGenerator, fabric: Fabric) -> None:
                         for p in b.sharedPort:
                             if "UserCLK" not in p[0]:
                                 portsPairs.append(("UserCLK", p[0]))
+
+                wrapper = fabric.tile[y + j][x + i].config_mem_wrapper
+                if wrapper is not None:
+                    for p in wrapper.external_ports:
+                        portsPairs.append((p.name, f"Tile_X{x + i}Y{y + j}_{p.name}"))
 
             # supertile-level BEL external ports: connect the wrapper's external
             # ports to the top-level nets declared at the anchor coordinates.

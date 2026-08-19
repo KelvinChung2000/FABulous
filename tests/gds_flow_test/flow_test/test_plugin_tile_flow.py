@@ -129,16 +129,14 @@ class TestEmitTileVerilog:
     def test_regular_tile_emits_switch_matrix_config_mem_and_tile(
         self, mock_writer: MagicMock, mocker: MockerFixture, tmp_path: Path
     ) -> None:
-        from fabulous.fabric_definition.config_mem_spec import ConfigMemSpec
         from fabulous.fabric_definition.tile import Tile
 
         tile_dir: Path = tmp_path / "LUT4AB"
         tile_dir.mkdir()
         mock_tile: MagicMock = mocker.MagicMock(spec=Tile)
         mock_tile.name = "LUT4AB"
-        mock_tile.config_mem = ConfigMemSpec(
-            mapping_csv=tile_dir / "LUT4AB_ConfigMem.csv"
-        )
+        mock_tile.config_mem_csv = tile_dir / "LUT4AB_ConfigMem.csv"
+        mock_tile.config_mem_wrapper = None
 
         actual_paths: list[Path] = []
         gen_sm = mocker.patch.object(plugin_tile_flow, "genTileSwitchMatrix")
@@ -183,7 +181,6 @@ class TestEmitTileVerilog:
             mock_tile.name,
             mock_tile.globalConfigBits,
             tile_dir / "LUT4AB_ConfigMem.csv",
-            hdl_file=None,
         )
         gen_tile.assert_called_once()
 
@@ -558,27 +555,28 @@ class TestFABulousTileEndToEnd:
         assert any(f"{name}_switch_matrix.v" in p for p in verilog_files)
 
     @pytest.mark.usefixtures("stubbed_pdk_and_flow")
-    def test_run_uses_a_hand_written_config_mem_instead_of_generating_one(
+    def test_run_generates_the_config_mem_and_adds_the_wrapper(
         self,
         tmp_path: Path,
         mocker: MockerFixture,
     ) -> None:
-        """`CONFIGMEM,<file>.v` leaves the module to the user's file.
+        """`CONFIGMEM,<file>.v` wraps the generated module, it does not replace it.
 
-        The mapping CSV is still written, because the bitstream reads it
-        whoever owns the RTL.
+        The generated RTL, the mapping CSV and the user's wrapper all have to
+        reach the synthesis file list, because the wrapper instantiates the
+        module FABulous generated.
         """
         name = SYNTHETIC_TILE_NAME
-        hand_written = tmp_path / name / f"{name}_ConfigMem_hand.v"
+        wrapper = tmp_path / name / f"{name}_ConfigMem_wrapper.v"
         tile_workspace = _build_synthetic_tile(
             tmp_path,
-            extra_rows=(f"CONFIGMEM,./{hand_written.name}",),
+            extra_rows=(f"CONFIGMEM,./{wrapper.name}",),
             # Four 4-input muxes, so the tile really has configuration bits.
             matrix="".join(
                 f"S1BEG{out},N1END{src}\n" for out in range(4) for src in range(4)
             ),
         )
-        hand_written.write_text("", encoding="utf-8")
+        wrapper.write_text("", encoding="utf-8")
 
         flow = FABulousTile(
             config={
@@ -596,7 +594,7 @@ class TestFABulousTileEndToEnd:
 
         flow.run(initial_state=mocker.MagicMock())
 
-        assert not (tile_workspace / f"{name}_ConfigMem.v").exists()
+        assert (tile_workspace / f"{name}_ConfigMem.v").is_file()
         assert (tile_workspace / f"{name}_ConfigMem.csv").is_file()
         verilog_files = [str(p) for p in flow.config["VERILOG_FILES"]]
-        assert str(hand_written) in verilog_files
+        assert str(wrapper) in verilog_files

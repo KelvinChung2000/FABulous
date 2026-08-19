@@ -29,6 +29,9 @@ from pathlib import Path
 import pytest
 
 from fabulous.fabric_definition.bel import Bel
+from fabulous.fabric_definition.config_mem_wrapper import (
+    conventional_config_mem_csv,
+)
 from fabulous.fabric_definition.define import IO, ConfigBitMode, Direction, Side
 from fabulous.fabric_definition.port import TilePort
 from fabulous.fabric_definition.supertile import SuperTile
@@ -333,6 +336,7 @@ class TestBelExternalPorts:
             switch_matrix=SwitchMatrix(matrix_file=Path(), connections={}),
             gen_ios=[],
             userCLK=False,
+            config_mem_csv=conventional_config_mem_csv("BelTile", Path()),
         )
         net = supertile_netlist([[tile]])
 
@@ -369,6 +373,7 @@ class TestInterTileRouting:
             switch_matrix=SwitchMatrix(matrix_file=Path(), connections={}),
             gen_ios=[],
             userCLK=False,
+            config_mem_csv=conventional_config_mem_csv("Left", Path()),
         )
         right = Tile(
             name="Right",
@@ -391,6 +396,7 @@ class TestInterTileRouting:
             switch_matrix=SwitchMatrix(matrix_file=Path(), connections={}),
             gen_ios=[],
             userCLK=False,
+            config_mem_csv=conventional_config_mem_csv("Right", Path()),
         )
         net = supertile_netlist([[left, right]])
 

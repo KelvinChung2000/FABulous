@@ -11,6 +11,7 @@ from loguru import logger
 import fabulous.fabulous
 import fabulous.fabulous_settings
 from fabulous.fabric_definition.bel import Bel
+from fabulous.fabric_definition.config_mem_wrapper import conventional_config_mem_csv
 from fabulous.fabric_definition.define import IO, Direction, HDLType, Side
 from fabulous.fabric_definition.fabric import Fabric
 from fabulous.fabric_definition.port import TilePort
@@ -75,6 +76,7 @@ def make_empty_tile(
         gen_ios=[],
         userCLK=False,
         pinOrderConfig=pinOrderConfig,
+        config_mem_csv=conventional_config_mem_csv(name, tileDir),
     )
 
 

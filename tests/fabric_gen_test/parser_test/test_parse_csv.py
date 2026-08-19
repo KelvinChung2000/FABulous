@@ -4,12 +4,22 @@ from pathlib import Path
 
 import pytest
 
-from fabulous.custom_exception import InvalidPortType, InvalidTileDefinition
+from fabulous.custom_exception import (
+    InvalidPortType,
+    InvalidSupertileDefinition,
+    InvalidTileDefinition,
+)
+from fabulous.fabric_definition.config_mem_wrapper import ConfigMemPort
 from fabulous.fabric_definition.define import IO, Direction, Side
 from fabulous.fabric_definition.fabric import Fabric
 from fabulous.fabric_definition.tile import Tile
-from fabulous.fabric_generator.parser.parse_csv import parse_port_line, parseTilesCSV
+from fabulous.fabric_generator.parser.parse_csv import (
+    parse_port_line,
+    parseSupertilesCSV,
+    parseTilesCSV,
+)
 from fabulous.fabulous_settings import init_context
+from tests.conftest import make_empty_tile
 
 # (kind, physical side of the OUTPUT/start port, physical side of the INPUT/end port)
 DIRECTIONAL_CASES = [
@@ -133,8 +143,8 @@ class TestPortNameTrailingDigit:
         assert ports
 
 
-class TestConfigMemSpecWiring:
-    """`parseTilesCSV` is the sole producer of a tile's `ConfigMemSpec`.
+class TestConfigMemWiring:
+    """`parseTilesCSV` is the sole producer of a tile's config-memory path.
 
     The mapping CSV path used to be rebuilt by convention in every consumer.
     These tests pin the parser as the one place that decides it, for both the
@@ -147,7 +157,7 @@ class TestConfigMemSpecWiring:
     ) -> None:
         for tile in parsed_default_fabric.tileDic.values():
             assert (
-                tile.config_mem.mapping_csv
+                tile.config_mem_csv
                 == tile.tileDir.parent / f"{tile.name}_ConfigMem.csv"
             )
 
@@ -157,13 +167,11 @@ class TestConfigMemSpecWiring:
         assert parsed_default_fabric.superTileDic, "fixture must contain a supertile"
         for super_tile in parsed_default_fabric.superTileDic.values():
             assert (
-                super_tile.config_mem.mapping_csv
+                super_tile.config_mem_csv
                 == super_tile.tileDir.parent / f"{super_tile.name}_ConfigMem.csv"
             )
             for sub_tile in super_tile.tiles:
-                assert (
-                    sub_tile.config_mem.mapping_csv != super_tile.config_mem.mapping_csv
-                )
+                assert sub_tile.config_mem_csv != super_tile.config_mem_csv
 
     def test_legacy_inline_layout_follows_the_switch_matrix_file(
         self, tmp_path: Path
@@ -188,12 +196,13 @@ class TestConfigMemSpecWiring:
             "EndTILE,,,,,,,\n"
         )
 
+        (tmp_path / ".FABulous").mkdir(exist_ok=True)
         init_context(tmp_path)
         tiles, _ = parseTilesCSV(fabric_csv)
 
         assert len(tiles) == 1
         assert tiles[0].tileDir == fabric_csv
-        assert tiles[0].config_mem.mapping_csv == matrix_dir / "LUT4AB_ConfigMem.csv"
+        assert tiles[0].config_mem_csv == matrix_dir / "LUT4AB_ConfigMem.csv"
 
 
 TILE_NAME = "LUT4AB"
@@ -280,6 +289,7 @@ def parse_single_tile(proj_dir: Path, *extra_rows: str, matrix: str = "") -> Til
         The single parsed tile.
     """
     tile_csv = write_tile_csv(proj_dir, *extra_rows, matrix=matrix)
+    (proj_dir / ".FABulous").mkdir(exist_ok=True)
     init_context(proj_dir)
     tiles, _ = parseTilesCSV(tile_csv)
     assert len(tiles) == 1
@@ -289,10 +299,9 @@ def parse_single_tile(proj_dir: Path, *extra_rows: str, matrix: str = "") -> Til
 class TestConfigMemKeyword:
     """The optional `CONFIGMEM` tile-CSV line says where config memory comes from.
 
-    A `.csv` entry overrides the mapping-file path. An HDL entry hands the
-    `<tile>_ConfigMem` module to the user, exactly as a hand-written `MATRIX`
-    file does for the switch matrix, and leaves the mapping CSV where
-    convention puts it — the bitstream reads it either way.
+    A `.csv` entry overrides the mapping-file path. An HDL entry names a
+    wrapper around the generated `<tile>_ConfigMem`, and leaves the mapping CSV
+    where convention puts it — the bitstream reads it either way.
     """
 
     def test_absent_line_keeps_the_convention_default(self, tmp_path: Path) -> None:
@@ -300,7 +309,7 @@ class TestConfigMemKeyword:
         tile = parse_single_tile(tmp_path)
 
         assert (
-            tile.config_mem.mapping_csv
+            tile.config_mem_csv
             == tmp_path / "Tile" / TILE_NAME / f"{TILE_NAME}_ConfigMem.csv"
         )
 
@@ -319,7 +328,7 @@ class TestConfigMemKeyword:
         tile = parse_single_tile(tmp_path, f"CONFIGMEM,{entry}")
 
         assert (
-            tile.config_mem.mapping_csv.resolve()
+            tile.config_mem_csv.resolve()
             == tmp_path.joinpath(*expected_parts).resolve()
         )
 
@@ -327,14 +336,14 @@ class TestConfigMemKeyword:
         """`generateConfigMem` writes the mapping on demand, so absence is fine."""
         tile = parse_single_tile(tmp_path, "CONFIGMEM,./not_written_yet.csv")
 
-        assert not tile.config_mem.mapping_csv.exists()
-        assert tile.config_mem.mapping_csv.name == "not_written_yet.csv"
+        assert not tile.config_mem_csv.exists()
+        assert tile.config_mem_csv.name == "not_written_yet.csv"
 
     def test_null_means_no_configuration_memory(self, tmp_path: Path) -> None:
         tile = parse_single_tile(tmp_path, "CONFIGMEM,NULL")
 
-        assert tile.config_mem is not None
-        assert tile.config_mem.mapping_csv is None
+        assert tile.config_mem_csv is None
+        assert tile.config_mem_wrapper is None
         assert tile.globalConfigBits == 0
 
     def test_null_on_a_tile_with_config_bits_is_rejected(self, tmp_path: Path) -> None:
@@ -361,7 +370,7 @@ class TestConfigMemKeyword:
         tile = parse_single_tile(tmp_path, matrix=MATRIX_WITH_TWO_CONFIG_BITS)
 
         assert tile.globalConfigBits == 2
-        assert tile.config_mem.mapping_csv is not None
+        assert tile.config_mem_csv is not None
 
     @pytest.mark.parametrize("suffix", [".v", ".sv", ".vhd", ".vhdl"])
     def test_hdl_entry_is_recorded_for_every_suffix(
@@ -371,24 +380,25 @@ class TestConfigMemKeyword:
 
         tile = parse_single_tile(tmp_path, f"CONFIGMEM,./{hdl.name}")
 
-        assert tile.config_mem.hdl_file == hdl
+        assert tile.config_mem_wrapper is not None
+        assert tile.config_mem_wrapper.hdl_file == hdl
 
     @pytest.mark.parametrize("suffix", [".v", ".sv", ".vhd", ".vhdl"])
     def test_hdl_entry_keeps_the_conventional_mapping_csv(
         self, tmp_path: Path, suffix: str
     ) -> None:
-        """Owning the RTL does not move the bitstream's mapping file."""
+        """Wrapping the module does not move the bitstream's mapping file."""
         hdl = write_config_mem_hdl(tmp_path, suffix)
 
         tile = parse_single_tile(tmp_path, f"CONFIGMEM,./{hdl.name}")
 
         assert (
-            tile.config_mem.mapping_csv
+            tile.config_mem_csv
             == tmp_path / "Tile" / TILE_NAME / f"{TILE_NAME}_ConfigMem.csv"
         )
 
     def test_hdl_entry_survives_a_tile_with_config_bits(self, tmp_path: Path) -> None:
-        """An HDL tile is not a `CONFIGMEM,NULL` tile, so bits are fine."""
+        """A wrapped tile is not a `CONFIGMEM,NULL` tile, so bits are fine."""
         hdl = write_config_mem_hdl(tmp_path, ".v")
 
         tile = parse_single_tile(
@@ -398,25 +408,14 @@ class TestConfigMemKeyword:
         )
 
         assert tile.globalConfigBits == 2
-        assert tile.config_mem.hdl_file == hdl
-        assert tile.config_mem.mapping_csv is not None
+        assert tile.config_mem_wrapper is not None
+        assert tile.config_mem_wrapper.hdl_file == hdl
+        assert tile.config_mem_csv is not None
 
     def test_missing_hdl_file_is_rejected(self, tmp_path: Path) -> None:
         """Nothing writes the HDL on demand, so a missing file is an error."""
         with pytest.raises(InvalidTileDefinition, match="does not exist"):
             parse_single_tile(tmp_path, f"CONFIGMEM,./{TILE_NAME}_ConfigMem.v")
-
-    def test_hdl_entry_warns_what_is_not_generated(
-        self, tmp_path: Path, caplog: pytest.LogCaptureFixture
-    ) -> None:
-        """The user has to be told the module is now theirs to keep in step."""
-        hdl = write_config_mem_hdl(tmp_path, ".v")
-
-        parse_single_tile(tmp_path, f"CONFIGMEM,./{hdl.name}")
-
-        assert hdl.name in caplog.text
-        assert f"generates NO {TILE_NAME}_ConfigMem module" in caplog.text
-        assert f"{TILE_NAME}_ConfigMem.csv" in caplog.text
 
     @pytest.mark.parametrize(
         "entry", ["./mapping.txt", "./mapping.list", "./mapping.yaml", "./mapping"]
@@ -438,3 +437,127 @@ class TestConfigMemKeyword:
     def test_unknown_keyword_error_advertises_configmem(self, tmp_path: Path) -> None:
         with pytest.raises(InvalidTileDefinition, match="MATRIX, CONFIGMEM, and"):
             parse_single_tile(tmp_path, "CONFIGMEMORY,./mapping.csv")
+
+
+class TestConfigMemWrapper:
+    """`CONFIGMEM,<file>.v` wraps the generated ConfigMem, it does not replace it.
+
+    FABulous still generates `<tile>_ConfigMem`. The named HDL supplies
+    `<tile>_ConfigMem_wrapper`, which the tile instantiates in its place and
+    which instantiates the generated module itself, so user logic can sit
+    before or after the configuration bits. Extra wrapper ports are declared
+    with `CONFIGMEM_PORT` rows and leave the tile as external ports.
+    """
+
+    def test_wrapper_ports_are_parsed_into_typed_ports(self, tmp_path: Path) -> None:
+        """A CONFIGMEM_PORT row becomes a typed port on the tile's wrapper."""
+        write_config_mem_hdl(tmp_path, ".v")
+        tile = parse_single_tile(
+            tmp_path,
+            f"CONFIGMEM,./{TILE_NAME}_ConfigMem.v",
+            "CONFIGMEM_PORT,crc_error,OUTPUT,1",
+            matrix=MATRIX_WITH_TWO_CONFIG_BITS,
+        )
+
+        assert tile.config_mem_wrapper is not None
+        assert tile.config_mem_wrapper.ports == (
+            ConfigMemPort(name="crc_error", io=IO.OUTPUT, width=1),
+        )
+
+    def test_ports_are_kept_in_declaration_order(self, tmp_path: Path) -> None:
+        """Order is the user's, because it is the wrapper's port order."""
+        write_config_mem_hdl(tmp_path, ".v")
+        tile = parse_single_tile(
+            tmp_path,
+            f"CONFIGMEM,./{TILE_NAME}_ConfigMem.v",
+            "CONFIGMEM_PORT,scrub_en,INPUT,1",
+            "CONFIGMEM_PORT,syndrome,OUTPUT,8",
+            "CONFIGMEM_PORT,crc_error,OUTPUT,1",
+            matrix=MATRIX_WITH_TWO_CONFIG_BITS,
+        )
+
+        assert tile.config_mem_wrapper is not None
+        assert [p.name for p in tile.config_mem_wrapper.ports] == [
+            "scrub_en",
+            "syndrome",
+            "crc_error",
+        ]
+
+    def test_a_tile_without_ports_has_an_empty_port_list(self, tmp_path: Path) -> None:
+        """A bare wrapper is legal: it just wraps, adding no ports."""
+        write_config_mem_hdl(tmp_path, ".v")
+        tile = parse_single_tile(tmp_path, f"CONFIGMEM,./{TILE_NAME}_ConfigMem.v")
+
+        assert tile.config_mem_wrapper is not None
+        assert tile.config_mem_wrapper.ports == ()
+
+    @pytest.mark.parametrize(
+        "config_mem_row",
+        [None, "CONFIGMEM,NULL", "CONFIGMEM,./mapping.csv"],
+        ids=["no-configmem-line", "null", "mapping-csv"],
+    )
+    def test_ports_without_a_wrapper_are_rejected(
+        self, tmp_path: Path, config_mem_row: str | None
+    ) -> None:
+        """`CONFIGMEM_PORT` describes a wrapper, so there has to be one."""
+        rows = [] if config_mem_row is None else [config_mem_row]
+        rows.append("CONFIGMEM_PORT,crc_error,OUTPUT,1")
+
+        with pytest.raises(InvalidTileDefinition, match="no wrapper"):
+            parse_single_tile(tmp_path, *rows)
+
+    @pytest.mark.parametrize(
+        ("row", "match"),
+        [
+            ("CONFIGMEM_PORT,crc_error,SIDEWAYS,1", "Give INPUT or OUTPUT"),
+            ("CONFIGMEM_PORT,crc_error,OUTPUT,wide", "not an integer"),
+            ("CONFIGMEM_PORT,crc_error,OUTPUT", "needs a name, a direction"),
+            ("CONFIGMEM_PORT,crc_error", "needs a name, a direction"),
+            ("CONFIGMEM_PORT,FrameData,INPUT,32", "collides with a standard"),
+            ("CONFIGMEM_PORT,crc_error,OUTPUT,0", "at least one bit"),
+        ],
+        ids=[
+            "bad-direction",
+            "non-integer-width",
+            "missing-width",
+            "missing-direction",
+            "standard-port-name",
+            "zero-width",
+        ],
+    )
+    def test_malformed_port_row_is_rejected(
+        self, tmp_path: Path, row: str, match: str
+    ) -> None:
+        write_config_mem_hdl(tmp_path, ".v")
+
+        with pytest.raises(InvalidTileDefinition, match=match):
+            parse_single_tile(tmp_path, f"CONFIGMEM,./{TILE_NAME}_ConfigMem.v", row)
+
+    def test_duplicate_port_names_are_rejected(self, tmp_path: Path) -> None:
+        write_config_mem_hdl(tmp_path, ".v")
+
+        with pytest.raises(InvalidTileDefinition, match="declared more than once"):
+            parse_single_tile(
+                tmp_path,
+                f"CONFIGMEM,./{TILE_NAME}_ConfigMem.v",
+                "CONFIGMEM_PORT,crc_error,OUTPUT,1",
+                "CONFIGMEM_PORT,crc_error,OUTPUT,1",
+            )
+
+
+class TestConfigMemIsTileOnly:
+    """`CONFIGMEM` is a tile-CSV keyword; a supertile cannot declare one."""
+
+    @pytest.mark.parametrize(
+        "row", ["CONFIGMEM,./wrapper.v", "CONFIGMEM_PORT,crc_error,OUTPUT,1"]
+    )
+    def test_config_mem_in_a_supertile_names_itself_in_the_error(
+        self, tmp_path: Path, row: str
+    ) -> None:
+        """The error says CONFIGMEM, not the generic 'not tiles or Null'."""
+        super_csv = tmp_path / "super.csv"
+        super_csv.write_text(f"SuperTILE,DSP\n{row}\nLUT4AB\nEndSuperTILE\n")
+        tile_dic = {TILE_NAME: make_empty_tile(TILE_NAME)}
+
+        with pytest.raises(InvalidSupertileDefinition, match="CONFIGMEM"):
+            parseSupertilesCSV(super_csv, tile_dic)

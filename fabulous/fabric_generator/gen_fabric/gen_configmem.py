@@ -109,7 +109,6 @@ def generateConfigMem(
     config_mem_csv: Path | None,
     frame_bits_per_row: int = 32,
     max_frame_per_col: int = 20,
-    hdl_file: Path | None = None,
 ) -> None:
     """Generate the RTL code for configuration memory.
 
@@ -117,10 +116,9 @@ def generateConfigMem(
     `generateConfigMemInit`. A `None` path means the tile declared
     `CONFIGMEM,NULL`, so there is no configuration memory to generate.
 
-    When `hdl_file` is given the tile supplies its own `<name>_ConfigMem`
-    module, so no RTL is written. The mapping CSV is still created if missing
-    and still checked against `config_bits_count`, because the bitstream reads
-    it regardless of who wrote the RTL.
+    The module is always generated. A tile may wrap it with hand-written HDL
+    (`CONFIGMEM,<file>.v`), but that wrapper instantiates this module, so
+    suppressing it would leave the wrapper with nothing to wrap.
 
     We use a file to describe the exact configuration bits to frame mapping
     the following command generates an init file with a
@@ -143,9 +141,6 @@ def generateConfigMem(
         The number of configuration bits per frame row.
     max_frame_per_col : int
         The number of frames stored per tile column.
-    hdl_file : Path | None
-        Hand-written HDL supplying the `<name>_ConfigMem` module. When set, the
-        module is not generated.
 
     Raises
     ------
@@ -223,13 +218,6 @@ def generateConfigMem(
             f"Total config bits in {name}_configMem.csv ({totalConfigBits}) "
             f"does not match global config bits ({config_bits_count})"
         )
-
-    if hdl_file is not None:
-        logger.info(
-            f"{name} provides a hand-written ConfigMem HDL ({hdl_file.name}); "
-            "skipping ConfigMem generation."
-        )
-        return
 
     # start writing the file
     logger.info(f"Generating {writer.outFileName} for {name}")

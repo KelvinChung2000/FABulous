@@ -16,6 +16,10 @@ Key features:
 from collections import defaultdict
 from pathlib import Path
 
+from fabulous.fabric_definition.config_mem_wrapper import (
+    USER_CLK_PORT,
+    wrapper_module_name,
+)
 from fabulous.fabric_definition.define import IO, ConfigBitMode, Direction
 from fabulous.fabric_definition.supertile import SuperTile
 from fabulous.fabric_definition.tile import Tile
@@ -88,6 +92,9 @@ def generateTile(
     FileNotFoundError
         Only raised for VHDL output. If required component files
         (e.g., switch matrix or config memory) are missing.
+    ValueError
+        If the tile's ConfigMem wrapper declares a `UserCLK` port but the tile
+        has no user clock.
     """
     allJumpWireList = []
 
@@ -154,6 +161,15 @@ def generateTile(
         externalPorts += i.externalInput
         externalPorts += i.externalOutput
 
+    # A ConfigMem wrapper's extra ports leave the tile the same way a BEL's
+    # external ports do; UserCLK is bound to the tile clock instead.
+    if tile.config_mem_wrapper is not None:
+        for p in tile.config_mem_wrapper.external_ports:
+            if p.width == 1:
+                writer.addPortScalar(p.name, p.io, indentLevel=2)
+            else:
+                writer.addPortVector(p.name, p.io, f"{p.width}-1", indentLevel=2)
+
     # if we found BELs with top-level IO ports, we just pass them through
     sharedExternalPorts = set()
     for i in tile.bels:
@@ -216,11 +232,9 @@ def generateTile(
             )
 
         if tile.globalConfigBits > 0:
-            # A hand-written ConfigMem is never generated into basePath, so the
-            # component has to be read from the file the tile CSV named.
-            config_mem_vhdl = tile.config_mem.hdl_file or (
-                basePath / f"{tile.name}_ConfigMem.vhdl"
-            )
+            # The generated module is always instantiated: by the tile directly,
+            # or by the wrapper that stands in for it.
+            config_mem_vhdl = basePath / f"{tile.name}_ConfigMem.vhdl"
             if config_mem_vhdl.exists():
                 writer.addComponentDeclarationForFile(str(config_mem_vhdl))
             else:
@@ -229,6 +243,18 @@ def generateTile(
                     f"{config_mem_vhdl.parent} Need to run config_mem "
                     "generation first"
                 )
+
+            # The wrapper is never generated into basePath, so its component
+            # has to be read from the file the tile CSV named.
+            if tile.config_mem_wrapper is not None:
+                wrapper_vhdl = tile.config_mem_wrapper.hdl_file
+                if not wrapper_vhdl.exists():
+                    raise FileNotFoundError(
+                        f"Could not find ConfigMem wrapper {wrapper_vhdl.name} in "
+                        f"{wrapper_vhdl.parent}. FABulous does not generate it; "
+                        "the file must be supplied."
+                    )
+                writer.addComponentDeclarationForFile(str(wrapper_vhdl))
 
     # signal declarations
     writer.addComment("signal declarations", onNewLine=True)
@@ -395,15 +421,31 @@ def generateTile(
 
     if config_bit_mode == ConfigBitMode.FRAME_BASED and tile.globalConfigBits > 0:
         writer.addComment("configuration storage latches", onNewLine=True)
+        config_mem_ports = [
+            ("FrameData", "FrameData"),
+            ("FrameStrobe", "FrameStrobe"),
+            ("ConfigBits", "ConfigBits"),
+            ("ConfigBits_N", "ConfigBits_N"),
+        ]
+        if tile.config_mem_wrapper is None:
+            config_mem_module = f"{tile.name}_ConfigMem"
+        else:
+            config_mem_module = wrapper_module_name(tile.name)
+            if tile.config_mem_wrapper.wants_user_clk:
+                if disable_user_clk:
+                    raise ValueError(
+                        f"The ConfigMem wrapper of tile {tile.name} declares a "
+                        f"{USER_CLK_PORT} port, but the tile has no user clock."
+                    )
+                config_mem_ports.append((USER_CLK_PORT, USER_CLK_PORT))
+            config_mem_ports += [
+                (p.name, p.name) for p in tile.config_mem_wrapper.external_ports
+            ]
+
         writer.addInstantiation(
-            compName=f"{tile.name}_ConfigMem",
+            compName=config_mem_module,
             compInsName=f"Inst_{tile.name}_ConfigMem",
-            portsPairs=[
-                ("FrameData", "FrameData"),
-                ("FrameStrobe", "FrameStrobe"),
-                ("ConfigBits", "ConfigBits"),
-                ("ConfigBits_N", "ConfigBits_N"),
-            ],
+            portsPairs=config_mem_ports,
             emulateParamPairs=[("Emulate_Bitstream", "Emulate_Bitstream")],
         )
 

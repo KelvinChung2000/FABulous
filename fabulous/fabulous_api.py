@@ -186,8 +186,8 @@ class FABulous_API:
         """Generate configuration memory for specified tile.
 
         A tile that declares `CONFIGMEM,NULL` has no configuration memory, so
-        nothing is generated for it. A tile that declares HDL supplies its own
-        `<tile>_ConfigMem` module, so only its mapping CSV is written.
+        nothing is generated for it. A wrapper never suppresses generation: it
+        instantiates `<tile>_ConfigMem`, so that module is always written.
 
         Parameters
         ----------
@@ -195,7 +195,7 @@ class FABulous_API:
             Name of the tile for which configuration memory will be generated.
         config_mem : Path | None, optional
             Frame-to-bit mapping CSV to read. Defaults to the tile's own
-            `config_mem.mapping_csv`, which is the authoritative location.
+            `config_mem_csv`, which is the authoritative location.
 
         Raises
         ------
@@ -207,10 +207,9 @@ class FABulous_API:
                 self.writer,
                 tile.name,
                 tile.globalConfigBits,
-                tile.config_mem.mapping_csv if config_mem is None else config_mem,
+                tile.config_mem_csv if config_mem is None else config_mem,
                 frame_bits_per_row=self.fabric.frameBitsPerRow,
                 max_frame_per_col=self.fabric.maxFramesPerCol,
-                hdl_file=tile.config_mem.hdl_file,
             )
         else:
             raise ValueError(f"Tile {tile_name} not found")
@@ -389,7 +388,7 @@ class FABulous_API:
             generate_super_tile_config_mem(
                 self.writer,
                 tile,
-                master_tile.config_mem.mapping_csv,
+                master_tile.config_mem_csv,
                 frame_bits_per_row=self.fabric.frameBitsPerRow,
                 max_frame_per_col=self.fabric.maxFramesPerCol,
             )

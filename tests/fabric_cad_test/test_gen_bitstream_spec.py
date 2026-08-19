@@ -24,6 +24,9 @@ from fabulous.fabric_cad.gen_bitstream_spec import (
     generateBitstreamSpec,
 )
 from fabulous.fabric_definition.bel import Bel
+from fabulous.fabric_definition.config_mem_wrapper import (
+    conventional_config_mem_csv,
+)
 from fabulous.fabric_definition.define import Direction
 from fabulous.fabric_definition.fabric import Fabric
 from fabulous.fabric_definition.switch_matrix import SwitchMatrix
@@ -312,6 +315,9 @@ def _build_fabric(
         switch_matrix=SwitchMatrix.from_file(matrix_path, _TILE_NAME),
         gen_ios=[],
         userCLK=False,
+        config_mem_csv=conventional_config_mem_csv(
+            _TILE_NAME, tile_dir / f"{_TILE_NAME}.csv"
+        ),
     )
     tile.wireList = wires
 

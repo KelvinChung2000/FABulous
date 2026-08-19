@@ -11,6 +11,9 @@ import pytest
 from cocotb_tools.runner import get_runner
 from pytest_mock import MockerFixture
 
+from fabulous.fabric_definition.config_mem_wrapper import (
+    conventional_config_mem_csv,
+)
 from fabulous.fabric_definition.configmem import ConfigMem
 from fabulous.fabric_definition.fabric import Fabric
 from fabulous.fabric_definition.switch_matrix import SwitchMatrix
@@ -56,7 +59,16 @@ def mk_tile(tmp_path: Path) -> Callable[[str], Tile]:
         switch_matrix = SwitchMatrix(
             matrix_file=tmp_path / f"{name}.list", connections={}
         )
-        return Tile(name, [], [], tmp_path, switch_matrix, [], False)
+        return Tile(
+            name,
+            [],
+            [],
+            tmp_path,
+            switch_matrix,
+            [],
+            False,
+            config_mem_csv=conventional_config_mem_csv(name, tmp_path),
+        )
 
     return _create
 

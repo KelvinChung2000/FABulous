@@ -91,7 +91,7 @@ def generateBitstreamSpec(fabric: Fabric) -> dict[str, dict]:
         for x, tile in enumerate(row):
             if tile is None:
                 continue
-            config_mem_path = tile.config_mem.mapping_csv
+            config_mem_path = tile.config_mem_csv
             logger.info(f"ConfigMemPath: {config_mem_path}")
 
             # A CONFIGMEM,NULL tile has no mapping file, which is the same
@@ -200,7 +200,7 @@ def generateBitstreamSpec(fabric: Fabric) -> dict[str, dict]:
         st_mask_dic: dict[int, str] = {}
         if st_config_bits > 0:
             st_config_mem_list = parseConfigMem(
-                super_tile.config_mem.mapping_csv,
+                super_tile.config_mem_csv,
                 fabric.maxFramesPerCol,
                 fabric.frameBitsPerRow,
                 st_config_bits,

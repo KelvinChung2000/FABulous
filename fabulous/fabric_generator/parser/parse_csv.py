@@ -2,7 +2,6 @@
 
 import re
 from copy import deepcopy
-from dataclasses import replace
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -17,9 +16,11 @@ from fabulous.custom_exception import (
     InvalidSwitchMatrixDefinition,
     InvalidTileDefinition,
 )
-from fabulous.fabric_definition.config_mem_spec import (
-    ConfigMemSpec,
-    resolve_config_mem_spec,
+from fabulous.fabric_definition.config_mem_wrapper import (
+    ConfigMemMode,
+    ConfigMemPort,
+    ConfigMemWrapper,
+    resolve_config_mem_csv,
 )
 from fabulous.fabric_definition.define import (
     IO,
@@ -235,20 +236,17 @@ CONFIG_MEM_WRAPPER_SUFFIXES = (".v", ".sv", ".vhd", ".vhdl")
 
 def parse_config_mem_line(
     entry: str, tile_name: str, tile_csv_dir: Path
-) -> ConfigMemSpec:
+) -> tuple[ConfigMemMode, Path | None]:
     """Parse the payload of a `CONFIGMEM` line from a tile CSV.
 
     The suffix decides the mode, the same rule `MATRIX` already follows. A
     `.csv` entry names the frame-to-bit mapping file; the file need not exist,
     because `generateConfigMem` writes a default enumerated mapping when it is
-    missing. An HDL entry names a file that provides `<tile>_ConfigMem`, so
-    FABulous generates no ConfigMem RTL for the tile; that file must exist,
-    since nothing writes it on demand. `NULL` states that the tile has no
+    missing. An HDL entry names a file supplying `<tile>_ConfigMem_wrapper`,
+    which the tile instantiates instead of the generated `<tile>_ConfigMem` and
+    which instantiates that generated module itself; the file must exist, since
+    nothing writes it on demand. `NULL` states that the tile has no
     configuration memory.
-
-    An HDL entry leaves `mapping_csv` unset: the mapping stays where convention
-    puts it, and `parseTilesCSV` fills it in once the tile's real directory is
-    known.
 
     Parameters
     ----------
@@ -268,50 +266,102 @@ def parse_config_mem_line(
 
     Returns
     -------
-    ConfigMemSpec
-        Spec pointing at the named mapping CSV, at the named HDL file, or with
-        `mapping_csv` set to None for `NULL`.
+    tuple[ConfigMemMode, Path | None]
+        The declared mode and the path it names, which is None for `NULL`.
     """
     if not entry:
         raise InvalidTileDefinition(
             f"CONFIGMEM line in tile {tile_name} has no value. Give a path to a "
-            f"{CONFIG_MEM_MAPPING_SUFFIX} mapping file, or "
+            f"{CONFIG_MEM_MAPPING_SUFFIX} mapping file, a wrapper HDL file, or "
             f"{CONFIG_MEM_NULL_TOKEN} for a tile without configuration memory."
         )
 
     if entry == CONFIG_MEM_NULL_TOKEN:
-        return ConfigMemSpec(mapping_csv=None)
+        return (ConfigMemMode.NULL, None)
 
     path = tile_csv_dir.joinpath(entry)
 
     if path.suffix == CONFIG_MEM_MAPPING_SUFFIX:
-        return ConfigMemSpec(mapping_csv=path)
+        return (ConfigMemMode.MAPPING, path)
 
     if path.suffix in CONFIG_MEM_WRAPPER_SUFFIXES:
         # Nothing writes this file on demand the way generateConfigMem writes a
-        # missing mapping CSV, so a typo here would silently leave the tile
-        # without a ConfigMem module at all.
+        # missing mapping CSV, so a typo here would leave the tile
+        # instantiating a wrapper module that does not exist.
         if not path.is_file():
             raise InvalidTileDefinition(
                 f"CONFIGMEM entry {entry!r} in tile {tile_name} names the HDL "
                 f"file {path}, which does not exist. FABulous does not generate "
                 "it; the file must be supplied."
             )
-        logger.warning(
-            f"Configuration memory for tile {tile_name!r} is read from HDL "
-            f"{path.name}: FABulous generates NO {tile_name}_ConfigMem module "
-            "for this tile. The tile still instantiates that module name and "
-            "the mapping CSV still drives the bitstream, so you are "
-            "responsible for ensuring the HDL matches the tile's "
-            f"configuration-bit count and {tile_name}_ConfigMem.csv."
-        )
-        return ConfigMemSpec(mapping_csv=None, hdl_file=path)
+        return (ConfigMemMode.WRAPPER, path)
 
     raise InvalidTileDefinition(
         f"CONFIGMEM entry {entry!r} in tile {tile_name} has unsupported suffix "
-        f"{path.suffix!r}. Give a {CONFIG_MEM_MAPPING_SUFFIX} mapping file "
-        f"or {CONFIG_MEM_NULL_TOKEN}."
+        f"{path.suffix!r}. Give a {CONFIG_MEM_MAPPING_SUFFIX} mapping file, a "
+        f"wrapper HDL file ({', '.join(CONFIG_MEM_WRAPPER_SUFFIXES)}), or "
+        f"{CONFIG_MEM_NULL_TOKEN}."
     )
+
+
+def parse_config_mem_port_line(fields: list[str], tile_name: str) -> ConfigMemPort:
+    """Parse a `CONFIGMEM_PORT` line into a typed wrapper port.
+
+    The line is `CONFIGMEM_PORT,<name>,<INPUT|OUTPUT>,<width>`. FABulous does
+    not read the wrapper's HDL, so this declaration is the only description of
+    the port it has; a declaration that disagrees with the HDL fails at
+    synthesis, not here.
+
+    Parameters
+    ----------
+    fields : list[str]
+        The comma-separated fields of the line, including the keyword itself.
+    tile_name : str
+        Name of the tile being parsed, used in error messages.
+
+    Raises
+    ------
+    InvalidTileDefinition
+        If the line is missing fields, names an unknown direction, has a width
+        that is not a positive integer, or describes a port that cannot be
+        wired.
+
+    Returns
+    -------
+    ConfigMemPort
+        The declared port.
+    """
+    # Tile CSV rows carry a trailing comma run, so a short line arrives padded
+    # with empty fields rather than missing them.
+    padded = [f.strip() for f in fields] + [""] * 4
+    name, direction, width = padded[1], padded[2], padded[3]
+
+    if not name or not direction or not width:
+        raise InvalidTileDefinition(
+            f"CONFIGMEM_PORT line in tile {tile_name} needs a name, a direction "
+            "and a width, as CONFIGMEM_PORT,<name>,<INPUT|OUTPUT>,<width>."
+        )
+
+    try:
+        io = IO[direction.upper()]
+    except KeyError:
+        raise InvalidTileDefinition(
+            f"CONFIGMEM_PORT {name!r} in tile {tile_name} has direction "
+            f"{direction!r}. Give INPUT or OUTPUT."
+        ) from None
+
+    try:
+        bits = int(width)
+    except ValueError:
+        raise InvalidTileDefinition(
+            f"CONFIGMEM_PORT {name!r} in tile {tile_name} has width {width!r}, "
+            "which is not an integer."
+        ) from None
+
+    try:
+        return ConfigMemPort(name=name, io=io, width=bits)
+    except ValueError as e:
+        raise InvalidTileDefinition(f"Tile {tile_name}: {e}") from e
 
 
 def parseTilesCSV(
@@ -377,7 +427,10 @@ def parseTilesCSV(
         ports: list[TilePort] = []
         bels: list[Bel] = []
         matrix_dir: Path | None = None
-        config_mem: ConfigMemSpec | None = None
+        config_mem_mode: ConfigMemMode | None = None
+        config_mem_csv_override: Path | None = None
+        config_mem_wrapper_hdl: Path | None = None
+        config_mem_ports: list[ConfigMemPort] = []
         gen_ios: list[Gen_IO] = []
         with_user_clk = False
         gen_matrix_list = False
@@ -574,14 +627,21 @@ def parseTilesCSV(
                     matrix_dir = fileName.parent.joinpath(temp[1]).absolute()
 
             elif temp[0] == "CONFIGMEM":
-                if config_mem is not None:
+                if config_mem_mode is not None:
                     raise InvalidTileDefinition(
                         f"Tile {tile_name} has more than one CONFIGMEM line. "
                         "A tile has exactly one configuration memory."
                     )
-                config_mem = parse_config_mem_line(
+                config_mem_mode, path = parse_config_mem_line(
                     temp[1] if len(temp) > 1 else "", tile_name, file_path_parent
                 )
+                if config_mem_mode is ConfigMemMode.WRAPPER:
+                    config_mem_wrapper_hdl = path
+                elif config_mem_mode is ConfigMemMode.MAPPING:
+                    config_mem_csv_override = path
+
+            elif temp[0] == "CONFIGMEM_PORT":
+                config_mem_ports.append(parse_config_mem_port_line(temp, tile_name))
 
             elif temp[0] == "INCLUDE":
                 p = fileName.parent.joinpath(temp[1])
@@ -622,18 +682,34 @@ def parseTilesCSV(
                 tile_name, bels, matrix_dir, tile_carry, local_shared_ports
             )
 
-        if config_mem is None or config_mem.hdl_file is not None:
-            # An HDL entry names the RTL only. The mapping CSV keeps its
-            # conventional location, because the bitstream spec reads it whether
-            # or not FABulous generated the module - and that location depends on
-            # the switch matrix file, which is only known now.
-            resolved = resolve_config_mem_spec(
-                tile_name, fileName, proj_dir, switch_matrix_file=matrix_dir
+        if config_mem_ports and config_mem_wrapper_hdl is None:
+            raise InvalidTileDefinition(
+                f"Tile {tile_name} declares CONFIGMEM_PORT lines but no wrapper "
+                "HDL. CONFIGMEM_PORT describes ports of the module named by "
+                "CONFIGMEM,<file>.v, so that line has to come first."
             )
-            config_mem = (
-                resolved
-                if config_mem is None
-                else replace(config_mem, mapping_csv=resolved.mapping_csv)
+
+        if config_mem_wrapper_hdl is None:
+            config_mem_wrapper = None
+        else:
+            try:
+                config_mem_wrapper = ConfigMemWrapper(
+                    hdl_file=config_mem_wrapper_hdl, ports=tuple(config_mem_ports)
+                )
+            except ValueError as e:
+                raise InvalidTileDefinition(f"Tile {tile_name}: {e}") from e
+
+        if config_mem_mode is ConfigMemMode.NULL:
+            config_mem_csv = None
+        elif config_mem_csv_override is not None:
+            config_mem_csv = config_mem_csv_override
+        else:
+            # No CONFIGMEM line, or a wrapper: the mapping CSV keeps its
+            # conventional location, because the bitstream spec reads it whether
+            # or not a wrapper sits around the generated module - and that
+            # location depends on the switch matrix file, which is only known now.
+            config_mem_csv = resolve_config_mem_csv(
+                tile_name, fileName, proj_dir, switch_matrix_file=matrix_dir
             )
 
         tile = Tile(
@@ -650,12 +726,13 @@ def parseTilesCSV(
             ),
             gen_ios=gen_ios,
             userCLK=with_user_clk,
-            config_mem=config_mem,
+            config_mem_csv=config_mem_csv,
+            config_mem_wrapper=config_mem_wrapper,
         )
 
         # globalConfigBits is only known once the switch matrix and BELs are
         # assembled, so CONFIGMEM,NULL can only be contradicted here.
-        if tile.config_mem.mapping_csv is None and tile.globalConfigBits > 0:
+        if tile.config_mem_csv is None and tile.globalConfigBits > 0:
             raise InvalidTileDefinition(
                 f"Tile {tile_name} declares CONFIGMEM,{CONFIG_MEM_NULL_TOKEN} but "
                 f"has {tile.globalConfigBits} configuration bits "
@@ -785,6 +862,14 @@ def parseSupertilesCSV(fileName: Path, tileDic: dict[str, Tile]) -> list[SuperTi
                 if len(line) > 1:
                     matrix_line_path = filePath / line[1]
                 continue
+
+            if line[0] in ("CONFIGMEM", "CONFIGMEM_PORT"):
+                raise InvalidSupertileDefinition(
+                    f"Supertile '{name}' has a {line[0]} line. Configuration "
+                    "memory is declared on a tile CSV, not a supertile: a "
+                    "supertile's mapping file always takes its conventional "
+                    "location and it cannot be wrapped."
+                )
 
             row_master = False
             for j in line:

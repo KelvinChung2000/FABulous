@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 from fabulous.fabric_definition.bel import Bel
-from fabulous.fabric_definition.config_mem_spec import ConfigMemSpec
+from fabulous.fabric_definition.config_mem_wrapper import ConfigMemWrapper
 from fabulous.fabric_definition.define import IO, Direction, PinSortMode, Side
 from fabulous.fabric_definition.gen_io import Gen_IO
 from fabulous.fabric_definition.port import TilePort
@@ -43,9 +43,14 @@ class Tile:
     pinOrderConfig : dict[Side, PinOrderConfig] | None, optional
         Configuration for pin ordering on each side of the tile. If None, defaults to
         BUS_MAJOR sorting on all sides.
-    config_mem : ConfigMemSpec | None, optional
-        Where the tile's config-memory mapping CSV lives. If None, the
-        conventional location next to the tile CSV is used.
+    config_mem_csv : Path | None
+        Where the tile's config-memory mapping CSV lives, or None when the tile
+        has no configuration memory at all (`CONFIGMEM,NULL`). Required: the
+        caller knows which of the two it means, so there is no default to
+        misread.
+    config_mem_wrapper : ConfigMemWrapper | None, optional
+        A hand-written wrapper around the generated ConfigMem. None means the
+        tile instantiates the generated module directly.
 
     Attributes
     ----------
@@ -69,12 +74,12 @@ class Tile:
         Whether the tile is part of a super tile. Default is False.
     pinOrderConfig : dict, optional
         Configuration for pin ordering on each side of the tile.
-    config_mem : ConfigMemSpec | None
+    config_mem_csv : Path | None
         The tile's config-memory mapping CSV location, and the sole authority
-        for that path so no consumer rebuilds it by convention. Never None on a
-        constructed tile: `__init__` falls back to the conventional location.
-        The declared default only exists because the dataclass field order
-        requires one.
+        for that path so no consumer rebuilds it by convention. None means the
+        tile declared `CONFIGMEM,NULL` and has no configuration memory.
+    config_mem_wrapper : ConfigMemWrapper | None
+        The tile's hand-written ConfigMem wrapper, or None when there is none.
     """
 
     name: str
@@ -87,7 +92,8 @@ class Tile:
     tileDir: Path = Path()
     partOfSuperTile: bool = False
     pinOrderConfig: dict = field(default_factory=dict)
-    config_mem: ConfigMemSpec | None = None
+    config_mem_csv: Path | None = None
+    config_mem_wrapper: ConfigMemWrapper | None = None
 
     def __init__(
         self,
@@ -99,7 +105,9 @@ class Tile:
         gen_ios: list[Gen_IO],
         userCLK: bool,
         pinOrderConfig: dict[Side, "PinOrderConfig"] | None = None,
-        config_mem: ConfigMemSpec | None = None,
+        *,
+        config_mem_csv: Path | None,
+        config_mem_wrapper: ConfigMemWrapper | None = None,
     ) -> None:
         self.name = name
         self.portsInfo = ports
@@ -109,11 +117,8 @@ class Tile:
         self.withUserCLK = userCLK
         self.wireList = []
         self.tileDir = tileDir
-        self.config_mem = (
-            ConfigMemSpec.by_convention(name, tileDir)
-            if config_mem is None
-            else config_mem
-        )
+        self.config_mem_csv = config_mem_csv
+        self.config_mem_wrapper = config_mem_wrapper
 
         if pinOrderConfig is None:
             from fabulous.fabric_generator.gds_generator.gen_io_pin_config_yaml import (

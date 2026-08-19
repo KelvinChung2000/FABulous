@@ -6,6 +6,10 @@ from pathlib import Path
 
 from pytest_mock import MockerFixture
 
+from fabulous.fabric_definition.config_mem_wrapper import (
+    ConfigMemPort,
+    ConfigMemWrapper,
+)
 from fabulous.fabric_definition.define import IO, ConfigBitMode
 from fabulous.fabric_definition.fabric import Fabric
 from fabulous.fabric_definition.port import Port
@@ -18,7 +22,12 @@ from fabulous.fabric_generator.gen_fabric.gen_fabric import (
     iter_super_tile_anchors,
 )
 from fabulous.fabric_generator.gen_fabric.gen_tile import generateSuperTile
-from tests.conftest import make_empty_tile, make_muladd_bel, sjump_port
+from tests.conftest import (
+    make_empty_tile,
+    make_fabric_from_grid,
+    make_muladd_bel,
+    sjump_port,
+)
 from tests.fabric_gen_test.conftest import create_switchmatrix_list
 
 
@@ -186,3 +195,55 @@ def test_iter_supertile_anchors_yields_top_left_anchor(tmp_path: Path) -> None:
 
     # One placement; anchor is the top-left child at (0, 0), i.e. DSP_top.
     assert anchors == [(0, 0, supertile)]
+
+
+class TestConfigMemWrapperPortsReachTheTop:
+    """A wrapper's extra ports leave the tile and become fabric-level ports.
+
+    They ride the same rails as a BEL's `EXTERNAL` ports: declared on the fabric
+    module under the tile's coordinates, and wired to that tile's instance.
+    """
+
+    def _fabric_with_wrapper_port(self, tmp_path: Path, port: ConfigMemPort) -> Fabric:
+        hdl = tmp_path / "LUT4AB_ConfigMem_wrapper.v"
+        hdl.write_text("")
+        tile = make_empty_tile("LUT4AB", config_bits=4)
+        tile.config_mem_wrapper = ConfigMemWrapper(hdl_file=hdl, ports=(port,))
+        return make_fabric_from_grid([[tile]])
+
+    def test_the_port_is_declared_at_the_tile_coordinates(
+        self,
+        tmp_path: Path,
+        code_generator_factory: Callable[[str, str], CodeGenerator],
+    ) -> None:
+        writer = code_generator_factory(".v", "fabric")
+        fabric = self._fabric_with_wrapper_port(
+            tmp_path, ConfigMemPort(name="crc_error", io=IO.OUTPUT, width=1)
+        )
+
+        generateFabric(writer, fabric)
+
+        assert "Tile_X0Y0_crc_error" in writer.outFileName.read_text()
+
+    def test_a_user_clk_port_adds_nothing_at_the_top(
+        self,
+        tmp_path: Path,
+        code_generator_factory: Callable[[str, str], CodeGenerator],
+    ) -> None:
+        """`UserCLK` binds to the tile clock, so it adds no fabric-level port.
+
+        Asserted differentially against a wrapper with no ports at all, because
+        the fabric already carries `Tile_XxYy_UserCLK` nets for clock chaining.
+        """
+        hdl = tmp_path / "LUT4AB_ConfigMem_wrapper.v"
+        hdl.write_text("")
+
+        def _fabric_text(ports: tuple[ConfigMemPort, ...]) -> str:
+            writer = code_generator_factory(".v", f"fabric{len(ports)}")
+            tile = make_empty_tile("LUT4AB", config_bits=4)
+            tile.config_mem_wrapper = ConfigMemWrapper(hdl_file=hdl, ports=ports)
+            generateFabric(writer, make_fabric_from_grid([[tile]]))
+            return writer.outFileName.read_text()
+
+        with_clk = _fabric_text((ConfigMemPort(name="UserCLK", io=IO.INPUT, width=1),))
+        assert with_clk == _fabric_text(())

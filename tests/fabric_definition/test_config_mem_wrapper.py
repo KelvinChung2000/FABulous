@@ -1,14 +1,17 @@
-"""Tests for `ConfigMemSpec`, its path resolver, and the consumers of `None`.
+"""Tests for the ConfigMem wrapper model, its path resolver, and `None` consumers.
 
 The resolver is the single authority for `<tile>_ConfigMem.csv`, so these tests
 pin down each layout it has to serve — in particular the legacy
 `fabric.csv`-embedded layout, which `tests/reference_test` exercises end to end
 but which cannot be run without cloning an external repo.
 
-`mapping_csv is None` (a tile CSV's `CONFIGMEM,NULL`) is the other half: the
+`config_mem_csv is None` (a tile CSV's `CONFIGMEM,NULL`) is the other half: the
 parser rejects it on a tile that has configuration bits, and the generators must
 still let a genuinely zero-config-bit tile through instead of dereferencing the
 missing path.
+
+A wrapper never suppresses generation. `<tile>_ConfigMem` is emitted whether or
+not a wrapper sits around it, because the wrapper instantiates it.
 """
 
 from pathlib import Path
@@ -16,10 +19,14 @@ from pathlib import Path
 import pytest
 
 from fabulous.fabric_cad.gen_bitstream_spec import generateBitstreamSpec
-from fabulous.fabric_definition.config_mem_spec import (
-    ConfigMemSpec,
-    resolve_config_mem_spec,
+from fabulous.fabric_definition.config_mem_wrapper import (
+    ConfigMemPort,
+    ConfigMemWrapper,
+    conventional_config_mem_csv,
+    resolve_config_mem_csv,
+    wrapper_module_name,
 )
+from fabulous.fabric_definition.define import IO
 from fabulous.fabric_definition.supertile import SuperTile
 from fabulous.fabric_definition.switch_matrix import SwitchMatrix
 from fabulous.fabric_definition.tile import Tile
@@ -35,10 +42,8 @@ from tests.conftest import make_empty_tile, make_fabric_from_grid
 
 PROJ = Path("/proj")
 
-NO_CONFIG_MEM = ConfigMemSpec(mapping_csv=None)
 
-
-def _tile(tile_dir: Path, config_mem: ConfigMemSpec | None = None) -> Tile:
+def _tile(tile_dir: Path, config_mem_csv: Path | None = None) -> Tile:
     """Build a bare tile carrying only the fields the config-mem path needs."""
     return Tile(
         name="LUT4AB",
@@ -48,27 +53,28 @@ def _tile(tile_dir: Path, config_mem: ConfigMemSpec | None = None) -> Tile:
         switch_matrix=SwitchMatrix(matrix_file=Path(), connections={}),
         gen_ios=[],
         userCLK=False,
-        config_mem=config_mem,
+        config_mem_csv=config_mem_csv,
     )
 
 
-def test_by_convention_sits_next_to_the_tile_csv() -> None:
+def test_convention_sits_next_to_the_tile_csv() -> None:
     """The mapping file is named after the tile and lives beside its CSV."""
-    spec = ConfigMemSpec.by_convention("LUT4AB", PROJ / "Tile/LUT4AB/LUT4AB.csv")
-    assert spec.mapping_csv == PROJ / "Tile/LUT4AB/LUT4AB_ConfigMem.csv"
+    assert (
+        conventional_config_mem_csv("LUT4AB", PROJ / "Tile/LUT4AB/LUT4AB.csv")
+        == PROJ / "Tile/LUT4AB/LUT4AB_ConfigMem.csv"
+    )
 
 
 def test_modern_layout_ignores_the_switch_matrix_file(tmp_path: Path) -> None:
     """A tile with its own CSV resolves relative to that CSV, not the matrix."""
     matrix = tmp_path / "elsewhere.csv"
     matrix.touch()
-    spec = resolve_config_mem_spec(
-        "LUT4AB",
-        PROJ / "Tile/LUT4AB/LUT4AB.csv",
-        PROJ,
-        switch_matrix_file=matrix,
+    assert (
+        resolve_config_mem_csv(
+            "LUT4AB", PROJ / "Tile/LUT4AB/LUT4AB.csv", PROJ, switch_matrix_file=matrix
+        )
+        == PROJ / "Tile/LUT4AB/LUT4AB_ConfigMem.csv"
     )
-    assert spec.mapping_csv == PROJ / "Tile/LUT4AB/LUT4AB_ConfigMem.csv"
 
 
 def test_legacy_layout_follows_the_switch_matrix_file(tmp_path: Path) -> None:
@@ -77,10 +83,21 @@ def test_legacy_layout_follows_the_switch_matrix_file(tmp_path: Path) -> None:
     tile_dir.mkdir(parents=True)
     matrix = tile_dir / "LUT4AB_switch_matrix.csv"
     matrix.touch()
-    spec = resolve_config_mem_spec(
-        "LUT4AB", PROJ / "fabric.csv", PROJ, switch_matrix_file=matrix
+    assert (
+        resolve_config_mem_csv(
+            "LUT4AB", PROJ / "fabric.csv", PROJ, switch_matrix_file=matrix
+        )
+        == tile_dir / "LUT4AB_ConfigMem.csv"
     )
-    assert spec.mapping_csv == tile_dir / "LUT4AB_ConfigMem.csv"
+
+
+def test_a_tile_dir_merely_containing_fabric_csv_is_not_the_legacy_layout() -> None:
+    """Only a tile CSV actually named `fabric.csv` takes the legacy path."""
+    tile_csv = PROJ / "fabric.csv.d" / "LUT4AB.csv"
+    assert (
+        resolve_config_mem_csv("LUT4AB", tile_csv, PROJ)
+        == PROJ / "fabric.csv.d" / "LUT4AB_ConfigMem.csv"
+    )
 
 
 @pytest.mark.parametrize(
@@ -92,38 +109,93 @@ def test_legacy_layout_falls_back_to_project_tile_dir(
     switch_matrix_file: Path | None, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Without a usable matrix file the legacy layout warns and assumes a default."""
-    spec = resolve_config_mem_spec(
-        "LUT4AB", PROJ / "fabric.csv", PROJ, switch_matrix_file=switch_matrix_file
+    assert (
+        resolve_config_mem_csv(
+            "LUT4AB", PROJ / "fabric.csv", PROJ, switch_matrix_file=switch_matrix_file
+        )
+        == PROJ / "Tile/LUT4AB/LUT4AB_ConfigMem.csv"
     )
-    assert spec.mapping_csv == PROJ / "Tile/LUT4AB/LUT4AB_ConfigMem.csv"
     assert "is not a valid file or directory" in caplog.text
 
 
-def test_tile_defaults_to_the_conventional_location() -> None:
-    """A tile built without a spec still exposes the conventional path."""
-    tile = _tile(PROJ / "Tile/LUT4AB/LUT4AB.csv")
-    assert tile.config_mem.mapping_csv == PROJ / "Tile/LUT4AB/LUT4AB_ConfigMem.csv"
+def test_tile_keeps_the_mapping_it_was_given() -> None:
+    """The tile stores the path the parser resolved, with no second guess."""
+    mapping = PROJ / "shared/LUT4AB_ConfigMem.csv"
+    assert _tile(PROJ / "Tile/LUT4AB/LUT4AB.csv", mapping).config_mem_csv == mapping
 
 
-def test_tile_keeps_an_explicit_spec() -> None:
-    """An explicitly supplied spec wins over the convention."""
-    spec = ConfigMemSpec(mapping_csv=PROJ / "shared/LUT4AB_ConfigMem.csv")
-    assert _tile(PROJ / "Tile/LUT4AB/LUT4AB.csv", config_mem=spec).config_mem is spec
+def test_tile_without_config_memory_keeps_none() -> None:
+    """`None` survives construction: it means CONFIGMEM,NULL, not 'unset'."""
+    assert _tile(PROJ / "Tile/LUT4AB/LUT4AB.csv", None).config_mem_csv is None
 
 
-def test_supertile_defaults_to_the_conventional_location() -> None:
+def test_supertile_derives_the_conventional_location() -> None:
     """A supertile resolves its own mapping file, not the master tile's."""
     super_tile = SuperTile(
-        name="DSP",
-        tileDir=PROJ / "Tile/DSP/DSP.csv",
-        tiles=[],
-        tileMap=[],
+        name="DSP", tileDir=PROJ / "Tile/DSP/DSP.csv", tiles=[], tileMap=[]
     )
-    assert super_tile.config_mem.mapping_csv == PROJ / "Tile/DSP/DSP_ConfigMem.csv"
+    assert super_tile.config_mem_csv == PROJ / "Tile/DSP/DSP_ConfigMem.csv"
+
+
+def test_wrapper_module_is_named_after_the_tile() -> None:
+    """The tile instantiates a wrapper whose name it can compute."""
+    assert wrapper_module_name("LUT4AB") == "LUT4AB_ConfigMem_wrapper"
+
+
+class TestWrapperPortValidation:
+    """A declared port that cannot be wired is rejected where it is declared."""
+
+    @pytest.mark.parametrize(
+        ("name", "io", "width", "match"),
+        [
+            ("", IO.OUTPUT, 1, "empty port name"),
+            ("FrameData", IO.INPUT, 32, "collides with a standard"),
+            ("ConfigBits_N", IO.OUTPUT, 8, "collides with a standard"),
+            ("crc_error", IO.OUTPUT, 0, "at least one bit"),
+            ("crc_error", IO.OUTPUT, -4, "at least one bit"),
+            ("crc_error", IO.INOUT, 1, "INPUT or OUTPUT"),
+        ],
+        ids=[
+            "empty-name",
+            "collides-framedata",
+            "collides-configbits-n",
+            "zero-width",
+            "negative-width",
+            "inout-direction",
+        ],
+    )
+    def test_invalid_port_is_rejected(
+        self, name: str, io: IO, width: int, match: str
+    ) -> None:
+        with pytest.raises(ValueError, match=match):
+            ConfigMemPort(name=name, io=io, width=width)
+
+    def test_duplicate_port_names_are_rejected(self, tmp_path: Path) -> None:
+        port = ConfigMemPort(name="crc_error", io=IO.OUTPUT, width=1)
+        with pytest.raises(ValueError, match="declared more than once"):
+            ConfigMemWrapper(hdl_file=tmp_path / "w.v", ports=(port, port))
+
+    def test_user_clk_is_not_an_external_port(self, tmp_path: Path) -> None:
+        """`UserCLK` binds to the tile clock, so it never leaves the tile."""
+        wrapper = ConfigMemWrapper(
+            hdl_file=tmp_path / "w.v",
+            ports=(
+                ConfigMemPort(name="UserCLK", io=IO.INPUT, width=1),
+                ConfigMemPort(name="crc_error", io=IO.OUTPUT, width=1),
+            ),
+        )
+
+        assert wrapper.wants_user_clk
+        assert [p.name for p in wrapper.external_ports] == ["crc_error"]
+
+    def test_a_wrapper_without_user_clk_says_so(self, tmp_path: Path) -> None:
+        wrapper = ConfigMemWrapper(hdl_file=tmp_path / "w.v")
+        assert not wrapper.wants_user_clk
+        assert wrapper.external_ports == ()
 
 
 class TestGeneratorsHonourNoConfigMem:
-    """`mapping_csv is None` must reach a decision, never a dereference.
+    """`config_mem_csv is None` must reach a decision, never a dereference.
 
     A zero-config-bit tile with `CONFIGMEM,NULL` is legitimate and has to flow
     through generation untouched. The contradictory combination — no mapping
@@ -137,7 +209,7 @@ class TestGeneratorsHonourNoConfigMem:
     ) -> None:
         """A NULL zero-bit tile yields an empty frame map, not a crash."""
         tile = make_empty_tile("EMPTY", config_bits=0)
-        tile.config_mem = NO_CONFIG_MEM
+        tile.config_mem_csv = None
 
         spec = generateBitstreamSpec(make_fabric_from_grid([[tile]]))
 
@@ -200,29 +272,14 @@ class TestGeneratorsHonourNoConfigMem:
             generate_super_tile_config_mem(writer, super_tile, None)
 
 
-class TestGeneratorsSkipHandWrittenConfigMem:
-    """`hdl_file` suppresses the RTL and nothing else.
+class TestAWrapperNeverSuppressesGeneration:
+    """The wrapper instantiates `<tile>_ConfigMem`, so it must still be generated.
 
-    A tile whose CSV names HDL owns the `<tile>_ConfigMem` module, so the
-    generator must not write one. The mapping CSV is a separate contract - the
-    bitstream reads it whoever wrote the RTL - so it is still created when
-    missing and still checked against the tile's configuration-bit count.
+    This is the whole point of wrapping rather than overriding: the frame-latch
+    array stays FABulous's, and user logic sits around it.
     """
 
-    def test_rtl_is_not_written_but_the_mapping_is(self, tmp_path: Path) -> None:
-        writer = VerilogCodeGenerator()
-        writer.outFileName = tmp_path / "LUT4AB_ConfigMem.v"
-        hdl = tmp_path / "LUT4AB_ConfigMem_hand_written.v"
-        hdl.write_text("")
-        mapping = tmp_path / "LUT4AB_ConfigMem.csv"
-
-        generateConfigMem(writer, "LUT4AB", 8, mapping, hdl_file=hdl)
-
-        assert mapping.is_file()
-        assert not writer.outFileName.exists()
-
-    def test_rtl_is_written_without_hand_written_hdl(self, tmp_path: Path) -> None:
-        """The same call without `hdl_file` still emits the module."""
+    def test_rtl_is_written_for_a_wrapped_tile(self, tmp_path: Path) -> None:
         writer = VerilogCodeGenerator()
         writer.outFileName = tmp_path / "LUT4AB_ConfigMem.v"
 
@@ -230,30 +287,25 @@ class TestGeneratorsSkipHandWrittenConfigMem:
 
         assert writer.outFileName.is_file()
 
-    def test_mapping_is_still_checked_against_the_bit_count(
+    def test_the_mapping_is_still_checked_against_the_bit_count(
         self, tmp_path: Path
     ) -> None:
-        """A stale mapping is caught even though no RTL is generated from it."""
+        """A stale mapping is caught regardless of what wraps the module."""
         writer = VerilogCodeGenerator()
         writer.outFileName = tmp_path / "LUT4AB_ConfigMem.v"
-        hdl = tmp_path / "LUT4AB_ConfigMem_hand_written.v"
-        hdl.write_text("")
         mapping = tmp_path / "LUT4AB_ConfigMem.csv"
         generateConfigMemInit(mapping, 8)
 
         with pytest.raises(ValueError, match="bitmask mismatch"):
-            generateConfigMem(writer, "LUT4AB", 4, mapping, hdl_file=hdl)
+            generateConfigMem(writer, "LUT4AB", 4, mapping)
 
-    def test_bitstream_spec_reads_the_mapping_of_a_hand_written_tile(
-        self, tmp_path: Path
-    ) -> None:
-        """`hdl_file` is invisible to the bitstream spec."""
+    def test_bitstream_spec_is_blind_to_the_wrapper(self, tmp_path: Path) -> None:
+        """The bitstream reads the mapping whoever wraps the module."""
         mapping = tmp_path / "LUT4AB_ConfigMem.csv"
         generateConfigMemInit(mapping, 8)
         tile = make_empty_tile("LUT4AB", config_bits=8)
-        tile.config_mem = ConfigMemSpec(
-            mapping_csv=mapping, hdl_file=tmp_path / "LUT4AB_ConfigMem_hand.v"
-        )
+        tile.config_mem_csv = mapping
+        tile.config_mem_wrapper = ConfigMemWrapper(hdl_file=tmp_path / "wrap.v")
 
         spec = generateBitstreamSpec(make_fabric_from_grid([[tile]]))
 

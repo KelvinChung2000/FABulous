@@ -12,7 +12,7 @@ from decimal import Decimal
 from pathlib import Path
 
 from fabulous.fabric_definition.bel import Bel
-from fabulous.fabric_definition.config_mem_spec import ConfigMemSpec
+from fabulous.fabric_definition.config_mem_wrapper import conventional_config_mem_csv
 from fabulous.fabric_definition.define import Side
 from fabulous.fabric_definition.port import TilePort
 from fabulous.fabric_definition.switch_matrix import SwitchMatrix
@@ -45,10 +45,6 @@ class SuperTile:
         in the supertile CSV, or computed as the last non-None tile in row-major
         order if no MASTER is present.  All supertile config bits and BELs are
         anchored to this tile.
-    config_mem : ConfigMemSpec | None
-        Where the supertile's own config-memory mapping CSV lives. Left None by
-        the caller to take the conventional location next to the supertile CSV;
-        `__post_init__` always fills it in, so consumers can rely on it.
     """
 
     name: str
@@ -59,12 +55,21 @@ class SuperTile:
     withUserCLK: bool = False
     switch_matrix: SwitchMatrix | None = None
     master_tile_coords: tuple[int, int] | None = None
-    config_mem: ConfigMemSpec | None = None
 
-    def __post_init__(self) -> None:
-        """Fill in the conventional config-memory location when none was given."""
-        if self.config_mem is None:
-            self.config_mem = ConfigMemSpec.by_convention(self.name, self.tileDir)
+    @property
+    def config_mem_csv(self) -> Path:
+        """Where the supertile's config-memory mapping CSV lives.
+
+        A supertile cannot override the location -- `CONFIGMEM` is a tile-CSV
+        keyword -- so this is always the conventional path and is derived
+        rather than stored.
+
+        Returns
+        -------
+        Path
+            `<tileDir>.parent/<name>_ConfigMem.csv`.
+        """
+        return conventional_config_mem_csv(self.name, self.tileDir)
 
     def get_ports_around_tile(self) -> dict[str, list[list[TilePort]]]:
         """Return all the ports that are around the supertile.

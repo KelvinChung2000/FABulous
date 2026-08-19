@@ -270,9 +270,10 @@ def parse_config_mem_line(
     Raises
     ------
     InvalidTileDefinition
-        If the entry is empty, names an HDL file that does not exist, is not in
-        the project language, names no module or one the file does not declare,
-        or has any other unrecognised suffix.
+        If the entry is empty, names a module on a line that takes none, names
+        an HDL file that does not exist, is not in the project language, names
+        no module or one the file does not declare, or has any other
+        unrecognised suffix.
 
     Returns
     -------
@@ -292,6 +293,18 @@ def parse_config_mem_line(
             f"CONFIGMEM line in tile {tile_name} has no value. Give a path to a "
             f"{CONFIG_MEM_MAPPING_SUFFIX} mapping file, a wrapper HDL file, or "
             f"{CONFIG_MEM_NULL_TOKEN} for a tile without configuration memory."
+        )
+
+    # Only a wrapper line takes a module, so a third field anywhere else is a
+    # typo that would otherwise be dropped without a word.
+    if module and (
+        entry == CONFIG_MEM_NULL_TOKEN
+        or tile_csv_dir.joinpath(entry).suffix == CONFIG_MEM_MAPPING_SUFFIX
+    ):
+        raise InvalidTileDefinition(
+            f"CONFIGMEM entry {entry!r} in tile {tile_name} is followed by "
+            f"{module!r}, but only a wrapper HDL line names a module. Drop the "
+            "extra field, or name a wrapper file for it to go with."
         )
 
     if entry == CONFIG_MEM_NULL_TOKEN:

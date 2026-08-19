@@ -474,13 +474,13 @@ class TestConfigMemKeyword:
 
 
 class TestConfigMemWrapper:
-    """`CONFIGMEM,<file>.v` wraps the generated ConfigMem, it does not replace it.
+    """`CONFIGMEM,<file>,<module>` wraps the generated ConfigMem, not replaces it.
 
-    FABulous still generates `<tile>_ConfigMem`. The named HDL supplies
-    `<tile>_ConfigMem_wrapper`, which the tile instantiates in its place and
-    which instantiates the generated module itself, so user logic can sit
-    before or after the configuration bits. Extra wrapper ports are declared
-    with `CONFIGMEM_PORT` rows and leave the tile as external ports.
+    FABulous still generates `<tile>_ConfigMem`. The named HDL supplies the
+    named module, which the tile instantiates in its place and which
+    instantiates the generated module itself, so user logic can sit before or
+    after the configuration bits. Extra wrapper ports are declared with
+    `CONFIGMEM_PORT` rows and leave the tile as external ports.
     """
 
     def test_wrapper_ports_are_parsed_into_typed_ports(self, tmp_path: Path) -> None:
@@ -603,6 +603,18 @@ class TestConfigMemWrapperHdlIsChecked:
 
         assert tile.config_mem_wrapper is not None
         assert tile.config_mem_wrapper.module == "whatever_i_like"
+
+    @pytest.mark.parametrize(
+        "entry",
+        ["NULL", "./mapping.csv"],
+        ids=["null", "mapping-csv"],
+    )
+    def test_a_module_on_a_line_that_takes_none_is_rejected(
+        self, tmp_path: Path, entry: str
+    ) -> None:
+        """Silently dropping the field would hide a typo, so it is an error."""
+        with pytest.raises(InvalidTileDefinition, match="only a wrapper"):
+            parse_single_tile(tmp_path, f"CONFIGMEM,{entry},ecc_guard")
 
     def test_a_wrapper_without_a_module_is_rejected(self, tmp_path: Path) -> None:
         """Nothing can be derived, so an omitted name is an error, not a default."""

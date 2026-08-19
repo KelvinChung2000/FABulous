@@ -187,7 +187,7 @@ class ConfigMemMode(Enum):
     """`CONFIGMEM,<file>.csv`: the mapping file lives somewhere else."""
 
     WRAPPER = auto()
-    """`CONFIGMEM,<file>.v`: the tile wraps its generated ConfigMem."""
+    """`CONFIGMEM,<file>,<module>`: the tile wraps its generated ConfigMem."""
 
 
 def resolve_config_mem_csv(

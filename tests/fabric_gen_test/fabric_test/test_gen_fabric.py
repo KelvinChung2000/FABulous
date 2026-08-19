@@ -205,7 +205,7 @@ class TestConfigMemWrapperPortsReachTheTop:
     """
 
     def _fabric_with_wrapper_port(self, tmp_path: Path, port: ConfigMemPort) -> Fabric:
-        hdl = tmp_path / "LUT4AB_ConfigMem_wrapper.v"
+        hdl = tmp_path / "ecc_guard.v"
         hdl.write_text("")
         tile = make_empty_tile("LUT4AB", config_bits=4)
         tile.config_mem_wrapper = ConfigMemWrapper(
@@ -237,7 +237,7 @@ class TestConfigMemWrapperPortsReachTheTop:
         Asserted differentially against a wrapper with no ports at all, because
         the fabric already carries `Tile_XxYy_UserCLK` nets for clock chaining.
         """
-        hdl = tmp_path / "LUT4AB_ConfigMem_wrapper.v"
+        hdl = tmp_path / "ecc_guard.v"
         hdl.write_text("")
 
         def _fabric_text(ports: tuple[ConfigMemPort, ...]) -> str:

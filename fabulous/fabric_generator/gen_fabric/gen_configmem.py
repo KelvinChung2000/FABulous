@@ -117,7 +117,7 @@ def generateConfigMem(
     `CONFIGMEM,NULL`, so there is no configuration memory to generate.
 
     The module is always generated. A tile may wrap it with hand-written HDL
-    (`CONFIGMEM,<file>.v`), but that wrapper instantiates this module, so
+    (`CONFIGMEM,<file>,<module>`), but that wrapper instantiates this module, so
     suppressing it would leave the wrapper with nothing to wrap.
 
     We use a file to describe the exact configuration bits to frame mapping

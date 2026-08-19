@@ -101,6 +101,12 @@ class ConfigMemPort:
                 f"CONFIGMEM_PORT {self.name!r} has direction {self.io.name}. "
                 "A wrapper port is INPUT or OUTPUT."
             )
+        if self.name == USER_CLK_PORT and (self.io is not IO.INPUT or self.width != 1):
+            raise ValueError(
+                f"CONFIGMEM_PORT {USER_CLK_PORT} is bound to the tile's clock, "
+                f"so it must be declared INPUT with width 1, not "
+                f"{self.io.name} with width {self.width}."
+            )
 
 
 @dataclass(frozen=True)

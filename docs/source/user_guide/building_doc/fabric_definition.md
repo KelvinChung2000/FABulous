@@ -720,8 +720,8 @@ Each declared port leaves the tile and is propagated to the fabric's top level a
 `Tile_X<x>Y<y>_<name>`, the same treatment a BEL's `EXTERNAL` port gets.
 
 One name is special: a port called `UserCLK` is connected to the tile's own clock instead
-of leaving the tile. Declaring it on a tile that has no user clock — because the fabric
-disables it, or because the tile is part of a supertile — is an error.
+of leaving the tile. It must be declared `INPUT` with width 1, and declaring it on a tile
+that has no user clock — because the fabric disables it — is an error.
 
 ##### What FABulous does not check
 
@@ -742,8 +742,10 @@ A wrapper HDL file must exist when the tile CSV is parsed — unlike the mapping
 generates it on demand, so a mistyped path is reported as an error rather than leaving the
 tile instantiating a module that does not exist.
 
-Wrappers are a tile-level feature: `CONFIGMEM` is a tile-CSV keyword, and a supertile
-cannot declare one.
+Wrappers are a tile-level feature. `CONFIGMEM` is a tile-CSV keyword, so a supertile
+cannot declare one; a tile that declares a wrapper also cannot be used inside a supertile,
+because the supertile wrapper would have to declare and forward the extra ports and does
+not. Both are rejected when the fabric is parsed.
 
 (primitives)=
 

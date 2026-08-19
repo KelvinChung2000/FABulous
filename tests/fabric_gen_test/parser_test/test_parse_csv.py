@@ -9,7 +9,10 @@ from fabulous.custom_exception import (
     InvalidSupertileDefinition,
     InvalidTileDefinition,
 )
-from fabulous.fabric_definition.config_mem_wrapper import ConfigMemPort
+from fabulous.fabric_definition.config_mem_wrapper import (
+    ConfigMemPort,
+    ConfigMemWrapper,
+)
 from fabulous.fabric_definition.define import IO, Direction, Side
 from fabulous.fabric_definition.fabric import Fabric
 from fabulous.fabric_definition.tile import Tile
@@ -561,3 +564,20 @@ class TestConfigMemIsTileOnly:
 
         with pytest.raises(InvalidSupertileDefinition, match="CONFIGMEM"):
             parseSupertilesCSV(super_csv, tile_dic)
+
+    def test_a_wrapped_tile_cannot_be_used_in_a_supertile(self, tmp_path: Path) -> None:
+        """A subtile's wrapper ports have no path out of the supertile wrapper.
+
+        The supertile wrapper module would have to declare and forward them,
+        which it does not, so the fabric would reference ports that do not
+        exist. Rejected by name rather than left to fail at synthesis.
+        """
+        hdl = tmp_path / "wrapper.v"
+        hdl.write_text("")
+        tile = make_empty_tile(TILE_NAME)
+        tile.config_mem_wrapper = ConfigMemWrapper(hdl_file=hdl)
+        super_csv = tmp_path / "super.csv"
+        super_csv.write_text(f"SuperTILE,DSP\n{TILE_NAME}\nEndSuperTILE\n")
+
+        with pytest.raises(InvalidSupertileDefinition, match=TILE_NAME):
+            parseSupertilesCSV(super_csv, {TILE_NAME: tile})

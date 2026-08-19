@@ -881,6 +881,14 @@ def parseSupertilesCSV(fileName: Path, tileDic: dict[str, Tile]) -> list[SuperTi
                     row_master = True
                     continue
                 if j in tileDic:
+                    if tileDic[j].config_mem_wrapper is not None:
+                        raise InvalidSupertileDefinition(
+                            f"Supertile '{name}' uses tile '{j}', which declares a "
+                            "ConfigMem wrapper. A subtile's wrapper ports would "
+                            "have to be forwarded by the supertile wrapper, which "
+                            "FABulous does not do, so the fabric would reference "
+                            "ports that do not exist."
+                        )
                     tileDic[j].partOfSuperTile = True
                     t = deepcopy(tileDic[j])
                     row.append(t)

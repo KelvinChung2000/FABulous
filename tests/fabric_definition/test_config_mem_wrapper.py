@@ -310,3 +310,19 @@ class TestAWrapperNeverSuppressesGeneration:
         spec = generateBitstreamSpec(make_fabric_from_grid([[tile]]))
 
         assert spec["FrameMap"]["LUT4AB"] != {}
+
+
+class TestUserClkPortShape:
+    """`UserCLK` binds to the tile clock, so only one shape makes sense."""
+
+    @pytest.mark.parametrize(
+        ("io", "width"),
+        [(IO.OUTPUT, 1), (IO.INPUT, 8)],
+        ids=["output-direction", "multi-bit"],
+    )
+    def test_a_misshapen_user_clk_is_rejected(self, io: IO, width: int) -> None:
+        with pytest.raises(ValueError, match="UserCLK"):
+            ConfigMemPort(name="UserCLK", io=io, width=width)
+
+    def test_a_scalar_input_user_clk_is_accepted(self) -> None:
+        assert ConfigMemPort(name="UserCLK", io=IO.INPUT, width=1).width == 1

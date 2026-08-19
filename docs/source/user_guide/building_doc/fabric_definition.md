@@ -650,7 +650,7 @@ By default neither needs to be mentioned in the tile CSV: FABulous looks for the
 CSV next to the tile CSV, generates a default enumerated mapping if it is absent, and
 generates the RTL from it.
 
-The optional `CONFIGMEM` keyword overrides that. Like `MATRIX`, the file suffix selects
+The optional `CONFIGMEM` keyword changes that. Like `MATRIX`, the file suffix selects
 the mode, and the path is resolved relative to the tile CSV:
 
 ```{code-block} text
@@ -667,34 +667,83 @@ EndTILE
 | --- | --- |
 | _no `CONFIGMEM` line_ | The mapping CSV is taken from its conventional location beside the tile CSV. This is the default and no existing fabric needs changing. |
 | `<path>.csv` | Use this file as the mapping CSV. It need not exist yet; FABulous writes a default enumerated mapping if it is missing. |
-| `<path>.v`, `.sv`, `.vhd`, `.vhdl` | The tile's `<tile_descriptor>_ConfigMem` module is supplied by this file. FABulous generates **no** configuration-memory RTL for the tile. |
+| `<path>.v`, `.sv`, `.vhd`, `.vhdl` | This file supplies a _wrapper_ around the tile's generated configuration memory. See [wrapping the configuration memory](#wrapping-the-configuration-memory). |
 | `NULL` | The tile has no configuration memory. Only valid for a tile with zero configuration bits. |
 
-#### Supplying your own configuration memory
+(wrapping-the-configuration-memory)=
+
+#### Wrapping the configuration memory
 
 Naming an HDL file is how user hardware is placed in the configuration-memory path — for
-example a checksum over the configuration bits, an ECC scrubber, or a write lock. FABulous
-steps out of the way and the file becomes the tile's configuration memory, so a few things
-become your responsibility:
+example a checksum over the configuration bits, an ECC scrubber, or a write lock.
 
-- The module must be named `<tile_descriptor>_ConfigMem`. The tile instantiates that name
-  either way, so nothing else in the generated fabric changes.
-- Its port list must match what the tile expects: `FrameData`, `FrameStrobe`, `ConfigBits`
-  and `ConfigBits_N`, with the widths the fabric's `FrameBitsPerRow`, `MaxFramesPerCol`
-  and the tile's configuration-bit count imply.
-- **The mapping CSV still drives the bitstream.** `gen_bitStream_spec` reads it whether or
-  not FABulous generated the RTL, so the two must agree. If your module stores a bit
-  somewhere other than where the mapping CSV says, the fabric is misprogrammed and nothing
-  will report it.
-- Keep the file in step with the tile. If the tile's configuration-bit count later changes,
-  FABulous cannot update a file it does not generate.
+FABulous keeps generating `<tile_descriptor>_ConfigMem` exactly as it would otherwise. Your
+file supplies a second module, `<tile_descriptor>_ConfigMem_wrapper`, which the tile
+instantiates in its place and which instantiates the generated module itself. Your logic
+sits between the two — before the frame data reaches the latches, after the configuration
+bits leave them, or both:
 
-The same caveats apply as for a hand-written switch matrix, and FABulous emits a warning at
-parse time naming the file so the substitution is visible in the log.
+```{code-block} text
 
-An HDL file must exist when the tile CSV is parsed — unlike the mapping CSV, nothing
-generates it on demand, so a mistyped path is reported as an error rather than silently
-leaving the tile without a configuration memory.
+<tile>            instantiates  ->  <tile>_ConfigMem_wrapper   (yours)
+<tile>_ConfigMem_wrapper          ->  <tile>_ConfigMem         (generated)
+```
+
+Because the generated module is still generated, the mapping CSV, the bitstream and the
+frame layout are unaffected by anything the wrapper does around it.
+
+The wrapper must expose the same four ports the generated module does — `FrameData`,
+`FrameStrobe`, `ConfigBits` and `ConfigBits_N`, with the widths the fabric's
+`FrameBitsPerRow`, `MaxFramesPerCol` and the tile's configuration-bit count imply — because
+the tile wires it exactly as it wires the module it stands in for.
+
+##### Extra wrapper ports
+
+A wrapper often needs signals of its own: a status flag to report a checksum failure, an
+enable to start a scrub. Declare each one with a `CONFIGMEM_PORT` line after the
+`CONFIGMEM` line:
+
+```{code-block} text
+:emphasize-lines: 5,6,7
+
+TILE, LUT4AB
+BEL,            LUT4c_frame_config_OQ.vhdl,  LA_
+MATRIX,         LUT4AB_switch_matrix.list
+CONFIGMEM,      LUT4AB_ConfigMem_wrapper.v
+CONFIGMEM_PORT, crc_error,  OUTPUT,  1
+CONFIGMEM_PORT, scrub_en,   INPUT,   1
+CONFIGMEM_PORT, syndrome,   OUTPUT,  8
+EndTILE
+```
+
+Each declared port leaves the tile and is propagated to the fabric's top level as
+`Tile_X<x>Y<y>_<name>`, the same treatment a BEL's `EXTERNAL` port gets.
+
+One name is special: a port called `UserCLK` is connected to the tile's own clock instead
+of leaving the tile. Declaring it on a tile that has no user clock — because the fabric
+disables it, or because the tile is part of a supertile — is an error.
+
+##### What FABulous does not check
+
+FABulous never reads the wrapper's HDL; the `CONFIGMEM_PORT` lines are its only description
+of the module. That keeps fabric parsing free of an HDL front end, at a cost worth stating
+plainly:
+
+- If the declared ports disagree with the wrapper's actual port list, the mismatch surfaces
+  at synthesis, not when the fabric is parsed.
+- The wrapper must declare and forward the `Emulate_Bitstream` parameter under
+  `` `ifdef EMULATION `` in Verilog. The tile passes it to whatever it instantiates, so a
+  wrapper that swallows it silently breaks emulation for that tile.
+- Keep the file in step with the tile. If the tile's configuration-bit count changes, the
+  wrapper's port widths change with it and FABulous cannot update a file it does not
+  generate.
+
+A wrapper HDL file must exist when the tile CSV is parsed — unlike the mapping CSV, nothing
+generates it on demand, so a mistyped path is reported as an error rather than leaving the
+tile instantiating a module that does not exist.
+
+Wrappers are a tile-level feature: `CONFIGMEM` is a tile-CSV keyword, and a supertile
+cannot declare one.
 
 (primitives)=
 

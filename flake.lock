@@ -141,11 +141,11 @@
     "nextpnr-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1785693751,
-        "narHash": "sha256-tMBMAmhYegiz5R2rkfkRnWfnwlQBX2kUUdee4jpS8/E=",
+        "lastModified": 1787236430,
+        "narHash": "sha256-/XAH2Vz3kP/yGPDoUXOB0R4xUGzCobqQ6ewLaC+gB7E=",
         "owner": "YosysHQ",
         "repo": "nextpnr",
-        "rev": "8945407874c3031f13a5453598e9923268259698",
+        "rev": "7c0c1c40196fcca091320d06422a08749b106e53",
         "type": "github"
       },
       "original": {

@@ -1038,11 +1038,12 @@ def generateSuperTile(
             cm_frame_data = f"Tile_X{mx - 1}Y{my}_FrameData_O"
         else:
             cm_frame_data = f"Tile_X{mx}Y{my}_FrameData"
+        cm_strobe_src = my - step
         if (
-            0 <= my + 1 < len(superTile.tileMap)
-            and superTile.tileMap[my + 1][mx] is not None
+            0 <= cm_strobe_src < len(superTile.tileMap)
+            and superTile.tileMap[cm_strobe_src][mx] is not None
         ):
-            cm_frame_strobe = f"Tile_X{mx}Y{my + 1}_FrameStrobe_O"
+            cm_frame_strobe = f"Tile_X{mx}Y{cm_strobe_src}_FrameStrobe_O"
         else:
             cm_frame_strobe = f"Tile_X{mx}Y{my}_FrameStrobe"
         writer.addInstantiation(

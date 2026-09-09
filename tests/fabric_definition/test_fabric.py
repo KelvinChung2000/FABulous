@@ -6,6 +6,7 @@ from unittest.mock import MagicMock
 
 import pytest
 
+from fabulous.fabric_definition.define import Origin
 from fabulous.fabric_definition.fabric import Fabric
 from fabulous.fabric_definition.supertile import SuperTile
 from fabulous.fabric_definition.tile import Tile
@@ -163,23 +164,32 @@ class TestGetSuperTileContaining:
         assert fabric.get_super_tile_containing("ANY") is None
 
 
+@pytest.fixture(params=list(Origin), ids=lambda o: o.value)
+def north_over_south(
+    request: pytest.FixtureRequest, make_fabric: Callable[..., Fabric]
+) -> Fabric:
+    """A one-column fabric with `NORTH_TILE` above `SOUTH_TILE`, stored per origin."""
+    origin: Origin = request.param
+    south = make_empty_tile("SOUTH_TILE", pinOrderConfig={})
+    north = make_empty_tile("NORTH_TILE", pinOrderConfig={})
+    rows = [[south], [north]] if origin is Origin.BOTTOM_LEFT else [[north], [south]]
+    return make_fabric(
+        tile=rows,
+        numberOfRows=2,
+        numberOfColumns=1,
+        origin=origin,
+        tileDic={"SOUTH_TILE": south, "NORTH_TILE": north},
+    )
+
+
 class TestFabricRepr:
     """`Fabric.__repr__` must print the grid north-first, matching the CSV."""
 
     def test_grid_prints_north_row_before_south_row(
-        self, make_fabric: Callable[..., Fabric]
+        self, north_over_south: Fabric
     ) -> None:
-        """Storage is bottom-first (row 0 = south); the repr must flip it."""
-        south = make_empty_tile("SOUTH_TILE", pinOrderConfig={})
-        north = make_empty_tile("NORTH_TILE", pinOrderConfig={})
-        fabric = make_fabric(
-            tile=[[south], [north]],
-            numberOfRows=2,
-            numberOfColumns=1,
-            tileDic={"SOUTH_TILE": south, "NORTH_TILE": north},
-        )
-
-        lines = repr(fabric).splitlines()
+        """Whichever row storage puts first, the repr prints north first."""
+        lines = repr(north_over_south).splitlines()
         grid_lines = [
             line for line in lines if line.startswith(("NORTH_TILE", "SOUTH_TILE"))
         ]

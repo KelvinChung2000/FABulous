@@ -91,10 +91,10 @@ class Side(StrEnum):
 
 
 # Grid offset (dx, dy) of the tile whose UserCLKo feeds a tile's UserCLK, keyed by
-# the side the clock enters. y grows downwards, so SOUTH means "the row below".
+# the side the clock enters. Row 0 is the south row, so SOUTH means "the row below".
 USER_CLK_PREDECESSOR: dict[Side, tuple[int, int]] = {
-    Side.SOUTH: (0, 1),
-    Side.NORTH: (0, -1),
+    Side.SOUTH: (0, -1),
+    Side.NORTH: (0, 1),
     Side.WEST: (-1, 0),
     Side.EAST: (1, 0),
 }

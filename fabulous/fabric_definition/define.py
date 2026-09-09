@@ -90,14 +90,52 @@ class Side(StrEnum):
                 return Side.ANY
 
 
-# Grid offset (dx, dy) of the tile whose UserCLKo feeds a tile's UserCLK, keyed by
-# the side the clock enters. Row 0 is the south row, so SOUTH means "the row below".
+class Origin(StrEnum):
+    """Which corner of the fabric grid holds coordinate (0, 0).
+
+    `BOTTOM_LEFT` is the convention FABulous 3.0 will use exclusively: row 0 is
+    the south row and north is increasing y. `TOP_LEFT` is the pre-3.0
+    convention, kept only so fabrics authored against it keep generating the
+    output they did before, and is removed in 3.0 along with every branch that
+    reads it.
+    """
+
+    TOP_LEFT = "top_left"
+    BOTTOM_LEFT = "bottom_left"
+
+
+# Offset (dx, dy) of the tile whose UserCLKo feeds a tile's UserCLK, keyed by the
+# side the clock enters. dy counts north steps rather than row indices, so it
+# needs scaling by the grid's `north_step`; `user_clk_predecessor` does that.
 USER_CLK_PREDECESSOR: dict[Side, tuple[int, int]] = {
     Side.SOUTH: (0, -1),
     Side.NORTH: (0, 1),
     Side.WEST: (-1, 0),
     Side.EAST: (1, 0),
 }
+
+
+def user_clk_predecessor(side: Side, *, north_step: int) -> tuple[int, int]:
+    """Return the grid offset of the tile whose UserCLKo feeds a tile's UserCLK.
+
+    Parameters
+    ----------
+    side : Side
+        The side on which the clock enters each tile.
+    north_step : int
+        The grid's y increment that moves one tile north, `1` under a
+        bottom-left origin and `-1` under the deprecated top-left one. A
+        supertile's `tileMap` carries its own step, distinct from the fabric's.
+
+    Returns
+    -------
+    tuple[int, int]
+        `(dx, dy)` to add to a tile's coordinate to reach its predecessor.
+    """
+    # `Side.ANY` is the one value with no ladder direction, and the parser
+    # cannot produce it, so the lookup is left to fail on a programming error.
+    dx, dy = USER_CLK_PREDECESSOR[side]
+    return dx, dy * north_step
 
 
 def grid_at[T](grid: list[list[T | None]], x: int, y: int) -> T | None:

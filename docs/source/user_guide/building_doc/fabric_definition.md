@@ -177,7 +177,7 @@ It is planned to remove these limitations in future versions of FABulous.
 
   - `UserCLKDirection`, `[S2N|N2S|W2E|E2W]` (default `S2N`)
 
-    Direction in which `UserCLK` is chained through the fabric. Every tile has a `UserCLK` input and a buffered `UserCLKo` output; each tile takes its clock from the `UserCLKo` of its neighbour on the entry side (`S2N`: the tile below, `W2E`: the tile to the left, and so on) and tiles with no such neighbour take the fabric-level `UserCLK` directly. The GDS pin placement follows the same sides.
+    Direction in which `UserCLK` is chained through the fabric. Every tile has a `UserCLK` input and a buffered `UserCLKo` output; each tile takes its clock from the `UserCLKo` of its neighbour on the entry side (`S2N`: the tile to its south, `W2E`: the tile to its west, and so on) and tiles with no such neighbour take the fabric-level `UserCLK` directly. The side is a compass direction, so the ladder runs the same way across the fabric whichever origin `TopLeftOrigin` selects; only the `y` index it resolves to changes. The GDS pin placement follows the same sides.
 
     :::{warning}
     Changing the clock direction changes the clock tree topology in the fabric

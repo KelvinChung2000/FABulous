@@ -25,6 +25,7 @@ from cmd2 import Statement, with_annotated
 from cmd2.annotated import Argument, ArgumentBlock, Option
 from loguru import logger
 
+from fabulous.custom_exception import CommandError
 from fabulous.fabric_generator.gds_generator.steps.tile_area_opt import OptMode
 from fabulous.fabulous_repl.command_set_base import (
     CMD_FABRIC_FLOW,
@@ -157,6 +158,38 @@ class TileHardeningOptions(ArgumentBlock):
         ),
     ] = None
 
+    def resolve(self) -> tuple[OptMode, dict]:
+        """Resolve the flags into an optimisation mode and LibreLane overrides.
+
+        Called once per command invocation rather than once per tile, so a
+        conflicting pair aborts the fan-out instead of failing every tile in it.
+
+        Returns
+        -------
+        tuple[OptMode, dict]
+            The optimisation mode, and the config overrides the `--override` file
+            and the fix flags imply.
+
+        Raises
+        ------
+        CommandError
+            If the fix flags conflict with each other or with `--optimise`.
+        """
+        try:
+            opt_mode, die_area_override = _resolve_directional_fix(
+                self.optimise, self.fix_width, self.fix_height
+            )
+        except ValueError as exc:
+            raise CommandError(str(exc)) from exc
+
+        custom_overrides: dict = {}
+        if self.override:
+            custom_overrides.update(yaml.safe_load(self.override.read_text()) or {})
+        if die_area_override is not None:
+            custom_overrides["FABULOUS_OPT_MODE"] = opt_mode
+            custom_overrides["DIE_AREA"] = die_area_override
+        return opt_mode, custom_overrides
+
 
 class MacroFlowCommandSet(ReplCommandSet):
     """Harden tiles and the fabric into GDS macros via the LibreLane flow."""
@@ -199,6 +232,7 @@ class MacroFlowCommandSet(ReplCommandSet):
         This command generates GDSII files for the specified tile, allowing for the
         physical representation of the tile to be created.
         """
+        opt_mode, custom_overrides = options.resolve()
         if not is_pdk_config_set():
             logger.error(
                 "PDK configuration is not set. Please set the PDK configuration to "
@@ -206,12 +240,13 @@ class MacroFlowCommandSet(ReplCommandSet):
             )
             return
 
-        self._harden_tile(tile, options, io_pin_config=io_pin_config)
+        self._harden_tile(tile, opt_mode, custom_overrides, io_pin_config=io_pin_config)
 
     def _harden_tile(
         self,
         tile: str,
-        options: TileHardeningOptions,
+        opt_mode: OptMode,
+        custom_overrides: dict,
         *,
         io_pin_config: Path | None = None,
     ) -> None:
@@ -221,28 +256,15 @@ class MacroFlowCommandSet(ReplCommandSet):
         ----------
         tile : str
             Name of the tile to harden.
-        options : TileHardeningOptions
-            The sizing flags as parsed on the invoking subcommand.
+        opt_mode : OptMode
+            The optimisation mode resolved by `TileHardeningOptions.resolve`.
+        custom_overrides : dict
+            The LibreLane config overrides resolved alongside `opt_mode`.
         io_pin_config : Path | None
             Pin order file to use as-is. Defaults to None, which generates the
             tile's pin order from the fabric structure.
         """
         repl = self._cmd
-        try:
-            opt_mode, die_area_override = _resolve_directional_fix(
-                options.optimise, options.fix_width, options.fix_height
-            )
-        except ValueError as exc:
-            logger.error(str(exc))
-            return
-
-        custom_overrides: dict = {}
-        if options.override:
-            custom_overrides.update(yaml.safe_load(options.override.read_text()) or {})
-        if die_area_override is not None:
-            custom_overrides["FABULOUS_OPT_MODE"] = opt_mode
-            custom_overrides["DIE_AREA"] = die_area_override
-
         tile_dir = repl.projectDir / "Tile" / tile
         pin_order_file = tile_dir / f"{tile}_io_pin_order.yaml"
 
@@ -285,6 +307,7 @@ class MacroFlowCommandSet(ReplCommandSet):
     ) -> None:
         """Generate GDSII files for all tiles in the fabric."""
         repl = self._cmd
+        opt_mode, custom_overrides = options.resolve()
         if not is_pdk_config_set():
             logger.error(
                 "PDK configuration is not set. Please set the PDK configuration to "
@@ -295,12 +318,14 @@ class MacroFlowCommandSet(ReplCommandSet):
         tiles = sorted(repl.all_tile)
         if not parallel:
             for tile in tiles:
-                self._harden_tile(tile, options)
+                self._harden_tile(tile, opt_mode, custom_overrides)
             return
 
         with ThreadPoolExecutor(max_workers=repl.max_job) as executor:
             running = {
-                executor.submit(self._harden_tile, tile, options): tile
+                executor.submit(
+                    self._harden_tile, tile, opt_mode, custom_overrides
+                ): tile
                 for tile in tiles
             }
             for future in as_completed(running):
@@ -403,7 +428,7 @@ class MacroFlowCommandSet(ReplCommandSet):
         )
 
     def _forward_deprecated(
-        self, old_name: str, new_command: str, statement: Statement
+        self, old_name: str, new_command: str, statement: Statement | str
     ) -> None:
         """Run `new_command` with the raw argument tail of a deprecated command.
 
@@ -413,29 +438,34 @@ class MacroFlowCommandSet(ReplCommandSet):
             The deprecated command name, named in the warning.
         new_command : str
             The `gen_macro` subcommand replacing it.
-        statement : Statement
-            The parsed command line; its raw tail is appended unchanged.
+        statement : Statement | str
+            The parsed command line, or the already-joined argument tail the TCL
+            bridge hands to a `do_*` method. Either way the tail is appended
+            unchanged.
         """
+        args = statement.args if isinstance(statement, Statement) else statement
         logger.warning(
             f"The '{old_name}' command is deprecated. Use '{new_command}' instead."
         )
         self._cmd.onecmd_plus_hooks(
-            f"{new_command} {statement.args}".strip(), add_to_history=False
+            f"{new_command} {args}".strip(), add_to_history=False
         )
 
-    def do_gen_tile_macro(self, statement: Statement) -> None:
+    def do_gen_tile_macro(self, statement: Statement | str) -> None:
         """Run `gen_macro tile`; this name is deprecated."""
         self._forward_deprecated("gen_tile_macro", "gen_macro tile", statement)
 
-    def do_gen_all_tile_macros(self, statement: Statement) -> None:
+    def do_gen_all_tile_macros(self, statement: Statement | str) -> None:
         """Run `gen_macro all_tile`; this name is deprecated."""
         self._forward_deprecated("gen_all_tile_macros", "gen_macro all_tile", statement)
 
-    def do_gen_fabric_macro(self, statement: Statement) -> None:
+    def do_gen_fabric_macro(self, statement: Statement | str) -> None:
         """Run `gen_macro stitch`; this name is deprecated."""
         self._forward_deprecated("gen_fabric_macro", "gen_macro stitch", statement)
 
-    def do_run_FABulous_eFPGA_macro(self, statement: Statement) -> None:  # noqa: N802
+    def do_run_FABulous_eFPGA_macro(  # noqa: N802
+        self, statement: Statement | str
+    ) -> None:
         """Run `gen_macro full`; this name is deprecated."""
         self._forward_deprecated(
             "run_FABulous_eFPGA_macro", "gen_macro full", statement

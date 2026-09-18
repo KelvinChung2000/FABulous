@@ -765,6 +765,18 @@ class TestGenMacroAllTile:
         gen_macro_tile_mock.assert_not_called()
         assert cli.exit_code != 0
 
+    @pytest.mark.parametrize("flags", ["", "--parallel"], ids=["serial", "parallel"])
+    def test_conflicting_sizing_flags_abort_before_fan_out(
+        self, cli: FABulousREPL, mocker: MockerFixture, flags: str
+    ) -> None:
+        """A bad flag pair fails the command once, not once per tile."""
+        gen_macro_tile_mock = self._patch(cli, mocker)
+
+        run_cmd(cli, f"gen_macro all_tile --fix-width 246 --fix-height 245 {flags}")
+
+        gen_macro_tile_mock.assert_not_called()
+        assert cli.exit_code != 0
+
 
 def test_gen_macro_tile_completer_offers_tile_names(cli: FABulousREPL) -> None:
     """The tile completer still reaches app state from inside the subparser."""
@@ -791,14 +803,20 @@ def test_gen_macro_tile_completer_offers_tile_names(cli: FABulousREPL) -> None:
         ("run_FABulous_eFPGA_macro", "gen_macro full"),
     ],
 )
+@pytest.mark.parametrize("through_tcl", [False, True], ids=["repl", "tcl"])
 def test_deprecated_macro_commands_forward(
     cli: FABulousREPL,
     mocker: MockerFixture,
     caplog: pytest.LogCaptureFixture,
     deprecated: str,
     replacement: str,
+    through_tcl: bool,
 ) -> None:
-    """Each pre-subcommand name warns and runs its `gen_macro` replacement."""
+    """Each pre-subcommand name warns and runs its `gen_macro` replacement.
+
+    The TCL bridge calls the `do_*` method with a joined string rather than a
+    `Statement`, so both entry paths have to reach the replacement.
+    """
     mocker.patch(
         "fabulous.fabulous_repl.cmd_macro.is_pdk_config_set", return_value=True
     )
@@ -808,7 +826,10 @@ def test_deprecated_macro_commands_forward(
     mocker.patch.object(cli.fabulousAPI, "full_fabric_automation")
     argument = f" {TILE}" if deprecated == "gen_tile_macro" else ""
 
-    run_cmd(cli, f"{deprecated}{argument}")
+    if through_tcl:
+        cli.tcl.eval(f"{deprecated}{argument}")
+    else:
+        run_cmd(cli, f"{deprecated}{argument}")
 
     assert any("deprecated" in r.message.lower() for r in caplog.records)
     assert any(replacement in r.message for r in caplog.records)

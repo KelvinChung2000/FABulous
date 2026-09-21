@@ -393,7 +393,7 @@ def fabulous_test_environment(
         "get_ciel_home",
         lambda: str(tmp_path / ".ciel"),
     )
-    (tmp_path / ".ciel" / "ihp-sg13g2").mkdir(parents=True, exist_ok=True)
+    (tmp_path / ".ciel" / "ihp-sg13").mkdir(parents=True, exist_ok=True)
     setup_logger(0, False)
 
     yield

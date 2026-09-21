@@ -1005,7 +1005,7 @@ class TestCheckPdkAutoResolution:
     def test_error_from_get_ciel_pdk_hash_propagates(
         self, project: Path, monkeypatch: pytest.MonkeyPatch, mocker: MockerFixture
     ) -> None:
-        """A family librelane has not validated fails the settings validation."""
+        """A family with no librelane-validated PDK hash fails settings validation."""
         self._setup_pdk_env(project, monkeypatch, mocker)
         mocker.patch(
             "librelane.common.misc.get_ciel_pdk_hash",
@@ -1034,11 +1034,7 @@ class TestCheckPdkAutoResolution:
         pdk_name: str,
         expected_family: str | None,
     ) -> None:
-        """Test hash resolution for known families and skipping for unknown ones.
-
-        A variant name resolves to the family it belongs to, which is what ciel
-        installs and what the hash is keyed on.
-        """
+        """A variant resolves to its ciel family; unknown PDKs skip resolution."""
         is_known_family = expected_family is not None
         pdk_root = None if is_known_family else project.parent / "custom_pdk"
         self._setup_pdk_env(

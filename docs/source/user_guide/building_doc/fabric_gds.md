@@ -52,7 +52,7 @@ This sets up all EDA tools (Yosys, NextPNR, OpenROAD, GHDL, etc.) and verifies t
 
 ### Install PDK
 
-To compile the design, we will also need to install the PDK. For ciel-supported PDKs (e.g. `ihp-sg13g2`, `sky130A`, `gf180mcu`), FABulous automatically resolves the recommended PDK version from LibreLane and installs it via [ciel](https://github.com/fossi-foundation/ciel) on first use. No manual installation is required. By default, we have set up the project to target the `ihp-sg13g2` process (130nm).
+To compile the design, we will also need to install the PDK. For ciel-supported PDKs (e.g. `ihp-sg13g2`, `ihp-sg13cmos5l`, `sky130A`, `gf180mcu`), FABulous automatically resolves the recommended PDK version from LibreLane and installs it via [ciel](https://github.com/fossi-foundation/ciel) on first use. No manual installation is required. By default, we have set up the project to target the `ihp-sg13g2` process (130nm).
 
 For details on how the PDK is resolved and when manual configuration is needed, see the [PDK Resolution Logic](#pdk-resolution-logic) section.
 

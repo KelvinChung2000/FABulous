@@ -73,6 +73,7 @@ jobs:
               - 'fabulous/**'
               - 'pyproject.toml'
               - 'uv.lock'
+              - '.readthedocs.yaml'
               - '.github/workflows/docs.yml'
               - '.github/workflows/ci.yml'
 

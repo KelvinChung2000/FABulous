@@ -38,6 +38,12 @@ in
         wheel = [ ];
       };
   });
+  fabulous-tiles = prev.fabulous-tiles.overrideAttrs (old: {
+    nativeBuildInputs = (old.nativeBuildInputs or [ ]) ++ final.resolveBuildSystem { hatchling = [ ]; };
+  });
+  fabulous-fabrics = prev.fabulous-fabrics.overrideAttrs (old: {
+    nativeBuildInputs = (old.nativeBuildInputs or [ ]) ++ final.resolveBuildSystem { hatchling = [ ]; };
+  });
 
   # Fix file collision between alive-progress and about-time (both provide LICENSE files)
   alive-progress = prev.alive-progress.overrideAttrs (old: {

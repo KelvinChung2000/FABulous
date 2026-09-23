@@ -626,6 +626,14 @@ wheels = [
 ]
 
 [[package]]
+name = "fabulous-fabrics"
+version = "0.1.0"
+source = { git = "https://github.com/FPGA-Research/fabulous-fabrics.git?rev=6fad0fe8a54c02043bcfe0def0ddb49b26a7966f#6fad0fe8a54c02043bcfe0def0ddb49b26a7966f" }
+dependencies = [
+    { name = "fabulous-tiles" },
+]
+
+[[package]]
 name = "fabulous-fasm"
 version = "0.2.0"
 source = { registry = "https://pypi.org/simple" }
@@ -646,6 +654,8 @@ dependencies = [
     { name = "cmd2" },
     { name = "dill" },
     { name = "fabulous-bit-gen" },
+    { name = "fabulous-fabrics" },
+    { name = "fabulous-tiles" },
     { name = "go-task-bin" },
     { name = "jinja2" },
     { name = "librelane" },
@@ -685,6 +695,8 @@ requires-dist = [
     { name = "cmd2", specifier = ">=4.1.2" },
     { name = "dill", specifier = ">=0.4.0" },
     { name = "fabulous-bit-gen", specifier = ">=0.3.1" },
+    { name = "fabulous-fabrics", git = "https://github.com/FPGA-Research/fabulous-fabrics.git?rev=6fad0fe8a54c02043bcfe0def0ddb49b26a7966f" },
+    { name = "fabulous-tiles", git = "https://github.com/FPGA-Research/fabulous-tiles.git?rev=9ad3d6e5686d258e3712073f3ae500d42556062a" },
     { name = "go-task-bin", specifier = ">=3.40.0" },
     { name = "jinja2", specifier = ">=3.1.6" },
     { name = "librelane", specifier = ">=3.0.0" },
@@ -716,6 +728,11 @@ dev = [
     { name = "pyyaml", specifier = ">=6.0.0" },
     { name = "ruff", specifier = ">=0.12.7" },
 ]
+
+[[package]]
+name = "fabulous-tiles"
+version = "0.1.0"
+source = { git = "https://github.com/FPGA-Research/fabulous-tiles.git?rev=9ad3d6e5686d258e3712073f3ae500d42556062a#9ad3d6e5686d258e3712073f3ae500d42556062a" }
 
 [[package]]
 name = "filelock"

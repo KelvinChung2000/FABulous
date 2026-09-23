@@ -3,6 +3,7 @@
 import os
 import shutil
 from collections.abc import Callable, Generator
+from importlib import resources
 from pathlib import Path
 from typing import Protocol
 
@@ -23,19 +24,20 @@ from fabulous.fabulous_repl.fabulous_repl import FABulousREPL
 from fabulous.fabulous_repl.helper import create_project, setup_logger
 from fabulous.fabulous_settings import init_context, reset_context
 
-VERILOG_SOURCE_PATH = (
-    Path(__file__).parent.parent
-    / "fabulous"
-    / "fabric_files"
-    / "FABulous_project_template_verilog"
-)
 
-VHDL_SOURCE_PATH = (
-    Path(__file__).parent.parent
-    / "fabulous"
-    / "fabric_files"
-    / "FABulous_project_template_vhdl"
-)
+def _package_root(package: str) -> Path:
+    """Return the import root of an asset package installed as a directory."""
+    root = resources.files(package)
+    assert isinstance(root, Path), (
+        f"{package} is not installed as a directory: {root!r}"
+    )
+    return root
+
+
+FABRIC_ROOT = _package_root("fabulous_fabrics") / "fabrics" / "fabulous"
+VERILOG_SOURCE_PATH = FABRIC_ROOT / "verilog"
+VHDL_SOURCE_PATH = FABRIC_ROOT / "vhdl"
+TILES_PRIMITIVES = _package_root("fabulous_tiles") / "primitives"
 
 SIM_FOR_SUFFIX: dict[str, str] = {
     ".v": "verilator",

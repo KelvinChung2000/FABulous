@@ -441,6 +441,11 @@ class MacroFlowCommandSet(ReplCommandSet):
             The parsed command line, or the already-joined argument tail the TCL
             bridge hands to a `do_*` method. Either way the tail is appended
             unchanged.
+
+        Raises
+        ------
+        CommandError
+            If `new_command` fails.
         """
         args = statement.args if isinstance(statement, Statement) else statement
         logger.warning(
@@ -449,6 +454,10 @@ class MacroFlowCommandSet(ReplCommandSet):
         self._cmd.onecmd_plus_hooks(
             f"{new_command} {args}".strip(), add_to_history=False
         )
+        # The nested call swallows the failure into `exit_code`, which neither the
+        # TCL bridge nor the outer command's stop flag reads.
+        if self._cmd.exit_code != 0:
+            raise CommandError(f"'{new_command}' failed")
 
     def do_gen_tile_macro(self, statement: Statement | str) -> None:
         """Run `gen_macro tile`; this name is deprecated."""

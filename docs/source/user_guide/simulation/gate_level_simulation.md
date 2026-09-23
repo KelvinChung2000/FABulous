@@ -30,8 +30,8 @@ From a fresh project the full path is:
 
 ```text
 run_FABulous_fabric                                  # 1. generate the fabric HDL
-gen_all_tile_macros --parallel
-gen_fabric_macro                                     # 2. harden it (long; see fabric_gds.md)
+gen_macro all_tile --parallel
+gen_macro stitch                                     # 2. harden it (long; see fabric_gds.md)
 compile_design ./user_design/<design>.v              # 3. build a bitstream
 run_simulation --gl fst ./user_design/<design>.bin   # 4. gate-level simulate
 ```

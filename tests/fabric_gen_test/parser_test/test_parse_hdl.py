@@ -6,19 +6,22 @@ from pathlib import Path
 
 import pytest
 
-from fabulous.fabric_definition.define import HDLType
+from fabulous.custom_exception import InvalidBelDefinition
+from fabulous.fabric_definition.define import FABulousAttribute, HDLType, Status
 from fabulous.fabric_generator.parser.parse_hdl import parseBelFile
 from fabulous.fabulous_settings import get_context, init_context
 
 
 def write_bel(
-    directory: Path, lang: HDLType, *, bel_map: bool, deprecated: bool
+    directory: Path,
+    lang: HDLType,
+    *,
+    bel_map: bool,
+    markers: tuple[FABulousAttribute, ...],
 ) -> Path:
-    """Write a one-port BEL, optionally with a one-bit BelMap and `DEPRECATED`."""
+    """Write a one-port BEL, optionally with a one-bit BelMap and status markers."""
     if lang is HDLType.VERILOG:
-        attributes = ["FABulous"]
-        if deprecated:
-            attributes.append("DEPRECATED")
+        attributes = ["FABulous", *markers]
         if bel_map:
             attributes += ["BelMap", "INIT=0"]
         config_port = ", input wire [0:0] ConfigBits" if bel_map else ""
@@ -32,8 +35,9 @@ def write_bel(
         return bel
 
     specs = ['attribute FABulous of dep_bel : entity is "TRUE";']
-    if deprecated:
-        specs.append('attribute DEPRECATED of dep_bel : entity is "TRUE";')
+    specs += [
+        f'attribute {marker} of dep_bel : entity is "TRUE";' for marker in markers
+    ]
     if bel_map:
         specs += [
             'attribute BelMap of dep_bel : entity is "TRUE";',
@@ -48,6 +52,7 @@ def write_bel(
         "package dep_bel_attrs is\n"
         "  attribute FABulous : string;\n"
         "  attribute DEPRECATED : string;\n"
+        "  attribute EXPERIMENTAL : string;\n"
         "  attribute BelMap : string;\n"
         "  attribute INIT : integer;\n"
         "end package dep_bel_attrs;\n"
@@ -85,34 +90,59 @@ def bel_lang(
     return lang
 
 
+STATUS_CASES = [
+    pytest.param((FABulousAttribute.DEPRECATED,), Status.DEPRECATED, id="deprecated"),
+    pytest.param(
+        (FABulousAttribute.EXPERIMENTAL,), Status.EXPERIMENTAL, id="experimental"
+    ),
+    pytest.param((), Status.STABLE, id="stable"),
+]
+
+
 @pytest.mark.parametrize("bel_map", [True, False], ids=["belmap", "no_belmap"])
-@pytest.mark.parametrize("deprecated", [True, False], ids=["deprecated", "current"])
-def test_deprecated_attribute_sets_flag(
-    tmp_path: Path, bel_lang: HDLType, bel_map: bool, deprecated: bool
+@pytest.mark.parametrize(("markers", "status"), STATUS_CASES)
+def test_status_attribute_sets_status(
+    tmp_path: Path,
+    bel_lang: HDLType,
+    bel_map: bool,
+    markers: tuple[FABulousAttribute, ...],
+    status: Status,
 ) -> None:
-    bel_file = write_bel(tmp_path, bel_lang, bel_map=bel_map, deprecated=deprecated)
+    bel_file = write_bel(tmp_path, bel_lang, bel_map=bel_map, markers=markers)
 
     bel = parseBelFile(bel_file)
 
-    assert bel.deprecated is deprecated
+    assert bel.status is status
     assert bel.configBit == int(bel_map)
 
 
-@pytest.mark.parametrize("deprecated", [True, False], ids=["deprecated", "current"])
-def test_deprecated_bel_logs_warning(
+@pytest.mark.parametrize(("markers", "status"), STATUS_CASES)
+def test_non_stable_bel_logs_warning(
     tmp_path: Path,
     bel_lang: HDLType,
-    deprecated: bool,
+    markers: tuple[FABulousAttribute, ...],
+    status: Status,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
-    bel_file = write_bel(tmp_path, bel_lang, bel_map=True, deprecated=deprecated)
+    bel_file = write_bel(tmp_path, bel_lang, bel_map=True, markers=markers)
 
     parseBelFile(bel_file)
 
     warned = [
         r
         for r in caplog.records
-        if r.levelname == "WARNING" and "DEPRECATED" in r.getMessage()
+        if r.levelname == "WARNING" and status in r.getMessage()
     ]
-    assert len(warned) == int(deprecated)
+    assert len(warned) == int(status is not Status.STABLE)
     assert all(str(bel_file) in r.getMessage() for r in warned)
+
+
+@pytest.mark.parametrize("bel_map", [True, False], ids=["belmap", "no_belmap"])
+def test_both_status_attributes_raise(
+    tmp_path: Path, bel_lang: HDLType, bel_map: bool
+) -> None:
+    markers = (FABulousAttribute.DEPRECATED, FABulousAttribute.EXPERIMENTAL)
+    bel_file = write_bel(tmp_path, bel_lang, bel_map=bel_map, markers=markers)
+
+    with pytest.raises(InvalidBelDefinition, match="both"):
+        parseBelFile(bel_file)

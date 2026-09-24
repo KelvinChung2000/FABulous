@@ -12,7 +12,7 @@ from decimal import Decimal
 from pathlib import Path
 
 from fabulous.fabric_definition.bel import Bel
-from fabulous.fabric_definition.define import Side
+from fabulous.fabric_definition.define import Side, Status
 from fabulous.fabric_definition.port import TilePort
 from fabulous.fabric_definition.switch_matrix import SwitchMatrix
 from fabulous.fabric_definition.tile import Tile
@@ -44,9 +44,9 @@ class SuperTile:
         in the supertile CSV, or computed as the last non-None tile in row-major
         order if no MASTER is present.  All supertile config bits and BELs are
         anchored to this tile.
-    deprecated : bool
-        Whether the supertile CSV header marks the supertile `DEPRECATED`, kept
-        only for backward compatibility. Default is False.
+    status : Status
+        Support status of the supertile, set by an `EXPERIMENTAL` or `DEPRECATED`
+        marker in column 3 of the supertile CSV header. Default is `Status.STABLE`.
     """
 
     name: str
@@ -57,7 +57,7 @@ class SuperTile:
     withUserCLK: bool = False
     switch_matrix: SwitchMatrix | None = None
     master_tile_coords: tuple[int, int] | None = None
-    deprecated: bool = False
+    status: Status = Status.STABLE
 
     def get_ports_around_tile(self) -> dict[str, list[list[TilePort]]]:
         """Return all the ports that are around the supertile.

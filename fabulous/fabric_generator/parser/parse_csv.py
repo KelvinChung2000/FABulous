@@ -23,6 +23,7 @@ from fabulous.fabric_definition.define import (
     Direction,
     MultiplexerStyle,
     Side,
+    Status,
 )
 from fabulous.fabric_definition.fabric import Fabric
 from fabulous.fabric_definition.gen_io import Gen_IO
@@ -290,14 +291,15 @@ def parseTilesCSV(
         # Generated tile CSVs write a bare `TILE,<name>` header without column 3.
         match header[2].strip() if len(header) > 2 else "":
             case "":
-                deprecated = False
-            case "DEPRECATED":
-                deprecated = True
-                logger.warning(f"Tile {tileName} in {fileName} is marked DEPRECATED.")
+                status = Status.STABLE
+            case Status.EXPERIMENTAL | Status.DEPRECATED as marker:
+                status = Status(marker)
+                logger.warning(f"Tile {tileName} in {fileName} is marked {status}.")
             case marker:
                 raise InvalidTileDefinition(
                     f"Unknown marker {marker!r} in the header of tile {tileName} in "
-                    f"{fileName}. Only DEPRECATED is accepted in column 3."
+                    f"{fileName}. Column 3 accepts EXPERIMENTAL or DEPRECATED, or "
+                    "stays empty for a stable tile."
                 )
         if filePathParent.name != tileName:
             logger.warning(
@@ -556,7 +558,7 @@ def parseTilesCSV(
                 ),
                 gen_ios=gen_ios,
                 userCLK=withUserCLK,
-                deprecated=deprecated,
+                status=status,
             )
         )
 
@@ -659,14 +661,15 @@ def parseSupertilesCSV(fileName: Path, tileDic: dict[str, Tile]) -> list[SuperTi
         name = header[1]
         match header[2].strip() if len(header) > 2 else "":
             case "":
-                deprecated = False
-            case "DEPRECATED":
-                deprecated = True
-                logger.warning(f"Supertile {name} in {fileName} is marked DEPRECATED.")
+                status = Status.STABLE
+            case Status.EXPERIMENTAL | Status.DEPRECATED as marker:
+                status = Status(marker)
+                logger.warning(f"Supertile {name} in {fileName} is marked {status}.")
             case marker:
                 raise InvalidSupertileDefinition(
                     f"Unknown marker {marker!r} in the header of supertile {name} in "
-                    f"{fileName}. Only DEPRECATED is accepted in column 3."
+                    f"{fileName}. Column 3 accepts EXPERIMENTAL or DEPRECATED, or "
+                    "stays empty for a stable supertile."
                 )
         tileMap = []
         tiles = []
@@ -739,7 +742,7 @@ def parseSupertilesCSV(fileName: Path, tileDic: dict[str, Tile]) -> list[SuperTi
             tileMap,
             bels,
             withUserCLK,
-            deprecated=deprecated,
+            status=status,
         )
         super_tile.master_tile_coords = master_coords
 

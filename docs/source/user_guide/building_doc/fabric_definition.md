@@ -324,21 +324,29 @@ EndTILE
 The path of the `INCLUDE` will be relative to where the base file is. For example if the base file is located
 at `foo/bar/LUT4AB.csv` then the `INCLUDE` path will point to `foo/bar/../Base.csv`.
 
-(tile-deprecated-marker)=
+(tile-status-marker)=
 
-### Deprecated marker
+### Status marker
 
 The header row of a `TILE` or `SuperTILE` definition accepts an optional third
-column. The only accepted value is `DEPRECATED`; any other non-empty value is
-rejected with an error. The marker flags the tile or supertile as kept only for
-backward compatibility, and FABulous logs a warning each time it loads the
+column that sets the support status of the tile or supertile:
+
+| Column 3       | Status       | Meaning                                    |
+| -------------- | ------------ | ------------------------------------------ |
+| empty          | stable       | Supported; the default.                    |
+| `EXPERIMENTAL` | experimental | Not yet stable; may change or be removed.  |
+| `DEPRECATED`   | deprecated   | Kept only for backward compatibility.      |
+
+An empty column is the only way to mark a definition stable; an explicit
+`STABLE`, or any other value, is rejected with an error. FABulous logs a warning
+naming the status each time it loads an `EXPERIMENTAL` or `DEPRECATED`
 definition:
 
 ```text
-TILE, LUT4AB, DEPRECATED
+TILE, LUT4AB, EXPERIMENTAL
 ```
 
-A BEL is marked the same way through the [`DEPRECATED` module attribute](#bel-deprecated-attribute).
+A BEL is marked the same way through the [`EXPERIMENTAL` and `DEPRECATED` module attributes](#bel-status-attribute).
 
 (wires)=
 
@@ -962,19 +970,22 @@ UserCLK : in std_logic; -- EXTERNAL -- SHARED_PORT
 New BEL files should use native VHDL attribute assignments instead.
 :::
 
-(bel-deprecated-attribute)=
+(bel-status-attribute)=
 
-#### DEPRECATED attribute
+#### EXPERIMENTAL and DEPRECATED attributes
 
-The `DEPRECATED` module attribute flags a BEL as kept only for backward
-compatibility. FABulous detects the attribute by its presence and ignores its
-value. It is not a BelMap feature and takes no configuration bit. The BEL still
-parses, and FABulous logs a warning each time it loads the BEL.
+A BEL is stable unless a module attribute sets another support status. The
+`EXPERIMENTAL` attribute flags a BEL as not yet stable, and the `DEPRECATED`
+attribute flags it as kept only for backward compatibility. A BEL carries at
+most one of the two; a module with both is rejected with an error. FABulous
+detects each attribute by its presence and ignores its value. Neither is a
+BelMap feature and neither takes a configuration bit. The BEL still parses, and
+FABulous logs a warning naming the status each time it loads the BEL.
 
 In Verilog, the attribute goes in the module attribute list:
 
 ```verilog
-(* FABulous, DEPRECATED, BelMap, INIT=0 *)
+(* FABulous, EXPERIMENTAL, BelMap, INIT=0 *)
 module MyBel (...);
 ```
 
@@ -982,11 +993,11 @@ In VHDL, it is an entity-level attribute, declared in the attribute package
 like the other FABulous attributes:
 
 ```VHDL
-attribute DEPRECATED : string;
-attribute DEPRECATED of MyBel : entity is "TRUE";
+attribute EXPERIMENTAL : string;
+attribute EXPERIMENTAL of MyBel : entity is "TRUE";
 ```
 
-Tiles and supertiles use the [`DEPRECATED` header marker](#tile-deprecated-marker)
+Tiles and supertiles use the [status header marker](#tile-status-marker)
 instead.
 
 (belmap-primitives)=

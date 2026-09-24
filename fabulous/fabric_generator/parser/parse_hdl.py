@@ -10,7 +10,7 @@ from fabulous.custom_exception import (
     InvalidBelDefinition,
 )
 from fabulous.fabric_definition.bel import Bel
-from fabulous.fabric_definition.define import IO, FABulousAttribute
+from fabulous.fabric_definition.define import IO, FABulousAttribute, Status
 from fabulous.fabric_definition.yosys_obj import YosysJson, YosysModule
 
 
@@ -50,6 +50,7 @@ def belMapProcessing(module_info: YosysModule) -> dict:
         "BelMap",
         "FABulous",
         FABulousAttribute.DEPRECATED,
+        FABulousAttribute.EXPERIMENTAL,
         "dynports",
         "cells_not_processed",
         "src",
@@ -120,6 +121,7 @@ def parseBelFile(
     * **SHARED_ENABLE**
     * **SHARED_RESET**
     * **DEPRECATED**
+    * **EXPERIMENTAL**
 
     The **BelMap** attribute will specify the bel mapping for the bel.
     This attribute should be placed before the start of the module.
@@ -155,7 +157,8 @@ def parseBelFile(
     **CONFIG_PORT** attribute will notify FABulous the port is for configuration.
 
     **DEPRECATED** is a module attribute marking the BEL as kept only for backward
-    compatibility. The BEL still parses, but a warning is logged.
+    compatibility. **EXPERIMENTAL** is a module attribute marking the BEL as not yet
+    stable. Either sets the BEL status and logs a warning; a BEL cannot carry both.
 
     Example
     -------
@@ -198,7 +201,8 @@ def parseBelFile(
         Fabric cannot be parsed
     InvalidBelDefinition
         The BEL file contains invalid BEL definitions. Such as wrong attribute type on
-        wrong port type. i.e SHARE_EN on output ports
+        wrong port type. i.e SHARE_EN on output ports, or a module carrying both the
+        DEPRECATED and EXPERIMENTAL attributes.
     ValueError
         - If CARRY port prefix is not a string
         - Port naming is reused
@@ -326,12 +330,23 @@ def parseBelFile(
             "config bits"
         )
 
-    deprecated = any(
-        key.casefold() == FABulousAttribute.DEPRECATED.casefold()
-        for key in module_info.attributes
-    )
-    if deprecated:
-        logger.warning(f"BEL {filename} is marked DEPRECATED.")
+    module_attributes = {key.casefold() for key in module_info.attributes}
+    deprecated = FABulousAttribute.DEPRECATED.casefold() in module_attributes
+    experimental = FABulousAttribute.EXPERIMENTAL.casefold() in module_attributes
+    match deprecated, experimental:
+        case True, True:
+            raise InvalidBelDefinition(
+                f"BEL {filename} carries both the DEPRECATED and EXPERIMENTAL "
+                "attributes; a BEL takes at most one."
+            )
+        case True, False:
+            status = Status.DEPRECATED
+        case False, True:
+            status = Status.EXPERIMENTAL
+        case _:
+            status = Status.STABLE
+    if status is not Status.STABLE:
+        logger.warning(f"BEL {filename} is marked {status}.")
 
     return Bel(
         src=filename,
@@ -347,5 +362,5 @@ def parseBelFile(
         ports_vectors=ports_vectors,
         carry=carry,
         localShared=localSharedPorts,
-        deprecated=deprecated,
+        status=status,
     )

@@ -172,6 +172,7 @@ class FABulousAttribute(StrEnum):
     - USER_CLK: User clock attribute
     - CONFIG_BIT: Configuration bit attribute
     - DEPRECATED: Module attribute marking a BEL as deprecated
+    - EXPERIMENTAL: Module attribute marking a BEL as experimental
     """
 
     EXTERNAL = "EXTERNAL"
@@ -179,6 +180,15 @@ class FABulousAttribute(StrEnum):
     GLOBAL = "GLOBAL"
     USER_CLK = "USER_CLK"
     CONFIG_BIT = "CONFIG_BIT"
+    DEPRECATED = "DEPRECATED"
+    EXPERIMENTAL = "EXPERIMENTAL"
+
+
+class Status(StrEnum):
+    """Support status of a tile, supertile or BEL."""
+
+    STABLE = "STABLE"
+    EXPERIMENTAL = "EXPERIMENTAL"
     DEPRECATED = "DEPRECATED"
 
 

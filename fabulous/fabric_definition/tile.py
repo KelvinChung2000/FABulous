@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 from fabulous.fabric_definition.bel import Bel
-from fabulous.fabric_definition.define import IO, Direction, PinSortMode, Side
+from fabulous.fabric_definition.define import IO, Direction, PinSortMode, Side, Status
 from fabulous.fabric_definition.gen_io import Gen_IO
 from fabulous.fabric_definition.port import TilePort
 from fabulous.fabric_definition.switch_matrix import SwitchMatrix
@@ -42,8 +42,9 @@ class Tile:
     pinOrderConfig : dict[Side, PinOrderConfig] | None, optional
         Configuration for pin ordering on each side of the tile. If None, defaults to
         BUS_MAJOR sorting on all sides.
-    deprecated : bool
-        Whether the tile CSV header marks the tile `DEPRECATED`. Defaults to False.
+    status : Status
+        Support status from column 3 of the tile CSV header. Defaults to
+        `Status.STABLE`.
 
     Attributes
     ----------
@@ -67,9 +68,9 @@ class Tile:
         Whether the tile is part of a super tile. Default is False.
     pinOrderConfig : dict, optional
         Configuration for pin ordering on each side of the tile.
-    deprecated : bool
-        Whether the tile is marked `DEPRECATED` and kept only for backward
-        compatibility. Default is False.
+    status : Status
+        Support status of the tile, set by an `EXPERIMENTAL` or `DEPRECATED`
+        header marker. Default is `Status.STABLE`.
     """
 
     name: str
@@ -82,7 +83,7 @@ class Tile:
     tileDir: Path = Path()
     partOfSuperTile: bool = False
     pinOrderConfig: dict = field(default_factory=dict)
-    deprecated: bool = False
+    status: Status = Status.STABLE
 
     def __init__(
         self,
@@ -94,7 +95,7 @@ class Tile:
         gen_ios: list[Gen_IO],
         userCLK: bool,
         pinOrderConfig: dict[Side, "PinOrderConfig"] | None = None,
-        deprecated: bool = False,
+        status: Status = Status.STABLE,
     ) -> None:
         self.name = name
         self.portsInfo = ports
@@ -104,7 +105,7 @@ class Tile:
         self.withUserCLK = userCLK
         self.wireList = []
         self.tileDir = tileDir
-        self.deprecated = deprecated
+        self.status = status
 
         if pinOrderConfig is None:
             from fabulous.fabric_generator.gds_generator.gen_io_pin_config_yaml import (

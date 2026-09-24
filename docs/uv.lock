@@ -601,8 +601,8 @@ dev = [{ name = "sphinx-autobuild" }]
 
 [[package]]
 name = "fabulous-fabrics"
-version = "0.0.1.dev70+gf4521f763"
-source = { git = "https://github.com/FPGA-Research/fabulous-fabrics.git?rev=f4521f763ece0e4b4af1822d6461c5bbcf2520e9#f4521f763ece0e4b4af1822d6461c5bbcf2520e9" }
+version = "0.0.1.dev71+g7e99038b2"
+source = { git = "https://github.com/FPGA-Research/fabulous-fabrics.git?rev=7e99038b2f22f48a8be4da11d61db7ba0e4f3201#7e99038b2f22f48a8be4da11d61db7ba0e4f3201" }
 dependencies = [
     { name = "fabulous-tiles" },
     { name = "pydantic" },
@@ -657,8 +657,8 @@ requires-dist = [
     { name = "cmd2", specifier = ">=4.1.2" },
     { name = "dill", specifier = ">=0.4.0" },
     { name = "fabulous-bit-gen", specifier = ">=0.3.1" },
-    { name = "fabulous-fabrics", git = "https://github.com/FPGA-Research/fabulous-fabrics.git?rev=f4521f763ece0e4b4af1822d6461c5bbcf2520e9" },
-    { name = "fabulous-tiles", git = "https://github.com/FPGA-Research/fabulous-tiles.git?rev=3fa549b74bd2fb83ac9186460c455877a7f8aa68" },
+    { name = "fabulous-fabrics", git = "https://github.com/FPGA-Research/fabulous-fabrics.git?rev=7e99038b2f22f48a8be4da11d61db7ba0e4f3201" },
+    { name = "fabulous-tiles", git = "https://github.com/FPGA-Research/fabulous-tiles.git?rev=639ff0e686234bd949e892184507162c81a1ddea" },
     { name = "go-task-bin", specifier = ">=3.40.0" },
     { name = "jinja2", specifier = ">=3.1.6" },
     { name = "librelane", specifier = ">=3.0.0" },
@@ -693,8 +693,8 @@ dev = [
 
 [[package]]
 name = "fabulous-tiles"
-version = "0.0.1.dev129+g3fa549b74"
-source = { git = "https://github.com/FPGA-Research/fabulous-tiles.git?rev=3fa549b74bd2fb83ac9186460c455877a7f8aa68#3fa549b74bd2fb83ac9186460c455877a7f8aa68" }
+version = "0.0.1.dev130+g639ff0e68"
+source = { git = "https://github.com/FPGA-Research/fabulous-tiles.git?rev=639ff0e686234bd949e892184507162c81a1ddea#639ff0e686234bd949e892184507162c81a1ddea" }
 
 [[package]]
 name = "fonttools"

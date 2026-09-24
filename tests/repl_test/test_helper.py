@@ -85,6 +85,14 @@ def test_create_project_matches_template_layout(tmp_path: Path, lang: HDLType) -
     assert created == expected
 
 
+@pytest.mark.parametrize("lang", [HDLType.SYSTEM_VERILOG])
+def test_create_project_rejects_unsupported_language(
+    tmp_path: Path, lang: HDLType
+) -> None:
+    with pytest.raises(ValueError, match="Unsupported language"):
+        create_project(tmp_path / "proj", lang=lang)
+
+
 def test_create_project_overwrites_existing(tmp_path: Path) -> None:
     """A second create_project over the same directory succeeds."""
     project_dir = tmp_path / "proj"

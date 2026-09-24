@@ -8,7 +8,6 @@ functionalities used throughout the REPL components.
 
 import os
 import platform
-import re
 import shutil
 import subprocess
 import sys
@@ -22,17 +21,13 @@ from typing import TYPE_CHECKING, Any, cast
 import requests
 from dotenv import get_key, set_key
 from fabulous_fabrics import fabrics
+from fabulous_tiles import Language
 from loguru import logger
 from packaging.version import Version
 from pick import pick
 
 from fabulous.custom_exception import EnvironmentNotSet, PipelineCommandError
 from fabulous.fabric_definition.define import HDLType
-from fabulous.fabulous_repl.project_assets import (
-    DEFAULT_FABRIC,
-    copy_fabric,
-    copy_tile_library,
-)
 from fabulous.fabulous_settings import add_var_to_global_env
 
 if TYPE_CHECKING:
@@ -41,6 +36,7 @@ if TYPE_CHECKING:
     from fabulous.fabulous_repl.fabulous_repl import FABulousREPL
 
 MAX_BITBYTES = 16384
+DEFAULT_FABRIC = "fabulous"
 
 # Yosys master broke FABulous; pin the OSS-CAD-Suite install to a known-good
 # release. Set to None to track the latest nightly again.
@@ -127,10 +123,10 @@ def create_project(project_dir: Path, lang: HDLType = HDLType.VERILOG) -> None:
 
     **This function will overwrite existing files in the target directory.**
 
-    The fabric `fabulous` registered by `fabulous_fabrics` supplies everything
-    outside `Tile/`, and the tile library its `fabric.yaml` names supplies `Tile/`. The
-    `{HDL_SUFFIX}` placeholder in every project CSV is then replaced with the
-    language's file extension, and `.FABulous/.env` records the project settings.
+    The fabric `fabulous` registered by `fabulous_fabrics` materialises the project:
+    its skeleton for `lang`, and the tile library its `fabric.yaml` names under
+    `Tile/` with every BEL source copied next to its tile. `.FABulous/.env` then
+    records the project settings.
 
     Parameters
     ----------
@@ -147,19 +143,17 @@ def create_project(project_dir: Path, lang: HDLType = HDLType.VERILOG) -> None:
     project_dir = project_dir.resolve()
     logger.info(f"Creating project at {project_dir}")
 
-    if lang not in [HDLType.VERILOG, HDLType.VHDL]:
-        raise ValueError(f"Unsupported language: {lang!s}")
+    match lang:
+        case HDLType.VERILOG:
+            language = Language.VERILOG
+        case HDLType.VHDL:
+            language = Language.VHDL
+        case _:
+            raise ValueError(f"Unsupported language: {lang!s}")
 
     (project_dir / ".FABulous").mkdir(parents=True, exist_ok=True)
-    fabric = fabrics[DEFAULT_FABRIC]
-    copy_fabric(project_dir, fabric, lang)
-    copy_tile_library(project_dir, fabric.tile_library, lang)
-
-    new_suffix = "v" if lang == HDLType.VERILOG else HDLType.VHDL
-    for file_path in project_dir.rglob("*.csv"):
-        content = file_path.read_text()
-        new_content = re.sub(r"\{HDL_SUFFIX\}", new_suffix, content)
-        file_path.write_text(new_content)
+    fabrics[DEFAULT_FABRIC].materialise(project_dir, language)
+    new_suffix = language.suffix
 
     env_file = project_dir / ".FABulous" / ".env"
     set_key(env_file, "FAB_PROJ_LANG", str(lang))

@@ -1,99 +1,50 @@
-"""Assemble a new project from a packaged fabric and its tile library.
+"""Assemble a new project from a registered fabric and its tile library.
 
-Fabrics and tile libraries ship as Python packages with a `manifest.yaml` at the
-import root, so a project builds the same from a wheel, a uv git source or the Nix
-store. Every file is copied into the project, because parsing a VHDL BEL writes `.v`
-and `.json` files next to its source and an installed package can be read-only.
+`fabulous_fabrics.fabrics` and `fabulous_tiles.tile_libraries` find fabrics and tile
+libraries from their packages' directory layout, so a project builds the same from
+a wheel, a uv git source or the Nix store. Every file is copied into the project,
+because parsing a VHDL BEL writes `.v` and `.json` files next to its source and an
+installed package can be read-only.
 """
 
 import shutil
-from importlib import resources
 from pathlib import Path
 
-import yaml
-from pydantic import BaseModel, ConfigDict
+from fabulous_fabrics import FabricSource
+from fabulous_tiles import Language, TileLibrary
 
 from fabulous.fabric_definition.define import HDLType
 
-DEFAULT_FABRIC_PACKAGE = "fabulous_fabrics"
 DEFAULT_FABRIC = "fabulous"
-_HDL_SUFFIX = "{HDL_SUFFIX}"
 
 
-class TileLibraryRef(BaseModel):
-    """A tile library named by the package that ships it and its manifest key."""
-
-    model_config = ConfigDict(extra="forbid", frozen=True)
-
-    package: str
-    name: str
-
-
-class FabricAsset(BaseModel):
-    """A fabric skeleton under `root`, split into `common/`, `verilog/` and `vhdl/`."""
-
-    model_config = ConfigDict(extra="forbid", frozen=True)
-
-    root: Path
-    tile_library: TileLibraryRef
-
-
-class TileLibraryAsset(BaseModel):
-    """A tile library whose tile directories sit under `root`."""
-
-    model_config = ConfigDict(extra="forbid", frozen=True)
-
-    root: Path
-
-
-class AssetManifest(BaseModel):
-    """The `manifest.yaml` at the import root of an asset package."""
-
-    model_config = ConfigDict(extra="forbid", frozen=True)
-
-    fabrics: dict[str, FabricAsset] = {}
-    tile_libraries: dict[str, TileLibraryAsset] = {}
-
-
-def _load_manifest(package: str) -> tuple[Path, AssetManifest]:
-    """Return the import root of `package` and its validated manifest.
+def to_language(lang: HDLType) -> Language:
+    """Return the asset-package language for `lang`.
 
     Parameters
     ----------
-    package : str
-        The import package shipping the manifest.
+    lang : HDLType
+        The project language.
 
     Returns
     -------
-    tuple[Path, AssetManifest]
-        The import root and the validated manifest.
+    Language
+        The matching `fabulous_tiles` language.
 
     Raises
     ------
-    ModuleNotFoundError
-        If `package` is not installed.
-    FileNotFoundError
-        If `package` is not installed as a directory or has no `manifest.yaml`.
+    ValueError
+        If `lang` is neither Verilog nor VHDL.
     """
-    try:
-        root = resources.files(package)
-    except ModuleNotFoundError as e:
-        raise ModuleNotFoundError(
-            f"The asset package {package} is not installed. Run `uv sync` in the "
-            "FABulous checkout, or reinstall FABulous with its dependencies."
-        ) from e
-    if not isinstance(root, Path):
-        raise FileNotFoundError(
-            f"The asset package {package} is not installed as a directory ({root!r}). "
-            "Reinstall it from a wheel or a source checkout."
-        )
-    manifest_path = root / "manifest.yaml"
-    if not manifest_path.is_file():
-        raise FileNotFoundError(
-            f"The asset package {package} has no manifest at {manifest_path}. "
-            "Install a release of it that ships manifest.yaml."
-        )
-    return root, AssetManifest.model_validate(yaml.safe_load(manifest_path.read_text()))
+    match lang:
+        case HDLType.VERILOG:
+            return Language.VERILOG
+        case HDLType.VHDL:
+            return Language.VHDL
+        case _:
+            raise ValueError(
+                f"Fabrics and tile libraries ship Verilog and VHDL only, not {lang}."
+            )
 
 
 def _copy_writable(src: Path, dest: Path) -> None:
@@ -128,106 +79,58 @@ def _copy_into_tile(src: Path, dest: Path, sources: dict[Path, Path]) -> None:
     _copy_writable(src, dest)
 
 
-def copy_fabric(
-    project_dir: Path,
-    lang: HDLType,
-    package: str = DEFAULT_FABRIC_PACKAGE,
-    name: str = DEFAULT_FABRIC,
-) -> TileLibraryRef:
-    """Copy fabric `name` from `package` into `project_dir`.
+def copy_fabric(project_dir: Path, fabric: FabricSource, lang: HDLType) -> None:
+    """Copy the project skeleton of `fabric` for `lang` into `project_dir`.
 
-    `common/` is copied first and the language directory second, so a language file
-    replaces a common file at the same path.
+    A language other than Verilog or VHDL, or one the fabric ships no skeleton for,
+    raises `ValueError`.
 
     Parameters
     ----------
     project_dir : Path
         The project root.
+    fabric : FabricSource
+        The fabric to copy.
     lang : HDLType
-        The project language, which selects `verilog/` or `vhdl/`.
-    package : str
-        The import package shipping the fabric. Defaults to `fabulous_fabrics`.
-    name : str
-        The fabric's manifest key. Defaults to `fabulous`.
-
-    Returns
-    -------
-    TileLibraryRef
-        The tile library the fabric declares.
-
-    Raises
-    ------
-    ValueError
-        If `lang` is neither Verilog nor VHDL, or the manifest has no fabric `name`.
-    FileNotFoundError
-        If the fabric lacks `common/` or the language directory.
+        The project language.
     """
-    if lang not in (HDLType.VERILOG, HDLType.VHDL):
-        raise ValueError(f"Fabrics ship Verilog and VHDL skeletons only, not {lang}.")
-    root, manifest = _load_manifest(package)
-    if name not in manifest.fabrics:
-        raise ValueError(
-            f"Fabric {name} is not in {package}. Available: {sorted(manifest.fabrics)}."
-        )
-    fabric = manifest.fabrics[name]
-    for part in ("common", str(lang)):
-        part_dir = root / fabric.root / part
-        if not part_dir.is_dir():
-            raise FileNotFoundError(f"Fabric {name} in {package} has no {part_dir}.")
-        for src in sorted(part_dir.rglob("*")):
-            if src.is_file():
-                _copy_writable(src, project_dir / src.relative_to(part_dir))
-    return fabric.tile_library
+    for rel, src in fabric.files(to_language(lang)).items():
+        _copy_writable(src, project_dir / rel)
 
 
-def copy_tile_library(project_dir: Path, ref: TileLibraryRef, lang: HDLType) -> None:
-    """Copy tile library `ref` into `project_dir/Tile` with tile-local BEL sources.
+def copy_tile_library(project_dir: Path, library: TileLibrary, lang: HDLType) -> None:
+    """Copy `library` into `project_dir/Tile` with tile-local BEL sources.
 
     Files directly in the library root are library metadata and are skipped. Each
-    `BEL,` row is rewritten to `./<file name>`, and the primitive it names, with
-    `{HDL_SUFFIX}` resolved for `lang`, is copied next to the tile CSV. Two files
-    with different bytes that would land at the same path raise `FileExistsError`.
+    `BEL,` row is rewritten to `./<file name>`, and the primitive source the tile
+    library resolved for it is copied next to the tile CSV. Two files with different
+    bytes that would land at the same path raise `FileExistsError`.
 
     Parameters
     ----------
     project_dir : Path
         The project root.
-    ref : TileLibraryRef
+    library : TileLibrary
         The tile library to copy.
     lang : HDLType
-        The project language, which selects the primitive file suffix.
+        The project language, which selects each BEL's primitive source.
 
     Raises
     ------
     ValueError
-        If `lang` is neither Verilog nor VHDL, the manifest has no library
-        `ref.name`, or a BEL path resolves outside the package's `primitives/`
-        directory.
-    FileNotFoundError
-        If the primitive a BEL row names does not exist for `lang`.
+        If `lang` is neither Verilog nor VHDL, a BEL has no source for it, or a CSV
+        that is no tile of the library holds a `BEL,` row.
     """
-    match lang:
-        case HDLType.VERILOG:
-            suffix = "v"
-        case HDLType.VHDL:
-            suffix = "vhdl"
-        case _:
-            raise ValueError(
-                f"Tile libraries ship Verilog and VHDL primitives only, not {lang}."
-            )
-    root, manifest = _load_manifest(ref.package)
-    if ref.name not in manifest.tile_libraries:
-        raise ValueError(
-            f"Tile library {ref.name} is not in {ref.package}. "
-            f"Available: {sorted(manifest.tile_libraries)}."
-        )
-    library_dir = root / manifest.tile_libraries[ref.name].root
-    primitives_dir = (root / "primitives").resolve()
+    language = to_language(lang)
+    bel_sources = {
+        tile.csv: {bel.row: bel.source(language) for bel in tile.bels}
+        for tile in library.values()
+    }
     sources: dict[Path, Path] = {}
-    for src in sorted(library_dir.rglob("*")):
-        if not src.is_file() or src.parent == library_dir:
+    for src in sorted(library.root.rglob("*")):
+        if not src.is_file() or src.parent == library.root:
             continue
-        dest = project_dir / "Tile" / src.relative_to(library_dir)
+        dest = project_dir / "Tile" / src.relative_to(library.root)
         if src.suffix != ".csv":
             _copy_into_tile(src, dest, sources)
             continue
@@ -240,17 +143,11 @@ def copy_tile_library(project_dir: Path, ref: TileLibraryRef, lang: HDLType) -> 
             if fields[0] != "BEL":
                 out.append(line)
                 continue
-            bel_src = (src.parent / fields[1].replace(_HDL_SUFFIX, suffix)).resolve()
-            if not bel_src.is_relative_to(primitives_dir):
+            if src not in bel_sources:
                 raise ValueError(
-                    f"BEL {fields[1]} in {src} resolves to {bel_src}, outside "
-                    f"{primitives_dir}. Tile library BELs must live in primitives/."
+                    f"{src} holds a BEL row but is no tile of library {library.name}."
                 )
-            if not bel_src.is_file():
-                raise FileNotFoundError(
-                    f"BEL {fields[1]} in {src} resolves to {bel_src}, which does not "
-                    f"exist. The tile library ships no {lang} source for it."
-                )
+            bel_src = bel_sources[src][fields[1].strip()]
             _copy_into_tile(bel_src, dest.parent / bel_src.name, sources)
             fields[1] = f"./{Path(fields[1]).name}"
             out.append(",".join(fields) + line[len(body) :])

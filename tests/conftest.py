@@ -3,13 +3,13 @@
 import os
 import shutil
 from collections.abc import Callable, Generator
-from importlib import resources
 from pathlib import Path
 from typing import Protocol
 
 import pytest
 from _pytest.logging import LogCaptureFixture
 from cocotb_tools.runner import get_runner
+from fabulous_fabrics import fabrics
 from loguru import logger
 
 import fabulous.fabulous
@@ -24,20 +24,9 @@ from fabulous.fabulous_repl.fabulous_repl import FABulousREPL
 from fabulous.fabulous_repl.helper import create_project, setup_logger
 from fabulous.fabulous_settings import init_context, reset_context
 
-
-def _package_root(package: str) -> Path:
-    """Return the import root of an asset package installed as a directory."""
-    root = resources.files(package)
-    assert isinstance(root, Path), (
-        f"{package} is not installed as a directory: {root!r}"
-    )
-    return root
-
-
-FABRIC_ROOT = _package_root("fabulous_fabrics") / "fabrics" / "fabulous"
+FABRIC_ROOT = fabrics["fabulous"].root
 VERILOG_SOURCE_PATH = FABRIC_ROOT / "verilog"
 VHDL_SOURCE_PATH = FABRIC_ROOT / "vhdl"
-TILES_PRIMITIVES = _package_root("fabulous_tiles") / "primitives"
 
 SIM_FOR_SUFFIX: dict[str, str] = {
     ".v": "verilator",

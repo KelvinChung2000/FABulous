@@ -39,10 +39,10 @@ in
       };
   });
   fabulous-tiles = prev.fabulous-tiles.overrideAttrs (old: {
-    nativeBuildInputs = (old.nativeBuildInputs or [ ]) ++ final.resolveBuildSystem { hatchling = [ ]; };
+    nativeBuildInputs = (old.nativeBuildInputs or [ ]) ++ final.resolveBuildSystem { hatchling = [ ]; hatch-vcs = [ ]; };
   });
   fabulous-fabrics = prev.fabulous-fabrics.overrideAttrs (old: {
-    nativeBuildInputs = (old.nativeBuildInputs or [ ]) ++ final.resolveBuildSystem { hatchling = [ ]; };
+    nativeBuildInputs = (old.nativeBuildInputs or [ ]) ++ final.resolveBuildSystem { hatchling = [ ]; hatch-vcs = [ ]; };
   });
 
   # Fix file collision between alive-progress and about-time (both provide LICENSE files)

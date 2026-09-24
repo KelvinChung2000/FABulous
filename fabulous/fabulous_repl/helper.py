@@ -21,13 +21,18 @@ from typing import TYPE_CHECKING, Any, cast
 
 import requests
 from dotenv import get_key, set_key
+from fabulous_fabrics import fabrics
 from loguru import logger
 from packaging.version import Version
 from pick import pick
 
 from fabulous.custom_exception import EnvironmentNotSet, PipelineCommandError
 from fabulous.fabric_definition.define import HDLType
-from fabulous.fabulous_repl.project_assets import copy_fabric, copy_tile_library
+from fabulous.fabulous_repl.project_assets import (
+    DEFAULT_FABRIC,
+    copy_fabric,
+    copy_tile_library,
+)
 from fabulous.fabulous_settings import add_var_to_global_env
 
 if TYPE_CHECKING:
@@ -122,8 +127,8 @@ def create_project(project_dir: Path, lang: HDLType = HDLType.VERILOG) -> None:
 
     **This function will overwrite existing files in the target directory.**
 
-    The fabric `fabulous` from the `fabulous_fabrics` package supplies everything
-    outside `Tile/`, and the tile library it declares supplies `Tile/`. The
+    The fabric `fabulous` registered by `fabulous_fabrics` supplies everything
+    outside `Tile/`, and the tile library its `fabric.yaml` names supplies `Tile/`. The
     `{HDL_SUFFIX}` placeholder in every project CSV is then replaced with the
     language's file extension, and `.FABulous/.env` records the project settings.
 
@@ -146,8 +151,9 @@ def create_project(project_dir: Path, lang: HDLType = HDLType.VERILOG) -> None:
         raise ValueError(f"Unsupported language: {lang!s}")
 
     (project_dir / ".FABulous").mkdir(parents=True, exist_ok=True)
-    tile_library = copy_fabric(project_dir, lang)
-    copy_tile_library(project_dir, tile_library, lang)
+    fabric = fabrics[DEFAULT_FABRIC]
+    copy_fabric(project_dir, fabric, lang)
+    copy_tile_library(project_dir, fabric.tile_library, lang)
 
     new_suffix = "v" if lang == HDLType.VERILOG else HDLType.VHDL
     for file_path in project_dir.rglob("*.csv"):

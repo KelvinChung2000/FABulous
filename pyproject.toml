@@ -171,9 +171,7 @@ extend_exclude = [
 ]
 
 [tool.deptry.per_rule_ignores]
-# Read through importlib.resources, which deptry cannot see as imports: fabulous_fabrics
-# is named by DEFAULT_FABRIC_PACKAGE, fabulous_tiles by the fabric's manifest.
-DEP002 = ["go-task-bin", "FABulous-bit-gen", "fabulous-tiles", "fabulous-fabrics"]
+DEP002 = ["go-task-bin", "FABulous-bit-gen"]
 
 [tool.deptry.package_module_name_map]
 FABulous-bit-gen = "FABulous_bit_gen"
@@ -182,8 +180,8 @@ FABulous-bit-gen = "FABulous_bit_gen"
 sdf-timing = { git = "https://github.com/FPGA-Research/f4pga-sdf-timing.git" }
 # The fabulous-tiles entry must match the source fabulous-fabrics declares, since uv
 # reads a git dependency's own sources.
-fabulous-tiles = { git = "https://github.com/FPGA-Research/fabulous-tiles.git", rev = "9ad3d6e5686d258e3712073f3ae500d42556062a" }
-fabulous-fabrics = { git = "https://github.com/FPGA-Research/fabulous-fabrics.git", rev = "6fad0fe8a54c02043bcfe0def0ddb49b26a7966f" }
+fabulous-tiles = { git = "https://github.com/FPGA-Research/fabulous-tiles.git", rev = "3fa549b74bd2fb83ac9186460c455877a7f8aa68" }
+fabulous-fabrics = { git = "https://github.com/FPGA-Research/fabulous-fabrics.git", rev = "f4521f763ece0e4b4af1822d6461c5bbcf2520e9" }
 
 [tool.uv.extra-build-dependencies]
 sdf-timing = ["vcs-versioning"]

@@ -51,6 +51,7 @@ def _print_tool_help(tool_path: Path | str, args: list[str], tool_name: str) -> 
 
 _SCL_BY_PDK: dict[str, str] = {
     "ihp-sg13g2": "sg13g2_stdcell",
+    "ihp-sg13cmos5l": "sg13cmos5l_stdcell",
     "sky130A": "sky130_fd_sc_hd",
     "gf180mcuD": "gf180mcu_fd_sc_mcu7t5v0",
 }

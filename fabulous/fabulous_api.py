@@ -859,6 +859,18 @@ class FABulous_API:
                 ]
                 min_buf_cell_and_ports: str = "sg13g2_buf_1 A X"
 
+            case "ihp-sg13cmos5l":
+                liberty_files: Path = (
+                    pdk_root
+                    / "libs.ref/sg13cmos5l_stdcell/lib"
+                    / "sg13cmos5l_stdcell_typ_1p20V_25C.lib"
+                )
+                techmap_files: list[Path] = [
+                    pdk_root / "libs.tech/librelane/sg13cmos5l_stdcell/latch_map.v",
+                    pdk_root / "libs.tech/librelane/sg13cmos5l_stdcell/tribuff_map.v",
+                ]
+                min_buf_cell_and_ports: str = "sg13cmos5l_buf_1 A X"
+
             case "sky130A" | "sky130B":
                 liberty_files: Path = (
                     pdk_root

@@ -456,10 +456,17 @@ def test_exit_code_reset_after_error(cli: FABulousREPL) -> None:
     [
         pytest.param(
             "ihp-sg13g2",
-            "ihp-sg13g2",
+            "ihp-sg13",
             "sg13g2.lyp",
             True,
             id="ihp_sg13g2_fresh_ciel_install",
+        ),
+        pytest.param(
+            "ihp-sg13cmos5l",
+            "ihp-sg13",
+            "sg13cmos5l.lyp",
+            True,
+            id="ihp_sg13cmos5l_fresh_ciel_install",
         ),
         pytest.param(
             "sky130A",

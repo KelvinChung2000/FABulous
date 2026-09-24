@@ -281,7 +281,7 @@ def pytest_addoption(parser: pytest.Parser) -> None:  # type: ignore[name-define
         action="store",
         default=None,
         help="path to a FABulous project that has been run through "
-        "`gen_fabric_macro` (must contain Fabric/macro/final_views/). "
+        "`gen_macro stitch` (must contain Fabric/macro/final_views/). "
         "May also be supplied via the FAB_GL_FABRIC_PROJECT env var. "
         "Typically the unpacked `fabric-output-<pdk>` artifact from "
         "gds-flow-ci.yml.",

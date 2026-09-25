@@ -22,6 +22,10 @@ class FabricParsingError(Exception):
     """Exception raised for errors in fabric parsing."""
 
 
+class InvalidCSVSyntax(FabricParsingError):
+    """Exception raised when a fabric or tile CSV file does not match its grammar."""
+
+
 class SpecMissMatch(Exception):
     """Exception raised when a required FASM file is missing."""
 

@@ -427,8 +427,7 @@ def _build_synthetic_tile(parent: Path) -> Path:
     """Build a minimal valid plugin-tile workspace under `parent`.
 
     Produces `<parent>/<name>/<name>.csv` and the matching
-    `<name>_switch_matrix.list`. The trailing comma on each line keeps the
-    `temp[6]` lookup in :func:`parseTilesCSV` safe.
+    `<name>_switch_matrix.list`.
     """
     name = SYNTHETIC_TILE_NAME
     tile_dir = parent / name

@@ -1,0 +1,81 @@
+// Fabric and tile CSV files as a line-oriented language.
+// `_NL` absorbs trailing `,` padding, `#` comments and blank lines, so rules
+// only see meaningful cells. A padded CSV cell is never an empty value.
+
+csv_file: _NL? _block*
+// Exactly one grid and one Parameters block, in either order. TILE and
+// SuperTILE blocks in a fabric file are deprecated but accepted until 3.0.
+fabric_file: _NL? _local_block* (fabric _local_block* parameters | parameters _local_block* fabric) _local_block*
+port_file: _NL? (port _NL)*
+?port_line: port _NL
+
+_block: tile | supertile | fabric | parameters
+_local_block: tile | supertile
+
+// TILE ------------------------------------------------------------------------
+tile: "TILE" _SEP NAME _NL (_tile_line _NL)* "EndTILE" _NL
+_tile_line: port | bel | gen_io | matrix | include
+
+port: DIRECTION _SEP NAME _SEP SIGNED_INT _SEP SIGNED_INT _SEP NAME _SEP INT [_SEP port_attr]
+?port_attr: carry | SHARED
+carry: "CARRY" ["=" ESCAPED_STRING]
+SHARED: "SHARED_RESET" | "SHARED_ENABLE"
+
+bel: "BEL" _SEP PATH [_SEP [NAME] (_SEP BEL_FLAG)*]
+BEL_FLAG: "ADD_AS_CUSTOM_PRIM"
+
+gen_io: "GEN_IO" _SEP INT _SEP IO _SEP NAME (_SEP [GEN_IO_FLAG])*
+IO: "INPUT" | "OUTPUT" | "INOUT"
+GEN_IO_FLAG: "CONFIGACCESS"i | "INVERTED"i | "CLOCKED_COMB"i | "CLOCKED_MUX"i | "CLOCKED"i
+
+matrix: "MATRIX" _SEP PATH                     -> matrix_file
+      | "MATRIX" _SEP "GENERATE" [_SEP PATH]   -> matrix_generate
+
+include: "INCLUDE" _SEP PATH
+
+// SuperTILE -------------------------------------------------------------------
+supertile: "SuperTILE" _SEP NAME _NL (_supertile_line _NL)* "EndSuperTILE" _NL
+_supertile_line: bel | supertile_matrix | supertile_row
+supertile_matrix: "MATRIX" _SEP PATH
+// Empty cells anywhere in a row are dropped. MASTER is accepted in any cell
+// so lowering can say where it is misplaced.
+supertile_row: _SEP* _supertile_cell (_SEP+ _supertile_cell)*
+_supertile_cell: NAME | MASTER
+MASTER: "MASTER"
+
+// Fabric ----------------------------------------------------------------------
+fabric: "FabricBegin" _NL (fabric_row _NL)+ "FabricEnd" _NL
+fabric_row: _SEP* NAME (_SEP+ NAME)*
+
+// Parameters ------------------------------------------------------------------
+parameters: "ParametersBegin" _NL (_param _NL)* "ParametersEnd" _NL
+_param: tile_param | supertile_param | setting
+tile_param: "Tile" _SEP PATH [_SEP GENERATE]
+supertile_param: "Supertile" _SEP PATH
+setting: "ConfigBitMode" _SEP CONFIG_BIT_MODE         -> config_bit_mode
+       | "MultiplexerStyle" _SEP MUX_STYLE            -> multiplexer_style
+       | "UserCLKDirection" _SEP USER_CLK_DIRECTION   -> user_clk_direction
+       | "Package" _SEP PATH                          -> package
+       | INT_KEY _SEP INT                             -> int_setting
+       | BOOL_KEY _SEP BOOL                           -> bool_setting
+GENERATE: "GENERATE"
+CONFIG_BIT_MODE: "frame_based" | "FlipFlopChain"
+MUX_STYLE: "custom" | "generic"
+USER_CLK_DIRECTION: "S2N" | "N2S" | "W2E" | "E2W"
+INT_KEY: "FrameBitsPerRow" | "MaxFramesPerCol" | "GenerateDelayInSwitchMatrix"
+BOOL_KEY: "SuperTileEnable" | "DisableUserCLK" | "MultiClkDomains" | "PreserveListOrder"
+BOOL: "TRUE" | "FALSE"
+
+// Lexical ---------------------------------------------------------------------
+DIRECTION: "NORTH" | "EAST" | "SOUTH" | "WEST" | "SJUMP" | "JUMP"
+// Row keywords that share a line position with a tile name are reserved, so
+// `A,MATRIX` is a syntax error rather than a tile called MATRIX.
+NAME: /(?!(MASTER|BEL|MATRIX|EndSuperTILE|FabricEnd)\b)[A-Za-z_][A-Za-z0-9_]*/
+PATH: /[^,#\s][^,#\n]*/
+_SEP: ","
+_NL: /([ \t,]*(#[^\n]*)?\r?\n)+/
+
+%import common.INT
+%import common.SIGNED_INT
+%import common.ESCAPED_STRING
+%ignore /[ \t]+/

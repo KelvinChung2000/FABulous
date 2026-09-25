@@ -1,12 +1,20 @@
 """Tests for parsing tile port lines from CSV fabric definitions."""
 
+from collections.abc import Callable
 from pathlib import Path
 
 import pytest
+from lark import Lark
 
-from fabulous.custom_exception import InvalidFabricParameter, InvalidPortType
+from fabulous.custom_exception import InvalidCSVSyntax, InvalidPortType
 from fabulous.fabric_definition.define import IO, Direction, Side
-from fabulous.fabric_generator.parser.parse_csv import parse_port_line, parseFabricCSV
+from fabulous.fabric_definition.fabric import Fabric
+from fabulous.fabric_generator.parser.parse_csv import (
+    GRAMMAR_PATH,
+    parse_port_line,
+    parseFabricCSV,
+    parseTilesCSV,
+)
 from fabulous.fabulous_settings import init_context
 
 # (kind, physical side of the OUTPUT/start port, physical side of the INPUT/end port)
@@ -87,7 +95,7 @@ class TestUnknownPortType:
 
     @pytest.mark.parametrize("kind", ["BEL", "MATRIX", "north", "FOO"])
     def test_raises_invalid_port_type(self, kind: str) -> None:
-        with pytest.raises(InvalidPortType, match="Unknown port type"):
+        with pytest.raises(InvalidCSVSyntax, match=f"unexpected '{kind}'"):
             parse_port_line(f"{kind},SRC_BEG,0,0,DST_END,1")
 
 
@@ -166,5 +174,79 @@ class TestUserCLKDirection:
 
     def test_invalid_direction_raises(self, project: Path) -> None:
         init_context(project)
-        with pytest.raises(InvalidFabricParameter, match="UP"):
+        with pytest.raises(InvalidCSVSyntax, match="unexpected 'UP'"):
             parseFabricCSV(str(self._set_direction(project, "UP")))
+
+
+class TestGrammar:
+    """The CSV grammar is an unambiguous LALR(1) grammar."""
+
+    def test_strict_lalr_has_no_conflicts(self) -> None:
+        # strict=True raises on shift/reduce conflicts and colliding terminals.
+        Lark(
+            GRAMMAR_PATH.read_text(encoding="utf-8"),
+            parser="lalr",
+            strict=True,
+            start=["csv_file", "fabric_file", "port_file", "port_line"],
+        )
+
+
+class TestMalformedCSVRejected:
+    """Malformed rows fail with their file position instead of being skipped."""
+
+    @pytest.mark.parametrize(
+        ("parse", "text", "position"),
+        [
+            pytest.param(
+                parseTilesCSV,
+                "TILE,T\nNORTH,N1BEG,0,-1,N1END,4\nMATRIX,./m.list\n",
+                ":3:16: unexpected end of file",
+                id="unclosed-tile",
+            ),
+            pytest.param(
+                parseTilesCSV,
+                "TILE,T\nNORTH,N1BEG,0,-1,N1END,4,FOO\nMATRIX,./m.list\nEndTILE\n",
+                ":2:26: unexpected 'FOO'",
+                id="unknown-port-attribute",
+            ),
+            pytest.param(
+                lambda path: parseFabricCSV(str(path)),
+                "FabricBegin\nNULL\nFabricEnd\n"
+                "ParametersBegin\nSuperTileEnable,ture\nParametersEnd\n",
+                ":5:17: unexpected 'ture'",
+                id="boolean-typo",
+            ),
+        ],
+    )
+    def test_raises_with_position(
+        self,
+        tmp_path: Path,
+        parse: Callable[[Path], object],
+        text: str,
+        position: str,
+    ) -> None:
+        csv = tmp_path / "T.csv"
+        csv.write_text(text)
+        with pytest.raises(InvalidCSVSyntax, match=position):
+            parse(csv)
+
+
+class TestEmptyGridCells:
+    """Empty cells in a fabric grid row are dropped wherever they sit."""
+
+    def test_leading_empty_cells_keep_the_grid(self, project: Path) -> None:
+        init_context(project)
+        csv = project / "fabric.csv"
+        before = parseFabricCSV(str(csv))
+        head, rest = csv.read_text().split("FabricBegin", 1)
+        grid, tail = rest.split("FabricEnd", 1)
+        grid = "\n".join(
+            f",,{row}" if row.strip(", ") else row for row in grid.split("\n")[1:]
+        )
+        csv.write_text(f"{head}FabricBegin\n{grid}FabricEnd{tail}")
+        after = parseFabricCSV(str(csv))
+
+        def names(fabric: Fabric) -> list[list[str | None]]:
+            return [[t.name if t else None for t in row] for row in fabric.tile]
+
+        assert names(after) == names(before)

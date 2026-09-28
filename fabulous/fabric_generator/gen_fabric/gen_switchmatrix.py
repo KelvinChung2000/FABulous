@@ -275,9 +275,8 @@ def _gen_switch_matrix_body(
             muxSize = len(connections[portName])
             if muxSize >= 2:
                 paddedMuxSize = 2 ** (muxSize - 1).bit_length() - 1
-                writer.addConnectionVector(
-                    f"DEBUG_select_{portName}",
-                    f"{paddedMuxSize.bit_length() - 1}",
+                writer.addConnectionWires(
+                    f"DEBUG_select_{portName}", paddedMuxSize.bit_length()
                 )
     writer.addComment(
         "The configuration bits (if any) are just a long shift register",
@@ -409,13 +408,21 @@ def _gen_switch_matrix_body(
             muxSize = len(connections[portName])
             if muxSize >= 2:
                 paddedMuxSize = 2 ** (muxSize - 1).bit_length()
-                configBitstreamPosition += paddedMuxSize.bit_length() - 1
-                writer.addAssignVector(
-                    f"DEBUG_select_{portName:<15}",
-                    "ConfigBits",
-                    f"{configBitstreamPosition - 1}",
-                    old_ConfigBitstreamPosition,
-                )
+                select_width = paddedMuxSize.bit_length() - 1
+                configBitstreamPosition += select_width
+                # a one-bit select is a scalar, see `addConnectionWires`
+                if select_width == 1:
+                    writer.addAssignScalar(
+                        f"DEBUG_select_{portName:<15}",
+                        f"ConfigBits[{old_ConfigBitstreamPosition}]",
+                    )
+                else:
+                    writer.addAssignVector(
+                        f"DEBUG_select_{portName:<15}",
+                        "ConfigBits",
+                        f"{configBitstreamPosition - 1}",
+                        old_ConfigBitstreamPosition,
+                    )
                 old_ConfigBitstreamPosition = configBitstreamPosition
     ### SwitchMatrixDebugSignals ### SwitchMatrixDebugSignals ###
 

@@ -441,6 +441,48 @@ class CodeGenerator(abc.ABC):
             signal **name** : STD_LOGIC_VECTOR( **startIndex** downto **endIndex** );
         """
 
+    def addPortWires(self, name: str, io: IO, width: int, indentLevel: int = 0) -> None:
+        """Declare a port carrying `width` wires.
+
+        One wire is declared as a scalar rather than a `[0:0]` vector, so
+        references to it must use the bare name.
+
+        Parameters
+        ----------
+        name : str
+            Name of the port.
+        io : IO
+            Direction of the port (input, output, inout).
+        width : int
+            Number of wires the port carries.
+        indentLevel : int
+            The indentation level. Defaults to 0.
+        """
+        if width == 1:
+            self.addPortScalar(name, io, indentLevel=indentLevel)
+        else:
+            self.addPortVector(name, io, width - 1, indentLevel=indentLevel)
+
+    def addConnectionWires(self, name: str, width: int, indentLevel: int = 0) -> None:
+        """Declare a signal carrying `width` wires.
+
+        One wire is declared as a scalar rather than a `[0:0]` vector, so
+        references to it must use the bare name.
+
+        Parameters
+        ----------
+        name : str
+            Name of the signal.
+        width : int
+            Number of wires the signal carries.
+        indentLevel : int
+            The indentation level. Defaults to 0.
+        """
+        if width == 1:
+            self.addConnectionScalar(name, indentLevel=indentLevel)
+        else:
+            self.addConnectionVector(name, width - 1, indentLevel=indentLevel)
+
     @abc.abstractmethod
     def addLogicStart(self, indentLevel: int = 0) -> None:
         """Add start of logic. Only useful with VHDL.

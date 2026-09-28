@@ -152,7 +152,7 @@ def generateTopWrapper(writer: CodeGenerator, fabric: Fabric) -> None:
     for name, group in sorted(portGroups.items(), key=lambda x: x[0]):
         if fabric.numberOfBRAMs > 0 and ("RAM2FAB" in name or "FAB2RAM" in name):
             continue
-        writer.addPortVector(name, group[0], len(group[1]) - 1, indentLevel=2)
+        writer.addPortWires(name, group[0], len(group[1]), indentLevel=2)
     writer.addComment("Config related ports", onNewLine=True, indentLevel=2)
     writer.addPortScalar("CLK", IO.INPUT, indentLevel=2)
     writer.addPortScalar("resetn", IO.INPUT, indentLevel=2)
@@ -309,7 +309,8 @@ def generateTopWrapper(writer: CodeGenerator, fabric: Fabric) -> None:
     for name, group in sorted(portGroups.items(), key=lambda x: x[0]):
         for i, sig in enumerate(group[1]):
             portList.append(sig)
-            signal.append(f"{name}[{i}]")
+            # a one-element group is a scalar port, see `addPortWires`
+            signal.append(name if len(group[1]) == 1 else f"{name}[{i}]")
 
     portList.append("UserCLK")
     signal.append("CLK")

@@ -135,7 +135,9 @@ def generateTile(
             writer.addComment(str(side_of_port), onNewLine=True)
         # destination port are input to the tile
         # source port are output of the tile
-        writer.addPortWires(port.name, port.io_direction, port.bus_width, indentLevel=2)
+        writer.addPort(
+            port.name, port.io_direction, width=port.bus_width, indentLevel=2
+        )
         writer.addComment(str(port), indentLevel=2, onNewLine=False)
 
     # SJUMP ports: OUTPUT exits toward supertile SM; INPUT enters from supertile SM
@@ -145,16 +147,16 @@ def generateTile(
             "SJUMP ports (supertile BEL interface)", onNewLine=True, indentLevel=1
         )
         for p in sjump_ports:
-            writer.addPortWires(p.name, p.io_direction, p.bus_width, indentLevel=2)
+            writer.addPort(p.name, p.io_direction, width=p.bus_width, indentLevel=2)
 
     # now we have to scan all BELs if they use external pins,
     # because they have to be exported to the tile entity
     externalPorts = []
     for i in tile.bels:
         for p in i.externalInput:
-            writer.addPortScalar(p, IO.INPUT, indentLevel=2)
+            writer.addPort(p, IO.INPUT, indentLevel=2)
         for p in i.externalOutput:
-            writer.addPortScalar(p, IO.OUTPUT, indentLevel=2)
+            writer.addPort(p, IO.OUTPUT, indentLevel=2)
         externalPorts += i.externalInput
         externalPorts += i.externalOutput
 
@@ -166,28 +168,24 @@ def generateTile(
     writer.addComment("Tile IO ports from BELs", onNewLine=True, indentLevel=1)
 
     if not disable_user_clk:
-        writer.addPortScalar("UserCLK", IO.INPUT, indentLevel=2)
-        writer.addPortScalar("UserCLKo", IO.OUTPUT, indentLevel=2)
+        writer.addPort("UserCLK", IO.INPUT, indentLevel=2)
+        writer.addPort("UserCLKo", IO.OUTPUT, indentLevel=2)
 
     if config_bit_mode == ConfigBitMode.FRAME_BASED:
-        writer.addPortVector("FrameData", IO.INPUT, "FrameBitsPerRow-1", indentLevel=2)
+        writer.addPort("FrameData", IO.INPUT, width="FrameBitsPerRow", indentLevel=2)
         writer.addComment("CONFIG_PORT", onNewLine=False, end="")
-        writer.addPortVector(
-            "FrameData_O", IO.OUTPUT, "FrameBitsPerRow-1", indentLevel=2
-        )
-        writer.addPortVector(
-            "FrameStrobe", IO.INPUT, "MaxFramesPerCol-1", indentLevel=2
-        )
+        writer.addPort("FrameData_O", IO.OUTPUT, width="FrameBitsPerRow", indentLevel=2)
+        writer.addPort("FrameStrobe", IO.INPUT, width="MaxFramesPerCol", indentLevel=2)
         writer.addComment("CONFIG_PORT", onNewLine=False, end="")
-        writer.addPortVector(
-            "FrameStrobe_O", IO.OUTPUT, "MaxFramesPerCol-1", indentLevel=2
+        writer.addPort(
+            "FrameStrobe_O", IO.OUTPUT, width="MaxFramesPerCol", indentLevel=2
         )
 
     elif config_bit_mode == ConfigBitMode.FLIPFLOP_CHAIN:
-        writer.addPortScalar("MODE", IO.INPUT, indentLevel=2)
-        writer.addPortScalar("CONFin", IO.INPUT, indentLevel=2)
-        writer.addPortScalar("CONFout", IO.OUTPUT, indentLevel=2)
-        writer.addPortScalar("CLK", IO.INPUT, indentLevel=2)
+        writer.addPort("MODE", IO.INPUT, indentLevel=2)
+        writer.addPort("CONFin", IO.INPUT, indentLevel=2)
+        writer.addPort("CONFout", IO.OUTPUT, indentLevel=2)
+        writer.addPort("CLK", IO.INPUT, indentLevel=2)
 
     writer.addComment("global", onNewLine=True, indentLevel=1)
 
@@ -238,7 +236,7 @@ def generateTile(
     for bel in tile.bels:
         for i in bel.inputs + bel.outputs:
             if f"{i}" not in repeatDeclaration:
-                writer.addConnectionScalar(i)
+                writer.addConnection(i)
                 repeatDeclaration.add(f"{bel.prefix}{i}")
 
     # Jump wires
@@ -246,7 +244,7 @@ def generateTile(
     for p in tile.portsInfo:
         if p.wire_direction == Direction.JUMP:
             if p.source_name != "NULL" and p.destination_name != "NULL" and p.is_output:
-                writer.addConnectionWires(p.name, p.bus_width)
+                writer.addConnection(p.name, width=p.bus_width)
 
             for k in range(p.wire_count):
                 allJumpWireList.append(f"{p.name}( {k} )")
@@ -276,15 +274,15 @@ def generateTile(
 
     # all the signal wire need to declare first for compatibility with VHDL
     if tile.globalConfigBits > 0:
-        writer.addConnectionVector("ConfigBits", "NoConfigBits-1", 0)
-        writer.addConnectionVector("ConfigBits_N", "NoConfigBits-1", 0)
+        writer.addConnection("ConfigBits", width="NoConfigBits")
+        writer.addConnection("ConfigBits_N", width="NoConfigBits")
 
     writer.addNewLine()
     writer.addComment("Connection for outgoing wires", onNewLine=True)
-    writer.addConnectionVector("FrameData_i", "FrameBitsPerRow-1", 0)
-    writer.addConnectionVector("FrameData_O_i", "FrameBitsPerRow-1", 0)
-    writer.addConnectionVector("FrameStrobe_i", "MaxFramesPerCol-1", 0)
-    writer.addConnectionVector("FrameStrobe_O_i", "MaxFramesPerCol-1", 0)
+    writer.addConnection("FrameData_i", width="FrameBitsPerRow")
+    writer.addConnection("FrameData_O_i", width="FrameBitsPerRow")
+    writer.addConnection("FrameStrobe_i", width="MaxFramesPerCol")
+    writer.addConnection("FrameStrobe_O_i", width="MaxFramesPerCol")
 
     added = set()
     for port in tile.portsInfo:
@@ -292,11 +290,11 @@ def generateTile(
         if (port.source_name, port.destination_name) in added:
             continue
         if span >= 2 and port.source_name != "NULL" and port.destination_name != "NULL":
-            writer.addConnectionWires(
-                f"{port.destination_name}_i", span * port.wire_count
+            writer.addConnection(
+                f"{port.destination_name}_i", width=span * port.wire_count
             )
-            writer.addConnectionWires(
-                f"{port.source_name}_i", (span - 1) * port.wire_count
+            writer.addConnection(
+                f"{port.source_name}_i", width=(span - 1) * port.wire_count
             )
             added.add((port.source_name, port.destination_name))
 
@@ -304,7 +302,7 @@ def generateTile(
     writer.addLogicStart()
 
     # buffer FrameData signals
-    writer.addAssignScalar("FrameData_O_i", "FrameData_i")
+    writer.addAssign("FrameData_O_i", "FrameData_i")
     writer.addNewLine()
     for i in range(frame_bits_per_row):
         writer.addInstantiation(
@@ -323,7 +321,7 @@ def generateTile(
         )
 
     # strobe is always added even when config bits are 0
-    writer.addAssignScalar("FrameStrobe_O_i", "FrameStrobe_i")
+    writer.addAssign("FrameStrobe_O_i", "FrameStrobe_i")
     writer.addNewLine()
     for i in range(max_frame_per_col):
         writer.addInstantiation(
@@ -349,21 +347,12 @@ def generateTile(
             continue
         if span >= 2 and port.source_name != "NULL" and port.destination_name != "NULL":
             high_bound_index = span * port.wire_count - 1
-            # a single-wire source copy is a scalar, see `addConnectionWires`
-            single_wire = (span - 1) * port.wire_count == 1
-            if single_wire:
-                writer.addAssignScalar(
-                    f"{port.source_name}_i",
-                    f"{port.destination_name}_i[{port.wire_count}]",
-                )
-            else:
-                # using scalar assignment to connect the two vectors
-                # could replace with assign as vector,
-                # but will lose the - wire_count readability
-                writer.addAssignScalar(
-                    f"{port.source_name}_i[{high_bound_index}-{port.wire_count}:0]",
-                    f"{port.destination_name}_i[{high_bound_index}:{port.wire_count}]",
-                )
+            writer.addAssign(
+                f"{port.source_name}_i",
+                f"{port.destination_name}_i",
+                high=high_bound_index,
+                low=port.wire_count,
+            )
             writer.addNewLine()
             for i in range(high_bound_index - port.wire_count + 1):
                 writer.addInstantiation(
@@ -374,6 +363,8 @@ def generateTile(
                         ("X", f"{port.destination_name}_i[{i + port.wire_count}]"),
                     ],
                 )
+            # a single-wire source copy is a scalar, see `CodeGenerator.addConnection`
+            single_wire = (span - 1) * port.wire_count == 1
             for i in range(high_bound_index - port.wire_count + 1):
                 writer.addInstantiation(
                     "my_buf",
@@ -402,9 +393,9 @@ def generateTile(
     # top configuration data daisy chaining
     if config_bit_mode == ConfigBitMode.FLIPFLOP_CHAIN:
         writer.addComment("top configuration data daisy chaining", onNewLine=True)
-        writer.addAssignScalar("conf_data(conf_data'low)", "CONFin")
+        writer.addAssign("conf_data(conf_data'low)", "CONFin")
         writer.addComment("conf_data'low=0 and CONFin is from tile entity")
-        writer.addAssignScalar("conf_data(conf_data'high)", "CONFout")
+        writer.addAssign("conf_data(conf_data'high)", "CONFout")
         writer.addComment("CONFout is from tile entity")
 
     if config_bit_mode == ConfigBitMode.FRAME_BASED and tile.globalConfigBits > 0:
@@ -689,10 +680,10 @@ def generateSuperTile(
                 indentLevel=1,
             )
             for p in pList:
-                writer.addPortWires(
+                writer.addPort(
                     f"Tile_X{x}Y{y}_{p.name}",
                     p.io_direction,
-                    p.bus_width,
+                    width=p.bus_width,
                     indentLevel=2,
                 )
                 writer.addComment(str(p), onNewLine=False)
@@ -702,22 +693,22 @@ def generateSuperTile(
     for i in superTile.tiles:
         for b in i.bels:
             for p in b.externalInput:
-                writer.addPortScalar(p, IO.INPUT, indentLevel=2)
+                writer.addPort(p, IO.INPUT, indentLevel=2)
             for p in b.externalOutput:
-                writer.addPortScalar(p, IO.OUTPUT, indentLevel=2)
+                writer.addPort(p, IO.OUTPUT, indentLevel=2)
             for p in b.sharedPort:
                 if p[0] == "UserCLK":
                     continue
-                writer.addPortScalar(p[0], p[1], indentLevel=2)
+                writer.addPort(p[0], p[1], indentLevel=2)
 
     # add supertile-level BEL external ports
     if superTile.bels:
         writer.addComment("SuperTile BEL IO ports", onNewLine=True, indentLevel=1)
         for b in superTile.bels:
             for p in b.externalInput:
-                writer.addPortScalar(p, IO.INPUT, indentLevel=2)
+                writer.addPort(p, IO.INPUT, indentLevel=2)
             for p in b.externalOutput:
-                writer.addPortScalar(p, IO.OUTPUT, indentLevel=2)
+                writer.addPort(p, IO.OUTPUT, indentLevel=2)
 
     st_config_bits = superTile.total_config_bits
 
@@ -739,18 +730,18 @@ def generateSuperTile(
                 if tile is None:
                     continue
                 if y - 1 < 0 or superTile.tileMap[y - 1][x] is None:
-                    writer.addPortVector(
+                    writer.addPort(
                         f"Tile_X{x}Y{y}_FrameStrobe_O",
                         IO.OUTPUT,
-                        "MaxFramesPerCol-1",
+                        width="MaxFramesPerCol",
                         indentLevel=2,
                     )
                     writer.addComment("CONFIG_PORT", onNewLine=False)
                 if x - 1 < 0 or superTile.tileMap[y][x - 1] is None:
-                    writer.addPortVector(
+                    writer.addPort(
                         f"Tile_X{x}Y{y}_FrameData",
                         IO.INPUT,
-                        "FrameBitsPerRow-1",
+                        width="FrameBitsPerRow",
                         indentLevel=2,
                     )
                     writer.addComment("CONFIG_PORT", onNewLine=False)
@@ -758,10 +749,10 @@ def generateSuperTile(
                     y + 1 >= len(superTile.tileMap)
                     or superTile.tileMap[y + 1][x] is None
                 ):
-                    writer.addPortVector(
+                    writer.addPort(
                         f"Tile_X{x}Y{y}_FrameStrobe",
                         IO.INPUT,
-                        "MaxFramesPerCol-1",
+                        width="MaxFramesPerCol",
                         indentLevel=2,
                     )
                     writer.addComment("CONFIG_PORT", onNewLine=False)
@@ -769,10 +760,10 @@ def generateSuperTile(
                     x + 1 >= len(superTile.tileMap[y])
                     or superTile.tileMap[y][x + 1] is None
                 ):
-                    writer.addPortVector(
+                    writer.addPort(
                         f"Tile_X{x}Y{y}_FrameData_O",
                         IO.OUTPUT,
-                        "FrameBitsPerRow-1",
+                        width="FrameBitsPerRow",
                         indentLevel=2,
                     )
                     writer.addComment("CONFIG_PORT", onNewLine=False)
@@ -785,13 +776,9 @@ def generateSuperTile(
                 if tile is None:
                     continue
                 if grid_at(superTile.tileMap, x - dx, y - dy) is None:
-                    writer.addPortScalar(
-                        f"Tile_X{x}Y{y}_UserCLKo", IO.OUTPUT, indentLevel=2
-                    )
+                    writer.addPort(f"Tile_X{x}Y{y}_UserCLKo", IO.OUTPUT, indentLevel=2)
                 if grid_at(superTile.tileMap, x + dx, y + dy) is None:
-                    writer.addPortScalar(
-                        f"Tile_X{x}Y{y}_UserCLK", IO.INPUT, indentLevel=2
-                    )
+                    writer.addPort(f"Tile_X{x}Y{y}_UserCLK", IO.INPUT, indentLevel=2)
     writer.addPortEnd()
     writer.addHeaderEnd(f"{superTile.name}")
     writer.addDesignDescriptionStart(f"{superTile.name}")
@@ -841,9 +828,9 @@ def generateSuperTile(
     if sjump_ports:
         writer.addComment("SJUMP signals (child tile -> supertile SM)", onNewLine=True)
         for lx, ly, p in sjump_ports:
-            writer.addConnectionWires(
+            writer.addConnection(
                 f"{superTile.tileMap[ly][lx].name}_{p.name}",
-                p.bus_width,
+                width=p.bus_width,
                 indentLevel=1,
             )
 
@@ -852,9 +839,9 @@ def generateSuperTile(
     if all_input_sjump:
         writer.addComment("SJUMP signals (supertile SM -> child tile)", onNewLine=True)
         for lx, ly, p in all_input_sjump:
-            writer.addConnectionWires(
+            writer.addConnection(
                 f"{superTile.tileMap[ly][lx].name}_{p.name}",
-                p.bus_width,
+                width=p.bus_width,
                 indentLevel=1,
             )
 
@@ -865,15 +852,15 @@ def generateSuperTile(
     if bel_pin_signals:
         writer.addComment("BEL pin signals (BEL <-> supertile SM)", onNewLine=True)
         for pin in bel_pin_signals:
-            writer.addConnectionScalar(pin, indentLevel=1)
+            writer.addConnection(pin, indentLevel=1)
 
     for i, x, y in internal_connections:
         if i:
             writer.addComment(f"Tile_X{x}Y{y}_{i[0].wire_direction}", onNewLine=True)
             for p in i:
                 if p.is_output:
-                    writer.addConnectionWires(
-                        f"Tile_X{x}Y{y}_{p.name}", p.bus_width, indentLevel=1
+                    writer.addConnection(
+                        f"Tile_X{x}Y{y}_{p.name}", width=p.bus_width, indentLevel=1
                     )
                     writer.addComment(str(p), onNewLine=False)
 
@@ -886,27 +873,27 @@ def generateSuperTile(
                 0 <= y - 1 < len(superTile.tileMap)
                 and superTile.tileMap[y - 1][x] is not None
             ):
-                writer.addConnectionVector(
+                writer.addConnection(
                     f"Tile_X{x}Y{y}_FrameStrobe_O",
-                    "MaxFramesPerCol-1",
+                    width="MaxFramesPerCol",
                     indentLevel=1,
                 )
             if (
                 not disable_user_clk
                 and grid_at(superTile.tileMap, x - dx, y - dy) is not None
             ):
-                writer.addConnectionScalar(f"Tile_X{x}Y{y}_UserCLKo", indentLevel=1)
+                writer.addConnection(f"Tile_X{x}Y{y}_UserCLKo", indentLevel=1)
             if (
                 0 <= x + 1 < len(superTile.tileMap[y])
                 and superTile.tileMap[y][x + 1] is not None
             ):
-                writer.addConnectionVector(
-                    f"Tile_X{x}Y{y}_FrameData_O", "FrameBitsPerRow-1", indentLevel=1
+                writer.addConnection(
+                    f"Tile_X{x}Y{y}_FrameData_O", width="FrameBitsPerRow", indentLevel=1
                 )
 
     if st_config_bits > 0 and config_bit_mode == ConfigBitMode.FRAME_BASED:
-        writer.addConnectionWires("ST_ConfigBits", st_config_bits, indentLevel=1)
-        writer.addConnectionWires("ST_ConfigBits_N", st_config_bits, indentLevel=1)
+        writer.addConnection("ST_ConfigBits", width=st_config_bits, indentLevel=1)
+        writer.addConnection("ST_ConfigBits_N", width=st_config_bits, indentLevel=1)
 
     writer.addNewLine()
 

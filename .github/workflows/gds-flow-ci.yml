@@ -111,10 +111,9 @@ jobs:
             TILE_OUTPUT=$(tail -100 tile_hardening_output.txt)
           fi
 
-          DATE=$(date -u +%Y-%m-%d)
           PDK="${{ matrix.pdk }}"
 
-          echo "title=Tile Hardening CI Failed - ${PDK} - ${DATE}" >> "$GITHUB_OUTPUT"
+          echo "title=Tile Hardening CI Failed - ${PDK}" >> "$GITHUB_OUTPUT"
 
           {
             echo 'body<<ISSUE_BODY_EOF'
@@ -285,10 +284,9 @@ jobs:
             GL_OUTPUT=$(tail -60 gl_sim_output.txt)
           fi
 
-          DATE=$(date -u +%Y-%m-%d)
           PDK="${{ matrix.pdk }}"
 
-          echo "title=Fabric Stitching / GL Sim CI Failed - ${PDK} - ${DATE}" >> "$GITHUB_OUTPUT"
+          echo "title=Fabric Stitching / GL Sim CI Failed - ${PDK}" >> "$GITHUB_OUTPUT"
 
           {
             echo 'body<<ISSUE_BODY_EOF'

@@ -329,7 +329,6 @@ class TilePort(Port):
     def __repr__(self) -> str:
         """Return a string representation of the TilePort."""
         name = f"{self.side_of_tile}"
-        # Lands in generated HDL comments, where some tools read `[0:0]` as a bus.
         bus = self.name if self.width == 1 else f"{self.name}[{self.width - 1}:0]"
         return f"TilePort({{{name}}} {self.io_direction.value} {bus})"
 
@@ -510,8 +509,18 @@ class TilePort(Port):
         -------
         str
             The bare name for a one-wire signal, otherwise the bit-select.
+
+        Raises
+        ------
+        IndexError
+            If `index` is outside `0` to `bus_width - 1`.
         """
-        if self.bus_width == 1 and index == 0:
+        if not 0 <= index < self.bus_width:
+            raise IndexError(
+                f"Wire {index} is outside {self.name}, which carries "
+                f"{self.bus_width} wires. Select a wire from 0 to {self.bus_width - 1}."
+            )
+        if self.bus_width == 1:
             return f"{prefix}{self.name}"
         if escape:
             return rf"{prefix}{self.name}\[{index}\]"

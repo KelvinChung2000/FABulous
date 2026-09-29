@@ -413,3 +413,22 @@ def test_top_slice_of_one_wire_port_is_referenced_by_bare_name(
     port = next(p for p in parse_port_line(line)[0] if p.name == name)
 
     assert port.expand_port_info_by_name_top(indexed=True) == indexed_top
+
+
+@pytest.mark.parametrize(
+    ("line", "name", "index"),
+    [
+        ("NORTH,Co,0,-1,Ci,1", "Co", 1),
+        ("NORTH,X2BEG,0,-2,X2END,1", "X2BEG", 2),
+        ("NORTH,X2BEG,0,-2,X2END,1", "X2BEG", -1),
+        ("JUMP,J_BEG,0,0,J_END,1", "J_BEG", -1),
+    ],
+)
+def test_select_wire_outside_the_signal_raises(
+    line: str, name: str, index: int
+) -> None:
+    """A wire index outside `0` to `bus_width - 1` has no HDL name."""
+    port = next(p for p in parse_port_line(line)[0] if p.name == name)
+
+    with pytest.raises(IndexError, match=f"Wire {index} is outside {name}"):
+        port.select_wire(index)

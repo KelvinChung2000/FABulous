@@ -18,14 +18,13 @@ from fabulous.tools.yosys import YosysTool
 from tests.conftest import run_cmd
 from tests.equivalence import (
     GHDL_FLAGS,
-    VERILOG_SUFFIXES,
     VHDL_SUFFIXES,
     Design,
     EquivalenceFailure,
-    fabric_top,
+    fabric_files,
     parse_project,
     prove_modules,
-    vhdl_sources,
+    vhdl_pack_modules,
 )
 from tests.fabric_gen_test.integration_test.conftest import set_multiplexer_style
 
@@ -35,6 +34,7 @@ def _check_vhdl_verilog_equivalence(
     vhdl_project: Path,
     verilog_models_pack: Path,
     vhdl_models_pack: Path,
+    top: str,
     work_dir: Path,
 ) -> list[EquivalenceFailure]:
     """Check the VHDL fabric of a project against its Verilog fabric.
@@ -56,6 +56,8 @@ def _check_vhdl_verilog_equivalence(
         Absolute Verilog models pack path.
     vhdl_models_pack : Path
         Absolute VHDL models pack path.
+    top : str
+        Fabric top module, `<fabric>_top`, the same in both languages.
     work_dir : Path
         Directory for yosys scripts, logs and the parsed designs.
 
@@ -73,20 +75,23 @@ def _check_vhdl_verilog_equivalence(
     """
     work_dir.mkdir(parents=True, exist_ok=True)
     verilog = parse_project(
-        verilog_project, verilog_models_pack, HDLType.VERILOG, work_dir, "verilog"
+        project=verilog_project,
+        models_pack=verilog_models_pack,
+        language=HDLType.VERILOG,
+        top=top,
+        work_dir=work_dir,
+        tag="verilog",
     )
 
-    source_dir = work_dir / "vhdl_sources"
-    source_dir.mkdir()
-    sources, pack_modules = vhdl_sources(vhdl_project, vhdl_models_pack, source_dir)
-    vhdl_top = fabric_top(vhdl_project, VHDL_SUFFIXES).stem
+    pack_modules = vhdl_pack_modules(vhdl_models_pack, work_dir / "vhdl_pack")
+    sources = fabric_files(vhdl_project, vhdl_models_pack, VHDL_SUFFIXES)
     vhdl_netlist = work_dir / "vhdl.json"
     vhdl_script = work_dir / "vhdl_parse.ys"
     vhdl_script.write_text(
         "\n".join(
             [
                 f"ghdl {' '.join(GHDL_FLAGS)} {vhdl_models_pack} "
-                f"{' '.join(map(str, sources))} -e {vhdl_top}",
+                f"{' '.join(map(str, sources))} -e {top}",
                 "hierarchy -check",
                 "proc",
                 "opt_clean",
@@ -112,12 +117,11 @@ def _check_vhdl_verilog_equivalence(
         if not any(name == p or name.startswith(f"{p}_") for p in pack_modules)
     }
 
-    verilog_top = fabric_top(verilog_project, VERILOG_SUFFIXES).stem
     # VHDL module name to Verilog module name, and back.
-    mapping = {vhdl_top: verilog_top}
-    paired = {verilog_top: vhdl_top}
+    mapping = {top: top}
+    paired = {top: top}
     failures: list[EquivalenceFailure] = []
-    stack = [vhdl_top]
+    stack = [top]
     while stack:
         vhdl_module = stack.pop()
         verilog_module = mapping[vhdl_module]
@@ -235,8 +239,11 @@ def _check_vhdl_verilog_equivalence(
 
 def _generate(
     project_factory: Callable[..., Path], lang: HDLType, mux_style: str
-) -> tuple[Path, Path]:
-    """Generate the fabric RTL of a new `lang` project, returning it and its pack."""
+) -> tuple[Path, Path, str]:
+    """Generate the fabric RTL of a new `lang` project.
+
+    Returns the project, its models pack and the fabric name.
+    """
     project_dir = project_factory(lang=lang, name=f"{lang.value}_project")
     set_multiplexer_style(project_dir, mux_style)
     reset_context()
@@ -255,7 +262,7 @@ def _generate(
         assert cli.exit_code == 0, f"{command} failed for the {lang.value} project"
     models_pack = get_context().models_pack
     assert models_pack is not None, f"No models pack configured for {project_dir}"
-    return project_dir, models_pack
+    return project_dir, models_pack, cli.fabulousAPI.fabric.name
 
 
 @pytest.mark.parametrize("mux_style", ["custom", "generic"])
@@ -264,16 +271,17 @@ def test_vhdl_matches_verilog(
     mux_style: str, project_factory: Callable[..., Path], tmp_path: Path
 ) -> None:
     """The VHDL fabric of the template project is equivalent to its Verilog one."""
-    verilog_project, verilog_pack = _generate(
+    verilog_project, verilog_pack, fabric = _generate(
         project_factory, HDLType.VERILOG, mux_style
     )
-    vhdl_project, vhdl_pack = _generate(project_factory, HDLType.VHDL, mux_style)
+    vhdl_project, vhdl_pack, _ = _generate(project_factory, HDLType.VHDL, mux_style)
 
     failures = _check_vhdl_verilog_equivalence(
         verilog_project=verilog_project,
         vhdl_project=vhdl_project,
         verilog_models_pack=verilog_pack,
         vhdl_models_pack=vhdl_pack,
+        top=f"{fabric}_top",
         work_dir=tmp_path / "equivalence",
     )
     if failures:

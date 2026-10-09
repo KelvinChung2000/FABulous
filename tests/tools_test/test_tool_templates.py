@@ -1,8 +1,8 @@
 """Tests for the Jinja-rendered tool scripts and their Python-side wiring.
 
 Covers the Yosys synthesis and OpenSTA SDF templates directly (exact rendered
-text) and the `analyze` wrapper that normalizes its inputs and feeds the rendered
-script to the tool.
+text), the `analyze` wrapper that normalizes its inputs and feeds the rendered
+script to the tool, and the parse of the GHDL library listing.
 """
 
 import tempfile
@@ -11,7 +11,7 @@ from pathlib import Path
 import pytest
 from pytest_mock import MockerFixture
 
-from fabulous.tools.ghdl import GhdlTool
+from fabulous.tools.ghdl import GhdlTool, GhdlUnit
 from fabulous.tools.opensta import OpenStaTool
 from fabulous.tools.tool import Tool
 from fabulous.tools.yosys import YosysTool
@@ -163,6 +163,39 @@ def test_analyze_empty_sdf_raises(mocker: MockerFixture, tmp_path: Path) -> None
     with pytest.raises(RuntimeError, match="No content in SDF file"):
         OpenStaTool.analyze(tmp_path / "n.v", tmp_path / "x.lib", "EMPTY")
     assert not sdf.exists()
+
+
+@pytest.mark.parametrize(
+    ("line", "unit"),
+    [
+        pytest.param(
+            "entity my_buf",
+            GhdlUnit(kind="entity", name="my_buf", entity=None),
+            id="entity",
+        ),
+        pytest.param(
+            "architecture from_verilog of my_buf",
+            GhdlUnit(kind="architecture", name="from_verilog", entity="my_buf"),
+            id="architecture",
+        ),
+        pytest.param(
+            "package attr_pack",
+            GhdlUnit(kind="package", name="attr_pack", entity=None),
+            id="package",
+        ),
+    ],
+)
+def test_ghdl_analyze_lists_units(
+    line: str, unit: GhdlUnit, mocker: MockerFixture, tmp_path: Path
+) -> None:
+    """`GhdlTool.analyze` turns each `ghdl --dir` unit line into a `GhdlUnit`."""
+    listing = f"# Library work\n# Directory: {tmp_path}/\n{line}\n"
+    run = mocker.patch.object(GhdlTool, "run")
+    run.return_value.stdout = listing
+
+    assert GhdlTool.analyze(files=[tmp_path / "a.vhdl"], workdir=tmp_path / "lib") == [
+        unit
+    ]
 
 
 @pytest.mark.parametrize("tool_cls", [Tool, YosysTool, GhdlTool, OpenStaTool])

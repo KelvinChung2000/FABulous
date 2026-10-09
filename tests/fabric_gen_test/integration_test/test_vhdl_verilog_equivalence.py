@@ -24,7 +24,7 @@ from tests.equivalence import (
     fabric_files,
     parse_project,
     prove_modules,
-    vhdl_pack_modules,
+    vhdl_pack_prefixes,
 )
 from tests.fabric_gen_test.integration_test.conftest import set_multiplexer_style
 
@@ -83,7 +83,7 @@ def _check_vhdl_verilog_equivalence(
         tag="verilog",
     )
 
-    pack_modules = vhdl_pack_modules(vhdl_models_pack, work_dir / "vhdl_pack")
+    pack_prefixes = vhdl_pack_prefixes(vhdl_models_pack, work_dir / "vhdl_pack")
     sources = fabric_files(vhdl_project, vhdl_models_pack, VHDL_SUFFIXES)
     vhdl_netlist = work_dir / "vhdl.json"
     vhdl_script = work_dir / "vhdl_parse.ys"
@@ -110,11 +110,8 @@ def _check_vhdl_verilog_equivalence(
         ]
     )
     vhdl_modules: dict[str, Any] = json.loads(vhdl_netlist.read_text())["modules"]
-    # A pack architecture elaborated with generics gets their values appended.
     vhdl_project_modules = {
-        name
-        for name in vhdl_modules
-        if not any(name == p or name.startswith(f"{p}_") for p in pack_modules)
+        name for name in vhdl_modules if not name.startswith(pack_prefixes)
     }
 
     # VHDL module name to Verilog module name, and back.

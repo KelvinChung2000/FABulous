@@ -73,7 +73,7 @@ def _check_vhdl_verilog_equivalence(
     """
     work_dir.mkdir(parents=True, exist_ok=True)
     verilog = parse_project(
-        verilog_project, verilog_models_pack, "verilog", work_dir, "verilog"
+        verilog_project, verilog_models_pack, HDLType.VERILOG, work_dir, "verilog"
     )
 
     source_dir = work_dir / "vhdl_sources"

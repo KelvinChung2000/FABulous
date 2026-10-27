@@ -11,6 +11,7 @@ import pytest
 from cocotb.triggers import Timer
 
 from fabulous.fabric_definition.configmem import ConfigMem, ConfigMemFrame
+from fabulous.fabric_definition.define import ConfigBitMode
 from fabulous.fabric_definition.fabric import Fabric
 from fabulous.fabric_definition.tile import Tile
 from fabulous.fabric_generator.code_generator.code_generator import CodeGenerator
@@ -137,6 +138,9 @@ def test_configmem_rtl_with_generated_configmem_simulation(
     cocotb_runner: Callable[..., Callable],
 ) -> None:
     """Generate ConfigMem RTL and verify its behavior using cocotb simulation."""
+    if fabric_config.configBitMode != ConfigBitMode.FRAME_BASED:
+        pytest.skip("FLIPFLOP_CHAIN covered by chain tests")
+
     # Skip impossible configurations where fabric capacity < tile requirements
     fabric_capacity = fabric_config.frameBitsPerRow * fabric_config.maxFramesPerCol
     tile_requirements = tile_config.globalConfigBits
@@ -164,7 +168,12 @@ def test_configmem_rtl_with_generated_configmem_simulation(
     memory.to_csv()
 
     # Generate the ConfigMem RTL
-    generate_config_mem(writer, tile_config.name, memory)
+    generate_config_mem(
+        writer,
+        tile_config.name,
+        memory,
+        config_bit_mode=fabric_config.configBitMode,
+    )
 
     if tile_config.globalConfigBits == 0:
         # `ConfigBits[-1:0]` is not a vector, so no module is generated.
@@ -258,7 +267,12 @@ def test_configmem_rtl_with_custom_configmem_simulation(
     memory.to_csv()
 
     # Generate the ConfigMem RTL
-    generate_config_mem(writer, default_tile.name, memory)
+    generate_config_mem(
+        writer,
+        default_tile.name,
+        memory,
+        config_bit_mode=default_fabric.configBitMode,
+    )
 
     bit_mapping = {}  # Key: "frame,framedata_bit", Value: config_bit_index
 

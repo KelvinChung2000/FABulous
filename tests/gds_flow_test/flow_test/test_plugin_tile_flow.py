@@ -182,7 +182,9 @@ class TestEmitTileVerilog:
         assert sm_kwargs["config_bit_mode"] == config_bit_mode
         assert sm_kwargs["multiplexer_style"] == MultiplexerStyle.GENERIC
         if config_bit_mode is ConfigBitMode.FRAME_BASED:
-            gen_cm.assert_called_once_with(mock_writer, mock_tile)
+            gen_cm.assert_called_once_with(
+                mock_writer, mock_tile, config_bit_mode=config_bit_mode
+            )
         else:
             gen_cm.assert_not_called()
         gen_tile.assert_called_once()

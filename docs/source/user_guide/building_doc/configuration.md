@@ -45,7 +45,7 @@ The bitbang adapter offers a quick asynchronous serial configuration port interf
 :::{wavedrom} ./figs/bitbang1.json
 :align: center
 :alt: Timing diagram of one bitbang word. Each rising edge of s_clk shifts a bit into the 32-bit serial_data register and each falling edge shifts a bit into the 16-bit serial_control register, and the word is released to the configuration port once serial_control holds 0xFAB1.
-:caption: Transfer of one word, carrying `0xDEADBEEF` on the rising-edge lane and sixteen zeros followed by `0xFAB1` on the falling-edge lane. The diagram is drawn against `s_clk`, so the single-`clk` `strobe` pulse appears far wider than it is.
+:caption: Transfer of the first word after reset, carrying `0xDEADBEEF` in the data bits and `0x0000FAB1` in the control bits. `s_data` shows the bit values on the wire and the register lanes start from their reset value of zero. The diagram is drawn against `s_clk`, so the single-`clk` `strobe` pulse appears far wider than it is.
 :::
 
 - **Signals:** `s_clk` and `s_data` are the two serial inputs, `data[31:0]`, `strobe` and `active` the outputs, and `clk` and `reset_n` the fabric-side clock and reset.

@@ -13,6 +13,7 @@ import pytest
 import yaml
 from pytest_mock import MockerFixture
 
+from fabulous.custom_exception import StaleIOPinConfigError
 from fabulous.fabric_definition.define import PinSortMode, Side
 from fabulous.fabric_definition.fabric import Fabric
 from fabulous.fabric_definition.supertile import SuperTile
@@ -517,6 +518,84 @@ class TestGenerateIOPinOrderConfig:
             config = yaml.safe_load(f)
 
         assert "X0Y0" in config
+
+    @pytest.mark.parametrize(
+        ("user_edit", "fabric_changed", "expect_kept"),
+        [
+            pytest.param(False, True, False, id="untouched-regenerated"),
+            pytest.param(True, False, True, id="edited-kept"),
+        ],
+    )
+    def test_generate_io_pin_order_config_existing_file(
+        self,
+        mock_tile: Tile,
+        mock_fabric: Fabric,
+        tmp_path: Path,
+        user_edit: bool,
+        fabric_changed: bool,
+        expect_kept: bool,
+    ) -> None:
+        """Test which existing files are regenerated and which are kept."""
+        outfile = tmp_path / "io_pin_order.yaml"
+        mock_fabric.userCLKSide = Side.SOUTH
+        generate_IO_pin_order_config(mock_tile, outfile, fabric=mock_fabric)
+        if user_edit:
+            outfile.write_text(
+                outfile.read_text().replace(
+                    "reverse_result: false", "reverse_result: true", 1
+                )
+            )
+        existing = outfile.read_text()
+
+        if fabric_changed:
+            mock_fabric.userCLKSide = Side.WEST
+        generate_IO_pin_order_config(mock_tile, outfile, fabric=mock_fabric)
+
+        assert (outfile.read_text() == existing) == expect_kept
+
+    def test_generate_io_pin_order_config_stamps_file_without_hash(
+        self, mock_tile: Tile, mock_fabric: Fabric, tmp_path: Path
+    ) -> None:
+        """Test that a file without the hash key keeps its body and gains the key."""
+        outfile = tmp_path / "io_pin_order.yaml"
+        generate_IO_pin_order_config(mock_tile, outfile, fabric=mock_fabric)
+        generated = outfile.read_text()
+        hash_line, _, body = generated.partition("\n")
+        hand_written = "# hand-written\n" + body.replace(
+            "reverse_result: false", "reverse_result: true", 1
+        )
+        outfile.write_text(hand_written)
+
+        generate_IO_pin_order_config(mock_tile, outfile, fabric=mock_fabric)
+
+        assert outfile.read_text() == f"{hash_line}\n{hand_written}"
+
+    def test_generate_io_pin_order_config_unstampable_file_raises(
+        self, mock_tile: Tile, mock_fabric: Fabric, tmp_path: Path
+    ) -> None:
+        """Test that a file the hash key cannot be prepended to raises."""
+        outfile = tmp_path / "io_pin_order.yaml"
+        outfile.write_text("---\nX0Y0: {}\n")
+
+        with pytest.raises(ValueError, match="single block mapping"):
+            generate_IO_pin_order_config(mock_tile, outfile, fabric=mock_fabric)
+
+    def test_generate_io_pin_order_config_edited_and_stale_raises(
+        self, mock_tile: Tile, mock_fabric: Fabric, tmp_path: Path
+    ) -> None:
+        """Test that user edits made against an older fabric raise."""
+        outfile = tmp_path / "io_pin_order.yaml"
+        mock_fabric.userCLKSide = Side.SOUTH
+        generate_IO_pin_order_config(mock_tile, outfile, fabric=mock_fabric)
+        outfile.write_text(
+            outfile.read_text().replace(
+                "reverse_result: false", "reverse_result: true", 1
+            )
+        )
+
+        mock_fabric.userCLKSide = Side.WEST
+        with pytest.raises(StaleIOPinConfigError):
+            generate_IO_pin_order_config(mock_tile, outfile, fabric=mock_fabric)
 
     def test_generate_io_pin_order_config_tile_structure(
         self, mock_tile: Tile, tmp_path: Path

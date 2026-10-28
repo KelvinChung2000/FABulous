@@ -20,6 +20,7 @@ from pytest_mock import MockerFixture
 
 from fabulous.fabulous import main
 from fabulous.fabulous_api import FABulous_API
+from fabulous.fabulous_repl.fabulous_repl import FABulousREPL
 from fabulous.fabulous_repl.helper import setup_logger
 from fabulous.fabulous_settings import init_context, reset_context
 
@@ -117,19 +118,21 @@ def test_create_project(
 
 
 @pytest.mark.parametrize(
-    ("argv", "start_dir", "expected_code"),
+    ("argv", "start_dir", "expected_code", "expected_runner"),
     [
         # FAB script with explicit project
         pytest.param(
             ["FABulous", "{project}", "--FABulousScript", "{file}"],
             None,
             0,
+            "run_script",
             id="fab-legacy",
         ),
         pytest.param(
             ["FABulous", "-p", "{project}", "script", "{file}"],
             None,
             0,
+            "run_script",
             id="fab-typer",
         ),
         # FAB script in cwd in a project
@@ -137,6 +140,7 @@ def test_create_project(
             ["FABulous", "--FABulousScript", "{file}"],
             "project",
             0,
+            "run_script",
             id="fab-cwd-project",
         ),
         # FAB script with nonexistent file
@@ -144,6 +148,7 @@ def test_create_project(
             ["FABulous", "-p", "{project}", "script", "{missing}"],
             None,
             2,
+            None,
             id="fab-nonexistent",
         ),
         # TCL script with explicit project
@@ -151,12 +156,14 @@ def test_create_project(
             ["FABulous", "{project}", "--TCLScript", "{tcl}"],
             None,
             0,
+            "run_tcl",
             id="tcl-legacy",
         ),
         pytest.param(
             ["FABulous", "-p", "{project}", "script", "{tcl}"],
             None,
             0,
+            "run_tcl",
             id="tcl-typer",
         ),
         # FAB script in non-project cwd (should fail)
@@ -164,13 +171,36 @@ def test_create_project(
             ["FABulous", "--FABulousScript", "{file}"],
             "nonproject",
             1,
+            None,
             id="fab-cwd-nonproject",
         ),
         pytest.param(
             ["FABulous", "-p", "{project}", "script", "nonexistent.fab"],
             None,
             2,
+            None,
             id="tcl-typer",
+        ),
+        pytest.param(
+            ["FABulous", "-p", "{project}", "script", "{fs}"],
+            None,
+            0,
+            "run_script",
+            id="detect-fs",
+        ),
+        pytest.param(
+            ["FABulous", "-p", "{project}", "script", "-t", "tcl", "{file}"],
+            None,
+            0,
+            "run_tcl",
+            id="type-overrides-suffix",
+        ),
+        pytest.param(
+            ["FABulous", "-p", "{project}", "script", "{other}"],
+            None,
+            1,
+            None,
+            id="unknown-suffix-no-type",
         ),
     ],
 )
@@ -178,9 +208,11 @@ def test_script_execution(
     tmp_path: Path,
     project: Path,
     monkeypatch: pytest.MonkeyPatch,
+    mocker: MockerFixture,
     argv: list[str],
     start_dir: str | None,
     expected_code: int,
+    expected_runner: str | None,
 ) -> None:
     fab_script = tmp_path / "test_script.fab"
     # Default content succeeds; override below for failure scenarios
@@ -193,12 +225,18 @@ def test_script_execution(
     tcl_script.write_text(
         '# TCL script with FABulous commands\nputs "Hello from TCL"\n'
     )
+    fs_script = tmp_path / "test_script.fs"
+    fs_script.write_text(fab_content)
+    other_script = tmp_path / "test_script.txt"
+    other_script.write_text(fab_content)
     missing = tmp_path / "missing_script.fab"
 
     test_argv = [
         s.replace("{project}", str(project))
         .replace("{file}", str(fab_script))
         .replace("{tcl}", str(tcl_script))
+        .replace("{fs}", str(fs_script))
+        .replace("{other}", str(other_script))
         .replace("{missing}", str(missing))
         for s in argv
     ]
@@ -211,10 +249,17 @@ def test_script_execution(
         monkeypatch.chdir(nonproj)
 
     monkeypatch.setattr(sys, "argv", test_argv)
+    onecmd_spy = mocker.spy(FABulousREPL, "onecmd_plus_hooks")
     with pytest.raises(SystemExit) as exc_info:
         main()
 
     assert exc_info.value.code == expected_code
+    runners = [
+        call.args[1].split()[0]
+        for call in onecmd_spy.call_args_list
+        if call.args[1].startswith("run_")
+    ]
+    assert runners == ([] if expected_runner is None else [expected_runner])
 
 
 @pytest.mark.parametrize(
@@ -1168,7 +1213,7 @@ def test_script_execution_with_content(
         pytest.param(".fab", 0, id="fab-extension"),
         pytest.param(".fs", 0, id="fs-extension"),
         pytest.param(".tcl", 0, id="tcl-extension"),
-        pytest.param(".txt", 0, id="unknown-extension-defaults-tcl"),
+        pytest.param(".txt", 1, id="unknown-extension-fails"),
     ],
 )
 def test_script_type_detection(

@@ -77,7 +77,9 @@ class FabricGenCommandSet(ReplCommandSet):
                 repl.fabulousAPI.gen_super_tile_config_mem(i)
                 logger.info(f"Generated configMem for super tile {i}")
                 continue
-            generate_tile_config_mem(repl.fabulousAPI.writer, tile)
+            generate_tile_config_mem(
+                repl.fabulousAPI.writer, tile, config_bit_mode=fabric.configBitMode
+            )
         logger.info("ConfigMem generation complete")
 
     @with_annotated
@@ -166,7 +168,11 @@ class FabricGenCommandSet(ReplCommandSet):
                     if frame_based:
                         logger.info(f"Generating configMem for tile {t}")
                         logger.info(f"Generating ConfigMem for {st}")
-                        generate_tile_config_mem(repl.fabulousAPI.writer, sub_tile)
+                        generate_tile_config_mem(
+                            repl.fabulousAPI.writer,
+                            sub_tile,
+                            config_bit_mode=fabric.configBitMode,
+                        )
                         logger.info(f"Generated configMem for {st}")
 
                     # Gen tile

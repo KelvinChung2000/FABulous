@@ -274,8 +274,7 @@ def _emit_regular_tile_verilog(
         multiplexer_style=multiplexer_style,
         default_pip_delay=_SWITCH_MATRIX_PIP_DELAY,
     )
-    if config_bit_mode is ConfigBitMode.FRAME_BASED:
-        generate_tile_config_mem(writer, tile)
+    generate_tile_config_mem(writer, tile, config_bit_mode=config_bit_mode)
     writer.outFileName = tile_dir / f"{tile.name}.v"
     generateTile(
         writer,

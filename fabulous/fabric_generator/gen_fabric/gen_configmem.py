@@ -13,7 +13,7 @@ from typing import TYPE_CHECKING
 from loguru import logger
 
 from fabulous.fabric_definition.configmem import ConfigMem
-from fabulous.fabric_definition.define import IO
+from fabulous.fabric_definition.define import IO, ConfigBitMode
 from fabulous.fabric_generator.code_generator.code_generator import CodeGenerator
 from fabulous.fabric_generator.code_generator.code_generator_Verilog import (
     VerilogCodeGenerator,
@@ -27,8 +27,18 @@ if TYPE_CHECKING:
     from fabulous.fabric_definition.tile import Tile
 
 
-def generate_config_mem(writer: CodeGenerator, name: str, memory: ConfigMem) -> None:
+def generate_config_mem(
+    writer: CodeGenerator,
+    name: str,
+    memory: ConfigMem,
+    *,
+    config_bit_mode: ConfigBitMode,
+) -> None:
     """Generate the RTL code for a configuration memory.
+
+    FRAME_BASED places one `config_latch` per crosspoint. FLIPFLOP_CHAIN places
+    one `config_dff` per bit, chained from `CONFin` to `CONFout` in the order
+    `memory.bit_at` lists the bits.
 
     Parameters
     ----------
@@ -39,6 +49,8 @@ def generate_config_mem(writer: CodeGenerator, name: str, memory: ConfigMem) -> 
     memory : ConfigMem
         The mapping the module implements. A mapping holding no bits gets no
         module, since `ConfigBits[-1:0]` is not a vector.
+    config_bit_mode : ConfigBitMode
+        The storage the module instantiates.
     """
     if memory.config_bits == 0:
         logger.info(f"{name} maps no configuration bits, so it gets no module")
@@ -60,20 +72,30 @@ def generate_config_mem(writer: CodeGenerator, name: str, memory: ConfigMem) -> 
             indentLevel=2,
         )
         writer.addPreprocEndif()
-    if memory.max_frames_per_col != 0:
-        writer.addParameter(
-            "MaxFramesPerCol", "integer", memory.max_frames_per_col, indentLevel=2
-        )
-    if memory.frame_bits_per_row != 0:
-        writer.addParameter(
-            "FrameBitsPerRow", "integer", memory.frame_bits_per_row, indentLevel=2
-        )
+    if config_bit_mode is ConfigBitMode.FRAME_BASED:
+        if memory.max_frames_per_col != 0:
+            writer.addParameter(
+                "MaxFramesPerCol", "integer", memory.max_frames_per_col, indentLevel=2
+            )
+        if memory.frame_bits_per_row != 0:
+            writer.addParameter(
+                "FrameBitsPerRow", "integer", memory.frame_bits_per_row, indentLevel=2
+            )
     writer.addParameter("NoConfigBits", "integer", memory.config_bits, indentLevel=2)
     writer.addParameterEnd(indentLevel=1)
     writer.addPortStart(indentLevel=1)
-    # the port definitions are generic
-    writer.addPortVector("FrameData", IO.INPUT, "FrameBitsPerRow - 1", indentLevel=2)
-    writer.addPortVector("FrameStrobe", IO.INPUT, "MaxFramesPerCol - 1", indentLevel=2)
+    match config_bit_mode:
+        case ConfigBitMode.FRAME_BASED:
+            writer.addPortVector(
+                "FrameData", IO.INPUT, "FrameBitsPerRow - 1", indentLevel=2
+            )
+            writer.addPortVector(
+                "FrameStrobe", IO.INPUT, "MaxFramesPerCol - 1", indentLevel=2
+            )
+        case ConfigBitMode.FLIPFLOP_CHAIN:
+            writer.addPortScalar("CONF_CLK", IO.INPUT, indentLevel=2)
+            writer.addPortScalar("CONFin", IO.INPUT, indentLevel=2)
+            writer.addPortScalar("CONFout", IO.OUTPUT, indentLevel=2)
     writer.addPortVector("ConfigBits", IO.OUTPUT, "NoConfigBits - 1", indentLevel=2)
     writer.addPortVector("ConfigBits_N", IO.OUTPUT, "NoConfigBits - 1", indentLevel=2)
     writer.addPortEnd(indentLevel=1)
@@ -91,20 +113,38 @@ def generate_config_mem(writer: CodeGenerator, name: str, memory: ConfigMem) -> 
     writer.addNewLine()
     writer.addNewLine()
     writer.addLogicStart()
-    writer.addComment("instantiate frame latches", end="")
-    for crosspoint, bit in memory.bit_at.items():
-        writer.addInstantiation(
-            compName="config_latch",
-            compInsName=(
-                f"Inst_{memory.frame_names[crosspoint.frame]}_bit{crosspoint.data_bit}"
-            ),
-            portsPairs=[
-                ("D", f"FrameData[{crosspoint.data_bit}]"),
-                ("E", f"FrameStrobe[{crosspoint.frame}]"),
-                ("Q", f"ConfigBits[{bit}]"),
-                ("QN", f"ConfigBits_N[{bit}]"),
-            ],
-        )
+    match config_bit_mode:
+        case ConfigBitMode.FRAME_BASED:
+            writer.addComment("instantiate frame latches", end="")
+            for crosspoint, bit in memory.bit_at.items():
+                frame_name = memory.frame_names[crosspoint.frame]
+                writer.addInstantiation(
+                    compName="config_latch",
+                    compInsName=f"Inst_{frame_name}_bit{crosspoint.data_bit}",
+                    portsPairs=[
+                        ("D", f"FrameData[{crosspoint.data_bit}]"),
+                        ("E", f"FrameStrobe[{crosspoint.frame}]"),
+                        ("Q", f"ConfigBits[{bit}]"),
+                        ("QN", f"ConfigBits_N[{bit}]"),
+                    ],
+                )
+        case ConfigBitMode.FLIPFLOP_CHAIN:
+            writer.addComment("instantiate shift registers", end="")
+            chain = list(memory.bit_at.values())
+            d_source = "CONFin"
+            for bit in chain:
+                writer.addInstantiation(
+                    compName="config_dff",
+                    compInsName=f"Inst_ConfigBit_FF{bit}",
+                    portsPairs=[
+                        ("D", d_source),
+                        ("CLK", "CONF_CLK"),
+                        ("Q", f"ConfigBits[{bit}]"),
+                        ("QN", f"ConfigBits_N[{bit}]"),
+                    ],
+                )
+                d_source = f"ConfigBits[{bit}]"
+            writer.addAssignScalar("CONFout", f"ConfigBits[{chain[-1]}]")
     if isinstance(writer, VerilogCodeGenerator):  # emulation only in Verilog
         writer.addPreprocEndif()
     writer.addDesignDescriptionEnd()
@@ -121,7 +161,9 @@ def _module_path(writer: CodeGenerator, name: str, tile_dir: Path) -> Path:
     return tile_dir / f"{name}_ConfigMem.{extension}"
 
 
-def generate_tile_config_mem(writer: CodeGenerator, tile: "Tile") -> None:
+def generate_tile_config_mem(
+    writer: CodeGenerator, tile: "Tile", *, config_bit_mode: ConfigBitMode
+) -> None:
     """Generate the tile's configuration memory module from its mapping.
 
     A tile whose mapping holds no bits yet gets the default mapping, written to
@@ -134,6 +176,8 @@ def generate_tile_config_mem(writer: CodeGenerator, tile: "Tile") -> None:
         HDL the module is written in.
     tile : Tile
         The tile the memory belongs to.
+    config_bit_mode : ConfigBitMode
+        The storage the module instantiates.
 
     Raises
     ------
@@ -167,7 +211,7 @@ def generate_tile_config_mem(writer: CodeGenerator, tile: "Tile") -> None:
             f"{tile.globalConfigBits}. Delete the file to regenerate it."
         )
     writer.outFileName = _module_path(writer, tile.name, tile.directory)
-    generate_config_mem(writer, tile.name, memory)
+    generate_config_mem(writer, tile.name, memory, config_bit_mode=config_bit_mode)
 
 
 def validate_super_tile_config_mem(
@@ -254,7 +298,11 @@ def build_super_tile_config_mem(
 
 
 def generate_super_tile_config_mem(
-    writer: CodeGenerator, super_tile: "SuperTile", master: ConfigMem
+    writer: CodeGenerator,
+    super_tile: "SuperTile",
+    master: ConfigMem,
+    *,
+    config_bit_mode: ConfigBitMode,
 ) -> None:
     """Give a supertile its configuration memory and generate the module for it.
 
@@ -271,6 +319,8 @@ def generate_super_tile_config_mem(
         The supertile the memory belongs to.
     master : ConfigMem
         The master tile's memory, whose free crosspoints the bits take.
+    config_bit_mode : ConfigBitMode
+        The storage the module instantiates.
 
     Raises
     ------
@@ -302,4 +352,9 @@ def generate_super_tile_config_mem(
         super_tile.config_mem.to_csv()
 
     writer.outFileName = _module_path(writer, super_tile.name, super_tile.directory)
-    generate_config_mem(writer, super_tile.name, super_tile.config_mem)
+    generate_config_mem(
+        writer,
+        super_tile.name,
+        super_tile.config_mem,
+        config_bit_mode=config_bit_mode,
+    )

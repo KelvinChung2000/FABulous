@@ -498,26 +498,38 @@ def script_cmd(
         ),
     ],
     script_type: Annotated[
-        ScriptType,
+        ScriptType | None,
         typer.Option(
             "--type",
             "-t",
             help="Override script type detection",
             case_sensitive=False,
         ),
-    ] = ScriptType.TCL,
+    ] = None,
     force: ForceType = False,
 ) -> None:
     """Execute a script file with auto-detection of script type.
 
-    Automatically detects whether the script is a FABulous (.fab, .fs) or TCL (.tcl)
-    script based on file extension and content. You can override the detection with
-    --type.
+    Detects whether the script is a FABulous (.fab, .fs) or TCL (.tcl) script from
+    its file extension. --type overrides the detection and is required for any other
+    extension.
 
     If no project directory is specified, uses the current directory.
     """
-    # Initialize context
     script_file = script_file.absolute()
+    if script_type is None:
+        match script_file.suffix.lower():
+            case ".fab" | ".fs":
+                script_type = ScriptType.FABULOUS
+            case ".tcl":
+                script_type = ScriptType.TCL
+            case _:
+                logger.error(
+                    f"Cannot detect the script type of {script_file} from its "
+                    "extension. Use .fab, .fs or .tcl, or pass --type fabulous|tcl."
+                )
+                raise typer.Exit(1)
+
     repl = FABulousREPL(
         writerType=get_context().proj_lang,
         force=force,
@@ -533,32 +545,25 @@ def script_cmd(
         logger.error(f"Script file {script_file} does not exist")
         raise typer.Exit(1)
 
-    # Execute the script based on type
-    if (
-        script_file.suffix.lower() in [".fab", ".fs"] and script_type is None
-    ) or script_type == "fabulous":
-        repl.onecmd_plus_hooks(f"run_script {script_file.absolute()}")
-        if repl.exit_code:
-            logger.error(
-                f"FABulous script {script_file} execution failed with "
-                f"exit code {repl.exit_code}"
-            )
-            raise typer.Exit(repl.exit_code)
-        logger.info(f"FABulous script {script_file} executed successfully")
-    elif (
-        script_file.suffix.lower() == ".tcl" and script_type is None
-    ) or script_type == "tcl":
-        repl.onecmd_plus_hooks(f"run_tcl {script_file.absolute()}")
-        if repl.exit_code:
-            logger.error(
-                f"TCL script {script_file} execution failed with "
-                f"exit code {repl.exit_code}"
-            )
-            raise typer.Exit(repl.exit_code)
-        logger.info(f"TCL script {script_file} executed successfully")
-    else:
-        logger.error(f"Unknown script type: {script_type}")
-        raise typer.Exit(1)
+    match script_type:
+        case ScriptType.FABULOUS:
+            repl.onecmd_plus_hooks(f"run_script {script_file}")
+            if repl.exit_code:
+                logger.error(
+                    f"FABulous script {script_file} execution failed with "
+                    f"exit code {repl.exit_code}"
+                )
+                raise typer.Exit(repl.exit_code)
+            logger.info(f"FABulous script {script_file} executed successfully")
+        case ScriptType.TCL:
+            repl.onecmd_plus_hooks(f"run_tcl {script_file}")
+            if repl.exit_code:
+                logger.error(
+                    f"TCL script {script_file} execution failed with "
+                    f"exit code {repl.exit_code}"
+                )
+                raise typer.Exit(repl.exit_code)
+            logger.info(f"TCL script {script_file} executed successfully")
 
 
 @app.command("start")
@@ -938,7 +943,7 @@ def convert_legacy_args_with_deprecation_warning() -> None:
         try:
             script_cmd(
                 script_file=args.FABulousScript,
-                script_type="fabulous",
+                script_type=ScriptType.FABULOUS,
                 force=args.force,
             )
         except typer.Exit as e:
@@ -950,7 +955,7 @@ def convert_legacy_args_with_deprecation_warning() -> None:
         try:
             script_cmd(
                 script_file=args.TCLScript,
-                script_type="tcl",
+                script_type=ScriptType.TCL,
                 force=args.force,
             )
         except typer.Exit as e:

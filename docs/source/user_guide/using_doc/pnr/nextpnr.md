@@ -98,7 +98,6 @@ A `FABULOUS_LC` block looks like:
     CFG,I0mux
     CFG,SET_NORESET
     CFG,INIT
-    CFG,IOmux
     GlobalClk
     BelEnd
 ```
@@ -190,7 +189,6 @@ A `FABULOUS_LC` block with timing:
     CFG,I0mux
     CFG,SET_NORESET
     CFG,INIT
-    CFG,IOmux
     Clock,CLK,FF=1
     Delay,I0,O,3.0,FF=0
     Delay,I1,O,3.0,FF=0

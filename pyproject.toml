@@ -31,7 +31,7 @@ dependencies = [
   "pydantic-settings>=2.10.1",
   "packaging>=25.0",
   "typer>=0.20.0",
-  "FABulous-bit-gen>=0.3.1",
+  "FABulous-bit-gen>=0.4.0",
   'PyYAML>=6.0.0',
   # ihp-sg13cmos5l needs ciel 3; 3.1.0.dev4 is the first PyPI librelane with it.
   "librelane>=3.1.0.dev4",
@@ -167,6 +167,9 @@ extend_exclude = [
   "fabulous/fabric_generator/gds_generator/script",
   "docs",
   "build_hooks.py",
+  # Standalone tools, not part of the package. Some declare their dependencies
+  # in a PEP 723 block, which deptry does not read.
+  "scripts",
 ]
 
 [tool.deptry.per_rule_ignores]

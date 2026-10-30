@@ -11,6 +11,7 @@ from pathlib import Path
 import pytest
 
 from fabulous.fabric_definition.configmem import ConfigMem, ConfigMemFrame
+from fabulous.fabric_definition.define import ConfigBitMode
 from fabulous.fabric_definition.fabric import Fabric
 from fabulous.fabric_definition.supertile import SuperTile
 from fabulous.fabric_definition.switch_matrix import SwitchMatrix
@@ -245,13 +246,13 @@ class TestDefaultConfigMemCsv:
 class TestGeneratedConfigMemRTL:
     """Parametric test cases for generate_config_mem function."""
 
-    def test_configmem_rtl_generates_correct_lhqd1_instantiations(
+    def test_configmem_rtl_generates_correct_config_prims_instantiations(
         self,
         fabric_config: Fabric,
         tile_config: Tile,
         code_generator_factory: Callable[..., CodeGenerator],
     ) -> None:
-        """Test generate_config_mem creates RTL with right number of config_latch."""
+        """Test generate_config_mem creates RTL with right number of config prims."""
         # Create code generator
         writer = code_generator_factory(".v")
 
@@ -278,6 +279,7 @@ class TestGeneratedConfigMemRTL:
                 max_frames_per_col=fabric_config.maxFramesPerCol,
                 source=Path("ConfigMem.csv"),
             ),
+            config_bit_mode=fabric_config.configBitMode,
         )
 
         # Verify output file was created and contains expected content
@@ -290,23 +292,42 @@ class TestGeneratedConfigMemRTL:
         # Read and verify the generated content
         content = output_file.read_text()
 
-        # Count actual config_latch instantiations in content
-        actual_instantiations = content.count("config_latch")
+        match fabric_config.configBitMode:
+            case ConfigBitMode.FRAME_BASED:
+                expected_prim, unwanted_prim = "config_latch", "config_dff"
+            case ConfigBitMode.FLIPFLOP_CHAIN:
+                expected_prim, unwanted_prim = "config_dff", "config_latch"
+        actual_instantiations = content.count(expected_prim)
         assert actual_instantiations == tile_config.globalConfigBits, (
-            f"Expected {tile_config.globalConfigBits} config_latch instantiations, "
-            f"found {actual_instantiations}"
+            f"Expected {tile_config.globalConfigBits} {expected_prim} "
+            f"instantiations, found {actual_instantiations}"
+        )
+        assert content.count(unwanted_prim) == 0, (
+            f"{unwanted_prim} shouldn't be instantiated in "
+            f"{fabric_config.configBitMode.value} mode"
         )
 
-    def test_configmem_rtl_maps_frame_signals_to_config_bits_correctly(
+    @pytest.mark.parametrize(
+        "config_bit_mode",
+        [ConfigBitMode.FRAME_BASED, ConfigBitMode.FLIPFLOP_CHAIN],
+        ids=["frame_based", "flipflop_chain"],
+    )
+    def test_configmem_rtl_maps_signals_to_config_bits_correctly(
         self,
         default_fabric: Fabric,
         default_tile: Tile,
         configmem_list: Callable[[Fabric, Tile], list[ConfigMemFrame]],
         tmp_path: Path,
         code_generator_factory: Callable[[str, str], CodeGenerator],
+        config_bit_mode: ConfigBitMode,
     ) -> None:
-        """Test that generated RTL correctly maps FrameData and FrameStrobe to
-        ConfigBits."""
+        """Verify generated RTL wires each config bit to the correct source signal.
+
+        FRAME_BASED: each bit is driven by a unique (FrameData, FrameStrobe) pair.
+        FLIPFLOP_CHAIN: bits form a shift register. The first bit comes from
+        CONFin, each subsequent bit from the previous bit's Q, and CONFout is
+        driven by the last bit in the chain.
+        """
         # Create code generator
         writer = code_generator_factory(".v", f"{default_tile.name}_ConfigMem")
         writer.outFileName = tmp_path / f"{default_tile.name}_ConfigMem.v"
@@ -322,50 +343,92 @@ class TestGeneratedConfigMemRTL:
         memory.to_csv()
 
         # Generate the ConfigMem RTL
-        generate_config_mem(writer, default_tile.name, memory)
+        generate_config_mem(
+            writer, default_tile.name, memory, config_bit_mode=config_bit_mode
+        )
 
         # Read the generated RTL
         rtl_content = writer.outFileName.read_text()
 
-        # Verify each frame mapping
-        for config_mem in config_memlist_data:
-            if not config_mem.bits:
-                continue
+        match config_bit_mode:
+            case ConfigBitMode.FRAME_BASED:
+                # Verify each frame mapping
+                for config_mem in config_memlist_data:
+                    if not config_mem.bits:
+                        continue
 
-            frame_idx = config_mem.frame_index
-            bit_mask = config_mem.used_bits_mask
-            expected_config_bits = config_mem.config_bit_ranges
+                    frame_idx = config_mem.frame_index
+                    bit_mask = config_mem.used_bits_mask
+                    expected_config_bits = config_mem.config_bit_ranges
 
-            # Check each bit in the frame
-            config_bit_counter = 0
-            for bit_pos in range(len(bit_mask)):
-                if bit_mask[bit_pos] == "1":
-                    # This bit should be connected
-                    frame_data_bit = default_fabric.frameBitsPerRow - 1 - bit_pos
-                    frame_strobe_bit = frame_idx
-                    expected_config_bit = expected_config_bits[config_bit_counter]
+                    # Check each bit in the frame
+                    config_bit_counter = 0
+                    for bit_pos in range(len(bit_mask)):
+                        if bit_mask[bit_pos] == "1":
+                            # This bit should be connected
+                            frame_data_bit = (
+                                default_fabric.frameBitsPerRow - 1 - bit_pos
+                            )
+                            frame_strobe_bit = frame_idx
+                            expected_config_bit = expected_config_bits[
+                                config_bit_counter
+                            ]
 
-                    # Verify the config_latch instantiation exists with correct
-                    # connections
-                    expected_inst_name = (
-                        f"Inst_{config_mem.frame_name}_bit{frame_data_bit}"
+                            # Verify the config_latch instantiation exists with correct
+                            # connections
+                            expected_inst_name = (
+                                f"Inst_{config_mem.frame_name}_bit{frame_data_bit}"
+                            )
+                            assert expected_inst_name in rtl_content, (
+                                "Missing config_latch instantiation: "
+                                f"{expected_inst_name}"
+                            )
+
+                            # Verify the port connections
+                            connection = (
+                                f"    .D(FrameData[{frame_data_bit}]),\n"
+                                f"    .E(FrameStrobe[{frame_strobe_bit}]),\n"
+                                f"    .Q(ConfigBits[{expected_config_bit}]),\n"
+                                f"    .QN(ConfigBits_N[{expected_config_bit}])"
+                            )
+                            assert connection in rtl_content, (
+                                f"Missing connection {connection} for "
+                                f"{expected_inst_name}"
+                            )
+
+                            config_bit_counter += 1
+
+            case ConfigBitMode.FLIPFLOP_CHAIN:
+                mapped_indices: list[int] = []
+                for config_mem in config_memlist_data:
+                    mapped_indices.extend(config_mem.config_bit_ranges)
+
+                assert mapped_indices, (
+                    "FF-chain branch requires at least one mapped config bit"
+                )
+
+                for i, curr_bit in enumerate(mapped_indices):
+                    d_source = (
+                        "CONFin" if i == 0 else f"ConfigBits[{mapped_indices[i - 1]}]"
                     )
+                    expected_inst_name = f"Inst_ConfigBit_FF{curr_bit}"
                     assert expected_inst_name in rtl_content, (
-                        f"Missing config_latch instantiation: {expected_inst_name}"
+                        f"Missing config_dff instantiation: {expected_inst_name}"
                     )
-
-                    # Verify the port connections
                     connection = (
-                        f"    .D(FrameData[{frame_data_bit}]),\n"
-                        f"    .E(FrameStrobe[{frame_strobe_bit}]),\n"
-                        f"    .Q(ConfigBits[{expected_config_bit}]),\n"
-                        f"    .QN(ConfigBits_N[{expected_config_bit}])"
+                        f"    .D({d_source}),\n"
+                        f"    .CLK(CONF_CLK),\n"
+                        f"    .Q(ConfigBits[{curr_bit}]),\n"
+                        f"    .QN(ConfigBits_N[{curr_bit}])"
                     )
                     assert connection in rtl_content, (
-                        f"Missing connection {connection} for {expected_inst_name}"
+                        f"Missing connection for {expected_inst_name}:\n{connection}"
                     )
 
-                    config_bit_counter += 1
+                last_bit = mapped_indices[-1]
+                assert f"CONFout = ConfigBits[{last_bit}]" in rtl_content, (
+                    f"Missing CONFout assignment for last bit {last_bit}"
+                )
 
 
 def _write_configmem_csv(path: Path, masks: list[str], ranges: list[str]) -> None:
@@ -580,11 +643,12 @@ class TestGenerateSuperTileConfigMem:
             source=tmp_path / "ST_ConfigMem.csv",
         )
         stale.to_csv()
+        child = make_empty_tile("C")
         super_tile = SuperTile(
             name="ST",
             tileDir=tmp_path / "ST.csv",
-            tiles=[],
-            tileMap=[[]],
+            tiles=[child],
+            tileMap=[[child]],
             switch_matrix=SwitchMatrix(
                 matrix_file=tmp_path / "ST_switch_matrix.csv",
                 connections={},
@@ -595,7 +659,10 @@ class TestGenerateSuperTileConfigMem:
 
         with pytest.raises(ValueError, match="maps no configuration bits"):
             generate_super_tile_config_mem(
-                code_generator_factory(".v"), super_tile, master
+                code_generator_factory(".v"),
+                super_tile,
+                master,
+                config_bit_mode=ConfigBitMode.FRAME_BASED,
             )
 
     def test_a_supertile_declared_in_the_fabric_csv_is_found_by_its_children(
@@ -629,7 +696,12 @@ class TestGenerateSuperTileConfigMem:
             ),
         )
 
-        generate_super_tile_config_mem(code_generator_factory(".v"), super_tile, master)
+        generate_super_tile_config_mem(
+            code_generator_factory(".v"),
+            super_tile,
+            master,
+            config_bit_mode=ConfigBitMode.FRAME_BASED,
+        )
 
         assert (st_dir / "ST_ConfigMem.v").is_file()
 
@@ -660,7 +732,11 @@ class TestGenerateTileConfigMem:
         )
         tile = self._tile(tmp_path, empty)
 
-        generate_tile_config_mem(code_generator_factory(".v"), tile)
+        generate_tile_config_mem(
+            code_generator_factory(".v"),
+            tile,
+            config_bit_mode=ConfigBitMode.FRAME_BASED,
+        )
 
         assert tile.config_mem.config_bits == 4
         assert (tmp_path / "T_ConfigMem.csv").is_file()
@@ -685,7 +761,11 @@ class TestGenerateTileConfigMem:
                 tile.switch_matrix, matrix_file=elsewhere / "Shared_matrix.csv"
             )
 
-        generate_tile_config_mem(code_generator_factory(".v"), tile)
+        generate_tile_config_mem(
+            code_generator_factory(".v"),
+            tile,
+            config_bit_mode=ConfigBitMode.FRAME_BASED,
+        )
 
         assert (tmp_path / "T_ConfigMem.v").is_file()
         assert not (elsewhere / "T_ConfigMem.v").exists()
@@ -704,7 +784,11 @@ class TestGenerateTileConfigMem:
         )
         tile.config_mem = replace(tile.config_mem, source=tile_dir / "T_ConfigMem.csv")
 
-        generate_tile_config_mem(code_generator_factory(".v"), tile)
+        generate_tile_config_mem(
+            code_generator_factory(".v"),
+            tile,
+            config_bit_mode=ConfigBitMode.FRAME_BASED,
+        )
 
         assert (tile_dir / "T_ConfigMem.v").is_file()
 
@@ -722,7 +806,11 @@ class TestGenerateTileConfigMem:
         tile = self._tile(tmp_path, empty)
 
         with pytest.raises(ValueError, match="maps no configuration bits"):
-            generate_tile_config_mem(code_generator_factory(".v"), tile)
+            generate_tile_config_mem(
+                code_generator_factory(".v"),
+                tile,
+                config_bit_mode=ConfigBitMode.FRAME_BASED,
+            )
 
     def test_a_mapping_for_another_tile_is_refused(
         self, tmp_path: Path, code_generator_factory: Callable[..., CodeGenerator]
@@ -737,4 +825,8 @@ class TestGenerateTileConfigMem:
         tile = self._tile(tmp_path, wrong)
 
         with pytest.raises(ValueError, match="maps 7 bits but T has 4"):
-            generate_tile_config_mem(code_generator_factory(".v"), tile)
+            generate_tile_config_mem(
+                code_generator_factory(".v"),
+                tile,
+                config_bit_mode=ConfigBitMode.FRAME_BASED,
+            )

@@ -10,6 +10,10 @@ and the same `_harden_tile` body, so a flag added there reaches both parsers and
 needs no per-command wiring. The flags belonging to only one of them
 (`--io-pin-config`, `--parallel`) stay on that subcommand, where argparse
 rejects them on the other.
+
+`tile`, `all_tile` and `stitch` also share the LibreLane run-selection flags
+through `FlowResumeOptions`. Its per-flow subclasses differ only in the step IDs
+that complete `--from`, since the tile and stitching flows run different steps.
 """
 
 from collections.abc import Callable
@@ -190,6 +194,87 @@ class TileHardeningOptions(ArgumentBlock):
         return opt_mode, custom_overrides
 
 
+def _from_option(
+    step_ids: Callable[["MacroFlowCommandSet"], list[str]] | None,
+) -> Option:
+    return Option(
+        "--from",
+        metavar="STEP",
+        choices_provider=step_ids,
+        help_text=(
+            "LibreLane step ID to start from, such as OpenROAD.GlobalRouting. "
+            "Earlier steps are skipped and STEP reads its input state from the "
+            "run that --run-tag or --last-run selects."
+        ),
+    )
+
+
+@dataclass
+class FlowResumeOptions(ArgumentBlock):
+    """Run-selection flags for the `gen_macro` subcommands that run a LibreLane flow.
+
+    Subclasses redefine `frm` to complete it with the step IDs of their flow.
+    """
+
+    frm: Annotated[str | None, _from_option(None)] = None
+    run_tag: Annotated[
+        str | None,
+        Option(
+            "--run-tag",
+            metavar="TAG",
+            help_text="Name of the LibreLane run directory under runs/ to create or "
+            "resume.",
+        ),
+    ] = None
+    last_run: Annotated[
+        bool,
+        Option("--last-run", help_text="Resume the newest LibreLane run."),
+    ] = False
+
+    def validate(self) -> None:
+        """Reject flag combinations before any flow starts.
+
+        Called once per command invocation, so a bad combination aborts the
+        `all_tile` fan-out instead of failing every tile in it.
+
+        Raises
+        ------
+        CommandError
+            If both `--run-tag` and `--last-run` are given, or `--from` is given
+            without either.
+        """
+        if self.run_tag is not None and self.last_run:
+            raise CommandError("Specify only one of --run-tag / --last-run.")
+        if self.frm is not None and self.run_tag is None and not self.last_run:
+            raise CommandError(
+                "--from needs a run to resume. Add --last-run or --run-tag TAG."
+            )
+
+
+@dataclass
+class TileResumeOptions(FlowResumeOptions):
+    """`FlowResumeOptions` completing `--from` with the tile flow's step IDs."""
+
+    frm: Annotated[
+        str | None,
+        _from_option(
+            lambda self: [s.id for s in self._cmd.fabulousAPI.tile_flow_cls.Steps]
+        ),
+    ] = None
+
+
+@dataclass
+class StitchResumeOptions(FlowResumeOptions):
+    """`FlowResumeOptions` completing `--from` with the stitching flow's step IDs."""
+
+    frm: Annotated[
+        str | None,
+        _from_option(
+            lambda self: [s.id for s in self._cmd.fabulousAPI.fabric_flow_cls.Steps]
+        ),
+    ] = None
+
+
 class MacroFlowCommandSet(ReplCommandSet):
     """Harden tiles and the fabric into GDS macros via the LibreLane flow."""
 
@@ -218,6 +303,7 @@ class MacroFlowCommandSet(ReplCommandSet):
             ),
         ],
         options: TileHardeningOptions,
+        resume: TileResumeOptions,
         io_pin_config: Annotated[
             Path | None,
             Option(
@@ -232,6 +318,7 @@ class MacroFlowCommandSet(ReplCommandSet):
         physical representation of the tile to be created.
         """
         opt_mode, custom_overrides = options.resolve()
+        resume.validate()
         if not is_pdk_config_set():
             logger.error(
                 "PDK configuration is not set. Please set the PDK configuration to "
@@ -239,13 +326,16 @@ class MacroFlowCommandSet(ReplCommandSet):
             )
             return
 
-        self._harden_tile(tile, opt_mode, custom_overrides, io_pin_config=io_pin_config)
+        self._harden_tile(
+            tile, opt_mode, custom_overrides, resume, io_pin_config=io_pin_config
+        )
 
     def _harden_tile(
         self,
         tile: str,
         opt_mode: OptMode,
         custom_overrides: dict,
+        resume: FlowResumeOptions,
         *,
         io_pin_config: Path | None = None,
     ) -> None:
@@ -259,6 +349,8 @@ class MacroFlowCommandSet(ReplCommandSet):
             The optimisation mode resolved by `TileHardeningOptions.resolve`.
         custom_overrides : dict
             The LibreLane config overrides resolved alongside `opt_mode`.
+        resume : FlowResumeOptions
+            The run to resume and the step to start from.
         io_pin_config : Path | None
             Pin order file to use as-is. Defaults to None, which generates the
             tile's pin order from the fabric structure.
@@ -293,12 +385,16 @@ class MacroFlowCommandSet(ReplCommandSet):
             base_config_path=repl.projectDir / "Tile" / "include" / "gds_config.yaml",
             config_override_path=tile_dir / "gds_config.yaml",
             custom_config_overrides=custom_overrides or None,
+            frm=resume.frm,
+            run_tag=resume.run_tag,
+            last_run=resume.last_run,
         )
 
     @with_annotated(subcommand_to="gen_macro", help="Harden every tile in the fabric")
     def gen_macro_all_tile(
         self,
         options: TileHardeningOptions,
+        resume: TileResumeOptions,
         parallel: Annotated[
             bool,
             Option("--parallel", "-p", help_text="Generate tile macros in parallel"),
@@ -306,6 +402,7 @@ class MacroFlowCommandSet(ReplCommandSet):
     ) -> None:
         """Generate GDSII files for all tiles in the fabric."""
         opt_mode, custom_overrides = options.resolve()
+        resume.validate()
         if not is_pdk_config_set():
             logger.error(
                 "PDK configuration is not set. Please set the PDK configuration to "
@@ -317,13 +414,13 @@ class MacroFlowCommandSet(ReplCommandSet):
         tiles = sorted(repl.all_tile)
         if not parallel:
             for tile in tiles:
-                self._harden_tile(tile, opt_mode, custom_overrides)
+                self._harden_tile(tile, opt_mode, custom_overrides, resume)
             return
 
         with ThreadPoolExecutor(max_workers=repl.max_job) as executor:
             running = {
                 executor.submit(
-                    self._harden_tile, tile, opt_mode, custom_overrides
+                    self._harden_tile, tile, opt_mode, custom_overrides, resume
                 ): tile
                 for tile in tiles
             }
@@ -337,8 +434,9 @@ class MacroFlowCommandSet(ReplCommandSet):
         subcommand_to="gen_macro",
         help="Stitch the hardened tile macros into the fabric macro",
     )
-    def gen_macro_stitch(self) -> None:
+    def gen_macro_stitch(self, resume: StitchResumeOptions) -> None:
         """Generate GDSII files for the entire fabric."""
+        resume.validate()
         repl = self._cmd
         if not is_pdk_config_set():
             logger.error(
@@ -373,6 +471,9 @@ class MacroFlowCommandSet(ReplCommandSet):
             cast("str", get_context().pdk),
             cast("Path", get_context().pdk_root),
             base_config_path=repl.projectDir / "Fabric" / "gds_config.yaml",
+            frm=resume.frm,
+            run_tag=resume.run_tag,
+            last_run=resume.last_run,
         )
 
     @with_annotated(

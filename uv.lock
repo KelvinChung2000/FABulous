@@ -1,5 +1,5 @@
 version = 1
-revision = 5
+revision = 3
 requires-python = ">=3.12"
 
 [[package]]
@@ -647,16 +647,15 @@ wheels = [
 
 [[package]]
 name = "fabulous-bit-gen"
-version = "0.3.1"
+version = "0.4.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "fabulous-fasm" },
     { name = "loguru" },
-    { name = "packaging" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/20/a4/d44330a4f17239ae33b49f6e6d1c57b14f4f637e7ed6f25e5066adc41fa4/fabulous_bit_gen-0.3.1.tar.gz", hash = "sha256:3f8ae49fb602c5159f7cfacfd2bdfb829652ec82c022ed4f3b563fbb66140ec8", size = 4133818, upload-time = "2026-07-03T12:53:15.275Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/03/0d/5f298a945d10213ead6b365de6d7eb0b52484e00d0eaec10e0f9f6a22a02/fabulous_bit_gen-0.4.0.tar.gz", hash = "sha256:6f6d3bb46563b6d99125ae617e8fab0cd64c8d9ec1248afd81c03d38a317667e", size = 4135064, upload-time = "2026-10-30T10:41:19.77Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/7f/f6/7d66b1e76778c85dcc2c6e696eb41f55e9ea40efc0326687b6c3bf143b6a/fabulous_bit_gen-0.3.1-py3-none-any.whl", hash = "sha256:b32cc5806ea5866fabb6b4113c1d3ce795fe8b366ad9b40458210278d03c5214", size = 14638, upload-time = "2026-07-03T12:53:13.415Z" },
+    { url = "https://files.pythonhosted.org/packages/d9/1a/21b119c7494f21ad39e2b7ec927d6fe6ead97c0d4e8adc5d4ef2d2da987b/fabulous_bit_gen-0.4.0-py3-none-any.whl", hash = "sha256:605a026c25cf3191a208a88ae32df18c10ffe125a7e59f936f3a9bb8a71faf2e", size = 13899, upload-time = "2026-10-30T10:41:18.317Z" },
 ]
 
 [[package]]
@@ -718,7 +717,7 @@ requires-dist = [
     { name = "ciel", specifier = ">=3.0.0" },
     { name = "cmd2", specifier = ">=4.1.2" },
     { name = "dill", specifier = ">=0.4.0" },
-    { name = "fabulous-bit-gen", specifier = ">=0.3.1" },
+    { name = "fabulous-bit-gen", specifier = ">=0.4.0" },
     { name = "go-task-bin", specifier = ">=3.40.0" },
     { name = "jinja2", specifier = ">=3.1.6" },
     { name = "librelane", specifier = ">=3.1.0.dev4" },

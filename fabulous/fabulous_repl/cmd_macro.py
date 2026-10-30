@@ -12,8 +12,8 @@ needs no per-command wiring. The flags belonging to only one of them
 rejects them on the other.
 
 The LibreLane run-selection flags live in `FlowResumeOptions`, which `stitch`
-takes directly and `TileHardeningOptions` extends. `start_flow` validates them,
-so a bad combination fails when the flow starts rather than here.
+takes directly and `TileHardeningOptions` extends. LibreLane validates them, so
+a bad combination fails when the flow starts rather than here.
 """
 
 from collections.abc import Callable, Mapping, Sequence
@@ -324,7 +324,7 @@ class MacroFlowCommandSet(ReplCommandSet):
         custom_overrides : dict
             The LibreLane config overrides resolved alongside `opt_mode`.
         resume : FlowResumeOptions
-            The run to fork or resume and the step to start from.
+            The run to fork and the step the fork starts from.
         io_pin_config : Path | None
             Pin order file to use as-is. Defaults to None, which generates the
             tile's pin order from the fabric structure.

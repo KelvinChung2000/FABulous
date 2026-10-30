@@ -379,7 +379,7 @@ fabulous> gen_macro tile LUT4AB --last-run --from FABulous.TileAreaOptimisation
 fabulous> gen_macro stitch --run-tag RUN_2026-10-30_12-00-00 --from KLayout.DRC
 ```
 
-Pressing Tab after `--from` lists the step IDs of the flow. A step that appears more than once carries a suffix on its later occurrences, such as `OpenROAD.STAMidPNR-1`. The step must have run in the source run, otherwise the command fails and lists the steps that did. The input state points at view files inside the source run, so deleting the source run breaks the fork.
+Pressing Tab after `--from` lists the step IDs of the flow. A step that appears more than once carries a suffix on its later occurrences, such as `OpenROAD.STAMidPNR-1`. The step must have run in the source run. The input state points at view files inside the source run, so deleting the source run breaks the fork.
 
 Tile runs live in `Tile/<tile>/macro/<mode>/runs/`, where `<mode>` is the `--optimise` mode, and fabric runs in `Fabric/macro/runs/`. `--last-run` on a tile therefore only finds a run made with the same `--optimise` mode. The config is rebuilt from the current flags on every invocation, so forking with different sizing flags gives the remaining steps a config the earlier steps did not run under.
 

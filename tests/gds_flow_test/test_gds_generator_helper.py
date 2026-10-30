@@ -8,7 +8,6 @@ from unittest.mock import MagicMock
 
 import pytest
 from librelane.config.config import Config
-from librelane.flows.flow import FlowException
 from librelane.state.state import State
 from pytest_mock import MockerFixture
 
@@ -392,6 +391,7 @@ class TestStartFlow:
             (None, "RUN_A", False),
             (None, None, True),
             ("OpenROAD.Floorplan", None, False),
+            ("OpenROAD.Floorplan", "RUN_A", True),
         ],
     )
     def test_passes_through_without_fork(
@@ -426,32 +426,3 @@ class TestStartFlow:
         kwargs = flow.start.call_args.kwargs
         assert kwargs.keys() == {"with_initial_state", "frm"}
         assert kwargs["with_initial_state"].metrics["mark"] == mark
-
-    @pytest.mark.parametrize(
-        ("frm", "run_tag", "last_run", "match"),
-        [
-            ("OpenROAD.Floorplan", "RUN_C", False, "does not exist"),
-            ("KLayout.DRC", "RUN_A", False, "never ran"),
-            ("OpenROAD.Floorplan", "RUN_A", True, "cannot be used together"),
-        ],
-    )
-    def test_fork_errors(
-        self,
-        mocker: MockerFixture,
-        runs: Path,
-        frm: str,
-        run_tag: str | None,
-        last_run: bool,
-        match: str,
-    ) -> None:
-        flow = mocker.MagicMock(design_dir=str(runs))
-        with pytest.raises(FlowException, match=match):
-            start_flow(flow, frm=frm, run_tag=run_tag, last_run=last_run)
-        flow.start.assert_not_called()
-
-    def test_last_run_without_runs_raises(
-        self, mocker: MockerFixture, tmp_path: Path
-    ) -> None:
-        flow = mocker.MagicMock(design_dir=str(tmp_path))
-        with pytest.raises(FlowException, match="without any runs"):
-            start_flow(flow, frm="OpenROAD.Floorplan", last_run=True)

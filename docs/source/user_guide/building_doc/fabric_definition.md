@@ -914,7 +914,7 @@ package attr_pack_LUT4AB_LUT4c_frame_config_dffesr is
   attribute INIT_1      : integer;
   -- ... one attribute per BelMap feature ...
   attribute FAB_ATTR_FF : integer;
-  attribute IOmux       : integer;
+  attribute I0mux       : integer;
   attribute SET_NORESET : integer;
   attribute EXTERNAL    : string;
   attribute SHARED_PORT : string;
@@ -940,7 +940,7 @@ entity LUT4c_frame_config_dffesr is
   attribute INIT_1 of LUT4c_frame_config_dffesr      : entity is 1;
   -- ... remaining BelMap feature attributes ...
   attribute FAB_ATTR_FF of LUT4c_frame_config_dffesr : entity is 16;
-  attribute IOmux of LUT4c_frame_config_dffesr       : entity is 17;
+  attribute I0mux of LUT4c_frame_config_dffesr       : entity is 17;
   attribute SET_NORESET of LUT4c_frame_config_dffesr : entity is 18;
   attribute EXTERNAL of UserCLK                      : signal is "TRUE";
   attribute SHARED_PORT of UserCLK                   : signal is "TRUE";
@@ -989,7 +989,7 @@ INIT[13]=13,
 INIT[14]=14,
 INIT[15]=15,
 FF=16,
-IOmux=17,
+I0mux=17,
 SET_NORESET=18
 *)
 module LUT4c_frame_config (I0, I1, I2, I3, O, Ci, Co, SR, EN, UserCLK, ConfigBits);
@@ -998,7 +998,7 @@ parameter NoConfigBits = 19 ;
 endmodule
 ```
 
-In this example, the LUT4 has 16 configuration bits for `INIT` values (mapping to indices 0-15), 1 bit for `FF` (the flip-flop bypass switch at index 16), 1 bit for `IOmux` (the carry input switch at index 17), and 1 bit for `SET_NORESET` (the SET or RESET switch at index 18), totaling 19 configuration bits.
+In this example, the LUT4 has 16 configuration bits for `INIT` values (mapping to indices 0-15), 1 bit for `FF` (the flip-flop bypass switch at index 16), 1 bit for `I0mux` (the carry input switch at index 17), and 1 bit for `SET_NORESET` (the SET or RESET switch at index 18), totaling 19 configuration bits.
 
 ##### VHDL BelMap
 
@@ -1015,7 +1015,7 @@ entity LUT4c_frame_config_dffesr is
   attribute INIT_1 of LUT4c_frame_config_dffesr      : entity is 1;
   -- ...
   attribute FAB_ATTR_FF of LUT4c_frame_config_dffesr : entity is 16;
-  attribute IOmux of LUT4c_frame_config_dffesr       : entity is 17;
+  attribute I0mux of LUT4c_frame_config_dffesr       : entity is 17;
   attribute SET_NORESET of LUT4c_frame_config_dffesr : entity is 18;
 end entity LUT4c_frame_config_dffesr;
 ```

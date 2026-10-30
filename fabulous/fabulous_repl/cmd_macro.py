@@ -146,7 +146,7 @@ class FlowResumeOptions(ArgumentBlock):
             metavar="STEP",
             choices_provider=_flow_step_ids,
             help_text=(
-                "LibreLane step ID to start from, such as OpenROAD.GlobalRouting. "
+                "LibreLane step ID to start from, such as KLayout.DRC. "
                 "Earlier steps are skipped and STEP reads its input state from the "
                 "run that --run-tag or --last-run selects."
             ),

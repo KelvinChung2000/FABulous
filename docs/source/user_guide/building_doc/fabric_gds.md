@@ -375,7 +375,7 @@ When a tile or fabric run fails, `start_openroad_gui --last-run --tile <tile_nam
 `gen_macro tile`, `gen_macro all_tile` and `gen_macro stitch` restart a LibreLane run at any step with `--from <step>`. The step reads its input state from an earlier run, which `--last-run` selects as the newest run and `--run-tag <tag>` selects by name.
 
 ```bash
-fabulous> gen_macro tile LUT4AB --last-run --from OpenROAD.GlobalRouting
+fabulous> gen_macro tile LUT4AB --last-run --from FABulous.TileAreaOptimisation
 fabulous> gen_macro stitch --run-tag RUN_2026-10-30_12-00-00 --from KLayout.DRC
 ```
 

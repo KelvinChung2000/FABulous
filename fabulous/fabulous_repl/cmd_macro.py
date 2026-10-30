@@ -11,9 +11,9 @@ needs no per-command wiring. The flags belonging to only one of them
 (`--io-pin-config`, `--parallel`) stay on that subcommand, where argparse
 rejects them on the other.
 
-`tile`, `all_tile` and `stitch` also share the LibreLane run-selection flags
-through `FlowResumeOptions`. LibreLane validates them, so a bad combination fails
-in `Flow.start` rather than here.
+The LibreLane run-selection flags live in `FlowResumeOptions`, which `stitch`
+takes directly and `TileHardeningOptions` extends. LibreLane validates them, so
+a bad combination fails in `Flow.start` rather than here.
 """
 
 from collections.abc import Callable, Mapping, Sequence
@@ -118,9 +118,58 @@ def _resolve_directional_fix(
     return opt_mode, None
 
 
+def _flow_step_ids(
+    repl: "FABulousREPL", arg_tokens: Mapping[str, Sequence[str]]
+) -> Choices:
+    """List the step IDs of the LibreLane flow the `gen_macro` subcommand runs.
+
+    cmd2 passes the app as `repl` because this function is not defined on a
+    `CommandSet`. `arg_tokens` carries the subcommand name under its parser dest.
+    """
+    api = repl.fabulousAPI
+    if arg_tokens["subcommand"] == ["stitch"]:
+        flow = api.fabric_flow_cls
+    else:
+        flow = api.tile_flow_cls
+    # Keep the flow's execution order rather than sorting alphabetically.
+    return Choices.from_values((step.id for step in flow.Steps), is_sorted=True)
+
+
 @dataclass
-class TileHardeningOptions(ArgumentBlock):
-    """Sizing flags shared by `gen_macro tile` and `gen_macro all_tile`."""
+class FlowResumeOptions(ArgumentBlock):
+    """LibreLane run-selection flags shared by `tile`, `all_tile` and `stitch`."""
+
+    frm: Annotated[
+        str | None,
+        Option(
+            "--from",
+            metavar="STEP",
+            choices_provider=_flow_step_ids,
+            help_text=(
+                "LibreLane step ID to start from, such as OpenROAD.GlobalRouting. "
+                "Earlier steps are skipped and STEP reads its input state from the "
+                "run that --run-tag or --last-run selects."
+            ),
+        ),
+    ] = None
+    run_tag: Annotated[
+        str | None,
+        Option(
+            "--run-tag",
+            metavar="TAG",
+            help_text="Name of the LibreLane run directory under runs/ to create or "
+            "resume.",
+        ),
+    ] = None
+    last_run: Annotated[
+        bool,
+        Option("--last-run", help_text="Resume the newest LibreLane run."),
+    ] = False
+
+
+@dataclass
+class TileHardeningOptions(FlowResumeOptions):
+    """Sizing and run-selection flags shared by `gen_macro tile` and `all_tile`."""
 
     optimise: Annotated[
         OptMode,
@@ -197,55 +246,6 @@ class TileHardeningOptions(ArgumentBlock):
         return opt_mode, custom_overrides
 
 
-def _flow_step_ids(
-    repl: "FABulousREPL", arg_tokens: Mapping[str, Sequence[str]]
-) -> Choices:
-    """List the step IDs of the LibreLane flow the `gen_macro` subcommand runs.
-
-    cmd2 passes the app as `repl` because this function is not defined on a
-    `CommandSet`. `arg_tokens` carries the subcommand name under its parser dest.
-    """
-    api = repl.fabulousAPI
-    if arg_tokens["subcommand"] == ["stitch"]:
-        flow = api.fabric_flow_cls
-    else:
-        flow = api.tile_flow_cls
-    # Keep the flow's execution order rather than sorting alphabetically.
-    return Choices.from_values((step.id for step in flow.Steps), is_sorted=True)
-
-
-@dataclass
-class FlowResumeOptions(ArgumentBlock):
-    """LibreLane run-selection flags shared by `tile`, `all_tile` and `stitch`."""
-
-    frm: Annotated[
-        str | None,
-        Option(
-            "--from",
-            metavar="STEP",
-            choices_provider=_flow_step_ids,
-            help_text=(
-                "LibreLane step ID to start from, such as OpenROAD.GlobalRouting. "
-                "Earlier steps are skipped and STEP reads its input state from the "
-                "run that --run-tag or --last-run selects."
-            ),
-        ),
-    ] = None
-    run_tag: Annotated[
-        str | None,
-        Option(
-            "--run-tag",
-            metavar="TAG",
-            help_text="Name of the LibreLane run directory under runs/ to create or "
-            "resume.",
-        ),
-    ] = None
-    last_run: Annotated[
-        bool,
-        Option("--last-run", help_text="Resume the newest LibreLane run."),
-    ] = False
-
-
 class MacroFlowCommandSet(ReplCommandSet):
     """Harden tiles and the fabric into GDS macros via the LibreLane flow."""
 
@@ -274,7 +274,6 @@ class MacroFlowCommandSet(ReplCommandSet):
             ),
         ],
         options: TileHardeningOptions,
-        resume: FlowResumeOptions,
         io_pin_config: Annotated[
             Path | None,
             Option(
@@ -297,7 +296,7 @@ class MacroFlowCommandSet(ReplCommandSet):
             return
 
         self._harden_tile(
-            tile, opt_mode, custom_overrides, resume, io_pin_config=io_pin_config
+            tile, opt_mode, custom_overrides, options, io_pin_config=io_pin_config
         )
 
     def _harden_tile(
@@ -364,7 +363,6 @@ class MacroFlowCommandSet(ReplCommandSet):
     def gen_macro_all_tile(
         self,
         options: TileHardeningOptions,
-        resume: FlowResumeOptions,
         parallel: Annotated[
             bool,
             Option("--parallel", "-p", help_text="Generate tile macros in parallel"),
@@ -383,13 +381,13 @@ class MacroFlowCommandSet(ReplCommandSet):
         tiles = sorted(repl.all_tile)
         if not parallel:
             for tile in tiles:
-                self._harden_tile(tile, opt_mode, custom_overrides, resume)
+                self._harden_tile(tile, opt_mode, custom_overrides, options)
             return
 
         with ThreadPoolExecutor(max_workers=repl.max_job) as executor:
             running = {
                 executor.submit(
-                    self._harden_tile, tile, opt_mode, custom_overrides, resume
+                    self._harden_tile, tile, opt_mode, custom_overrides, options
                 ): tile
                 for tile in tiles
             }

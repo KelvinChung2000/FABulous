@@ -968,86 +968,55 @@ class TestGenMacroResume:
         for call in api_mock.call_args_list:
             assert {k: call.kwargs[k] for k in expected} == expected
 
-    @pytest.mark.parametrize(("command", "api_method"), COMMANDS, ids=COMMAND_IDS)
-    @pytest.mark.parametrize(
-        "flags",
-        ["--from OpenROAD.Floorplan", "--run-tag RUN_1 --last-run"],
-        ids=["from-without-run", "run-tag-and-last-run"],
-    )
-    def test_invalid_run_selection_aborts(
-        self,
-        cli: FABulousREPL,
-        mocker: MockerFixture,
-        command: str,
-        api_method: str,
-        flags: str,
+    def test_tile_flow_starts_with_run_selection(
+        self, cli: FABulousREPL, mocker: MockerFixture
     ) -> None:
-        api_mock = self._patch(cli, mocker, api_method)
-
-        run_cmd(cli, f"{command} {flags}")
-
-        api_mock.assert_not_called()
-        assert cli.exit_code != 0
-
-    @pytest.mark.parametrize(
-        ("existing_runs", "expect_start"),
-        [({"RUN_1"}, True), (set(), False)],
-        ids=["run-exists", "run-missing"],
-    )
-    def test_from_needs_the_tagged_run_on_disk(
-        self,
-        cli: FABulousREPL,
-        mocker: MockerFixture,
-        tmp_path: Path,
-        existing_runs: set[str],
-        expect_start: bool,
-    ) -> None:
-        """A missing run would hand the resumed step an empty LibreLane state."""
         mocker.patch(
             "fabulous.fabulous_repl.cmd_macro.is_pdk_config_set", return_value=True
         )
         mocker.patch.object(cli.fabulousAPI, "gen_io_pin_order_config")
-        flow = mocker.MagicMock(design_dir=str(tmp_path))
+        flow = mocker.MagicMock()
         mocker.patch.object(
             type(cli.fabulousAPI),
             "tile_flow_cls",
             new_callable=mocker.PropertyMock,
             return_value=mocker.MagicMock(return_value=flow),
         )
-        for run in existing_runs:
-            (tmp_path / "runs" / run).mkdir(parents=True)
 
-        run_cmd(cli, f"gen_macro tile {TILE} --from OpenROAD.Floorplan --run-tag RUN_1")
+        run_cmd(cli, f"gen_macro tile {TILE} --from OpenROAD.Floorplan --last-run")
 
-        if expect_start:
-            assert cli.exit_code == 0
-            flow.start.assert_called_once_with(
-                tag="RUN_1", last_run=False, frm="OpenROAD.Floorplan"
-            )
-        else:
-            assert cli.exit_code != 0
-            flow.start.assert_not_called()
+        assert cli.exit_code == 0
+        flow.start.assert_called_once_with(
+            tag=None, last_run=True, frm="OpenROAD.Floorplan"
+        )
 
     @pytest.mark.parametrize(
-        ("subcommand", "own_step", "other_flow_step"),
+        ("command", "own_step", "other_flow_step"),
         [
-            ("tile", "FABulous.TileAreaOptimisation", "OpenROAD.GlobalRouting"),
-            ("stitch", "OpenROAD.GlobalRouting", "FABulous.TileAreaOptimisation"),
+            (
+                f"gen_macro tile {TILE}",
+                "FABulous.TileAreaOptimisation",
+                "OpenROAD.GlobalRouting",
+            ),
+            (
+                "gen_macro all_tile",
+                "FABulous.TileAreaOptimisation",
+                "OpenROAD.GlobalRouting",
+            ),
+            (
+                "gen_macro stitch",
+                "OpenROAD.GlobalRouting",
+                "FABulous.TileAreaOptimisation",
+            ),
         ],
+        ids=["tile", "all_tile", "stitch"],
     )
     def test_from_completes_the_subcommand_flow_steps(
-        self, cli: FABulousREPL, subcommand: str, own_step: str, other_flow_step: str
+        self, cli: FABulousREPL, command: str, own_step: str, other_flow_step: str
     ) -> None:
-        parser = cli.command_parsers.get(cli.do_gen_macro)
-        subparsers = next(a for a in parser._actions if a.dest == "subcommand")  # noqa: SLF001
-        from_action = next(
-            a
-            for a in subparsers.choices[subcommand]._actions  # noqa: SLF001
-            if a.dest == "frm"
-        )
-        cmd_set = cli.find_commandset_for_command("gen_macro")
+        line = f"{command} --from "
 
-        step_ids = from_action.get_choices_provider()(cmd_set)
+        step_ids = cli.complete("", line, len(line), len(line)).to_strings()
 
         assert own_step in step_ids
         assert other_flow_step not in step_ids

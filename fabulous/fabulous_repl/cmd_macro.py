@@ -12,19 +12,19 @@ needs no per-command wiring. The flags belonging to only one of them
 rejects them on the other.
 
 `tile`, `all_tile` and `stitch` also share the LibreLane run-selection flags
-through `FlowResumeOptions`. Its per-flow subclasses differ only in the step IDs
-that complete `--from`, since the tile and stitching flows run different steps.
+through `FlowResumeOptions`. LibreLane validates them, so a bad combination fails
+in `Flow.start` rather than here.
 """
 
-from collections.abc import Callable
+from collections.abc import Callable, Mapping, Sequence
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass
 from decimal import Decimal
 from pathlib import Path
-from typing import Annotated, cast
+from typing import TYPE_CHECKING, Annotated, cast
 
 import yaml
-from cmd2 import Statement, with_annotated
+from cmd2 import Choices, Statement, with_annotated
 from cmd2.annotated import Argument, ArgumentBlock, Option
 from loguru import logger
 
@@ -35,6 +35,9 @@ from fabulous.fabulous_repl.command_set_base import (
     ReplCommandSet,
 )
 from fabulous.fabulous_settings import get_context, is_pdk_config_set
+
+if TYPE_CHECKING:
+    from fabulous.fabulous_repl.fabulous_repl import FABulousREPL
 
 
 def _require_directional_mode(
@@ -194,29 +197,40 @@ class TileHardeningOptions(ArgumentBlock):
         return opt_mode, custom_overrides
 
 
-def _from_option(
-    step_ids: Callable[["MacroFlowCommandSet"], list[str]] | None,
-) -> Option:
-    return Option(
-        "--from",
-        metavar="STEP",
-        choices_provider=step_ids,
-        help_text=(
-            "LibreLane step ID to start from, such as OpenROAD.GlobalRouting. "
-            "Earlier steps are skipped and STEP reads its input state from the "
-            "run that --run-tag or --last-run selects."
-        ),
-    )
+def _flow_step_ids(
+    repl: "FABulousREPL", arg_tokens: Mapping[str, Sequence[str]]
+) -> Choices:
+    """List the step IDs of the LibreLane flow the `gen_macro` subcommand runs.
+
+    cmd2 passes the app as `repl` because this function is not defined on a
+    `CommandSet`. `arg_tokens` carries the subcommand name under its parser dest.
+    """
+    api = repl.fabulousAPI
+    if arg_tokens["subcommand"] == ["stitch"]:
+        flow = api.fabric_flow_cls
+    else:
+        flow = api.tile_flow_cls
+    # Keep the flow's execution order rather than sorting alphabetically.
+    return Choices.from_values((step.id for step in flow.Steps), is_sorted=True)
 
 
 @dataclass
 class FlowResumeOptions(ArgumentBlock):
-    """Run-selection flags for the `gen_macro` subcommands that run a LibreLane flow.
+    """LibreLane run-selection flags shared by `tile`, `all_tile` and `stitch`."""
 
-    Subclasses redefine `frm` to complete it with the step IDs of their flow.
-    """
-
-    frm: Annotated[str | None, _from_option(None)] = None
+    frm: Annotated[
+        str | None,
+        Option(
+            "--from",
+            metavar="STEP",
+            choices_provider=_flow_step_ids,
+            help_text=(
+                "LibreLane step ID to start from, such as OpenROAD.GlobalRouting. "
+                "Earlier steps are skipped and STEP reads its input state from the "
+                "run that --run-tag or --last-run selects."
+            ),
+        ),
+    ] = None
     run_tag: Annotated[
         str | None,
         Option(
@@ -230,49 +244,6 @@ class FlowResumeOptions(ArgumentBlock):
         bool,
         Option("--last-run", help_text="Resume the newest LibreLane run."),
     ] = False
-
-    def validate(self) -> None:
-        """Reject flag combinations before any flow starts.
-
-        Called once per command invocation, so a bad combination aborts the
-        `all_tile` fan-out instead of failing every tile in it.
-
-        Raises
-        ------
-        CommandError
-            If both `--run-tag` and `--last-run` are given, or `--from` is given
-            without either.
-        """
-        if self.run_tag is not None and self.last_run:
-            raise CommandError("Specify only one of --run-tag / --last-run.")
-        if self.frm is not None and self.run_tag is None and not self.last_run:
-            raise CommandError(
-                "--from needs a run to resume. Add --last-run or --run-tag TAG."
-            )
-
-
-@dataclass
-class TileResumeOptions(FlowResumeOptions):
-    """`FlowResumeOptions` completing `--from` with the tile flow's step IDs."""
-
-    frm: Annotated[
-        str | None,
-        _from_option(
-            lambda self: [s.id for s in self._cmd.fabulousAPI.tile_flow_cls.Steps]
-        ),
-    ] = None
-
-
-@dataclass
-class StitchResumeOptions(FlowResumeOptions):
-    """`FlowResumeOptions` completing `--from` with the stitching flow's step IDs."""
-
-    frm: Annotated[
-        str | None,
-        _from_option(
-            lambda self: [s.id for s in self._cmd.fabulousAPI.fabric_flow_cls.Steps]
-        ),
-    ] = None
 
 
 class MacroFlowCommandSet(ReplCommandSet):
@@ -303,7 +274,7 @@ class MacroFlowCommandSet(ReplCommandSet):
             ),
         ],
         options: TileHardeningOptions,
-        resume: TileResumeOptions,
+        resume: FlowResumeOptions,
         io_pin_config: Annotated[
             Path | None,
             Option(
@@ -318,7 +289,6 @@ class MacroFlowCommandSet(ReplCommandSet):
         physical representation of the tile to be created.
         """
         opt_mode, custom_overrides = options.resolve()
-        resume.validate()
         if not is_pdk_config_set():
             logger.error(
                 "PDK configuration is not set. Please set the PDK configuration to "
@@ -394,7 +364,7 @@ class MacroFlowCommandSet(ReplCommandSet):
     def gen_macro_all_tile(
         self,
         options: TileHardeningOptions,
-        resume: TileResumeOptions,
+        resume: FlowResumeOptions,
         parallel: Annotated[
             bool,
             Option("--parallel", "-p", help_text="Generate tile macros in parallel"),
@@ -402,7 +372,6 @@ class MacroFlowCommandSet(ReplCommandSet):
     ) -> None:
         """Generate GDSII files for all tiles in the fabric."""
         opt_mode, custom_overrides = options.resolve()
-        resume.validate()
         if not is_pdk_config_set():
             logger.error(
                 "PDK configuration is not set. Please set the PDK configuration to "
@@ -434,9 +403,8 @@ class MacroFlowCommandSet(ReplCommandSet):
         subcommand_to="gen_macro",
         help="Stitch the hardened tile macros into the fabric macro",
     )
-    def gen_macro_stitch(self, resume: StitchResumeOptions) -> None:
+    def gen_macro_stitch(self, resume: FlowResumeOptions) -> None:
         """Generate GDSII files for the entire fabric."""
-        resume.validate()
         repl = self._cmd
         if not is_pdk_config_set():
             logger.error(

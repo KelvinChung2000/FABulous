@@ -12,8 +12,8 @@ needs no per-command wiring. The flags belonging to only one of them
 rejects them on the other.
 
 The LibreLane run-selection flags live in `FlowResumeOptions`, which `stitch`
-takes directly and `TileHardeningOptions` extends. LibreLane validates them, so
-a bad combination fails in `Flow.start` rather than here.
+takes directly and `TileHardeningOptions` extends. `start_flow` validates them,
+so a bad combination fails when the flow starts rather than here.
 """
 
 from collections.abc import Callable, Mapping, Sequence
@@ -147,8 +147,9 @@ class FlowResumeOptions(ArgumentBlock):
             choices_provider=_flow_step_ids,
             help_text=(
                 "LibreLane step ID to start from, such as KLayout.DRC. "
-                "Earlier steps are skipped and STEP reads its input state from the "
-                "run that --run-tag or --last-run selects."
+                "Earlier steps are skipped. With --run-tag or --last-run, the "
+                "selected run is forked into a new run where STEP gets the input "
+                "state it had in the selected run."
             ),
         ),
     ] = None
@@ -157,13 +158,17 @@ class FlowResumeOptions(ArgumentBlock):
         Option(
             "--run-tag",
             metavar="TAG",
-            help_text="Name of the LibreLane run directory under runs/ to create or "
-            "resume.",
+            help_text="Name of the LibreLane run directory under runs/ to fork with "
+            "--from, or to create or resume without it.",
         ),
     ] = None
     last_run: Annotated[
         bool,
-        Option("--last-run", help_text="Resume the newest LibreLane run."),
+        Option(
+            "--last-run",
+            help_text="Select the newest LibreLane run, to fork with --from or "
+            "to resume without it.",
+        ),
     ] = False
 
 
@@ -319,7 +324,7 @@ class MacroFlowCommandSet(ReplCommandSet):
         custom_overrides : dict
             The LibreLane config overrides resolved alongside `opt_mode`.
         resume : FlowResumeOptions
-            The run to resume and the step to start from.
+            The run to fork or resume and the step to start from.
         io_pin_config : Path | None
             Pin order file to use as-is. Defaults to None, which generates the
             tile's pin order from the fabric structure.

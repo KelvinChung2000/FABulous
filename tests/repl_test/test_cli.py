@@ -10,6 +10,7 @@ from decimal import Decimal
 from pathlib import Path
 
 import pytest
+from librelane.state.state import State
 from pytest_mock import MockerFixture
 
 from fabulous.custom_exception import CommandError
@@ -968,14 +969,17 @@ class TestGenMacroResume:
         for call in api_mock.call_args_list:
             assert {k: call.kwargs[k] for k in expected} == expected
 
-    def test_tile_flow_starts_with_run_selection(
-        self, cli: FABulousREPL, mocker: MockerFixture
+    def test_tile_flow_forks_the_selected_run(
+        self, cli: FABulousREPL, mocker: MockerFixture, tmp_path: Path
     ) -> None:
         mocker.patch(
             "fabulous.fabulous_repl.cmd_macro.is_pdk_config_set", return_value=True
         )
         mocker.patch.object(cli.fabulousAPI, "gen_io_pin_order_config")
-        flow = mocker.MagicMock()
+        step_dir = tmp_path / "runs" / "RUN_A" / "03-openroad-floorplan"
+        step_dir.mkdir(parents=True)
+        (step_dir / "state_in.json").write_text(State(metrics={"x": 1}).dumps())
+        flow = mocker.MagicMock(design_dir=str(tmp_path))
         mocker.patch.object(
             type(cli.fabulousAPI),
             "tile_flow_cls",
@@ -986,9 +990,10 @@ class TestGenMacroResume:
         run_cmd(cli, f"gen_macro tile {TILE} --from OpenROAD.Floorplan --last-run")
 
         assert cli.exit_code == 0
-        flow.start.assert_called_once_with(
-            tag=None, last_run=True, frm="OpenROAD.Floorplan"
-        )
+        flow.start.assert_called_once()
+        assert flow.start.call_args.kwargs["frm"] == "OpenROAD.Floorplan"
+        assert flow.start.call_args.kwargs["with_initial_state"].metrics["x"] == 1
+        assert "tag" not in flow.start.call_args.kwargs
 
     @pytest.mark.parametrize(
         ("command", "own_step", "other_flow_step"),

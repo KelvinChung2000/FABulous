@@ -51,6 +51,7 @@ from fabulous.fabric_generator.gds_generator.flows.tile_macro_flow import (
 from fabulous.fabric_generator.gds_generator.gen_io_pin_config_yaml import (
     generate_IO_pin_order_config,
 )
+from fabulous.fabric_generator.gds_generator.helper import start_flow
 from fabulous.fabric_generator.gds_generator.steps.tile_area_opt import OptMode
 from fabulous.fabric_generator.gen_fabric.fabric_automation import genIOBel
 from fabulous.fabric_generator.gen_fabric.gen_configmem import (
@@ -666,7 +667,7 @@ class FABulous_API:
     ) -> None:
         """Run the macro flow to harden a tile, in the project's HDL language.
 
-        `frm`, `run_tag` and `last_run` go to LibreLane's `Flow.start`, as in
+        `frm`, `run_tag` and `last_run` go to `start_flow`, as in
         `fabric_stitching`. `last_run` picks the newest run under
         `macro/<optimisation>/runs`.
         """
@@ -683,7 +684,7 @@ class FABulous_API:
             override_config_path=config_override_path,
             **custom_config_overrides or {},
         )
-        result = flow.start(tag=run_tag, last_run=last_run, frm=frm)
+        result = start_flow(flow, frm=frm, run_tag=run_tag, last_run=last_run)
         if final_view:
             logger.info(f"Saving final view to {final_view}")
             result.save_snapshot(final_view)
@@ -728,14 +729,16 @@ class FABulous_API:
         config_override_path : Path | None, optional
             Additional configuration overrides.
         frm : str | None
-            LibreLane step ID to start from. Its input `State` is the newest
-            `state_out.json` of the run `run_tag` or `last_run` selects. A new run
-            has none, so the step fails on its first missing input.
+            LibreLane step ID to start from. With `run_tag` or `last_run`, the
+            selected run is forked: `frm` gets the input state it had there and
+            runs in a new run directory. Without either, it starts a new run with
+            an empty state and fails on its first missing input.
         run_tag : str | None
-            Run directory under `out_folder/runs` to create or resume.
+            Run directory under `out_folder/runs` to fork with `frm`, or to create
+            or resume without it.
         last_run : bool
-            Resume the newest run under `out_folder/runs`. LibreLane raises
-            `FlowException` if `run_tag` is also set.
+            Select the newest run under `out_folder/runs`. Setting `run_tag` too
+            raises `FlowException`.
         **custom_config_overrides : dict
             software configuration overrides.
         """
@@ -754,7 +757,7 @@ class FABulous_API:
             pdk=pdk,
             **custom_config_overrides,
         )
-        result = flow.start(tag=run_tag, last_run=last_run, frm=frm)
+        result = start_flow(flow, frm=frm, run_tag=run_tag, last_run=last_run)
         logger.info(f"Saving final views for FABulous to {out_folder / 'final_views'}")
         result.save_snapshot(out_folder / "final_views")
         logger.info("Stitching flow completed.")
